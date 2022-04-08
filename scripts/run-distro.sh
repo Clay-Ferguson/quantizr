@@ -2,18 +2,12 @@
 
 # ===================================================================
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}
-# The only prerequisite for the machine is: docker & docker-compose
+#
+# The only prerequisite software to be installed before running this is
+# docker and docker-compose
 #
 # Docker References: https://docs.docker.com/compose/install/
 #
-# To deploy a completely new release you can just put a new springboot
-# fat jar right in this folder, and then change the line below 
-# in this file from 'dockerUp' to 'dockerBuild && dockerUp'. In other words, all the 
-# scripting exists in these files to be able to either run the executables 
-# from the fat JAR if it's in this folder and you call 'dockerBuild && dockerUp', or else
-# if you leave this script file as the default and run 'dockerUp' then the script
-# will either pull the docker image from the public repository or else use the
-# one it finds locally if it does fine it. 
 # ===================================================================
 
 # change to folder this script file is in
@@ -36,7 +30,13 @@ rm -rf ./log/*.log
 
 ./gen-mongod-conf-file.sh 
 
-docker-compose -version
+docker-compose -v
+
+# If we detect that the springboot fat jar (the executable) exists in this folder then we run
+# the dockerBuild function which does a docker-compose 'build' to create the image we will actually run USING the JAR
+# file executable.
+# This 'build' step will reference the `dockerfile` which is where the JAR_FILE is actually copied into the
+# image. Once this is done our 'dockerUp' function will be able to start the actual server.
 if [ -f "${JAR_FILE}" ]; then
     echo "Installing JAR file: ${JAR_FILE}"
     dockerBuild
@@ -49,11 +49,15 @@ dockerCheck mongo-distro
 # docker-compose -f ${dc_app_yaml} logs --tail="all" quanta-distro
 
 echo ================================================
-echo Quanta Distro Started OK!
+echo Quanta Started OK!
 echo http://${quanta_domain}:${PORT}
+echo Login with: UserName=admin, Password=${adminPassword}
 echo ================================================
 read -p "Press any key."
 
+# If we detected the JAR_FILE above, and ran the dockerBuild step, then we don't need to do it again
+# the next time we run because the docker image will already exist, and not need to be rebuild, so
+# we rename the JAR_FILE so it won't cause another build, on next run.
 if [ -f "${JAR_FILE}" ]; then
     mv ${JAR_FILE} ${JAR_FILE}.bak
 fi

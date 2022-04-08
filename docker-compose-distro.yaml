@@ -44,7 +44,7 @@ services:
         volumes:
             - "${MONGO_DATA}:/data/db"
             - "${DEPLOY_TARGET}/dumps:/dumps"
-            - "${MONGO_SCRIPTS}:/mongo-scripts"
+            # - "${MONGO_SCRIPTS}:/mongo-scripts"
             - "${MONGOD_CONF}:/etc/mongod.conf"
         command: mongod --config /etc/mongod.conf
         ports:

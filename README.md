@@ -4,7 +4,7 @@
 
 ### Social Media and Content Mangement/Publishing
 
-Join the Fediverse!
+Welcome to the Fediverse!
 
 A new kind of social media and content management platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
 
@@ -16,9 +16,9 @@ Designed to allow a more fine-grained hierarchical approach to content managemen
 
 https://quanta.wiki
 
-## How to Build
+## How to Build/Deploy
 
-Basic DEV builder is called `./scripts/dev-build.sh` and shows how to build the project. Other builders (for PROD for example) are there as well and all similar. Builds the SpringBoot app, and starts it running in a docker container.
+See ./distro/README.md for details on how to build and/or run a Quanta instance, and also for info on how to do development of the app effeciently using techniques that allow you to rapidly edit either Java or TypeScript code and see the results almost immediately without waiting for a full build.
 
 ## Search Tags
 

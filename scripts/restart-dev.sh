@@ -1,4 +1,9 @@
 #!/bin/bash
+# This script is for recompiling just the Java files, and then restarting the test servers,
+# as fast as possible without doing a full build. Note that our dev project is setup to read
+# java class files directly from disk, so we don't even need to really do an actual build, and
+# we can get away with just compiling the new classes, and then restarting docker!
+# This makes for a very rapid development cycle (edit->test->edit->test, etc.)
 
 clear
 # show commands as they are run.

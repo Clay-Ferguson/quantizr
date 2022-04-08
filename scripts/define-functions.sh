@@ -40,9 +40,6 @@ ipfsConfig () {
 export -f ipfsConfig
 
 dockerBuild () {
-    # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
-    # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-    # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerBuild"
 
     docker-compose -f ${dc_app_yaml} build --no-cache \

@@ -1,8 +1,7 @@
 #!/bin/bash
 # Purpose: Generator for mongo config files (mongod.conf). 
-# This lets us generate specific
-# files by writing out what is basically 'template' text below, because the
-# variables in the template do get substituted during the 'cat' operation.
+# Generates files by writing out what is basically 'template' text below, because the
+# variables in the template get substituted during the 'cat' operation.
 
 # gets the filename of the currently executing bash script.
 THIS_FILE=`basename "$0"`
