@@ -197,16 +197,12 @@ public class MongoAuth extends ServiceBase {
 			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
 
 			// if no content, and the parent isn't our own node
-			// if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
-			// 	SubNode parentUserNode = read.getNode(ms, parent.getOwner());
-			// 	if (ok(parentUserNode)) {
-			// 		// I saw a case where something like "@itmslaves.com:" gets put in here as if that was a user name, so I'm backing
-			// 		// out this code, but really I didn't like it anyway. It was a bit confusing to stuff this into the text when it's 
-			// 		// actually not really needed. Sharing works fine without this.
-			// 		// Leaving commented for now.
-			// 		// mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
-			// 	}
-			// }
+			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
+				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
+				if (ok(parentUserNode)) {
+					mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
+				}
+			}
 
 			if (mentions.size() > 0) {
 				String content = "";
@@ -643,7 +639,7 @@ public class MongoAuth extends ServiceBase {
 		return namesSet;
 	}
 
-	/** 
+	/**
 	 * uses the ap:tag property on the node to build a list of foreign user names in the namesSet. If
 	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
 	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not
@@ -682,9 +678,17 @@ public class MongoAuth extends ServiceBase {
 
 						// add a string like host@username
 						URL hrefUrl = new URL((String) href);
+
+						// sometimes the name is ALREADY containing the host to be sure not to append it again in that case
+						// or else
+						// we end up with "user@server.com@server.com"
+						String longName = (String) name;
+						if (ok(longName) && !longName.contains("@" + hrefUrl.getHost())) {
+							longName += "@" + hrefUrl.getHost();
+						}
+
 						// build this name without host part if it's a local user, otherwise full fediverse name
-						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name
-								: (String) name + "@" + hrefUrl.getHost();
+						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name : longName;
 
 						// add the name if it's not the current user. No need to self-mention in a reply?
 						if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
