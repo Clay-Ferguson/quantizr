@@ -1,14 +1,14 @@
 # How to Run/Build Quanta
 
-### Notes
+## Notes
 
 The following explanations are for Linux distros only. Quanta doesn't provide any of these scripts for other Operating Systems (like Windows), but since Quanta is purely a Dockerized Java App, running on Windows or any other platform can work if you need it to.
 
-### Overview
+## Overview
 
 The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself. Regardless of whether you run from the Docker public repository image, or an image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. Such a runtime folder can be created simply by unzipping the "Distro Zip" which contains all that stuff, pre-configured with usable defaults. Inside that zip file is also the `run-distro.sh` which will run the app.
 
-### Option #1: Run from Public Docker Image
+## Option #1: Run from Public Docker Image
 
 To run a Quanta instance from the Docker Public Repository you can simply unzip the Distro Zip file (named like `./distro/quanta-1.0.24.tar.gz` in the github project files) onto an empty folder, and then start the app with `run-distro.sh`. This will create an instance running at `http://localhost:8185`. To stop the app run `stop-distro.sh`. The only prerequisite for this is `docker` and `docker-compose`.
 
@@ -16,19 +16,19 @@ NOTE: You should edit the password in `secrets.sh`, before your first run, becau
 
 So to reiterate, this Distro Zip contains everything needed to configure the app, and by default it will have the effect of using the Public Docker image as the executable to run. Below, "Option #2" describes how to run your own executable that you build yourself.
 
-### Option #2: Run from Locally-built Executable 
+## Option #2: Run from Locally-built Executable 
 
 If you want to run Quanta executable code you've built yourself, you'll still use a Distro Zip to create a configuration location and files (by just unzipping the Distro Zip into some folder), but after unzipping this Distro Zip you'll drop in the actual SpringBoot fat-jar file (that you built) onto the Distro Zip directory before running `run-distro.sh`. The scripts in the distro folder will automatically detect that the SpringBoot file exists (by looking for the `${JAR_FILE}` file named in the `setenv*.sh`), and if that JAR file (executable) is found then the script will automatically do a docker build that installs and runs from this local JAR file instead of the Public Docker Repository file.
 
 So to summarize, your Distro Zip files will automatically use the JAR file if it's found, or default to the Public Docker Repo if no JAR is found.
 
-### Building the Distro Zip (and executable JAR)
+## Building the Distro Zip (and executable JAR)
 
 If the above made sense so far, you'll know there's a zip file (the Distro Zip) which contains a confuration for the installation files, and also a SpringBoot fat JAR that can be built too. Both of those things (Distro Zip file, and Fat JAR file) can themselves be built from scratch using `./scripts/build-distro.sh`, which will build them both at the same time. After you run the `build-distro.sh` you'll find the Fat JAR in the `./target/` folder and the Distro Zip file in the `./distro` folder. 
 
 To repeat again for clarity: You can simply unzip the Distro Zip file into some empty folder, then drop the Fat JAR into that folder, and then run script `run-distro.sh` to get a server up and running.
 
-### How to Develop Quanta
+## How to Develop Quanta
 
 This section gives the recommended way for working on Quanta, as a developer, working on making code changes. That is, how to edit code, rebuild, and then test your changes, as rapidly as possible, including techniques that allow you to rapidly edit either Java or TypeScript code and see the results (test the code) almost immediately without waiting for a full build.
 
@@ -38,7 +38,7 @@ This section gives the recommended way for working on Quanta, as a developer, wo
 
 Once you have `setenv-dev.sh` all configured you should be able to run `build-dev.sh` which will build the code from scratch and start an instance of Quanta, that you can test against. If you then edit only TypeScript files and want to test those changes you can run just `build-webpack.sh` to make those changes go live. Or if you edit only Java files you can run `restart-dev.sh` to see those changes go live, and immediately test them. 
 
-### How does the "semi" Hot-Deploy Work
+## How the "semi" Hot-Deploy Works
 
 As just stated you can test TypeScript and Java file changes without doing a FULL build. It's worth mentioning here the tricks that allow that to work which are bascically done using the following volume definitions in the docker-compose YAML:
 
