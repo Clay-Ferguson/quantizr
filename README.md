@@ -18,7 +18,7 @@ https://quanta.wiki
 
 ## How to Build/Deploy
 
-See ./distro/README.md for details on how to build and/or run a Quanta instance, and also for info on how to do development of the app effeciently using techniques that allow you to rapidly edit either Java or TypeScript code and see the results almost immediately without waiting for a full build.
+See [./distro/README.md](./distro/README.md) for details on how to build and/or run a Quanta instance.
 
 ## Search Tags
 
