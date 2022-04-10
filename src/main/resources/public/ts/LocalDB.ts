@@ -63,7 +63,9 @@ export class LocalDB {
             };
 
             req.onerror = () => {
-                console.warn("runTrans failed");
+                // calling runner with null signals the error.
+                console.warn("runTrans failed: " + access + " error:" + req.error);
+                runner(null);
             };
         }
     }
@@ -97,8 +99,10 @@ export class LocalDB {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
-                    // console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
-                    store.put(val);
+                    if (store) {
+                        // console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
+                        store.put(val);
+                    }
                     resolve();
                 });
         });
@@ -111,6 +115,12 @@ export class LocalDB {
         return new Promise<Object>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
                 (store: IDBObjectStore) => {
+                    // If anything goes wrong in runTrans, it will still call this method with a null store.
+                    // One possible way is for example in Firefox in Incognito Mode, where storage is not allowed.
+                    if (!store) {
+                        resolve(null);
+                    }
+
                     // NOTE: name is the "keyPath" value.
                     const promise = store.get(name);
 

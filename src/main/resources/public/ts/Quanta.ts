@@ -266,6 +266,17 @@ export class Quanta {
             this.setOverlay(false);
             S.util.playAudioIfRequested();
 
+            // For testing error message handling
+            // setTimeout(async () => {
+            //     let x = null;
+            //     try {
+            //         console.log(x.oops);
+            //     }
+            //     catch (ex) {
+            //         S.util.logAndReThrow("Intentional Test Exception: ", ex);
+            //     }
+            // }, 1000);
+
             // This timer delay is just for asthetics and should not be required.
             setTimeout(async () => {
                 let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", null, true);
