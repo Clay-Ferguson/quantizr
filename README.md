@@ -12,7 +12,7 @@ Create hierarchically organized content that's always editable like a wiki and s
 
 Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content as tree nodes. These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, etc.
 
-## Live test instance:
+This Quanta test instance is open to the public, so anyone can sign up and/or browse the Fediverse:
 
 https://quanta.wiki
 
