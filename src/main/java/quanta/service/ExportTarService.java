@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-
 @Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {

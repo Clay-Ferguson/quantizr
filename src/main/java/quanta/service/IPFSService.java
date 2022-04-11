@@ -89,7 +89,7 @@ public class IPFSService extends ServiceBase {
     private AppProp prop;
 
     @Autowired
-	private ApplicationContext context;
+    private ApplicationContext context;
 
     public static String API_BASE;
     public static String API_CAT;
@@ -397,7 +397,7 @@ public class IPFSService extends ServiceBase {
     }
 
     /**
-     * Returns string of the the hash get, as requested usingn the 'encoding=' url argument specified.
+     * Returns string of the hash get, as requested using the 'encoding=' url argument specified.
      */
     public String getAsString(String hash, String encoding) {
         String ret = null;
@@ -420,16 +420,35 @@ public class IPFSService extends ServiceBase {
 
     /**
      * Returns JSON as string
+     * 
+     * ***** WARNING: I think ALL API calls are now using POSTS ONLY. ****** ( so this method should
+     * never work again! )
+     * 
      */
-    public String dagGet(String hash) {
+    public String dagGet__obsolete(String hash) {
         String ret = null;
         try {
-            String url = API_DAG + "/get?arg=" + hash;
+            String url = API_DAG + "/get?arg=" + hash + "&output-codec=dag-json";
+            // log.debug("DAG GET: " + url);
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             ret = result.getBody();
             log.debug("RET: " + ret);
         } catch (Exception e) {
             log.error("Failed in restTemplate.getForEntity", e);
+        }
+        return ret;
+    }
+
+    public String dagGet(String hash) {
+        String ret = null;
+        try {
+            String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ret = response.getBody();
+            log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
+        } catch (Exception e) {
+            log.error("Failed to dagGet: " + hash, e);
         }
         return ret;
     }
@@ -507,7 +526,7 @@ public class IPFSService extends ServiceBase {
      */
     public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
             Val<Integer> streamSize, Val<String> cid) {
-        // log.debug("Writing file: " + path);
+        // log.debug("Write stream to endpoint: " + endpoint);
         MerkleLink ret = null;
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -528,12 +547,17 @@ public class IPFSService extends ServiceBase {
                 if (StringUtils.isEmpty(response.getBody())) {
                     log.debug("no response body");
                 } else {
-                    ret = XString.jsonMapper.readValue(response.getBody(), MerkleLink.class);
+                    String body = response.getBody();
+                    try {
+                        ret = XString.jsonMapper.readValue(body, MerkleLink.class);
+                    } catch (Exception e) {
+                        log.debug("Unable to parse response string: " + body);
+                    }
 
                     // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
 
-                    if (ok(cid)) {
-                        cid.setVal(ret.getHash());
+                    if (ok(cid) && ok(ret) && ok(ret.getCid())) {
+                        cid.setVal((String) ret.getCid().get("/"));
                     }
                 }
             }
@@ -570,6 +594,7 @@ public class IPFSService extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             // Use a rest call with no timeout becasue publish can take a LONG time.
+            log.debug("Publishing IPNS: " + url);
             ResponseEntity<String> response = restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 

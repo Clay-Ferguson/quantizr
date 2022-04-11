@@ -95,7 +95,8 @@ public enum NodeProp {
 
     // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
     // type of the node to "sn:ipfsNode" (IPFS_NODE)
-    IPFS_CID("ipfs:cid", "s"), IPNS_CID("ipns:cid", "s"),
+    IPFS_CID("ipfs:cid", "s"), //
+    IPNS_CID("ipns:cid", "s"), //
 
     // Represents an IPFS CID that is aht "Source" for the data in such a way that we assume
     // the IPFS content will supercede (and take precedence), so that we can always read from IPFS

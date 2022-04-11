@@ -3,17 +3,12 @@ package quanta.test;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
-import quanta.mongo.AdminRun;
-import quanta.service.IPFSService;
 import quanta.util.Val;
 import quanta.util.XString;
-
 
 @Component("IPFSTest")
 public class IPFSTest extends ServiceBase implements TestIntf {
@@ -23,8 +18,8 @@ public class IPFSTest extends ServiceBase implements TestIntf {
     public void test() throws Exception {
         log.debug("IPFSTest.test() running.");
         // testUploadDirectory();
-
         // ipfs.getRepoStat();
+        ipnsTest();
     }
 
 
@@ -47,9 +42,12 @@ public class IPFSTest extends ServiceBase implements TestIntf {
         });
     }
 
-    public void oldTest2() throws Exception {
+    public void ipnsTest() throws Exception {
         // ipfs.getPins();
         arun.run(as -> {
+            log.debug("Running IPNS Test.");
+
+            // Save some JSON to a CID
             Val<String> cid = new Val<>();
             ipfs.dagPutFromString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
