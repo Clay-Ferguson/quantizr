@@ -1,12 +1,8 @@
 # How to Run/Build Quanta
 
-## Notes
-
-The following explanations are for Linux distros only. Quanta doesn't provide any of these scripts for other Operating Systems (like Windows), but since Quanta is purely a Dockerized Java App, running on Windows or any other platform can work if you need it to.
-
 ## Overview
 
-The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself. Regardless of whether you run from the Docker public repository image, or an image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. Such a runtime folder can be created simply by unzipping the "Distro Zip" which contains all that stuff, pre-configured with usable defaults. Inside that zip file is also the `run-distro.sh` which will run the app.
+The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. Regardless of whether you run from the Docker public repository image, or an image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. Such a runtime folder can be created simply by unzipping the "Distro Zip" which contains all that stuff, pre-configured with usable defaults. Inside that zip file is also the `run-distro.sh` which will run the app.
 
 ## Option #1: Run from Public Docker Image
 
