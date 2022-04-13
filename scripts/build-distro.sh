@@ -31,7 +31,9 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback
 cd ${PRJROOT}
 cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile-ipfs               ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh                 ${DEPLOY_TARGET}
+cp ${PRJROOT}/entrypoint-ipfs.sh            ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target

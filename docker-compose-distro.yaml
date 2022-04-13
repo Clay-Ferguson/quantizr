@@ -74,9 +74,7 @@ services:
             - "${DEPLOY_TARGET}/tmp:/tmp"
             - "${DEPLOY_TARGET}/log:/log"
             - '${DEPLOY_TARGET}/config:/config'
-
-             # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
-            - $PWD:/app
+            # - $PWD:/app
         ports:
             - "${PORT}:${PORT}"
             # Uncomment for debugging...

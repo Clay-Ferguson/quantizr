@@ -1,4 +1,7 @@
 FROM ipfs/go-ipfs:v0.9.1
+
+WORKDIR /ipfs
+
 EXPOSE 4001
 # Swarm UDP; should be exposed to the public
 EXPOSE 4001/udp
@@ -7,4 +10,11 @@ EXPOSE 4001/udp
 # in production.
 EXPOSE 5001
 
-CMD ["daemon", "--migrate=true", "--enable-pubsub-experiment", "--enable-namesys-pubsub"]
+COPY ./entrypoint-ipfs.sh /ipfs/entrypoint-ipfs.sh
+RUN ["chmod", "+x", "/ipfs/entrypoint-ipfs.sh"]
+ENTRYPOINT ["/ipfs/entrypoint-ipfs.sh"]
+
+# I had this format for a long time, but then noticed IPFS container was failing finding /bin/bash so I moved to the simpler shell script command above
+# ENTRYPOINT ["/bin/bash", "-c", "/ipfs/entrypoint-ipfs.sh"]
+
+

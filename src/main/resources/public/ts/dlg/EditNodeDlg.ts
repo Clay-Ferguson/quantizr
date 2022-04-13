@@ -433,7 +433,7 @@ export class EditNodeDlg extends DialogBase {
 
         let pinCheckbox: Checkbox = null;
         if (ipfsLink) {
-            pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
+            pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
                         this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);

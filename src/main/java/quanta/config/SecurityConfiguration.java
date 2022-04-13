@@ -60,7 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(AppController.API_PATH + "/serverPush") //
                 .antMatchers("/public") //
                 .antMatchers("/error") //
-                .antMatchers("/app") //
+                // .antMatchers("/app") //
                 .antMatchers("/");
     }
 

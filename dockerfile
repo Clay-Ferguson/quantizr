@@ -30,7 +30,10 @@ RUN sh -c 'touch /quanta/app.jar'
 
 COPY ./entrypoint.sh /quanta/entrypoint.sh
 RUN ["chmod", "+x", "/quanta/entrypoint.sh"]
-ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint.sh"]
+ENTRYPOINT ["/quanta/entrypoint.sh"]
+
+# I had this format for a long time, but then noticed IPFS container was failing finding /bin/bash so I moved to the simpler shell script command above
+# ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint.sh"]
 
 # This works too but it's more flexible to just put the commands in 'entrypoint.sh'
 # ENTRYPOINT ["/bin/bash", "-c", "java -Xms${XMS} -Xmx${XMX} -Dloader.path=/loader-path -Djava.security.egd=file:/dev/./urandom -jar /quanta/app.jar"]

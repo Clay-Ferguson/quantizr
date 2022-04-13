@@ -76,9 +76,7 @@ dockerUp () {
         verifySuccess "MongoDB Compose: up"
     fi
 
-    # NOTE: --compatibility switch is required for the CPUS limitier to work,
-    # in a non-swarm docker setup, which we have
-    docker-compose --compatibility -f ${dc_app_yaml} up -d
+    docker-compose -f ${dc_app_yaml} up -d
     verifySuccess "Docker Compose: up"
 
     # sleep 10

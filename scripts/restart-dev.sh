@@ -27,9 +27,7 @@ sudo rm -rf ${QUANTA_BASE}/log/*
 # load right from /src/mai/resouces which is the spring default location.)
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
 
-# NOTE: --compatibility switch is required for the CPUS limitier to work,
-# in a non-swarm docker setup, which we have
-docker-compose --compatibility -f ${dc_app_yaml} restart quanta-dev
+docker-compose -f ${dc_app_yaml} restart quanta-dev
 
 # This is another way, but slower. Not needed.
 # dockerDown ${dc_app_yaml} quanta-dev
