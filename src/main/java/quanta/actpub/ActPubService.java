@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.AppProp;
@@ -77,7 +78,12 @@ public class ActPubService extends ServiceBase {
      * proccessing to a daemon thread.
      * 
      * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even
-     * if we do have the node, becuase we want to make sure there's no concurrent access.
+     * if we do have the node, because we want to make sure there's no concurrent access.
+     * 
+     * todo-0: IMPORTANT: This method ONLY sends notifications to users who ARE in the 'acl' which means
+     * these can only be users ALREADY imported into the system, however this is ok, because we will
+     * have called saveMentionsToNodeACL() right before calling this method so the 'acl' should
+     * completely contain all the mentions that exist in the text of the message.
      */
     public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, String replyToType,
             HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
@@ -87,22 +93,22 @@ public class ActPubService extends ServiceBase {
                 boolean privateMessage = true;
 
                 /*
-                 * Now we need to lookup all userNames from the ACL info, to add them all to 'toUserNames', and we
-                 * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
-                 * care of (in the list)
+                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
                  */
-                for (String k : acl.keySet()) {
-                    if (PrincipalName.PUBLIC.s().equals(k)) {
+                for (String accntId : acl.keySet()) {
+                    if (PrincipalName.PUBLIC.s().equals(accntId)) {
                         privateMessage = false;
                     } else {
-                        // k will be a nodeId of an account node here.
-                        SubNode accntNode = apCache.acctNodesById.get(k);
+                        // try to get account node from cache
+                        SubNode accntNode = apCache.acctNodesById.get(accntId);
 
+                        // if not in cache find the node and ADD to the cache.
                         if (no(accntNode)) {
-                            accntNode = read.getNode(ms, k);
-                            apCache.acctNodesById.put(k, accntNode);
+                            accntNode = read.getNode(ms, accntId);
+                            apCache.acctNodesById.put(accntId, accntNode);
                         }
 
+                        // get username off this node and add to 'toUserNames'
                         if (ok(accntNode)) {
                             String userName = accntNode.getStr(NodeProp.USER.s());
                             toUserNames.add(userName);
@@ -135,6 +141,7 @@ public class ActPubService extends ServiceBase {
                     }
                 }
 
+                // Post message to all foreign usernames found in 'toUserNames'
                 if (toUserNames.size() > 0) {
                     sendNote(ms, toUserNames, fromUser, inReplyTo, replyToType, content, attachments, noteUrl, privateMessage);
                 }
@@ -200,7 +207,13 @@ public class ActPubService extends ServiceBase {
         return attachments;
     }
 
-    /* Sends note outbound to other servers */
+    /*
+     * Sends note outbound to other inboxes, for all inboxes corresponding to all 'toUserNames'
+     * IMPORTANT: This method doesn't require or expect 'toUserNames' to have been 'imported' into
+     * Quanta. That is, there may not even BE a "user node" for any of these users, or there may be. We
+     * don't know or care in here, because we go straight to the WebFinger and build up their outbox
+     * "live" from the WebFinger in realtime.
+     */
     public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String replyToType,
             String content, APList attachments, String noteUrl, boolean privateMessage) {
         if (no(toUserNames))
@@ -208,6 +221,8 @@ public class ActPubService extends ServiceBase {
 
         String host = prop.getMetaHost();
         String fromActor = null;
+
+        // log.debug("Sending note: " + content + " to foreign user inboxes.");
 
         /*
          * Post the same message to all the inboxes that need to see it
@@ -224,6 +239,7 @@ public class ActPubService extends ServiceBase {
                 continue;
             }
 
+            // log.debug("to Foreign User: " + toUserName);
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (no(webFinger)) {
                 apLog.trace("Unable to get webfinger for " + toUserName);
@@ -233,6 +249,7 @@ public class ActPubService extends ServiceBase {
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
             if (ok(toActorObj)) {
+                // log.debug("    actor: " + toActorUrl);
                 String inbox = AP.str(toActorObj, APObj.inbox);
 
                 /* lazy create fromActor here */
@@ -244,6 +261,7 @@ public class ActPubService extends ServiceBase {
                         privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();
+                // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n    to inbox: " + inbox);
                 apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
             }
         }
@@ -254,7 +272,7 @@ public class ActPubService extends ServiceBase {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
      * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByUserName(MongoSession ms, String apUserName, boolean preferDbNode) {
+    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String apUserName, boolean preferDbNode) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -789,7 +807,7 @@ public class ActPubService extends ServiceBase {
 
             // make sure username contains @ making it a foreign user.
             if (user.contains("@")) {
-                SubNode userNode = apub.getAcctNodeByUserName(ms, user, true);
+                SubNode userNode = apub.getAcctNodeByForeignUserName(ms, user, true);
                 if (!ok(userNode)) {
                     log.debug("Unable to import user: " + user);
                 }
@@ -1233,7 +1251,7 @@ public class ActPubService extends ServiceBase {
     public void loadForeignUser(String userName) {
         arun.run(ms -> {
             apLog.trace("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByUserName(ms, userName, false);
+            SubNode userNode = getAcctNodeByForeignUserName(ms, userName, false);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;
@@ -1430,5 +1448,74 @@ public class ActPubService extends ServiceBase {
             count++;
         }
         return "Fediverse Users: " + String.valueOf(count) + "\n\n" + sb.toString();
+    }
+
+    public List<String> getUserNamesFromNodeAcl(MongoSession ms, SubNode node) {
+        // if we have no ACL return null
+        if (no(node) || no(node.getAc()))
+            return null;
+
+        List<String> userNames = new LinkedList<>();
+
+        /*
+         * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+         */
+        for (String accntId : node.getAc().keySet()) {
+            if (PrincipalName.PUBLIC.s().equals(accntId)) {
+                continue;
+            }
+
+            try {
+                // try to get account node from cache
+                SubNode accntNode = apCache.acctNodesById.get(accntId);
+
+                // if not in cache find the node and ADD to the cache.
+                if (no(accntNode)) {
+                    accntNode = read.getNode(ms, accntId);
+                    apCache.acctNodesById.put(accntId, accntNode);
+                }
+
+                // get username off this node and add to 'toUserNames'
+                if (ok(accntNode)) {
+                    String userName = accntNode.getStr(NodeProp.USER.s());
+                    userNames.add(userName);
+                }
+            } catch (Exception e) {
+                // todo-0: do something here.
+            }
+        }
+        return userNames;
+    }
+
+    public APList getTagListFromUserNames(List<String> userNames) {
+        if (no(userNames) || userNames.isEmpty())
+            return null;
+
+        APList tagList = new APList();
+        for (String userName : userNames) {
+            try {
+                String actorUrl = null;
+
+                // if this is a local username
+                if (!userName.contains("@")) {
+                    actorUrl = apUtil.makeActorUrlForUserName(userName);
+                } 
+                // else foreign userName
+                else {
+                    actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
+                }
+                
+                if (no(actorUrl))
+                    continue;
+
+                // prepend character to make it like '@user@server.com'
+                tagList.val(new APOMention(actorUrl, "@" + userName));
+            }
+            // log and continue if any loop (user) fails here.
+            catch (Exception e) {
+                log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
+            }
+        }
+        return tagList;
     }
 }

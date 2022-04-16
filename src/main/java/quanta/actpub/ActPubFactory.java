@@ -71,7 +71,10 @@ public class ActPubFactory extends ServiceBase {
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
 			try {
-				String actorUrl = apUtil.getActorUrlFromUserName(userName);
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
+
+				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
+				// for local users, but aren't doing that, by design.
 				if (no(actorUrl))
 					continue;
 
@@ -93,7 +96,6 @@ public class ActPubFactory extends ServiceBase {
 				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
 			}
 		}
-
 		ret.put(APObj.tag, tagList);
 
 		if (!privateMessage) {
@@ -133,7 +135,9 @@ public class ActPubFactory extends ServiceBase {
 		List<String> ccActors = new LinkedList<>();
 		for (String userName : toUserNames) {
 			try {
-				String actorUrl = apUtil.getActorUrlFromUserName(userName);
+				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
+				// for local users, but aren't doing that, by design.
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
 				if (no(actorUrl))
 					continue;
 

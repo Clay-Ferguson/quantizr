@@ -132,7 +132,7 @@ public class ActPubFollowing extends ServiceBase {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user
-                    SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName, false);
+                    SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, followerUserName, false);
                     if (no(followerAccountNode)) {
                         apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);

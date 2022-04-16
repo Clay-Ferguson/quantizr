@@ -271,7 +271,7 @@ public class ActPubOutbox extends ServiceBase {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
-            if (!AclService.isPublic(as, node)) { 
+            if (!AclService.isPublic(as, node)) {
                 throw new NodeAuthFailedException();
             }
 
@@ -302,6 +302,15 @@ public class ActPubOutbox extends ServiceBase {
         else {
             ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
                     new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        }
+
+        // build the 'tags' array for this object from the sharing ACLs.
+        List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
+        if (ok(userNames)) {
+            APList tags = apub.getTagListFromUserNames(userNames);
+            if (ok(tags)) {
+                ret.put(APObj.tag, tags);
+            }
         }
 
         if (ok(parent)) {

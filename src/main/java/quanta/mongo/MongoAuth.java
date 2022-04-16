@@ -153,9 +153,9 @@ public class MongoAuth extends ServiceBase {
 
 	/*
 	 * When a child is created under a parent we want to default the sharing on the child so that
-	 * there's an explicit share to the owner of the parent. Also we remove any share to 'child' user
-	 * that may be in the parent Acl, because that would represent 'child' node sharing to himself which
-	 * is never done.
+	 * there's an explicit share to the owner of the parent (minus any share to 'child' user that may be
+	 * in the parent Acl, because that would represent 'child' node sharing to himself which is never
+	 * done)
 	 */
 	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
 		if (no(parent) || no(child))
@@ -165,6 +165,12 @@ public class MongoAuth extends ServiceBase {
 			ms = getAdminSession();
 		}
 
+		// log.debug("childNode: " + child.getIdStr() + " being created under " + parent.getIdStr());
+
+		/*
+		 * get ACL of the parent (minus the child.Owner if he exists there), or else if parent isn't shared
+		 * at all we create a new empty ACL.
+		 */
 		HashMap<String, AccessControl> ac = parent.getAc();
 		if (no(ac)) {
 			ac = new HashMap<>();
@@ -193,7 +199,14 @@ public class MongoAuth extends ServiceBase {
 		 * otherwise if not a FRIEND node we just share to the owner of the parent node
 		 */
 		else {
+			// add `parent.owner` to the ACL
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
+
+			/*
+			 * We also extract the 'mentions' out of any 'tag' array that might be on this node, so we can
+			 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
+			 * mentioned in the tags array
+			 */
 			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
 
 			// if no content, and the parent isn't our own node
@@ -212,7 +225,7 @@ public class MongoAuth extends ServiceBase {
 
 				/*
 				 * This will put a string of all mentioned users right in the text of the message so they can see
-				 * who will be replied to re even remove users they don't want replied to.
+				 * who will be replied to or remove users they don't want replied to.
 				 */
 				child.setContent(content);
 			}
@@ -644,6 +657,8 @@ public class MongoAuth extends ServiceBase {
 	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
 	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not
 	 * sure how standardized this is (per ActPub Spec, etc)
+	 * 
+	 * Example format of the "ap:tag"...
 	 * 
 	 * <pre>
 			"ap:tag" : [ {
