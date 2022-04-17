@@ -44,14 +44,11 @@ export class MenuPanel extends Div {
         S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
     };
 
-    // DO NOT DELETE
-    // I'll keep this in case there's a reason, but for now let's just rely on the fact that
-    // every bookmark has an edit icon to make this no longer needed.
-    // static openBookmarksNode = () => {
-    //     let state = store.getState();
-    //     S.util.setUserPreferences(state, true);
-    //     S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
-    // };
+    static openBookmarksNode = () => {
+        let state = store.getState();
+        S.util.setUserPreferences(state, true);
+        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
+    };
 
     static continueEditing = () => {
         let state = store.getState();
@@ -158,33 +155,35 @@ export class MenuPanel extends Div {
         if (!state.isAnonUser) {
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
-                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
-                        new Icon({
-                            className: "fa fa-edit fa-lg float-end menuIcon",
-                            title: "Edit this bookmark",
-                            onClick: (event: any) => {
-                                event.stopPropagation();
-                                event.preventDefault();
-                                S.util.setUserPreferences(state, true);
+                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null
+                        // DO NOT DELETE (Leave as an example of how to put an icon on a menu item)
+                        // new Icon({
+                        //     className: "fa fa-edit fa-lg float-end menuIcon",
+                        //     title: "Edit this bookmark",
+                        //     onClick: (event: any) => {
+                        //         event.stopPropagation();
+                        //         event.preventDefault();
+                        //         S.util.setUserPreferences(state, true);
 
-                                // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
-                                if (S.quanta.mainMenu) {
-                                    S.quanta.mainMenu.close();
-                                }
-                                S.view.jumpToId(bookmark.selfId);
-                            }
-                        })
+                        //         // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
+                        //         if (S.quanta.mainMenu) {
+                        //             S.quanta.mainMenu.close();
+                        //         }
+                        //         S.view.jumpToId(bookmark.selfId);
+                        //     }
+                        // })
                     ));
                     return true;
                 });
             }
 
-            // DO NOT DELETE
-            // if (bookmarkItems.length > 0) {
-            //     bookmarkItems.push(new MenuItemSeparator());
-            // }
-            // bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
+            let hasBookmarks = bookmarkItems.length > 0;
             if (bookmarkItems.length > 0) {
+                bookmarkItems.push(new MenuItemSeparator());
+            }
+            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
+
+            if (hasBookmarks) {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems));
             }
         }
