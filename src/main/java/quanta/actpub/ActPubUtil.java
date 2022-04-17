@@ -315,7 +315,6 @@ public class ActPubUtil extends ServiceBase {
         String actorUrl = null;
 
         MongoSession as = auth.getAdminSession();
-        // this userName comes back null for user "clay" (local user). This is not good right? todo-0
         SubNode userNode = apub.getAcctNodeByForeignUserName(as, userName, false);
         if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());

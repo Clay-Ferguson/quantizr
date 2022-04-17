@@ -80,10 +80,10 @@ public class ActPubService extends ServiceBase {
      * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even
      * if we do have the node, because we want to make sure there's no concurrent access.
      * 
-     * todo-0: IMPORTANT: This method ONLY sends notifications to users who ARE in the 'acl' which means
-     * these can only be users ALREADY imported into the system, however this is ok, because we will
-     * have called saveMentionsToNodeACL() right before calling this method so the 'acl' should
-     * completely contain all the mentions that exist in the text of the message.
+     * IMPORTANT: This method ONLY sends notifications to users who ARE in the 'acl' which means these
+     * can only be users ALREADY imported into the system, however this is ok, because we will have
+     * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
+     * contain all the mentions that exist in the text of the message.
      */
     public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, String replyToType,
             HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
@@ -249,7 +249,7 @@ public class ActPubService extends ServiceBase {
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
             if (ok(toActorObj)) {
-                // log.debug("    actor: " + toActorUrl);
+                // log.debug(" actor: " + toActorUrl);
                 String inbox = AP.str(toActorObj, APObj.inbox);
 
                 /* lazy create fromActor here */
@@ -261,7 +261,7 @@ public class ActPubService extends ServiceBase {
                         privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();
-                // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n    to inbox: " + inbox);
+                // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
                 apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
             }
         }
@@ -1481,7 +1481,7 @@ public class ActPubService extends ServiceBase {
                     userNames.add(userName);
                 }
             } catch (Exception e) {
-                // todo-0: do something here.
+                log.error("Failed getting userName from accountId: " + accntId);
             }
         }
         return userNames;
@@ -1499,12 +1499,12 @@ public class ActPubService extends ServiceBase {
                 // if this is a local username
                 if (!userName.contains("@")) {
                     actorUrl = apUtil.makeActorUrlForUserName(userName);
-                } 
+                }
                 // else foreign userName
                 else {
                     actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
                 }
-                
+
                 if (no(actorUrl))
                     continue;
 
