@@ -6,7 +6,7 @@ source ./secrets.sh
 export DEPLOY_TARGET=$PWD
 
 export quanta_domain=localhost
-export dc_app_yaml=docker-compose-distro.yaml
+export dc_app_yaml=dc-distro.yaml
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 

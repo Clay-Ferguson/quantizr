@@ -29,7 +29,7 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback
 
 # copy some configs and scripts to deploy target
 cd ${PRJROOT}
-cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
+cp ${PRJROOT}/dc-distro.yaml    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile-ipfs               ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh                 ${DEPLOY_TARGET}
@@ -43,7 +43,7 @@ cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv-distro-runner.sh       ${DEPLOY_TARGET}
 
-# Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'
+# Note: this 'dumps' folder is mapped onto a volume in 'dc-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
 mkdir -p ${DEPLOY_TARGET}/dumps
 mkdir -p ${DEPLOY_TARGET}/config
@@ -87,7 +87,7 @@ cd ${DEPLOY_TARGET}
 dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
-cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
+cp ${PRJROOT}/dc-distro.yaml ${DEPLOY_TARGET}
 rm -f ${DEPLOY_TARGET}/quanta-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts

@@ -24,17 +24,9 @@ services:
     #        command: [ "daemon", "--enable-pubsub-experiment" ] 
     #
     ipfs-dev: 
-        # We only have this build and custom docker file for ipfs pubsub enablement
         build: 
             context: .
-            dockerfile: ./dockerfile-ipfs
-        # We could do this, but instead we just rate-limit using `trickle` in `entrypoint-ipfs.sh`
-        # NOTE: Enabling this requires: docker-compose --compatibility ...
-        # deploy:
-        #     resources:
-        #       limits:
-        #         # limit IPFS usage to 15% CPU. IPFS is a hog and will consume all your CPU if you let it.
-        #         cpus: '0.15'
+            dockerfile: dockerfile-ipfs
         container_name: ipfs-dev 
         environment:
             # IPFS_PROFILE options (lowpower | server)

@@ -1,8 +1,8 @@
 FROM ipfs/go-ipfs:v0.9.1
 
 # tip: https://techoverflow.net/2021/01/13/how-to-use-apt-install-correctly-in-your-dockerfile/
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y trickle && rm -rf /var/lib/apt/lists/*
+# ENV DEBIAN_FRONTEND=noninteractive
+# RUN apt update && apt install -y trickle && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /ipfs
 

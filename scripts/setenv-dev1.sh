@@ -19,7 +19,7 @@ export ipfs_staging=/home/clay/.ipfs1/staging
 export quanta_domain=localhost
 
 # Docker files are relative to project root
-export dc_app_yaml=docker-compose-dev1.yaml
+export dc_app_yaml=dc-dev1.yaml
 
 export mvn_profile=dev
 

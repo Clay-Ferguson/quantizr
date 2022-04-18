@@ -57,7 +57,7 @@ export -f dockerBuild
 dockerUp () {
     # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
     # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-    # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
+    # https://stackoverflow.com/questions/35231362/dockerfile-and-dc-not-updating-with-new-instructions
     echo "dockerUp"
 
     if [[ -z ${dc_ipfs_yaml} ]];  
