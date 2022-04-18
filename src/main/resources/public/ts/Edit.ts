@@ -664,7 +664,7 @@ export class Edit {
 
         let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
         let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-info", state);
         await dlg.open();
         if (dlg.yes) {
             let res: J.JoinNodesResponse = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
