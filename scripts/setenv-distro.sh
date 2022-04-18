@@ -15,7 +15,9 @@ export quanta_domain=localhost
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
 
-export dc_app_yaml=dc-distro.yaml
+export dc_app_yaml=dc-distro-app.yaml
+export dc_ipfs_yaml=dc-distro-ipfs.yaml
+export dc_mongo_yaml=dc-distro-mongo.yaml
 export mvn_profile=prod
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content

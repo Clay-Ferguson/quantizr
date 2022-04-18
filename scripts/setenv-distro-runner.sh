@@ -6,7 +6,11 @@ source ./secrets.sh
 export DEPLOY_TARGET=$PWD
 
 export quanta_domain=localhost
-export dc_app_yaml=dc-distro.yaml
+
+export dc_app_yaml=dc-distro-app.yaml
+export dc_ipfs_yaml=dc-distro-ipfs.yaml
+export dc_mongo_yaml=dc-distro-mongo.yaml
+
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 

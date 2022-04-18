@@ -45,6 +45,7 @@ dockerUp
 
 dockerCheck quanta-distro
 dockerCheck mongo-distro
+dockerCheck ipfs-distro
 
 # docker-compose -f ${dc_app_yaml} logs --tail="all" quanta-distro
 

@@ -24,9 +24,6 @@ services:
     #        command: [ "daemon", "--enable-pubsub-experiment" ] 
     #
     ipfs-dev: 
-        build: 
-            context: .
-            dockerfile: dockerfile-ipfs
         container_name: ipfs-dev 
         environment:
             # IPFS_PROFILE options (lowpower | server)
@@ -46,9 +43,7 @@ services:
             - "5001:5001"
         networks:
             - net-dev
-        # We could have this actual image if we weren't building from a custom dockerfile
-        # image: ipfs/go-ipfs:v0.9.0
-        image: ipfs-dev
+        image: ipfs/go-ipfs:v0.12.2
 
 # https://docs.docker.com/compose/networking/
 

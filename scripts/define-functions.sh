@@ -40,7 +40,7 @@ ipfsConfig () {
 export -f ipfsConfig
 
 dockerBuild () {
-    echo "dockerBuild"
+    echo "dockerBuild: app"
 
     docker-compose -f ${dc_app_yaml} build --no-cache \
         --build-arg PORT="${PORT}" \
@@ -49,8 +49,8 @@ dockerBuild () {
         --build-arg XMS="${XMS}" \
         --build-arg XMX="${XMX}" \
         --build-arg JAR_FILE="${JAR_FILE}"
-        
-    verifySuccess "Docker Compose: build"
+
+    verifySuccess "Docker Compose: build app"
 }
 export -f dockerBuild
 
@@ -60,21 +60,17 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-dc-not-updating-with-new-instructions
     echo "dockerUp"
 
+    # todo-0: we really need this condition everywhere.
     if [[ -z ${dc_ipfs_yaml} ]];  
     then  
-        echo "ipfs not enabled"
+        echo "ipfs docker yaml not configured"
     else
         docker-compose -f ${dc_ipfs_yaml} up -d
         verifySuccess "IPFS Compose: up"
     fi
 
-    if [[ -z ${START_MONGO} ]];  
-    then  
-        echo "Not starting MongoDB"
-    else
-        docker-compose -f ${dc_mongo_yaml} up -d
-        verifySuccess "MongoDB Compose: up"
-    fi
+    docker-compose -f ${dc_mongo_yaml} up -d
+    verifySuccess "MongoDB Compose: up"
 
     docker-compose -f ${dc_app_yaml} up -d
     verifySuccess "Docker Compose: up"

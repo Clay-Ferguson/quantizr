@@ -35,9 +35,6 @@ export CLEAN=true
 # Kubernetes is not yet working. Ignore this if you don't know what it is.
 export TARGET_K8=
 
-# Set this to empty string if you want to not start mongo for whatever reason.
-export START_MONGO=true
-
 # Docker files are relative to project root. We hold these in variables so that none of the scripts have them hardcoded
 export dc_app_yaml=dc-dev-app.yaml
 export dc_ipfs_yaml=dc-dev-ipfs.yaml

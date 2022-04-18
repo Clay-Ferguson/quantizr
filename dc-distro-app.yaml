@@ -3,61 +3,6 @@
 
 version: '3.7'
 services:
-    # IMPORTANT: Uncomment this block to enable IPFS
-    # https://hub.docker.com/r/ipfs/go-ipfs/
-    # NOTES: To run a prodution IPFS instance be sure port 4001 is open
-    # and set the IPFS_PROFILE to "server"
-    # 4001 is swarm port required to connect IPFS to outside world. Don't forget to open up 
-    # this port in your firewall (and ISP/Router configs)
-    # ipfs-distro: 
-    #    deploy:
-    #        resources:
-    #          limits:
-    # limit IPFS usage to 15% CPU. IPFS is a hog and will consume all your CPU if you let it.
-    #            cpus: '0.15'
-    #     container_name: ipfs-distro 
-    #     environment:
-    #         # IPFS_PROFILE options (lowpower | server)
-    #         IPFS_PROFILE: "server" 
-    #         IPFS_PATH: "/data/ipfs"
-    #         # LIBP2P_FORCE_PNET: 1
-    #     expose:
-    #         - '4001'
-    #     #     - '8081'
-    #     #     - '5001'
-    #     # WARNING: volumes will not handle '~' character for home folder. Do not use.
-    #     volumes:
-    #         - '${ipfs_staging}:/export'
-    #         - '${ipfs_data}:/data/ipfs'
-    #     ports:
-    #         - "4001:4001"
-    #         # - "127.0.0.1:8080:8080"
-    #         # - "127.0.0.1:8081:8081"
-    #         # - "127.0.0.1:5001:5001"
-    #     networks:
-    #         - net-distro
-    #     image: ipfs/go-ipfs:v0.7.0
-
-    mongo-distro: 
-        container_name: mongo-distro 
-        # WARNING: volumes will not handle '~' character for home folder. Do not use.
-        volumes:
-            - "${MONGO_DATA}:/data/db"
-            - "${DEPLOY_TARGET}/dumps:/dumps"
-            # - "${MONGO_SCRIPTS}:/mongo-scripts"
-            - "${MONGOD_CONF}:/etc/mongod.conf"
-        command: mongod --config /etc/mongod.conf
-        ports:
-            - "${MONGO_PORT}:${MONGO_PORT}"
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
-        networks:
-            - net-distro
-        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-        # and we don't want that happening unexpectedly
-        image: mongo:4.0
-
     quanta-distro:
         # When we're not doing a docker build this build section will sit here harmlessly not being used.
         build: 
@@ -114,13 +59,13 @@ services:
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
-            xxxipfs.host: "http://ipfs-test"
-            xxxipfs.apiPort: "5001"
-            xxxipfs.gatewayPort: "8080"
+            ipfs.host: "http://ipfs-distro"
+            ipfs.apiPort: "5001"
+            ipfs.gatewayPort: "8080"
         
         image: subnode/repo:quanta${QUANTA_VER}
-        depends_on:
-            - mongo-distro
+        # depends_on:
+        #     - mongo-distro
             # IMPORTANT: Uncomment this line to enable IPFS
             # - ipfs-distro
 

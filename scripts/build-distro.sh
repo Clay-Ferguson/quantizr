@@ -14,6 +14,9 @@ clear
 cd $(dirname $(realpath $0))
 source ./setenv-distro.sh
 
+# remove this to be sure we will notice if it doesn't successfully build
+sudo rm -f ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz
+
 # sanity check since we do "rm -rf" in here
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
 sudo rm -rf ${DEPLOY_TARGET}/*
@@ -29,12 +32,12 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback
 
 # copy some configs and scripts to deploy target
 cd ${PRJROOT}
-cp ${PRJROOT}/dc-distro.yaml    ${DEPLOY_TARGET}
-cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}
-cp ${PRJROOT}/dockerfile-ipfs               ${DEPLOY_TARGET}
-cp ${PRJROOT}/entrypoint.sh                 ${DEPLOY_TARGET}
-cp ${PRJROOT}/entrypoint-ipfs.sh            ${DEPLOY_TARGET}
-cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
+cp ${PRJROOT}/dc-distro-app.yaml                ${DEPLOY_TARGET}
+cp ${PRJROOT}/dc-distro-mongo.yaml              ${DEPLOY_TARGET}
+cp ${PRJROOT}/dc-distro-ipfs.yaml               ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile                        ${DEPLOY_TARGET}
+cp ${PRJROOT}/entrypoint.sh                     ${DEPLOY_TARGET}
+cp ${PRJROOT}/distro/README.sh                  ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/gen-mongod-conf-file.sh       ${DEPLOY_TARGET}
@@ -66,7 +69,7 @@ mkdir -p ${ipfs_staging}
 # Wipe previous springboot fat jar to ensure it can't be used again.
 rm -f ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar
 
-# build the project (comile source)
+# build the project (compile all source)
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
 
@@ -81,13 +84,16 @@ verifySuccess "JAR copied to build distro"
 
  ${SCRIPTS}/gen-mongod-conf-file.sh 
 
-# This builds the image locally, and saves it into local docker repository, so that 'docker-compose up',
+# This builds the images locally, and saves them into local docker repository, so that 'docker-compose up',
 # is all that's required.
 cd ${DEPLOY_TARGET}
 dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
-cp ${PRJROOT}/dc-distro.yaml ${DEPLOY_TARGET}
+
+# todo-0: this copy is redundant right? We did it above?
+cp ${PRJROOT}/dc-distro-app.yaml ${DEPLOY_TARGET}
+
 rm -f ${DEPLOY_TARGET}/quanta-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts

@@ -37,14 +37,7 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.x
 # Take all the services offline
 cd ${PRJROOT}
 dockerDown ${dc_app_yaml} quanta-dev
-
-if [[ -z ${START_MONGO} ]];  
-then  
-    echo "Not stopping MongoDB"
-else
-    dockerDown ${dc_mongo_yaml} mongo-dev
-fi
-
+dockerDown ${dc_mongo_yaml} mongo-dev
 dockerDown ${dc_ipfs_yaml} ipfs-dev
 
 cd ${PRJROOT}
@@ -70,14 +63,7 @@ fi
 dockerUp
 
 dockerCheck quanta-dev
-
-if [[ -z ${START_MONGO} ]];  
-then  
-    echo "Not checking MongoDB"
-else
-    dockerCheck mongo-dev
-fi
-
+dockerCheck mongo-dev
 dockerCheck ipfs-dev
 
 # configure ipfs 
