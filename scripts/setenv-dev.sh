@@ -20,11 +20,6 @@ mkdir -p ${MONGO_SCRIPTS}
 export SECRETS=/home/clay/ferguson/secrets
 source ${SECRETS}/secrets.sh
 
-# Configure some locations for IPFS-related runtime files
-export ipfs_data=/home/clay/.ipfs
-export ipfs_staging=/home/clay/.ipfs/staging
-export ipfs_test_root=/home/clay/ipfs_test_root
-
 # Configure the domain name your instance will be running on.
 export quanta_domain=localhost
 
@@ -37,8 +32,16 @@ export TARGET_K8=
 
 # Docker files are relative to project root. We hold these in variables so that none of the scripts have them hardcoded
 export dc_app_yaml=dc-dev-app.yaml
-export dc_ipfs_yaml=dc-dev-ipfs.yaml
 export dc_mongo_yaml=dc-dev-mongo.yaml
+export dc_ipfs_yaml=dc-dev-ipfs.yaml
+
+# Configure some locations for IPFS-related runtime files
+export ipfs_data=/home/clay/.ipfs
+export ipfs_staging=/home/clay/.ipfs/staging
+export ipfs_test_root=/home/clay/ipfs_test_root
+
+# set to 'true' to activate IPFS
+export use_ipfs=
 
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev

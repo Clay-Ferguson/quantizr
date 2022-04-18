@@ -18,7 +18,11 @@ export CLEAN=true
 export dc_app_yaml=dc-distro-app.yaml
 export dc_ipfs_yaml=dc-distro-ipfs.yaml
 export dc_mongo_yaml=dc-distro-mongo.yaml
+
 export mvn_profile=prod
+
+# set to 'true' to activate IPFS
+export use_ipfs=
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
 export DEPLOY_TARGET=/home/clay/ferguson/quanta-distro

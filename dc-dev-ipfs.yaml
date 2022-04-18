@@ -24,6 +24,10 @@ services:
     #        command: [ "daemon", "--enable-pubsub-experiment" ] 
     #
     ipfs-dev: 
+        deploy:
+            resources:
+              limits:
+                cpus: '0.15'
         container_name: ipfs-dev 
         environment:
             # IPFS_PROFILE options (lowpower | server)

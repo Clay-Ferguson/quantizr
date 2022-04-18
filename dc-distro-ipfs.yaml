@@ -10,6 +10,10 @@ services:
     # 4001 is swarm port required to connect IPFS to outside world. Don't forget to open up 
     # this port in your firewall (and ISP/Router configs)
     ipfs-distro: 
+        deploy:
+            resources:
+              limits:
+                cpus: '0.15'
         container_name: ipfs-distro 
         environment:
             # IPFS_PROFILE options (lowpower | server)

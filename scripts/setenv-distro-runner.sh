@@ -14,6 +14,9 @@ export dc_mongo_yaml=dc-distro-mongo.yaml
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
+# set to 'true' to activate IPFS
+export use_ipfs=
+
 export QUANTA_VER=1.0.24
 
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar

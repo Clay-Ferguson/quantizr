@@ -60,13 +60,12 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-dc-not-updating-with-new-instructions
     echo "dockerUp"
 
-    # todo-0: we really need this condition everywhere.
-    if [[ -z ${dc_ipfs_yaml} ]];  
-    then  
-        echo "ipfs docker yaml not configured"
-    else
-        docker-compose -f ${dc_ipfs_yaml} up -d
-        verifySuccess "IPFS Compose: up"
+    if [[ -z ${use_ipfs} ]];  
+        then  
+            echo "ipfs not in use"
+        else
+            docker-compose --compatibility -f ${dc_ipfs_yaml} up -d
+            verifySuccess "IPFS Compose: up"
     fi
 
     docker-compose -f ${dc_mongo_yaml} up -d

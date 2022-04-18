@@ -38,7 +38,13 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.x
 cd ${PRJROOT}
 dockerDown ${dc_app_yaml} quanta-dev
 dockerDown ${dc_mongo_yaml} mongo-dev
-dockerDown ${dc_ipfs_yaml} ipfs-dev
+
+if [[ -z ${use_ipfs} ]];  
+    then  
+        echo "ipfs not in use"
+    else
+        dockerDown ${dc_ipfs_yaml} ipfs-dev
+fi
 
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
@@ -64,7 +70,13 @@ dockerUp
 
 dockerCheck quanta-dev
 dockerCheck mongo-dev
-dockerCheck ipfs-dev
+
+if [[ -z ${use_ipfs} ]];  
+    then  
+        echo "ipfs not in use"
+    else
+        dockerCheck ipfs-dev
+fi
 
 # configure ipfs 
 # todo-1: need to find out if there's a way to pass config parameters into the ipfs docker file or not, because that

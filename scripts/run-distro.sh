@@ -45,7 +45,13 @@ dockerUp
 
 dockerCheck quanta-distro
 dockerCheck mongo-distro
-dockerCheck ipfs-distro
+
+if [[ -z ${use_ipfs} ]];  
+    then  
+        echo "ipfs not in use"
+    else
+        dockerCheck ipfs-distro
+fi
 
 # docker-compose -f ${dc_app_yaml} logs --tail="all" quanta-distro
 
