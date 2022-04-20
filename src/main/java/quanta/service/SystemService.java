@@ -116,7 +116,7 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		String ret = ipfs.getRepoGC();
+		String ret = ipfs.repoGC();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}

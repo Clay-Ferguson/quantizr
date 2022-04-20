@@ -2,6 +2,7 @@ package quanta.model.ipfs.dag;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/* todo-0: This is duplicate of MerkleLink right? Consolidate them */
 public class DagLink {
     @JsonProperty("Cid")
     private DagCid cid;

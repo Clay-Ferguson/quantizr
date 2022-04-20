@@ -65,7 +65,6 @@ import quanta.response.PublishNodeToIpfsResponse;
 import quanta.util.Cast;
 import quanta.util.Const;
 import quanta.util.DateUtil;
-import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
@@ -217,7 +216,7 @@ public class IPFSService extends ServiceBase {
         return "\nIPFS Pin Verify:\n" + XString.prettyPrint(res) + "\n";
     }
 
-    public String getRepoGC() {
+    public String repoGC() {
         String url = API_REPO + "/gc";
         // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
         // LinkedHashMap.class));
@@ -239,9 +238,8 @@ public class IPFSService extends ServiceBase {
         exec.run(() -> {
             // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
             /*
-             * todo-2: What we could do here instead of what is essentially polling we're doing is hook into the
-             * MongoEventListener class and have a pub/sub model in effect so we can detect immediately when the
-             * node is saved.
+             * todo-2: What we could do here instead of of this polling is hook into the MongoEventListener
+             * class and have a pub/sub model in effect so we can detect immediately when the node is saved.
              */
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
@@ -367,9 +365,7 @@ public class IPFSService extends ServiceBase {
     }
 
     /**
-     * @param hash
-     * @param encoding text | json
-     * @return MerkleNode of the hash, as requested usingn the 'encoding=' url argument specified.
+     * returns MerkleNode of the hash, as requested using the 'encoding=' url argument specified.
      */
     public MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
@@ -396,6 +392,23 @@ public class IPFSService extends ServiceBase {
         return ret;
     }
 
+    public MerkleNode objectOperation(String endpoint) {
+        MerkleNode ret = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
+            // log.debug("new Object: " + XString.prettyPrint(ret));
+
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
     /**
      * Returns string of the hash get, as requested using the 'encoding=' url argument specified.
      */
@@ -412,27 +425,6 @@ public class IPFSService extends ServiceBase {
             } else {
                 log.debug("RAW BODY: " + result.getBody());
             }
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.getForEntity", e);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns JSON as string
-     * 
-     * ***** WARNING: I think ALL API calls are now using POSTS ONLY. ****** ( so this method should
-     * never work again! )
-     * 
-     */
-    public String dagGet__obsolete(String hash) {
-        String ret = null;
-        try {
-            String url = API_DAG + "/get?arg=" + hash + "&output-codec=dag-json";
-            // log.debug("DAG GET: " + url);
-            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
-            ret = result.getBody();
-            log.debug("RET: " + ret);
         } catch (Exception e) {
             log.error("Failed in restTemplate.getForEntity", e);
         }
@@ -667,7 +659,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public MerkleNode newObject() {
-        return postToGetMerkleNode(API_OBJECT + "/new");
+        return objectOperation(API_OBJECT + "/new");
     }
 
     /*
@@ -677,7 +669,7 @@ public class IPFSService extends ServiceBase {
         if (StringUtils.isEmpty(filePath)) {
             filePath = fileCid;
         }
-        return postToGetMerkleNode(
+        return objectOperation(
                 API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
     }
 
@@ -726,23 +718,6 @@ public class IPFSService extends ServiceBase {
                 }
             }
         }
-    }
-
-    public MerkleNode postToGetMerkleNode(String endpoint) {
-        MerkleNode ret = null;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
-            // log.debug("new Object: " + XString.prettyPrint(ret));
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
     }
 
     public IPFSDirStat pathStat(String path) {

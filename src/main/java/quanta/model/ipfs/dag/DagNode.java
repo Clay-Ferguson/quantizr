@@ -3,6 +3,7 @@ package quanta.model.ipfs.dag;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/* todo-0: This is duplicate of MerkleNode right? Consolidate them */
 /*
  * This is very similar to MerkleLink, but I'm not sure if they should be the SAME, because if so it
  * means IPFS has changed things, not us
