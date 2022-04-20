@@ -58,7 +58,6 @@ fi
 echo ================================================
 echo Quanta Started OK!
 echo http://${quanta_domain}:${PORT}
-echo Login with: UserName=admin, Password=${adminPassword}
 echo ================================================
 read -p "Press any key."
 
