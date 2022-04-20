@@ -91,9 +91,6 @@ dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
 
-# todo-0: this copy is redundant right? We did it above?
-cp ${PRJROOT}/dc-distro-app.yaml ${DEPLOY_TARGET}
-
 rm -f ${DEPLOY_TARGET}/quanta-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts

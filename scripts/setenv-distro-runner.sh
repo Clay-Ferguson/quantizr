@@ -30,8 +30,8 @@ export MONGO_HOST=mongo-distro
 export MONGO_PORT=27020
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 
-# Allow extra propert setter file if exists one level up in the directory 
-# structure to be able to override any settings
+# If this additional variable setter file exists we run it, so it can 
+# be used to override any of these settings
 if [ -f "../setenv-quanta-ext.sh" ]; then
     source ../setenv-quanta-ext.sh
 fi
