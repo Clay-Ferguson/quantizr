@@ -26,7 +26,7 @@ public class IPFSTest extends ServiceBase implements TestIntf {
     private void testUploadDirectory() {
         arun.run(as -> {
             // create the root directory
-            MerkleNode rootDir = ipfs.newObject();
+            MerkleNode rootDir = ipfsObj.newObject();
             log.debug("rootDir: " + XString.prettyPrint(rootDir));
 
             // create a file to put in the directory.
@@ -36,7 +36,7 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             MerkleLink file2 = ipfs.addFileFromString(as, "Test file two", "filetwo.txt", "text/plain", false);
             log.debug("file2: " + XString.prettyPrint(file2));
 
-            MerkleNode newRootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
+            MerkleNode newRootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
             log.debug("newRoot (first file added): " + XString.prettyPrint(newRootDir));
             return null;
         });
@@ -49,17 +49,17 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
             // Save some JSON to a CID
             Val<String> cid = new Val<>();
-            ipfs.dagPutFromString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
+            ipfsDag.putString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
 
-            String verify = ipfs.dagGet(cid.getVal());
+            String verify = ipfsDag.getString(cid.getVal());
             log.debug("verify: " + verify);
 
-            Map<String, Object> ret = ipfs.ipnsPublish(as, "ClaysKey", cid.getVal());
+            Map<String, Object> ret = ipfsName.publish(as, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 
             String ipnsName = (String) ret.get("Name");
-            ret = ipfs.ipnsResolve(as, ipnsName);
+            ret = ipfsName.resolve(as, ipnsName);
             log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
 
             // verify = ipfs.dagGet(ipnsName);
@@ -67,17 +67,17 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
             // --------------
 
-            ipfs.dagPutFromString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
+            ipfsDag.putString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
             log.debug("Cid (Second Version)=" + cid.getVal());
 
-            verify = ipfs.dagGet(cid.getVal());
+            verify = ipfsDag.getString(cid.getVal());
             log.debug("verify (second): " + verify);
 
-            ret = ipfs.ipnsPublish(as, "ClaysKey", cid.getVal());
+            ret = ipfsName.publish(as, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
 
             ipnsName = (String) ret.get("Name");
-            ret = ipfs.ipnsResolve(as, ipnsName);
+            ret = ipfsName.resolve(as, ipnsName);
             log.debug("ipnsResolveRet (second): " + XString.prettyPrint(ret));
             return null;
         });
@@ -87,11 +87,11 @@ public class IPFSTest extends ServiceBase implements TestIntf {
         try {
             String hash = "QmaaqrHyAQm7gALkRW8DcfGX3u8q9rWKnxEMmf7m9z515w";
             log.debug("Querying Hash: " + hash);
-            String json = ipfs.getAsString(hash, "json");
+            String json = ipfsObj.getAsString(hash, "json");
             log.debug("JSON [" + hash + "]=" + json);
 
             log.debug("Querying for MerkleNode...");
-            MerkleNode mnode = ipfs.getMerkleNode(hash, "json");
+            MerkleNode mnode = ipfsObj.getMerkleNode(hash, "json");
             log.debug("MerkleNode: " + XString.prettyPrint(mnode));
 
             // String merkContent = ipfs.objectCat(hash);

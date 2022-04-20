@@ -123,7 +123,7 @@ public class MongoUpdate extends ServiceBase {
 		Val<String> ret = new Val<>("failed");
 		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
-			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
+			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfsPin.getPins());
 			if (ok(pins)) {
 				/*
 				 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
@@ -162,7 +162,7 @@ public class MongoUpdate extends ServiceBase {
 					} else {
 						// log.debug("Removing Orphan IPFS CID=" + pin);
 						orphanCount++;
-						ipfs.removePin(pin);
+						ipfsPin.remove(pin);
 					}
 				}
 			}

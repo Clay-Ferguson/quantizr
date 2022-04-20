@@ -11,10 +11,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -27,6 +30,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.client.IPSMData;
@@ -45,6 +49,12 @@ import quanta.util.XString;
 public class IPFSPubSub extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
 
+    @Autowired
+    private AppProp prop;
+
+    @Autowired
+    private ApplicationContext context;
+
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
     private static final String IPSM_TOPIC_TEST = "/ipsm/test";
@@ -52,12 +62,21 @@ public class IPFSPubSub extends ServiceBase {
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    public static String API_BASE;
+    public static String API_PUBSUB;
+
     // private static int heartbeatCounter = 0;
 
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
 
+    @PostConstruct
+    public void init() {
+        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
+        API_PUBSUB = API_BASE + "/pubsub";
+    }
+
     @EventListener
-	public void handleContextRefresh(ContextRefreshedEvent event) {
+    public void handleContextRefresh(ContextRefreshedEvent event) {
         ServiceBase.init(event.getApplicationContext());
         log.debug("ContextRefreshedEvent");
         // log.debug("Checking swarmPeers");
@@ -66,7 +85,7 @@ public class IPFSPubSub extends ServiceBase {
         if (IPSM_ENABLE) {
             exec.run(null, () -> {
                 setOptions();
-                ipfs.doSwarmConnect();
+                ipfsSwarm.connect();
                 Util.sleep(3000);
                 openChannel(IPSM_TOPIC_HEARTBEAT);
                 openChannel(IPSM_TOPIC_TEST);
@@ -120,7 +139,7 @@ public class IPFSPubSub extends ServiceBase {
     public Map<String, Object> pub(String topic, String message) {
         Map<String, Object> ret = null;
         try {
-            String url = IPFSService.API_PUBSUB + "/pub?arg=" + topic + "&arg=" + message;
+            String url = API_PUBSUB + "/pub?arg=" + topic + "&arg=" + message;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -136,7 +155,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void sub(String topic) {
-        String url = IPFSService.API_PUBSUB + "/sub?arg=" + topic;
+        String url = API_PUBSUB + "/sub?arg=" + topic;
         try {
             HttpURLConnection conn = configureConnection(new URL(url), "POST");
             InputStream is = conn.getInputStream();
@@ -249,7 +268,7 @@ public class IPFSPubSub extends ServiceBase {
             return null;
         StringBuilder sb = new StringBuilder();
         for (IPSMData data : msg.getContent()) {
-            String text = ipfs.catToString(data.getData());
+            String text = ipfsCat.getString(data.getData());
             sb.append(text);
         }
         return sb.toString();

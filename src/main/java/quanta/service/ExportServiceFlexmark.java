@@ -200,12 +200,12 @@ public class ExportServiceFlexmark extends ServiceBase {
 		String mime = "text/html";
 
 		// generate root folder to hold all the files
-		MerkleNode rootDir = ipfs.newObject();
+		MerkleNode rootDir = ipfsObj.newObject();
 		// log.debug("new rootDir: " + XString.prettyPrint(rootDir));
 
 		// add the main html file as index.html
 		MerkleLink index = ipfs.addFileFromString(session, html, "index.html", mime, false);
-		rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "index.html", index.getHash());
+		rootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), "index.html", index.getHash());
 
 		/*
 		 * Next we add all the 'image' attachments that the HTML can point to (currently only supports other
@@ -224,7 +224,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			// todo-2: is there a way to add multiple files to a DAG all at once? Post this
 			// question on discuss.ipfs.io?
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
-			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
+			rootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
 		}
 
 		String fullCid = rootDir.getHash() + "/index.html";

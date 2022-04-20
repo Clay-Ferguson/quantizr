@@ -65,7 +65,7 @@ public class NodeEditService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
 	@Autowired
-    private ActPubLog apLog;
+	private ActPubLog apLog;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -414,7 +414,7 @@ public class NodeEditService extends ServiceBase {
 					arun.run(sess -> {
 						// don't pass the actual node into here, because it runs in a separate thread and would be
 						// a concurrency problem.
-						ipfs.ipfsAsyncPinNode(sess, node.getId());
+						ipfsPin.ipfsAsyncPinNode(sess, node.getId());
 						return null;
 					});
 				}
@@ -482,8 +482,8 @@ public class NodeEditService extends ServiceBase {
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 
 					// This broadcasts out to the shared inboxes of all the followers of the user
-					apub.sendNotificationForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments, node.getContent(),
-							nodeUrl);
+					apub.sendNotificationForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
+							node.getContent(), nodeUrl);
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 				return null;

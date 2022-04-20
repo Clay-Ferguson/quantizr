@@ -108,7 +108,7 @@ public class SyncFromIpfsService extends ServiceBase {
 	 */
 	public boolean traverseDag(SubNode node, String cid, int recursive) {
 		boolean success = false;
-		DagNode dag = ipfs.getDagNode(cid);
+		DagNode dag = ipfsDag.getNode(cid);
 		if (ok(dag)) {
 			log.debug("Dag Dir: " + XString.prettyPrint(dag));
 
@@ -139,7 +139,7 @@ public class SyncFromIpfsService extends ServiceBase {
 					}
 				} else {
 					// read the node json from ipfs file
-					String json = ipfs.catToString(entryCid);
+					String json = ipfsCat.getString(entryCid);
 					if (no(json)) {
 						log.debug("fileReadFailed: " + entryCid);
 						failedFiles++;
@@ -166,7 +166,7 @@ public class SyncFromIpfsService extends ServiceBase {
 		boolean success = false;
 		log.debug("processDir: " + path);
 
-		IPFSDir dir = ipfs.getDir(path);
+		IPFSDir dir = ipfsFiles.getDir(path);
 		if (ok(dir)) {
 			log.debug("Dir: " + XString.prettyPrint(dir));
 
@@ -191,7 +191,7 @@ public class SyncFromIpfsService extends ServiceBase {
 						log.debug("processFile: " + entryPath);
 
 						// read the node json from ipfs file
-						String json = ipfs.readFile(entryPath);
+						String json = ipfsFiles.readFile(entryPath);
 						if (no(json)) {
 							log.debug("fileReadFailed: " + entryPath);
 							failedFiles++;

@@ -116,7 +116,7 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		String ret = ipfs.repoGC();
+		String ret = ipfsRepo.gc();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
@@ -124,8 +124,8 @@ public class SystemService extends ServiceBase {
 	public String validateDb() {
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
-		ret += ipfs.repoVerify();
-		ret += ipfs.pinVerify();
+		ret += ipfsRepo.verify();
+		ret += ipfsPin.verify();
 		return ret;
 	}
 
@@ -156,7 +156,7 @@ public class SystemService extends ServiceBase {
 
 			String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 			if (ok(ipfsLink)) {
-				IPFSObjectStat fullStat = ipfs.objectStat(ipfsLink, false);
+				IPFSObjectStat fullStat = ipfsObj.objectStat(ipfsLink, false);
 				if (ok(fullStat)) {
 					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
 				}
@@ -184,7 +184,7 @@ public class SystemService extends ServiceBase {
 		sb.append(apub.getStatsReport());
 
 		if (!StringUtils.isEmpty(prop.getIPFSApiHostAndPort())) {
-			sb.append(ipfs.getRepoStat());
+			sb.append(ipfsRepo.getStat());
 		}
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();

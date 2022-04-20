@@ -72,13 +72,13 @@ public class SyncToIpfsService extends ServiceBase {
 				processNode(n);
 			}
 
-			ipfs.flushFiles(node.getPath());
+			ipfsFiles.flushFiles(node.getPath());
 
 			// collects all paths into allFilePaths
-			ipfs.traverseDir(node.getPath(), allFilePaths);
+			ipfsFiles.traverseDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
 
-			IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
+			IPFSDirStat pathStat = ipfsFiles.pathStat(node.getPath());
 			if (ok(pathStat)) {
 				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
 
@@ -133,7 +133,7 @@ public class SyncToIpfsService extends ServiceBase {
 					// and this will delete children first.
 					path = XString.stripIfEndsWith(path, "/n.json");
 					log.debug("DELETE ORPHAN: " + path);
-					ipfs.deletePath(path);
+					ipfsFiles.deletePath(path);
 					orphansRemoved++;
 				} catch (Exception e) {
 					/*
@@ -174,7 +174,7 @@ public class SyncToIpfsService extends ServiceBase {
 	 * time so we do that for now because it's simpler
 	 */
 	private void addFile(String fileName, String json) {
-		if (json.equals(ipfs.readFile(fileName))) {
+		if (json.equals(ipfsFiles.readFile(fileName))) {
 			log.debug("not writing. Content was up to date.");
 			return;
 		}
@@ -186,6 +186,6 @@ public class SyncToIpfsService extends ServiceBase {
 	}
 
 	private void addEntry(String fileName, InputStream stream) {
-		ipfs.addFileFromStream(session, fileName, stream, null, null);
+		ipfsFiles.addFileFromStream(session, fileName, stream, null, null);
 	}
 }

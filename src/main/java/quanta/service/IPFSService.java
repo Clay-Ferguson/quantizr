@@ -4,19 +4,12 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +18,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +39,7 @@ import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
-import quanta.model.ipfs.dag.MerkleNode;
-import quanta.model.ipfs.file.IPFSDir;
-import quanta.model.ipfs.file.IPFSDirEntry;
-import quanta.model.ipfs.file.IPFSDirStat;
-import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
@@ -91,20 +77,12 @@ public class IPFSService extends ServiceBase {
     private ApplicationContext context;
 
     public static String API_BASE;
-    public static String API_CAT;
-    public static String API_FILES;
-    public static String API_PIN;
-    public static String API_OBJECT;
-    public static String API_DAG;
-    public static String API_TAR;
-    public static String API_NAME;
-    public static String API_REPO;
-    public static String API_PUBSUB;
-    public static String API_SWARM;
+
+    // public static String API_TAR;
     public static String API_CONFIG;
     public static String API_ID;
 
-    private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
 
     public LinkedHashMap<String, Object> instanceId = null;
     Object instanceIdLock = new Object();
@@ -113,30 +91,21 @@ public class IPFSService extends ServiceBase {
      * originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
      * example page seems to show 'encoding' is the name here.
      */
-    public static String ENCODING_PARAM_NAME = "encoding";
+    public String ENCODING_PARAM_NAME = "encoding";
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
      */
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
-    private static final RestTemplate restTemplateNoTimeout = new RestTemplate(Util.getClientHttpRequestFactory(0));
-    private static final ObjectMapper mapper = new ObjectMapper();
+    public final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
+    public final RestTemplate restTemplateNoTimeout = new RestTemplate(Util.getClientHttpRequestFactory(0));
+    public final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
     public void init() {
         API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_CAT = API_BASE + "/cat";
-        API_FILES = API_BASE + "/files";
-        API_PIN = API_BASE + "/pin";
-        API_OBJECT = API_BASE + "/object";
-        API_DAG = API_BASE + "/dag";
-        API_TAR = API_BASE + "/tar";
-        API_NAME = API_BASE + "/name";
-        API_REPO = API_BASE + "/repo";
-        API_PUBSUB = API_BASE + "/pubsub";
-        API_SWARM = API_BASE + "/swarm";
-        API_CONFIG = API_BASE + "/config";
+
+        // API_TAR = API_BASE + "/tar";
         API_ID = API_BASE + "/id";
     }
 
@@ -148,83 +117,6 @@ public class IPFSService extends ServiceBase {
         failedCIDs.clear();
     }
 
-    public void doSwarmConnect() {
-        arun.run(ms -> {
-            List<String> adrsList = getSwarmConnectAddresses(ms);
-            if (ok(adrsList)) {
-                for (String adrs : adrsList) {
-                    if (adrs.startsWith("/")) {
-                        swarmConnect(adrs);
-                    }
-                }
-            }
-            return null;
-        });
-    }
-
-    public List<String> getSwarmConnectAddresses(MongoSession ms) {
-        List<String> ret = null;
-        SubNode node = read.getNode(ms, ":ipfsSwarmAddresses");
-        if (ok(node)) {
-            log.debug("swarmAddresses: " + node.getContent());
-            ret = XString.tokenize(node.getContent(), "\n", true);
-        }
-        return ret;
-    }
-
-    public String getRepoStat() {
-        StringBuilder sb = new StringBuilder();
-        LinkedHashMap<String, Object> res = null;
-
-        res = Cast.toLinkedHashMap(postForJsonReply(API_REPO + "/stat?human=true", LinkedHashMap.class));
-        sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
-
-        res = Cast.toLinkedHashMap(postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
-        sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
-
-        res = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
-        sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
-
-        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic,
-        // LinkedHashMap.class));
-        // sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
-
-        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
-        // sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
-
-        return sb.toString();
-    }
-
-    /*
-     * this appears to be broken due to a bug in IPFS? Haven't reported an error to them yet. Returns
-     * HTTP success (200), but no data. It should be returnin JSON but doesn't, so I have hacked the
-     * postForJsonReply to always return 'success' in this scenario (200 with no body)
-     */
-    public String repoVerify() {
-        String url = API_REPO + "/verify";
-        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-        return "\nIPFS Repository Verify:\n" + XString.prettyPrint(res) + "\n";
-    }
-
-    public String pinVerify() {
-        String url = API_PIN + "/verify";
-        // LinkedHashMap<String, Object> res =
-        // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-        // casting to a string now, because a bug in IPFS is making it not return data,
-        // so we get back string "success"
-        String res = (String) postForJsonReply(url, String.class);
-        return "\nIPFS Pin Verify:\n" + XString.prettyPrint(res) + "\n";
-    }
-
-    public String repoGC() {
-        String url = API_REPO + "/gc";
-        // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
-        // LinkedHashMap.class));
-        // return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
-        String res = (String) postForJsonReply(url, String.class);
-        return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
-    }
-
     public LinkedHashMap<String, Object> getInstanceId() {
         synchronized (instanceIdLock) {
             if (no(instanceId)) {
@@ -232,36 +124,6 @@ public class IPFSService extends ServiceBase {
             }
             return instanceId;
         }
-    }
-
-    public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
-        exec.run(() -> {
-            // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
-            /*
-             * todo-2: What we could do here instead of of this polling is hook into the MongoEventListener
-             * class and have a pub/sub model in effect so we can detect immediately when the node is saved.
-             */
-            Util.sleep(3000);
-            SubNode node = read.getNode(ms, nodeId, false, 10);
-
-            if (no(node))
-                return;
-            String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
-            addPin(ipfsLink);
-
-            // always get bytes here from IPFS, and update the node prop with that too.
-            IPFSObjectStat stat = objectStat(ipfsLink, false);
-
-            // note: the enclosing scope this we're running in will take care of comitting the node change to
-            // the db.
-            node.set(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
-
-            /* And finally update this user's quota for the added storage */
-            SubNode accountNode = read.getUserNodeByUserName(ms, null);
-            if (ok(accountNode)) {
-                user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
-            }
-        });
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
@@ -289,182 +151,6 @@ public class IPFSService extends ServiceBase {
         return cid;
     }
 
-    /**
-     * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the string.
-     * 
-     * NOTE: The hash is allowed to have a subpath here.
-     */
-    public String catToString(String hash) {
-        String ret = null;
-        try {
-            String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
-            ret = response.getBody();
-            // log.debug("IPFS post cat. Ret " + response.getStatusCode() + "] " + ret);
-        } catch (Exception e) {
-            log.error("Failed to cat: " + hash, e);
-        }
-        return ret;
-    }
-
-    public InputStream getInputStream(String hash) {
-        String url = API_CAT + "?arg=" + hash;
-        InputStream is = null;
-        try {
-            is = new URL(url).openStream();
-        } catch (Exception e) {
-            log.error("Failed in read: " + url, e);
-        }
-        return is;
-    }
-
-    public IPFSDir getDir(String path) {
-        String url = API_FILES + "/ls?arg=" + path + "&long=true";
-        return (IPFSDir) postForJsonReply(url, IPFSDir.class);
-    }
-
-    public boolean removePin(String cid) {
-        // log.debug("Remove Pin: " + cid);
-        String url = API_PIN + "/rm?arg=" + cid;
-        return ok(postForJsonReply(url, Object.class));
-    }
-
-    public boolean addPin(String cid) {
-        // log.debug("Add Pin: " + cid);
-        String url = API_PIN + "/add?arg=" + cid;
-        return ok(postForJsonReply(url, Object.class));
-    }
-
-    /* Deletes the file or if a folder deletes it recursively */
-    public boolean deletePath(String path) {
-        String url = API_FILES + "/rm?arg=" + path + "&force=true";
-        return ok(postForJsonReply(url, Object.class));
-    }
-
-    public boolean flushFiles(String path) {
-        String url = API_FILES + "/flush?arg=" + path;
-        return ok(postForJsonReply(url, Object.class));
-    }
-
-    public LinkedHashMap<String, Object> getPins() {
-        LinkedHashMap<String, Object> pins = null;
-        HashMap<String, Object> res = null;
-        try {
-            String url = API_PIN + "/ls?type=recursive";
-            res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-            // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
-
-            if (ok(res)) {
-                pins = Cast.toLinkedHashMap(res.get("Keys"));
-            }
-        } catch (Exception e) {
-            log.error("Failed to get pins", e);
-        }
-        return pins;
-    }
-
-    /**
-     * returns MerkleNode of the hash, as requested using the 'encoding=' url argument specified.
-     */
-    public MerkleNode getMerkleNode(String hash, String encoding) {
-        MerkleNode ret = null;
-        try {
-            String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
-            log.debug("REQ: " + url);
-
-            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
-            MediaType contentType = result.getHeaders().getContentType();
-
-            // log.debug("RAW RESULT: " + result.getBody());
-
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = XString.jsonMapper.readValue(result.getBody(), MerkleNode.class);
-                ret.setHash(hash);
-                ret.setContentType(contentType.getType());
-                // String formatted = XString.prettyPrint(ret);
-                // log.debug(formatted);
-            }
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.getForEntity", e);
-        }
-        return ret;
-    }
-
-    public MerkleNode objectOperation(String endpoint) {
-        MerkleNode ret = null;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
-            // log.debug("new Object: " + XString.prettyPrint(ret));
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    /**
-     * Returns string of the hash get, as requested using the 'encoding=' url argument specified.
-     */
-    public String getAsString(String hash, String encoding) {
-        String ret = null;
-        try {
-            String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
-
-            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
-            MediaType contentType = result.getHeaders().getContentType();
-
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = result.getBody();
-            } else {
-                log.debug("RAW BODY: " + result.getBody());
-            }
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.getForEntity", e);
-        }
-        return ret;
-    }
-
-    public String dagGet(String hash) {
-        String ret = null;
-        try {
-            String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
-            ResponseEntity<String> response =
-                    restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
-            ret = response.getBody();
-            log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
-        } catch (Exception e) {
-            log.error("Failed to dagGet: " + hash, e);
-        }
-        return ret;
-    }
-
-    public DagNode getDagNode(String cid) {
-        DagNode ret = null;
-        try {
-            String url = API_DAG + "/get?arg=" + cid;
-            ret = (DagNode) postForJsonReply(url, DagNode.class);
-        } catch (Exception e) {
-            log.error("Failed in getDagNode", e);
-        }
-        return ret;
-    }
-
-    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize, Val<String> cid) {
-        return writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
-    }
-
-    public MerkleLink dagPutFromStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize,
-            Val<String> cid) {
-        return writeFromStream(ms, API_DAG + "/put", stream, null, streamSize, cid);
-    }
-
     public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType, boolean wrapInFolder) {
         InputStream stream = IOUtils.toInputStream(text);
         try {
@@ -472,13 +158,6 @@ public class IPFSService extends ServiceBase {
         } finally {
             StreamUtil.close(stream);
         }
-    }
-
-    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
-            Val<Integer> streamSize) {
-        // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
-        return writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
-                streamSize, null);
     }
 
     /*
@@ -494,21 +173,22 @@ public class IPFSService extends ServiceBase {
         return writeFromStream(ms, endpoint, stream, fileName, streamSize, cid);
     }
 
-    public Map<String, Object> addTarFromFile(String fileName) {
-        arun.run(as -> {
-            try {
-                addTarFromStream(as, new BufferedInputStream(new FileInputStream(fileName)), null, null);
-            } catch (Exception e) {
-                log.error("Failed in restTemplate.exchange", e);
-            }
-            return null;
-        });
-        return null;
-    }
+    // public Map<String, Object> addTarFromFile(String fileName) {
+    // arun.run(as -> {
+    // try {
+    // addTarFromStream(as, new BufferedInputStream(new FileInputStream(fileName)), null, null);
+    // } catch (Exception e) {
+    // log.error("Failed in restTemplate.exchange", e);
+    // }
+    // return null;
+    // });
+    // return null;
+    // }
 
-    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, Val<Integer> streamSize, Val<String> cid) {
-        return writeFromStream(ms, API_TAR + "/add", stream, null, streamSize, cid);
-    }
+    // public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, Val<Integer> streamSize,
+    // Val<String> cid) {
+    // return writeFromStream(ms, API_TAR + "/add", stream, null, streamSize, cid);
+    // }
 
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
     /*
@@ -575,104 +255,6 @@ public class IPFSService extends ServiceBase {
         return fileEntity;
     }
 
-    // todo-2: convert to actual type, not map.
-    public Map<String, Object> ipnsPublish(MongoSession ms, String key, String cid) {
-        Map<String, Object> ret = null;
-        try {
-            String url = API_NAME + "/publish?arg=" + cid + (ok(key) ? "&=" + key : "");
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            // Use a rest call with no timeout becasue publish can take a LONG time.
-            log.debug("Publishing IPNS: " + url);
-            ResponseEntity<String> response = restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-
-            // ret output:
-            // {
-            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
-            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
-            // }
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    // todo-2: convert return val to a type (not map)
-    public Map<String, Object> ipnsResolve(MongoSession ms, String name) {
-        Map<String, Object> ret = null;
-        try {
-            String url = API_NAME + "/resolve?arg=" + name;
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    public Map<String, Object> swarmConnect(String peer) {
-        Map<String, Object> ret = null;
-        try {
-            log.debug("Swarm connect: " + peer);
-            String url = API_SWARM + "/connect?arg=" + peer;
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS swarm connect: " + XString.prettyPrint(ret));
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    // PubSub List peers
-    public Map<String, Object> swarmPeers() {
-        Map<String, Object> ret = null;
-        try {
-            String url = API_SWARM + "/peers";
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS swarm peers: " + XString.prettyPrint(ret));
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    public MerkleNode newObject() {
-        return objectOperation(API_OBJECT + "/new");
-    }
-
-    /*
-     * Adds an existing CID into the directory strcture at rootCid, and returns the new rootCid
-     */
-    public MerkleNode addFileToDagRoot(String rootCid, String filePath, String fileCid) {
-        if (StringUtils.isEmpty(filePath)) {
-            filePath = fileCid;
-        }
-        return objectOperation(
-                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
-    }
-
     /*
      * Creates a node holding this CID in the current user (SessionContext) account under their EXPORTS
      * node type.
@@ -718,24 +300,6 @@ public class IPFSService extends ServiceBase {
                 }
             }
         }
-    }
-
-    public IPFSDirStat pathStat(String path) {
-        String url = API_FILES + "/stat?arg=" + path;
-        return (IPFSDirStat) postForJsonReply(url, IPFSDirStat.class);
-    }
-
-    public IPFSObjectStat objectStat(String cid, boolean humanReadable) {
-        String url = API_OBJECT + "/stat?arg=" + cid;
-        if (humanReadable) {
-            url += "&human=true";
-        }
-        return (IPFSObjectStat) postForJsonReply(url, IPFSObjectStat.class);
-    }
-
-    public String readFile(String path) {
-        String url = API_FILES + "/read?arg=" + path;
-        return (String) postForJsonReply(url, String.class);
     }
 
     public void streamResponse(HttpServletResponse response, MongoSession ms, String hash, String mimeType) {
@@ -808,44 +372,6 @@ public class IPFSService extends ServiceBase {
         SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
         svc.writeNodes(ms, req, res);
         return res;
-    }
-
-    /* This has a side effect of deleting empty directories */
-    public void traverseDir(String path, HashSet<String> allFilePaths) {
-        log.debug("dumpDir: " + path);
-        IPFSDir dir = getDir(path);
-        if (ok(dir)) {
-            log.debug("Dir: " + XString.prettyPrint(dir));
-
-            if (no(dir.getEntries())) {
-                log.debug("DEL EMPTY FOLDER: " + path);
-                deletePath(path);
-                return;
-            }
-
-            for (IPFSDirEntry entry : dir.getEntries()) {
-                String entryPath = path + "/" + entry.getName();
-
-                // entries with 0 size are folders
-                if (entry.getSize() == 0) {
-                    traverseDir(entryPath, allFilePaths);
-                } else {
-                    /*
-                     * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
-                     */
-                    if (!entry.getName().endsWith(".json")) {
-                        traverseDir(entryPath, allFilePaths);
-                    } else {
-                        log.debug("dump: " + entryPath);
-                        // String readTest = readFile(entryPath);
-                        // log.debug("readTest: " + readTest);
-                        if (ok(allFilePaths)) {
-                            allFilePaths.add(entryPath);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public Object postForJsonReply(String url, Class<?> clazz) {

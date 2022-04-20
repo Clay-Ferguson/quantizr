@@ -31,8 +31,17 @@ import quanta.mongo.MongoUtil;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
 import quanta.service.GraphNodesService;
+import quanta.service.IPFSCat;
+import quanta.service.IPFSConfig;
+import quanta.service.IPFSDag;
+import quanta.service.IPFSFiles;
+import quanta.service.IPFSName;
+import quanta.service.IPFSObj;
+import quanta.service.IPFSPin;
 import quanta.service.IPFSPubSub;
+import quanta.service.IPFSRepo;
 import quanta.service.IPFSService;
+import quanta.service.IPFSSwarm;
 import quanta.service.ImportBookService;
 import quanta.service.ImportService;
 import quanta.service.JSoupService;
@@ -61,10 +70,10 @@ import quanta.util.Validator;
 
 /**
  * We have lots of circular references in our services, and since SpringBoot has decided it doesn't
- * support that without setting a flag to disable checking, I just solved it in this monolithic way,
- * because I don't consider circular references among beans to be a bad thing, nor am I going to
- * refactor Quanta to eliminate them because of this stupid presumptuious opinionated decision made
- * by Spring Boot developers.
+ * support that without setting a flag to disable checking, I solved this problem in this monolithic
+ * way, because I don't consider circular references among beans to be a bad thing, nor am I going
+ * to refactor a million line of code to eliminate them because of this flawed presumptuious
+ * opinionated decision made by Spring Boot developers.
  * 
  * To make all services able to access other services we break convention here and use inheritance
  * in a non "is-a" way, which is normally bad practice. However the benefit to this small design
@@ -90,8 +99,6 @@ public class ServiceBase {
 	public static AclService acl;
 	public static UserManagerService user;
 	public static AdminRun arun;
-	public static IPFSService ipfs;
-	public static IPFSPubSub ipfsPubSub;
 	public static AttachmentService attach;
 	public static ActPubService apub;
 	public static NodeRenderService render;
@@ -132,6 +139,18 @@ public class ServiceBase {
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
 
+	public static IPFSService ipfs;
+	public static IPFSCat ipfsCat;
+	public static IPFSFiles ipfsFiles;
+	public static IPFSPin ipfsPin;
+	public static IPFSObj ipfsObj;
+	public static IPFSDag ipfsDag;
+	public static IPFSName ipfsName;
+	public static IPFSRepo ipfsRepo;
+	public static IPFSSwarm ipfsSwarm;
+	public static IPFSConfig ipfsConfig;
+	public static IPFSPubSub ipfsPubSub;
+
 	public static boolean initComplete = false;
 	public static final Object initLock = new Object();
 
@@ -165,8 +184,6 @@ public class ServiceBase {
 			acl = getBean(ctx, AclService.class);
 			user = getBean(ctx, UserManagerService.class);
 			arun = getBean(ctx, AdminRun.class);
-			ipfs = getBean(ctx, IPFSService.class);
-			ipfsPubSub = getBean(ctx, IPFSPubSub.class);
 			attach = getBean(ctx, AttachmentService.class);
 			apub = getBean(ctx, ActPubService.class);
 			render = getBean(ctx, NodeRenderService.class);
@@ -203,6 +220,19 @@ public class ServiceBase {
 			roomType = getBean(ctx, RoomType.class);
 			rssType = getBean(ctx, RssFeedType.class);
 			mongoRepo = getBean(ctx, MongoRepository.class);
+
+			ipfs = getBean(ctx, IPFSService.class);
+			ipfsCat = getBean(ctx, IPFSCat.class);
+			ipfsFiles = getBean(ctx, IPFSFiles.class);
+			ipfsPin = getBean(ctx, IPFSPin.class);
+			ipfsObj = getBean(ctx, IPFSObj.class);
+			ipfsDag = getBean(ctx, IPFSDag.class);
+			ipfsName = getBean(ctx, IPFSName.class);
+			ipfsRepo = getBean(ctx, IPFSRepo.class);
+			ipfsSwarm = getBean(ctx, IPFSSwarm.class);
+			ipfsConfig = getBean(ctx, IPFSConfig.class);
+
+			ipfsPubSub = getBean(ctx, IPFSPubSub.class);
 
 			initComplete = true;
 		}
