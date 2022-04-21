@@ -5,12 +5,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import quanta.AppServer;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoRepository;
@@ -23,9 +21,6 @@ import quanta.mongo.model.SubNode;
 @Component
 public class EmailSenderDaemon extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
-
-	@Autowired
-    private AppProp prop;
 
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;

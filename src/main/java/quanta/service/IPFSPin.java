@@ -8,9 +8,7 @@ import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSObjectStat;
@@ -24,16 +22,11 @@ import quanta.util.XString;
 public class IPFSPin extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPin.class);
 
-    @Autowired
-    private AppProp prop;
-
-    public static String API_BASE;
     public static String API_PIN;
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_PIN = API_BASE + "/pin";
+        API_PIN = prop.getIPFSApiBase() + "/pin";
     }
 
     public String verify() {

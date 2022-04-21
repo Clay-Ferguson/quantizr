@@ -15,10 +15,8 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
-import quanta.config.AppProp;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -41,9 +39,6 @@ import quanta.util.XString;
 @Component
 public class SystemService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
-
-	@Autowired
-	private AppProp prop;
 
 	public String rebuildIndexes() {
 		ThreadLocals.requireAdmin();

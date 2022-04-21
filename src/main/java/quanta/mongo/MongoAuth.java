@@ -14,13 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.config.AppProp;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -45,9 +43,6 @@ import quanta.util.XString;
 @Component
 public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
-
-	@Autowired
-	private AppProp prop;
 
 	private static final boolean verbose = false;
 

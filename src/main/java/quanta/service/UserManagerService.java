@@ -27,7 +27,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubLog;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -88,9 +87,6 @@ public class UserManagerService extends ServiceBase {
 
 	@Autowired
 	private ActPubLog apLog;
-
-	@Autowired
-	private AppProp prop;
 
 	@Autowired
 	public AuthenticationManager authenticationManager;

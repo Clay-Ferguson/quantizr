@@ -30,7 +30,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.client.IPSMData;
@@ -50,9 +49,6 @@ public class IPFSPubSub extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
 
     @Autowired
-    private AppProp prop;
-
-    @Autowired
     private ApplicationContext context;
 
     private static final boolean IPSM_ENABLE = false;
@@ -62,7 +58,6 @@ public class IPFSPubSub extends ServiceBase {
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public static String API_BASE;
     public static String API_PUBSUB;
 
     // private static int heartbeatCounter = 0;
@@ -71,8 +66,7 @@ public class IPFSPubSub extends ServiceBase {
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_PUBSUB = API_BASE + "/pubsub";
+        API_PUBSUB = prop.getIPFSApiBase() + "/pubsub";
     }
 
     @EventListener

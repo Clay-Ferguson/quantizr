@@ -18,7 +18,6 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
@@ -44,9 +43,6 @@ public class ActPubFollowing extends ServiceBase {
 
     @Autowired
     private ActPubLog apLog;
-
-    @Autowired
-    private AppProp prop;
 
     /**
      * Outbound message to foreign servers to follow/unfollow users

@@ -4,9 +4,7 @@ import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.Cast;
 import quanta.util.XString;
@@ -15,16 +13,11 @@ import quanta.util.XString;
 public class IPFSRepo extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSRepo.class);
 
-    @Autowired
-    private AppProp prop;
-
-    public static String API_BASE;
     public static String API_REPO;
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_REPO = API_BASE + "/repo";
+        API_REPO = prop.getIPFSApiBase() + "/repo";
     }
 
     public String getStat() {

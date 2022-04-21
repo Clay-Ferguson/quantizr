@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -48,9 +47,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@Autowired
-    private AppProp prop;
 
 	private String shortFileName;
 	private String fullFileName;

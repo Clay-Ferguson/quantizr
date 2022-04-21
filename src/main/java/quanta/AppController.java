@@ -41,7 +41,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import quanta.actpub.ActPubLog;
-import quanta.config.AppProp;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -171,9 +170,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@Autowired
 	private ActPubLog apLog;
-
-	@Autowired
-	private AppProp prop;
 
 	@Autowired
 	private GracefulShutdown gracefulShutdown;

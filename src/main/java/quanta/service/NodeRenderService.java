@@ -15,7 +15,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
@@ -51,9 +50,6 @@ import quanta.util.XString;
 @Component
 public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
-
-	@Autowired
-	private AppProp prop;
 
 	@Autowired
 	private ApplicationContext context;

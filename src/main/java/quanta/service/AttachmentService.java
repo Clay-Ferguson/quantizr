@@ -55,7 +55,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -102,9 +101,6 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	public GridFSBucket gridBucket;
-
-	@Autowired
-	private AppProp prop;
 
 	@Autowired
 	private ApplicationContext context;

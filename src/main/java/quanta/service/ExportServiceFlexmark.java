@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -52,9 +51,6 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@Autowired
-	private AppProp prop;
 
 	private MongoSession session;
 

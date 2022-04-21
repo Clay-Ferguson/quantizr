@@ -3,6 +3,7 @@ package quanta.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -85,6 +86,9 @@ import quanta.util.Validator;
  */
 public class ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ServiceBase.class);
+
+	@Autowired
+    public AppProp prop;
 
 	public static UserFeedService userFeed;
 	public static Convert convert;

@@ -18,11 +18,9 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
@@ -42,9 +40,6 @@ import quanta.util.XString;
 @Scope("prototype")
 public class ExportPdfServicePdfBox extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
-
-	@Autowired
-    private AppProp prop;
 
 	private MongoSession session;
 

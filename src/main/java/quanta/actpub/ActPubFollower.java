@@ -14,8 +14,6 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
-import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
@@ -38,9 +36,6 @@ public class ActPubFollower extends ServiceBase {
 
     @Autowired
     private ActPubLog apLog;
-
-    @Autowired
-    private AppProp prop;
 
     /**
      * Generates outbound followers data

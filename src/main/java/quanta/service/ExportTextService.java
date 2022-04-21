@@ -8,11 +8,9 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
@@ -29,9 +27,6 @@ import quanta.util.ThreadLocals;
 @Scope("prototype")
 public class ExportTextService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportTextService.class);
-
-	@Autowired
-    private AppProp prop;
 
 	private MongoSession session;
 

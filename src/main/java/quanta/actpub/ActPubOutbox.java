@@ -20,7 +20,6 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -45,9 +44,6 @@ public class ActPubOutbox extends ServiceBase {
 
     @Autowired
     private ActPubLog apLog;
-
-    @Autowired
-    private AppProp prop;
 
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the

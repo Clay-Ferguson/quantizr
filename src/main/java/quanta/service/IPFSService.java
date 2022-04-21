@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -71,12 +70,7 @@ public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     @Autowired
-    private AppProp prop;
-
-    @Autowired
     private ApplicationContext context;
-
-    public static String API_BASE;
 
     // public static String API_TAR;
     public static String API_CONFIG;
@@ -103,10 +97,7 @@ public class IPFSService extends ServiceBase {
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-
-        // API_TAR = API_BASE + "/tar";
-        API_ID = API_BASE + "/id";
+        API_ID = prop.getIPFSApiBase() + "/id";
     }
 
     /* On regular interval forget which CIDs have failed and allow them to be retried */
@@ -166,7 +157,7 @@ public class IPFSService extends ServiceBase {
      */
     public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
             Val<Integer> streamSize, Val<String> cid, boolean wrapInFolder) {
-        String endpoint = API_BASE + "/add?stream-channels=true";
+        String endpoint = prop.getIPFSApiBase() + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
         }

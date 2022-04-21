@@ -3,7 +3,6 @@ package quanta.config;
 import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,9 +17,6 @@ import quanta.mongo.model.SubNode;
 @Service
 public class AppUserDetailsService extends ServiceBase implements UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(AppUserDetailsService.class);
-
-    @Autowired
-    private AppProp prop;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {

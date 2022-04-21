@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.util.XString;
@@ -37,9 +36,6 @@ public class ActPubController extends ServiceBase {
 
 	@Autowired
     private ActPubLog apLog;
-
-	@Autowired
-	private AppProp prop;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 

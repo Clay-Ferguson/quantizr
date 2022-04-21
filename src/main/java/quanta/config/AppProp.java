@@ -204,6 +204,10 @@ public class AppProp {
 		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.apiPort");
 	}
 
+	public String getIPFSApiBase() {
+		return getIPFSApiHostAndPort() + "/api/v0";
+	}
+
 	public String getIPFSGatewayHostAndPort() {
 		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.gatewayPort");
 	}

@@ -5,11 +5,9 @@ import java.net.URL;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.Util;
 
@@ -17,16 +15,11 @@ import quanta.util.Util;
 public class IPFSCat extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSCat.class);
 
-    @Autowired
-    private AppProp prop;
-
-    public static String API_BASE;
     public static String API_CAT;
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_CAT = API_BASE + "/cat";
+        API_CAT = prop.getIPFSApiBase() + "/cat";
     }
 
     /**

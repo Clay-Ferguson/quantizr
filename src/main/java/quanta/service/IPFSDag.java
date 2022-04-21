@@ -5,11 +5,9 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -21,16 +19,11 @@ import quanta.util.Val;
 public class IPFSDag extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSDag.class);
 
-    @Autowired
-    private AppProp prop;
-
-    public static String API_BASE;
     public static String API_DAG;
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_DAG = API_BASE + "/dag";
+        API_DAG = prop.getIPFSApiBase() + "/dag";
     }
 
     public String getString(String hash) {

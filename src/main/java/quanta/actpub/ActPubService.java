@@ -25,9 +25,9 @@ import quanta.actpub.model.APList;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -43,7 +43,6 @@ import quanta.service.NodeSearchService;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import quanta.instrument.PerfMon;
 
 /**
  * General AP functions
@@ -54,9 +53,6 @@ public class ActPubService extends ServiceBase {
 
     @Autowired
     private ActPubLog apLog;
-
-    @Autowired
-    private AppProp prop;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;

@@ -36,13 +36,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
@@ -68,9 +66,6 @@ public class ActPubUtil extends ServiceBase {
 
     @Autowired
     private ActPubLog apLog;
-
-    @Autowired
-    private AppProp prop;
 
     private static final int MAX_THREAD_NODES = 6;
 

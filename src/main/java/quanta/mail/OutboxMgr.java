@@ -5,9 +5,7 @@ import static quanta.util.Util.ok;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -31,9 +29,6 @@ import quanta.util.XString;
 @Component
 public class OutboxMgr extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
-
-	@Autowired
-    private AppProp prop;
 
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;

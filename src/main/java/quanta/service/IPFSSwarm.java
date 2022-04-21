@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -25,16 +23,11 @@ import quanta.util.XString;
 public class IPFSSwarm extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSSwarm.class);
 
-    @Autowired
-    private AppProp prop;
-
-    public static String API_BASE;
     public static String API_SWARM;
 
     @PostConstruct
     public void init() {
-        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
-        API_SWARM = API_BASE + "/swarm";
+        API_SWARM = prop.getIPFSApiBase() + "/swarm";
     }
 
     public Map<String, Object> connect(String peer) {

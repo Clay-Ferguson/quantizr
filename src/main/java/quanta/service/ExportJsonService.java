@@ -21,7 +21,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
@@ -44,9 +43,6 @@ public class ExportJsonService extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@Autowired
-	private AppProp prop;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
