@@ -62,13 +62,13 @@ public class IPFSFiles extends ServiceBase {
     }
 
     /* This has a side effect of deleting empty directories */
-    public void traverseDir(String path, HashSet<String> allFilePaths) {
+    public void traverseDir(String path, HashSet<String> allFilePaths, boolean deleteEmptyDirs) {
         log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (ok(dir)) {
             log.debug("Dir: " + XString.prettyPrint(dir));
 
-            if (no(dir.getEntries())) {
+            if (deleteEmptyDirs && no(dir.getEntries())) {
                 log.debug("DEL EMPTY FOLDER: " + path);
                 deletePath(path);
                 return;
@@ -79,13 +79,13 @@ public class IPFSFiles extends ServiceBase {
 
                 // entries with 0 size are folders
                 if (entry.getSize() == 0) {
-                    traverseDir(entryPath, allFilePaths);
+                    traverseDir(entryPath, allFilePaths, deleteEmptyDirs);
                 } else {
                     /*
                      * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
                      */
                     if (!entry.getName().endsWith(".json")) {
-                        traverseDir(entryPath, allFilePaths);
+                        traverseDir(entryPath, allFilePaths, deleteEmptyDirs);
                     } else {
                         log.debug("dump: " + entryPath);
                         // String readTest = readFile(entryPath);

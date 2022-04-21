@@ -45,8 +45,8 @@ public class SyncToMFSService extends ServiceBase {
 	int orphansRemoved = 0;
 
 	/*
-	 * Creates MFS files (a folder structure/tree) with identical in content to the JSON of each
-	 * node, and at the same MFS path as the 'pth' property (Node path)
+	 * Creates MFS files (a folder structure/tree) with identical in content to the JSON of each node,
+	 * and at the same MFS path as the 'pth' property (Node path)
 	 */
 	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {
 		log.debug("writeIpfsFiles: " + XString.prettyPrint(res));
@@ -62,37 +62,35 @@ public class SyncToMFSService extends ServiceBase {
 		boolean success = false;
 		try {
 			auth.ownerAuth(ms, node);
+
+			// Get all public nodes under the subgraph
 			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true, true);
 
+			/*
+			 * process the root node then all subgraph nodes, which will write the JSON of each node to an MFS
+			 * file, and add the generated filenames of all files to the 'allNodePaths' set.
+			 */
 			processNode(node);
 			for (SubNode n : results) {
 				processNode(n);
 			}
 
+			// flush all MFS files to disk
 			ipfsFiles.flushFiles(node.getPath());
 
-			// collects all paths into allFilePaths
-			ipfsFiles.traverseDir(node.getPath(), allFilePaths);
+			// collects all paths into allFilePaths, and deletes any empty dirs as they're encounterd
+			ipfsFiles.traverseDir(node.getPath(), allFilePaths, true);
+
+			/*
+			 * Now with 'allFilePaths' and 'allNodePaths' we can remove any orphaned MFS files, and this will
+			 * result in the MFS files now being perfectly in sync with the Quanta Nodes
+			 */
 			removeOrphanFiles();
 
+			// Now we can get the IPFS CID of the root and save it on a property on the root of the node we just saved to MFS.
 			IPFSDirStat pathStat = ipfsFiles.pathStat(node.getPath());
 			if (ok(pathStat)) {
 				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
-
-				/*
-				 * DO NOT DELETE
-				 * 
-				 * For a "Federated" type of install we will be doing IPNS publish from a browser-only instantiation
-				 * of IPFS so the server never has access to any keys, but this would require an 'always-on' up-time
-				 * for the IPNS name to stay active I think. However once "IPNSPubSub" is working (or even doing it
-				 * ourselves, with plain IPFSPubSub we can potentially broadcast our new CID for any updated IPNS to
-				 * all "listening" clients.
-				 */
-				// Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
-				// String name = (String) ipnsMap.get("Name");
-				// if (ok(name )) {
-				// node.set(NodeProp.IPNS_CID.s(), name);
-				// }
 			}
 
 			success = true;
@@ -146,7 +144,7 @@ public class SyncToMFSService extends ServiceBase {
 	}
 
 	private void processNode(SubNode node) {
-		// todo-2: This should be unnecessary but for now we need it.
+		// todo-2: This should eventually be unnecessary but for now we need it.
 		snUtil.removeDefaultProps(node);
 
 		snUtil.removeUnwantedPropsForIPFS(node);
