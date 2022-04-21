@@ -671,11 +671,11 @@ public class MongoRead extends ServiceBase {
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans) {
+    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans, boolean publicOnly) {
 
-        // The removeOrphans algo REQUIRES all nodes to be returned (NO LIMIT) or else it would cause a
-        // massive
-        // loss of data by removing nodes that are NOT orphans!!!
+        /*
+         * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit') 
+         */
         // DO NOT REMOVE THIS CHECK!!!
         if (removeOrphans && limit > 0) {
             throw new RuntimeException("getSubGraph: invalid parameters");
@@ -689,6 +689,11 @@ public class MongoRead extends ServiceBase {
          * children.
          */
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+
+        if (publicOnly) {
+            crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+        }
+
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
 

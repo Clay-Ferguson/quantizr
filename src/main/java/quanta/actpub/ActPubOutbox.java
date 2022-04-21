@@ -65,7 +65,7 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true);
+            Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false);
             String outboxUrl = AP.str(actor, APObj.outbox);
             APObj outbox = getOutbox(outboxUrl);
             if (no(outbox)) {

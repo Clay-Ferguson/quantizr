@@ -239,7 +239,7 @@ public class RSSFeedService extends ServiceBase {
 			feed.setEntries(entries);
 			List<String> urls = new LinkedList<>();
 
-			Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0, true);
+			Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0, true, true);
 			List<SubNode> children = read.iterateToList(iter);
 
 			// Scan to collect all the urls.

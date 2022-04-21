@@ -27,8 +27,8 @@ import quanta.util.XString;
 
 @Component
 @Scope("prototype")
-public class SyncFromIpfsService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SyncFromIpfsService.class);
+public class SyncFromMFSService extends ServiceBase {
+	private static final Logger log = LoggerFactory.getLogger(SyncFromMFSService.class);
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	{

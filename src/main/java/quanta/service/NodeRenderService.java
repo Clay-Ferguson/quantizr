@@ -96,7 +96,7 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		if (ok(node.getStr(NodeProp.IPFS_SCID))) {
-			SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
+			SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
 			svc.loadNode(ms, node);
 		}
 

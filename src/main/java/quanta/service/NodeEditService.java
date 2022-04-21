@@ -674,7 +674,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (no(fromUserNode)) {
 					n.setOwner(toUserNode.getOwner());
@@ -805,7 +805,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
 				if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
 					replacements++;
 				}

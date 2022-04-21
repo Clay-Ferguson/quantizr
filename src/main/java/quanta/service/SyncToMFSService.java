@@ -21,24 +21,21 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
- * 
  * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) and
  * also removes any existing orphans from underneath the MFS path so that MFS is guaranteed to match
  * the nodes tree perfectly after this operation. The 'pth' (path) property on the node is used as
  * the path for MFS.
  * 
  * Security: Note that for now, until encryption is added we only write the 'public' nodes to IPFS
- * because IPFS is a public system, and currently the simple algo for this is to require that the
- * ACTUAL node being saved into IPFS must itself be 'public' which by deinition means all children
- * of it are public.
+ * because IPFS is a public system.
  * 
  * Spring 'Prototype-scope Bean': We instantiate a new instance of this bean every time it's run.
  */
 
 @Component
 @Scope("prototype")
-public class SyncToIpfsService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(SyncToIpfsService.class);
+public class SyncToMFSService extends ServiceBase {
+	private static final Logger log = LoggerFactory.getLogger(SyncToMFSService.class);
 
 	MongoSession session;
 	HashSet<String> allNodePaths = new HashSet<>();
@@ -65,7 +62,7 @@ public class SyncToIpfsService extends ServiceBase {
 		boolean success = false;
 		try {
 			auth.ownerAuth(ms, node);
-			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true);
+			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true, true);
 
 			processNode(node);
 			for (SubNode n : results) {

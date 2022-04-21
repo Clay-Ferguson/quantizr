@@ -81,7 +81,7 @@ public class AclService extends ServiceBase {
 		SubNode node = read.getNode(ms, req.getNodeId());
 		BulkOperations bops = null;
 
-		for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
 
 			// lazy instantiate
 			if (no(bops)) {

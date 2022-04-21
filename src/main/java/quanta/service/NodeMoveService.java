@@ -308,7 +308,7 @@ public class NodeMoveService extends ServiceBase {
 		// log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true, false)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}

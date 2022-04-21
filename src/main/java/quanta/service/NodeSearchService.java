@@ -396,7 +396,7 @@ public class NodeSearchService extends ServiceBase {
 
 			// We pass true if this is a basic subgraph (not a Trending analysis), so that running Node Stats
 			// has the side effect of cleaning out orphans.
-			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false);
+			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false);
 		}
 
 		for (SubNode node : iter) {

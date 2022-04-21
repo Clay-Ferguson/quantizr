@@ -340,7 +340,7 @@ public class IPFSService extends ServiceBase {
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {
         ThreadLocals.requireAdmin();
         PublishNodeToIpfsResponse res = new PublishNodeToIpfsResponse();
-        SyncToIpfsService svc = (SyncToIpfsService) context.getBean(SyncToIpfsService.class);
+        SyncToMFSService svc = (SyncToMFSService) context.getBean(SyncToMFSService.class);
         svc.writeIpfsFiles(ms, req, res);
         return res;
     }
@@ -348,7 +348,7 @@ public class IPFSService extends ServiceBase {
     public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession ms, LoadNodeFromIpfsRequest req) {
         ThreadLocals.requireAdmin();
         LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
-        SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
+        SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
         svc.writeNodes(ms, req, res);
         return res;
     }
