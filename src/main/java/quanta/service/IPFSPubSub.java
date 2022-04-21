@@ -90,11 +90,11 @@ public class IPFSPubSub extends ServiceBase {
         // Pubsub.Router="floodsub" | "gossipsub"
         // todo-2: we can add this to the startup bash scripts along with the CORS configs?
         res = Cast.toLinkedHashMap(
-                ipfs.postForJsonReply(IPFSService.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
+                ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
 
         res = Cast.toLinkedHashMap(ipfs.postForJsonReply(
-                IPFSService.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
+                ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 

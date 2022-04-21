@@ -179,7 +179,7 @@ public class SystemService extends ServiceBase {
 		sb.append(apub.getStatsReport());
 
 		if (!StringUtils.isEmpty(prop.getIPFSApiHostAndPort())) {
-			sb.append(ipfsRepo.getStat());
+			sb.append(ipfsConfig.getStat());
 		}
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();

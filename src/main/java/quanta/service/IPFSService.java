@@ -57,18 +57,11 @@ import quanta.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
-/*
- * todo-2: There are several places in here where we're getting back a "String" from a
- * restTemplate.exchange for getting back JSON, and we can probably define a POJO and let the spring
- * converter convert do this for us always instead
- */
-
 @Component
 public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     // public static String API_TAR;
-    public static String API_CONFIG;
     public static String API_ID;
 
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();

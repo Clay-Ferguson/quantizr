@@ -48,7 +48,7 @@ public class SyncToIpfsService extends ServiceBase {
 	int orphansRemoved = 0;
 
 	/*
-	 * Creates MFS files (a folder structure/tree) that are identical in content to the JSON of each
+	 * Creates MFS files (a folder structure/tree) with identical in content to the JSON of each
 	 * node, and at the same MFS path as the 'pth' property (Node path)
 	 */
 	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {

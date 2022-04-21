@@ -13,7 +13,7 @@ import quanta.util.XString;
 public class IPFSConfig extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSConfig.class);
 
-    public static String API_CONFIG;
+    public String API_CONFIG;
 
     @PostConstruct
     public void init() {
@@ -27,7 +27,7 @@ public class IPFSConfig extends ServiceBase {
         res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
         sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
 
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_CONFIG + "/show", LinkedHashMap.class));
+        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
         sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
 
         res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));

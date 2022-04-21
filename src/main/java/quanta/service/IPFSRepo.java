@@ -20,29 +20,6 @@ public class IPFSRepo extends ServiceBase {
         API_REPO = prop.getIPFSApiBase() + "/repo";
     }
 
-    public String getStat() {
-        StringBuilder sb = new StringBuilder();
-        LinkedHashMap<String, Object> res = null;
-
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_REPO + "/stat?human=true", LinkedHashMap.class));
-        sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
-
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_CONFIG + "/show", LinkedHashMap.class));
-        sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
-
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));
-        sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
-
-        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic,
-        // LinkedHashMap.class));
-        // sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
-
-        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
-        // sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
-
-        return sb.toString();
-    }
-
     /*
      * this appears to be broken due to a bug in IPFS? Haven't reported an error to them yet. Returns
      * HTTP success (200), but no data. It should be returnin JSON but doesn't, so I have hacked the
