@@ -14,8 +14,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -40,9 +38,6 @@ import quanta.util.Val;
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();

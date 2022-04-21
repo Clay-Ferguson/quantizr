@@ -20,8 +20,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
@@ -30,9 +28,6 @@ import quanta.exception.base.RuntimeEx;
 @Component
 public class FileUtils extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	/*
 	 * Creates the set of file extensions that we allow user to edit

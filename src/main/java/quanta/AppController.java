@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.support.ResourceRegion;
@@ -173,9 +172,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@Autowired
 	private GracefulShutdown gracefulShutdown;
-
-	@Autowired
-	private ApplicationContext context;
 
 	public static final String API_PATH = "/mobile/api";
 

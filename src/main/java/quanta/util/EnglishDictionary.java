@@ -13,8 +13,6 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -26,9 +24,6 @@ public class EnglishDictionary extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
-
-	@Autowired
-	private ApplicationContext context;
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

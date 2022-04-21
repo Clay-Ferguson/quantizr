@@ -15,8 +15,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import quanta.config.ServiceBase;
@@ -44,9 +42,6 @@ import quanta.util.XString;
  */
 public abstract class ExportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	private String shortFileName;
 	private String fullFileName;

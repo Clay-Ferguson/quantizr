@@ -20,8 +20,6 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -48,9 +46,6 @@ import quanta.util.XString;
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	private MongoSession session;
 

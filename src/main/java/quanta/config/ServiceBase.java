@@ -90,6 +90,9 @@ public class ServiceBase {
 	@Autowired
     public AppProp prop;
 
+	@Autowired
+	public ApplicationContext context;
+
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;

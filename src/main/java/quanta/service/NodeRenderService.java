@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -50,9 +48,6 @@ import quanta.util.XString;
 @Component
 public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();

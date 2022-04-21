@@ -3,15 +3,12 @@ package quanta.service;
 import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.InsertBookRequest;
 import quanta.response.InsertBookResponse;
-import quanta.util.ExUtil;
 import quanta.util.ImportWarAndPeace;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -24,9 +21,6 @@ import quanta.util.XString;
 @Component
 public class ImportBookService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();

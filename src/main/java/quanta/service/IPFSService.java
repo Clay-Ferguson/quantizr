@@ -20,8 +20,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -68,9 +66,6 @@ import quanta.util.XString;
 @Component
 public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
-
-    @Autowired
-    private ApplicationContext context;
 
     // public static String API_TAR;
     public static String API_CONFIG;

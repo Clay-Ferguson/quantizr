@@ -7,8 +7,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -33,9 +31,6 @@ import quanta.util.ThreadLocals;
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	private ZipArchiveInputStream zis;
 

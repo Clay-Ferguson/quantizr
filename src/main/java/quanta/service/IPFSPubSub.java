@@ -16,8 +16,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -47,9 +45,6 @@ import quanta.util.XString;
 @Component
 public class IPFSPubSub extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
-
-    @Autowired
-    private ApplicationContext context;
 
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";

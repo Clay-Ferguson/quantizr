@@ -10,7 +10,6 @@ import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,8 +31,6 @@ import quanta.util.Util;
 @Component
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
-	@Autowired
-	private ApplicationContext context;
 
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {

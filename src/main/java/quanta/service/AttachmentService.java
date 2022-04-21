@@ -39,7 +39,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -101,9 +100,6 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	public GridFSBucket gridBucket;
-
-	@Autowired
-	private ApplicationContext context;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine

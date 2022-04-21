@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -39,9 +37,6 @@ import quanta.mongo.model.SubNode;
 @Scope("prototype")
 public class ImportWarAndPeace extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
