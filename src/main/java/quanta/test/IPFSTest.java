@@ -52,9 +52,11 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             ipfsDag.putString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
 
+            // Read back the data to be sure we can get it
             String verify = ipfsDag.getString(cid.getVal());
             log.debug("verify: " + verify);
 
+            // Publish the CID under a Key
             Map<String, Object> ret = ipfsName.publish(as, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 

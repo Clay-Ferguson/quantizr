@@ -25,6 +25,7 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
+/* Does the reverse of SyntToMFSService */
 @Component
 @Scope("prototype")
 public class SyncFromMFSService extends ServiceBase {
