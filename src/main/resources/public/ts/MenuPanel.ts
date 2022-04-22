@@ -175,14 +175,14 @@ export class MenuPanel extends Div {
 
         if (!state.isAnonUser) {
             children.push(new Menu("Tree", [
-                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser, null, this.makeHelpIcon(":home")), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
-                new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
-                new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
+                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
+                new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
+                new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
                 new MenuItemSeparator(),
-                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
-                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
-                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser, null, this.makeHelpIcon(":home"))
-            ]));
+                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
+                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
+                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+            ], null, this.makeHelpIcon(":docs-tree")));
         }
 
         let messagesSuffix = state.newMessageCount > 0
@@ -203,7 +203,7 @@ export class MenuPanel extends Div {
                 // We need to make this a configurable option.
                 // new MenuItem("From Local Users", S.nav.messagesLocal),
                 new MenuItem("Federated", S.nav.messagesFediverse)
-            ]));
+            ], null, this.makeHelpIcon(":docs-feed")));
 
             children.push(new Menu("Trending", [
                 new MenuItem("Hashtags", S.nav.showTrendingHashtags),
@@ -484,26 +484,20 @@ export class MenuPanel extends Div {
     }
 
     makeHelpIcon = (nodeName: string): Icon => {
-        // I think we will need to put this ONLY on menus themselves and NOT the menu items
-        // because the screen is too cluttered that way, and then we should only show this button
-        // when the menu is expanded, to direct the user to all the help for that entire menu.
         return null;
 
-        // This code works perfectly, but we're not yet using this feature.
+        // This works perfectly, so we need to enable it once we have docs for each
+        // menu section.
         // return new Icon({
         //     className: "fa fa-question-circle fa-lg float-end menuIcon",
         //     title: "Display Help Information",
         //     onClick: (event: any) => {
         //         event.stopPropagation();
         //         event.preventDefault();
-        //         // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
-        //         if (S.quanta.mainMenu) {
-        //             S.quanta.mainMenu.close();
-        //         }
         //         // S.view.jumpToId(bookmark.selfId);
         //         S.nav.openContentNode(nodeName);
         //     }
-        // })
+        // });
     }
 
     siteNavCustomItems = (state: AppState): Div[] => {

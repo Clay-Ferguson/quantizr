@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
-import { CompIntf } from "./base/CompIntf";
 import { Div } from "../comp/core/Div";
+import { CompIntf } from "./base/CompIntf";
 
 interface LS { // Local State
     visible: boolean;
     disabled: boolean;
+    expanded: boolean;
 }
 
 export class Menu extends Div {
@@ -12,7 +13,7 @@ export class Menu extends Div {
     static userClickedMenu: boolean = false;
     static activeMenu: string = null;
 
-    constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null) {
+    constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null, private floatRightComp: CompIntf = null) {
         super(null, {
             className: "card menuCard accordion-item"
         });
@@ -20,7 +21,10 @@ export class Menu extends Div {
 
     compRender(): ReactNode {
         let state = this.getState<LS>();
-        this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
+        this.attribs.style = {
+            display: (state.visible && !state.disabled ? "" : "none"),
+            expanded: false
+        };
         let show = Menu.activeMenu === this.name;
         // console.log("MENU: " + this.name + " active=" + show);
 
@@ -45,9 +49,10 @@ export class Menu extends Div {
                         if (this.onClickCallback) {
                             this.onClickCallback();
                         }
+                        this.mergeState({ expanded });
                     }, 500);
                 }
-            }),
+            }, [Menu.activeMenu === this.name ? this.floatRightComp : null]),
 
             new Div(null, {
                 id: "collapse" + this.getId(),
