@@ -110,6 +110,7 @@ public class SyncToMFSService extends ServiceBase {
 		return sb.toString();
 	}
 
+	/* Remove orphans from the MFS file system, to sync up with the Quanta DB tree */
 	private void removeOrphanFiles() {
 		allFilePaths.forEach(path -> {
 			/*

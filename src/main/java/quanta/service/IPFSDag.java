@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.ipfs.dag.DagNode;
+import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
 import quanta.util.Util;
@@ -40,13 +40,13 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public DagNode getNode(String cid) {
-        DagNode ret = null;
+    public MerkleNode getNode(String cid) {
+        MerkleNode ret = null;
         try {
             String url = API_DAG + "/get?arg=" + cid;
-            ret = (DagNode) ipfs.postForJsonReply(url, DagNode.class);
+            ret = (MerkleNode) ipfs.postForJsonReply(url, MerkleNode.class);
         } catch (Exception e) {
-            log.error("Failed in getDagNode", e);
+            log.error("Failed in getMerkleNode", e);
         }
         return ret;
     }

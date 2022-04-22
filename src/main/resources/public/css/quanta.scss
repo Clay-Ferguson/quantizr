@@ -740,9 +740,9 @@ Will come back later and study this more. todo-1 */
     width: 100%;
 }
 
-// This 70px gap is what makes room for the '+' buttons on the RHS during editing
+// This padding is what makes room for the '+' buttons on the RHS during editing
 .my-tab-pane-editmode {
-    padding-right: 64px;
+    padding-right: 50px;
 }
 
 .tabPanel {

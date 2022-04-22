@@ -17,6 +17,7 @@ public class MerkleLink {
     // This will be someting like:
     // {"/": "<cid-string>" }
     @JsonProperty("Cid")
+    // private MerkleCid cid; <--- this will work here. Change it.
     private HashMap<String, Object> cid;
 
     public String getName() {
