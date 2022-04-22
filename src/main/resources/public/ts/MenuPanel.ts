@@ -3,7 +3,6 @@ import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
-import { Markdown } from "./comp/core/Markdown";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -13,7 +12,6 @@ import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
-import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
@@ -155,24 +153,7 @@ export class MenuPanel extends Div {
         if (!state.isAnonUser) {
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
-                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null
-                        // DO NOT DELETE (Leave as an example of how to put an icon on a menu item)
-                        // new Icon({
-                        //     className: "fa fa-edit fa-lg float-end menuIcon",
-                        //     title: "Edit this bookmark",
-                        //     onClick: (event: any) => {
-                        //         event.stopPropagation();
-                        //         event.preventDefault();
-                        //         S.util.setUserPreferences(state, true);
-
-                        //         // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
-                        //         if (S.quanta.mainMenu) {
-                        //             S.quanta.mainMenu.close();
-                        //         }
-                        //         S.view.jumpToId(bookmark.selfId);
-                        //     }
-                        // })
-                    ));
+                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null));
                     return true;
                 });
             }
@@ -194,13 +175,13 @@ export class MenuPanel extends Div {
 
         if (!state.isAnonUser) {
             children.push(new Menu("Tree", [
-                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
-                new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
-                new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
+                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser, null, this.makeHelpIcon(":home")), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
+                new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
+                new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
                 new MenuItemSeparator(),
-                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
-                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
-                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
+                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser, null, this.makeHelpIcon(":home")),
+                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser, null, this.makeHelpIcon(":home"))
             ]));
         }
 
@@ -502,27 +483,27 @@ export class MenuPanel extends Div {
         this.setChildren(children);
     }
 
-    /* The textGetter must be a fuction because the config text is loaded asynchronously */
-    makeHelpIcon = (textGetter: () => string): Icon => {
-        return new Icon({
-            className: "fa fa-question-circle fa-lg float-end menuIcon",
-            title: "Display help info for this menu item",
-            onClick: (event: any) => {
-                let text: string = textGetter();
-                event.stopPropagation();
-                event.preventDefault();
-                if (!text) return;
-                let idx = text.indexOf("\n");
-                if (idx !== -1) {
-                    let title = text.substring(0, idx);
-                    let content = text.substring(idx);
-                    // content = content.replace("\n\n", "[nl]");
-                    // content = content.replace("\n", " ");
-                    // content = content.replace("[nl]", "\n\n");
-                    new MessageDlg(null, title, null, new Markdown(content), false, 0, null, store.getState()).open();
-                }
-            }
-        })
+    makeHelpIcon = (nodeName: string): Icon => {
+        // I think we will need to put this ONLY on menus themselves and NOT the menu items
+        // because the screen is too cluttered that way, and then we should only show this button
+        // when the menu is expanded, to direct the user to all the help for that entire menu.
+        return null;
+
+        // This code works perfectly, but we're not yet using this feature.
+        // return new Icon({
+        //     className: "fa fa-question-circle fa-lg float-end menuIcon",
+        //     title: "Display Help Information",
+        //     onClick: (event: any) => {
+        //         event.stopPropagation();
+        //         event.preventDefault();
+        //         // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
+        //         if (S.quanta.mainMenu) {
+        //             S.quanta.mainMenu.close();
+        //         }
+        //         // S.view.jumpToId(bookmark.selfId);
+        //         S.nav.openContentNode(nodeName);
+        //     }
+        // })
     }
 
     siteNavCustomItems = (state: AppState): Div[] => {
