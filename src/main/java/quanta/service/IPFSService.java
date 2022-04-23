@@ -189,6 +189,11 @@ public class IPFSService extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+
+            if (response.getStatusCodeValue() != 200) {
+                throw new RuntimeException("Failed. StatusCode: " + response.getStatusCode());
+            }
+
             MediaType contentType = response.getHeaders().getContentType();
 
             // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
@@ -213,6 +218,7 @@ public class IPFSService extends ServiceBase {
             }
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
+            throw e;
         }
         return ret;
     }

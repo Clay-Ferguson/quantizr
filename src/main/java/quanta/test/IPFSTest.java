@@ -1,5 +1,6 @@
 package quanta.test;
 
+import static quanta.util.Util.ok;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
-import quanta.util.Val;
 import quanta.util.XString;
 
 @Component("IPFSTest")
@@ -19,9 +19,27 @@ public class IPFSTest extends ServiceBase implements TestIntf {
         log.debug("IPFSTest.test() running.");
         // testUploadDirectory();
         // ipfs.getRepoStat();
-        ipnsTest();
+        // ipnsTest();
+        mfsTest();
     }
 
+    private void mfsTest() {
+        arun.run(as -> {
+            String fileName = "/a/b/file.txt";
+
+            // Write a text file to MFS.
+            ipfsFiles.addFile(as, fileName, "This is a test");
+            log.debug("MFS File Added: " + fileName);
+
+            // Now read back the file
+            String content = ipfsFiles.readFile(fileName);
+            if (ok(content)) {
+                log.debug("Read Confirmed: " + content);
+            }
+
+            return null;
+        });
+    }
 
     private void testUploadDirectory() {
         arun.run(as -> {
@@ -52,11 +70,11 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("Cid=" + ml.getCid().getPath());
 
             // Read back the data to be sure we can get it
-            String verify = ipfsDag.getString( ml.getCid().getPath());
+            String verify = ipfsDag.getString(ml.getCid().getPath());
             log.debug("verify: " + verify);
 
             // Publish the CID under a Key
-            Map<String, Object> ret = ipfsName.publish(as, "ClaysKey",  ml.getCid().getPath());
+            Map<String, Object> ret = ipfsName.publish(as, "ClaysKey", ml.getCid().getPath());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 
             String ipnsName = (String) ret.get("Name");
@@ -69,12 +87,12 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             // --------------
 
             ml = ipfsDag.putString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null);
-            log.debug("Cid (Second Version)=" +  ml.getCid().getPath());
+            log.debug("Cid (Second Version)=" + ml.getCid().getPath());
 
-            verify = ipfsDag.getString( ml.getCid().getPath());
+            verify = ipfsDag.getString(ml.getCid().getPath());
             log.debug("verify (second): " + verify);
 
-            ret = ipfsName.publish(as, "ClaysKey",  ml.getCid().getPath());
+            ret = ipfsName.publish(as, "ClaysKey", ml.getCid().getPath());
             log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
 
             ipnsName = (String) ret.get("Name");

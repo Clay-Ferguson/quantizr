@@ -66,6 +66,9 @@ dockerUp () {
         else
             docker-compose --compatibility -f ${dc_ipfs_yaml} up -d
             verifySuccess "IPFS Compose: up"
+
+            echo "Sleeping long enough to let IPFS fully initialize..."
+            sleep 10s
     fi
 
     docker-compose -f ${dc_mongo_yaml} up -d

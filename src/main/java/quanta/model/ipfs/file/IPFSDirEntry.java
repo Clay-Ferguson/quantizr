@@ -1,5 +1,6 @@
 package quanta.model.ipfs.file;
 
+import static quanta.util.Util.ok;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IPFSDirEntry {
@@ -8,10 +9,10 @@ public class IPFSDirEntry {
 
     @JsonProperty("Type")
     private Integer type;
-    
+
     @JsonProperty("Size")
     private Integer size;
-    
+
     @JsonProperty("Hash")
     private String hash;
 
@@ -45,5 +46,13 @@ public class IPFSDirEntry {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public boolean isDir() {
+        return ok(type) && type.intValue() == 1;
+    }
+
+    public boolean isFile() {
+        return ok(type) && type.intValue() == 0;
     }
 }

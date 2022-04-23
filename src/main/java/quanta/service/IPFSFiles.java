@@ -2,7 +2,9 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -43,6 +45,18 @@ public class IPFSFiles extends ServiceBase {
         String url = API_FILES + "/flush?arg=" + path;
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
+
+    public MerkleLink addFile(MongoSession ms, String fileName, String content) {
+		return addFile(ms, fileName, content.getBytes(StandardCharsets.UTF_8));
+	}
+
+    public MerkleLink addFile(MongoSession ms, String fileName, byte[] bytes) {
+		return addEntry(ms, fileName, new ByteArrayInputStream(bytes));
+	}
+
+	public MerkleLink addEntry(MongoSession ms, String fileName, InputStream stream) {
+		return ipfsFiles.addFileFromStream(ms, fileName, stream, null, null);
+	}
 
     public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
             Val<Integer> streamSize) {

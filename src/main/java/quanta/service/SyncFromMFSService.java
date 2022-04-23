@@ -52,7 +52,7 @@ public class SyncFromMFSService extends ServiceBase {
 	 * NOTE: req.path can be a path or CID. Path must of course be a LOCAL path, and is assumed if the
 	 * string starts with '/', otherwise is treated as a CID.
 	 *
-	 * todo-2: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
+	 * todo-2: currently this is an inefficient AND imcomplete algo, and only a work in progress, and needs these two enhancements:
 	 * 
 	 * 1) Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then
 	 * use that to know which nodes already do exist, as a performance aid.
@@ -71,7 +71,7 @@ public class SyncFromMFSService extends ServiceBase {
 			// if the path is a CID we load from CID however this flow path was never perfected/finised and was
 			// only ever a partially complete experiment
 			if (!req.getPath().startsWith("/")) {
-				if (traverseDag(null, req.getPath(), 3)) {
+				if (traverseDag(null, req.getPath(), 0, 3)) {
 					res.setMessage(buildReport());
 					res.setSuccess(true);
 				} else {
@@ -97,21 +97,29 @@ public class SyncFromMFSService extends ServiceBase {
 
 	public boolean loadNode(MongoSession ms, SubNode node) {
 		String cid = node.getStr(NodeProp.IPFS_SCID);
-		traverseDag(node, cid, 1);
+		traverseDag(node, cid, 0, 1);
 		return true;
 	}
 
 	/*
 	 * WORK IN PROGRESS: This code will be the core of how we can have an IPFS explorer capability that
-	 * can explore a DAG.
+	 * can explore a DAG. Right now we just dump the content we find in MFS and don't try to build the
+	 * node subgraph.
 	 * 
 	 * recursive will be the number of depth levels left allowed
 	 */
-	public boolean traverseDag(SubNode node, String cid, int recursive) {
+	public boolean traverseDag(SubNode node, String cid, int level, int recursive) {
 		boolean success = false;
+
+		String indent = "";
+		for (int i = 0; i < level; i++) {
+			indent += "    ";
+		}
+
+		log.debug(indent + "DagGet CID: " + cid);
 		MerkleNode dag = ipfsDag.getNode(cid);
 		if (ok(dag)) {
-			log.debug("Dag Dir: " + XString.prettyPrint(dag));
+			log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
 
 			if (no(dag.getLinks())) {
 				return success;
@@ -121,37 +129,40 @@ public class SyncFromMFSService extends ServiceBase {
 				String entryCid = entry.getCid().getPath();
 
 				/*
-				 * we rely on the logic of "if not a json file, it's a folder
+				 * we rely on the logic of "if not a json file, it's a folder"
 				 */
 				if (!entry.getName().endsWith(".json")) {
+					log.debug(indent + "Processing Folder: " + entry.getName());
 					if (recursive > 0) {
 
-						// WARNING. This codee is Incomplete: Left off working here: Need to create newNode as a child of 'node', and put the
-						// entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for now we could either
-						// just put it's CID also in as the text for it, or else actually read the text-content from the
-						// JSON
-						// (But we'd need to first query all subnodes under 'node' so we can be sure not to recreate any
-						// duplidate nodes in case this scid already exists).
-						// Also once we DO load a level we'd need to set a flag on the node to indicate we DID read it
-						// and to avoid attempting to traverse any node that's already fully loaded.
+						/*
+						 * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
+						 * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
+						 * now we could either just put it's CID also in as the text for it, or else actually read the
+						 * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
+						 * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO load
+						 * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting to
+						 * traverse any node that's already fully loaded.
+						 */
 						SubNode newNode = null;
 
-						traverseDag(newNode, entry.getCid().getPath(), recursive - 1);
+						traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
 					}
 				} else {
 					// read the node json from ipfs file
+					log.debug(indent + "Processing File: " + entry.getName());
 					String json = ipfsCat.getString(entryCid);
 					if (no(json)) {
 						log.debug("fileReadFailed: " + entryCid);
 						failedFiles++;
 					} else {
-						log.debug("json: " + json);
+						log.debug(indent + "json: " + json);
 
 						try {
 							SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
-							log.debug("nodePojo Parsed: " + XString.prettyPrint(nodePojo));
+							log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
 							// update.save(session, nodePojo);
-							log.debug("Created Node: " + nodePojo.getId());
+							log.debug(indent + "Created Node: " + nodePojo.getId());
 						} catch (Exception e) {
 							// todo
 						}
@@ -183,16 +194,17 @@ public class SyncFromMFSService extends ServiceBase {
 				}
 				// else process a file
 				else {
-					/*
-					 * we rely on the logic of "if not a json file, it's a folder
-					 */
-					if (!entry.getName().endsWith(".json")) {
+					// process directory
+					if (entry.isDir()) {
 						processPath(entryPath);
-					} else {
+					}
+					// process file
+					else if (entry.isFile()) {
 						log.debug("processFile: " + entryPath);
 
 						// read the node json from ipfs file
 						String json = ipfsFiles.readFile(entryPath);
+						log.debug("JSON: " + json);
 						if (no(json)) {
 							log.debug("fileReadFailed: " + entryPath);
 							failedFiles++;
@@ -231,6 +243,8 @@ public class SyncFromMFSService extends ServiceBase {
 								log.error("Failed parsing json: " + json, e);
 							}
 						}
+					} else {
+						log.debug("Unknown entry type.");
 					}
 				}
 			}

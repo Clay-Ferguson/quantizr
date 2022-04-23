@@ -95,10 +95,12 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		if (ok(node.getStr(NodeProp.IPFS_SCID))) {
-			SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
-			svc.loadNode(ms, node);
-		}
+		// NOTE: This code was for loading MFS defined content live as it's rendered, but for now we don't do this, and only have a kind of import/export to/from
+		// a node and MFS as a menu option that must be explicitly run.
+		// if (ok(node.getStr(NodeProp.IPFS_SCID))) {
+		// 	SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
+		// 	svc.loadNode(ms, node);
+		// }
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
