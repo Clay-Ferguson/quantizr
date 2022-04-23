@@ -109,58 +109,57 @@ public class SyncFromMFSService extends ServiceBase {
 	 */
 	public boolean traverseDag(SubNode node, String cid, int recursive) {
 		boolean success = false;
-		// DO NOT DELETE (Work in Progress)
-		// MerkleNode dag = ipfsDag.getNode(cid);
-		// if (ok(dag)) {
-		// 	log.debug("Dag Dir: " + XString.prettyPrint(dag));
+		MerkleNode dag = ipfsDag.getNode(cid);
+		if (ok(dag)) {
+			log.debug("Dag Dir: " + XString.prettyPrint(dag));
 
-		// 	if (no(dag.getLinks())) {
-		// 		return success;
-		// 	}
+			if (no(dag.getLinks())) {
+				return success;
+			}
 
-		// 	for (MerkleLink entry : dag.getLinks()) {
-		// 		String entryCid = entry.getCid().getPath();
+			for (MerkleLink entry : dag.getLinks()) {
+				String entryCid = entry.getCid().getPath();
 
-		// 		/*
-		// 		 * we rely on the logic of "if not a json file, it's a folder
-		// 		 */
-		// 		if (!entry.getName().endsWith(".json")) {
-		// 			if (recursive > 0) {
+				/*
+				 * we rely on the logic of "if not a json file, it's a folder
+				 */
+				if (!entry.getName().endsWith(".json")) {
+					if (recursive > 0) {
 
-		// 				// WARNING. This codee is Incomplete: Left off working here: Need to create newNode as a child of 'node', and put the
-		// 				// entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for now we could either
-		// 				// just put it's CID also in as the text for it, or else actually read the text-content from the
-		// 				// JSON
-		// 				// (But we'd need to first query all subnodes under 'node' so we can be sure not to recreate any
-		// 				// duplidate nodes in case this scid already exists).
-		// 				// Also once we DO load a level we'd need to set a flag on the node to indicate we DID read it
-		// 				// and to avoid attempting to traverse any node that's already fully loaded.
-		// 				SubNode newNode = null;
+						// WARNING. This codee is Incomplete: Left off working here: Need to create newNode as a child of 'node', and put the
+						// entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for now we could either
+						// just put it's CID also in as the text for it, or else actually read the text-content from the
+						// JSON
+						// (But we'd need to first query all subnodes under 'node' so we can be sure not to recreate any
+						// duplidate nodes in case this scid already exists).
+						// Also once we DO load a level we'd need to set a flag on the node to indicate we DID read it
+						// and to avoid attempting to traverse any node that's already fully loaded.
+						SubNode newNode = null;
 
-		// 				traverseDag(newNode, entry.getCid().getPath(), recursive - 1);
-		// 			}
-		// 		} else {
-		// 			// read the node json from ipfs file
-		// 			String json = ipfsCat.getString(entryCid);
-		// 			if (no(json)) {
-		// 				log.debug("fileReadFailed: " + entryCid);
-		// 				failedFiles++;
-		// 			} else {
-		// 				log.debug("json: " + json);
+						traverseDag(newNode, entry.getCid().getPath(), recursive - 1);
+					}
+				} else {
+					// read the node json from ipfs file
+					String json = ipfsCat.getString(entryCid);
+					if (no(json)) {
+						log.debug("fileReadFailed: " + entryCid);
+						failedFiles++;
+					} else {
+						log.debug("json: " + json);
 
-		// 				try {
-		// 					SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
-		// 					log.debug("nodePojo Parsed: " + XString.prettyPrint(nodePojo));
-		// 					// update.save(session, nodePojo);
-		// 					log.debug("Created Node: " + nodePojo.getId());
-		// 				} catch (Exception e) {
-		// 					// todo
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// 	success = true;
-		// }
+						try {
+							SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
+							log.debug("nodePojo Parsed: " + XString.prettyPrint(nodePojo));
+							// update.save(session, nodePojo);
+							log.debug("Created Node: " + nodePojo.getId());
+						} catch (Exception e) {
+							// todo
+						}
+					}
+				}
+			}
+			success = true;
+		}
 		return success;
 	}
 

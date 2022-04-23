@@ -3,7 +3,6 @@ package quanta.model.ipfs.dag;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MerkleCid {
-    // NOTE: This prop actually holds a CID, not a path.
     @JsonProperty("/")
     private String path;
 

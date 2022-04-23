@@ -61,7 +61,6 @@ import quanta.util.XString;
 public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
-    // public static String API_TAR;
     public static String API_ID;
 
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
@@ -114,7 +113,7 @@ public class IPFSService extends ServiceBase {
         InputStream is = attach.getStreamByNode(node, "");
         if (ok(is)) {
             try {
-                MerkleLink ret = addFromStream(ms, is, fileName, mime, null, null, false);
+                MerkleLink ret = addFromStream(ms, is, fileName, mime, null, false);
                 if (ok(ret)) {
                     cid = ret.getHash();
                 }
@@ -133,7 +132,7 @@ public class IPFSService extends ServiceBase {
     public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType, boolean wrapInFolder) {
         InputStream stream = IOUtils.toInputStream(text);
         try {
-            return addFromStream(ms, stream, fileName, mimeType, null, null, wrapInFolder);
+            return addFromStream(ms, stream, fileName, mimeType, null, wrapInFolder);
         } finally {
             StreamUtil.close(stream);
         }
@@ -144,12 +143,12 @@ public class IPFSService extends ServiceBase {
      * DOES pin the file
      */
     public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
-            Val<Integer> streamSize, Val<String> cid, boolean wrapInFolder) {
+            Val<Integer> streamSize, boolean wrapInFolder) {
         String endpoint = prop.getIPFSApiBase() + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
         }
-        return writeFromStream(ms, endpoint, stream, fileName, streamSize, cid);
+        return writeFromStream(ms, endpoint, stream, fileName, streamSize);
     }
 
     // public Map<String, Object> addTarFromFile(String fileName) {
@@ -176,7 +175,7 @@ public class IPFSService extends ServiceBase {
      * always basing off extension on this filename?
      */
     public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
-            Val<Integer> streamSize, Val<String> cid) {
+            Val<Integer> streamSize) {
         // log.debug("Write stream to endpoint: " + endpoint);
         MerkleLink ret = null;
         try {
@@ -192,7 +191,7 @@ public class IPFSService extends ServiceBase {
             ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             MediaType contentType = response.getHeaders().getContentType();
 
-            log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
+            // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
 
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
                 if (StringUtils.isEmpty(response.getBody())) {
@@ -206,10 +205,6 @@ public class IPFSService extends ServiceBase {
                     }
 
                     // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
-
-                    if (ok(cid) && ok(ret) && ok(ret.getCid())) {
-                        cid.setVal((String) ret.getCid().get("/"));
-                    }
                 }
             }
 

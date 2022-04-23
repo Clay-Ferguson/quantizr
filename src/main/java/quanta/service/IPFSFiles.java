@@ -48,7 +48,7 @@ public class IPFSFiles extends ServiceBase {
             Val<Integer> streamSize) {
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
         return ipfs.writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
-                null, streamSize, null);
+                null, streamSize);
     }
 
     public IPFSDirStat pathStat(String path) {

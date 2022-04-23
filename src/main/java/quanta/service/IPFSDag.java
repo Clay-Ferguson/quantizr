@@ -51,12 +51,11 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public MerkleLink putString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize, Val<String> cid) {
-        return ipfs.writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
+    public MerkleLink putString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize) {
+        return ipfs.writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize);
     }
 
-    public MerkleLink putStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize,
-            Val<String> cid) {
-        return ipfs.writeFromStream(ms, API_DAG + "/put", stream, null, streamSize, cid);
+    public MerkleLink putStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize) {
+        return ipfs.writeFromStream(ms, API_DAG + "/put", stream, null, streamSize);
     }
 }

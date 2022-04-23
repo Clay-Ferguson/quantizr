@@ -48,16 +48,15 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("Running IPNS Test.");
 
             // Save some JSON to a CID
-            Val<String> cid = new Val<>();
-            ipfsDag.putString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
-            log.debug("Cid=" + cid.getVal());
+            MerkleLink ml = ipfsDag.putString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null);
+            log.debug("Cid=" + ml.getCid().getPath());
 
             // Read back the data to be sure we can get it
-            String verify = ipfsDag.getString(cid.getVal());
+            String verify = ipfsDag.getString( ml.getCid().getPath());
             log.debug("verify: " + verify);
 
             // Publish the CID under a Key
-            Map<String, Object> ret = ipfsName.publish(as, "ClaysKey", cid.getVal());
+            Map<String, Object> ret = ipfsName.publish(as, "ClaysKey",  ml.getCid().getPath());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 
             String ipnsName = (String) ret.get("Name");
@@ -69,13 +68,13 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
             // --------------
 
-            ipfsDag.putString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
-            log.debug("Cid (Second Version)=" + cid.getVal());
+            ml = ipfsDag.putString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null);
+            log.debug("Cid (Second Version)=" +  ml.getCid().getPath());
 
-            verify = ipfsDag.getString(cid.getVal());
+            verify = ipfsDag.getString( ml.getCid().getPath());
             log.debug("verify (second): " + verify);
 
-            ret = ipfsName.publish(as, "ClaysKey", cid.getVal());
+            ret = ipfsName.publish(as, "ClaysKey",  ml.getCid().getPath());
             log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
 
             ipnsName = (String) ret.get("Name");
