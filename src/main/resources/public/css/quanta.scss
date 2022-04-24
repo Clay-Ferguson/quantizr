@@ -1428,7 +1428,8 @@ Will come back later and study this more. todo-1 */
 }
 
 .row-border {
-    border-bottom: 1px solid $nodeBorderBottomColor;
+    /* If no border is defined here then borders only show up during edit or metadata display modes */
+    /* border-bottom: 1px solid $nodeBorderBottomColor; */
 }
 
 /* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
