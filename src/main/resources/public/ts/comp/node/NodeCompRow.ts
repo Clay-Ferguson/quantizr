@@ -66,6 +66,8 @@ export class NodeCompRow extends Div {
         }
 
         let insertInlineButton = null;
+        let isPageRootNode = state.node && this.node.id === state.node.id;
+
         if (this.allowHeaders && state.userPreferences.editMode) {
             let insertAllowed = true;
 
@@ -77,8 +79,6 @@ export class NodeCompRow extends Div {
                     insertAllowed = state.isAdminUser || parentTypeHandler.allowAction(NodeActionType.insert, state.node, state);
                 }
             }
-
-            let isPageRootNode = state.node && this.node.id === state.node.id;
 
             if (this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
@@ -99,17 +99,23 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
+        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row");
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
+        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
         // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
         if (this.isTableCell) {
         }
-        else if (layout && layout.indexOf("c") === 0 && (!!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
-        }
+        // else if (layout && layout.indexOf("c") === 0 && (isInlineChildren || this.node.id === state.node.id)) {
+        // }
         else {
-            layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
+            if (isInlineChildren && node.hasChildren && !isPageRootNode) {
+                layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border-inline-children";
+            }
+            else {
+                layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
+            }
         }
 
         let indentLevel = this.isTableCell ? 0 : this.level;

@@ -30,6 +30,9 @@ export class NodeCompVerticalRowLayout extends Div {
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;
 
+        // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
+        let inVerticalSpace = false;
+
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
@@ -52,6 +55,10 @@ export class NodeCompVerticalRowLayout extends Div {
                     else {
                         lastNode = n;
                         let row: Comp = null;
+                        if (n.children && !inVerticalSpace) {
+                            comps.push(new Div(null, { className: "vertical-space" }));
+                        }
+
                         /* NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
                          because if the user wants their Account root laid out in a grid just let them do that and show everything
                          without doing any collapsedComps. */
@@ -65,11 +72,16 @@ export class NodeCompVerticalRowLayout extends Div {
                             row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, state);
                             comps.push(row);
                         }
+                        inVerticalSpace = false;
                     }
 
                     rowCount++;
+                    // if we have any children on the node they will always have been loaded to be displayed so display them
+                    // This is the linline children
                     if (n.children) {
                         comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove, state));
+                        comps.push(new Div(null, { className: "vertical-space" }));
+                        inVerticalSpace = true;
                     }
                 }
 
@@ -88,7 +100,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
             if (this.level <= 1) {
                 // todo-1: this button should have same enabelement as "new" button, on the page root
-                comps.push(new Div(null, { className: "node-table-row" }, [
+                comps.push(new Div(null, { className: (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row") }, [
                     new Button(null, e => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);

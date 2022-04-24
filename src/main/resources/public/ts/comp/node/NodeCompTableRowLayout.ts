@@ -46,6 +46,9 @@ export class NodeCompTableRowLayout extends Div {
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;
 
+        // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
+        let inVerticalSpace = false;
+
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
             let comps: Comp[] = [];
@@ -64,13 +67,22 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
+
+                    if (n.children && !inVerticalSpace) {
+                        comps.push(new Div(null, { className: "vertical-space" }));
+                    }
                     let row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, true, state);
+                    inVerticalSpace = false;
                     comps.push(row);
                 }
 
                 rowCount++;
+                // if we have any children on the node they will always have been loaded to be displayed so display them
+                // This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove, state));
+                    comps.push(new Div(null, { className: "vertical-space" }));
+                    inVerticalSpace = true;
                 }
 
                 let curCol = new Div(null, {
