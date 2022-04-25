@@ -3,6 +3,7 @@ import * as marked from "marked";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
+import { Menu } from "./comp/Menu";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
@@ -1233,6 +1234,11 @@ export class Util {
             // Log.log("bookmark count=" + count);
             dispatch("Action_loadBookmarks", (s: AppState): AppState => {
                 s.bookmarks = res.bookmarks;
+
+                // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
+                if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
+                    s.activeMenu = C.BOOKMARKS_MENU_TEXT;
+                }
                 return s;
             });
         }

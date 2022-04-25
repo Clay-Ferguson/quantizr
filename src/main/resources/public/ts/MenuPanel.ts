@@ -169,10 +169,6 @@ export class MenuPanel extends Div {
             }
         }
 
-        if (!Menu.userClickedMenu) {
-            Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : null;
-        }
-
         if (!state.isAnonUser) {
             children.push(new Menu("Tree", [
                 new MenuItem("My Root", S.nav.navHome, !state.isAnonUser),

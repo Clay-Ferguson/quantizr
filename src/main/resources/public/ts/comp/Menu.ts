@@ -1,4 +1,7 @@
 import { ReactNode } from "react";
+import { useSelector } from "react-redux";
+import { dispatch, store } from "../AppRedux";
+import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { CompIntf } from "./base/CompIntf";
 
@@ -11,7 +14,6 @@ interface LS { // Local State
 export class Menu extends Div {
 
     static userClickedMenu: boolean = false;
-    static activeMenu: string = null;
 
     constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null, private floatRightComp: CompIntf = null) {
         super(null, {
@@ -21,17 +23,18 @@ export class Menu extends Div {
 
     compRender(): ReactNode {
         let state = this.getState<LS>();
+        let appState: AppState = useSelector((state: AppState) => state);
         this.attribs.style = {
             display: (state.visible && !state.disabled ? "" : "none"),
             expanded: false
         };
-        let show = Menu.activeMenu === this.name;
-        // console.log("MENU: " + this.name + " active=" + show);
+        let show = appState.activeMenu === this.name;
+        // console.log("MENU: " + this.name + " active=" + show + " activeMenu=" + appState.activeMenu);
 
         this.setChildren([
             new Div(this.name, {
                 className: "card-header menuHeading mb-0 accordion-header",
-                "aria-expanded": Menu.activeMenu === this.name ? "true" : "false",
+                "aria-expanded": appState.activeMenu === this.name ? "true" : "false",
                 "data-bs-toggle": "collapse",
                 // "data-target": "#collapse" + this.getId(),
                 href: "#collapse" + this.getId(),
@@ -43,7 +46,13 @@ export class Menu extends Div {
                         timer here to wait for it to get updated */
                         let headingElm = document.getElementById("heading" + this.getId());
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
-                        Menu.activeMenu = expanded ? this.name : null;
+                        let activeName = expanded ? this.name : null;
+
+                        dispatch("Action_setActiveMenu", (s: AppState): AppState => {
+                            s.activeMenu = activeName;
+                            return s;
+                        });
+
                         Menu.userClickedMenu = true;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
                         if (this.onClickCallback) {
@@ -51,14 +60,10 @@ export class Menu extends Div {
                         }
                         // we need a pub-sub call that can force the ENTIRE menu panel to refresh.
                         this.mergeState({ expanded });
-                    }, 500);
+                    }, 250);
                 }
             }
-            // This is the help icon, and it's not working correctly yet, because it won't successfully go away unless
-            // the menu is specifically clicked to close it, and I don't want that behavior.
-            // todo-0: we need to move the 'Menu.activeMenu' into the AppState, and then the mergeState above can be used
-            // to update the menu, and we might not even then need the 'expanded' property in this LS local state.
-            /* , [Menu.activeMenu === this.name ? this.floatRightComp : null] */),
+                , [appState.activeMenu === this.name ? this.floatRightComp : null]),
 
             new Div(null, {
                 id: "collapse" + this.getId(),

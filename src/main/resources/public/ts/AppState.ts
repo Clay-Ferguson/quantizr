@@ -135,4 +135,5 @@ export class AppState {
     serverInfoTitle: string = null;
 
     ipsmActive: boolean = false;
+    activeMenu: string = null;
 }
