@@ -559,7 +559,7 @@ export class EditNodeDlg extends DialogBase {
             new Button("Save", () => {
                 this.utl.saveNode(this);
                 this.close();
-            }, { title: "Save this node and close editor." }, "btn-primary"),
+            }, { title: "Save this node and close editor." }, "attentionButton"),
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 

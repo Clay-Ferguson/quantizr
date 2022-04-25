@@ -88,7 +88,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "btn-primary"),
+                    }, "attentionButton"),
 
                     showBookmarkIcon ? new Icon({
                         className: "fa fa-bookmark fa-lg clickable marginRight",
