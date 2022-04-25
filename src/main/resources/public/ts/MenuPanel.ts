@@ -165,7 +165,7 @@ export class MenuPanel extends Div {
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
 
             if (hasBookmarks) {
-                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems));
+                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
             }
         }
 
@@ -175,14 +175,14 @@ export class MenuPanel extends Div {
 
         if (!state.isAnonUser) {
             children.push(new Menu("Tree", [
-                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
+                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
                 new MenuItemSeparator(),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
                 new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
                 new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
-            ], null, this.makeHelpIcon(":docs-tree")));
+            ], null, this.makeHelpIcon(":menu-tree")));
         }
 
         let messagesSuffix = state.newMessageCount > 0
@@ -203,7 +203,7 @@ export class MenuPanel extends Div {
                 // We need to make this a configurable option.
                 // new MenuItem("From Local Users", S.nav.messagesLocal),
                 new MenuItem("Federated", S.nav.messagesFediverse)
-            ], null, this.makeHelpIcon(":docs-feed")));
+            ], null, this.makeHelpIcon(":menu-feed")));
 
             children.push(new Menu("Trending", [
                 new MenuItem("Hashtags", S.nav.showTrendingHashtags),
@@ -218,7 +218,7 @@ export class MenuPanel extends Div {
             new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),
             new MenuItemSeparator(),
             new MenuItem("Find People", MenuPanel.findUsers, !state.isAnonUser) //
-        ]));
+        ], null, this.makeHelpIcon(":menu-people")));
 
         children.push(new Menu("Edit", [
             state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
@@ -258,7 +258,7 @@ export class MenuPanel extends Div {
             //    () => { return state.isAdminUser }, //
             //    true
             // ), //
-        ]));
+        ], null, this.makeHelpIcon(":menu-edit")));
 
         let createMenuItems = [];
         let typeHandlers = S.plugin.getAllTypeHandlers();
@@ -270,7 +270,7 @@ export class MenuPanel extends Div {
             return true;
         });
 
-        children.push(new Menu("Create", createMenuItems));
+        children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":doc-types")));
 
         children.push(new Menu("Share", [
             // moved into editor dialog
@@ -285,7 +285,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Show Public Appendable", MenuPanel.showPublicWritableShares, //
                 !state.isAnonUser && !!hltNode)
-        ]));
+        ], null, this.makeHelpIcon(":menu-share")));
 
         children.push(new Menu("Search", [
             new MenuItem("By Content", MenuPanel.searchByContent, !state.isAnonUser && !!hltNode), //
@@ -294,7 +294,7 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
-        ]));
+        ], null, this.makeHelpIcon(":search-menu")));
 
         children.push(new Menu("Timeline", [
             new MenuItem("Created", MenuPanel.timelineByCreated, !state.isAnonUser && !!hltNode), //
@@ -302,7 +302,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
             new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, !state.isAnonUser && !!hltNode), //
             new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, !state.isAnonUser && !!hltNode) //
-        ]));
+        ], null, this.makeHelpIcon(":menu-timeline")));
 
         // let's make calendar an admin-only function for now.
         if (state.isAdminUser) {
@@ -340,7 +340,7 @@ export class MenuPanel extends Div {
 
             // DO NOT DELETE
             // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
-        ]));
+        ], null, this.makeHelpIcon(":menu-tools")));
 
         children.push(new Menu("Node Info", [
             // I decided with this on the toolbar we don't need it repliated here.
@@ -360,7 +360,7 @@ export class MenuPanel extends Div {
             // because you'd need a document with many thousands of nodes before the "top 500" will have any real significance as a 'trending' definition.
             // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
             //     !state.isAnonUser /* state.isAdminUser */) //
-        ]));
+        ], null, this.makeHelpIcon(":menu-node-info")));
 
         children.push(new Menu("Settings", [
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
@@ -392,7 +392,7 @@ export class MenuPanel extends Div {
             new MenuItem("Generate Keys", MenuPanel.generateKeys, !state.isAnonUser), //
             new MenuItem("Publish Keys", MenuPanel.publishKeys, !state.isAnonUser), //
             new MenuItem("Import Keys", MenuPanel.importKeys, !state.isAnonUser) //
-        ]));
+        ], null, this.makeHelpIcon(":menu-encrypt")));
 
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
@@ -485,20 +485,16 @@ export class MenuPanel extends Div {
     }
 
     makeHelpIcon = (nodeName: string): Icon => {
-        return null;
-
-        // This works perfectly, so we need to enable it once we have docs for each
-        // menu section.
-        // return new Icon({
-        //     className: "fa fa-question-circle fa-lg float-end menuIcon",
-        //     title: "Display Help Information",
-        //     onClick: (event: any) => {
-        //         event.stopPropagation();
-        //         event.preventDefault();
-        //         // S.view.jumpToId(bookmark.selfId);
-        //         S.nav.openContentNode(nodeName);
-        //     }
-        // });
+        return new Icon({
+            className: "fa fa-question-circle fa-lg float-end menuIcon",
+            title: "Display Help Information",
+            onClick: (event: any) => {
+                event.stopPropagation();
+                event.preventDefault();
+                // S.view.jumpToId(bookmark.selfId);
+                S.nav.openContentNode(nodeName);
+            }
+        });
     }
 
     siteNavCustomItems = (state: AppState): Div[] => {

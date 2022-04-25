@@ -49,10 +49,16 @@ export class Menu extends Div {
                         if (this.onClickCallback) {
                             this.onClickCallback();
                         }
+                        // we need a pub-sub call that can force the ENTIRE menu panel to refresh.
                         this.mergeState({ expanded });
                     }, 500);
                 }
-            }, [Menu.activeMenu === this.name ? this.floatRightComp : null]),
+            }
+            // This is the help icon, and it's not working correctly yet, because it won't successfully go away unless
+            // the menu is specifically clicked to close it, and I don't want that behavior.
+            // todo-0: we need to move the 'Menu.activeMenu' into the AppState, and then the mergeState above can be used
+            // to update the menu, and we might not even then need the 'expanded' property in this LS local state.
+            /* , [Menu.activeMenu === this.name ? this.floatRightComp : null] */),
 
             new Div(null, {
                 id: "collapse" + this.getId(),
