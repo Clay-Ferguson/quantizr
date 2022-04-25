@@ -266,7 +266,7 @@ export class MenuPanel extends Div {
             return true;
         });
 
-        children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":doc-types")));
+        children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
 
         children.push(new Menu("Share", [
             // moved into editor dialog
@@ -290,7 +290,7 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
-        ], null, this.makeHelpIcon(":search-menu")));
+        ], null, this.makeHelpIcon(":menu-search")));
 
         children.push(new Menu("Timeline", [
             new MenuItem("Created", MenuPanel.timelineByCreated, !state.isAnonUser && !!hltNode), //
