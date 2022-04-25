@@ -614,8 +614,10 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	/*
-	 * Parses all foreign mentions of forengn usernames from message. Puts them in namesSet if not null,
+	 * Parses all foreign mentions of foreign usernames from message. Puts them in namesSet if not null,
 	 * and returns namesSet, or if null is passed in for namesSet you get a new set created.
+	 * 
+	 * Names will NOT have '@' prefix, but will be like "clay@tld.com"
 	 */
 	public HashSet<String> parseMentionsFromString(HashSet<String> namesSet, String message) {
 		if (no(message))
@@ -626,8 +628,13 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		// prepare so that newlines are compatable with our tokenizing
+		// todo-1: This really needs to replace ALL non-username-valid (non-DNS-chars) with a space
 		message = message.replace("\n", " ");
 		message = message.replace("\r", " ");
+		message = message.replace("\t", " ");
+		message = message.replace(",", " ");
+		message = message.replace(";", " ");
+		message = message.replace("!", " ");
 
 		List<String> words = XString.tokenize(message, " ", true);
 		if (ok(words)) {
@@ -720,7 +727,11 @@ public class MongoAuth extends ServiceBase {
 	/*
 	 * Parses all mentions (like '@bob@server.com') in the node content text and adds them (if not
 	 * existing) to the node sharing on the node, which ensures the person mentioned has visibility of
-	 * this node and that it will also appear in their FEED listing
+	 * this node and that it will also appear in their FEED listing.
+	 * 
+	 * We also do a 'side effect' of replacing all occurrances of these full-length names with the short
+	 * names (i.e. short names being the name with the DNS/TLD stripped off). Short names is better to
+	 * have appearing in the text.
 	 */
 	public HashSet<String> saveMentionsToNodeACL(MongoSession ms, SubNode node) {
 		HashSet<String> mentionsSet = parseMentionsFromString(null, node.getContent());
@@ -728,6 +739,15 @@ public class MongoAuth extends ServiceBase {
 		if (no(mentionsSet)) {
 			return null;
 		}
+
+		for (String mention : mentionsSet) {
+			// short name will be the username without the host part
+			String shortMention = apUtil.stripHostFromUserName(mention);
+
+			// not replace it in the Node.
+			node.setContent(node.getContent().replace("@" + mention, "@" + shortMention));
+		}
+
 		return saveMentionsToNodeACL(mentionsSet, ms, node);
 	}
 
