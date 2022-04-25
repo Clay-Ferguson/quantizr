@@ -271,31 +271,7 @@ export class Render {
                 }
             }));
 
-        let markdownIdUrl = "[link](?id=" + node.id + ")";
-        children.push(new Heading(5, "Markdown, by ID"), //
-            new Div(markdownIdUrl, {
-                className: "anchorBigMarginBottom",
-                title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(markdownIdUrl);
-                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                    dlgHolder.dlg.close();
-                }
-            }));
-
         if (node.name) {
-            let markdownNameUrl = "[link](" + S.nodeUtil.getPathPartForNamedNode(node) + ")";
-            children.push(new Heading(5, "Markdown, by Name"), //
-                new Div(markdownNameUrl, {
-                    className: "anchorBigMarginBottom",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(markdownNameUrl);
-                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                        dlgHolder.dlg.close();
-                    }
-                }));
-
             let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
             children.push(new Heading(5, "By Name"), //
                 new Div(byNameUrl, {
