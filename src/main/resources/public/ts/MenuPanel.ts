@@ -57,6 +57,13 @@ export class MenuPanel extends Div {
 
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
     // which can be slow in JS.
+
+    // todo-1: Need to include in instance setup docs, the fact that these nodes need to be defined.
+    static aboutQuanta = () => S.nav.openContentNode(":home");
+    static openUserGuide = () => S.nav.openContentNode(":user-guide");
+    static openFeatures = () => S.nav.openContentNode(":features");
+    static openScreencasts = () => S.nav.openContentNode(":screencast");
+    static openDemoContent = () => S.nav.openContentNode(":demo-data");
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
@@ -168,6 +175,14 @@ export class MenuPanel extends Div {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
             }
         }
+
+        children.push(new Menu("Help", [
+            new MenuItem("About Quanta", MenuPanel.aboutQuanta),
+            new MenuItem("User Guide", MenuPanel.openUserGuide),
+            new MenuItem("Features Overview", MenuPanel.openFeatures),
+            new MenuItem("Watch Screencasts", MenuPanel.openScreencasts),
+            new MenuItem("Demo Content", MenuPanel.openDemoContent)
+        ]));
 
         if (!state.isAnonUser) {
             children.push(new Menu("Tree", [
