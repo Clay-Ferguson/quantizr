@@ -24,11 +24,9 @@ Quanta is a browser-based SPA (Single Page App), that works on both mobile and d
 
 The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS+Redux front end. Deployed and installed via docker (docker compose), MongoDB as the data store, as well as the GO Lang version of IPFS.
 
-## Fund this Project
+## Project Funding
 
-Help support this project by making a financial contribution here:
-
-[Contribute to Quanta](https://www.paypal.com/donate/?hosted_button_id=4S3DEDU4BLYEW)
+Help support this project by making a financial contribution here: [Contribute to Quanta](https://www.paypal.com/donate/?hosted_button_id=4S3DEDU4BLYEW)
 
 ## Search Tags
 
