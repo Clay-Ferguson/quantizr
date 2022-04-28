@@ -1952,11 +1952,21 @@ audio::-webkit-media-controls-play-button {
     background-color: $baseBgColor;
 }
 
+.openGraphPanelRss {
+    overflow-x: hidden;
+}
+
 .openGraphImage {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     width: 100%;
     margin-top: 8px;
+}
+
+.openGraphImageRss {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 100%;
 }
 
 .openGraphImageVert {
@@ -2005,6 +2015,7 @@ audio::-webkit-media-controls-play-button {
 
 .openGraphDesc {
     max-width: 45em;
+    margin-bottom: 8px;
 }
 
 .openGraphTitle {

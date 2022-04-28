@@ -23,6 +23,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
+import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
@@ -292,6 +293,7 @@ export class RssTypeHandler extends TypeBase {
         // console.log("ENTRY: " + S.util.prettyPrint(entry));
         let children: Comp[] = [];
         let headerDivChildren = [];
+        let imageShown = false;
 
         /* todo-2: Sometimes entry.category can be an Object (not a String) here which will
         make React fail badly and render the entire page blank,
@@ -310,6 +312,7 @@ export class RssTypeHandler extends TypeBase {
         //     headerDivChildren.push(new Div(entry.category));
         // }
 
+        let anchor: Anchor = null;
         if (entry.title) {
             if (entry.parentFeedTitle) {
                 headerDivChildren.push(new Div(null, {
@@ -319,7 +322,7 @@ export class RssTypeHandler extends TypeBase {
             }
 
             headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                new Anchor(entry.link, null, {
+                anchor = new Anchor(entry.link, null, {
                     className: "rssAnchor",
                     target: "_blank",
                     dangerouslySetInnerHTML: { __html: entry.title }
@@ -356,6 +359,7 @@ export class RssTypeHandler extends TypeBase {
         if (entry.enclosures) {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("image/") !== -1) {
+                    imageShown = true;
                     children.push(new Img(null, {
                         className: "rss-feed-image",
                         src: enc.url
@@ -365,12 +369,14 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (entry.image) {
+            imageShown = true;
             children.push(new Img(null, {
                 className: "rss-feed-image",
                 src: entry.image
             }));
         }
         else if (entry.thumbnail) {
+            imageShown = true;
             children.push(new Img(null, {
                 className: "rss-feed-image",
                 src: entry.thumbnail
@@ -379,6 +385,7 @@ export class RssTypeHandler extends TypeBase {
 
         if (entry.mediaContent) {
             let imageAdded = false;
+            imageShown = true;
             entry.mediaContent.forEach(mc => {
                 /* some feeds have the same image multiple times for some reason so we
                     use imageAdded to keep it from appearing twice */
@@ -395,6 +402,16 @@ export class RssTypeHandler extends TypeBase {
         if (!state.userPreferences.rssHeadlinesOnly) {
             if (entry.description) {
                 children.push(new Html(entry.description));
+            }
+        }
+
+        let tabData = state.tabData.find(d => d.id === C.TAB_MAIN);
+        if (anchor) {
+            let og = new OpenGraphPanel(state, tabData, "og_rss_" + anchor.getId(), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            children.push(og);
+
+            if (tabData) {
+                tabData.openGraphComps.push(og);
             }
         }
 
@@ -445,6 +462,11 @@ export class RssTypeHandler extends TypeBase {
         // const urlSet: Set<string> = new Set<string>();
 
         S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
+
+            // this logic doesn't apply to openGraphImages, so we detect those and bail out
+            if (el.className.indexOf("openGraphImage") !== -1) {
+                return;
+            }
 
             /* Because some feeds use the same image in the header and content we try to detect that here
             and remove any but the first ocurrance of any given image on the entire page.

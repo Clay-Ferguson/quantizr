@@ -19,7 +19,8 @@ interface LS { // Local State
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(private appState: AppState, private tabData: TabIntf<any>, key: string, private url: string) {
+    constructor(private appState: AppState, private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
+        private imageClass: string, private showTitle: boolean, private allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
             title: url,
             key
@@ -138,7 +139,7 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        let bookmarkIcon = state.og.url && !this.appState.isAnonUser ? new Icon({
+        let bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.appState.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
             onClick: () => {
                 S.edit.addLinkBookmark(state.og.url, null, null);
@@ -150,7 +151,7 @@ export class OpenGraphPanel extends Div {
         }
 
         let imgAndDesc: CompIntf = null;
-        if (state.og.image) {
+        if (state.og.image && this.includeImage) {
             // if mobile portrait mode render image above (not beside) description
             if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
@@ -166,7 +167,8 @@ export class OpenGraphPanel extends Div {
                 imgAndDesc = new HorizontalLayout([
                     new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
-                            className: "openGraphImage",
+                            // warning: this class is referenced other places in the code, you must chagne both if you chagne one.
+                            className: this.imageClass,
                             src: state.og.image
                         })
                     ]),
@@ -183,15 +185,15 @@ export class OpenGraphPanel extends Div {
             ]);
         }
 
-        this.attribs.className = "openGraphPanel";
+        this.attribs.className = this.wrapperClass;
         this.setChildren([
             bookmarkIcon,
-            state.og.url ? new Anchor(state.og.url, state.og.title, {
+            this.showTitle ? (state.og.url ? new Anchor(state.og.url, state.og.title, {
                 target: "_blank",
                 className: "openGraphTitle"
             }) : new Div(state.og.title, {
                 className: "openGraphTitle"
-            }),
+            })) : null,
             imgAndDesc
         ]);
     }
