@@ -20,12 +20,20 @@ https://quanta.wiki
 
 See [./distro/README.md](./distro/README.md) for details on how to build and/or run a Quanta instance. 
 
-
-## Tech Stack
-
 Quanta is a browser-based SPA (Single Page App), that works on both mobile and desktop browsers. 
 
 The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS+Redux front end. Deployed and installed via docker (docker compose), MongoDB as the data store, as well as the GO Lang version of IPFS.
+
+## Fund this Project
+
+To support this project contribute via PayPal:
+
+<form action="https://www.paypal.com/donate" method="post" target="_top">
+<input type="hidden" name="hosted_button_id" value="4S3DEDU4BLYEW" />
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+
 
 ## Search Tags
 
