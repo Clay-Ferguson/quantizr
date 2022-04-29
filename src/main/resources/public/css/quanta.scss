@@ -107,6 +107,12 @@ body {
     font-family: "QuantaCustomFont" !important;
 }
 
+.alert {
+    // these sizes are half the default for bootstrap
+    padding: .5rem;
+    margin-bottom: .5rem;
+}
+
 .markdown-content table, th, td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;
@@ -1999,6 +2005,11 @@ audio::-webkit-media-controls-play-button {
 
 .textField {
     margin-top: $smallGap;
+}
+
+.stickyNote {
+    margin-top: 6px;
+    color: darkkhaki;
 }
 
 .rhsLink {

@@ -1226,6 +1226,23 @@ export class Util {
         }
     }
 
+    showPageMessage = (message: string) => {
+        // This outter timer is a very slight hack because when the page re-renders currently it resets pageMessage, so we sneak in
+        // here behind that to set this.
+        setTimeout(() => {
+            dispatch("Action_ShowPageMessage", (s: AppState): AppState => {
+                s.pageMessage = message;
+                return s;
+            });
+            setTimeout(() => {
+                dispatch("Action_ClearPageMessage", (s: AppState): AppState => {
+                    s.pageMessage = null;
+                    return s;
+                });
+            }, 5000);
+        }, 500);
+    }
+
     loadBookmarks = async (): Promise<void> => {
         let state: AppState = store.getState();
         if (!state.isAnonUser) {

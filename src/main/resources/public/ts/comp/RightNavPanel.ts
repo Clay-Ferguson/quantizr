@@ -81,18 +81,17 @@ export class RightNavPanel extends Div {
             title: "Save clipboard"
         }) : null;
 
-        let addNoteButton = state.userPreferences.editMode ? new Icon({
-            className: "fa fa-sticky-note fa-lg marginRight clickable",
+        let addNoteButton = !state.isAnonUser ? new Icon({
+            className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
             onClick: e => {
-                S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, state);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, () => S.util.showPageMessage("Saved (Menu -> Tree -> Notes)"), state);
             },
-            title: "Create new Note"
+            title: "Create new Private Note"
         }) : null;
 
         // These buttons are great, but not rendering them for now, because we need to declutter the GUI, but these can be
         // an advanced option required to be turned on by the user.
         // clipboardPasteButton,
-        // addNoteButton
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [
@@ -103,6 +102,7 @@ export class RightNavPanel extends Div {
                     }) : null,
 
                     new Div(null, { className: "bigMarginBottom" }, [
+                        addNoteButton,
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Allow editing content" }, {
                             setValue: (checked: boolean): void => {
                                 S.edit.toggleEditMode(state);
@@ -180,7 +180,6 @@ export class RightNavPanel extends Div {
 
     makeAvatarDiv = (state: AppState, offset: boolean): CompIntf => {
         let src: string = null;
-
         if (!state.userProfile) return null;
 
         // if ActivityPub icon exists, we know that's the one to use.

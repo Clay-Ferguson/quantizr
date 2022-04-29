@@ -72,7 +72,7 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
@@ -102,7 +102,7 @@ export class Edit {
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
                 else if (editInPopup) {
-                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state);
+                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state, null, afterEditAction);
                     dlg.open();
                 } else {
                     dispatch("Action_startEditing", (s: AppState): AppState => {
@@ -257,7 +257,7 @@ export class Edit {
                     properties: null,
                     shareToUserId: null
                 });
-                this.createSubNodeResponse(res, false, null, state);
+                this.createSubNodeResponse(res, false, null, null, state);
             }
         }
     }
@@ -266,18 +266,18 @@ export class Edit {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.updateNodeMap(res.newNode, state);
             S.nodeUtil.highlightNode(res.newNode, false, state);
-            this.runEditNode(null, res.newNode.id, false, false, false, null, state);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, null, state);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, state: AppState): void => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh(state);
             }
             else {
                 S.nodeUtil.updateNodeMap(res.newNode, state);
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, state);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, state);
             }
         }
     }
@@ -546,7 +546,7 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState) => {
+    runEditNode = async (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state?: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -564,7 +564,7 @@ export class Edit {
         let res: J.InitNodeEditResponse = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         });
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, state);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
@@ -947,10 +947,10 @@ export class Edit {
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null
         });
-        this.createSubNodeResponse(res, true, null, state);
+        this.createSubNodeResponse(res, true, null, null, state);
     }
 
-    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState) => {
+    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -969,7 +969,8 @@ export class Edit {
             properties: null,
             shareToUserId
         });
-        this.createSubNodeResponse(res, false, replyToId, state);
+
+        this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
     }
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
@@ -992,7 +993,7 @@ export class Edit {
         if (!state.userPreferences.editMode) {
             await S.edit.toggleEditMode(state);
         }
-        this.createSubNodeResponse(res, forceUsePopup, null, state);
+        this.createSubNodeResponse(res, forceUsePopup, null, null, state);
     }
 
     addCalendarEntry = async (initDate: number, state: AppState) => {
@@ -1009,7 +1010,7 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null
         });
-        this.createSubNodeResponse(res, false, null, state);
+        this.createSubNodeResponse(res, false, null, null, state);
     }
 
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean): Promise<void> => {

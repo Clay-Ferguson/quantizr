@@ -124,7 +124,7 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(node.id, null, null, node.id, state);
+                        S.edit.addNode(node.id, null, null, node.id, null, state);
                     }
                 }
             }));

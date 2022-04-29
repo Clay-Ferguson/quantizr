@@ -59,24 +59,10 @@ export class Nav {
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
-            dispatch("Action_ShowPageMessage", (s: AppState): AppState => {
-                s.pageMessage = "The node above is not shared.";
-                return s;
-            });
-
-            this.delayedClearPageMessage();
+            S.util.showPageMessage("The node above is not shared.");
         } else {
             S.render.renderPageFromData(res, scrollToTop, id, true, true);
         }
-    }
-
-    delayedClearPageMessage = (): void => {
-        setTimeout(() => {
-            dispatch("Action_ClearPageMessage", (s: AppState): AppState => {
-                s.pageMessage = null;
-                return s;
-            });
-        }, 5000);
     }
 
     navOpenSelectedNode = (state: AppState): void => {

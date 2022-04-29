@@ -86,7 +86,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
 
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
-                    state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
+                    state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, null, state), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "attentionButton"),
 
@@ -147,7 +147,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         // if editing a new post (not a reply)
         if (!editingExistingItem && state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
@@ -176,7 +176,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
                 if (editingExistingItem && node.id === state.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
                 }
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
@@ -188,7 +188,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     // editing a reply inline.
                     if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
                     }
                 }
             });

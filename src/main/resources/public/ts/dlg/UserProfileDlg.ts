@@ -225,7 +225,7 @@ export class UserProfileDlg extends DialogBase {
     sendMessage = (): void => {
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, this.userNodeId, null, this.appState);
+            S.edit.addNode(null, null, this.userNodeId, null, null, this.appState);
         }, 10);
     }
 

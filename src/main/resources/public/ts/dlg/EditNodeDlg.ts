@@ -69,7 +69,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
+    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode, private afterEditAction: Function) {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
         this.close = this.close.bind(this);
 
@@ -559,6 +559,9 @@ export class EditNodeDlg extends DialogBase {
             new Button("Save", () => {
                 this.utl.saveNode(this);
                 this.close();
+                if (this.afterEditAction) {
+                    this.afterEditAction();
+                }
             }, { title: "Save this node and close editor." }, "attentionButton"),
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
