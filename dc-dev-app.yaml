@@ -32,6 +32,7 @@ services:
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # examples are "UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest"
+            # **** Tip ****: remember to put this line in setenv-dev.sh if enablingIPFSTest: `export use_ipfs=true`
             runTests:
             
             mongoAdminPassword: "${adminPassword}"

@@ -6,6 +6,7 @@ import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
+import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { NodeActionType } from "../../enums/NodeActionType";
 import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
@@ -82,15 +83,29 @@ export class NodeCompRow extends Div {
 
             if (this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
+                let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
-                    new Button(null, e => {
+                    insertButton = new Button(null, e => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     }, {
                         iconclass: "fa fa-plus",
-                        title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
+                        title: "Insert new node(1)" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
                 ]);
+
+                S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                    const data = evt.dataTransfer.items;
+                    for (let i = 0; i < data.length; i++) {
+                        const d = data[i];
+                        // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                        if (d.kind === "file") {
+                            EditNodeDlg.pendingUploadFile = data[i].getAsFile();
+                            S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                            return;
+                        }
+                    }
+                });
             }
         }
 

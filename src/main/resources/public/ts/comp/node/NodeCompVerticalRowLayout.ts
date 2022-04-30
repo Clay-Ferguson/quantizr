@@ -99,9 +99,10 @@ export class NodeCompVerticalRowLayout extends Div {
             }
 
             if (this.level <= 1) {
+                let insertButton: Button = null;
                 // todo-1: this button should have same enabelement as "new" button, on the page root
                 comps.push(new Div(null, { className: (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row") }, [
-                    new Button(null, e => {
+                    insertButton = new Button(null, e => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
                         }
@@ -113,6 +114,24 @@ export class NodeCompVerticalRowLayout extends Div {
                         title: "Insert new node"
                     }, "btn-secondary plusButtonFloatRight")
                 ]));
+
+                S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                    const data = evt.dataTransfer.items;
+                    for (let i = 0; i < data.length; i++) {
+                        const d = data[i];
+                        // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                        if (d.kind === "file") {
+                            EditNodeDlg.pendingUploadFile = data[i].getAsFile();
+                            if (lastNode) {
+                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                            }
+                            else {
+                                S.edit.newSubNode(null, state.node.id);
+                            }
+                            return;
+                        }
+                    }
+                });
 
                 if (lastNode) {
                     let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;

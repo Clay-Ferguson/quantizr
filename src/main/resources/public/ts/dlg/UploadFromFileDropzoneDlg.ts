@@ -343,6 +343,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 /* It took me forever to figure out that 'addFile' can do this here, I'm not sure if it's undocumented or
                 could be taken away some day. Hopefully not. */
                 this.dropzone.addFile(this.autoAddFile);
+
+                // let's click the upload button too, automatically
+                setTimeout(() => {
+                    this.upload();
+                }, 500);
             }
         });
     }

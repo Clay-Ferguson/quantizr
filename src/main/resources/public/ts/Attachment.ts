@@ -1,3 +1,4 @@
+import { appState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
@@ -8,6 +9,7 @@ import { S } from "./Singletons";
 
 export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
+        state = appState(state);
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }

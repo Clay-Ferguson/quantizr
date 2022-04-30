@@ -179,10 +179,10 @@ export class EditNodeDlgUtil {
         return null;
     }
 
-    upload = async (dlg: EditNodeDlg): Promise<void> => {
+    upload = async (file: File, dlg: EditNodeDlg): Promise<void> => {
         let state = dlg.getState<LS>();
 
-        let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, null, false, true, dlg.appState, async () => {
+        let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, dlg.appState, async () => {
             await this.refreshBinaryPropsFromServer(dlg, state.node);
             this.initPropStates(dlg, state.node, true);
             dlg.mergeState<LS>({ node: state.node });

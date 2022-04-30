@@ -42,7 +42,7 @@ export ipfs_staging=/home/clay/.ipfs/staging
 # set to 'true' to activate IPFS. Note: This is the ONLY thing required to activate IPFS too. 
 # When you run with this variable defined all the configs and docker files all get run
 # in a way which configures and starts up IPFS.
-export use_ipfs=true
+export use_ipfs=
 
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev

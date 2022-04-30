@@ -44,6 +44,7 @@ import { SelectTagsDlg } from "./SelectTagsDlg";
  */
 export class EditNodeDlg extends DialogBase {
 
+    static pendingUploadFile: File = null;
     utl: EditNodeDlgUtil = new EditNodeDlgUtil();
 
     static embedInstance: EditNodeDlg;
@@ -96,6 +97,13 @@ export class EditNodeDlg extends DialogBase {
         if (encrypt) {
             setTimeout(() => {
                 this.utl.setEncryption(this, true);
+            }, 500);
+        }
+
+        if (EditNodeDlg.pendingUploadFile) {
+            setTimeout(() => {
+                this.utl.upload(EditNodeDlg.pendingUploadFile, this);
+                EditNodeDlg.pendingUploadFile = null;
             }, 500);
         }
     }
@@ -327,6 +335,22 @@ export class EditNodeDlg extends DialogBase {
         let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel
         ]);
+
+        // Allows user to drag-n-drop files onto editor to upload
+        S.util.setDropHandler(this.attribs, true, (evt: DragEvent) => {
+            const data = evt.dataTransfer.items;
+
+            for (let i = 0; i < data.length; i++) {
+                const d = data[i];
+                // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                if (d.kind === "file") {
+                    const file: File = data[i].getAsFile();
+                    let state = this.getState<LS>();
+                    this.utl.upload(file, this);
+                    return;
+                }
+            }
+        });
 
         propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
@@ -567,7 +591,7 @@ export class EditNodeDlg extends DialogBase {
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", null, {
-                onClick: () => this.utl.upload(this),
+                onClick: () => this.utl.upload(null, this),
                 title: "Upload file attachment"
             }) : null,
 
