@@ -46,17 +46,16 @@ public class IPFSFiles extends ServiceBase {
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
 
-    // this file does NOT return results, so get rid of this return value. todo-0
-    public MerkleLink addFile(MongoSession ms, String fileName, String mimeType, String content) {
-		return addFile(ms, fileName, mimeType, content.getBytes(StandardCharsets.UTF_8));
+    public void addFile(MongoSession ms, String fileName, String mimeType, String content) {
+		addFile(ms, fileName, mimeType, content.getBytes(StandardCharsets.UTF_8));
 	}
 
-    public MerkleLink addFile(MongoSession ms, String fileName, String mimeType, byte[] bytes) {
-		return addEntry(ms, fileName, mimeType, new ByteArrayInputStream(bytes));
+    public void addFile(MongoSession ms, String fileName, String mimeType, byte[] bytes) {
+		addEntry(ms, fileName, mimeType, new ByteArrayInputStream(bytes));
 	}
 
-	public MerkleLink addEntry(MongoSession ms, String fileName, String mimeType, InputStream stream) {
-		return ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
+	public void addEntry(MongoSession ms, String fileName, String mimeType, InputStream stream) {
+		ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
 	}
 
     public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
