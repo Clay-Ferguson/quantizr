@@ -5,6 +5,7 @@ import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -88,6 +89,21 @@ export class RightNavPanel extends Div {
             },
             title: "Create new Private Note"
         }) : null;
+
+        if (addNoteButton) {
+            S.util.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
+                const data = evt.dataTransfer.items;
+                for (let i = 0; i < data.length; i++) {
+                    const d = data[i];
+                    // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                    if (d.kind === "file") {
+                        EditNodeDlg.pendingUploadFile = data[i].getAsFile();
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu->Tree->Notes)"), state);
+                        return;
+                    }
+                }
+            });
+        }
 
         // These buttons are great, but not rendering them for now, because we need to declutter the GUI, but these can be
         // an advanced option required to be turned on by the user.
