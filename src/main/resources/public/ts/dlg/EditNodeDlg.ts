@@ -101,10 +101,11 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (EditNodeDlg.pendingUploadFile) {
-            setTimeout(() => {
-                this.utl.upload(EditNodeDlg.pendingUploadFile, this);
+            setTimeout(async () => {
+                await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
                 EditNodeDlg.pendingUploadFile = null;
-            }, 500);
+                this.save();
+            }, 250);
         }
     }
 
@@ -556,6 +557,14 @@ export class EditNodeDlg extends DialogBase {
         };
     }
 
+    save = () => {
+        this.utl.saveNode(this);
+        this.close();
+        if (this.afterEditAction) {
+            this.afterEditAction();
+        }
+    }
+
     renderButtons(): CompIntf {
         let state = this.getState<LS>();
         let hasAttachment: boolean = S.props.hasBinary(state.node);
@@ -580,13 +589,7 @@ export class EditNodeDlg extends DialogBase {
         let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
-            new Button("Save", () => {
-                this.utl.saveNode(this);
-                this.close();
-                if (this.afterEditAction) {
-                    this.afterEditAction();
-                }
-            }, { title: "Save this node and close editor." }, "attentionButton"),
+            new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 

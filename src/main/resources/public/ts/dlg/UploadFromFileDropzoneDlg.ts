@@ -347,7 +347,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 // let's click the upload button too, automatically
                 setTimeout(() => {
                     this.upload();
-                }, 500);
+                }, 250);
             }
         });
     }

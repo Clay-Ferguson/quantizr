@@ -90,7 +90,7 @@ export class NodeCompRow extends Div {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     }, {
                         iconclass: "fa fa-plus",
-                        title: "Insert new node(1)" + (this.isTableCell ? " (above this one)" : "")
+                        title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
                 ]);
 
