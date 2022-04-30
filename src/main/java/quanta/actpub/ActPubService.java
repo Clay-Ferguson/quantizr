@@ -973,7 +973,7 @@ public class ActPubService extends ServiceBase {
                 String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
                 String avatarMime = userNode.getStr(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStr(NodeProp.BIN.s());
-                String ipns = userNode.getStr(NodeProp.USER_DID_IPNS.s());
+                String did = userNode.getStr(NodeProp.USER_DID_IPNS.s());
                 String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getIdStr() + "&v=" + avatarVer;
 
@@ -987,7 +987,7 @@ public class ActPubService extends ServiceBase {
                          */
                         .put(APObj.id, apUtil.makeActorUrlForUserName(userName)) //
                         .put(APObj.type, APType.Person) //
-                        .put(APObj.ipns, ipns) //
+                        .put(APObj.did, did) //
                         .put(APObj.preferredUsername, userName) //
                         .put(APObj.name, displayName) //
 

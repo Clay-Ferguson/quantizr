@@ -14,7 +14,7 @@ public class APObj extends HashMap<String, Object> {
     public static final String id = "id";
     public static final String context = "@context";
     public static final String type = "type";
-    public static final String ipns = "ipns";
+    public static final String did = "did";
     public static final String language = "language";
     public static final String object = "object";
     public static final String actor = "actor";
