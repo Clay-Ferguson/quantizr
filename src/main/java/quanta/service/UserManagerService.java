@@ -660,13 +660,18 @@ public class UserManagerService extends ServiceBase {
 				String cid = null;
 
 				log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
-				String fileName = "/" + userNodeId.toHexString() + "/identity.json";
+
+				// make a folder for this user
+				String folderName = "/" + userNodeId.toHexString();
+
+				// put identity file in this folder
+				String fileName = folderName + "/identity.json";
 
 				// Instead let's wrap in a MFS folder type for now. This is all experimental so far.
 				ipfsFiles.addFile(ms, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
 
 				// Now we have to read the file we just wrote to get it's CID so we can publish it.
-				IPFSDirStat pathStat = ipfsFiles.pathStat(fileName);
+				IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
 				if (no(pathStat)) {
 					push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED"));
 					return null;

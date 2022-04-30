@@ -136,7 +136,7 @@ export class UserProfileDlg extends DialogBase {
                     className: "marginTop clickable",
                     onClick: () => {
                         let link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
-                        S.util.copyToClipboard("/ipns/" + state.userProfile.didIPNS);
+                        S.util.copyToClipboard(link);
                         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
                         // window.open(link, "_blank");
                     }
