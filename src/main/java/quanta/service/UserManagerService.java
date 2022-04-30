@@ -652,13 +652,14 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
+	// todo-0: do we need to pathStat to get the CID of the existing root to make sure it's pinned, and then pin the new one
+	// Basically I need to figure out how MFS handles pins, or if everything persisted to MFS is automatically pinned or not
 	public void writeProfileToIPNS(SessionContext sc, ObjectId userNodeId, String key, String userName) {
 		exec.run(() -> {
 			arun.run(ms -> {
 				APODID did = new APODID(userName + "@" + prop.getMetaHost());
 				String didPayload = XString.prettyPrint(did);
 				String cid = null;
-
 				log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
 
 				// make a folder for this user
