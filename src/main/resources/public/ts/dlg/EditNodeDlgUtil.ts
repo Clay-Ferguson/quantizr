@@ -78,6 +78,11 @@ export class EditNodeDlgUtil {
             node: state.node
         });
 
+        /* IMPORTANT: If there's an after edit action function specified on the dialog then that will be the ONLY
+         action performed after the saveNode, so if we ever need any of the below logic to be run, in the case with
+         afterEditAction we'd have to call that logic inside the afterEditAction function. */
+        if (dlg.afterEditAction) return;
+
         // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
         // page refreshing after the edit.
         if (res.node.type === J.NodeType.BOOKMARK && dlg.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
@@ -214,7 +219,7 @@ export class EditNodeDlgUtil {
 
     deletePropertiesButtonClick = async (dlg: EditNodeDlg): Promise<void> => {
         let confirmDlg: ConfirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
-        "btn-danger", "alert alert-danger", dlg.appState);
+            "btn-danger", "alert alert-danger", dlg.appState);
         await confirmDlg.open();
         if (confirmDlg.yes) {
             this.deleteSelectedProperties(dlg);
@@ -399,9 +404,9 @@ export class EditNodeDlgUtil {
         this.initPropStates(dlg, state.node, false);
     }
 
-        /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
-    the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
-    an upload has been added or removed. */
+    /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
+the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
+an upload has been added or removed. */
     initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         let customProps: string[] = null;
