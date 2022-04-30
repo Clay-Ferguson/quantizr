@@ -77,6 +77,7 @@ public enum NodeProp {
     USER("sn:user", "s"), //
     DISPLAY_NAME("sn:displayName", "s"), //
     USER_BIO("sn:userBio", "s"), //
+    USER_DID_IPNS("sn:didIPNS", "s"), //
     USER_TAGS("sn:tags", "s"), //
     PWD_HASH("sn:pwdHash", "s"), //
 

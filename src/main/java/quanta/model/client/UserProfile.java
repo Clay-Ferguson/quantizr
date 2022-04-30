@@ -7,6 +7,8 @@ public class UserProfile {
 	// if a node exists named '[userName]:home', then the id of that node is stored here.
 	private String homeNodeId;
 
+	private String didIPNS;
+
 	private String userBio;
 	private String userTags;
 
@@ -155,5 +157,13 @@ public class UserProfile {
 
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
+	}
+
+	public String getDidIPNS() {
+		return didIPNS;
+	}
+
+	public void setDidIPNS(String didIPNS) {
+		this.didIPNS = didIPNS;
 	}
 }

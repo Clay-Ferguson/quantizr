@@ -86,6 +86,13 @@ export class ServerPush {
             this.ipsmPushItem(data.payload, state);
         }, false);
 
+        this.eventSource.addEventListener("pushPageMessage", (e: any) => {
+            let state = store.getState();
+            const data: J.PushPageMessage = JSON.parse(e.data);
+            // console.log("pagePushMessage: " + data.payload);
+            S.util.showPageMessage(data.payload);
+        }, false);
+
         this.eventSource.addEventListener("newInboxNode", (e: any) => {
             // const obj: J.NotificationMessage = JSON.parse(e.data);
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));

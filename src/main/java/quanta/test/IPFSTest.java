@@ -4,6 +4,7 @@ import static quanta.util.Util.ok;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -19,8 +20,8 @@ public class IPFSTest extends ServiceBase implements TestIntf {
         log.debug("IPFSTest.test() running.");
         // testUploadDirectory();
         // ipfs.getRepoStat();
-        // ipnsTest();
-        mfsTest();
+        ipnsTest();
+        // mfsTest();
     }
 
     private void mfsTest() {
@@ -28,7 +29,7 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             String fileName = "/a/b/file.txt";
 
             // Write a text file to MFS.
-            ipfsFiles.addFile(as, fileName, "This is a test");
+            ipfsFiles.addFile(as, fileName, MediaType.TEXT_PLAIN_VALUE, "This is a test");
             log.debug("MFS File Added: " + fileName);
 
             // Now read back the file
@@ -76,10 +77,19 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             // Publish the CID under a Key
             Map<String, Object> ret = ipfsName.publish(as, "ClaysKey", ml.getCid().getPath());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
+            // The line above will print something like this:
+            // {
+            //     "Name" : "k51qzi5uqu5dkvzwaur63dwcvl49faobfu5wehnhgprr40sd91ut1quiwhg7fa",
+            //     "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
 
             String ipnsName = (String) ret.get("Name");
             ret = ipfsName.resolve(as, ipnsName);
             log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
+            // Resolve will print something like this:
+            // {
+            //     "Path" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
 
             // verify = ipfs.dagGet(ipnsName);
             // log.debug("verifyIPNS!: " + verify);

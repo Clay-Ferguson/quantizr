@@ -70,6 +70,7 @@ export interface UserProfile {
     displayName: string;
     userName: string;
     homeNodeId: string;
+    didIPNS: string;
     userBio: string;
     userTags: string;
     avatarVer: string;
@@ -698,6 +699,10 @@ export interface PingResponse extends ResponseBase {
 export interface PublishNodeToIpfsResponse extends ResponseBase {
 }
 
+export interface PushPageMessage extends ServerPushInfo {
+    payload: string;
+}
+
 export interface RemovePrivilegeResponse extends ResponseBase {
 }
 
@@ -917,6 +922,7 @@ export const enum NodeProp {
     USER = "sn:user",
     DISPLAY_NAME = "sn:displayName",
     USER_BIO = "sn:userBio",
+    USER_DID_IPNS = "sn:didIPNS",
     USER_TAGS = "sn:tags",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",

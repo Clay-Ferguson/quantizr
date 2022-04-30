@@ -9,6 +9,7 @@ public class APType {
 
     // Note: Pleroma sends these when you DM someone.
     public static final String ChatMessage = "ChatMessage";
+    public static final String DID = "DID";
     
     public static final String Tombstone = "Tombstone";
     public static final String Follow = "Follow";

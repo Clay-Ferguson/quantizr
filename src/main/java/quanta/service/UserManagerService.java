@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubLog;
+import quanta.actpub.model.APODID;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -39,6 +42,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
+import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.MongoUtil;
@@ -65,6 +69,7 @@ import quanta.response.GetFriendsResponse;
 import quanta.response.GetUserAccountInfoResponse;
 import quanta.response.GetUserProfileResponse;
 import quanta.response.LoginResponse;
+import quanta.response.PushPageMessage;
 import quanta.response.ResetPasswordResponse;
 import quanta.response.SavePublicKeyResponse;
 import quanta.response.SaveUserPreferencesResponse;
@@ -638,10 +643,46 @@ public class UserManagerService extends ServiceBase {
 				// sessionContext.setUserName(req.getUserName());
 				update.save(ms, userNode);
 				res.setSuccess(true);
+
+				String key = userNode.getStr(NodeProp.PWD_HASH);
+				writeProfileToIPNS(ThreadLocals.getSC(), userNode.getId(), key, userName);
 			}
 			return null;
 		});
 		return res;
+	}
+
+	public void writeProfileToIPNS(SessionContext sc, ObjectId userNodeId, String key, String userName) {
+		exec.run(() -> {
+			arun.run(ms -> {
+				APODID did = new APODID(userName + "@" + prop.getMetaHost());
+				String didPayload = XString.prettyPrint(did);
+				String cid = null;
+
+				log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
+				String fileName = "/" + userNodeId.toHexString() + "/identity.json";
+
+				// Instead let's wrap in a MFS folder type for now. This is all experimental so far.
+				ipfsFiles.addFile(ms, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
+
+				// Now we have to read the file we just wrote to get it's CID so we can publish it.
+				IPFSDirStat pathStat = ipfsFiles.pathStat(fileName);
+				if (no(pathStat)) {
+					push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED"));
+					return null;
+				}
+				cid = pathStat.getHash();
+
+				Map<String, Object> ret = ipfsName.publish(ms, key, cid);
+
+				SubNode userNode = read.getNode(ms, userNodeId, false);
+				userNode.set(NodeProp.USER_DID_IPNS.s(), ret.get("Name"));
+				update.save(ms, userNode);
+
+				push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete."));
+				return null;
+			});
+		});
 	}
 
 	public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
@@ -813,6 +854,7 @@ public class UserManagerService extends ServiceBase {
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO.s()));
+				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS.s()));
 				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN.s()));
 				userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
@@ -1004,7 +1046,7 @@ public class UserManagerService extends ServiceBase {
 			/*
 			 * IMPORTANT!
 			 *
-			 * verify that the email address provides IS A MATCH to the email address for this user! 
+			 * verify that the email address provides IS A MATCH to the email address for this user!
 			 */
 			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL.s());
 			if (no(nodeEmail) || !nodeEmail.equals(email)) {
@@ -1074,7 +1116,7 @@ public class UserManagerService extends ServiceBase {
 						}
 						// Otherwise the avatar will be specified as a remote user's Icon.
 						else {
-							fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL)); 
+							fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 						}
 					}
 					fi.setUserNodeId(userNodeId);

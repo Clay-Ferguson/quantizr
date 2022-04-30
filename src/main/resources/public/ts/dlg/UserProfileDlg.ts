@@ -131,6 +131,17 @@ export class UserProfileDlg extends DialogBase {
                     },
                         this.bioState),
 
+                state.userProfile.didIPNS ? new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
+                    title: "Decentralized Identity (DID) IPNS Name",
+                    className: "marginTop clickable",
+                    onClick: () => {
+                        let link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
+                        S.util.copyToClipboard("/ipns/" + state.userProfile.didIPNS);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        // window.open(link, "_blank");
+                    }
+                }) : null,
+
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
@@ -265,6 +276,10 @@ export class UserProfileDlg extends DialogBase {
             s.displayName = this.displayNameState.getValue();
             return s;
         });
+
+        if (!this.readOnly) {
+            S.util.showPageMessage("Publishing your Identity Info...");
+        }
     }
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {
