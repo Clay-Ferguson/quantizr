@@ -968,6 +968,7 @@ public class MongoUtil extends ServiceBase {
 		userNode.set(NodeProp.BIN_TOTAL.s(), 0);
 		userNode.set(NodeProp.LAST_LOGIN_TIME.s(), 0);
 		userNode.set(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
+		userNode.set(NodeProp.ALLOWED_FEATURES.s(), "0");
 
 		userNode.setContent("### Account: " + user);
 		userNode.touch();

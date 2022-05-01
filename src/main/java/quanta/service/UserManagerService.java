@@ -217,6 +217,7 @@ public class UserManagerService extends ServiceBase {
 			throw new RuntimeException("userNode id is null for user: " + userName);
 		}
 		sc.setRootId(id);
+		sc.setAllowedFeatures(userNode.getStr(NodeProp.ALLOWED_FEATURES));
 
 		UserPreferences userPreferences = getUserPreferences(userName, userNode);
 		sc.setUserPreferences(userPreferences);
@@ -622,7 +623,7 @@ public class UserManagerService extends ServiceBase {
 			boolean failed = false;
 			SubNode userNode = read.getUserNodeByUserName(ms, userName);
 
-			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userNaem)
+			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userName)
 			// If userName is changing, validate it first.
 			// if (!req.getUserName().equals(userName)) {
 			// validator.checkUserName(req.getUserName());
@@ -644,29 +645,45 @@ public class UserManagerService extends ServiceBase {
 				update.save(ms, userNode);
 				res.setSuccess(true);
 
-				String key = userNode.getStr(NodeProp.PWD_HASH);
-				writeProfileToIPNS(ThreadLocals.getSC(), userNode.getId(), key, userName);
+				if (req.isPublish()) {
+					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
+				}
 			}
 			return null;
 		});
 		return res;
 	}
 
-	// todo-0: do we need to pathStat to get the CID of the existing root to make sure it's pinned, and then pin the new one
-	// Basically I need to figure out how MFS handles pins, or if everything persisted to MFS is automatically pinned or not
-	public void writeProfileToIPNS(SessionContext sc, ObjectId userNodeId, String key, String userName) {
+	/*
+	 * todo-0: do we need to pathStat to get the CID of the existing root to make sure it's un-pinned,
+	 * and then pin the new one? Basically I need to figure out how MFS handles pins, or if everything
+	 * persisted to MFS is automatically pinned or not, so this feature is not complete until we
+	 * consider lifecycle of the pins for this folder. I'm pretty pinning on MFS is all automatic, but
+	 * not sure what happend when IPNS points to a CID that can get garbage collected.
+	 */
+	public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
+		if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+			return;
+		}
+
+		// Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
+		String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
 		exec.run(() -> {
 			arun.run(ms -> {
 				APODID did = new APODID(userName + "@" + prop.getMetaHost());
+				did.put("bio", bio);
+				did.put("displayName", displayName);
+
 				String didPayload = XString.prettyPrint(did);
 				String cid = null;
 				log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
 
 				// make a folder for this user
-				String folderName = "/" + userNodeId.toHexString();
+				String folderName = "/" + userNodeId;
 
 				// put identity file in this folder
 				String fileName = folderName + "/identity.json";
+				log.debug("identity file: " + fileName);
 
 				// Instead let's wrap in a MFS folder type for now. This is all experimental so far.
 				ipfsFiles.addFile(ms, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
@@ -677,9 +694,18 @@ public class UserManagerService extends ServiceBase {
 					push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED"));
 					return null;
 				}
+
+				log.debug("Parent Folder PathStat " + folderName + ": " + XString.prettyPrint(pathStat));
+
+				// IPFSDir dir = ipfsFiles.getDir(folderName);
+				// if (ok(dir)) {
+				// log.debug("Parent Folder Listing " + folderName + ": " + XString.prettyPrint(dir));
+				// }
 				cid = pathStat.getHash();
 
-				Map<String, Object> ret = ipfsName.publish(ms, key, cid);
+				log.debug("Publishing CID (root folder): " + cid);
+				Map<String, Object> ret = ipfsName.publish(ms, null, cid);
+				log.debug("Publishing complete!");
 
 				SubNode userNode = read.getNode(ms, userNodeId, false);
 				userNode.set(NodeProp.USER_DID_IPNS.s(), ret.get("Name"));

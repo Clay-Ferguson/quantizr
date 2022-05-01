@@ -166,6 +166,9 @@ public enum NodeProp {
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"), //
 
+    // if this contains web3, then web3 active, etc.
+    ALLOWED_FEATURES("sn:features", "s"), //
+
     LAST_LOGIN_TIME("sn:lastLogin", "s"), //
     LAST_ACTIVE_TIME("sn:lastActive", "s"), //
 

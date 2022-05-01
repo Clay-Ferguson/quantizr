@@ -6,8 +6,10 @@ public class SaveUserProfileRequest extends RequestBase {
 	private String userName;
 	private String userBio;
 	private String userTags;
-
 	private String displayName;
+
+	// only publishes DID/IPNS if this is true
+	private boolean publish;
 
 	public String getUserName() {
 		return userName;
@@ -29,7 +31,6 @@ public class SaveUserProfileRequest extends RequestBase {
 		this.userTags = userTags;
 	}
 
-
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
@@ -40,5 +41,13 @@ public class SaveUserProfileRequest extends RequestBase {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public boolean isPublish() {
+		return publish;
+	}
+
+	public void setPublish(boolean publish) {
+		this.publish = publish;
 	}
 }

@@ -31,7 +31,14 @@ public class IPFSName extends ServiceBase {
     public Map<String, Object> publish(MongoSession ms, String key, String cid) {
         Map<String, Object> ret = null;
         try {
-            String url = API_NAME + "/publish?arg=" + cid + (ok(key) ? "&=" + key : "");
+            String url = API_NAME + "/publish?arg=" + cid;
+
+            // todo-0: for now we don't try to manage any keys...
+            // I was misunderstanding this, the entire time I've used IPFS. You must use a real key here. This answers
+            // a lot of questions I'd had!!!
+            // if (ok(key)) {
+            //     url += "&key=" + key;
+            // }
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();

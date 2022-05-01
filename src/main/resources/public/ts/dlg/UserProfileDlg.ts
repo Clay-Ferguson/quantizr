@@ -146,6 +146,9 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    this.appState.isAnonUser || this.readOnly ? null : new Button("Publish", this.publish, {
+                        title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
+                    }),
 
                     // only local users might have set their 'home' node (named a node 'home')
                     localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
@@ -213,7 +216,19 @@ export class UserProfileDlg extends DialogBase {
             userName: null,
             userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
-            displayName: this.displayNameState.getValue()
+            displayName: this.displayNameState.getValue(),
+            publish: false
+        });
+        this.saveResponse(res);
+    }
+
+    publish = async () => {
+        let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+            userName: null,
+            userTags: this.appState.userProfile.userTags,
+            userBio: this.bioState.getValue(),
+            displayName: this.displayNameState.getValue(),
+            publish: true
         });
         this.saveResponse(res);
     }

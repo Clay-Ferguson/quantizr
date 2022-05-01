@@ -95,6 +95,10 @@ public class SubNode {
 	@JsonIgnore
 	private Object propLock = new Object();
 
+	// these are public on purpose.
+	public String cid;
+	public String prevCid;
+
 	/*
 	 * ACL=Access Control List
 	 * 
@@ -628,6 +632,9 @@ public class SubNode {
 	public void setTags(String tags) {
 		if (Util.equalObjs(tags, this.tags))
 			return;
+		// temporary hack (I saw empty tags prop in some JSON)
+		if ("".equals(tags))
+			tags = null;
 		ThreadLocals.dirty(this);
 		this.tags = tags;
 	}
@@ -657,5 +664,27 @@ public class SubNode {
 
 	public void setContentLength(int contentLength) {
 		this.contentLength = contentLength;
+	}
+
+	public String getCid() {
+		return cid;
+	}
+
+	public void setCid(String cid) {
+		if (Util.equalObjs(cid, this.cid))
+			return;
+		ThreadLocals.dirty(this);
+		this.cid = cid;
+	}
+
+	public String getPrevCid() {
+		return prevCid;
+	}
+
+	public void setPrevCid(String prevCid) {
+		if (Util.equalObjs(prevCid, this.prevCid))
+			return;
+		ThreadLocals.dirty(this);
+		this.prevCid = prevCid;
 	}
 }

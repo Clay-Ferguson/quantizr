@@ -60,6 +60,8 @@ public class SessionContext extends ServiceBase {
 	// Message to display to user at first convenient time.
 	private String userMessage;
 
+	private String allowedFeatures = "";
+
 	// variable not currently being used (due to refactoring)
 	private long lastLoginTime;
 	private long lastActiveTime;
@@ -515,5 +517,16 @@ public class SessionContext extends ServiceBase {
 
 	public void setUserMessage(String userMessage) {
 		this.userMessage = userMessage;
+	}
+
+	public String getAllowedFeatures() {
+		return allowedFeatures;
+	}
+
+	public void setAllowedFeatures(String allowedFeatures) {
+		if (no(allowedFeatures)) {
+			allowedFeatures = "";
+		}
+		this.allowedFeatures = allowedFeatures;
 	}
 }

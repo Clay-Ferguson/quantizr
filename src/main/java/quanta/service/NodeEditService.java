@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
@@ -26,6 +27,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
@@ -486,11 +488,87 @@ public class NodeEditService extends ServiceBase {
 							node.getContent(), nodeUrl);
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
+
+				if (AclService.isPublic(ms, node)) {
+					saveNodeToMFS(ms, node);
+				}
+
 				return null;
 			} else {
 				log.error("Unable to find parent node for path: " + node.getPath());
 			}
+
 			return null;
+		});
+	}
+
+	/*
+	 * Save PUBLIC nodes to IPFS/MFS
+	 */
+	public void saveNodeToMFS(MongoSession ms, SubNode node) {
+		if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+			return;
+		}
+
+		// Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
+		String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
+
+		exec.run(() -> {
+			arun.run(as -> {
+				SubNode ownerNode = read.getNode(as, node.getOwner());
+				if (no(ownerNode)) {
+					throw new RuntimeException("Unable to find owner node.");
+				}
+
+				String pathBase = "/" + userNodeId;
+
+				// make the path of the node relative to the owner by removing the part of the path that is
+				// the user's root node path
+				String path = node.getPath().replace(ownerNode.getPath(), "");
+				String mfsPath = pathBase + "/posts" + path;
+				log.debug("Writing JSON to MFS Path: " + mfsPath);
+
+				// save values for finally block
+				String cid = node.getCid();
+				String prevCid = node.getPrevCid();
+
+				try {
+					// intentionally not using setters here (becasue of dirty flag)
+					node.cid = null;
+					node.prevCid = null;
+
+					// todo-1: quick hack: i keep seeing tag="" in the JSON, but don't want to check that now.
+					// need to fix this the correct way.
+					if ("".equals(node.getTags())) {
+						node.setTags(null);
+					}
+
+					ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
+				} finally {
+					// retore values after done with json serializing (do NOT use setter methods here)
+					node.cid = cid;
+					node.prevCid = prevCid;
+				}
+
+				IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
+				if (ok(pathStat)) {
+					log.debug("File PathStat: " + XString.prettyPrint(pathStat));
+					node.setPrevCid(cid);
+					node.setCid(pathStat.getHash());
+				}
+
+				// pathStat = ipfsFiles.pathStat(pathBase);
+				// if (ok(pathStat)) {
+				// log.debug("Parent Folder PathStat " + pathBase + ": " + XString.prettyPrint(pathStat));
+				// }
+
+				// IPFSDir dir = ipfsFiles.getDir(pathBase);
+				// if (ok(dir)) {
+				// log.debug("Parent Folder Listing " + pathBase + ": " + XString.prettyPrint(dir));
+				// }
+
+				return null;
+			});
 		});
 	}
 

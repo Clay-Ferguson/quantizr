@@ -391,6 +391,7 @@ export interface SaveUserProfileRequest extends RequestBase {
     userBio: string;
     userTags: string;
     displayName: string;
+    publish: boolean;
 }
 
 export interface SearchAndReplaceRequest extends RequestBase {
@@ -957,6 +958,7 @@ export const enum NodeProp {
     CHILDREN_IMG_SIZES = "sn:childrenImgSizes",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
+    ALLOWED_FEATURES = "sn:features",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",
     CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
