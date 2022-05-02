@@ -95,9 +95,15 @@ public class SubNode {
 	@JsonIgnore
 	private Object propLock = new Object();
 
-	// these are public on purpose.
-	public String cid;
-	public String prevCid;
+	// these are public on purpose. (the M means this CID is from MFS, and no need to pin or unpin ever)
+	public static final String MCID = "mcid";
+	@Field(MCID)
+	public String mcid;
+
+	//  (the M means this CID is from MFS, and no need to pin or unpin ever)
+	public static final String PREV_MCID = "prevMcid";
+	@Field(PREV_MCID)
+	public String prevMcid;
 
 	/*
 	 * ACL=Access Control List
@@ -666,25 +672,25 @@ public class SubNode {
 		this.contentLength = contentLength;
 	}
 
-	public String getCid() {
-		return cid;
+	public String getMcid() {
+		return mcid;
 	}
 
-	public void setCid(String cid) {
-		if (Util.equalObjs(cid, this.cid))
+	public void setMcid(String mcid) {
+		if (Util.equalObjs(mcid, this.mcid))
 			return;
 		ThreadLocals.dirty(this);
-		this.cid = cid;
+		this.mcid = mcid;
 	}
 
-	public String getPrevCid() {
-		return prevCid;
+	public String getPrevMcid() {
+		return prevMcid;
 	}
 
-	public void setPrevCid(String prevCid) {
-		if (Util.equalObjs(prevCid, this.prevCid))
+	public void setPrevMcid(String prevMcid) {
+		if (Util.equalObjs(prevMcid, this.prevMcid))
 			return;
 		ThreadLocals.dirty(this);
-		this.prevCid = prevCid;
+		this.prevMcid = prevMcid;
 	}
 }

@@ -647,6 +647,10 @@ public class MongoUtil extends ServiceBase {
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
 
+		// The pinning cleanup was originally written to look these up, but 
+		// I've about concluded that MFS files don't need to be pinned at all.
+		// createIndex(ms, SubNode.class, SubNode.CID);
+
 		createIndex(ms, SubNode.class, SubNode.OWNER);
 		createIndex(ms, SubNode.class, SubNode.PARENT);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);

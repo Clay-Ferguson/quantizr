@@ -671,10 +671,11 @@ public class MongoRead extends ServiceBase {
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans, boolean publicOnly) {
+    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans,
+            boolean publicOnly) {
 
         /*
-         * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit') 
+         * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit')
          */
         // DO NOT REMOVE THIS CHECK!!!
         if (removeOrphans && limit > 0) {
@@ -1231,5 +1232,37 @@ public class MongoRead extends ServiceBase {
         SubNode ret = mongoUtil.findOne(q);
         auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
+    }
+
+    public SubNode findByCID(MongoSession ms, String cid) {
+        Query q = new Query();
+
+        /* Match the PIN to cid */
+        // todo-0: need to add an index for this.
+        Criteria crit = Criteria.where(SubNode.MCID).is(cid);
+        q.addCriteria(crit);
+        SubNode ret = mongoUtil.findOne(q);
+        auth.auth(ms, ret, PrivilegeType.READ);
+        return ret;
+    }
+
+    // This gets all nodes with a pinned attachment on IPFS.
+    // (not currently used)
+    public Iterable<SubNode> findAllWithIpfsLinks() {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).ne(null);
+
+        /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
+        crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
+        q.addCriteria(crit);
+        return mongoUtil.find(q);
+    }
+
+    // (not currently used)
+    public Iterable<SubNode> findAllWithCids() {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.MCID).ne(null);
+        q.addCriteria(crit);
+        return mongoUtil.find(q);
     }
 }

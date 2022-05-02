@@ -137,6 +137,8 @@ public enum NodeProp {
 
     BIN_MIME("sn:mimeType", "s"), //
     BIN_FILENAME("sn:fileName", "s"), //
+
+    // todo-1: Currently this size doesn't take into account IPFS storage of nodes with SubNode.CID property, that is.
     BIN_SIZE("sn:size", "s"), //
 
     /*

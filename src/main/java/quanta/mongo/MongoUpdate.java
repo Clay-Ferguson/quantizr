@@ -121,6 +121,8 @@ public class MongoUpdate extends ServiceBase {
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
 		Val<String> ret = new Val<>("failed");
+
+		// run as admin
 		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfsPin.getPins());
@@ -130,13 +132,27 @@ public class MongoUpdate extends ServiceBase {
 				 * if not we remove the pin
 				 */
 				for (String pin : pins.keySet()) {
+					log.debug("Check PIN: " + pin);
+					boolean attachment = false;
+
 					SubNode ipfsNode = read.findByIPFSPinned(as, pin);
+
+					// if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
+					if (no(ipfsNode)) {
+						// turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
+						// to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that are
+						// 'backing' the MFS file storage don't even appear in the pinning system.
+						// ipfsNode = read.findByCID(as, pin);
+					} else {
+						attachment = true;
+					}
+
 					if (ok(ipfsNode)) {
 						pinCount++;
-						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
-						// ipfsNode.getIdStr());
+						log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId="
+								+ ipfsNode.getIdStr());
 
-						if (ok(statsMap)) {
+						if (attachment && ok(statsMap)) {
 							Long binSize = ipfsNode.getInt(NodeProp.BIN_SIZE);
 							if (no(binSize)) {
 								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above

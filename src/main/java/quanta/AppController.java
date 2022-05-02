@@ -892,7 +892,8 @@ public class AppController extends ServiceBase implements ErrorController {
 						throw new RuntimeException("Node not found.");
 					}
 
-					// if there's no sharing at all on the node, then we do the token check, otherwise we allow access. This is for
+					// if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
+					// This is for
 					// good fediverse interoperability but still with a level of privacy for completely unshared nodes.
 					if (no(node.getAc()) || node.getAc().size() == 0) {
 						SessionContext.checkReqToken();

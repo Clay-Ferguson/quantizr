@@ -459,7 +459,7 @@ export class MenuPanel extends Div {
                 new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
                 new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state)), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
-                new MenuItem("Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
+                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
                 new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", "Run DB Conversion", null, state)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
                 new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),

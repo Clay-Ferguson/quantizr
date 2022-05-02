@@ -529,13 +529,13 @@ public class NodeEditService extends ServiceBase {
 				log.debug("Writing JSON to MFS Path: " + mfsPath);
 
 				// save values for finally block
-				String cid = node.getCid();
-				String prevCid = node.getPrevCid();
+				String mcid = node.getMcid();
+				String prevMcid = node.getPrevMcid();
 
 				try {
 					// intentionally not using setters here (becasue of dirty flag)
-					node.cid = null;
-					node.prevCid = null;
+					node.mcid = null;
+					node.prevMcid = null;
 
 					// todo-1: quick hack: i keep seeing tag="" in the JSON, but don't want to check that now.
 					// need to fix this the correct way.
@@ -546,15 +546,15 @@ public class NodeEditService extends ServiceBase {
 					ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
 				} finally {
 					// retore values after done with json serializing (do NOT use setter methods here)
-					node.cid = cid;
-					node.prevCid = prevCid;
+					node.mcid = mcid;
+					node.prevMcid = prevMcid;
 				}
 
 				IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
 				if (ok(pathStat)) {
 					log.debug("File PathStat: " + XString.prettyPrint(pathStat));
-					node.setPrevCid(cid);
-					node.setCid(pathStat.getHash());
+					node.setPrevMcid(mcid);
+					node.setMcid(pathStat.getHash());
 				}
 
 				// pathStat = ipfsFiles.pathStat(pathBase);
