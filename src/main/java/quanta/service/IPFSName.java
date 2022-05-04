@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,7 +32,8 @@ public class IPFSName extends ServiceBase {
         try {
             String url = API_NAME + "/publish?arg=" + cid;
 
-            // todo-0: for now we don't try to manage any keys...
+            // todo-0: for now we don't try to manage any keys...AND before we can turn on Web3 for all users we DO need to have the user-specific key here
+            // which we already do have because it's in use by ActivityPub.
             // I was misunderstanding this, the entire time I've used IPFS. You must use a real key here. This answers
             // a lot of questions I'd had!!!
             // if (ok(key)) {

@@ -11,14 +11,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
-import quanta.model.ipfs.dag.MerkleLink;
-import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSDir;
 import quanta.model.ipfs.file.IPFSDirEntry;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodeIdentity;
-import quanta.mongo.model.SubNodePojo;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.util.ExUtil;
@@ -117,60 +114,63 @@ public class SyncFromMFSService extends ServiceBase {
 		}
 
 		log.debug(indent + "DagGet CID: " + cid);
-		MerkleNode dag = ipfsDag.getNode(cid);
-		if (ok(dag)) {
-			log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
 
-			if (no(dag.getLinks())) {
-				return success;
-			}
+		//todo-1: I think IPFS has changed format and this will fail nowadays.
+		// disabling this code until the return value from ipfsDAg is updated
+		// MerkleNode dag = ipfsDag.getNode(cid);
+		// if (ok(dag)) {
+		// 	log.debug(indent + "Dag Dir: " + XString.prettyPrint(dag));
 
-			for (MerkleLink entry : dag.getLinks()) {
-				String entryCid = entry.getCid().getPath();
+		// 	if (no(dag.getLinks())) {
+		// 		return success;
+		// 	}
 
-				/*
-				 * we rely on the logic of "if not a json file, it's a folder"
-				 */
-				if (!entry.getName().endsWith(".json")) {
-					log.debug(indent + "Processing Folder: " + entry.getName());
-					if (recursive > 0) {
+		// 	for (MerkleLink entry : dag.getLinks()) {
+		// 		String entryCid = entry.getCid().getPath();
 
-						/*
-						 * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
-						 * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
-						 * now we could either just put it's CID also in as the text for it, or else actually read the
-						 * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
-						 * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO load
-						 * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting to
-						 * traverse any node that's already fully loaded.
-						 */
-						SubNode newNode = null;
+		// 		/*
+		// 		 * we rely on the logic of "if not a json file, it's a folder"
+		// 		 */
+		// 		if (!entry.getName().endsWith(".json")) {
+		// 			log.debug(indent + "Processing Folder: " + entry.getName());
+		// 			if (recursive > 0) {
 
-						traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
-					}
-				} else {
-					// read the node json from ipfs file
-					log.debug(indent + "Processing File: " + entry.getName());
-					String json = ipfsCat.getString(entryCid);
-					if (no(json)) {
-						log.debug("fileReadFailed: " + entryCid);
-						failedFiles++;
-					} else {
-						log.debug(indent + "json: " + json);
+		// 				/*
+		// 				 * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
+		// 				 * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
+		// 				 * now we could either just put it's CID also in as the text for it, or else actually read the
+		// 				 * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
+		// 				 * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO load
+		// 				 * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting to
+		// 				 * traverse any node that's already fully loaded.
+		// 				 */
+		// 				SubNode newNode = null;
 
-						try {
-							SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
-							log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
-							// update.save(session, nodePojo);
-							log.debug(indent + "Created Node: " + nodePojo.getId());
-						} catch (Exception e) {
-							// todo
-						}
-					}
-				}
-			}
-			success = true;
-		}
+		// 				traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
+		// 			}
+		// 		} else {
+		// 			// read the node json from ipfs file
+		// 			log.debug(indent + "Processing File: " + entry.getName());
+		// 			String json = ipfsCat.getString(entryCid);
+		// 			if (no(json)) {
+		// 				log.debug("fileReadFailed: " + entryCid);
+		// 				failedFiles++;
+		// 			} else {
+		// 				log.debug(indent + "json: " + json);
+
+		// 				try {
+		// 					SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
+		// 					log.debug(indent + "nodePojo Parsed: " + XString.prettyPrint(nodePojo));
+		// 					// update.save(session, nodePojo);
+		// 					log.debug(indent + "Created Node: " + nodePojo.getId());
+		// 				} catch (Exception e) {
+		// 					// todo
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	success = true;
+		// }
 		return success;
 	}
 

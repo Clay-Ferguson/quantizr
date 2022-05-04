@@ -25,8 +25,6 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedViewProps } from "./FeedViewProps";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div,
-but inherits capability of Comp class */
 export class FeedView extends AppTab<FeedViewProps> {
 
     constructor(data: TabIntf<FeedViewProps>) {

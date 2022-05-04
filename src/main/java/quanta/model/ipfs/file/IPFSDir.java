@@ -1,18 +1,17 @@
 package quanta.model.ipfs.file;
 
-import java.util.LinkedList;
-
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IPFSDir {
     @JsonProperty("Entries")
-    private LinkedList<IPFSDirEntry> entries;
+    private List<IPFSDirEntry> entries;
 
-    public LinkedList<IPFSDirEntry> getEntries() {
+    public List<IPFSDirEntry> getEntries() {
         return entries;
     }
 
-    public void setEntries(LinkedList<IPFSDirEntry> entries) {
+    public void setEntries(List<IPFSDirEntry> entries) {
         this.entries = entries;
     }
 }

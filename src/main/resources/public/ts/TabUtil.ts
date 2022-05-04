@@ -9,6 +9,7 @@ import { FeedViewData } from "./tabs/data/FeedViewData";
 import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
 import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
 import { MainTabCompData } from "./tabs/data/MainTabCompData";
+import { MFSViewData } from "./tabs/data/MFSViewData";
 import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
 import { ServerInfoViewData } from "./tabs/data/ServerInfoViewData";
 import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
@@ -65,6 +66,9 @@ export class TabUtil {
                 new FollowersResultSetViewData(),
                 new FollowingResultSetViewData(),
                 new FeedViewData(),
+
+                // todo-0: work in progres.
+                // new MFSViewData(),
 
                 // DO NOT DELETE
                 // The IPSMView will be repurposed as a server event log viewer

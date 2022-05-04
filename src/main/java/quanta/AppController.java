@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -48,6 +49,7 @@ import quanta.filter.HitFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
+import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoRepository;
@@ -63,6 +65,7 @@ import quanta.request.CopySharingRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.DeleteFriendRequest;
+import quanta.request.DeleteMFSFileRequest;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.ExportRequest;
@@ -72,6 +75,7 @@ import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
 import quanta.request.GetFriendsRequest;
+import quanta.request.GetMFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
 import quanta.request.GetNodeMetaInfoRequest;
 import quanta.request.GetNodePrivilegesRequest;
@@ -122,6 +126,7 @@ import quanta.response.ExportResponse;
 import quanta.response.GetActPubObjectResponse;
 import quanta.response.GetBookmarksResponse;
 import quanta.response.GetConfigResponse;
+import quanta.response.GetMFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
@@ -143,6 +148,7 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.Val;
 
 /**
  * Primary Spring MVC controller. All application logic (at least for core funtionality) from the
@@ -536,6 +542,31 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("renderNode", req, session, ms -> {
 			return render.renderNode(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getMFSFiles", method = RequestMethod.POST)
+	public @ResponseBody Object getMFSFiles(@RequestBody GetMFSFilesRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		// NO NOT HERE -> SessionContext.checkReqToken();
+		return callProc.run("getMFSFiles", req, session, ms -> {
+			Val<String> folder = new Val<>();
+			List<MFSDirEntry> files = ipfsFiles.getMFSFiles(ms, folder, req);
+			GetMFSFilesResponse res = new GetMFSFilesResponse();
+			res.setFiles(files);
+			res.setFolder(folder.getVal());
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
+	public @ResponseBody Object getMFSFiles(@RequestBody DeleteMFSFileRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		// NO NOT HERE -> SessionContext.checkReqToken();
+		return callProc.run("deleteMFSFile", req, session, ms -> {
+			ipfsFiles.deleteMFSFile(ms, req);
+			GetMFSFilesResponse res = new GetMFSFilesResponse();
+			return res;
 		});
 	}
 

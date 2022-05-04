@@ -654,13 +654,6 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
-	/*
-	 * todo-0: do we need to pathStat to get the CID of the existing root to make sure it's un-pinned,
-	 * and then pin the new one? Basically I need to figure out how MFS handles pins, or if everything
-	 * persisted to MFS is automatically pinned or not, so this feature is not complete until we
-	 * consider lifecycle of the pins for this folder. I'm pretty pinning on MFS is all automatic, but
-	 * not sure what happend when IPNS points to a CID that can get garbage collected.
-	 */
 	public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
 		if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
 			return;

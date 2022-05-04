@@ -1234,11 +1234,12 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    // (not currently used)
     public SubNode findByCID(MongoSession ms, String cid) {
         Query q = new Query();
 
         /* Match the PIN to cid */
-        // todo-0: need to add an index for this.
+        // need to add an index for this field if we ever start using it.
         Criteria crit = Criteria.where(SubNode.MCID).is(cid);
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);

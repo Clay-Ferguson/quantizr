@@ -12,9 +12,6 @@ public class MerkleNode {
     @JsonProperty("Links")
     private List<MerkleLink> links;
 
-    @JsonProperty("Data")
-    private String data;
-
     @JsonIgnore
     private String contentType;
 
@@ -26,13 +23,6 @@ public class MerkleNode {
         this.links = links;
     }
 
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
 
     public String getHash() {
         return hash;

@@ -19,6 +19,15 @@ export interface IPSMMessage {
     ts: number;
 }
 
+export interface MFSDirEntry {
+    file: boolean;
+    dir: boolean;
+    Name: string;
+    Type: number;
+    Size: number;
+    Hash: string;
+}
+
 export interface NodeMetaIntf {
     id: string;
     hasChildren: boolean;
@@ -143,6 +152,10 @@ export interface DeleteFriendRequest extends RequestBase {
     userNodeId: string;
 }
 
+export interface DeleteMFSFileRequest extends RequestBase {
+    item: string;
+}
+
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
     childrenOnly: boolean;
@@ -191,6 +204,10 @@ export interface GetFollowingRequest extends RequestBase {
 }
 
 export interface GetFriendsRequest extends RequestBase {
+}
+
+export interface GetMFSFilesRequest extends RequestBase {
+    folder: string;
 }
 
 export interface GetMultiRssRequest extends RequestBase {
@@ -506,6 +523,9 @@ export interface DeleteAttachmentResponse extends ResponseBase {
 export interface DeleteFriendResponse extends ResponseBase {
 }
 
+export interface DeleteMFSFileResponse extends ResponseBase {
+}
+
 export interface DeleteNodesResponse extends ResponseBase {
 }
 
@@ -560,6 +580,11 @@ export interface GetFollowingResponse extends ResponseBase {
 
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
+}
+
+export interface GetMFSFilesResponse extends ResponseBase {
+    files: MFSDirEntry[];
+    folder: string;
 }
 
 export interface GetMultiRssResponse extends ResponseBase {

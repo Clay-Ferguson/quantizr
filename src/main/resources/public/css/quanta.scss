@@ -113,6 +113,10 @@ body {
     margin-bottom: .5rem;
 }
 
+.mfsFileView {
+    margin: $smallGap;
+}
+
 .markdown-content table, th, td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;

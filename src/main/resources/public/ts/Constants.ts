@@ -22,6 +22,7 @@ export class Constants {
     static TAB_TRENDING: string = "trendingTab";
     static TAB_THREAD: string = "threadTab";
     static TAB_SERVERINFO: string = "serverInfoTab";
+    static TAB_MFSFILES: string = "mfsFilesTab";
     static TAB_LOG: string = "logTab"
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";

@@ -1,6 +1,7 @@
 package quanta.service;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -9,9 +10,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
+import quanta.util.Cast;
 import quanta.util.Util;
 import quanta.util.Val;
 
@@ -40,11 +41,11 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public MerkleNode getNode(String cid) {
-        MerkleNode ret = null;
+    public HashMap<String, Object> getNode(String cid) {
+        HashMap<String, Object> ret = null;
         try {
             String url = API_DAG + "/get?arg=" + cid;
-            ret = (MerkleNode) ipfs.postForJsonReply(url, MerkleNode.class);
+            ret = Cast.toHashMap(ipfs.postForJsonReply(url, HashMap.class));
         } catch (Exception e) {
             log.error("Failed in getMerkleNode", e);
         }

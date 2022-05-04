@@ -1,5 +1,6 @@
 package quanta.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -14,5 +15,10 @@ public class Cast {
 	@SuppressWarnings("unchecked")
 	public static LinkedHashMap<String, Object> toLinkedHashMap(Object obj) {
 		return (LinkedHashMap<String, Object>) obj;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, Object> toHashMap(Object obj) {
+		return (HashMap<String, Object>) obj;
 	}
 }
