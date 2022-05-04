@@ -10,6 +10,7 @@ public class SaveUserProfileRequest extends RequestBase {
 
 	// only publishes DID/IPNS if this is true
 	private boolean publish;
+	private boolean mfsEnable;
 
 	public String getUserName() {
 		return userName;
@@ -49,5 +50,13 @@ public class SaveUserProfileRequest extends RequestBase {
 
 	public void setPublish(boolean publish) {
 		this.publish = publish;
+	}
+
+	public boolean isMfsEnable() {
+		return mfsEnable;
+	}
+
+	public void setMfsEnable(boolean mfsEnable) {
+		this.mfsEnable = mfsEnable;
 	}
 }

@@ -66,9 +66,7 @@ export class TabUtil {
                 new FollowersResultSetViewData(),
                 new FollowingResultSetViewData(),
                 new FeedViewData(),
-
-                // todo-0: work in progres.
-                // new MFSViewData(),
+                new MFSViewData(),
 
                 // DO NOT DELETE
                 // The IPSMView will be repurposed as a server event log viewer

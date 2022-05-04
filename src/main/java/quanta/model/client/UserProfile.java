@@ -8,6 +8,7 @@ public class UserProfile {
 	private String homeNodeId;
 
 	private String didIPNS;
+	private boolean mfsEnable;
 
 	private String userBio;
 	private String userTags;
@@ -165,5 +166,13 @@ public class UserProfile {
 
 	public void setDidIPNS(String didIPNS) {
 		this.didIPNS = didIPNS;
+	}
+
+	public boolean isMfsEnable() {
+		return mfsEnable;
+	}
+
+	public void setMfsEnable(boolean mfsEnable) {
+		this.mfsEnable = mfsEnable;
 	}
 }

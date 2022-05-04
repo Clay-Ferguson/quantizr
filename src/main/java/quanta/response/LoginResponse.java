@@ -15,6 +15,8 @@ public class LoginResponse extends ResponseBase {
 	private String userName;
 	private String displayName;
 
+	private String allowedFeatures;
+
 	private String anonUserLandingPageNode;
 
 	/*
@@ -98,5 +100,13 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAuthToken(String authToken) {
 		this.authToken = authToken;
+	}
+
+	public String getAllowedFeatures() {
+		return allowedFeatures;
+	}
+
+	public void setAllowedFeatures(String allowedFeatures) {
+		this.allowedFeatures = allowedFeatures;
 	}
 }

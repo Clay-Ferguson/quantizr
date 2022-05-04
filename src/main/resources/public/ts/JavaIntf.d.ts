@@ -80,6 +80,7 @@ export interface UserProfile {
     userName: string;
     homeNodeId: string;
     didIPNS: string;
+    mfsEnable: boolean;
     userBio: string;
     userTags: string;
     avatarVer: string;
@@ -409,6 +410,7 @@ export interface SaveUserProfileRequest extends RequestBase {
     userTags: string;
     displayName: string;
     publish: boolean;
+    mfsEnable: boolean;
 }
 
 export interface SearchAndReplaceRequest extends RequestBase {
@@ -678,6 +680,7 @@ export interface LoginResponse extends ResponseBase {
     rootNodePath: string;
     userName: string;
     displayName: string;
+    allowedFeatures: string;
     anonUserLandingPageNode: string;
     homeNodeOverride: string;
     userPreferences: UserPreferences;
@@ -947,6 +950,7 @@ export const enum NodeProp {
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
     DISPLAY_NAME = "sn:displayName",
+    MFS_ENABLE = "sn:mfsEnable",
     USER_BIO = "sn:userBio",
     USER_DID_IPNS = "sn:didIPNS",
     USER_TAGS = "sn:tags",

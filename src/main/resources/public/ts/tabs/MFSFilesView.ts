@@ -2,6 +2,8 @@ import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
@@ -27,39 +29,42 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
         if (this.data.props.loading) {
             children.push(new Div(null, null, [
-                new Heading(4, "Loading MFS Files..."),
+                new Heading(4, "Loading Web3 Files..."),
                 new Div(null, {
                     className: "progressSpinner"
                 }, [new Spinner()])
             ]));
         }
         else {
-            children.push(new Heading(4, "MFS Files"));
-            children.push(new Div(this.data.props.mfsFolder || ""));
-            children.push(new IconButton("fa-refresh", "Root", {
-                onClick: () => this.goToRoot(),
-                title: "Go to root."
-            }));
-            children.push(new IconButton("fa-refresh", "Refresh", {
-                onClick: () => this.refreshFiles(),
-                title: "Refresh"
-            }));
-            children.push(new IconButton("fa-refresh", "Parent Folder", {
-                onClick: () => this.goToParent(),
-                title: "Parent Folder}"
-            }));
+            children.push(new Heading(4, "Web3 Files"));
+            children.push(new Div(this.data.props.mfsFolder || "", { className: "marginButtom" }));
+
+            children.push(new ButtonBar([
+                new Button("Root Folder", this.goToRoot, {
+                    title: "Go to root folder."
+                }),
+                new Button("Parent Folder", this.goToParent, {
+                    title: "Parent Folder}"
+                }),
+                new IconButton("fa-refresh", "Refresh", {
+                    onClick: () => this.refreshFiles(),
+                    title: "Refresh"
+                })
+            ]));
 
             if (this.data.props.mfsFiles) {
                 this.data.props.mfsFiles.forEach((file: J.MFSDirEntry) => {
                     let type = (file.Type === 0 || file.Size > 0) ? "file" : "folder";
                     let fullName = this.data.props.mfsFolder + "/" + file.Name;
 
-                    children.push(new Div(null, null, [
+                    children.push(new Div(null, { className: "marginTop" }, [
                         new Span(file.Name + " (" + type + ")", {
-                            onClick: () => { this.openFolder(fullName); }
+                            onClick: () => { this.openItem(fullName); },
+                            className: "clickable"
                         }),
                         new Span(" [delete]", {
-                            onClick: () => { this.deleteItem(fullName); }
+                            onClick: () => { this.deleteItem(fullName); },
+                            className: "clickable"
                         })
                     ]));
 
@@ -85,7 +90,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
         }, 100);
     }
 
-    openFolder = (folder: string) => {
+    openItem = (folder: string) => {
         dispatch("Action_RefreshMFSFiles", (s: AppState): AppState => {
             this.data.props.loading = true;
             return s;
@@ -109,19 +114,19 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
         let parent = S.util.chopAtLastChar(this.data.props.mfsFolder, "/");
         console.log("parent = " + parent);
         if (parent) {
-            this.openFolder(parent);
+            this.openItem(parent);
         }
     }
 
     refreshFiles = () => {
         setTimeout(async () => {
-            this.openFolder(this.data.props.mfsFolder);
+            this.openItem(this.data.props.mfsFolder);
         }, 100);
     }
 
     goToRoot = () => {
         setTimeout(async () => {
-            this.openFolder(null);
+            this.openItem(null);
         }, 100);
     }
 }

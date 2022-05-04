@@ -7,7 +7,7 @@ import { MFSFilesView } from "../MFSFilesView";
 import { MFSFilesViewProps } from "../MFSFilesViewProps";
 
 export class MFSViewData implements TabIntf {
-    name = "MFS Files";
+    name = "Web3 Files";
     id = C.TAB_MFSFILES;
     rsInfo = null;
     scrollPos = 0;
@@ -16,8 +16,7 @@ export class MFSViewData implements TabIntf {
 
     isVisible = () => {
         let state: AppState = store.getState();
-        // return !!state.serverInfoText;
-        return true; // make this correct (todo-0)
+        return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
     };
 
     // AppTab-derived class

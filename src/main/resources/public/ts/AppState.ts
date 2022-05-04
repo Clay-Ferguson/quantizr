@@ -98,6 +98,7 @@ export class AppState {
     isAdminUser: boolean;
     isAnonUser: boolean = true;
     allowBashScripting: boolean;
+    allowedFeatures: string;
 
     /*
      * toggled by button, and holds if we are going to show properties or not on each node in the main view

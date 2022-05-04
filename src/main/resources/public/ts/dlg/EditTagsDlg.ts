@@ -58,7 +58,8 @@ export class EditTagsDlg extends DialogBase {
             userTags: this.appState.userProfile.userTags,
             userBio: this.appState.userProfile.userBio,
             displayName: this.appState.userProfile.displayName,
-            publish: false
+            publish: false,
+            mfsEnable: this.appState.userProfile.mfsEnable
         });
         this.close();
     }

@@ -4,6 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
@@ -50,7 +51,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const state: any = this.getState<LS>();
+        const state: LS = this.getState<LS>();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
@@ -58,6 +59,40 @@ export class UserProfileDlg extends DialogBase {
         let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
         let profileImg: CompIntf = this.makeProfileImg(!!profileHeaderImg);
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
+
+        let web3Div: Div = null;
+
+        if (this.appState.allowedFeatures && this.appState.allowedFeatures.indexOf("web3") !== -1) {
+            let web3Comps: CompIntf[] = [];
+
+            if (state.userProfile.didIPNS) {
+                web3Comps.push(new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
+                    title: "Decentralized Identity (DID) IPNS Name",
+                    className: "marginTop clickable",
+                    onClick: () => {
+                        let link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
+                        S.util.copyToClipboard(link);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        // window.open(link, "_blank");
+                    }
+                }));
+            }
+
+            if (!this.readOnly) {
+                web3Comps.push(new Checkbox("Web3 File System", null, {
+                    setValue: (checked: boolean): void => {
+                        let state = this.getState<LS>();
+                        state.userProfile.mfsEnable = checked;
+                        this.mergeState<LS>({ userProfile: state.userProfile });
+                    },
+                    getValue: (): boolean => {
+                        return this.getState<LS>().userProfile.mfsEnable;
+                    }
+                }));
+            }
+
+            web3Div = new Div(null, null, web3Comps);
+        }
 
         let children = [
             new Div(null, null, [
@@ -131,16 +166,7 @@ export class UserProfileDlg extends DialogBase {
                     },
                         this.bioState),
 
-                state.userProfile.didIPNS ? new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
-                    title: "Decentralized Identity (DID) IPNS Name",
-                    className: "marginTop clickable",
-                    onClick: () => {
-                        let link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
-                        S.util.copyToClipboard(link);
-                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                        // window.open(link, "_blank");
-                    }
-                }) : null,
+                web3Div,
 
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.nav.logout }),
 
@@ -212,23 +238,27 @@ export class UserProfileDlg extends DialogBase {
     }
 
     save = async () => {
+        let state = this.getState<LS>();
         let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
-            publish: false
+            publish: false,
+            mfsEnable: state.userProfile.mfsEnable
         });
         this.saveResponse(res);
     }
 
     publish = async () => {
+        let state = this.getState<LS>();
         let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
-            publish: true
+            publish: true,
+            mfsEnable: state.userProfile.mfsEnable
         });
         this.saveResponse(res);
     }
@@ -292,7 +322,8 @@ export class UserProfileDlg extends DialogBase {
             return s;
         });
 
-        if (!this.readOnly) {
+        const state: any = this.getState<LS>();
+        if (!this.readOnly && state.userProfile.mfsEnable) {
             S.util.showPageMessage("Publishing your Identity Info...");
         }
     }

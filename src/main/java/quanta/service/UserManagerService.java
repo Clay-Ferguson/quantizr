@@ -218,6 +218,7 @@ public class UserManagerService extends ServiceBase {
 		}
 		sc.setRootId(id);
 		sc.setAllowedFeatures(userNode.getStr(NodeProp.ALLOWED_FEATURES));
+		res.setAllowedFeatures(sc.getAllowedFeatures());
 
 		UserPreferences userPreferences = getUserPreferences(userName, userNode);
 		sc.setUserPreferences(userPreferences);
@@ -641,10 +642,13 @@ public class UserManagerService extends ServiceBase {
 				userNode.set(NodeProp.USER_BIO.s(), req.getUserBio());
 				userNode.set(NodeProp.USER_TAGS.s(), req.getUserTags());
 				userNode.set(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
+				userNode.set(NodeProp.MFS_ENABLE.s(), req.isMfsEnable());
+
 				// sessionContext.setUserName(req.getUserName());
 				update.save(ms, userNode);
 				res.setSuccess(true);
 
+				// todo-1: more security here to verify web3 is enabled.
 				if (req.isPublish()) {
 					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
 				}
@@ -878,6 +882,7 @@ public class UserManagerService extends ServiceBase {
 
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
+				userProfile.setMfsEnable(userNode.getBool(NodeProp.MFS_ENABLE));
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO.s()));
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS.s()));

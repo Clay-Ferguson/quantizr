@@ -76,6 +76,7 @@ public enum NodeProp {
      */
     USER("sn:user", "s"), //
     DISPLAY_NAME("sn:displayName", "s"), //
+    MFS_ENABLE("sn:mfsEnable", "s"), // Mutable File System enabled (user can set this, independend of their admin authorization)
     USER_BIO("sn:userBio", "s"), //
     USER_DID_IPNS("sn:didIPNS", "s"), //
     USER_TAGS("sn:tags", "s"), //

@@ -1433,8 +1433,9 @@ export class Util {
             s.userName = res.userName;
             s.isAdminUser = res.userName === "admin";
             s.isAnonUser = res.userName === J.PrincipalName.ANON;
+            s.allowedFeatures = res.allowedFeatures;
 
-            Log.log("LoginResponse userName = " + res.userName);
+            // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
             // sure i'm keeping this feature.
