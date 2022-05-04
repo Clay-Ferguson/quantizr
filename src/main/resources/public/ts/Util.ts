@@ -1422,6 +1422,11 @@ export class Util {
         }
     }
 
+    countChars = (val: string, char: string): number => {
+        if (!val) return 0;
+        return val.split(char).length - 1;
+    }
+
     setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
         if (!res) return;
 

@@ -551,9 +551,11 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getMFSFiles", req, session, ms -> {
 			Val<String> folder = new Val<>();
-			List<MFSDirEntry> files = ipfsFiles.getMFSFiles(ms, folder, req);
+			Val<String> cid = new Val<>();
+			List<MFSDirEntry> files = ipfsFiles.getMFSFiles(ms, folder, cid, req);
 			GetMFSFilesResponse res = new GetMFSFilesResponse();
 			res.setFiles(files);
+			res.setCid(cid.getVal());
 			res.setFolder(folder.getVal());
 			return res;
 		});

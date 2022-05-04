@@ -135,7 +135,7 @@ public class IPFSFiles extends ServiceBase {
         deletePath(req.getItem());
     }
 
-    public List<MFSDirEntry> getMFSFiles(MongoSession ms, Val<String> folder, GetMFSFilesRequest req) {
+    public List<MFSDirEntry> getMFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetMFSFilesRequest req) {
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
         if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
@@ -149,6 +149,12 @@ public class IPFSFiles extends ServiceBase {
         folder.setVal(mfsPath);
         // if this is a path...
         if (mfsPath.startsWith("/")) {
+
+            IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
+            if (ok(pathStat)) {
+                cid.setVal(pathStat.getHash());
+            }
+
             IPFSDir dir = getDir(mfsPath);
             if (ok(dir)) {
                 log.debug("Dir: " + XString.prettyPrint(dir));

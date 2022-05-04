@@ -525,6 +525,8 @@ public class NodeEditService extends ServiceBase {
 				// make the path of the node relative to the owner by removing the part of the path that is
 				// the user's root node path
 				String path = node.getPath().replace(ownerNode.getPath(), "");
+				path = folderizePath(path);
+
 				String mfsPath = pathBase + "/posts" + path;
 				log.debug("Writing JSON to MFS Path: " + mfsPath);
 
@@ -570,6 +572,29 @@ public class NodeEditService extends ServiceBase {
 				return null;
 			});
 		});
+	}
+
+	/*
+	 * Since Quanta stores nodes under nodes, and file systems are not capable of doing this we have to
+	 * convert names to folders by putting a "-f" on them before writing to MFS
+	 */
+	private String folderizePath(String path) {
+		List<String> nameTokens = XString.tokenize(path, "/", true);
+		StringBuilder sb = new StringBuilder();
+		int idx = 0;
+		for (String tok : nameTokens) {
+			if (idx < nameTokens.size()) {
+				sb.append("/");
+			}
+
+			if (idx < nameTokens.size() - 1) {
+				sb.append(tok + "-f");
+			} else {
+				sb.append(tok);
+			}
+			idx++;
+		}
+		return sb.toString();
 	}
 
 	/*

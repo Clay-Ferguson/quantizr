@@ -587,6 +587,7 @@ export interface GetFriendsResponse extends ResponseBase {
 export interface GetMFSFilesResponse extends ResponseBase {
     files: MFSDirEntry[];
     folder: string;
+    cid: string;
 }
 
 export interface GetMultiRssResponse extends ResponseBase {

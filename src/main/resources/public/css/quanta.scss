@@ -1427,6 +1427,36 @@ Will come back later and study this more. todo-1 */
     width: 100%;
 }
 
+.folderIcon {
+    color: darkkhaki;
+}
+
+.fileIcon {
+    color: darkgray;
+}
+
+.files-table {
+    width: 100%;
+    margin-top: $smallGap;
+}
+
+.files-table-row {
+    width: 100%;
+}
+
+.files-table-type-col {
+    width: 10%;
+}
+
+.files-table-delete-col {
+    width: 10%;
+}
+
+.files-table-name-col {
+    cursor: pointer;
+    width: 80%;
+}
+
 .node-table-row {
     position: relative;
     padding-right: 10px;

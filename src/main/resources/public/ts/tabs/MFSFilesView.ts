@@ -6,19 +6,35 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
-import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
+import { FilesTable } from "../comp/FilesTable";
+import { FilesTableCell } from "../comp/FilesTableCell";
+import { FilesTableRow } from "../comp/FilesTableRow";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
+import { Constants as C } from "../Constants";
 import { MFSFilesViewProps } from "./MFSFilesViewProps";
 
 export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
+    loaded: boolean = false;
+
     constructor(data: TabIntf<MFSFilesViewProps>) {
         super(data);
         data.inst = this;
+
+        PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {
+            if (tabName === this.data.id) {
+                // only ever do this once, just to save CPU load on server.
+                if (this.loaded) return;
+                this.loaded = true;
+                this.refreshFiles();
+            }
+        });
     }
 
     preRender(): void {
@@ -37,42 +53,81 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
         }
         else {
             children.push(new Heading(4, "Web3 Files"));
-            children.push(new Div(this.data.props.mfsFolder || "", { className: "marginButtom" }));
+
+            let slashCount = S.util.countChars(this.data.props.mfsFolder, "/");
+            let isRoot = !this.data.props.mfsFolder || slashCount === 1;
+            let showParentButton = this.data.props.mfsFolder && slashCount > 1;
 
             children.push(new ButtonBar([
-                new Button("Root Folder", this.goToRoot, {
+                isRoot ? null : new Button("Root", this.goToRoot, {
                     title: "Go to root folder."
                 }),
-                new Button("Parent Folder", this.goToParent, {
+                showParentButton ? new Button("Parent", this.goToParent, {
                     title: "Parent Folder}"
-                }),
-                new IconButton("fa-refresh", "Refresh", {
+                }) : null,
+                new IconButton("fa-refresh", null, {
                     onClick: () => this.refreshFiles(),
                     title: "Refresh"
-                })
+                }, "marginAll")
             ]));
 
-            if (this.data.props.mfsFiles) {
-                this.data.props.mfsFiles.forEach((file: J.MFSDirEntry) => {
-                    let type = (file.Type === 0 || file.Size > 0) ? "file" : "folder";
-                    let fullName = this.data.props.mfsFolder + "/" + file.Name;
-
-                    children.push(new Div(null, { className: "marginTop" }, [
-                        new Span(file.Name + " (" + type + ")", {
-                            onClick: () => { this.openItem(fullName); },
-                            className: "clickable"
-                        }),
-                        new Span(" [delete]", {
-                            onClick: () => { this.deleteItem(fullName); },
-                            className: "clickable"
-                        })
-                    ]));
-
-                });
+            if (this.data.props.mfsFolder) {
+                children.push(new Div("MFS Path: " + this.data.props.mfsFolder, { className: "marginButtom" }));
+                children.push(new Div("CID: " + this.data.props.mfsFolderCid, { className: "marginButtom" }));
+                if (this.data.props.mfsFiles) {
+                    children.push(this.renderFilesTable(this.data.props.mfsFiles));
+                }
             }
         }
 
         this.setChildren([new Div(null, { className: "mfsFileView" }, children)]);
+    }
+
+    renderFilesTable = (mfsFiles: J.MFSDirEntry[]): FilesTable => {
+        if (mfsFiles) {
+            const propTable = new FilesTable({
+                border: "1",
+                className: "files-table"
+            });
+
+            mfsFiles.forEach((entry: J.MFSDirEntry) => {
+                let type: string = (entry.Type === 0 || entry.Size > 0) ? "file" : "folder";
+                let fullName = this.data.props.mfsFolder + "/" + entry.Name;
+                // console.log("entry: " + S.util.prettyPrint(entry));
+
+                const propTableRow = new FilesTableRow({
+                    className: "files-table-row"
+                }, [
+                    new FilesTableCell(null, {
+                        className: "files-table-type-col",
+                        onClick: () => { this.openItem(fullName); }
+                    }, [
+                        type === "file" ? null : new Icon({
+                            // className: "fa fa-lg " + (type === "file" ? "fa-file fileIcon" : "fa-folder folderIcon")
+                            className: "fa fa-lg fa-folder folderIcon"
+                        })
+                    ]),
+                    new FilesTableCell(entry.Name, {
+                        className: "files-table-name-col",
+                        onClick: () => { this.openItem(fullName); }
+                    }),
+                    new FilesTableCell(null, {
+                        className: "files-table-delete-col",
+                        onClick: () => { this.deleteItem(fullName); }
+                    }, [
+                        new Icon({
+                            className: "fa fa-trash fa-lg clickable",
+                            title: "Delete",
+                            onClick: () => this.refreshFiles()
+                        })
+                    ])
+                ]);
+                propTable.addChild(propTableRow);
+            });
+            return propTable;
+        } else {
+            return null;
+        }
     }
 
     deleteItem = (item: string) => {
@@ -105,6 +160,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
                 this.data.props.loading = false;
                 this.data.props.mfsFiles = res.files;
                 this.data.props.mfsFolder = res.folder;
+                this.data.props.mfsFolderCid = res.cid;
                 return s;
             });
         }, 100);
@@ -112,7 +168,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
     goToParent = () => {
         let parent = S.util.chopAtLastChar(this.data.props.mfsFolder, "/");
-        console.log("parent = " + parent);
+        // console.log("parent = " + parent);
         if (parent) {
             this.openItem(parent);
         }

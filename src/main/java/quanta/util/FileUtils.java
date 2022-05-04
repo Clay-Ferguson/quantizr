@@ -300,7 +300,6 @@ public class FileUtils extends ServiceBase {
 				lastWasDash = true;
 			}
 		}
-
 		return ret.toString();
 	}
 

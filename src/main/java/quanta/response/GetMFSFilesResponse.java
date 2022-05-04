@@ -10,6 +10,7 @@ public class GetMFSFilesResponse extends ResponseBase {
 
 	// returns whatever folder ended up gettin gloaded
 	public String folder;
+	public String cid;
 
 	public String getFolder() {
 		return folder;
@@ -25,5 +26,13 @@ public class GetMFSFilesResponse extends ResponseBase {
 
 	public void setFiles(List<MFSDirEntry> files) {
 		this.files = files;
+	}
+
+	public String getCid() {
+		return cid;
+	}
+
+	public void setCid(String cid) {
+		this.cid = cid;
 	}
 }

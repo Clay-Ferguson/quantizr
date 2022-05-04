@@ -19,7 +19,6 @@ export class MFSViewData implements TabIntf {
         return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
     };
 
-    // AppTab-derived class
     constructView = (data: TabIntf<MFSFilesViewProps>) => new MFSFilesView(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 }

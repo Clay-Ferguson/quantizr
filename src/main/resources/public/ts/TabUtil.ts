@@ -66,7 +66,6 @@ export class TabUtil {
                 new FollowersResultSetViewData(),
                 new FollowingResultSetViewData(),
                 new FeedViewData(),
-                new MFSViewData(),
 
                 // DO NOT DELETE
                 // The IPSMView will be repurposed as a server event log viewer
@@ -88,7 +87,8 @@ export class TabUtil {
 
                 new TrendingViewData(),
                 new ThreadViewData(),
-                new ServerInfoViewData()
+                new ServerInfoViewData(),
+                new MFSViewData()
 
                 // this is throwing a react error, but we don't need this now anyaay
                 // {
