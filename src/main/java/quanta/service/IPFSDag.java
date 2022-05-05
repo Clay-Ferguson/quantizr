@@ -1,7 +1,10 @@
 package quanta.service;
 
+import static quanta.util.Util.ok;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -10,11 +13,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.model.client.MFSDirEntry;
+import quanta.model.ipfs.dag.DagLink;
+import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
+import quanta.request.GetMFSFilesRequest;
 import quanta.util.Cast;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
+import quanta.util.XString;
 
 @Component
 public class IPFSDag extends ServiceBase {
@@ -41,15 +50,46 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public HashMap<String, Object> getNode(String cid) {
-        HashMap<String, Object> ret = null;
+    public DagNode getNode(String cid) {
+        DagNode ret = null;
         try {
             String url = API_DAG + "/get?arg=" + cid;
-            ret = Cast.toHashMap(ipfs.postForJsonReply(url, HashMap.class));
+            ret = Cast.toDagNode(ipfs.postForJsonReply(url, DagNode.class));
         } catch (Exception e) {
-            log.error("Failed in getMerkleNode", e);
+            log.error("Failed in getDagNode", e);
         }
         return ret;
+    }
+
+    public List<MFSDirEntry> getMFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetMFSFilesRequest req) {
+        LinkedList<MFSDirEntry> files = new LinkedList<>();
+
+        if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+            return null;
+        }
+
+        // oops, looks like a path
+        if (req.getFolder().startsWith("/"))
+            return null;
+
+        cid.setVal(req.getFolder());
+        folder.setVal(req.getFolder());
+
+        DagNode dagNode = getNode(req.getFolder());
+        log.debug("DagNode: " + XString.prettyPrint(dagNode));
+
+        if (ok(dagNode) && ok(dagNode.getLinks())) {
+            for (DagLink entry : dagNode.getLinks()) {
+                MFSDirEntry me = new MFSDirEntry();
+                me.setName(entry.getName());
+                me.setHash(entry.getHash().getPath());
+                me.setSize(entry.getTsize());
+                me.setType(-1); //entry.getType());
+                files.add(me);
+            }
+        }
+
+        return files;
     }
 
     public MerkleLink putString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize) {

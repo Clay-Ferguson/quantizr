@@ -2,6 +2,7 @@ package quanta.util;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import quanta.model.ipfs.dag.DagNode;
 
 /**
  * We encapsulate our unchecked casting needs to this method so the rest of the code
@@ -20,5 +21,10 @@ public class Cast {
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, Object> toHashMap(Object obj) {
 		return (HashMap<String, Object>) obj;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static DagNode toDagNode(Object obj) {
+		return (DagNode) obj;
 	}
 }

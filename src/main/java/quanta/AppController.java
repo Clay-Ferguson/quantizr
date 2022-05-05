@@ -548,11 +548,21 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getMFSFiles", method = RequestMethod.POST)
 	public @ResponseBody Object getMFSFiles(@RequestBody GetMFSFilesRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
+
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getMFSFiles", req, session, ms -> {
 			Val<String> folder = new Val<>();
 			Val<String> cid = new Val<>();
-			List<MFSDirEntry> files = ipfsFiles.getMFSFiles(ms, folder, cid, req);
+			List<MFSDirEntry> files = null;
+
+			// Get files using MFS
+			if (no(req.getFolder()) || req.getFolder().startsWith("/")) {
+				files = ipfsFiles.getMFSFiles(ms, folder, cid, req);
+			}
+			// Get files using DAG
+			else {
+				files = ipfsDag.getMFSFiles(ms, folder, cid, req);
+			}
 			GetMFSFilesResponse res = new GetMFSFilesResponse();
 			res.setFiles(files);
 			res.setCid(cid.getVal());

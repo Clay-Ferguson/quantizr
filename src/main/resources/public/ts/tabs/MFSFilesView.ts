@@ -9,14 +9,15 @@ import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Spinner } from "../comp/core/Spinner";
+import { TextField } from "../comp/core/TextField";
 import { FilesTable } from "../comp/FilesTable";
 import { FilesTableCell } from "../comp/FilesTableCell";
 import { FilesTableRow } from "../comp/FilesTableRow";
+import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { Constants as C } from "../Constants";
 import { MFSFilesViewProps } from "./MFSFilesViewProps";
 
 export class MFSFilesView extends AppTab<MFSFilesViewProps> {
@@ -54,9 +55,23 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
         else {
             children.push(new Heading(4, "Web3 Files"));
 
-            let slashCount = S.util.countChars(this.data.props.mfsFolder, "/");
-            let isRoot = !this.data.props.mfsFolder || slashCount === 1;
-            let showParentButton = this.data.props.mfsFolder && slashCount > 1;
+            let mfsFolder = this.data.props.cidField.getValue();
+            let slashCount = S.util.countChars(mfsFolder, "/");
+            let isRoot = !mfsFolder || slashCount === 1;
+            let showParentButton = mfsFolder && slashCount > 1;
+
+            children.push(new Div(null, null, [
+                new TextField({
+                    val: this.data.props.cidField,
+                    placeholder: "Find CID...",
+                    enter: () => {
+                        let item = this.data.props.cidField.getValue();
+                        if (item) {
+                            this.openItem(item);
+                        }
+                    }
+                })
+            ]));
 
             children.push(new ButtonBar([
                 isRoot ? null : new Button("Root", this.goToRoot, {
@@ -65,18 +80,22 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
                 showParentButton ? new Button("Parent", this.goToParent, {
                     title: "Parent Folder}"
                 }) : null,
-                new IconButton("fa-refresh", null, {
+                new IconButton("fa-refresh", "Search", {
                     onClick: () => this.refreshFiles(),
                     title: "Refresh"
                 }, "marginAll")
             ]));
 
-            if (this.data.props.mfsFolder) {
-                children.push(new Div("MFS Path: " + this.data.props.mfsFolder, { className: "marginButtom" }));
+            let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+            children.push(new Heading(5, "Retrieval Mode: " + (mfsMode ? "MFS" : "DAG")))
+
+            // Only show the CID if it's different from what's in search field
+            if (this.data.props.mfsFolderCid && this.data.props.mfsFolderCid !== mfsFolder) {
                 children.push(new Div("CID: " + this.data.props.mfsFolderCid, { className: "marginButtom" }));
-                if (this.data.props.mfsFiles) {
-                    children.push(this.renderFilesTable(this.data.props.mfsFiles));
-                }
+            }
+
+            if (this.data.props.mfsFiles) {
+                children.push(this.renderFilesTable(this.data.props.mfsFiles));
             }
         }
 
@@ -85,14 +104,32 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
     renderFilesTable = (mfsFiles: J.MFSDirEntry[]): FilesTable => {
         if (mfsFiles) {
+            let mfsFolder = this.data.props.cidField.getValue();
+            // mfsMode means this is a true MFS query on the local server and not a DAG query of CID which can be remote.
+            let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+
             const propTable = new FilesTable({
                 border: "1",
                 className: "files-table"
             });
 
             mfsFiles.forEach((entry: J.MFSDirEntry) => {
-                let type: string = (entry.Type === 0 || entry.Size > 0) ? "file" : "folder";
-                let fullName = this.data.props.mfsFolder + "/" + entry.Name;
+                let iconClass: string = null;
+                switch (entry.Type) {
+                    case 0:
+                        iconClass = "fa-file fileIcon";
+                        break;
+                    case 1:
+                        iconClass = "fa-folder folderIcon";
+                        break;
+                    default:
+                        iconClass = "fa-caret-right";
+                        break;
+                }
+
+                let fullName = mfsMode ? (mfsFolder + "/" + entry.Name) : null;
+                let locationToOpen = mfsMode ? fullName : entry.Hash;
+
                 // console.log("entry: " + S.util.prettyPrint(entry));
 
                 const propTableRow = new FilesTableRow({
@@ -100,18 +137,19 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
                 }, [
                     new FilesTableCell(null, {
                         className: "files-table-type-col",
-                        onClick: () => { this.openItem(fullName); }
+                        onClick: () => { this.openItem(locationToOpen); }
                     }, [
-                        type === "file" ? null : new Icon({
-                            // className: "fa fa-lg " + (type === "file" ? "fa-file fileIcon" : "fa-folder folderIcon")
-                            className: "fa fa-lg fa-folder folderIcon"
+                        new Icon({
+                            className: "fa fa-lg " + iconClass
                         })
                     ]),
                     new FilesTableCell(entry.Name, {
                         className: "files-table-name-col",
-                        onClick: () => { this.openItem(fullName); }
+                        onClick: () => { this.openItem(locationToOpen); }
                     }),
-                    new FilesTableCell(null, {
+
+                    // only show th edelete button for local mfsMode stuff.
+                    mfsMode ? new FilesTableCell(null, {
                         className: "files-table-delete-col",
                         onClick: () => { this.deleteItem(fullName); }
                     }, [
@@ -120,7 +158,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
                             title: "Delete",
                             onClick: () => this.refreshFiles()
                         })
-                    ])
+                    ]) : null
                 ]);
                 propTable.addChild(propTableRow);
             });
@@ -131,10 +169,11 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
     }
 
     deleteItem = (item: string) => {
-        dispatch("Action_deleteMFSFile", (s: AppState): AppState => {
-            this.data.props.loading = true;
-            return s;
-        });
+        // DO NOT DELETE (may decide to do this some day)
+        // dispatch("Action_deleteMFSFile", (s: AppState): AppState => {
+        //     this.data.props.loading = true;
+        //     return s;
+        // });
 
         setTimeout(async () => {
             let res: J.DeleteMFSFileResponse = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
@@ -146,12 +185,18 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
     }
 
     openItem = (folder: string) => {
-        dispatch("Action_RefreshMFSFiles", (s: AppState): AppState => {
-            this.data.props.loading = true;
-            return s;
-        });
+        // DO NOT DELETE (may decide to do this some day)
+        // dispatch("Action_RefreshMFSFiles", (s: AppState): AppState => {
+        //     this.data.props.loading = true;
+        //     return s;
+        // });
 
         setTimeout(async () => {
+            console.log("Loading: " + folder);
+
+            // ensure this is never empty string. Server needs to get null instead of empty string.
+            if (!folder) folder = null;
+
             let res: J.GetMFSFilesResponse = await S.util.ajax<J.GetMFSFilesRequest, J.GetMFSFilesResponse>("getMFSFiles", {
                 folder
             });
@@ -159,7 +204,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
             dispatch("Action_GotMFSFiles", (s: AppState): AppState => {
                 this.data.props.loading = false;
                 this.data.props.mfsFiles = res.files;
-                this.data.props.mfsFolder = res.folder;
+                this.data.props.cidField.setValue(res.folder);
                 this.data.props.mfsFolderCid = res.cid;
                 return s;
             });
@@ -167,7 +212,12 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
     }
 
     goToParent = () => {
-        let parent = S.util.chopAtLastChar(this.data.props.mfsFolder, "/");
+        let mfsFolder = this.data.props.cidField.getValue();
+        // mfsMode means this is a true MFS query on the local server and not a DAG query of CID which can be remote.
+        let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+        if (!mfsMode) return;
+
+        let parent = S.util.chopAtLastChar(mfsFolder, "/");
         // console.log("parent = " + parent);
         if (parent) {
             this.openItem(parent);
@@ -176,7 +226,8 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
     refreshFiles = () => {
         setTimeout(async () => {
-            this.openItem(this.data.props.mfsFolder);
+            let mfsFolder = this.data.props.cidField.getValue();
+            this.openItem(mfsFolder);
         }, 100);
     }
 

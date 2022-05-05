@@ -365,14 +365,19 @@ public class IPFSService extends ServiceBase {
             // Warning: IPFS is inconsistent. Sometimes they return plain/text and sometimes
             // JSON in the contentType, so we just ignore it
             if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
+                String body = response.getBody();
                 if (clazz == String.class) {
-                    return no(response.getBody()) ? "success" : response.getBody();
+                    return no(response.getBody()) ? "success" : body;
                 } else {
-                    // log.debug("postForJsonReply: " + response.getBody());
-                    if (no(response.getBody())) {
+                    // log.debug("postForJsonReply: " + body);
+                    if (no(body)) {
                         ret = "success";
                     } else {
-                        ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                        try {
+                            ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                        } catch (Exception e) {
+                            log.error("Failed to parse body: " + body + " to class " + clazz.getName(), e);
+                        }
                     }
                 }
             }

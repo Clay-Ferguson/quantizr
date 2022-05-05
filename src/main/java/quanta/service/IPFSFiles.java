@@ -147,26 +147,27 @@ public class IPFSFiles extends ServiceBase {
 
         String mfsPath = no(req.getFolder()) ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
-        // if this is a path...
-        if (mfsPath.startsWith("/")) {
+        
+        // opps, not a path
+        if (!mfsPath.startsWith("/"))
+            return null;
+            
+        IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
+        if (ok(pathStat)) {
+            cid.setVal(pathStat.getHash());
+        }
 
-            IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
-            if (ok(pathStat)) {
-                cid.setVal(pathStat.getHash());
-            }
-
-            IPFSDir dir = getDir(mfsPath);
-            if (ok(dir)) {
-                log.debug("Dir: " + XString.prettyPrint(dir));
-                if (ok(dir.getEntries())) {
-                    for (IPFSDirEntry entry : dir.getEntries()) {
-                        MFSDirEntry me = new MFSDirEntry();
-                        me.setName(entry.getName());
-                        me.setHash(entry.getHash());
-                        me.setSize(entry.getSize());
-                        me.setType(entry.getType());
-                        files.add(me);
-                    }
+        IPFSDir dir = getDir(mfsPath);
+        if (ok(dir)) {
+            log.debug("Dir: " + XString.prettyPrint(dir));
+            if (ok(dir.getEntries())) {
+                for (IPFSDirEntry entry : dir.getEntries()) {
+                    MFSDirEntry me = new MFSDirEntry();
+                    me.setName(entry.getName());
+                    me.setHash(entry.getHash());
+                    me.setSize(entry.getSize());
+                    me.setType(entry.getType());
+                    files.add(me);
                 }
             }
         }

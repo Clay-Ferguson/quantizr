@@ -528,7 +528,7 @@ public class NodeEditService extends ServiceBase {
 				path = folderizePath(path);
 
 				String mfsPath = pathBase + "/posts" + path;
-				log.debug("Writing JSON to MFS Path: " + mfsPath);
+				// log.debug("Writing JSON to MFS Path: " + mfsPath);
 
 				// save values for finally block
 				String mcid = node.getMcid();

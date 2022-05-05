@@ -2,10 +2,6 @@ package quanta.model.ipfs.dag;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/*
- * We may need to split this back into MerkleLink and MerkleDag as separate, because sometimes cid
- * is populated and sometimes the hash, and I'm not sure yet if this is desirable.
- */
 public class MerkleLink {
     @JsonProperty("Name")
     private String name;
