@@ -8,7 +8,7 @@ import { MFSFilesView } from "../MFSFilesView";
 import { MFSFilesViewProps } from "../MFSFilesViewProps";
 
 export class MFSViewData implements TabIntf {
-    name = "Web3 Files";
+    name = "IPFS Explorer";
     id = C.TAB_MFSFILES;
     rsInfo = null;
     scrollPos = 0;

@@ -10,7 +10,7 @@ public class DagLink {
     private MerkleCid hash;
 
     @JsonProperty("Tsize")
-    private Integer size;
+    private Integer tsize;
 
     public MerkleCid getHash() {
         return hash;
@@ -29,10 +29,10 @@ public class DagLink {
     }
 
     public Integer getTsize() {
-        return this.size;
+        return this.tsize;
     }
 
-    public void setTsize(Integer size) {
-        this.size = size;
+    public void setTsize(Integer tsize) {
+        this.tsize = tsize;
     }
 }

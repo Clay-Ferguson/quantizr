@@ -322,7 +322,16 @@ export abstract class Comp implements CompIntf {
             this.wrapClickFunc(props);
             if (children && children.length > 0) {
                 // console.log("Render Tag with children.");
-                return this.e(tag, props, children);
+
+                // special case where tbody always needs to be immediate child of table
+                // https://github.com/facebook/react/issues/5652
+                if (tag === "table") {
+                    // this is just wrapping the children in a tbody and giving it a key so react won't panic.
+                    return this.e(tag, props, [this.e("tbody", { key: props.key + "_tbody" }, children)]);
+                }
+                else {
+                    return this.e(tag, props, children);
+                }
             }
             else {
                 // console.log("Render Tag no children.");

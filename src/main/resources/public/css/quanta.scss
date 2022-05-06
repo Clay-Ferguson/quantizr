@@ -1445,16 +1445,20 @@ Will come back later and study this more. todo-1 */
 }
 
 .files-table-type-col {
-    width: 10%;
+    width: 5%;
+}
+
+.files-table-size-col {
+    width: 15%;
 }
 
 .files-table-delete-col {
-    width: 10%;
+    width: 5%;
 }
 
 .files-table-name-col {
     cursor: pointer;
-    width: 80%;
+    width: 75%;
 }
 
 .node-table-row {

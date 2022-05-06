@@ -138,7 +138,7 @@ export class Util {
             if (val < 1) {
                 return "0 bytes";
             }
-            return `${(val).toFixed(1)} bytes`;
+            return `${(val)} bytes`;
         }
         else if (val < 1024 * 1024) {
             return `${(val / 1024).toFixed(1)} KB`;
