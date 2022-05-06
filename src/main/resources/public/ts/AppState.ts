@@ -11,6 +11,9 @@ export class AppState {
     guiReady: boolean = false;
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 
+    // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
+    showIpfsTab: boolean;
+
     dialogStack: DialogBase[] = [];
 
     /* text at top of page, when user tries to upLevel too far etc */

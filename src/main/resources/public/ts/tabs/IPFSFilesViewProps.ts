@@ -1,7 +1,7 @@
 import * as J from "../JavaIntf";
 import { ValidatedState } from "../ValidatedState";
 
-export interface MFSFilesViewProps {
+export interface IPFSFilesViewProps {
     loading?: boolean;
 
     listCids?: boolean;

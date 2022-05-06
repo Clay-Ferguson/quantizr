@@ -89,7 +89,8 @@ export class MenuPanel extends Div {
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "all", "All calendar dates", 0, true);
-    static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+    // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+    static toolsShowIpfsTab = () => S.edit.showIpfsTab();
     static import = () => S.edit.openImportDlg(appState(null));
     static export = () => S.edit.openExportDlg(appState(null));
     static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
@@ -327,11 +328,10 @@ export class MenuPanel extends Div {
         }
 
         children.push(new Menu("Tools", [
-            new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
+            new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
-            new MenuItemSeparator(), //
 
             new MenuItem("Import", MenuPanel.import, importFeatureEnabled),
             new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
@@ -348,6 +348,9 @@ export class MenuPanel extends Div {
             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect),
 
             new MenuItem("My GEO Location", S.nav.geoLocation) //
+
+            // Removing for now. Our PostIt node icon makes this easy enough.
+            // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
 
             // DO NOT DELETE
             // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //

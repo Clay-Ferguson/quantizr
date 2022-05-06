@@ -4,12 +4,12 @@ import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { ValidatedState } from "../../ValidatedState";
-import { MFSFilesView } from "../MFSFilesView";
-import { MFSFilesViewProps } from "../MFSFilesViewProps";
+import { IPFSFilesView } from "../IPFSFilesView";
+import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
 
-export class MFSViewData implements TabIntf {
+export class IPFSViewData implements TabIntf {
     name = "IPFS Explorer";
-    id = C.TAB_MFSFILES;
+    id = C.TAB_IPFSVIEW;
     rsInfo = null;
     scrollPos = 0;
     props = {
@@ -20,9 +20,12 @@ export class MFSViewData implements TabIntf {
 
     isVisible = () => {
         let state: AppState = store.getState();
-        return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
+
+        // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
+        return state.showIpfsTab;
+        // return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
     };
 
-    constructView = (data: TabIntf<MFSFilesViewProps>) => new MFSFilesView(data);
+    constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 }

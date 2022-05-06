@@ -7,7 +7,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
@@ -21,15 +20,14 @@ import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { MFSFilesViewProps } from "./MFSFilesViewProps";
+import { IPFSFilesViewProps } from "./IPFSFilesViewProps";
 
-// todo-0: rename to IPFSExplorerView
-export class MFSFilesView extends AppTab<MFSFilesViewProps> {
+export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     loaded: boolean = false;
     static history: string[] = [];
 
-    constructor(data: TabIntf<MFSFilesViewProps>) {
+    constructor(data: TabIntf<IPFSFilesViewProps>) {
         super(data);
         data.inst = this;
 
@@ -81,7 +79,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
                 isRoot ? null : new Button("Root", this.goToRoot, {
                     title: "Go to root folder."
                 }),
-                MFSFilesView.history.length > 1 ? new Button("Back", this.goBack, {
+                IPFSFilesView.history.length > 1 ? new Button("Back", this.goBack, {
                     title: "Previous location"
                 }) : null,
                 showParentButton ? new Button("Parent", this.goToParent, {
@@ -122,7 +120,7 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
             }
 
             // DO NOT DELETE (this shows history, good for debugging.)
-            // MFSFilesView.history.forEach(f => {
+            // IPFSFilesView.history.forEach(f => {
             //     children.push(new Div(f));
             // });
         }
@@ -275,8 +273,8 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
             dispatch("Action_GotMFSFiles", (s: AppState): AppState => {
 
                 // this condition just makes sure we're not pushing the same thing already at the top of the stack.
-                if (!(MFSFilesView.history.length > 0 && MFSFilesView.history[MFSFilesView.history.length - 1] === folder)) {
-                    MFSFilesView.history.push(folder);
+                if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {
+                    IPFSFilesView.history.push(folder);
                 }
                 this.data.props.loading = false;
                 this.data.props.mfsFiles = res.files;
@@ -289,9 +287,9 @@ export class MFSFilesView extends AppTab<MFSFilesViewProps> {
 
     goBack = () => {
         // going back requires two pops becasue the first pop gives us the CURRENT location
-        let path = MFSFilesView.history.pop();
+        let path = IPFSFilesView.history.pop();
         if (path) {
-            path = MFSFilesView.history.pop();
+            path = IPFSFilesView.history.pop();
         }
         console.log("popped to: " + path);
         this.openItem(path);

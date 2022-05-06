@@ -9,7 +9,7 @@ import { FeedViewData } from "./tabs/data/FeedViewData";
 import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
 import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
 import { MainTabCompData } from "./tabs/data/MainTabCompData";
-import { MFSViewData } from "./tabs/data/MFSViewData";
+import { IPFSViewData } from "./tabs/data/IPFSViewData";
 import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
 import { ServerInfoViewData } from "./tabs/data/ServerInfoViewData";
 import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
@@ -88,7 +88,7 @@ export class TabUtil {
                 new TrendingViewData(),
                 new ThreadViewData(),
                 new ServerInfoViewData(),
-                new MFSViewData()
+                new IPFSViewData()
 
                 // this is throwing a react error, but we don't need this now anyaay
                 // {
