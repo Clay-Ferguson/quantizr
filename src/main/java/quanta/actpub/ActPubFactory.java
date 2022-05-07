@@ -5,6 +5,7 @@ import static quanta.util.Util.ok;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'note' message
 	 */
-	public APObj newCreateForNote(List<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
+	public APObj newCreateForNote(HashSet<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
 			String content, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
@@ -44,7 +45,7 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APObj newNote(List<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
+	public APObj newNote(HashSet<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
 			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = null;
 
@@ -127,7 +128,7 @@ public class ActPubFactory extends ServiceBase {
 	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
 	 * above (in newNoteObject() function)
 	 */
-	public APOCreate newCreate(APObj object, String fromActor, List<String> toUserNames, String noteUrl, ZonedDateTime now,
+	public APOCreate newCreate(APObj object, String fromActor, HashSet<String> toUserNames, String noteUrl, ZonedDateTime now,
 			boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 

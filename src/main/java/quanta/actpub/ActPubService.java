@@ -85,7 +85,7 @@ public class ActPubService extends ServiceBase {
             HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
         exec.run(() -> {
             try {
-                List<String> toUserNames = new LinkedList<>();
+                HashSet<String> toUserNames = new HashSet<>();
                 boolean privateMessage = true;
 
                 /*
@@ -116,11 +116,14 @@ public class ActPubService extends ServiceBase {
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
 
+                // for users that don't have a sharedInbox we collect their inboxes here to send to them individually
+                HashSet<String> userInboxes = new HashSet<>();
+
                 // When posting a public message we send out to all unique sharedInboxes here
                 if (!privateMessage) {
-                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
+                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
 
-                    if (sharedInboxes.size() > 0) {
+                    if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
                         APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
                                 noteUrl, privateMessage, attachments);
 
@@ -134,12 +137,24 @@ public class ActPubService extends ServiceBase {
                                 apLog.trace("failed to post to: " + inbox);
                             }
                         }
+
+                        for (String inbox : userInboxes) {
+                            apLog.trace("Posting to User Inbox: " + inbox);
+                            try {
+                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                            }
+                            // catch error from any server, and ignore, go to next server to send to.
+                            catch (Exception e) {
+                                apLog.trace("failed to post to: " + inbox);
+                            }
+                        }
                     }
                 }
 
                 // Post message to all foreign usernames found in 'toUserNames'
                 if (toUserNames.size() > 0) {
-                    sendNote(ms, toUserNames, fromUser, inReplyTo, replyToType, content, attachments, noteUrl, privateMessage);
+                    sendNote(ms, toUserNames, fromUser, inReplyTo, replyToType, content, attachments, noteUrl, privateMessage,
+                            userInboxes);
                 }
             } //
             catch (Exception e) {
@@ -151,9 +166,9 @@ public class ActPubService extends ServiceBase {
 
     /*
      * Finds all the foreign server followers of userName, and returns the unique set of sharedInboxes
-     * of them all
+     * of them all.
      */
-    public HashSet<String> getSharedInboxesOfFollowers(String userName) {
+    public HashSet<String> getSharedInboxesOfFollowers(String userName, HashSet<String> userInboxes) {
         HashSet<String> set = new HashSet<>();
         MongoSession as = auth.getAdminSession();
 
@@ -178,6 +193,13 @@ public class ActPubService extends ServiceBase {
                     if (ok(sharedInbox)) {
                         // log.debug("SharedInbox: " + sharedInbox);
                         set.add(sharedInbox);
+                    }
+                    // not all users have a shared inbox, and the ones that don't we collect here...
+                    else {
+                        String inbox = followerAccount.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
+                        if (ok(inbox)) {
+                            userInboxes.add(inbox);
+                        }
                     }
                 }
             }
@@ -209,9 +231,11 @@ public class ActPubService extends ServiceBase {
      * Quanta. That is, there may not even BE a "user node" for any of these users, or there may be. We
      * don't know or care in here, because we go straight to the WebFinger and build up their outbox
      * "live" from the WebFinger in realtime.
+     * 
+     * skipInboxes is a way to know which inboxes we've already sent to, and to not send again
      */
-    public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String replyToType,
-            String content, APList attachments, String noteUrl, boolean privateMessage) {
+    public void sendNote(MongoSession ms, HashSet<String> toUserNames, String fromUser, String inReplyTo, String replyToType,
+            String content, APList attachments, String noteUrl, boolean privateMessage, HashSet<String> skipInboxes) {
         if (no(toUserNames))
             return;
 
@@ -248,17 +272,20 @@ public class ActPubService extends ServiceBase {
                 // log.debug(" actor: " + toActorUrl);
                 String inbox = AP.str(toActorObj, APObj.inbox);
 
-                /* lazy create fromActor here */
-                if (no(fromActor)) {
-                    fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                // send post if inbox not in skipInboxes
+                if (!skipInboxes.contains(inbox)) {
+                    /* lazy create fromActor here */
+                    if (no(fromActor)) {
+                        fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                    }
+
+                    APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
+                            privateMessage, attachments);
+
+                    String userDoingPost = ThreadLocals.getSC().getUserName();
+                    // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
+                    apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
-
-                APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
-                        privateMessage, attachments);
-
-                String userDoingPost = ThreadLocals.getSC().getUserName();
-                // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
-                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
             }
         }
     }

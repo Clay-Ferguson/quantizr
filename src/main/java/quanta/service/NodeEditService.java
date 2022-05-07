@@ -489,9 +489,12 @@ public class NodeEditService extends ServiceBase {
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 
-				if (AclService.isPublic(ms, node)) {
-					saveNodeToMFS(ms, node);
-				}
+				// todo-1: This proof of concept worked great, but we need to standardize on a way to write this file out
+				// into a folder that can be more easily browsed by end users which may mean simply flattening them out into a directory
+				// with no structure (all in one folder of posts) and naming the files better somehow.
+				// if (AclService.isPublic(ms, node)) {
+				// 	saveNodeToMFS(ms, node);
+				// }
 
 				return null;
 			} else {
