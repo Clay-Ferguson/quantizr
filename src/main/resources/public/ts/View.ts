@@ -356,7 +356,6 @@ export class View {
 
     getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(state);
-
         let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,

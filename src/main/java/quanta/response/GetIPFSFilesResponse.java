@@ -4,7 +4,7 @@ import java.util.List;
 import quanta.model.client.MFSDirEntry;
 import quanta.response.base.ResponseBase;
 
-public class GetMFSFilesResponse extends ResponseBase {
+public class GetIPFSFilesResponse extends ResponseBase {
 
 	public List<MFSDirEntry> files;
 

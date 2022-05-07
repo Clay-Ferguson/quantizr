@@ -444,7 +444,7 @@ public class ActPubFollowing extends ServiceBase {
          * query all the direct children under the friendsListNode, that are FRIEND type although they
          * should all be FRIEND types.
          */
-        Criteria criteria = Criteria.where(SubNode.PARENT).is(friendsListNode.getParent()) //
+        Criteria criteria = Criteria.where(SubNode.PARENT).is(friendsListNode.getId()) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         q.addCriteria(criteria);

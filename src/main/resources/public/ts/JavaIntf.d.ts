@@ -207,7 +207,7 @@ export interface GetFollowingRequest extends RequestBase {
 export interface GetFriendsRequest extends RequestBase {
 }
 
-export interface GetMFSFilesRequest extends RequestBase {
+export interface GetIPFSFilesRequest extends RequestBase {
     folder: string;
 }
 
@@ -584,7 +584,7 @@ export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
 }
 
-export interface GetMFSFilesResponse extends ResponseBase {
+export interface GetIPFSFilesResponse extends ResponseBase {
     files: MFSDirEntry[];
     folder: string;
     cid: string;

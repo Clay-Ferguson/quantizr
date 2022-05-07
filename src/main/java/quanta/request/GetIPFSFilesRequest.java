@@ -2,7 +2,7 @@ package quanta.request;
 
 import quanta.request.base.RequestBase;
 
-public class GetMFSFilesRequest extends RequestBase {
+public class GetIPFSFilesRequest extends RequestBase {
     private String folder;
 
     public String getFolder() {

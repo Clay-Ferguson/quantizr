@@ -20,7 +20,7 @@ import quanta.model.ipfs.file.IPFSDirEntry;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.MongoSession;
 import quanta.request.DeleteMFSFileRequest;
-import quanta.request.GetMFSFilesRequest;
+import quanta.request.GetIPFSFilesRequest;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -129,13 +129,13 @@ public class IPFSFiles extends ServiceBase {
 
         // make sure the user is deleting something ONLY in their own folder.
         if (!req.getItem().startsWith("/" + userNodeId)) {
-            throw new RuntimeException("User does not own path: " + req.getItem());
+            throw new RuntimeException("You do not own the path: " + req.getItem());
         }
 
         deletePath(req.getItem());
     }
 
-    public List<MFSDirEntry> getMFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetMFSFilesRequest req) {
+    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
         if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {

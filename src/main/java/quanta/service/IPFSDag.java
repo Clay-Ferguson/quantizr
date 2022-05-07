@@ -2,7 +2,6 @@ package quanta.service;
 
 import static quanta.util.Util.ok;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -18,7 +17,7 @@ import quanta.model.ipfs.dag.DagLink;
 import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
-import quanta.request.GetMFSFilesRequest;
+import quanta.request.GetIPFSFilesRequest;
 import quanta.util.Cast;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -61,7 +60,7 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public List<MFSDirEntry> getMFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetMFSFilesRequest req) {
+    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
         if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {

@@ -75,7 +75,7 @@ import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
 import quanta.request.GetFriendsRequest;
-import quanta.request.GetMFSFilesRequest;
+import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
 import quanta.request.GetNodeMetaInfoRequest;
 import quanta.request.GetNodePrivilegesRequest;
@@ -126,7 +126,7 @@ import quanta.response.ExportResponse;
 import quanta.response.GetActPubObjectResponse;
 import quanta.response.GetBookmarksResponse;
 import quanta.response.GetConfigResponse;
-import quanta.response.GetMFSFilesResponse;
+import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
@@ -545,25 +545,25 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/getMFSFiles", method = RequestMethod.POST)
-	public @ResponseBody Object getMFSFiles(@RequestBody GetMFSFilesRequest req, //
+	@RequestMapping(value = API_PATH + "/getIPFSFiles", method = RequestMethod.POST)
+	public @ResponseBody Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getMFSFiles", req, session, ms -> {
+		return callProc.run("getIPFSFiles", req, session, ms -> {
 			Val<String> folder = new Val<>();
 			Val<String> cid = new Val<>();
 			List<MFSDirEntry> files = null;
 
 			// Get files using MFS
 			if (no(req.getFolder()) || req.getFolder().startsWith("/")) {
-				files = ipfsFiles.getMFSFiles(ms, folder, cid, req);
+				files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
 			}
 			// Get files using DAG
 			else {
-				files = ipfsDag.getMFSFiles(ms, folder, cid, req);
+				files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
 			}
-			GetMFSFilesResponse res = new GetMFSFilesResponse();
+			GetIPFSFilesResponse res = new GetIPFSFilesResponse();
 			res.setFiles(files);
 			res.setCid(cid.getVal());
 			res.setFolder(folder.getVal());
@@ -572,12 +572,12 @@ public class AppController extends ServiceBase implements ErrorController {
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
-	public @ResponseBody Object getMFSFiles(@RequestBody DeleteMFSFileRequest req, //
+	public @ResponseBody Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("deleteMFSFile", req, session, ms -> {
 			ipfsFiles.deleteMFSFile(ms, req);
-			GetMFSFilesResponse res = new GetMFSFilesResponse();
+			GetIPFSFilesResponse res = new GetIPFSFilesResponse();
 			return res;
 		});
 	}
