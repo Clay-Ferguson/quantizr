@@ -293,6 +293,11 @@ export interface JoinNodesRequest extends RequestBase {
     nodeIds: string[];
 }
 
+export interface LikeNodeRequest extends RequestBase {
+    id: string;
+    like: boolean;
+}
+
 export interface LoadNodeFromIpfsRequest extends RequestBase {
     path: string;
 }
@@ -672,6 +677,9 @@ export interface InsertNodeResponse extends ResponseBase {
 export interface JoinNodesResponse extends ResponseBase {
 }
 
+export interface LikeNodeResponse extends ResponseBase {
+}
+
 export interface LoadNodeFromIpfsResponse extends ResponseBase {
 }
 
@@ -845,6 +853,7 @@ export interface NodeInfo {
     parent: NodeInfo;
     children: NodeInfo[];
     parents: NodeInfo[];
+    likes: string[];
     imgId: string;
     displayName: string;
     owner: string;

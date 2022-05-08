@@ -6,6 +6,8 @@ package quanta.actpub.model;
 public class APType {
     public static final String Create = "Create";
     public static final String Note = "Note";
+    public static final String Update = "Update";
+    public static final String Like = "Like";
 
     // Note: Pleroma sends these when you DM someone.
     public static final String ChatMessage = "ChatMessage";

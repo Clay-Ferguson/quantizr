@@ -886,7 +886,7 @@ public class ActPubUtil extends ServiceBase {
                                 return null;
                             }
 
-                            SubNode node = apub.saveNote(as, accountNode, outboxNode, obj, false, true);
+                            SubNode node = apub.saveNote(as, accountNode, outboxNode, obj, false, true, APType.Create);
                             nodeId = no(node) ? null : node.getIdStr();
                         }
                         return nodeId;

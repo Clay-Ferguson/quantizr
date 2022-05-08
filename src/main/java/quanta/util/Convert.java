@@ -3,6 +3,7 @@ package quanta.util;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -147,9 +148,14 @@ public class Convert extends ServiceBase {
 			}
 		}
 
+		ArrayList<String> likes = null;
+		if (ok(node.getLikes())) {
+			likes = new ArrayList<String>(node.getLikes());
+		}
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(),
 				displayName, owner, ownerId, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasChildren, //
+				node.getModifyTime(), propList, acList, likes, hasChildren, //
 				ok(imageSize) ? imageSize.getWidth() : 0, //
 				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);

@@ -2051,6 +2051,13 @@ audio::-webkit-media-controls-play-button {
     color: darkkhaki;
 }
 
+.activeLikeIcon {
+    color: yellow;
+    border: 2px solid yellow;
+    padding: 4px;
+    border-radius: 8px;
+}
+
 .rhsLink {
     margin-top: 25px;
     margin-right: 55px;

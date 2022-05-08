@@ -116,7 +116,8 @@ public class ActPubService extends ServiceBase {
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
 
-                // for users that don't have a sharedInbox we collect their inboxes here to send to them individually
+                // for users that don't have a sharedInbox we collect their inboxes here to send to them
+                // individually
                 HashSet<String> userInboxes = new HashSet<>();
 
                 // When posting a public message we send out to all unique sharedInboxes here
@@ -492,7 +493,8 @@ public class ActPubService extends ServiceBase {
 
         switch (type) {
             case APType.Create:
-                apub.processCreateAction(httpReq, payload);
+            case APType.Update:
+                apub.processCreateOrUpdateAction(httpReq, payload, type);
                 break;
 
             case APType.Follow:
@@ -504,11 +506,16 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Delete:
+                // todo-0: are we sending outbound deletes to other servers, when a node is deleted?
                 apub.processDeleteAction(httpReq, payload);
                 break;
 
             case APType.Accept:
                 apub.processAcceptAction(payload);
+                break;
+
+            case APType.Like:
+                apub.processLikeAction(httpReq, payload);
                 break;
 
             default:
@@ -550,11 +557,11 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-
+    /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateAction(HttpServletRequest httpReq, Object payload) {
+    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String action) {
         arun.<Object>run(ms -> {
-            apLog.trace("processCreateAction");
+            apLog.trace("processCreateOrUpdateAction");
 
             // get actor url from payload object
             String actorUrl = AP.str(payload, APObj.actor);
@@ -580,7 +587,7 @@ public class ActPubService extends ServiceBase {
             switch (type) {
                 case APType.ChatMessage:
                 case APType.Note:
-                    apub.processCreateNote(ms, actorUrl, actorObj, object);
+                    apub.processCreateOrUpdateNote(ms, actorUrl, actorObj, object, action);
                     break;
 
                 default:
@@ -591,6 +598,39 @@ public class ActPubService extends ServiceBase {
             return null;
         });
     }
+
+    @PerfMon(category = "apub")
+    public void processLikeAction(HttpServletRequest httpReq, Object payload) {
+        arun.<Object>run(as -> {
+            apLog.trace("processLikeAction");
+            String actorUrl = AP.str(payload, APObj.actor);
+            if (no(actorUrl)) {
+                log.debug("no 'actor' found on create action request posted object");
+                return null;
+            }
+
+            APObj actorObj = apUtil.getActorByUrl(actorUrl);
+            if (no(actorObj)) {
+                log.debug("Unable to load actorUrl: " + actorUrl);
+                return null;
+            }
+
+            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            apCrypto.verifySignature(httpReq, pubKey);
+
+            String objectIdUrl = AP.str(payload, APObj.object);
+
+            // we know our objects are identified like this: "https://quanta.wiki?id=6277120c1363dc5d1fb426b5"
+            // So by chopping after last '=' we can get the ID part.
+            String nodeId = XString.parseAfterLast(objectIdUrl, "=");
+            SubNode node = read.getNode(as, nodeId);
+            if (no(node)) {
+                throw new RuntimeException("Unable to find node: "+nodeId);
+            }
+            return null;
+        });
+    }
+
 
     @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
@@ -638,10 +678,14 @@ public class ActPubService extends ServiceBase {
         delete.deleteByPropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
 
-    /* obj is the 'Note' object */
+    /*
+     * obj is the 'Note' object.
+     * 
+     * action will be APType.Create or APType.Update
+     */
     @PerfMon(category = "apub")
-    public void processCreateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
-        apLog.trace("processCreateNote");
+    public void processCreateOrUpdateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj, String action) {
+        apLog.trace("processCreateOrUpdateNote");
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -670,7 +714,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            apub.saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
+            apub.saveNote(ms, null, nodeBeingRepliedTo, obj, false, false, action);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -684,7 +728,7 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                apub.saveNote(ms, actorAccountNode, postsNode, obj, false, false);
+                apub.saveNote(ms, actorAccountNode, postsNode, obj, false, false, action);
             }
         }
     }
@@ -700,10 +744,12 @@ public class ActPubService extends ServiceBase {
      * to clean the Db.
      * 
      * This saves correctly either a obj.type==Note or obj.type==ChatMessage (maybe more to come?)
+     * 
+     * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
     public SubNode saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
-            boolean temp) {
+            boolean temp, String action) {
         apLog.trace("saveNote" + XString.prettyPrint(obj));
         String id = AP.str(obj, APObj.id);
 
@@ -713,7 +759,9 @@ public class ActPubService extends ServiceBase {
          * note: partial index "unique-apid", is what makes this lookup fast.
          */
         SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
-        if (ok(dupNode)) {
+
+        // If we found this node by ID and we aren't going to be updating it, return it as is.
+        if (ok(dupNode) && !action.equals(APType.Update)) {
             // apLog.trace("duplicate ActivityPub post ignored: " + id);
             return dupNode;
         }
@@ -759,6 +807,26 @@ public class ActPubService extends ServiceBase {
         }
         SubNode newNode =
                 create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
+
+        // If we're updating a node, find what the ID should be and we can just put that ID value into newNode
+        if (action.equals(APType.Update)) {
+            // if we didn't find what to update throw error.
+            if (no(dupNode)) {
+                throw new RuntimeException("Unable to find node to update.");
+            }
+
+            // If wrong user is updating this object throw error.
+            String dupNodeAttributedTo = dupNode.getStr(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
+            if (no(dupNodeAttributedTo) || !dupNodeAttributedTo.equals(objAttributedTo)) {
+                throw new RuntimeException("Wrong person to update object.");
+            }
+
+            // remove dupNode from memory cache so it can't be written out
+            ThreadLocals.clean(dupNode);
+    
+            newNode.setId(dupNode.getId());
+            ThreadLocals.clean(newNode);
+        }
 
         apLog.trace("createNode");
 

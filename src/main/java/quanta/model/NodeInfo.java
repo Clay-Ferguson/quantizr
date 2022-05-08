@@ -79,6 +79,8 @@ public class NodeInfo {
 	// but all the parents up to a certain number of parents, up towards the root, however many levels up.
 	private LinkedList<NodeInfo> parents;
 
+	private List<String> likes;
+
 	private String imgId;
 	private String displayName;
 	private String owner;
@@ -92,7 +94,7 @@ public class NodeInfo {
 	public NodeInfo() {}
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
-			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
+			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
 			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
@@ -108,6 +110,7 @@ public class NodeInfo {
 		this.logicalOrdinal = logicalOrdinal;
 		this.properties = properties;
 		this.ac = ac;
+		this.likes = likes;
 		this.hasChildren = hasChildren;
 		this.lastChild = lastChild;
 		this.width = width;
@@ -394,5 +397,13 @@ public class NodeInfo {
 
 	public void setParents(LinkedList<NodeInfo> parents) {
 		this.parents = parents;
+	}
+
+	public List<String> getLikes() {
+		return likes;
+	}
+
+	public void setLikes(List<String> likes) {
+		this.likes = likes;
 	}
 }

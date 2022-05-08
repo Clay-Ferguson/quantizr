@@ -36,6 +36,7 @@ import quanta.request.AppDropRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.InsertNodeRequest;
+import quanta.request.LikeNodeRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SplitNodeRequest;
@@ -45,6 +46,7 @@ import quanta.response.AppDropResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.response.DeletePropertyResponse;
 import quanta.response.InsertNodeResponse;
+import quanta.response.LikeNodeResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SplitNodeResponse;
@@ -301,6 +303,49 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	@PerfMon(category = "edit")
+	public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
+		LikeNodeResponse res = new LikeNodeResponse();
+		// log.debug("LikeNode saveNode");
+
+		exec.run(() -> {
+			arun.run(as -> {
+				// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
+				SubNode node = read.getNode(ms, req.getId());
+				if (no(node)) {
+					throw new RuntimeException("Unable to find node: " + req.getId());
+				}
+				if (no(node.getLikes())) {
+					node.setLikes(new HashSet<>());
+				}
+
+				String userName = ThreadLocals.getSC().getUserName();
+				// String actorUrl = apUtil.makeActorUrlForUserName(userName); // long name not used.
+
+				// local users will always just have their userName put in the 'likes'
+				if (req.isLike()) {
+					if (node.getLikes().add(userName)) {
+						// set node to dirty only if it just changed.
+						ThreadLocals.dirty(node);
+					}
+				} else {
+					if (node.getLikes().remove(userName)) {
+						// set node to dirty only if it just changed.
+						ThreadLocals.dirty(node);
+
+						// if likes set is now empty make it null.
+						if (node.getLikes().size() == 0) {
+							node.setLikes(null);
+						}
+					}
+				}
+
+				return null;
+			});
+		});
+		return res;
+	}
+
+	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode");
@@ -489,11 +534,13 @@ public class NodeEditService extends ServiceBase {
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 
-				// todo-1: This proof of concept worked great, but we need to standardize on a way to write this file out
-				// into a folder that can be more easily browsed by end users which may mean simply flattening them out into a directory
+				// todo-1: This proof of concept worked great, but we need to standardize on a way to write this
+				// file out
+				// into a folder that can be more easily browsed by end users which may mean simply flattening them
+				// out into a directory
 				// with no structure (all in one folder of posts) and naming the files better somehow.
 				// if (AclService.isPublic(ms, node)) {
-				// 	saveNodeToMFS(ms, node);
+				// saveNodeToMFS(ms, node);
 				// }
 
 				return null;

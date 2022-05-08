@@ -122,7 +122,7 @@ public class ActPubOutbox extends ServiceBase {
                                     AP.isType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveNote(ms, _userNode, outboxNode, object, false, true);
+                                    apub.saveNote(ms, _userNode, outboxNode, object, false, true, APType.Create);
                                     count.setVal(count.getVal() + 1);
                                 } catch (Exception e) {
                                     // log and ignore.

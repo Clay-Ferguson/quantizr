@@ -118,7 +118,7 @@ export class NodeCompRowHeader extends Div {
         if (!publicReadOnly || actPubId) {
             children.push(new Icon({
                 title: "Reply to this Node",
-                className: "fa fa-reply fa-lg",
+                className: "fa fa-reply fa-lg marginRight",
                 onClick: () => {
                     if (state.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -129,6 +129,23 @@ export class NodeCompRowHeader extends Div {
                 }
             }));
         }
+
+        // console.log("node " + node.id + " likes=" + node.likes);
+        // todo-1: work in progress. This can like/unlike from local users only, so the missing part is
+        // being able to 1) like/unlike from FOREIGN servers and 2) being able to display the NAMES of the likers in the GUI.
+        // let youLiked = node.likes && node.likes.find(u => u === state.userName);
+        // children.push(new Icon({
+        //     title: youLiked ? "You Liked this Node!" : "Like this Node",
+        //     className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
+        //     onClick: () => {
+        //         if (state.isAnonUser) {
+        //             S.util.showMessage("Login to like and create content.", "Login!");
+        //         }
+        //         else {
+        //             S.edit.likeNode(node, !youLiked, state);
+        //         }
+        //     }
+        // }));
 
         if (priority) {
             children.push(new Span(priority, {

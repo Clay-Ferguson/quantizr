@@ -5,6 +5,7 @@ import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -95,6 +96,14 @@ public class SubNode {
 	@JsonIgnore
 	private Object propLock = new Object();
 
+	public static final String LIKES = "like";
+	@Field(LIKES)
+	private HashSet<String> likes;
+
+	@Transient
+	@JsonIgnore
+	private Object likesLock = new Object();
+
 	// these are public on purpose. (the M means this CID is from MFS, and no need to pin or unpin ever)
 	public static final String MCID = "mcid";
 	@Field(MCID)
@@ -139,7 +148,9 @@ public class SubNode {
 			SubNode.CREATE_TIME, //
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
-			SubNode.PROPS};
+			SubNode.PROPS, //
+			SubNode.LIKES
+		};
 
 	private boolean disableParentCheck;
 
@@ -375,6 +386,21 @@ public class SubNode {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			this.props = props;
+		}
+	}
+
+	@JsonProperty(LIKES)
+	public HashSet<String> getLikes() {
+		synchronized (likesLock) {
+			return likes;
+		}
+	}
+
+	@JsonProperty(LIKES)
+	public void setLikes(HashSet<String> likes) {
+		ThreadLocals.dirty(this);
+		synchronized (likesLock) {
+			this.likes = likes;
 		}
 	}
 

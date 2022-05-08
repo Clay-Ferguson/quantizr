@@ -960,6 +960,30 @@ export class Edit {
         this.createSubNodeResponse(res, true, null, null, state);
     }
 
+    // like==false means 'unlike'
+    likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
+        let res: J.LikeNodeResponse = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
+            id: node.id,
+            like
+        }, true);
+
+        dispatch("Action_likeNode", (s: AppState): AppState => {
+            if (!node.likes) {
+                node.likes = [];
+            }
+
+            if (like && !node.likes.find(u => u === state.userName)) {
+                // add userName to likes
+                node.likes.push(state.userName);
+            }
+            else {
+                // remove userName from likes
+                node.likes = node.likes.filter(u => u !== state.userName);
+            }
+            return s;
+        });
+    }
+
     addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, state: AppState) => {
         state = appState(state);
 

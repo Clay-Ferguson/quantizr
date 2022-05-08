@@ -91,6 +91,7 @@ import quanta.request.InitNodeEditRequest;
 import quanta.request.InsertBookRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
+import quanta.request.LikeNodeRequest;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.LoginRequest;
 import quanta.request.LogoutRequest;
@@ -502,6 +503,15 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("renderCalendar", req, session, ms -> {
 			return render.renderCalendar(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/likeNode", method = RequestMethod.POST)
+	public @ResponseBody Object likeNode(@RequestBody LikeNodeRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		// NO NOT HERE -> SessionContext.checkReqToken();
+		return callProc.run("likeNode", req, session, ms -> {
+			return edit.likeNode(ms, req);
 		});
 	}
 
