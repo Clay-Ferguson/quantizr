@@ -130,22 +130,34 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        // console.log("node " + node.id + " likes=" + node.likes);
-        // todo-1: work in progress. This can like/unlike from local users only, so the missing part is
-        // being able to 1) like/unlike from FOREIGN servers and 2) being able to display the NAMES of the likers in the GUI.
-        // let youLiked = node.likes && node.likes.find(u => u === state.userName);
-        // children.push(new Icon({
-        //     title: youLiked ? "You Liked this Node!" : "Like this Node",
-        //     className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
-        //     onClick: () => {
-        //         if (state.isAnonUser) {
-        //             S.util.showMessage("Login to like and create content.", "Login!");
-        //         }
-        //         else {
-        //             S.edit.likeNode(node, !youLiked, state);
-        //         }
-        //     }
-        // }));
+        let youLiked: boolean = false;
+        let likeNames = null;
+        if (node.likes) {
+            youLiked = !!node.likes.find(u => u === state.userName);
+            likeNames = "Liked by:";
+            if (youLiked) {
+                likeNames += "\nYou";
+            }
+            node.likes.forEach(u => {
+                if (u !== state.userName) {
+                    likeNames += "\n" + u;
+                }
+            });
+        }
+
+        children.push(new Icon({
+            // title: youLiked ? "You Liked this Node!" : "Like this Node",
+            title: likeNames ? likeNames : "Like this Node",
+            className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
+            onClick: () => {
+                if (state.isAnonUser) {
+                    S.util.showMessage("Login to like and create content.", "Login!");
+                }
+                else {
+                    S.edit.likeNode(node, !youLiked, state);
+                }
+            }
+        }, node.likes?.length > 0 ? node.likes.length.toString() : ""));
 
         if (priority) {
             children.push(new Span(priority, {

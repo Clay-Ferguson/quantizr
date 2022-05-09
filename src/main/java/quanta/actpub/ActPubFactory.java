@@ -15,6 +15,7 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
+import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APObj;
@@ -40,6 +41,10 @@ public class ActPubFactory extends ServiceBase {
 				newNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
 
 		return newCreate(payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+	}
+
+	public APOLike newLike(String id, String objectId, String actor, List<String> to,  List<String> cc) {
+		return new APOLike(id, objectId, actor, to, cc);
 	}
 
 	/**

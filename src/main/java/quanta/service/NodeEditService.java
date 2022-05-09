@@ -309,7 +309,6 @@ public class NodeEditService extends ServiceBase {
 
 		exec.run(() -> {
 			arun.run(as -> {
-				// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 				SubNode node = read.getNode(ms, req.getId());
 				if (no(node)) {
 					throw new RuntimeException("Unable to find node: " + req.getId());
@@ -326,12 +325,18 @@ public class NodeEditService extends ServiceBase {
 					if (node.getLikes().add(userName)) {
 						// set node to dirty only if it just changed.
 						ThreadLocals.dirty(node);
+
+						// if this is a foreign post send message out to fediverse
+						if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
+							apub.sendLikeMessage(as, node);
+						}
 					}
 				} else {
 					if (node.getLikes().remove(userName)) {
 						// set node to dirty only if it just changed.
 						ThreadLocals.dirty(node);
 
+						// todo-0: send undo to foreign server
 						// if likes set is now empty make it null.
 						if (node.getLikes().size() == 0) {
 							node.setLikes(null);

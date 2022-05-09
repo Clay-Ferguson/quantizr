@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -68,6 +69,33 @@ public class ActPubService extends ServiceBase {
     public static boolean userRefresh = false;
     public static boolean bigRefresh = false;
 
+    public void sendLikeMessage(MongoSession ms, SubNode node) {
+        exec.run(() -> {
+            SubNode likedAccount = read.getNode(ms, node.getOwner());
+
+            String inbox = likedAccount.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
+            if (no(inbox)) {
+                throw new RuntimeException("No inbox for owner of node: " + node.getIdStr());
+            }
+
+            // foreign ID of node being liked
+            String apId = node.getStr(NodeProp.ACT_PUB_ID);
+
+            // the like needs to go out at least to this actorId
+            String toActorId = node.getStr(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
+
+            String fromUser = ThreadLocals.getSC().getUserName();
+            String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+
+            List<String> toUserNames = new LinkedList<String>();
+            toUserNames.add(toActorId);
+
+            APOLike message = apFactory.newLike(node.getIdStr() + "-like", apId, fromActor, toUserNames, null);
+            // log.debug("Sending Like message: "+XString.prettyPrint(message));
+            apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+        });
+    }
+
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers. This call returns immediately and delegates the actuall
@@ -80,6 +108,9 @@ public class ActPubService extends ServiceBase {
      * can only be users ALREADY imported into the system, however this is ok, because we will have
      * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
      * contain all the mentions that exist in the text of the message.
+     * 
+     * sendType can be 'Note' or 'Like' depending on what we're sending.
+     * 
      */
     public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, String replyToType,
             HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
@@ -126,7 +157,7 @@ public class ActPubService extends ServiceBase {
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
                         APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
-                                noteUrl, privateMessage, attachments);
+                                        noteUrl, privateMessage, attachments);  
 
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
@@ -281,7 +312,7 @@ public class ActPubService extends ServiceBase {
                     }
 
                     APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
-                            privateMessage, attachments);
+                                    privateMessage, attachments);
 
                     String userDoingPost = ThreadLocals.getSC().getUserName();
                     // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
@@ -625,8 +656,30 @@ public class ActPubService extends ServiceBase {
             String nodeId = XString.parseAfterLast(objectIdUrl, "=");
             SubNode node = read.getNode(as, nodeId);
             if (no(node)) {
-                throw new RuntimeException("Unable to find node: "+nodeId);
+                throw new RuntimeException("Unable to find node: " + nodeId);
             }
+            if (no(node.getLikes())) {
+                node.setLikes(new HashSet<>());
+            }
+
+            // if (req.isLike()) {
+            if (node.getLikes().add(actorUrl)) {
+                // set node to dirty only if it just changed.
+                ThreadLocals.dirty(node);
+            }
+            // do not delete...this will be the Undo logic. todo-0
+            // } else {
+            // if (node.getLikes().remove(userName)) {
+            // // set node to dirty only if it just changed.
+            // ThreadLocals.dirty(node);
+
+            // // if likes set is now empty make it null.
+            // if (node.getLikes().size() == 0) {
+            // node.setLikes(null);
+            // }
+            // }
+            // }
+
             return null;
         });
     }
@@ -808,7 +861,8 @@ public class ActPubService extends ServiceBase {
         SubNode newNode =
                 create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
 
-        // If we're updating a node, find what the ID should be and we can just put that ID value into newNode
+        // If we're updating a node, find what the ID should be and we can just put that ID value into
+        // newNode
         if (action.equals(APType.Update)) {
             // if we didn't find what to update throw error.
             if (no(dupNode)) {
@@ -823,7 +877,7 @@ public class ActPubService extends ServiceBase {
 
             // remove dupNode from memory cache so it can't be written out
             ThreadLocals.clean(dupNode);
-    
+
             newNode.setId(dupNode.getId());
             ThreadLocals.clean(newNode);
         }
@@ -892,6 +946,9 @@ public class ActPubService extends ServiceBase {
 
     // imports the list of foreign users into the system
     public void importUsers(MongoSession ms, HashSet<String> users) {
+        if (no(users))
+            return;
+
         users.forEach(user -> {
             // clean user if it's in '@mention' format
             user = XString.stripIfStartsWith(user, "@");

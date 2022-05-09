@@ -631,32 +631,35 @@ public class ActPubUtil extends ServiceBase {
 
             while (ok(ocPage)) {
                 orderedItems = AP.list(ocPage, APObj.orderedItems);
-                for (Object apObj : orderedItems) {
 
-                    // if apObj is an object (map)
-                    if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, APObj.id);
-                        // if no apId that's fine, just process item.
-                        if (no(apId)) {
+                if (ok(orderedItems)) {
+                    for (Object apObj : orderedItems) {
+
+                        // if apObj is an object (map)
+                        if (AP.hasProps(apObj)) {
+                            String apId = AP.str(apObj, APObj.id);
+                            // if no apId that's fine, just process item.
+                            if (no(apId)) {
+                                if (!observer.item(apObj))
+                                    return;
+                            }
+                            // if no apId that's fine, just process item.
+                            else if (!apIdSet.contains(apId)) {
+                                // log.debug("Iterate Collection Item: " + apId);
+                                if (!observer.item(apObj))
+                                    return;
+                                apIdSet.add(apId);
+                            }
+                        }
+                        // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                        // it.
+                        else {
                             if (!observer.item(apObj))
                                 return;
                         }
-                        // if no apId that's fine, just process item.
-                        else if (!apIdSet.contains(apId)) {
-                            // log.debug("Iterate Collection Item: " + apId);
-                            if (!observer.item(apObj))
-                                return;
-                            apIdSet.add(apId);
-                        }
-                    }
-                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
-                    // it.
-                    else {
-                        if (!observer.item(apObj))
+                        if (++count >= maxCount)
                             return;
                     }
-                    if (++count >= maxCount)
-                        return;
                 }
 
                 String nextPage = AP.str(ocPage, APObj.next);
@@ -680,31 +683,33 @@ public class ActPubUtil extends ServiceBase {
             if (ok(ocPage)) {
                 orderedItems = AP.list(ocPage, APObj.orderedItems);
 
-                for (Object apObj : orderedItems) {
-                    // if apObj is an object (map)
-                    if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, APObj.id);
-                        // if no apId that's fine, just process item.
-                        if (no(apId)) {
+                if (ok(orderedItems)) {
+                    for (Object apObj : orderedItems) {
+                        // if apObj is an object (map)
+                        if (AP.hasProps(apObj)) {
+                            String apId = AP.str(apObj, APObj.id);
+                            // if no apId that's fine, just process item.
+                            if (no(apId)) {
+                                if (!observer.item(apObj))
+                                    return;
+                            }
+                            // else process it with apId
+                            else if (!apIdSet.contains(apId)) {
+                                // log.debug("Iterate Collection Item: " + apId);
+                                if (!observer.item(apObj))
+                                    return;
+                                apIdSet.add(apId);
+                            }
+                        }
+                        // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                        // it.
+                        else {
                             if (!observer.item(apObj))
                                 return;
                         }
-                        // else process it with apId
-                        else if (!apIdSet.contains(apId)) {
-                            // log.debug("Iterate Collection Item: " + apId);
-                            if (!observer.item(apObj))
-                                return;
-                            apIdSet.add(apId);
-                        }
-                    }
-                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
-                    // it.
-                    else {
-                        if (!observer.item(apObj))
+                        if (++count >= maxCount)
                             return;
                     }
-                    if (++count >= maxCount)
-                        return;
                 }
             }
         }
