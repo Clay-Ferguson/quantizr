@@ -23,17 +23,17 @@ import quanta.util.XString;
 public class AP {
     private static final Logger log = LoggerFactory.getLogger(AP.class);
 
-    public static boolean hasProps(Object obj) {
-        return obj instanceof Map<?, ?>;
+    public static boolean apHasProps(Object obj) {
+        return obj instanceof Map<?, ?> || obj instanceof LinkedHashMap<?, ?>;
     }
 
-    public static boolean isType(Object obj, String type) {
+    public static boolean apIsType(Object obj, String type) {
         if (no(obj))
             return false;
-        return type.equalsIgnoreCase(str(obj, APObj.type));
+        return type.equalsIgnoreCase(apStr(obj, APObj.type));
     }
 
-    public static String str(Object obj, String prop) {
+    public static String apStr(Object obj, String prop) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -58,7 +58,7 @@ public class AP {
         return null;
     }
 
-    public static Boolean bool(Object obj, String prop) {
+    public static Boolean apBool(Object obj, String prop) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -77,7 +77,7 @@ public class AP {
         return false;
     }
 
-    public static Integer integer(Object obj, String prop) {
+    public static Integer apInt(Object obj, String prop) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -100,7 +100,7 @@ public class AP {
         return 0;
     }
 
-    public static Date date(Object obj, String prop) {
+    public static Date apDate(Object obj, String prop) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -117,7 +117,7 @@ public class AP {
         return null;
     }
 
-    public static List<?> list(Object obj, String prop) {
+    public static List<?> apList(Object obj, String prop) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -132,23 +132,23 @@ public class AP {
         return null;
     }
 
-    // instanceof Map won't always work as instanceof when LinkedHashMap
-    public static Val<Object> getFromMap(Object obj, String prop) {
-        if (obj instanceof LinkedHashMap<?, ?>) {
-            return new Val<Object>(((LinkedHashMap<?, ?>) obj).get(prop));
-        } else if (obj instanceof Map<?, ?>) {
-            return new Val<Object>(((Map<?, ?>) obj).get(prop));
-        }
-        return null;
-    }
-
-    public static Object obj(Object obj, String prop) {
+    public static Object apObj(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         } else if (obj instanceof LinkedHashMap<?, ?>) {
             return ((LinkedHashMap<?, ?>) obj).get(prop);
         }
         log.warn("getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return null;
+    }
+
+    // instanceof Map won't always work as instanceof when LinkedHashMap
+    private static Val<Object> getFromMap(Object obj, String prop) {
+        if (obj instanceof LinkedHashMap<?, ?>) {
+            return new Val<Object>(((LinkedHashMap<?, ?>) obj).get(prop));
+        } else if (obj instanceof Map<?, ?>) {
+            return new Val<Object>(((Map<?, ?>) obj).get(prop));
+        }
         return null;
     }
 }

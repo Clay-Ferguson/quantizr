@@ -1,5 +1,8 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apIsType;
+import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Arrays;
@@ -11,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
@@ -66,7 +68,7 @@ public class ActPubOutbox extends ServiceBase {
              * Query all existing known outbox items we have already saved for this foreign user
              */
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false);
-            String outboxUrl = AP.str(actor, APObj.outbox);
+            String outboxUrl = apStr(actor, APObj.outbox);
             APObj outbox = getOutbox(outboxUrl);
             if (no(outbox)) {
                 log.debug("Unable to get outbox for AP user: " + apUserName);
@@ -95,11 +97,11 @@ public class ActPubOutbox extends ServiceBase {
                     // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
 
-                    String apId = AP.str(obj, APObj.id);
+                    String apId = apStr(obj, APObj.id);
 
                     // If this is a new post our server hasn't yet injested.
                     if (!apIdSet.contains(apId)) {
-                        Object object = AP.obj(obj, APObj.object);
+                        Object object = apObj(obj, APObj.object);
 
                         if (ok(object)) {
                             if (object instanceof String) {
@@ -118,8 +120,8 @@ public class ActPubOutbox extends ServiceBase {
                                 // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                                 // }
                             } //
-                            else if (AP.isType(object, APType.Note) || //
-                                    AP.isType(object, APType.ChatMessage)) {
+                            else if (apIsType(object, APType.Note) || //
+                                    apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveNote(ms, _userNode, outboxNode, object, false, true, APType.Create);

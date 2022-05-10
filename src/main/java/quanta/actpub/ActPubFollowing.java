@@ -1,5 +1,8 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apInt;
+import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
@@ -11,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APOAccept;
 import quanta.actpub.model.APOFollow;
 import quanta.actpub.model.APOOrderedCollection;
@@ -83,7 +85,7 @@ public class ActPubFollowing extends ServiceBase {
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
-                    String toInbox = AP.str(toActor, APObj.inbox);
+                    String toInbox = apStr(toActor, APObj.inbox);
 
                     apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
@@ -108,7 +110,7 @@ public class ActPubFollowing extends ServiceBase {
     public void processFollowAction(Object followAction, boolean unFollow) {
 
         // Actor URL of actor doing the following
-        String followerActorUrl = AP.str(followAction, APObj.actor);
+        String followerActorUrl = apStr(followAction, APObj.actor);
         if (no(followerActorUrl)) {
             apLog.trace("no 'actor' found on follows action request posted object");
             return;
@@ -139,7 +141,7 @@ public class ActPubFollowing extends ServiceBase {
                     String actorBeingFollowedUrl = null;
 
                     // Actor being followed (local to our server)
-                    Object followObj = AP.obj(followAction, APObj.object);
+                    Object followObj = apObj(followAction, APObj.object);
 
                     if (no(followObj)) {
                         log.debug("Can't get followObj from: " + XString.prettyPrint(followAction));
@@ -151,7 +153,7 @@ public class ActPubFollowing extends ServiceBase {
                         actorBeingFollowedUrl = (String) followObj;
                         log.debug("Got actorBeingFollowedUrl from direct object being a string.");
                     } else {
-                        actorBeingFollowedUrl = AP.str(followObj, APObj.id);
+                        actorBeingFollowedUrl = apStr(followObj, APObj.id);
                         log.debug("Got actorBeingFollowedUrl from object.id");
                     }
 
@@ -210,7 +212,7 @@ public class ActPubFollowing extends ServiceBase {
                          * unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta
                          * users and see what the format of the message is sent from those).
                          */
-                        acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
+                        acceptPayload.put(APObj.id, apStr(followAction, APObj.id));
                         acceptPayload.put(APObj.actor, followerActorUrl);
                         acceptPayload.put(APObj.object, _actorBeingFollowedUrl);
 
@@ -221,7 +223,7 @@ public class ActPubFollowing extends ServiceBase {
                                 prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
                                 acceptPayload); // object
 
-                        String followerInbox = AP.str(followerActor, APObj.inbox);
+                        String followerInbox = apStr(followerActor, APObj.inbox);
                         log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
                         apUtil.securePost(null, as, privateKey, followerInbox, _actorBeingFollowedUrl, accept,
@@ -271,14 +273,14 @@ public class ActPubFollowing extends ServiceBase {
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowing(MongoSession ms, APObj actor) {
 
-        String followingUrl = (String) AP.str(actor, APObj.following);
+        String followingUrl = apStr(actor, APObj.following);
         APObj followings = getFollowing(followingUrl);
         if (no(followings)) {
             log.debug("Unable to get followings for AP user: " + followingUrl);
             return 0;
         }
 
-        int ret = AP.integer(followings, APObj.totalItems);
+        int ret = apInt(followings, APObj.totalItems);
 
         apUtil.iterateOrderedCollection(followings, Integer.MAX_VALUE, obj -> {
             try {
@@ -411,12 +413,12 @@ public class ActPubFollowing extends ServiceBase {
             if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
                 if (ok(actor)) {
-                    String followingUrl = (String) AP.str(actor, APObj.following);
+                    String followingUrl = apStr(actor, APObj.following);
                     APObj following = getFollowing(followingUrl);
                     if (no(following)) {
                         log.debug("Unable to get followers for AP user: " + followingUrl);
                     }
-                    ret = AP.integer(following, APObj.totalItems);
+                    ret = apInt(following, APObj.totalItems);
                 }
             }
             return ret;

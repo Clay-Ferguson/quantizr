@@ -1,5 +1,6 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.time.ZoneOffset;
@@ -11,7 +12,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
@@ -113,7 +113,7 @@ public class ActPubFactory extends ServiceBase {
 			 */
 			APObj actor = apCache.actorsByUrl.get(attributedTo);
 			if (ok(actor)) {
-				ccList.add(AP.str(actor, APObj.followers));
+				ccList.add(apStr(actor, APObj.followers));
 			}
 		}
 

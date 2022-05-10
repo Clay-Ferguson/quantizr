@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
@@ -135,11 +136,11 @@ public class ActPubCrypto extends ServiceBase {
 
     public PublicKey getPublicKeyFromActor(Object actorObj) {
         PublicKey pubKey = null;
-        Object pubKeyObj = AP.obj(actorObj, APObj.publicKey);
+        Object pubKeyObj = apObj(actorObj, APObj.publicKey);
         if (no(pubKeyObj))
             return null;
 
-        String pkeyEncoded = AP.str(pubKeyObj, APObj.publicKeyPem);
+        String pkeyEncoded = apStr(pubKeyObj, APObj.publicKeyPem);
         if (no(pkeyEncoded))
             return null;
 

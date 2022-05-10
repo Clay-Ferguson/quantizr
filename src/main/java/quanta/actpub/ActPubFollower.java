@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apInt;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.LinkedList;
@@ -10,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
@@ -53,14 +54,14 @@ public class ActPubFollower extends ServiceBase {
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowers(MongoSession ms, APObj actor) {
 
-        String followersUrl = (String) AP.str(actor, APObj.followers);
+        String followersUrl = apStr(actor, APObj.followers);
         APObj followers = getRemoteFollowers(followersUrl);
         if (no(followers)) {
             log.debug("Unable to get followers for AP user: " + followersUrl);
             return 0;
         }
 
-        int ret = AP.integer(followers, APObj.totalItems);
+        int ret = apInt(followers, APObj.totalItems);
 
         apUtil.iterateOrderedCollection(followers, Integer.MAX_VALUE, obj -> {
             try {
@@ -216,12 +217,12 @@ public class ActPubFollower extends ServiceBase {
             if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
                 if (ok(actor)) {
-                    String followersUrl = (String) AP.str(actor, APObj.followers);
+                    String followersUrl = apStr(actor, APObj.followers);
                     APObj followers = getRemoteFollowers(followersUrl);
                     if (no(followers)) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }
-                    ret = AP.integer(followers, APObj.totalItems);
+                    ret = apInt(followers, APObj.totalItems);
                 }
             }
             return ret;

@@ -1,5 +1,8 @@
 package quanta.actpub;
 
+import static quanta.actpub.model.AP.apHasProps;
+import static quanta.actpub.model.AP.apList;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.net.URL;
@@ -37,7 +40,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -146,7 +148,7 @@ public class ActPubUtil extends ServiceBase {
 
         String actorUrl = null;
         if (ok(self)) {
-            actorUrl = AP.str(self, APObj.href);
+            actorUrl = apStr(self, APObj.href);
         }
         return actorUrl;
     }
@@ -156,13 +158,13 @@ public class ActPubUtil extends ServiceBase {
      * a 'rel' property that matches the value in the rel param string
      */
     public Object getLinkByRel(Object webFinger, String rel) {
-        List<?> linksList = AP.list(webFinger, APObj.links);
+        List<?> linksList = apList(webFinger, APObj.links);
 
         if (no(linksList))
             return null;
 
         for (Object link : linksList) {
-            if (rel.equals(AP.str(link, APObj.rel))) {
+            if (rel.equals(apStr(link, APObj.rel))) {
                 return link;
             }
         }
@@ -501,8 +503,8 @@ public class ActPubUtil extends ServiceBase {
      * preferredUserName@host.com
      */
     public String getLongUserNameFromActor(Object actor) {
-        String shortUserName = AP.str(actor, APObj.preferredUsername); // short name like 'alice'
-        String inbox = AP.str(actor, APObj.inbox);
+        String shortUserName = apStr(actor, APObj.preferredUsername); // short name like 'alice'
+        String inbox = apStr(actor, APObj.inbox);
         try {
             URL url = new URL(inbox);
             String host = url.getHost();
@@ -602,7 +604,7 @@ public class ActPubUtil extends ServiceBase {
          * addition to the paging, although normally when the collection has the items it means it won't
          * have any paging
          */
-        List<?> orderedItems = AP.list(collectionObj, APObj.orderedItems);
+        List<?> orderedItems = apList(collectionObj, APObj.orderedItems);
         if (ok(orderedItems)) {
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
@@ -622,7 +624,7 @@ public class ActPubUtil extends ServiceBase {
          * it just means we have to read and deduplicate all the items from all pages to be sure we don't
          * end up with a empty array even when there ARE some
          */
-        String firstPageUrl = AP.str(collectionObj, APObj.first);
+        String firstPageUrl = apStr(collectionObj, APObj.first);
         if (ok(firstPageUrl)) {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
@@ -630,14 +632,14 @@ public class ActPubUtil extends ServiceBase {
             Object ocPage = no(firstPageUrl) ? null : getJson(firstPageUrl, APConst.MTYPE_ACT_JSON);
 
             while (ok(ocPage)) {
-                orderedItems = AP.list(ocPage, APObj.orderedItems);
+                orderedItems = apList(ocPage, APObj.orderedItems);
 
                 if (ok(orderedItems)) {
                     for (Object apObj : orderedItems) {
 
                         // if apObj is an object (map)
-                        if (AP.hasProps(apObj)) {
-                            String apId = AP.str(apObj, APObj.id);
+                        if (apHasProps(apObj)) {
+                            String apId = apStr(apObj, APObj.id);
                             // if no apId that's fine, just process item.
                             if (no(apId)) {
                                 if (!observer.item(apObj))
@@ -662,7 +664,7 @@ public class ActPubUtil extends ServiceBase {
                     }
                 }
 
-                String nextPage = AP.str(ocPage, APObj.next);
+                String nextPage = apStr(ocPage, APObj.next);
                 if (ok(nextPage)) {
                     if (++pageQueries > maxPageQueries)
                         return;
@@ -673,7 +675,7 @@ public class ActPubUtil extends ServiceBase {
             }
         }
 
-        String lastPageUrl = AP.str(collectionObj, APObj.last);
+        String lastPageUrl = apStr(collectionObj, APObj.last);
         if (ok(lastPageUrl)) {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
@@ -681,13 +683,13 @@ public class ActPubUtil extends ServiceBase {
             Object ocPage = no(lastPageUrl) ? null : getJson(lastPageUrl, APConst.MTYPE_ACT_JSON);
 
             if (ok(ocPage)) {
-                orderedItems = AP.list(ocPage, APObj.orderedItems);
+                orderedItems = apList(ocPage, APObj.orderedItems);
 
                 if (ok(orderedItems)) {
                     for (Object apObj : orderedItems) {
                         // if apObj is an object (map)
-                        if (AP.hasProps(apObj)) {
-                            String apId = AP.str(apObj, APObj.id);
+                        if (apHasProps(apObj)) {
+                            String apId = apStr(apObj, APObj.id);
                             // if no apId that's fine, just process item.
                             if (no(apId)) {
                                 if (!observer.item(apObj))
@@ -872,11 +874,11 @@ public class ActPubUtil extends ServiceBase {
             return null;
         }
 
-        String type = AP.str(obj, APObj.type);
+        String type = apStr(obj, APObj.type);
 
         switch (type) {
             case APType.Note:
-                String ownerActorUrl = AP.str(obj, APObj.attributedTo);
+                String ownerActorUrl = apStr(obj, APObj.attributedTo);
                 if (ok(ownerActorUrl)) {
                     return (String) arun.run(as -> {
                         String nodeId = null;
