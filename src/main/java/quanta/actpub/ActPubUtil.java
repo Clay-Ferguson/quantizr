@@ -788,7 +788,7 @@ public class ActPubUtil extends ServiceBase {
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
                 try {
                     nodes.addFirst(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
-                            false));
+                            false, true));
 
                     // if inReplyTo exists try to use it first.
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
@@ -844,7 +844,7 @@ public class ActPubUtil extends ServiceBase {
                             // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition.
                             if (!child.getIdStr().equals(nodeId)) {
                                 others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false,
-                                        false, false, false));
+                                        false, false, false, true));
                             }
                         }
                     }

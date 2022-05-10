@@ -44,7 +44,7 @@ public class Convert extends ServiceBase {
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
-			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers) {
+			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers, boolean loadLikes) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
@@ -153,6 +153,26 @@ public class Convert extends ServiceBase {
 			likes = new ArrayList<String>(node.getLikes());
 		}
 
+		// todo-1: enable this some day....
+		// LinkedList<String> likes = null;
+		// if (loadLikes && ok(node.getLikes())) {
+		// 	final LinkedList<String> _likes = new LinkedList<>();
+		// 	node.getLikes().forEach(like -> {
+		// 		// I decided not to risk the performance hit this could cause, and will probably load this asynchronously
+		// 		// whenver I do enable this capability in the future. Also for this special case of loading a property
+		//      // that we might have on a UserNode alrady the we need a way to check first the cache, and THEN the MongoDb
+		//      // node, BEFORE resorting to making an HTTP REST call like the getActorByUrl currently does.
+		// 		// if (like.startsWith("http://") || like.startsWith("https://")) {
+		// 		// 	APObj actor = apUtil.getActorByUrl(like);
+		// 		// 	if (ok(actor)) {
+		// 		// 		like = apStr(actor, APObj.preferredUsername);
+		// 		// 	}
+		// 		// }
+		// 		_likes.add(like);
+		// 	});
+		// 	likes = _likes;
+		// }
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(),
 				displayName, owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, likes, hasChildren, //
@@ -188,7 +208,7 @@ public class Convert extends ServiceBase {
 					boolean multiLevel = true;
 
 					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++,
-							multiLevel, lastChild, childrenCheck, false));
+							multiLevel, lastChild, childrenCheck, false, loadLikes));
 				}
 			}
 		}
@@ -294,8 +314,8 @@ public class Convert extends ServiceBase {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
-			boolean htmlOnly, boolean initNodeEdit) {
+	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop, boolean htmlOnly,
+			boolean initNodeEdit) {
 		try {
 			Object value = null;
 			switch (propName) {

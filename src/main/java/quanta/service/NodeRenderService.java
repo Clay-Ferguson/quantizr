@@ -106,7 +106,7 @@ public class NodeRenderService extends ServiceBase {
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
 			NodeInfo nodeInfo =
-					convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false);
+					convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false, true);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -189,7 +189,7 @@ public class NodeRenderService extends ServiceBase {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (ok(highestUpParent)) {
 					NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, highestUpParent, true, false, 0,
-							false, false, false, false);
+							false, false, false, false, true);
 
 					// each parent up goes on top of list for correct rendering order on client.
 					parentNodes.addFirst(nodeInfo);
@@ -236,7 +236,7 @@ public class NodeRenderService extends ServiceBase {
 		 * on all the nodes that have children.
 		 */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal, level > 0,
-				false, false, false);
+				false, false, false, true);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -464,7 +464,7 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
