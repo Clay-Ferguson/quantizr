@@ -258,6 +258,8 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getResource(String nodeId) {
+        if (no(nodeId)) return null;
+        
         return (APObj) arun.run(as -> {
             String host = prop.getProtocolHostAndPort();
             String nodeIdBase = host + "?id=";

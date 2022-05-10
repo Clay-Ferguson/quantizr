@@ -157,7 +157,7 @@ public class ActPubService extends ServiceBase {
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
                         APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
-                                        noteUrl, privateMessage, attachments);  
+                                noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
@@ -312,7 +312,7 @@ public class ActPubService extends ServiceBase {
                     }
 
                     APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
-                                    privateMessage, attachments);
+                            privateMessage, attachments);
 
                     String userDoingPost = ThreadLocals.getSC().getUserName();
                     // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
@@ -533,7 +533,7 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                apub.processUndoAction(payload);
+                apub.processUndoAction(httpReq, payload);
                 break;
 
             case APType.Delete:
@@ -546,7 +546,7 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                apub.processLikeAction(httpReq, payload);
+                apub.processLikeAction(httpReq, payload, false);
                 break;
 
             default:
@@ -557,7 +557,7 @@ public class ActPubService extends ServiceBase {
 
     /* Process inbound undo actions (coming from foreign servers) */
     @PerfMon(category = "apub")
-    public void processUndoAction(Object payload) {
+    public void processUndoAction(HttpServletRequest httpReq, Object payload) {
         Object obj = AP.obj(payload, APObj.object);
         String type = AP.str(obj, APObj.type);
         apLog.trace("Undo Type: " + type);
@@ -566,8 +566,12 @@ public class ActPubService extends ServiceBase {
                 apFollowing.processFollowAction(obj, true);
                 break;
 
+            case APType.Like:
+                apub.processLikeAction(httpReq, payload, true);
+                break;
+
             default:
-                log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
+                log.debug("Unsupported Undo payload object type:" + XString.prettyPrint(obj));
                 break;
         }
     }
@@ -609,7 +613,13 @@ public class ActPubService extends ServiceBase {
             }
 
             PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
-            apCrypto.verifySignature(httpReq, pubKey);
+
+            try {
+                apCrypto.verifySignature(httpReq, pubKey);
+            } catch (Exception e) {
+                log.error("Sig failed.");
+                return null;
+            }
 
             Object object = AP.obj(payload, APObj.object);
             String type = AP.str(object, APObj.type);
@@ -631,9 +641,9 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processLikeAction(HttpServletRequest httpReq, Object payload) {
+    public void processLikeAction(HttpServletRequest httpReq, Object payload, boolean unlike) {
         arun.<Object>run(as -> {
-            apLog.trace("processLikeAction");
+            apLog.trace("process " + (unlike ? "unlike" : "like"));
             String actorUrl = AP.str(payload, APObj.actor);
             if (no(actorUrl)) {
                 log.debug("no 'actor' found on create action request posted object");
@@ -647,11 +657,28 @@ public class ActPubService extends ServiceBase {
             }
 
             PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
-            apCrypto.verifySignature(httpReq, pubKey);
+
+            try {
+                apCrypto.verifySignature(httpReq, pubKey);
+            } catch (Exception e) {
+                log.error("Sig failed.");
+                return null;
+            }
 
             String objectIdUrl = AP.str(payload, APObj.object);
 
-            // we know our objects are identified like this: "https://quanta.wiki?id=6277120c1363dc5d1fb426b5"
+            if (no(objectIdUrl)) {
+                log.debug("Unable to get object from payload: " + XString.prettyPrint(payload));
+                return null;
+            }
+
+            // For now we don't maintain likes on nodes that aren't native to Quanta.
+            if (!objectIdUrl.startsWith(prop.getProtocolHostAndPort())) {
+                log.debug("Ignoring 'like' on foreign node: " + objectIdUrl);
+                return null;
+            }
+
+            // Our objects are identified like this: "https://quanta.wiki?id=6277120c1363dc5d1fb426b5"
             // So by chopping after last '=' we can get the ID part.
             String nodeId = XString.parseAfterLast(objectIdUrl, "=");
             SubNode node = read.getNode(as, nodeId);
@@ -662,23 +689,22 @@ public class ActPubService extends ServiceBase {
                 node.setLikes(new HashSet<>());
             }
 
-            // if (req.isLike()) {
-            if (node.getLikes().add(actorUrl)) {
-                // set node to dirty only if it just changed.
-                ThreadLocals.dirty(node);
-            }
-            // do not delete...this will be the Undo logic. todo-0
-            // } else {
-            // if (node.getLikes().remove(userName)) {
-            // // set node to dirty only if it just changed.
-            // ThreadLocals.dirty(node);
+            if (!unlike) {
+                if (node.getLikes().add(actorUrl)) {
+                    // set node to dirty only if it just changed.
+                    ThreadLocals.dirty(node);
+                }
+            } else {
+                if (node.getLikes().remove(actorUrl)) {
+                    // set node to dirty only if it just changed.
+                    ThreadLocals.dirty(node);
 
-            // // if likes set is now empty make it null.
-            // if (node.getLikes().size() == 0) {
-            // node.setLikes(null);
-            // }
-            // }
-            // }
+                    // if likes set is now empty make it null.
+                    if (node.getLikes().size() == 0) {
+                        node.setLikes(null);
+                    }
+                }
+            }
 
             return null;
         });
@@ -702,7 +728,13 @@ public class ActPubService extends ServiceBase {
             }
 
             PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
-            apCrypto.verifySignature(httpReq, pubKey);
+
+            try {
+                apCrypto.verifySignature(httpReq, pubKey);
+            } catch (Exception e) {
+                log.error("Sig failed.");
+                return null;
+            }
 
             Object object = AP.obj(payload, APObj.object);
             String type = AP.str(object, APObj.type);
@@ -710,23 +742,14 @@ public class ActPubService extends ServiceBase {
                 log.error("No delete type specified in delete request: " + XString.prettyPrint(payload));
                 return null;
             }
-            apLog.trace("delete type: " + type);
+            log.debug("delete: " + type);
 
-            switch (type) {
-                case APType.Tombstone:
-                    processCreateTombstone(as, actorUrl, actorObj, object);
-                    break;
-
-                default:
-                    // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Create action type: " + type);
-                    break;
-            }
+            deleteObject(as, actorUrl, actorObj, object);
             return null;
         });
     }
 
-    public void processCreateTombstone(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
+    public void deleteObject(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
         String id = AP.str(obj, APObj.id);
         delete.deleteByPropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
@@ -1314,10 +1337,10 @@ public class ActPubService extends ServiceBase {
                     continue;
 
                 /*
-                 * This may hurt performance of the app so let's throttle it way back to 5 seconds between loops.
+                 * This may hurt performance of the app so let's throttle it way back to a few seconds between loops.
                  * Also we don't want to put too much unwelcome load on other instances.
                  */
-                Thread.sleep(5000);
+                Thread.sleep(4000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
