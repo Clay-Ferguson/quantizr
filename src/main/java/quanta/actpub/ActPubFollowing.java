@@ -60,10 +60,10 @@ public class ActPubFollowing extends ServiceBase {
                 return;
             }
 
-            APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(apUserName);
-            String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
-
             arun.run(ms -> {
+                APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(ms, followerUserName, apUserName);
+                String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
+                
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
 
                 // generate a bogus id follow id here. We don't need anything more
@@ -83,11 +83,11 @@ public class ActPubFollowing extends ServiceBase {
                             followAction);
                 }
 
-                APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
+                APObj toActor = apUtil.getActorByUrl(ms, followerUserName, actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
                     String toInbox = apStr(toActor, APObj.inbox);
-
-                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
+                    String privateKey = apCrypto.getPrivateKey(ms, followerUserName);
+                    apUtil.securePostEx(toInbox, privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -99,7 +99,7 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     /**
-     * Follows or Unfollows foreign users
+     * Follows or Unfollows users
      * 
      * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
      * account node in our local DB created if not already existing, and then a FRIEND node under his
@@ -119,7 +119,7 @@ public class ActPubFollowing extends ServiceBase {
         Runnable runnable = () -> {
             arun.<APObj>run(as -> {
                 try {
-                    APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
+                    APObj followerActor = apUtil.getActorByUrl(as, null, followerActorUrl);
                     if (no(followerActor)) {
                         apLog.trace("no followerActor object gettable from actor: " + followerActorUrl);
                         return null;
@@ -130,7 +130,7 @@ public class ActPubFollowing extends ServiceBase {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user
-                    SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, followerUserName, false);
+                    SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, null, followerUserName, false);
                     if (no(followerAccountNode)) {
                         apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
@@ -226,7 +226,7 @@ public class ActPubFollowing extends ServiceBase {
                         String followerInbox = apStr(followerActor, APObj.inbox);
                         log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
-                        apUtil.securePost(null, as, privateKey, followerInbox, _actorBeingFollowedUrl, accept,
+                        apUtil.securePostEx(followerInbox, privateKey, _actorBeingFollowedUrl, accept,
                                 APConst.MTYPE_LD_JSON_PROF);
                         log.debug("Secure post completed.");
                     });
@@ -243,9 +243,9 @@ public class ActPubFollowing extends ServiceBase {
      * Generates outbound following data
      */
     @PerfMon(category = "apFollowing")
-    public APOOrderedCollection generateFollowing(String userName) {
+    public APOOrderedCollection generateFollowing(String userDoingAction, String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
-        Long totalItems = getFollowingCount(userName);
+        Long totalItems = getFollowingCount(userDoingAction, userName);
 
         APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
                 url + "?min_id=0&page=true");
@@ -271,10 +271,10 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowing(MongoSession ms, APObj actor) {
+    public int loadRemoteFollowing(MongoSession ms, String userDoingAction, APObj actor) {
 
         String followingUrl = apStr(actor, APObj.following);
-        APObj followings = getFollowing(followingUrl);
+        APObj followings = getFollowing(ms, userDoingAction, followingUrl);
         if (no(followings)) {
             log.debug("Unable to get followings for AP user: " + followingUrl);
             return 0;
@@ -282,7 +282,7 @@ public class ActPubFollowing extends ServiceBase {
 
         int ret = apInt(followings, APObj.totalItems);
 
-        apUtil.iterateOrderedCollection(followings, Integer.MAX_VALUE, obj -> {
+        apUtil.iterateOrderedCollection(ms, userDoingAction, followings, Integer.MAX_VALUE, obj -> {
             try {
                 // if (ok(obj )) {
                 // log.debug("follower: OBJ=" + XString.prettyPrint(obj));
@@ -309,11 +309,11 @@ public class ActPubFollowing extends ServiceBase {
         return ret;
     }
 
-    public APObj getFollowing(String url) {
+    public APObj getFollowing(MongoSession ms, String userDoingAction, String url) {
         if (no(url))
             return null;
 
-        APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+        APObj outbox = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Following: " + XString.prettyPrint(outbox));
@@ -360,9 +360,9 @@ public class ActPubFollowing extends ServiceBase {
         return following;
     }
 
-    public Long getFollowingCount(String userName) {
+    public Long getFollowingCount(String userDoingAction, String userName) {
         return (Long) arun.run(ms -> {
-            Long count = countFollowingOfUser(ms, userName, null);
+            Long count = countFollowingOfUser(ms, userDoingAction, userName, null);
             return count;
         });
     }
@@ -401,7 +401,7 @@ public class ActPubFollowing extends ServiceBase {
         return mongoUtil.find(q);
     }
 
-    public long countFollowingOfUser(MongoSession ms, String userName, String actorUrl) {
+    public long countFollowingOfUser(MongoSession ms, String userDoingAction, String userName, String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
             return countFollowingOfLocalUser(ms, userName);
@@ -411,10 +411,10 @@ public class ActPubFollowing extends ServiceBase {
             /* Starting with just actorUrl, lookup the following count */
             int ret = 0;
             if (ok(actorUrl)) {
-                APObj actor = apUtil.getActorByUrl(actorUrl);
+                APObj actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
                 if (ok(actor)) {
                     String followingUrl = apStr(actor, APObj.following);
-                    APObj following = getFollowing(followingUrl);
+                    APObj following = getFollowing(ms, userDoingAction, followingUrl);
                     if (no(following)) {
                         log.debug("Unable to get followers for AP user: " + followingUrl);
                     }

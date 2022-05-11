@@ -42,9 +42,9 @@ public class ActPubFollower extends ServiceBase {
      * Generates outbound followers data
      */
     @PerfMon(category = "apFollower")
-    public APOOrderedCollection generateFollowers(String userName) {
+    public APOOrderedCollection generateFollowers(String userMakingRequest, String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
-        Long totalItems = getFollowersCount(userName);
+        Long totalItems = getFollowersCount(userMakingRequest, userName);
 
         APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
                 url + "?min_id=0&page=true");
@@ -52,10 +52,10 @@ public class ActPubFollower extends ServiceBase {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowers(MongoSession ms, APObj actor) {
+    public int loadRemoteFollowers(MongoSession ms, String userMakingRequest, APObj actor) {
 
         String followersUrl = apStr(actor, APObj.followers);
-        APObj followers = getRemoteFollowers(followersUrl);
+        APObj followers = getRemoteFollowers(ms, userMakingRequest, followersUrl);
         if (no(followers)) {
             log.debug("Unable to get followers for AP user: " + followersUrl);
             return 0;
@@ -63,7 +63,7 @@ public class ActPubFollower extends ServiceBase {
 
         int ret = apInt(followers, APObj.totalItems);
 
-        apUtil.iterateOrderedCollection(followers, Integer.MAX_VALUE, obj -> {
+        apUtil.iterateOrderedCollection(ms, userMakingRequest, followers, Integer.MAX_VALUE, obj -> {
             try {
                 // if (ok(obj )) {
                 // log.debug("follower: OBJ=" + XString.prettyPrint(obj));
@@ -90,11 +90,11 @@ public class ActPubFollower extends ServiceBase {
         return ret;
     }
 
-    public APObj getRemoteFollowers(String url) {
+    public APObj getRemoteFollowers(MongoSession ms, String userMakingRequest, String url) {
         if (no(url))
             return null;
 
-        APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+        APObj outbox = apUtil.getJson(ms, userMakingRequest, url, APConst.MTYPE_ACT_JSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Followers: " + XString.prettyPrint(outbox));
@@ -151,9 +151,9 @@ public class ActPubFollower extends ServiceBase {
         return followers;
     }
 
-    public Long getFollowersCount(String userName) {
+    public Long getFollowersCount(String userMakingRequest, String userName) {
         return (Long) arun.run(ms -> {
-            Long count = countFollowersOfUser(ms, userName, null);
+            Long count = countFollowersOfUser(ms, userMakingRequest, userName, null);
             return count;
         });
     }
@@ -205,7 +205,7 @@ public class ActPubFollower extends ServiceBase {
         return res;
     }
 
-    public long countFollowersOfUser(MongoSession ms, String userName, String actorUrl) {
+    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, String userName, String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
             return countFollowersOfLocalUser(ms, userName);
@@ -215,10 +215,10 @@ public class ActPubFollower extends ServiceBase {
             /* Starting with just actorUrl, lookup the follower count */
             int ret = 0;
             if (ok(actorUrl)) {
-                APObj actor = apUtil.getActorByUrl(actorUrl);
+                APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
                 if (ok(actor)) {
                     String followersUrl = apStr(actor, APObj.followers);
-                    APObj followers = getRemoteFollowers(followersUrl);
+                    APObj followers = getRemoteFollowers(ms, userMakingRequest, followersUrl);
                     if (no(followers)) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }

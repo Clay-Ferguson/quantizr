@@ -171,20 +171,58 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
+    /*
+     * Does the get with userDoingGet if exists, or else falls back to either the supplied ms, or the
+     * admin ms.
+     */
+    public APObj getJson(MongoSession ms, String userDoingGet, String url, MediaType mediaType) {
+        if (ok(userDoingGet)) {
+            return (APObj) arun.run(as -> {
+                String actor = apUtil.makeActorUrlForUserName(userDoingGet);
+
+                /* if private key not sent then get it using the session */
+                String privateKey = apCrypto.getPrivateKey(as, userDoingGet);
+                if (no(privateKey)) {
+                    throw new RuntimeException("Unable to get private key for user.");
+                }
+                return secureGet(url, privateKey, actor, mediaType);
+            });
+        } else if (ok(ms)) {
+            String actor = apUtil.makeActorUrlForUserName(ms.getUserName());
+
+            /* if private key not sent then get it using the session */
+            String privateKey = apCrypto.getPrivateKey(ms, ms.getUserName());
+            if (no(privateKey)) {
+                throw new RuntimeException("Unable to get private key for user.");
+            }
+            return secureGet(url, privateKey, actor, mediaType);
+        } else {
+            return (APObj) arun.run(as -> {
+                String actor = apUtil.makeActorUrlForUserName(as.getUserName());
+
+                /* if private key not sent then get it using the session */
+                String privateKey = apCrypto.getPrivateKey(as, as.getUserName());
+                if (no(privateKey)) {
+                    throw new RuntimeException("Unable to get private key for user.");
+                }
+                return secureGet(url, privateKey, actor, mediaType);
+            });
+        }
+    }
+
     /**
-     * 
-     * @param url
-     * @param mediaType
-     * @param waitSeconds Number of seconds to wait for server to come online before giving up
-     * @return
+     * Headers can be optionally passed in, preloaded with security properties, or else null is
+     * acceptable too
      */
     @PerfMon(category = "apUtil")
-    public APObj getJson(String url, MediaType mediaType) {
+    public APObj getJson(String url, MediaType mediaType, HttpHeaders headers) {
         // log.debug("getJson: " + url);
         APObj ret = null;
         int responseCode = 0;
         try {
-            HttpHeaders headers = new HttpHeaders();
+            if (no(headers)) {
+                headers = new HttpHeaders();
+            }
 
             if (ok(mediaType)) {
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
@@ -208,47 +246,63 @@ public class ActPubUtil extends ServiceBase {
         return ret;
     }
 
-    /*
-     * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
-     * 
-     * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
-     */
-    public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
-            MediaType postType) {
-        try {
-            apLog.trace("Secure post to " + toInbox);
-            /* if private key not sent then get it using the session */
-            if (no(privateKey)) {
-                privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
-            }
+    public APObj secureGet(String url, String privateKey, String actor, MediaType mediaType) {
+        HttpHeaders headers = new HttpHeaders();
+        loadSignatureHeaderVals(headers, privateKey, url, actor, null, "get");
+        return getJson(url, mediaType, headers);
+    }
 
-            if (no(privateKey)) {
-                throw new RuntimeException("Unable to get private key for user sending message.");
-            }
+    public void securePostEx(String url, String privateKey, String actor, APObj message, MediaType postType) {
+        try {
+            apLog.trace("Secure post to " + url);
 
             String body = XString.prettyPrint(message);
-            byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             apLog.trace("Posting Object:\n" + body);
+            byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
 
-            byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
-            PrivateKey privKey = kf.generatePrivate(keySpecPKCS8);
+            HttpHeaders headers = new HttpHeaders();
+            loadSignatureHeaderVals(headers, privateKey, url, actor, bodyBytes, "post");
+            postJson(url, body, headers, postType);
+        } catch (Exception e) {
+            log.error("ALL secure http post failed to: " + url, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadSignatureHeaderVals(HttpHeaders headers, String privKeyStr, String urlStr, String actor, byte[] bodyBytes,
+            String method) {
+        try {
+            // try to get the key from the cache first
+            PrivateKey privKey = apCache.privateKeys.get(privKeyStr);
+
+            // if key not found in cache, generate it, and cache it.
+            if (no(privKey)) {
+                byte[] privKeyBytes = Base64.getDecoder().decode(privKeyStr);
+                KeyFactory kf = KeyFactory.getInstance("RSA");
+                PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
+                privKey = kf.generatePrivate(keySpecPKCS8);
+
+                // put the key in the cache now!
+                apCache.privateKeys.put(privKeyStr, privKey);
+            }
 
             // WARNING: dateFormat is NOT threasafe. Always create one here.
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = dateFormat.format(new Date());
 
-            String digestHeader =
-                    "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
+            String digestHeader = ok(bodyBytes)
+                    ? "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes))
+                    : null;
 
-            URL url = new URL(toInbox);
-            // log.debug("secure post to host: " + url.getHost());
-            String strToSign = "(request-target): post " + url.getPath() + "\n" + //
-                    "host: " + url.getHost() + "\n" + //
-                    "date: " + date + "\n" + //
-                    "digest: " + digestHeader;
+            URL url = new URL(urlStr);
+            String strToSign = "(request-target): " + method + " " + url.getPath() + //
+                    "\nhost: " + url.getHost() + //
+                    "\ndate: " + date;
+
+            if (ok(digestHeader)) {
+                strToSign += "\ndigest: " + digestHeader;
+            }
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
@@ -259,18 +313,89 @@ public class ActPubUtil extends ServiceBase {
              * todo-1: Pleroma is including content-length in this headers list but we don't. I should probably
              * add it but be sure not to break compatability when doing so.
              */
-
             String headerSig = headerPair("keyId", actor + "#main-key") + "," + //
-                    headerPair("headers", "(request-target) host date digest") + "," + //
+                    headerPair("headers", "(request-target) host date" + (ok(digestHeader) ? " digest" : "")) + "," + //
                     headerPair("algorithm", "rsa-sha256") + "," + //
                     headerPair("signature", Base64.getEncoder().encodeToString(signature));
 
-            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
+            headers.add("Host", url.getHost());
+            headers.add("Date", date);
+            headers.add("Signature", headerSig);
+
+            if (ok(digestHeader)) {
+                headers.add("Digest", digestHeader);
+            }
         } catch (Exception e) {
-            log.error("ALL secure http post failed to: " + toInbox, e);
+            log.error("loadSignatureHeaderVals failed", e);
             throw new RuntimeException(e);
         }
     }
+
+    /*
+     * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
+     * 
+     * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
+     */
+    // public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox,
+    // String actor, APObj message,
+    // MediaType postType) {
+    // try {
+    // apLog.trace("Secure post to " + toInbox);
+    // /* if private key not sent then get it using the session */
+    // if (no(privateKey)) {
+    // privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
+    // }
+
+    // if (no(privateKey)) {
+    // throw new RuntimeException("Unable to get private key for user sending message.");
+    // }
+
+    // String body = XString.prettyPrint(message);
+    // byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+    // apLog.trace("Posting Object:\n" + body);
+
+    // byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
+    // KeyFactory kf = KeyFactory.getInstance("RSA");
+    // PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
+    // PrivateKey privKey = kf.generatePrivate(keySpecPKCS8);
+
+    // // WARNING: dateFormat is NOT threasafe. Always create one here.
+    // SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+    // dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    // String date = dateFormat.format(new Date());
+
+    // String digestHeader =
+    // "SHA-256=" +
+    // Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
+
+    // URL url = new URL(toInbox);
+    // String strToSign = "(request-target): post " + url.getPath() + "\n" + //
+    // "host: " + url.getHost() + "\n" + //
+    // "date: " + date + "\n" + //
+    // "digest: " + digestHeader;
+
+    // Signature sig = Signature.getInstance("SHA256withRSA");
+    // sig.initSign(privKey);
+    // sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
+    // byte[] signature = sig.sign();
+
+    // /*
+    // * todo-1: Pleroma is including content-length in this headers list but we don't. I should
+    // probably
+    // * add it but be sure not to break compatability when doing so.
+    // */
+
+    // String headerSig = headerPair("keyId", actor + "#main-key") + "," + //
+    // headerPair("headers", "(request-target) host date digest") + "," + //
+    // headerPair("algorithm", "rsa-sha256") + "," + //
+    // headerPair("signature", Base64.getEncoder().encodeToString(signature));
+
+    // postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
+    // } catch (Exception e) {
+    // log.error("ALL secure http post failed to: " + toInbox, e);
+    // throw new RuntimeException(e);
+    // }
+    // }
 
     private String headerPair(String key, String val) {
         return key + "=\"" + val + "\"";
@@ -281,7 +406,7 @@ public class ActPubUtil extends ServiceBase {
      * app restarts at least, o
      */
     @PerfMon(category = "apUtil")
-    public APObj getActorByUrl(String url) {
+    public APObj getActorByUrl(MongoSession ms, String userDoingAction, String url) {
         if (no(url))
             return null;
 
@@ -294,7 +419,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         try {
-            actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+            actor = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
         } catch (Exception e) {
             log.error("Unable to get actor from url: " + url);
         }
@@ -308,11 +433,11 @@ public class ActPubUtil extends ServiceBase {
         return actor;
     }
 
-    public String getActorUrlFromForeignUserName(String userName) {
+    public String getActorUrlFromForeignUserName(String userDoingAction, String userName) {
         String actorUrl = null;
 
         MongoSession as = auth.getAdminSession();
-        SubNode userNode = apub.getAcctNodeByForeignUserName(as, userName, false);
+        SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false);
         if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
@@ -338,10 +463,10 @@ public class ActPubUtil extends ServiceBase {
      * 
      * someuser@ip:port (special testing mode, insecure)
      */
-    public APObj getWebFinger(String resource) {
+    public APObj getWebFinger(MongoSession ms, String userDoingAction, String resource) {
         apub.saveFediverseName(resource);
 
-        return getWebFingerSec(resource, true);
+        return getWebFingerSec(ms, userDoingAction, resource, true);
         // need to re-enable this again if we plan on doing localhost fediverse testing (todo-2)
         // // For non-secure domains, they're required to have a port in their name,
         // // so this is users like bob@q1:8184 (for example), and that port is expected
@@ -360,7 +485,7 @@ public class ActPubUtil extends ServiceBase {
     /**
      * Sec suffix means 'security' option (https vs http)
      */
-    public APObj getWebFingerSec(String userName, boolean secure) {
+    public APObj getWebFingerSec(MongoSession ms, String userDoingAction, String userName, boolean secure) {
         if (userName.startsWith("@")) {
             userName = userName.substring(1);
         }
@@ -377,7 +502,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
-        finger = getJson(url, APConst.MTYPE_JRD_JSON);
+        finger = getJson(ms, userDoingAction, url, APConst.MTYPE_JRD_JSON);
 
         if (ok(finger)) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
@@ -388,13 +513,14 @@ public class ActPubUtil extends ServiceBase {
         return finger;
     }
 
-    public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader, String body,
-            MediaType postType) {
+    public APObj postJson(String url, String body, HttpHeaders headers, MediaType postType) {
         APObj ret = null;
         try {
             // log.debug("postJson to: " + url);
 
-            HttpHeaders headers = new HttpHeaders();
+            if (no(headers)) {
+                headers = new HttpHeaders();
+            }
             headers.setAccept(List.of(APConst.MTYPE_ACT_JSON, APConst.MTYPE_JSON));
 
             String appName = prop.getConfigText("brandingAppName");
@@ -403,23 +529,6 @@ public class ActPubUtil extends ServiceBase {
 
             // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
             headers.add("user-agent", appName + "; https://" + prop.getMetaHost() + " <fake@email.com>");
-
-            // NOTE: no longer includes this
-            if (ok(headerHost)) {
-                headers.add("Host", headerHost);
-            }
-
-            if (ok(headerDate)) {
-                headers.add("Date", headerDate);
-            }
-
-            if (ok(headerSig)) {
-                headers.add("Signature", headerSig);
-            }
-
-            if (ok(digestHeader)) {
-                headers.add("Digest", digestHeader);
-            }
 
             headers.setContentType(postType);
 
@@ -475,7 +584,7 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
-    public String getLongUserNameFromActorUrl(String actorUrl) {
+    public String getLongUserNameFromActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
         if (no(actorUrl)) {
             return null;
         }
@@ -489,7 +598,7 @@ public class ActPubUtil extends ServiceBase {
             return longUserName;
         }
 
-        APObj actor = getActorByUrl(actorUrl);
+        APObj actor = getActorByUrl(ms, userDoingAction, actorUrl);
         if (no(actor)) {
             return null;
         }
@@ -580,7 +689,8 @@ public class ActPubUtil extends ServiceBase {
         return ok(url) && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
-    public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
+    public void iterateOrderedCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
+            ActPubObserver observer) {
         if (no(collectionObj))
             return;
         /*
@@ -629,7 +739,8 @@ public class ActPubUtil extends ServiceBase {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = no(firstPageUrl) ? null : getJson(firstPageUrl, APConst.MTYPE_ACT_JSON);
+
+            Object ocPage = no(firstPageUrl) ? null : getJson(ms, userDoingAction, firstPageUrl, APConst.MTYPE_ACT_JSON);
 
             while (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems);
@@ -668,7 +779,8 @@ public class ActPubUtil extends ServiceBase {
                 if (ok(nextPage)) {
                     if (++pageQueries > maxPageQueries)
                         return;
-                    ocPage = no(nextPage) ? null : getJson(nextPage, APConst.MTYPE_ACT_JSON);
+
+                    ocPage = no(nextPage) ? null : getJson(ms, userDoingAction, nextPage, APConst.MTYPE_ACT_JSON);
                 } else {
                     break;
                 }
@@ -680,7 +792,8 @@ public class ActPubUtil extends ServiceBase {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = no(lastPageUrl) ? null : getJson(lastPageUrl, APConst.MTYPE_ACT_JSON);
+
+            Object ocPage = no(lastPageUrl) ? null : getJson(ms, userDoingAction, lastPageUrl, APConst.MTYPE_ACT_JSON);
 
             if (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems);
@@ -793,7 +906,7 @@ public class ActPubUtil extends ServiceBase {
                     // if inReplyTo exists try to use it first.
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
                     if (ok(inReplyTo)) {
-                        String parentId = apUtil.loadObject(ms, inReplyTo);
+                        String parentId = apUtil.loadObject(ms, null, inReplyTo);
                         if (ok(parentId)) {
                             SubNode replyParent = read.getNode(ms, parentId);
                             if (ok(replyParent)) {
@@ -867,8 +980,8 @@ public class ActPubUtil extends ServiceBase {
         return res;
     }
 
-    public String loadObject(MongoSession ms, String url) {
-        APObj obj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+    public String loadObject(MongoSession ms, String userDoingAction, String url) {
+        APObj obj = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
         if (no(obj)) {
             log.debug("unable to get json: " + url);
             return null;
@@ -882,7 +995,7 @@ public class ActPubUtil extends ServiceBase {
                 if (ok(ownerActorUrl)) {
                     return (String) arun.run(as -> {
                         String nodeId = null;
-                        SubNode accountNode = apub.getAcctNodeByActorUrl(as, ownerActorUrl);
+                        SubNode accountNode = apub.getAcctNodeByActorUrl(as, userDoingAction, ownerActorUrl);
                         if (ok(accountNode)) {
                             String apUserName = accountNode.getStr(NodeProp.USER);
                             SubNode outboxNode =
@@ -893,7 +1006,8 @@ public class ActPubUtil extends ServiceBase {
                                 return null;
                             }
 
-                            SubNode node = apub.saveNote(as, accountNode, outboxNode, obj, false, true, APType.Create);
+                            SubNode node =
+                                    apub.saveNote(as, userDoingAction, accountNode, outboxNode, obj, false, true, APType.Create);
                             nodeId = no(node) ? null : node.getIdStr();
                         }
                         return nodeId;

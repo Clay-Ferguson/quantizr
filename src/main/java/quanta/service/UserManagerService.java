@@ -747,7 +747,7 @@ public class UserManagerService extends ServiceBase {
 				res.setMessage("Unable to block user: " + req.getUserName());
 			}
 
-			edit.updateSavedFriendNode(userNode);
+			edit.updateSavedFriendNode(userName, userNode);
 			res.setSuccess(true);
 		} else {
 			/*
@@ -819,7 +819,7 @@ public class UserManagerService extends ServiceBase {
 			// if friendNode was non-null here it means we were already following the user.
 			if (no(friendNode)) {
 				apLog.trace("loadForeignUser: " + newUserName);
-				apub.loadForeignUser(newUserName);
+				apub.loadForeignUser(userName, newUserName);
 
 				SubNode userNode = arun.run(s -> {
 					return read.getUserNodeByUserName(s, newUserName);
@@ -837,7 +837,7 @@ public class UserManagerService extends ServiceBase {
 
 				if (ok(friendNode)) {
 					friendNode.set(NodeProp.USER_NODE_ID.s(), userNode.getIdStr());
-					edit.updateSavedFriendNode(friendNode);
+					edit.updateSavedFriendNode(userName, friendNode);
 
 					// todo-2: eventually we can have a design that pushes these results back to the browser async
 					// instead of optimistically saying 'Added friend'
@@ -893,10 +893,10 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 
-				Long followerCount = apFollower.countFollowersOfUser(ms, nodeUserName, actorUrl);
+				Long followerCount = apFollower.countFollowersOfUser(ms, sessionUserName, nodeUserName, actorUrl);
 				userProfile.setFollowerCount(followerCount.intValue());
 
-				Long followingCount = apFollowing.countFollowingOfUser(ms, nodeUserName, actorUrl);
+				Long followingCount = apFollowing.countFollowingOfUser(ms, sessionUserName, nodeUserName, actorUrl);
 				userProfile.setFollowingCount(followingCount.intValue());
 
 				if (!ThreadLocals.getSC().isAnonUser()) {

@@ -328,7 +328,7 @@ public class NodeEditService extends ServiceBase {
 
 						// if this is a foreign post send message out to fediverse
 						if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
-							apub.sendLikeMessage(as, node);
+							apub.sendLikeMessage(as, ms.getUserName(), node);
 						}
 					}
 				} else {
@@ -656,7 +656,7 @@ public class NodeEditService extends ServiceBase {
 	 * Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub
 	 * server
 	 */
-	public void updateSavedFriendNode(SubNode node) {
+	public void updateSavedFriendNode(String userDoingAction, SubNode node) {
 		String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
 
 		String friendUserName = node.getStr(NodeProp.USER.s());
@@ -680,7 +680,7 @@ public class NodeEditService extends ServiceBase {
 					exec.run(() -> {
 						arun.run(s -> {
 							if (!ThreadLocals.getSC().isAdmin()) {
-								apub.getAcctNodeByForeignUserName(s, friendUserName, false);
+								apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false);
 							}
 
 							/*

@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
@@ -51,7 +52,7 @@ public class ActPubOutbox extends ServiceBase {
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
      */
-    public void loadForeignOutbox(MongoSession ms, Object actor, SubNode userNode, String apUserName) {
+    public void loadForeignOutbox(MongoSession ms, String userDoingAction, Object actor, SubNode userNode, String apUserName) {
         try {
             if (no(userNode)) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
@@ -69,7 +70,7 @@ public class ActPubOutbox extends ServiceBase {
              */
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false);
             String outboxUrl = apStr(actor, APObj.outbox);
-            APObj outbox = getOutbox(outboxUrl);
+            APObj outbox = getOutbox(ms, userDoingAction, outboxUrl);
             if (no(outbox)) {
                 log.debug("Unable to get outbox for AP user: " + apUserName);
                 return;
@@ -91,7 +92,7 @@ public class ActPubOutbox extends ServiceBase {
             final SubNode _userNode = userNode;
 
             // log.debug("scanning outbox orderedCollection");
-            apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
+            apUtil.iterateOrderedCollection(ms, userDoingAction, outbox, Integer.MAX_VALUE, obj -> {
                 try {
                     // if (ok(obj )) {
                     // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
@@ -124,8 +125,10 @@ public class ActPubOutbox extends ServiceBase {
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveNote(ms, _userNode, outboxNode, object, false, true, APType.Create);
+                                    apub.saveNote(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create);
                                     count.setVal(count.getVal() + 1);
+                                } catch (DuplicateKeyException dke) {
+                                    log.debug("Record already existed: " + dke.getMessage());
                                 } catch (Exception e) {
                                     // log and ignore.
                                     log.error("error in saveNode()", e);
@@ -146,11 +149,11 @@ public class ActPubOutbox extends ServiceBase {
         }
     }
 
-    public APObj getOutbox(String url) {
+    public APObj getOutbox(MongoSession ms, String userDoingAction, String url) {
         if (no(url))
             return null;
 
-        APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+        APObj outbox = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
@@ -260,8 +263,9 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getResource(String nodeId) {
-        if (no(nodeId)) return null;
-        
+        if (no(nodeId))
+            return null;
+
         return (APObj) arun.run(as -> {
             String host = prop.getProtocolHostAndPort();
             String nodeIdBase = host + "?id=";
@@ -307,7 +311,7 @@ public class ActPubOutbox extends ServiceBase {
         // build the 'tags' array for this object from the sharing ACLs.
         List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
         if (ok(userNames)) {
-            APList tags = apub.getTagListFromUserNames(userNames);
+            APList tags = apub.getTagListFromUserNames(null, userNames);
             if (ok(tags)) {
                 ret.put(APObj.tag, tags);
             }

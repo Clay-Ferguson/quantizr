@@ -34,7 +34,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
         String targetUser = "bob";
         String webFingerUrl = targetUser + "@" + targetHostAndPort;
 
-        APObj webFinger = apUtil.getWebFingerSec(webFingerUrl, false);
+        APObj webFinger = apUtil.getWebFingerSec(null, null, webFingerUrl, false);
         if (no(webFinger)) {
             throw new Exception("Unable to get webFinger of " + webFingerUrl);
         }
@@ -43,7 +43,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
 
         /* ----- GET ACTOR ----- */
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-        APObj actorObj = apUtil.getJson(actorUrl, APConst.MTYPE_ACT_JSON);
+        APObj actorObj = apUtil.getJson(null, null, actorUrl, APConst.MTYPE_ACT_JSON);
         if (no(actorObj)) {
             throw new Exception("Unable to get actor: " + actorUrl);
         }

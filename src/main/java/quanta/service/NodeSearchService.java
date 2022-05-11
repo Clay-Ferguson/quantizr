@@ -119,7 +119,7 @@ public class NodeSearchService extends ServiceBase {
 			if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()) || //
 					Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
 					Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
-				userSearch(ms, req, searchResults);
+				userSearch(ms, null, req, searchResults);
 			}
 			// else we're doing a normal subgraph search for the text
 			else {
@@ -148,7 +148,7 @@ public class NodeSearchService extends ServiceBase {
 		return res;
 	}
 
-	private void userSearch(MongoSession ms, NodeSearchRequest req, List<NodeInfo> searchResults) {
+	private void userSearch(MongoSession ms, String userDoingAction, NodeSearchRequest req, List<NodeInfo> searchResults) {
 		String findUserName = null;
 		int counter = 0;
 
@@ -216,7 +216,7 @@ public class NodeSearchService extends ServiceBase {
 			findUserName = XString.stripIfStartsWith(findUserName, "@");
 			final String _findUserName = findUserName;
 			arun.run(as -> {
-				SubNode userNode = apub.getAcctNodeByForeignUserName(as, _findUserName, false);
+				SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false);
 				if (ok(userNode)) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,

@@ -32,15 +32,15 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'note' message
 	 */
-	public APObj newCreateForNote(HashSet<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
+	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
 			String content, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 
 		APObj payload =
-				newNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
+				newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
 
-		return newCreate(payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+		return newCreate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
 	}
 
 	public APOLike newLike(String id, String objectId, String actor, List<String> to,  List<String> cc) {
@@ -50,7 +50,7 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APObj newNote(HashSet<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
+	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
 			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = null;
 
@@ -77,7 +77,7 @@ public class ActPubFactory extends ServiceBase {
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
 			try {
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 
 				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
 				// for local users, but aren't doing that, by design.
@@ -133,7 +133,7 @@ public class ActPubFactory extends ServiceBase {
 	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
 	 * above (in newNoteObject() function)
 	 */
-	public APOCreate newCreate(APObj object, String fromActor, HashSet<String> toUserNames, String noteUrl, ZonedDateTime now,
+	public APOCreate newCreate(String userDoingAction, APObj object, String fromActor, HashSet<String> toUserNames, String noteUrl, ZonedDateTime now,
 			boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
@@ -143,7 +143,7 @@ public class ActPubFactory extends ServiceBase {
 			try {
 				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
 				// for local users, but aren't doing that, by design.
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 				if (no(actorUrl))
 					continue;
 

@@ -1,5 +1,6 @@
 package quanta.actpub;
 
+import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,4 +46,7 @@ public class ActPubCache extends ServiceBase {
 
     /* Cache WebFinger fails, so we don't try them again */
     public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
+
+    /* Maps the string representation of a key to the PrivateKey object */
+    public final ConcurrentHashMap<String, PrivateKey> privateKeys = new ConcurrentHashMap<>();
 }

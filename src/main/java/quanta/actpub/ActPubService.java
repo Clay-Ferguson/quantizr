@@ -73,7 +73,7 @@ public class ActPubService extends ServiceBase {
     public static boolean userRefresh = false;
     public static boolean bigRefresh = false;
 
-    public void sendLikeMessage(MongoSession ms, SubNode node) {
+    public void sendLikeMessage(MongoSession ms, String userDoingLike, SubNode node) {
         exec.run(() -> {
             SubNode likedAccount = read.getNode(ms, node.getOwner());
 
@@ -88,15 +88,16 @@ public class ActPubService extends ServiceBase {
             // the like needs to go out at least to this actorId
             String toActorId = node.getStr(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO);
 
-            String fromUser = ThreadLocals.getSC().getUserName();
-            String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+            String fromActor = apUtil.makeActorUrlForUserName(userDoingLike);
 
             List<String> toUserNames = new LinkedList<String>();
             toUserNames.add(toActorId);
 
             APOLike message = apFactory.newLike(node.getIdStr() + "-like", apId, fromActor, toUserNames, null);
             // log.debug("Sending Like message: "+XString.prettyPrint(message));
-            apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+            
+            String privateKey = apCrypto.getPrivateKey(ms, userDoingLike);
+            apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
         });
     }
 
@@ -150,6 +151,7 @@ public class ActPubService extends ServiceBase {
                 // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                String privateKey = apCrypto.getPrivateKey(ms, fromUser);
 
                 // for users that don't have a sharedInbox we collect their inboxes here to send to them
                 // individually
@@ -160,13 +162,13 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
+                        APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
                                 noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
                             try {
-                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                             }
                             // catch error from any server, and ignore, go to next server to send to.
                             catch (Exception e) {
@@ -177,7 +179,7 @@ public class ActPubService extends ServiceBase {
                         for (String inbox : userInboxes) {
                             apLog.trace("Posting to User Inbox: " + inbox);
                             try {
-                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                             }
                             // catch error from any server, and ignore, go to next server to send to.
                             catch (Exception e) {
@@ -296,14 +298,14 @@ public class ActPubService extends ServiceBase {
             }
 
             // log.debug("to Foreign User: " + toUserName);
-            APObj webFinger = apUtil.getWebFinger(toUserName);
+            APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
             if (no(webFinger)) {
                 apLog.trace("Unable to get webfinger for " + toUserName);
                 continue;
             }
 
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-            APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
+            APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
             if (ok(toActorObj)) {
                 // log.debug(" actor: " + toActorUrl);
                 String inbox = apStr(toActorObj, APObj.inbox);
@@ -315,12 +317,13 @@ public class ActPubService extends ServiceBase {
                         fromActor = apUtil.makeActorUrlForUserName(fromUser);
                     }
 
-                    APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
+                    APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
                             privateMessage, attachments);
 
                     String userDoingPost = ThreadLocals.getSC().getUserName();
                     // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
-                    apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                    String privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
+                    apUtil.securePostEx(inbox,privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
             }
         }
@@ -331,7 +334,7 @@ public class ActPubService extends ServiceBase {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
      * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String apUserName, boolean preferDbNode) {
+    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName, boolean preferDbNode) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -365,12 +368,12 @@ public class ActPubService extends ServiceBase {
          */
         if (no(acctNode)) {
             log.debug("Loading foreign user: " + apUserName);
-            APObj webFinger = apUtil.getWebFinger(apUserName);
+            APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, apUserName);
 
             if (ok(webFinger)) {
                 String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
                 if (ok(actorUrl)) {
-                    acctNode = getAcctNodeByActorUrl(ms, actorUrl);
+                    acctNode = getAcctNodeByActorUrl(ms, userDoingAction, actorUrl);
                 }
             }
         }
@@ -390,7 +393,7 @@ public class ActPubService extends ServiceBase {
      * Gets foreign account SubNode using actorUrl, using the cached copy of found.
      */
     @PerfMon(category = "apub")
-    public SubNode getAcctNodeByActorUrl(MongoSession ms, String actorUrl) {
+    public SubNode getAcctNodeByActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
         saveFediverseName(actorUrl);
 
         /* return node from cache if already cached */
@@ -399,7 +402,7 @@ public class ActPubService extends ServiceBase {
             return acctNode;
         }
 
-        APObj actor = apUtil.getActorByUrl(actorUrl);
+        APObj actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (ok(actor)) {
@@ -610,7 +613,7 @@ public class ActPubService extends ServiceBase {
             }
 
             // Get ActorObject from actor url.
-            APObj actorObj = apUtil.getActorByUrl(actorUrl);
+            APObj actorObj = apUtil.getActorByUrl(ms, null, actorUrl);
             if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
                 return null;
@@ -654,7 +657,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            APObj actorObj = apUtil.getActorByUrl(actorUrl);
+            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
             if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
                 return null;
@@ -725,7 +728,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            APObj actorObj = apUtil.getActorByUrl(actorUrl);
+            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
             if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
                 return null;
@@ -794,7 +797,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            apub.saveNote(ms, null, nodeBeingRepliedTo, obj, false, false, action);
+            apub.saveNote(ms, null, null, nodeBeingRepliedTo, obj, false, false, action);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -803,12 +806,12 @@ public class ActPubService extends ServiceBase {
          */
         else {
             apLog.trace("not reply to existing Quanta node.");
-            SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, actorUrl);
+            SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, null, actorUrl);
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                apub.saveNote(ms, actorAccountNode, postsNode, obj, false, false, action);
+                apub.saveNote(ms, null, actorAccountNode, postsNode, obj, false, false, action);
             }
         }
     }
@@ -828,7 +831,7 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public SubNode saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
+    public SubNode saveNote(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp, String action) {
         apLog.trace("saveNote" + XString.prettyPrint(obj));
         String id = apStr(obj, APObj.id);
@@ -883,7 +886,7 @@ public class ActPubService extends ServiceBase {
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (no(toAccountNode)) {
-            toAccountNode = getAcctNodeByActorUrl(ms, objAttributedTo);
+            toAccountNode = getAcctNodeByActorUrl(ms, userDoingAction, objAttributedTo);
         }
         SubNode newNode =
                 create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
@@ -952,8 +955,8 @@ public class ActPubService extends ServiceBase {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
-        apub.shareToAllObjectRecipients(ms, newNode, obj, APObj.to);
-        apub.shareToAllObjectRecipients(ms, newNode, obj, APObj.cc);
+        apub.shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
+        apub.shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
 
         if (forcePublic) {
             acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
@@ -982,7 +985,7 @@ public class ActPubService extends ServiceBase {
 
             // make sure username contains @ making it a foreign user.
             if (user.contains("@")) {
-                SubNode userNode = apub.getAcctNodeByForeignUserName(ms, user, true);
+                SubNode userNode = apub.getAcctNodeByForeignUserName(ms, null, user, true);
                 if (!ok(userNode)) {
                     log.debug("Unable to import user: " + user);
                 }
@@ -996,14 +999,14 @@ public class ActPubService extends ServiceBase {
      * The node save is expected to be done external to this function after this function runs.
      */
     @PerfMon(category = "apub")
-    private void shareToAllObjectRecipients(MongoSession ms, SubNode node, Object obj, String propName) {
+    private void shareToAllObjectRecipients(MongoSession ms, String userDoingAction, SubNode node, Object obj, String propName) {
         List<?> list = apList(obj, propName);
         if (ok(list)) {
             /* Build up all the access controls */
             for (Object to : list) {
                 if (to instanceof String) {
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
-                    shareToUsersForUrl(ms, node, (String) to);
+                    shareToUsersForUrl(ms, userDoingAction, node, (String) to);
                 } else {
                     apLog.trace("to list entry not supported: " + to.getClass().getName());
                 }
@@ -1017,7 +1020,7 @@ public class ActPubService extends ServiceBase {
      * Reads the object from 'url' to determine if it's a 'followers' URL or an 'actor' URL, and then
      * shares the node to either all the followers or the specific actor
      */
-    private void shareToUsersForUrl(MongoSession ms, SubNode node, String url) {
+    private void shareToUsersForUrl(MongoSession ms, String userDoingAction, SubNode node, String url) {
         apLog.trace("shareToUsersForUrl: " + url);
 
         if (apUtil.isPublicAddressed(url)) {
@@ -1030,7 +1033,7 @@ public class ActPubService extends ServiceBase {
          * try that first
          */
         if (!url.contains("/followers")) {
-            apub.shareNodeToActorByUrl(ms, node, url);
+            apub.shareNodeToActorByUrl(ms, userDoingAction, node, url);
         }
         /*
          * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
@@ -1047,16 +1050,16 @@ public class ActPubService extends ServiceBase {
              */
             boolean allow = false;
             if (allow) {
-                APObj followersObj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+                APObj followersObj = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
                 if (ok(followersObj)) {
                     // note/warning: the ActPubFollower.java class also has code to read followers.
-                    apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
+                    apUtil.iterateOrderedCollection(ms, userDoingAction, followersObj, MAX_FOLLOWERS, obj -> {
                         /*
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
                          */
                         if (obj instanceof String) {
                             String followerActorUrl = (String) obj;
-                            shareNodeToActorByUrl(ms, node, followerActorUrl);
+                            shareNodeToActorByUrl(ms, userDoingAction, node, followerActorUrl);
                         }
                         return true;
                     });
@@ -1070,7 +1073,7 @@ public class ActPubService extends ServiceBase {
      * actorUrl points to a local user
      */
     @PerfMon(category = "apub")
-    private void shareNodeToActorByUrl(MongoSession ms, SubNode node, String actorUrl) {
+    private void shareNodeToActorByUrl(MongoSession ms, String userDoingAction, SubNode node, String actorUrl) {
         apLog.trace("Sharing node to actorUrl: " + actorUrl);
         /*
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
@@ -1092,7 +1095,7 @@ public class ActPubService extends ServiceBase {
             SubNode acctNode = null;
 
             if (apUtil.isLocalActorUrl(actorUrl)) {
-                String longUserName = apUtil.getLongUserNameFromActorUrl(actorUrl);
+                String longUserName = apUtil.getLongUserNameFromActorUrl(ms, userDoingAction, actorUrl);
                 acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
                 /*
@@ -1349,7 +1352,7 @@ public class ActPubService extends ServiceBase {
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
 
-                loadForeignUser(userName);
+                loadForeignUser(null, userName);
             } catch (Exception e) {
                 log.debug("Unable to load user: " + userName);
             }
@@ -1398,7 +1401,7 @@ public class ActPubService extends ServiceBase {
 
                     try {
                         if (ok(url)) {
-                            APObj actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+                            APObj actor = apUtil.getJson(ms, null, url, APConst.MTYPE_ACT_JSON);
 
                             if (ok(actor)) {
                                 // we could double check userName, and bail if wrong, but this is not needed.
@@ -1425,26 +1428,26 @@ public class ActPubService extends ServiceBase {
         exec.run(runnable);
     }
 
-    public void loadForeignUser(String userName) {
+    public void loadForeignUser(String userMakingRequest, String userName) {
         arun.run(ms -> {
             apLog.trace("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByForeignUserName(ms, userName, false);
+            SubNode userNode = getAcctNodeByForeignUserName(ms, userMakingRequest, userName, false);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;
             }
 
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
-            APObj actor = apUtil.getActorByUrl(actorUrl);
+            APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
             if (ok(actor)) {
-                apOutbox.loadForeignOutbox(ms, actor, userNode, userName);
+                apOutbox.loadForeignOutbox(ms, userMakingRequest, actor, userNode, userName);
 
                 /*
                  * I was going to load followerCounts into userNode, but I decided to just query them live when
                  * needed on the UserPreferences dialog
                  */
-                int followerCount = apFollower.loadRemoteFollowers(ms, actor);
-                int followingCount = apFollowing.loadRemoteFollowing(ms, actor);
+                int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
+                int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
             } else {
                 log.debug("Unable to get actor from url: " + actorUrl);
             }
@@ -1554,7 +1557,7 @@ public class ActPubService extends ServiceBase {
 
                     // This userName may be an actor url, and if so we convert it to an actual username.
                     if (userName.startsWith("https://")) {
-                        userName = apUtil.getLongUserNameFromActorUrl(userName);
+                        userName = apUtil.getLongUserNameFromActorUrl(ms, null, userName);
                         // log.debug("Converted to: " + userName);
                     }
 
@@ -1664,7 +1667,7 @@ public class ActPubService extends ServiceBase {
         return userNames;
     }
 
-    public APList getTagListFromUserNames(List<String> userNames) {
+    public APList getTagListFromUserNames(String userDoingAction, List<String> userNames) {
         if (no(userNames) || userNames.isEmpty())
             return null;
 
@@ -1679,7 +1682,7 @@ public class ActPubService extends ServiceBase {
                 }
                 // else foreign userName
                 else {
-                    actorUrl = apUtil.getActorUrlFromForeignUserName(userName);
+                    actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
                 }
 
                 if (no(actorUrl))

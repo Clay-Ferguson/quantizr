@@ -236,7 +236,7 @@ public class ActPubController extends ServiceBase {
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollower.generateFollowersPage(userName, minId);
 		} else {
-			ret = apFollower.generateFollowers(userName);
+			ret = apFollower.generateFollowers(null, userName);
 		}
 
 		if (ok(ret)) {
@@ -264,7 +264,7 @@ public class ActPubController extends ServiceBase {
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
-			ret = apFollowing.generateFollowing(userName);
+			ret = apFollowing.generateFollowing(null, userName);
 		}
 
 		if (ok(ret)) {
