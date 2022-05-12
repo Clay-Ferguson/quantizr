@@ -30,7 +30,7 @@ public class PushService extends ServiceBase {
 	/* Notify all users being shared to on this node, or everyone if the node is public. */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		exec.run(() -> {
-			// log.debug("Pushing update to all friends: id=" + node.getIdStr());
+			// log.debug("Pushing to browsers: id=" + node.getIdStr());
 
 			/* get list of userNames this node is shared to (one of them may be 'public') */
 			List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
@@ -48,6 +48,7 @@ public class PushService extends ServiceBase {
 			for (SessionContext sc : SessionContext.getAllSessions(true)) {
 				// if we know we already just pushed to this session, we can skip it in here.
 				if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
+					// log.debug("Skipping push: " + sc.hashCode() + " to " + sc.getUserName());
 					continue;
 				}
 
@@ -72,6 +73,7 @@ public class PushService extends ServiceBase {
 					FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 					// push notification message to browser
+					// log.debug("Pushing to user: " + sc.getUserName());
 					push.sendServerPushInfo(sc, pushInfo);
 				}
 			}
@@ -142,11 +144,15 @@ public class PushService extends ServiceBase {
 
 		exec.run(() -> {
 			SseEmitter pushEmitter = sc.getPushEmitter();
-			if (no(pushEmitter))
+			if (no(pushEmitter)) {
+				log.debug("no push emitter.");
 				return;
+			}
 
-			// Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable even
-			// probably to be sure each session is only doing one emit at a time.
+			/*
+			 * Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable
+			 * even probably to be sure each session is only doing one emit at a time.
+			 */
 			synchronized (pushEmitter) {
 				// log.debug("Pushing to User: " + sc.getUserName());
 				try {

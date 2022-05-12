@@ -3,6 +3,7 @@ package quanta.actpub;
 import static quanta.actpub.model.AP.apHasProps;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apStr;
+import static quanta.actpub.model.AP.apObj;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.net.URL;
@@ -719,8 +720,8 @@ public class ActPubUtil extends ServiceBase {
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
-            for (Object apObj : orderedItems) {
-                if (!observer.item(apObj)) {
+            for (Object obj : orderedItems) {
+                if (!observer.item(obj)) {
                     return;
                 }
                 if (++count >= maxCount)
@@ -730,44 +731,53 @@ public class ActPubUtil extends ServiceBase {
 
         /*
          * Warning: There are times when even with only two items in the outbox Mastodon might send back an
-         * empty array in the "first" page and the two items in teh "last" page, which makes no sense, but
+         * empty array in the "first" page and the two items in the "last" page, which makes no sense, but
          * it just means we have to read and deduplicate all the items from all pages to be sure we don't
          * end up with a empty array even when there ARE some
          */
-        String firstPageUrl = apStr(collectionObj, APObj.first);
-        if (ok(firstPageUrl)) {
+        Object firstPage = apObj(collectionObj, APObj.first);
+
+        if (ok(firstPage)) {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
 
-            Object ocPage = no(firstPageUrl) ? null : getJson(ms, userDoingAction, firstPageUrl, APConst.MTYPE_ACT_JSON);
+            Object ocPage = null;
+
+            // if firstPage contained a String consider it a URL to the page and get it.
+            if (firstPage instanceof String) {
+                ocPage = getJson(ms, userDoingAction, (String) firstPage, APConst.MTYPE_ACT_JSON);
+            }
+            // else consider firstPage to be the ACTUAL first page object
+            else {
+                ocPage = firstPage;
+            }
 
             while (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems);
 
                 if (ok(orderedItems)) {
-                    for (Object apObj : orderedItems) {
-
-                        // if apObj is an object (map)
-                        if (apHasProps(apObj)) {
-                            String apId = apStr(apObj, APObj.id);
+                    for (Object item : orderedItems) {
+                        // if item is an object (map)
+                        if (apHasProps(item)) {
+                            String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
                             if (no(apId)) {
-                                if (!observer.item(apObj))
+                                if (!observer.item(item))
                                     return;
                             }
                             // if no apId that's fine, just process item.
                             else if (!apIdSet.contains(apId)) {
                                 // log.debug("Iterate Collection Item: " + apId);
-                                if (!observer.item(apObj))
+                                if (!observer.item(item))
                                     return;
                                 apIdSet.add(apId);
                             }
                         }
-                        // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                        // otherwise item is probably a 'String' but whatever it is we call 'item' on
                         // it.
                         else {
-                            if (!observer.item(apObj))
+                            if (!observer.item(item))
                                 return;
                         }
                         if (++count >= maxCount)
@@ -775,51 +785,66 @@ public class ActPubUtil extends ServiceBase {
                     }
                 }
 
-                String nextPage = apStr(ocPage, APObj.next);
+                Object nextPage = apObj(ocPage, APObj.next);
+
                 if (ok(nextPage)) {
                     if (++pageQueries > maxPageQueries)
                         return;
 
-                    ocPage = no(nextPage) ? null : getJson(ms, userDoingAction, nextPage, APConst.MTYPE_ACT_JSON);
+                    // if nextPage is a string consider that a reference to the URL of the page and get it
+                    if (nextPage instanceof String) {
+                        ocPage = getJson(ms, userDoingAction, (String)nextPage, APConst.MTYPE_ACT_JSON);
+                    }
+                    else {
+                        ocPage = nextPage;
+                    }
                 } else {
                     break;
                 }
             }
         }
 
-        String lastPageUrl = apStr(collectionObj, APObj.last);
-        if (ok(lastPageUrl)) {
+        Object lastPage = apObj(collectionObj, APObj.last);
+        if (ok(lastPage)) {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
 
-            Object ocPage = no(lastPageUrl) ? null : getJson(ms, userDoingAction, lastPageUrl, APConst.MTYPE_ACT_JSON);
+            Object ocPage = null;
 
+            // if lastPage is a string it's the url
+            if (lastPage instanceof String) {
+                ocPage = getJson(ms, userDoingAction, (String)lastPage, APConst.MTYPE_ACT_JSON);
+            }
+            // else it's the page object
+            else {
+                ocPage = lastPage;
+            }
             if (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems);
 
                 if (ok(orderedItems)) {
-                    for (Object apObj : orderedItems) {
-                        // if apObj is an object (map)
-                        if (apHasProps(apObj)) {
-                            String apId = apStr(apObj, APObj.id);
+                    for (Object item : orderedItems) {
+                        // if item is an object (map)
+                        if (apHasProps(item)) {
+                            String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
                             if (no(apId)) {
-                                if (!observer.item(apObj))
+                                if (!observer.item(item))
                                     return;
                             }
                             // else process it with apId
                             else if (!apIdSet.contains(apId)) {
                                 // log.debug("Iterate Collection Item: " + apId);
-                                if (!observer.item(apObj))
+                                if (!observer.item(item))
                                     return;
                                 apIdSet.add(apId);
                             }
                         }
-                        // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                        // otherwise item is probably a 'String' but whatever it is we call 'item' on
                         // it.
                         else {
-                            if (!observer.item(apObj))
+                            if (!observer.item(item))
                                 return;
                         }
                         if (++count >= maxCount)

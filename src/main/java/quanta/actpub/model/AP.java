@@ -46,15 +46,15 @@ public class AP {
                         + XString.prettyPrint(obj));
                 return null;
             } else {
-                log.error("unhandled type on str() return val: " + (ok(val.getVal()) ? val.getVal().getClass().getName()
-                        : "null\n\non object:" + XString.prettyPrint(obj)));
+                log.error("unhandled type on str() return val: "
+                        + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object"));
+                log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
                 return null;
             }
-        } else if (obj instanceof String) {
-            return (String) obj;
         }
 
-        log.warn("unhandled type on str(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
@@ -69,11 +69,10 @@ public class AP {
             } else if (val.getVal() instanceof Boolean) {
                 return ((Boolean) val.getVal()).booleanValue();
             }
-        } else if (obj instanceof Boolean) {
-            return (Boolean) obj;
-        }
+        } 
 
-        log.warn("unhandled type on bool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on apBool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return false;
     }
 
@@ -90,13 +89,10 @@ public class AP {
             } else if (val.getVal() instanceof String) {
                 return Integer.valueOf((String) val.getVal());
             }
-        } else if (obj instanceof Integer) {
-            return (Integer) obj;
-        } else if (obj instanceof Long) {
-            return ((Long) obj).intValue();
-        }
+        } 
 
-        log.warn("unhandled type on integer(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on apInt(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return 0;
     }
 
@@ -109,11 +105,10 @@ public class AP {
             } else if (val.getVal() instanceof String) {
                 return DateUtil.parseISOTime((String) val.getVal());
             }
-        } else if (obj instanceof Date) {
-            return (Date) obj;
         }
 
-        log.warn("unhandled type on date(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on apDate(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
@@ -128,17 +123,20 @@ public class AP {
             }
         }
 
-        log.warn("unhandled type on list(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
     public static Object apObj(Object obj, String prop) {
-        if (obj instanceof Map<?, ?>) {
-            return ((Map<?, ?>) obj).get(prop);
-        } else if (obj instanceof LinkedHashMap<?, ?>) {
+        if (obj instanceof LinkedHashMap<?, ?>) {
             return ((LinkedHashMap<?, ?>) obj).get(prop);
+        } //
+        else if (obj instanceof Map<?, ?>) {
+            return ((Map<?, ?>) obj).get(prop);
         }
         log.warn("getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
@@ -146,7 +144,8 @@ public class AP {
     private static Val<Object> getFromMap(Object obj, String prop) {
         if (obj instanceof LinkedHashMap<?, ?>) {
             return new Val<Object>(((LinkedHashMap<?, ?>) obj).get(prop));
-        } else if (obj instanceof Map<?, ?>) {
+        } //
+        else if (obj instanceof Map<?, ?>) {
             return new Val<Object>(((Map<?, ?>) obj).get(prop));
         }
         return null;
