@@ -216,7 +216,7 @@ export class NodeCompButtonBar extends Div {
                 if (node.id !== state.homeNodeId) {
                     deleteNodeButton = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
-                        title: "Delete selected nodes",
+                        title: "Delete node(s)",
                         nid: node.id,
                         onClick: S.edit.deleteSelNodes
                     });

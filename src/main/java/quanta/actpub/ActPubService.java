@@ -95,7 +95,7 @@ public class ActPubService extends ServiceBase {
 
             APOLike message = apFactory.newLike(node.getIdStr() + "-like", apId, fromActor, toUserNames, null);
             // log.debug("Sending Like message: "+XString.prettyPrint(message));
-            
+
             String privateKey = apCrypto.getPrivateKey(ms, userDoingLike);
             apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
         });
@@ -117,8 +117,8 @@ public class ActPubService extends ServiceBase {
      * sendType can be 'Note' or 'Like' depending on what we're sending.
      * 
      */
-    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, String replyToType,
-            HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
+    public void sendActPubForNodeEdit(MongoSession ms, String inReplyTo, String replyToType, HashMap<String, AccessControl> acl,
+            APList attachments, String content, String noteUrl) {
         exec.run(() -> {
             try {
                 HashSet<String> toUserNames = new HashSet<>();
@@ -162,8 +162,8 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
-                                noteUrl, privateMessage, attachments);
+                        APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType,
+                                content, noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
@@ -197,6 +197,94 @@ public class ActPubService extends ServiceBase {
             } //
             catch (Exception e) {
                 log.error("sendNote failed", e);
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    // todo-0: this logic can be shared in a generic function if we can separate out 'message' payload
+    // from this, and just pass in as argument.
+    public void sendActPubForNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
+        // if no sharing bail out.
+        if (no(acl) || acl.isEmpty())
+            return;
+
+        exec.run(() -> {
+            try {
+                HashSet<String> toUserNames = new HashSet<>();
+                boolean privateMessage = true;
+
+                /*
+                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+                 */
+                for (String accntId : acl.keySet()) {
+                    if (PrincipalName.PUBLIC.s().equals(accntId)) {
+                        privateMessage = false;
+                    } else {
+                        // try to get account node from cache
+                        SubNode accntNode = apCache.acctNodesById.get(accntId);
+
+                        // if not in cache find the node and ADD to the cache.
+                        if (no(accntNode)) {
+                            accntNode = read.getNode(ms, accntId);
+                            apCache.acctNodesById.put(accntId, accntNode);
+                        }
+
+                        // get username off this node and add to 'toUserNames'
+                        if (ok(accntNode)) {
+                            String userName = accntNode.getStr(NodeProp.USER.s());
+                            toUserNames.add(userName);
+                        }
+                    }
+                }
+
+                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
+                String fromUser = ThreadLocals.getSC().getUserName();
+                String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                String privateKey = apCrypto.getPrivateKey(ms, fromUser);
+                APObj message = apFactory.newDeleteForNote(actPubId, fromActor);
+
+                // for users that don't have a sharedInbox we collect their inboxes here to send to them
+                // individually
+                HashSet<String> userInboxes = new HashSet<>();
+
+                // When posting a public message we send out to all unique sharedInboxes here
+                if (!privateMessage) {
+                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
+
+                    if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
+
+                        for (String inbox : sharedInboxes) {
+                            apLog.trace("send Delete to Shared Inbox: " + inbox);
+                            try {
+                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                            }
+                            // catch error from any server, and ignore, go to next server to send to.
+                            catch (Exception e) {
+                                apLog.trace("failed to post to: " + inbox);
+                            }
+                        }
+
+                        for (String inbox : userInboxes) {
+                            apLog.trace("send Delete to User Inbox: " + inbox);
+                            try {
+                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                            }
+                            // catch error from any server, and ignore, go to next server to send to.
+                            catch (Exception e) {
+                                apLog.trace("failed to delete to: " + inbox);
+                            }
+                        }
+                    }
+                }
+
+                // Post message to all foreign usernames found in 'toUserNames'
+                if (toUserNames.size() > 0) {
+                    sendDelete(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
+                }
+            } //
+            catch (Exception e) {
+                log.error("sendDelete failed", e);
                 throw new RuntimeException(e);
             }
         });
@@ -317,13 +405,65 @@ public class ActPubService extends ServiceBase {
                         fromActor = apUtil.makeActorUrlForUserName(fromUser);
                     }
 
-                    APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
-                            privateMessage, attachments);
+                    APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                            noteUrl, privateMessage, attachments);
 
                     String userDoingPost = ThreadLocals.getSC().getUserName();
                     // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
                     String privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
-                    apUtil.securePostEx(inbox,privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                    apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                }
+            }
+        }
+    }
+
+    public void sendDelete(MongoSession ms, HashSet<String> toUserNames, String fromUser, APObj message, boolean privateMessage,
+            HashSet<String> skipInboxes) {
+        if (no(toUserNames))
+            return;
+
+        String host = prop.getMetaHost();
+        String fromActor = null;
+
+        /*
+         * Post the same message to all the inboxes that need to see it
+         */
+        for (String toUserName : toUserNames) {
+            // Ignore userNames that are not foreign server names
+            if (!toUserName.contains("@")) {
+                continue;
+            }
+
+            // Ignore userNames that are for our own host
+            String userHost = apUtil.getHostFromUserName(toUserName);
+            if (userHost.equals(host)) {
+                continue;
+            }
+
+            // log.debug("to Foreign User: " + toUserName);
+            APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
+            if (no(webFinger)) {
+                apLog.trace("Unable to get webfinger for " + toUserName);
+                continue;
+            }
+
+            String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+            APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
+            if (ok(toActorObj)) {
+                // log.debug(" actor: " + toActorUrl);
+                String inbox = apStr(toActorObj, APObj.inbox);
+
+                // send post if inbox not in skipInboxes
+                if (!skipInboxes.contains(inbox)) {
+                    /* lazy create fromActor here */
+                    if (no(fromActor)) {
+                        fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                    }
+
+                    String userDoingPost = ThreadLocals.getSC().getUserName();
+                    // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
+                    String privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
+                    apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
             }
         }
@@ -334,7 +474,8 @@ public class ActPubService extends ServiceBase {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
      * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName, boolean preferDbNode) {
+    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName,
+            boolean preferDbNode) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -532,6 +673,10 @@ public class ActPubService extends ServiceBase {
         switch (type) {
             case APType.Create:
             case APType.Update:
+                /*
+                 * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
+                 * coding the outbound call but don't know of any live instances that support it yet.
+                 */
                 apub.processCreateOrUpdateAction(httpReq, payload, type);
                 break;
 
@@ -544,7 +689,6 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Delete:
-                // todo-0: are we sending outbound deletes to other servers, when a node is deleted?
                 apub.processDeleteAction(httpReq, payload);
                 break;
 
@@ -717,7 +861,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-
     @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(as -> {
@@ -831,8 +974,8 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public SubNode saveNote(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
-            boolean temp, String action) {
+    public SubNode saveNote(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
+            boolean forcePublic, boolean temp, String action) {
         apLog.trace("saveNote" + XString.prettyPrint(obj));
         String id = apStr(obj, APObj.id);
 
@@ -1344,8 +1487,8 @@ public class ActPubService extends ServiceBase {
                     continue;
 
                 /*
-                 * This may hurt performance of the app so let's throttle it way back to a few seconds between loops.
-                 * Also we don't want to put too much unwelcome load on other instances.
+                 * This may hurt performance of the app so let's throttle it way back to a few seconds between
+                 * loops. Also we don't want to put too much unwelcome load on other instances.
                  */
                 Thread.sleep(4000);
 

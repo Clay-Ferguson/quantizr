@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
@@ -128,7 +130,8 @@ public class MongoDelete extends ServiceBase {
 	 * 
 	 * todo-1: performance enhancement: We could just delete the one node identified by 'path', and then
 	 * run the recursive delete operation in an async thread. That's not ACID, but it's ok here, for the
-	 * performance benefit. Perhaps only for 'admin' user only do it synchronously all without any async.
+	 * performance benefit. Perhaps only for 'admin' user only do it synchronously all without any
+	 * async.
 	 */
 	public long deleteUnderPath(MongoSession ms, String path) {
 		// log.debug("Deleting under path: " + path);
@@ -305,6 +308,7 @@ public class MongoDelete extends ServiceBase {
 		}
 
 		BulkOperations bops = null;
+		List<SubNode> nodes = new LinkedList<>();
 
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
@@ -329,10 +333,20 @@ public class MongoDelete extends ServiceBase {
 					bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 				}
 
+				// really need a 'hasForeignShares' here to ignore if there aren't any (todo-1)
+				if (ok(node.getAc())) {
+					nodes.add(node);
+				}
+
 				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 				bops.remove(query);
 			}
 		}
+
+		// in async thread send out all the deletes to the foreign servers.
+		exec.run(() -> {
+			nodes.forEach(n -> apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n)));
+		});
 
 		if (ok(bops)) {
 			BulkWriteResult results = bops.execute();

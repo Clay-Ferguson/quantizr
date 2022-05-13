@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
+import quanta.actpub.model.APODelete;
 import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
+import quanta.actpub.model.APOTombstone;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
@@ -41,6 +43,11 @@ public class ActPubFactory extends ServiceBase {
 				newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
 
 		return newCreate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+	}
+
+	public APObj newDeleteForNote(String id, String fromActor) {
+		APObj payload = new APOTombstone(id);
+		return new APODelete(id+"#delete", fromActor, payload, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 	}
 
 	public APOLike newLike(String id, String objectId, String actor, List<String> to,  List<String> cc) {
