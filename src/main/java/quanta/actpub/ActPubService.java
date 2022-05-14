@@ -161,9 +161,9 @@ public class ActPubService extends ServiceBase {
                 HashSet<String> userInboxes = new HashSet<>();
 
                 // When posting a public message we send out to all unique sharedInboxes here
-                // todo-0: I think this if block can be made into a function and reused twice (or thrice?)
                 if (!privateMessage) {
-                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
+                    HashSet<String> sharedInboxes = new HashSet<>();
+                    getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
                         for (String inbox : sharedInboxes) {
@@ -250,7 +250,8 @@ public class ActPubService extends ServiceBase {
 
                 // When posting a public message we send out to all unique sharedInboxes here
                 if (!privateMessage) {
-                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
+                    HashSet<String> sharedInboxes = new HashSet<>();
+                    getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
 
@@ -294,14 +295,13 @@ public class ActPubService extends ServiceBase {
      * Finds all the foreign server followers of userName, and returns the unique set of sharedInboxes
      * of them all.
      */
-    public HashSet<String> getSharedInboxesOfFollowers(String userName, HashSet<String> userInboxes) {
-        HashSet<String> set = new HashSet<>();
+    public void getSharedInboxesOfFollowers(String userName, HashSet<String> sharedInboxes, HashSet<String> userInboxes) {
         MongoSession as = auth.getAdminSession();
 
         // This query gets the FRIEND nodes that specifify userName on them
         Query q = apFollower.getFriendsByUserName_query(as, userName);
         if (no(q))
-            return null;
+            return;
 
         Iterable<SubNode> iterable = mongoUtil.find(q);
 
@@ -318,7 +318,7 @@ public class ActPubService extends ServiceBase {
                     String sharedInbox = followerAccount.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                     if (ok(sharedInbox)) {
                         // log.debug("SharedInbox: " + sharedInbox);
-                        set.add(sharedInbox);
+                        sharedInboxes.add(sharedInbox);
                     }
                     // not all users have a shared inbox, and the ones that don't we collect here...
                     else {
@@ -330,7 +330,6 @@ public class ActPubService extends ServiceBase {
                 }
             }
         }
-        return set;
     }
 
     public APList createAttachmentsList(SubNode node) {
