@@ -153,18 +153,19 @@ public class ActPubService extends ServiceBase {
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
 
+                APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                        noteUrl, privateMessage, attachments);
+
                 // for users that don't have a sharedInbox we collect their inboxes here to send to them
                 // individually
                 HashSet<String> userInboxes = new HashSet<>();
 
                 // When posting a public message we send out to all unique sharedInboxes here
+                // todo-0: I think this if block can be made into a function and reused twice (or thrice?)
                 if (!privateMessage) {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser, userInboxes);
 
                     if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType,
-                                content, noteUrl, privateMessage, attachments);
-
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
                             try {
@@ -191,8 +192,7 @@ public class ActPubService extends ServiceBase {
 
                 // Post message to all foreign usernames found in 'toUserNames'
                 if (toUserNames.size() > 0) {
-                    sendNote(ms, toUserNames, fromUser, inReplyTo, replyToType, content, attachments, noteUrl, privateMessage,
-                            userInboxes);
+                    sendMessageToUsers(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
                 }
             } //
             catch (Exception e) {
@@ -280,7 +280,7 @@ public class ActPubService extends ServiceBase {
 
                 // Post message to all foreign usernames found in 'toUserNames'
                 if (toUserNames.size() > 0) {
-                    sendDelete(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
+                    sendMessageToUsers(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
                 }
             } //
             catch (Exception e) {
@@ -351,8 +351,8 @@ public class ActPubService extends ServiceBase {
         return attachments;
     }
 
-    /*
-     * Sends note outbound to other inboxes, for all inboxes corresponding to all 'toUserNames'
+     /*
+     * Sends message outbound to other inboxes, for all inboxes corresponding to all 'toUserNames'
      * IMPORTANT: This method doesn't require or expect 'toUserNames' to have been 'imported' into
      * Quanta. That is, there may not even BE a "user node" for any of these users, or there may be. We
      * don't know or care in here, because we go straight to the WebFinger and build up their outbox
@@ -360,65 +360,8 @@ public class ActPubService extends ServiceBase {
      * 
      * skipInboxes is a way to know which inboxes we've already sent to, and to not send again
      */
-    public void sendNote(MongoSession ms, HashSet<String> toUserNames, String fromUser, String inReplyTo, String replyToType,
-            String content, APList attachments, String noteUrl, boolean privateMessage, HashSet<String> skipInboxes) {
-        if (no(toUserNames))
-            return;
-
-        String host = prop.getMetaHost();
-        String fromActor = null;
-
-        // log.debug("Sending note: " + content + " to foreign user inboxes.");
-
-        /*
-         * Post the same message to all the inboxes that need to see it
-         */
-        for (String toUserName : toUserNames) {
-            // Ignore userNames that are not foreign server names
-            if (!toUserName.contains("@")) {
-                continue;
-            }
-
-            // Ignore userNames that are for our own host
-            String userHost = apUtil.getHostFromUserName(toUserName);
-            if (userHost.equals(host)) {
-                continue;
-            }
-
-            // log.debug("to Foreign User: " + toUserName);
-            APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
-            if (no(webFinger)) {
-                apLog.trace("Unable to get webfinger for " + toUserName);
-                continue;
-            }
-
-            String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-            APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
-            if (ok(toActorObj)) {
-                // log.debug(" actor: " + toActorUrl);
-                String inbox = apStr(toActorObj, APObj.inbox);
-
-                // send post if inbox not in skipInboxes
-                if (!skipInboxes.contains(inbox)) {
-                    /* lazy create fromActor here */
-                    if (no(fromActor)) {
-                        fromActor = apUtil.makeActorUrlForUserName(fromUser);
-                    }
-
-                    APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
-                            noteUrl, privateMessage, attachments);
-
-                    String userDoingPost = ThreadLocals.getSC().getUserName();
-                    // log.debug("Posting object:\n" + XString.prettyPrint(message) + "\n to inbox: " + inbox);
-                    String privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
-                    apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                }
-            }
-        }
-    }
-
-    public void sendDelete(MongoSession ms, HashSet<String> toUserNames, String fromUser, APObj message, boolean privateMessage,
-            HashSet<String> skipInboxes) {
+    public void sendMessageToUsers(MongoSession ms, HashSet<String> toUserNames, String fromUser, APObj message,
+            boolean privateMessage, HashSet<String> skipInboxes) {
         if (no(toUserNames))
             return;
 
