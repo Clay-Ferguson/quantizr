@@ -57,7 +57,7 @@ export class User {
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
         console.log("got loginState");
 
-        /* if we have known state as logged out, then do nothing here */
+        /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
             console.log("loginState known as logged out.");
             S.util.loadAnonPageHome(null);

@@ -276,27 +276,28 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + name;
 			}
 
+			// make sure urlId is defaulted to null
+			ThreadLocals.getSC().setUrlId(null);
+
+			// if we have an ID, try to look it up, to put it in the session and load the Social Card properties for this request.
 			if (ok(id)) {
-				ThreadLocals.getSC().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
 
 				arun.run(ms -> {
 					SubNode node = read.getNode(ms, _id);
 
-					if (no(node)) {
-						log.debug("Node did not exist.");
-						ThreadLocals.getSC().setUrlId(null);
-					}
+					if (ok(node)) {
+						// if we get in here we have the node AND are authorized to view it, so save in session.
+						ThreadLocals.getSC().setUrlId(_id);
 
-					if (AclService.isPublic(ms, node)) {
-						render.populateSocialCardProps(node, model);
+						if (AclService.isPublic(ms, node)) {
+							render.populateSocialCardProps(node, model);
+						}
 					}
 					return null;
 				});
-			} else {
-				ThreadLocals.getSC().setUrlId(null);
-			}
+			} 
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.

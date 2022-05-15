@@ -186,7 +186,7 @@ export class MenuPanel extends Div {
         ]));
 
         if (!state.isAnonUser) {
-            children.push(new Menu("Tree", [
+            children.push(new Menu("Quanta", [
                 new MenuItem("My Root", S.nav.navHome, !state.isAnonUser),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
@@ -555,7 +555,7 @@ export class MenuPanel extends Div {
     getTabMenuItems = (state: AppState): MenuItem[] => {
         let items: MenuItem[] = [];
         for (let tab of state.tabData) {
-            if (tab.isVisible()) {
+            if (tab.isVisible(state)) {
                 items.push(this.getTabMenuItem(state, tab));
             }
         }

@@ -14,7 +14,7 @@ export class TimelineResultSetViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => S.tabUtil.resultSetHasData(C.TAB_TIMELINE);
+    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_TIMELINE);
     constructView = (data: TabIntf) => new TimelineResultSetView<TimelineRSInfo>(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 }

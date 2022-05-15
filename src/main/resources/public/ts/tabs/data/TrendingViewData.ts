@@ -16,7 +16,7 @@ export class TrendingViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => true;
+    isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new TrendingView(data);
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [

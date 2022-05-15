@@ -127,7 +127,7 @@ export class TypeBase implements TypeHandlerIntf {
             return new Div(null, null, children);
         }
         else {
-            let isRoot = node.id === state.node.id;
+            let isRoot = node.id === state.node?.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (state.userPreferences.showMetaData || state.userPreferences.editMode)) {

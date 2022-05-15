@@ -72,7 +72,7 @@ export class Quanta {
             Log.log("initApp()");
 
             // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
-            // an if this value isn't set it prints a message just saying the browser isn't supported.
+            // and if this value isn't set it prints a message just saying the browser isn't supported.
             (window as any).__initAppStarted = true;
 
             if (this.appInitialized) {
@@ -127,7 +127,7 @@ export class Quanta {
             };
 
             /* We have to run this timer to wait for document.body to exist becasue we load our JS in the HTML HEAD
-            and we load in the head because we need our styling in place BEFORE the page renders or else you get that
+             because we need our styling in place BEFORE the page renders or else you get that
             well-known issue of a momentarily unstyled render before the page finishes loading */
             const interval = setInterval(() => {
                 if (!document?.body) {
@@ -213,7 +213,7 @@ export class Quanta {
                         default: break;
                     }
                 });
-            }, 250);
+            }, 100);
 
             Log.log("initConstants");
             S.props.initConstants();

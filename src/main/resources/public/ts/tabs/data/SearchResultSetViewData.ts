@@ -14,7 +14,7 @@ export class SearchResultSetViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
+    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
     constructView = (data: TabIntf) => new SearchResultSetView(data)
     getTabSubOptions = (state: AppState): Div => { return null; };
 }

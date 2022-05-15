@@ -22,7 +22,7 @@ export class NodeCompContent extends Div {
         public imgSizeOverride?: string,
         public isTreeView?: boolean) {
         super(null, {
-            id: (idPrefix ? idPrefix : "n") + node.id
+            id: (idPrefix ? idPrefix : "n") + node?.id
         });
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
@@ -58,6 +58,7 @@ export class NodeCompContent extends Div {
                 node.content.indexOf("{{imgUpperRight}}") !== -1)) {
                 embeddedImg = true;
             }
+
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
             children.push(typeHandler.render(node, this.tabData, this.rowStyling, this.isTreeView, state));
         }

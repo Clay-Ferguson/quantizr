@@ -50,7 +50,7 @@ export class TabPanel extends Div {
     buildTabs = (state: AppState): AppTab[] => {
         let tabs: AppTab[] = [];
         for (let tab of state.tabData) {
-            if (tab.isVisible()) {
+            if (tab.isVisible(state)) {
                 tabs.push(tab.constructView(tab));
             }
         }

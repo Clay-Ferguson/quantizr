@@ -36,7 +36,7 @@ export class FeedViewData implements TabIntf {
 
     openGraphComps = [];
 
-    isVisible = () => true;
+    isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
     getTabSubOptions = (state: AppState): Div => {
         return !state.isAnonUser

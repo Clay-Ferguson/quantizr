@@ -14,7 +14,7 @@ export class FollowersResultSetViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
+    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
     constructView = (data: TabIntf) => new FollowersResultSetView<FollowersRSInfo>(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 }

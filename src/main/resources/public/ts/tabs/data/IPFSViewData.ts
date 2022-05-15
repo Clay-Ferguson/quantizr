@@ -1,4 +1,3 @@
-import { store } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
@@ -18,9 +17,7 @@ export class IPFSViewData implements TabIntf {
 
     openGraphComps = [];
 
-    isVisible = () => {
-        let state: AppState = store.getState();
-
+    isVisible = (state: AppState) => {
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
         return state.showIpfsTab;
         // return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;

@@ -1,9 +1,8 @@
-import { ResultSetInfo } from "../ResultSetInfo";
-import { CompIntf } from "../comp/base/CompIntf";
-import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { AppState } from "../AppState";
-import { Div } from "../comp/core/Div";
 import { AppTab } from "../comp/AppTab";
+import { Div } from "../comp/core/Div";
+import { OpenGraphPanel } from "../comp/OpenGraphPanel";
+import { ResultSetInfo } from "../ResultSetInfo";
 
 export interface TabIntf<PropsType = any> {
     // display name shown on the tab
@@ -20,7 +19,7 @@ export interface TabIntf<PropsType = any> {
     getTabSubOptions(state: AppState): Div;
 
     // controls whether to show tab button or not.
-    isVisible(): boolean;
+    isVisible(state: AppState): boolean;
 
     rsInfo: ResultSetInfo;
     props: PropsType;

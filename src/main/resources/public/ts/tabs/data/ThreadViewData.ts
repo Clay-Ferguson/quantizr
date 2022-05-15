@@ -1,4 +1,3 @@
-import { store } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
@@ -14,10 +13,7 @@ export class ThreadViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => {
-        let state: AppState = store.getState();
-        return !!state.threadViewNodeId;
-    };
+    isVisible = (state: AppState) => { return !!state.threadViewNodeId; };
 
     constructView = (data: TabIntf) => new ThreadView(data);
     getTabSubOptions = (state: AppState): Div => { return null; };

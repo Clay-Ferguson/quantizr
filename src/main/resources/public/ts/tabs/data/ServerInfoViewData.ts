@@ -1,4 +1,3 @@
-import { store } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
@@ -13,8 +12,7 @@ export class ServerInfoViewData implements TabIntf {
     props = {};
     openGraphComps = [];
 
-    isVisible = () => {
-        let state: AppState = store.getState();
+    isVisible = (state: AppState) => {
         return !!state.serverInfoText;
     };
 

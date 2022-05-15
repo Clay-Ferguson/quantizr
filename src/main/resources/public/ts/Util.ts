@@ -13,7 +13,6 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
-import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
@@ -28,6 +27,10 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export class Util {
+    // I'd like to enable this but if we don't load the tree right away we have to check the 200ish places in the code where
+    // we are doing things like state.node.id, and assuming there IS a node on the state, and that will take more testing
+    // than I have time for righ tnow, so we can't do the 'default to feed" functionality for now.
+    sendAnonUsersToFeed = false;
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -1375,20 +1378,25 @@ export class Util {
         console.log("loadAnonPageHome()");
 
         try {
-            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
-
-            // if we have trouble accessing even the anon page just drop out to landing page.
-            if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
-                console.log("can't access anonymous page");
-                // check we aren't already at origin (no parameters) then set to origin.
-                if (window.location.href !== window.location.origin) {
-                    window.location.href = window.location.origin;
-                }
-                return;
+            if (this.sendAnonUsersToFeed) {
+                S.nav.messagesFediverse();
             }
-            state = appState(state);
-            console.log("renderPageFromData for anonymous");
-            S.render.renderPageFromData(res, false, null, true, true);
+            else {
+                let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+
+                // if we have trouble accessing even the anon page just drop out to landing page.
+                if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
+                    console.log("can't access anonymous page");
+                    // check we aren't already at origin (no parameters) then set to origin.
+                    if (window.location.href !== window.location.origin) {
+                        window.location.href = window.location.origin;
+                    }
+                    return;
+                }
+                state = appState(state);
+                console.log("renderPageFromData for anonymous");
+                S.render.renderPageFromData(res, false, null, true, true);
+            }
         }
         catch (e) {
             console.warn("anonPageLoad failed.");
