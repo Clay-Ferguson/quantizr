@@ -171,7 +171,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		update.save(ms, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -290,7 +291,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		update.save(ms, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -377,7 +379,13 @@ public class NodeEditService extends ServiceBase {
 			throw new RuntimeEx("Max text length is 64K");
 		}
 
+		/* If current content exists content is being edited reset likes */
+		if (ok(node.getContent()) && node.getContent().trim().length() > 0 && !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
+			node.setLikes(null);
+		}
+
 		node.setContent(nodeInfo.getContent());
+
 		node.setTags(nodeInfo.getTags());
 		node.touch();
 		node.setType(nodeInfo.getType());
@@ -534,8 +542,8 @@ public class NodeEditService extends ServiceBase {
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 
 					// This broadcasts out to the shared inboxes of all the followers of the user
-					apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
-							node.getContent(), nodeUrl);
+					apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments, node.getContent(),
+							nodeUrl);
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 
