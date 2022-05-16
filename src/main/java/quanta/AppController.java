@@ -171,7 +171,6 @@ import quanta.util.Val;
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
-
 	public static final HashMap<String, Integer> uniqueUserIpHits = new HashMap<>();
 
 	@Autowired
@@ -278,26 +277,38 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			// make sure urlId is defaulted to null
 			ThreadLocals.getSC().setUrlId(null);
+			boolean urlId = false;
 
-			// if we have an ID, try to look it up, to put it in the session and load the Social Card properties for this request.
-			if (ok(id)) {
-				// log.debug("ID specified on url=" + id);
-				String _id = id;
+			// if we have an ID, try to look it up, to put it in the session and load the Social Card properties
+			// for this request.
 
-				arun.run(ms -> {
-					SubNode node = read.getNode(ms, _id);
+			// If no id given defalt to ":home" only so we can get the social card props.
+			if (no(id)) {
+				id = ":home";
+			} else {
+				urlId = true;
+			}
 
-					if (ok(node)) {
+			// log.debug("ID specified on url=" + id);
+			String _id = id;
+			boolean _urlId = urlId;
+
+			arun.run(ms -> {
+				SubNode node = read.getNode(ms, _id);
+
+				if (ok(node)) {
+					if (_urlId) {
 						// if we get in here we have the node AND are authorized to view it, so save in session.
 						ThreadLocals.getSC().setUrlId(_id);
-
-						if (AclService.isPublic(ms, node)) {
-							render.populateSocialCardProps(node, model);
-						}
 					}
-					return null;
-				});
-			} 
+
+					if (AclService.isPublic(ms, node)) {
+						render.populateSocialCardProps(node, model);
+					}
+				}
+				return null;
+			});
+
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.

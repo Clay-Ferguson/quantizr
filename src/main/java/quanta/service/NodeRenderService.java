@@ -527,6 +527,7 @@ public class NodeRenderService extends ServiceBase {
 	public void populateSocialCardProps(SubNode node, Model model) {
 		if (no(node))
 			return;
+			
 		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());
