@@ -12,10 +12,10 @@ import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { SelectTagsDlg } from "./SelectTagsDlg";
-import * as J from "../JavaIntf";
 
 interface LS { // Local State
     sortField?: string;
@@ -132,7 +132,7 @@ export class SearchContentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),
-                    new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
+                    new HelpButton(() => this.appState.config?.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])

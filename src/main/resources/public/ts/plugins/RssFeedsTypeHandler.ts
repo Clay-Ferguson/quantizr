@@ -37,7 +37,7 @@ export class RssFeedsTypeHandler extends TypeBase {
                 className: "marginAll"
             })
             // new Clearfix(),
-            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render)
+            // new HelpButton(() => state.config?.help?.type?.friendsList?.render)
         ]);
     }
 }

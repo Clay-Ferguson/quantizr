@@ -5,8 +5,26 @@ brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediv
 # variable 'S.quanta.config'
 #
 # Links here can be full url, or node names, or "tab:tabName"
+
+rhsAnonLinks:
+  - name: "About Quanta"
+    link: ":home"
+  - name: "Explore Features"
+    link: ":features"
+
 menu:
-  siteNav:
+  help:
+    - name: "About Quanta"
+      link: ":home"
+    - name: "User Guide"
+      link: ":user-guide"
+    - name: "Features Overview"
+      link: ":features"
+    - name: "Watch Screencasts"
+      link: ":screencast"
+    - name: "Demo Content"
+      link: ":demo-data"
+      
     # - name: "separator"
     #   link: ""
     # - name: "News"

@@ -1,3 +1,4 @@
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
@@ -15,7 +16,8 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.quanta?.config?.help?.type?.friend?.editor;
+        let state = store.getState();
+        return state.config?.help?.type?.friend?.editor;
     }
 
     getAllowRowHeader(): boolean {

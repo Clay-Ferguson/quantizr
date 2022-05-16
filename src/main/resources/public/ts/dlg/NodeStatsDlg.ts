@@ -65,7 +65,7 @@ export class NodeStatsDlg extends DialogBase {
                 new Button("Ok", () => {
                     this.close();
                 }, null, "btn-primary"),
-                new HelpButton(() => S.quanta?.config?.help?.nodeStats?.dialog)
+                new HelpButton(() => this.appState.config?.help?.nodeStats?.dialog)
             ], "marginTop")
         ];
     }

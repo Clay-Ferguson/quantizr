@@ -177,13 +177,9 @@ export class MenuPanel extends Div {
             }
         }
 
-        children.push(new Menu("Help", [
-            new MenuItem("About Quanta", MenuPanel.aboutQuanta),
-            new MenuItem("User Guide", MenuPanel.openUserGuide),
-            new MenuItem("Features Overview", MenuPanel.openFeatures),
-            new MenuItem("Watch Screencasts", MenuPanel.openScreencasts),
-            new MenuItem("Demo Content", MenuPanel.openDemoContent)
-        ]));
+        if (state.config?.menu?.help) {
+            children.push(new Menu("Help", this.helpMenuItems(state)));
+        }
 
         if (!state.isAnonUser) {
             children.push(new Menu("Quanta", [
@@ -511,10 +507,11 @@ export class MenuPanel extends Div {
         });
     }
 
-    siteNavCustomItems = (state: AppState): Div[] => {
+    // These are defined externally in config-text.yaml
+    helpMenuItems = (state: AppState): Div[] => {
         let items: Div[] = [];
-        if (S.quanta.config && S.quanta.config.menu && S.quanta.config.menu.siteNav) {
-            for (let menuItem of S.quanta.config.menu.siteNav) {
+        if (state.config?.menu?.help) {
+            for (let menuItem of state.config.menu.help) {
                 if (menuItem.name === "separator") {
                     items.push(new MenuItemSeparator());
                 }
@@ -541,7 +538,7 @@ export class MenuPanel extends Div {
                         }
                         // named nodes like ":myName"
                         else {
-                            func = () => S.nav.openContentNode(link, state);
+                            func = () => S.nav.openContentNode(link);
                         }
                     }
 

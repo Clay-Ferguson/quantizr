@@ -11,7 +11,6 @@ import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
 export class Quanta {
-    config: any;
     mainMenu: MainMenuDlg;
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
@@ -281,12 +280,15 @@ export class Quanta {
             setTimeout(async () => {
                 let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", null, true);
                 if (res.config) {
-                    S.quanta.config = res.config;
-                    if (S.quanta.config.userMessage) {
-                        S.util.showMessage(S.quanta.config.userMessage, "");
-                    }
+                    dispatch("Action_configUpdates", (s: AppState): AppState => {
+                        s.config = res.config;
+                        if (s.config.userMessage) {
+                            S.util.showMessage(s.config.userMessage, "");
+                        }
+                        return s;
+                    });
                 }
-            }, 2500);
+            }, 250);
 
             Log.log("initApp complete.");
             S.util.enableMouseEffect();

@@ -1,3 +1,4 @@
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -17,7 +18,8 @@ export class CalcTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.quanta?.config?.help?.type?.calculator?.editor;
+        let state = store.getState();
+        return state.config?.help?.type?.calculator?.editor;
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

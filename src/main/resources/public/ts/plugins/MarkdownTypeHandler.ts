@@ -1,5 +1,5 @@
+import { store } from "../AppRedux";
 import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 /* Type for 'untyped' types. That is, if the user has not set a type explicitly this type will be the default */
@@ -14,6 +14,7 @@ export class MarkdownTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.quanta?.config?.help?.editor?.dialog;
+        let state = store.getState();
+        return state.config?.help?.editor?.dialog;
     }
 }

@@ -1,10 +1,10 @@
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 export class APPostsTypeHandler extends TypeBase {
@@ -25,6 +25,7 @@ export class APPostsTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.quanta?.config?.help?.editor?.dialog;
+        let state = store.getState();
+        return state.config?.help?.editor?.dialog;
     }
 }

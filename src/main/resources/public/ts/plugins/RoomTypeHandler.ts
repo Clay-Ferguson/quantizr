@@ -17,7 +17,7 @@ export class RoomTypeHandler extends TypeBase {
     }
 
     // getEditorHelp(): string {
-    //     return S.quanta?.config?.help?.type?.friend?.editor;
+    //     return state.config?.help?.type?.friend?.editor;
     // }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

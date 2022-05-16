@@ -7,6 +7,8 @@ import * as J from "./JavaIntf";
 
 /* root react Redux state for entire app */
 export class AppState {
+    config: any;
+
     // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
     mobileMode: boolean = clientInfo.isMobileOrTablet;

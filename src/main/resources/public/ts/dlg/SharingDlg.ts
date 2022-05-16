@@ -64,7 +64,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
-                    new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog)
+                    new HelpButton(() => this.appState.config?.help?.sharing?.dialog)
                 ], "marginTop")
             ])
         ];

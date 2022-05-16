@@ -8,7 +8,6 @@ import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 export class FriendsListTypeHandler extends TypeBase {
@@ -26,7 +25,7 @@ export class FriendsListTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, { className: "systemNodeContent" }, [
-            new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
+            new HelpButton(() => state.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", {
                 className: "marginAll"
             }),

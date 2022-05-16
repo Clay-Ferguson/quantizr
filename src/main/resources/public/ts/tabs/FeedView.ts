@@ -81,7 +81,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     hasSearchField && this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
-                    new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
+                    new HelpButton(() => state.config?.help?.fediverse?.feed),
 
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, null, state), {
