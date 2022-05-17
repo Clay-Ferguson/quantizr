@@ -260,6 +260,7 @@ export class NodeUtil {
 
         content = S.util.replaceAll(content, "{{imgUpperRight}}", "");
         content = S.util.replaceAll(content, "{{imgUpperLeft}}", "");
+        content = S.util.replaceAll(content, "{{imgUpperCenter}}", "");
         content = S.util.replaceAll(content, "{{img}}", "");
         content = content.trim();
 

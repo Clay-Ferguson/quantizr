@@ -62,14 +62,21 @@ export class Render {
         val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
 
-        let upperLeftImg = "<img class=\"img-upper-left\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>";
-        val = S.util.replaceAll(val, "{{imgUpperLeft}}", upperLeftImg);
+        if (val.indexOf("{{imgUpperCenter}}") !== -1) {
+            val = S.util.replaceAll(val, "{{imgUpperCenter}}", "<img class=\"img-center-top\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
+        }
 
-        let upperRightImg = "<img class=\"img-upper-right\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>";
-        val = S.util.replaceAll(val, "{{imgUpperRight}}", upperRightImg);
+        if (val.indexOf("{{imgUpperLeft}}") !== -1) {
+            val = S.util.replaceAll(val, "{{imgUpperLeft}}", "<img class=\"img-upper-left\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>");
+        }
 
-        let imgInline = "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">";
-        val = S.util.replaceAll(val, "{{img}}", imgInline);
+        if (val.indexOf("{{imgUpperRight}}") !== -1) {
+            val = S.util.replaceAll(val, "{{imgUpperRight}}", "<img class=\"img-upper-right\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>");
+        }
+
+        if (val.indexOf("{{img}}") !== -1) {
+            val = S.util.replaceAll(val, "{{img}}", "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
+        }
 
         let imgSize = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         // actual size prop is saved as "0"
@@ -91,8 +98,7 @@ export class Render {
          <div class="clearfix"/>
          */
         if (val.indexOf("{{imgUrl}}")) {
-            let src: string = S.render.getUrlForNodeAttachment(node, false);
-            val = val.replace("{{imgUrl}}", src);
+            val = val.replace("{{imgUrl}}", S.render.getUrlForNodeAttachment(node, false));
         }
         return val;
     }

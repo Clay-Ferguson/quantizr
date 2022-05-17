@@ -900,6 +900,14 @@ Will come back later and study this more. todo-1 */
     border-radius: $border-radius;
 }
 
+.img-center-top {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid $gray-700;
+    border-radius: $border-radius;
+}
+
 .microMarginTop {
     margin-top: $microGap;
 }

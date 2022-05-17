@@ -55,7 +55,8 @@ export class NodeCompContent extends Div {
                 node.content.indexOf("{{imgUrl}}") !== -1 ||
                 node.content.indexOf("{{img}}") !== -1 ||
                 node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
-                node.content.indexOf("{{imgUpperRight}}") !== -1)) {
+                node.content.indexOf("{{imgUpperRight}}") !== -1 ||
+                node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
                 embeddedImg = true;
             }
 
