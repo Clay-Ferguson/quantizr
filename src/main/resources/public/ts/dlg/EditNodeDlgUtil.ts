@@ -171,9 +171,6 @@ export class EditNodeDlgUtil {
             value: "01:00"
         });
 
-        // Ensure the have the panel expanded so we can see the new date.
-        // nope, i decided I don't like this auto-expanding.
-        // EditNodeDlg.morePanelExpanded = true;
         dlg.mergeState<LS>(state);
     }
 

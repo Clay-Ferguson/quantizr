@@ -543,6 +543,13 @@ strong em {
     margin-left: $smallGap;
 }
 
+.propsPanelExpanded {
+}
+
+.propsPanelCollapsed {
+    margin-bottom: $smallGap;
+}
+
 .collapse-panel-link {
     margin: $smallGap;
     cursor: pointer;
@@ -1732,6 +1739,7 @@ i'm backing out for now
 
 .editBinaryContainer {
     margin-bottom: $smallGap;
+    margin-top: $tinyGap;
 }
 
 .heading5 {
@@ -1873,6 +1881,18 @@ audio::-webkit-media-controls-play-button {
 }
 
 .sharingName {
+    border: 2px solid gray;
+    border-radius: 6px;
+    margin-left: 3px;
+    display: inline-block;
+    padding: 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0px;
+}
+
+.sharingNamePublic {
     border: 2px solid cyan;
     border-radius: 6px;
     margin-left: 3px;

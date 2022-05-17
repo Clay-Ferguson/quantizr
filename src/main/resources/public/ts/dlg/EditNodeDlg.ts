@@ -44,7 +44,7 @@ import { SelectTagsDlg } from "./SelectTagsDlg";
  */
 export class EditNodeDlg extends DialogBase {
 
-    static pendingUploadFile: File = null;
+    static pendingUploadFile: File = null;f
     utl: EditNodeDlgUtil = new EditNodeDlgUtil();
 
     static embedInstance: EditNodeDlg;
@@ -58,7 +58,10 @@ export class EditNodeDlg extends DialogBase {
     // holds a map of states by property names.
     propStates: Map<string, ValidatedState<any>> = new Map<string, ValidatedState<any>>();
 
+    // todo-1: these should be in our local state really
     static morePanelExpanded: boolean = false;
+    static propsPanelExpanded: boolean = false;
+
     pendingEncryptionChange: boolean = false;
 
     // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
@@ -297,13 +300,13 @@ export class EditNodeDlg extends DialogBase {
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node);
+        let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node, this);
         let isPublic = S.props.isPublic(state.node);
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
             sharingDiv = new Div(null, {
-                className: "marginBottom float-end clickable"
+                className: "float-end clickable"
             }, [
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
@@ -317,6 +320,16 @@ export class EditNodeDlg extends DialogBase {
             propsTable = null;
         }
 
+        let propsCollapsablePanel: CollapsiblePanel = null;
+        if (propsTable) {
+            propsCollapsablePanel = new CollapsiblePanel("Show Properties", "Hide Properties", null, [
+                propsTable
+            ], true,
+                (state: boolean) => {
+                    EditNodeDlg.propsPanelExpanded = state;
+                }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed", "div");
+        }
+
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             new Div(null, { className: "row align-items-end" }, [
                 new TextField({ label: "Tags", outterClass: "marginTop col-10", val: this.tagsState }),
@@ -326,12 +339,11 @@ export class EditNodeDlg extends DialogBase {
                 nodeNameTextField,
                 this.createPrioritySelection()
             ]),
-            flowPanel,
-            propsTable
+            flowPanel
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "marginRight", "marginTop", "marginTop", "span") : null;
+            }, EditNodeDlg.morePanelExpanded, "marginRight", "", "", "div") : null;
 
         let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel
@@ -353,8 +365,7 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
-            new Clearfix()]);
+        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons, propsCollapsablePanel, new Clearfix()]);
         return children;
     }
 
@@ -411,8 +422,11 @@ export class EditNodeDlg extends DialogBase {
             if (numPropsShowing > 0) {
                 let state = this.getState<LS>();
                 let propsButtonBar: ButtonBar = new ButtonBar([
-                    new IconButton("fa-cog", null, {
-                        onClick: () => this.utl.addProperty(this),
+                    new IconButton("fa-plus-circle", null, {
+                        onClick: async () => {
+                            EditNodeDlg.propsPanelExpanded = true;
+                            await this.utl.addProperty(this);
+                        },
                         title: "Add property"
                     }),
                     state.selectedProps.size > 0 ? new IconButton("fa-trash", null, {
@@ -422,7 +436,7 @@ export class EditNodeDlg extends DialogBase {
                 ], null, "float-end");
 
                 // adds the button bar to the top of the list of children.
-                propsParent.safeGetChildren().unshift(new Span("Properties"), propsButtonBar, new Clearfix());
+                propsParent.safeGetChildren().unshift(propsButtonBar);
             }
         }
     }
@@ -603,10 +617,11 @@ export class EditNodeDlg extends DialogBase {
                 title: "Share Node"
             }) : null,
 
-            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-cog", null, {
-                onClick: () => {
+            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
+                onClick: async () => {
                     EditNodeDlg.morePanelExpanded = true;
-                    this.utl.addProperty(this);
+                    EditNodeDlg.propsPanelExpanded = true;
+                    await this.utl.addProperty(this);
                 },
                 title: "Add Property"
             }) : null,

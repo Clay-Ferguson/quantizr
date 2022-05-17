@@ -304,35 +304,50 @@ public class AclService extends ServiceBase {
 			update.save(ms, node);
 			return;
 		}
-		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
 
 		HashMap<String, AccessControl> acl = node.getAc();
 		if (no(acl))
 			return;
 
-		AccessControl ac = acl.get(principalNodeId);
-		String privs = ac.getPrvs();
-		if (no(privs)) {
-			log.debug("ACL didn't contain principalNodeId " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
-			return;
-		}
-		StringTokenizer t = new StringTokenizer(privs, ",", false);
 		String newPrivs = "";
 		boolean removed = false;
+		AccessControl ac = null;
 
-		/*
-		 * build the new comma-delimited privs list by adding all that aren't in the 'setToRemove
-		 */
-		while (t.hasMoreTokens()) {
-			String tok = t.nextToken().trim();
-			if (setToRemove.contains(tok)) {
-				removed = true;
-				continue;
+		// if removing all privileges
+		if ("*".equals(privToRemove)) {
+			removed = true;
+		}
+		// else removing just some specific privileges
+		else {
+			ac = acl.get(principalNodeId);
+			if (no(ac)) {
+				log.debug("ac not found for " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
+				return;
 			}
-			if (newPrivs.length() > 0) {
-				newPrivs += ",";
+
+			String privs = ac.getPrvs();
+			if (no(privs)) {
+				log.debug("privs not found for " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
+				return;
 			}
-			newPrivs += tok;
+
+			HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
+			StringTokenizer t = new StringTokenizer(privs, ",", false);
+
+			/*
+			 * build the new comma-delimited privs list by adding all that aren't in the setToRemove
+			 */
+			while (t.hasMoreTokens()) {
+				String tok = t.nextToken().trim();
+				if (setToRemove.contains(tok)) {
+					removed = true;
+					continue;
+				}
+				if (newPrivs.length() > 0) {
+					newPrivs += ",";
+				}
+				newPrivs += tok;
+			}
 		}
 
 		if (removed) {

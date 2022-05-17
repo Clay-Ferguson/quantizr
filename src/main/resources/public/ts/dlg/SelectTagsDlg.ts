@@ -72,7 +72,7 @@ export class SelectTagsDlg extends DialogBase {
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,
-                    new Button("Edit", this.edit),
+                    new Button("Edit Tags", this.edit),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])

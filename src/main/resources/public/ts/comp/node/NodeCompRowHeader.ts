@@ -195,7 +195,7 @@ export class NodeCompRowHeader extends Div {
         }
         // Show all the share names
         else if (S.props.isShared(node)) {
-            let shareComps: Comp[] = S.nodeUtil.getSharingNames(state, node);
+            let shareComps: Comp[] = S.nodeUtil.getSharingNames(state, node, null);
             floatUpperRightDiv.addChild(
                 new Span(null, {
                     className: "rowHeaderSharingNames"

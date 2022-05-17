@@ -24,11 +24,11 @@ export class EditTagsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new Div("Enter your custom hashtags, each on a separate line, below."),
+                new Div("Enter your custom hashtags, each on a separate line below. Hashtags must start with #."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
-                    new Button("Cancel", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

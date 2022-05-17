@@ -299,7 +299,31 @@ export class NodeUtil {
         new LoadNodeFromIpfsDlg(state).open();
     }
 
-    getSharingNames = (state: AppState, node: J.NodeInfo): Comp[] => {
+    removePublicShare = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
+        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+            nodeId: node.id,
+            principalNodeId: "public",
+            privilege: "*"
+        });
+        this.removePrivilegeResponse(node, editorDlg);
+    }
+
+    removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
+        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+            nodeId: node.id,
+            includeAcl: true,
+            includeOwners: true
+        });
+
+        debugger;
+        if (editorDlg) {
+            let state = editorDlg.getState();
+            state.node.ac = res.aclEntries;
+            editorDlg.mergeState({ node: state.node });
+        }
+    }
+
+    getSharingNames = (state: AppState, node: J.NodeInfo, editorDlg: Comp): Comp[] => {
         if (!node?.ac) return null;
 
         let ret: Comp[] = [];
@@ -307,7 +331,8 @@ export class NodeUtil {
             ret.push(new Span("Public" + this.getPublicPrivilegesDisplay(node),
                 {
                     title: "Shared to Public (Everyone)",
-                    className: "sharingName marginLeftIfNotFirst"
+                    className: "sharingNamePublic marginLeftIfNotFirst",
+                    onClick: () => this.removePublicShare(node, editorDlg)
                 }));
         }
 

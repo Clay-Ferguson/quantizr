@@ -202,7 +202,7 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    // todo-0: this logic can be shared in a generic function if we can separate out 'message' payload
+    // todo-1: this logic can be shared in a generic function if we can separate out 'message' payload
     // from this, and just pass in as argument.
     public void sendActPubForNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
         // if no sharing bail out.
