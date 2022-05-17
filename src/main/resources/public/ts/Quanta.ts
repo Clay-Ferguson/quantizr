@@ -135,6 +135,11 @@ export class Quanta {
                 }
                 clearInterval(interval);
 
+                document.body.addEventListener("mousemove", function (e: any) {
+                    S.util.mouseX = e.clientX;
+                    S.util.mouseY = e.clientY;
+                });
+
                 document.body.addEventListener("click", function (e: any) {
                     e = e || window.event;
                     let target: HTMLElement = e.target;
@@ -154,51 +159,58 @@ export class Quanta {
                 // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
                 // capture events going to dialogs / edit fields
                 document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                    // Log.log("keydown: " + event.code);
+                    // console.log("keydown: " + event.code);
                     let state: AppState = store.getState();
 
-                    switch (event.code) {
-                        case "ControlLeft":
-                            this.ctrlKey = true;
-                            this.ctrlKeyTime = new Date().getTime();
-                            break;
-                        case "Escape":
-                            if (S.util.fullscreenViewerActive(state)) {
-                                S.nav.closeFullScreenViewer(state);
-                            }
+                    if (event.code.startsWith("Digit")) {
+                        if (this.ctrlKey) {
+                            S.util.addAnnotation(event.code);
+                        }
+                    }
+                    else {
+                        switch (event.code) {
+                            case "ControlLeft":
+                                this.ctrlKey = true;
+                                this.ctrlKeyTime = new Date().getTime();
+                                break;
+                            case "Escape":
+                                S.util.removeAnnotations();
+                                if (S.util.fullscreenViewerActive(state)) {
+                                    S.nav.closeFullScreenViewer(state);
+                                }
+                                break;
 
-                            break;
+                            // case "ArrowDown":
+                            //     if (this.keyDebounce()) return;
+                            //     state = store.getState();
+                            //     S.view.scrollRelativeToNode("down", state);
+                            //     break;
 
-                        // case "ArrowDown":
-                        //     if (this.keyDebounce()) return;
-                        //     state = store.getState();
-                        //     S.view.scrollRelativeToNode("down", state);
-                        //     break;
+                            // case "ArrowUp":
+                            //     if (this.keyDebounce()) return;
+                            //     state = store.getState();
+                            //     S.view.scrollRelativeToNode("up", state);
+                            //     break;
 
-                        // case "ArrowUp":
-                        //     if (this.keyDebounce()) return;
-                        //     state = store.getState();
-                        //     S.view.scrollRelativeToNode("up", state);
-                        //     break;
+                            case "ArrowLeft":
+                                if (this.keyDebounce()) return;
+                                // S.nav.navUpLevel();
+                                if (state.fullScreenViewId) {
+                                    S.nav.prevFullScreenImgViewer(state);
+                                }
+                                break;
 
-                        case "ArrowLeft":
-                            if (this.keyDebounce()) return;
-                            // S.nav.navUpLevel();
-                            if (state.fullScreenViewId) {
-                                S.nav.prevFullScreenImgViewer(state);
-                            }
-                            break;
+                            case "ArrowRight":
+                                if (this.keyDebounce()) return;
+                                state = store.getState();
+                                // S.nav.navOpenSelectedNode(state);
+                                if (state.fullScreenViewId) {
+                                    S.nav.nextFullScreenImgViewer(state);
+                                }
+                                break;
 
-                        case "ArrowRight":
-                            if (this.keyDebounce()) return;
-                            state = store.getState();
-                            // S.nav.navOpenSelectedNode(state);
-                            if (state.fullScreenViewId) {
-                                S.nav.nextFullScreenImgViewer(state);
-                            }
-                            break;
-
-                        default: break;
+                            default: break;
+                        }
                     }
                     // }
                 });

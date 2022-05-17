@@ -27,6 +27,10 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export class Util {
+    annotations: HTMLDivElement[] = [];
+    mouseX: number;
+    mouseY: number;
+
     // I'd like to enable this but if we don't load the tree right away we have to check the 200ish places in the code where
     // we are doing things like state.node.id, and assuming there IS a node on the state, and that will take more testing
     // than I have time for righ tnow, so we can't do the 'default to feed" functionality for now.
@@ -1351,7 +1355,31 @@ export class Util {
 
         setTimeout(() => {
             d.parentElement.removeChild(d);
-        }, 400); // this val is in 3 places. put the TS two in a constantas file.
+        }, 400); // this val is in 3 places. put the TS two in a constants file.
+    }
+
+    addAnnotation = (keyCode: string) => {
+        keyCode = this.replaceAll(keyCode, "Digit", "");
+        let d = document.createElement("div");
+
+        if (keyCode !== "0") {
+            let h = document.createElement("h3");
+            h.className = "annotationText";
+            let c: any = document.createTextNode(keyCode);
+            c.className = "annotationText";
+            h.appendChild(c);
+            d.appendChild(h);
+        }
+        d.className = "annotationCircle";
+        d.style.left = `${this.mouseX + 5}px`;
+        d.style.top = `${this.mouseY + 12}px`;
+        this.annotations.push(d);
+        document.body.appendChild(d);
+    }
+
+    removeAnnotations = () => {
+        this.annotations.forEach(d => d.parentElement.removeChild(d));
+        this.annotations = [];
     }
 
     playAudioIfRequested = () => {
