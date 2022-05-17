@@ -380,7 +380,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		/* If current content exists content is being edited reset likes */
-		if (ok(node.getContent()) && node.getContent().trim().length() > 0 && !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
+		if (ok(node.getContent()) && node.getContent().trim().length() > 0
+				&& !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
 			node.setLikes(null);
 		}
 
@@ -547,14 +548,9 @@ public class NodeEditService extends ServiceBase {
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 
-				// todo-1: This proof of concept worked great, but we need to standardize on a way to write this
-				// file out
-				// into a folder that can be more easily browsed by end users which may mean simply flattening them
-				// out into a directory
-				// with no structure (all in one folder of posts) and naming the files better somehow.
-				// if (AclService.isPublic(ms, node)) {
-				// saveNodeToMFS(ms, node);
-				// }
+				if (AclService.isPublic(ms, node) && !StringUtils.isEmpty(node.getName())) {
+					saveNodeToMFS(ms, node);
+				}
 
 				return null;
 			} else {
@@ -569,7 +565,7 @@ public class NodeEditService extends ServiceBase {
 	 * Save PUBLIC nodes to IPFS/MFS
 	 */
 	public void saveNodeToMFS(MongoSession ms, SubNode node) {
-		if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+		if (!ThreadLocals.getSC().allowWeb3()) {
 			return;
 		}
 
@@ -585,10 +581,16 @@ public class NodeEditService extends ServiceBase {
 
 				String pathBase = "/" + userNodeId;
 
-				// make the path of the node relative to the owner by removing the part of the path that is
-				// the user's root node path
-				String path = node.getPath().replace(ownerNode.getPath(), "");
-				path = folderizePath(path);
+				// **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files, for a tree on a user's MFS area
+				// but what we do instead is take the NAME of the node, and use that is the filename, and write directly into '[user]/posts/[name]' loation
+				// // make the path of the node relative to the owner by removing the part of the path that is
+				// // the user's root node path
+				// String path = node.getPath().replace(ownerNode.getPath(), "");
+				// path = folderizePath(path);
+
+				// If this gets to be too many files for IPFS to handle, we can always include a year and month, and that would probably
+				// at least create a viable system, proof-of-concept
+				String path = "/" + node.getName() + ".json";
 
 				String mfsPath = pathBase + "/posts" + path;
 				// log.debug("Writing JSON to MFS Path: " + mfsPath);
@@ -638,7 +640,7 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	/*
-	 * Since Quanta stores nodes under nodes, and file systems are not capable of doing this we have to
+	 * Since Quanta stores nodes under other nodes, and file systems are not capable of doing this we have to
 	 * convert names to folders by putting a "-f" on them before writing to MFS
 	 */
 	private String folderizePath(String path) {

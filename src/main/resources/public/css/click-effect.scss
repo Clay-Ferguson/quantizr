@@ -1,9 +1,14 @@
 /* #mouseEffects (do not delete this tag) */
 
+// This is fun!
+// *:hover {
+//     outline: 2px solid green;
+// }
+
 div.clickEffect {
     position: fixed;
     border-style: solid;
-    border-color: yellowgreen;
+    border-color: yellow;
     border-radius: 50%;
     /* Warning: must match the time in util.ts#delayFunc AND in runClickAnimation */
     animation: clickEffect 0.4s ease-out;

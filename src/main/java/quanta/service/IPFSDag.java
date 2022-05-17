@@ -63,7 +63,7 @@ public class IPFSDag extends ServiceBase {
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
-        if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
 

@@ -20,6 +20,7 @@ import quanta.model.ipfs.file.IPFSDirEntry;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.MongoSession;
 import quanta.request.DeleteMFSFileRequest;
+import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
@@ -120,7 +121,7 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public void deleteMFSFile(MongoSession ms, DeleteMFSFileRequest req) {
-        if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
             return;
         }
 
@@ -135,10 +136,18 @@ public class IPFSFiles extends ServiceBase {
         deletePath(req.getItem());
     }
 
+    public String getIPFSContent(MongoSession ms, GetIPFSContentRequest req) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
+            return null;
+        }
+
+        return readFile(req.getId());
+    }
+
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
-        if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
 
@@ -147,11 +156,11 @@ public class IPFSFiles extends ServiceBase {
 
         String mfsPath = no(req.getFolder()) ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
-        
+
         // opps, not a path
         if (!mfsPath.startsWith("/"))
             return null;
-            
+
         IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
         if (ok(pathStat)) {
             cid.setVal(pathStat.getHash());

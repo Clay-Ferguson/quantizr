@@ -75,6 +75,7 @@ import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
 import quanta.request.GetFriendsRequest;
+import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
 import quanta.request.GetNodeMetaInfoRequest;
@@ -127,6 +128,7 @@ import quanta.response.ExportResponse;
 import quanta.response.GetActPubObjectResponse;
 import quanta.response.GetBookmarksResponse;
 import quanta.response.GetConfigResponse;
+import quanta.response.GetIPFSContentResponse;
 import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetServerInfoResponse;
@@ -600,6 +602,18 @@ public class AppController extends ServiceBase implements ErrorController {
 		return callProc.run("deleteMFSFile", req, session, ms -> {
 			ipfsFiles.deleteMFSFile(ms, req);
 			GetIPFSFilesResponse res = new GetIPFSFilesResponse();
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getIPFSContent", method = RequestMethod.POST)
+	public @ResponseBody Object getIPFSContent(@RequestBody GetIPFSContentRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		// NO NOT HERE -> SessionContext.checkReqToken();
+		return callProc.run("getIPFSContent", req, session, ms -> {
+			String content = ipfsFiles.getIPFSContent(ms, req);
+			GetIPFSContentResponse res = new GetIPFSContentResponse();
+			res.setContent(content);
 			return res;
 		});
 	}

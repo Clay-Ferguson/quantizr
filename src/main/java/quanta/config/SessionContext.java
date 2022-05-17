@@ -529,4 +529,10 @@ public class SessionContext extends ServiceBase {
 		}
 		this.allowedFeatures = allowedFeatures;
 	}
+
+	public boolean allowWeb3() {
+		// turning on for everyone for now
+		return true;
+		// return getAllowedFeatures().contains("web3");
+	}
 }

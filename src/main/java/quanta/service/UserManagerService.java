@@ -659,7 +659,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
-		if (!ThreadLocals.getSC().getAllowedFeatures().contains("web3")) {
+		if (!ThreadLocals.getSC().allowWeb3()) {
 			return;
 		}
 

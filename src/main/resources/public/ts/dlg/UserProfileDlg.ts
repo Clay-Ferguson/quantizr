@@ -172,7 +172,7 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    this.appState.isAnonUser || this.readOnly ? null : new Button("Publish", this.publish, {
+                    this.appState.isAnonUser || this.readOnly ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 
@@ -321,11 +321,6 @@ export class UserProfileDlg extends DialogBase {
             s.displayName = this.displayNameState.getValue();
             return s;
         });
-
-        const state: any = this.getState<LS>();
-        if (!this.readOnly && state.userProfile.mfsEnable) {
-            S.util.showPageMessage("Publishing your Identity Info...");
-        }
     }
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {

@@ -14,7 +14,7 @@ export class AppState {
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 
     // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
-    showIpfsTab: boolean;
+    // showIpfsTab: boolean;
 
     dialogStack: DialogBase[] = [];
 

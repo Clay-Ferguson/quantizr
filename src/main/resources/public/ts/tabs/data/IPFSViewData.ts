@@ -19,8 +19,8 @@ export class IPFSViewData implements TabIntf {
 
     isVisible = (state: AppState) => {
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
-        return state.showIpfsTab;
-        // return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
+        // return state.showIpfsTab;
+        return state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
     };
 
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);

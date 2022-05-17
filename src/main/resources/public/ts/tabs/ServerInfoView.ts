@@ -22,7 +22,7 @@ export class ServerInfoView extends AppTab {
             new Div(null, { className: "marginTop" }, [
 
                 state.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
-                    S.view.runServerCommand("getServerInfo", "Server Info", null, state);
+                    S.view.runServerCommand("getServerInfo", "Info View", null, state);
                 }, { className: "float-end" }) : null,
 
                 new Heading(3, state.serverInfoTitle),

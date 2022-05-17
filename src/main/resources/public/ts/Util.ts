@@ -1446,7 +1446,9 @@ export class Util {
             s.userName = res.userName;
             s.isAdminUser = res.userName === "admin";
             s.isAnonUser = res.userName === J.PrincipalName.ANON;
-            s.allowedFeatures = res.allowedFeatures;
+
+            // allow for everyone for now
+            s.allowedFeatures = "web3"; // res.allowedFeatures;
 
             // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 

@@ -85,14 +85,13 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 showParentButton ? new Button("Parent", this.goToParent, {
                     title: "Parent Folder"
                 }) : null,
-                new IconButton("fa-refresh", "Search", {
-                    onClick: () => this.refreshFiles(),
-                    title: "Refresh"
+                new IconButton("fa-refresh", "Refresh", {
+                    onClick: () => this.refreshFiles()
                 }, "marginAll")
             ]));
 
             let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
-            children.push(new Heading(5, "Listing: " + (mfsMode ? "MFS" : "DAG")))
+            children.push(new Heading(5, "Listing: " + (mfsMode ? "Mutable File System" : "Hierarchy (DAG)")))
 
             children.push(new Div(null, null, [
                 new Span(null, { className: "float-end marginBottom" }, [
@@ -139,7 +138,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 className: "files-table"
             });
 
-            console.log("ListCids: " + this.data.props.listCids);
+            // console.log("ListCids: " + this.data.props.listCids);
 
             // render folders only
             this.renderItems(propTable, mfsFiles, mfsFolder, mfsMode, true);
@@ -203,7 +202,8 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                             onClick: () => {
                                 // if it's a file use ipfs.io to view it
                                 if (isFile) {
-                                    window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
+                                    // window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
+                                    this.openFile(fullName, entry.Name, entry.Hash);
                                 }
                                 // otherwise open the folder in our own viewer
                                 else {
@@ -223,17 +223,42 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 // DELETE ICON
                 // only show the delete button for local mfsMode stuff.
                 mfsMode ? new FilesTableCell(null, {
-                    className: "files-table-delete-col",
-                    onClick: () => { this.deleteItem(fullName); }
+                    className: "files-table-delete-col"
+                    // onClick: () => { this.deleteItem(fullName); }
                 }, [
-                    new Icon({
-                        className: "fa fa-trash fa-lg clickable",
-                        title: "Delete",
-                        onClick: () => this.refreshFiles()
-                    })
+                    !foldersOnly ? new Div(null, null, [
+                        new Icon({
+                            className: "fa fa-trash fa-lg clickable marginRight",
+                            title: "Delete",
+                            // todo-0: need to add confirmation for this delete.
+                            onClick: () => { this.deleteItem(fullName); }
+                        })
+                        // I decided to just make clicking the filename do this...
+                        // new Icon({
+                        //     className: "fa fa-cog fa-lg clickable",
+                        //     title: "Open File",
+                        //     onClick: () => { this.openFile(fullName, entry.Name, entry.Hash); }
+                        // })
+                    ]) : null
                 ]) : null
             ]);
             propTable.addChild(propTableRow);
+        });
+    }
+
+    openFile = async (item: string, shortName: string, hash: string) => {
+        // console.log(S.util.prettyPrint(item));
+        let res: J.GetIPFSContentResponse = await S.util.ajax<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
+            id: item
+        });
+
+        dispatch("Action_showServerInfo", (s: AppState): AppState => {
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+            s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
+            s.serverInfoText = shortName + "\n" + hash + "\n\n" + res.content;
+            s.serverInfoCommand = "IPFS File Content";
+            s.serverInfoTitle = "IPFS File Content";
+            return s;
         });
     }
 

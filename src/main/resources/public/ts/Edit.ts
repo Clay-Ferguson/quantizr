@@ -863,15 +863,15 @@ export class Edit {
         }
     }
 
-    showIpfsTab = () => {
-        dispatch("Action_showIpfsTab", (s: AppState): AppState => {
-            s.showIpfsTab = true;
-            setTimeout(() => {
-                S.tabUtil.selectTab(C.TAB_IPFSVIEW);
-            }, 250);
-            return s;
-        });
-    }
+    // showIpfsTab = () => {
+    //     dispatch("Action_showIpfsTab", (s: AppState): AppState => {
+    //         s.showIpfsTab = true;
+    //         setTimeout(() => {
+    //             S.tabUtil.selectTab(C.TAB_IPFSVIEW);
+    //         }, 250);
+    //         return s;
+    //     });
+    // }
 
     saveClipboardToChildNode = async (parentId: string): Promise<void> => {
         let clipText: string = await (navigator as any).clipboard.readText();

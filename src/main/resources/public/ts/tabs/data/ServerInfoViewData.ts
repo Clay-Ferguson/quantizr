@@ -5,7 +5,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import { ServerInfoView } from "../ServerInfoView";
 
 export class ServerInfoViewData implements TabIntf {
-    name = "Server Info";
+    name = "Info View";
     id = C.TAB_SERVERINFO;
     rsInfo = null;
     scrollPos = 0;

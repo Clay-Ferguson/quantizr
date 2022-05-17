@@ -207,6 +207,10 @@ export interface GetFollowingRequest extends RequestBase {
 export interface GetFriendsRequest extends RequestBase {
 }
 
+export interface GetIPFSContentRequest extends RequestBase {
+    id: string;
+}
+
 export interface GetIPFSFilesRequest extends RequestBase {
     folder: string;
 }
@@ -587,6 +591,10 @@ export interface GetFollowingResponse extends ResponseBase {
 
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
+}
+
+export interface GetIPFSContentResponse extends ResponseBase {
+    content: string;
 }
 
 export interface GetIPFSFilesResponse extends ResponseBase {

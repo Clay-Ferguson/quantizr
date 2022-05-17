@@ -90,7 +90,7 @@ export class MenuPanel extends Div {
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-    static toolsShowIpfsTab = () => S.edit.showIpfsTab();
+    // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
     static import = () => S.edit.openImportDlg(appState(null));
     static export = () => S.edit.openExportDlg(appState(null));
     static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
@@ -324,7 +324,7 @@ export class MenuPanel extends Div {
         }
 
         children.push(new Menu("Tools", [
-            new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
+            // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
@@ -443,7 +443,7 @@ export class MenuPanel extends Div {
             children.push(new Menu("Admin - Utils", [
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
-                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
+                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Info View", null, state)), //
                 new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", "Toggle Daemons", null, state)), //
                 new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", "Session Activity", null, state)), //
                 new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
