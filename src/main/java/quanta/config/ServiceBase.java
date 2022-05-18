@@ -37,6 +37,7 @@ import quanta.service.IPFSConfig;
 import quanta.service.IPFSDag;
 import quanta.service.IPFSFiles;
 import quanta.service.IPFSName;
+import quanta.service.IPFSKey;
 import quanta.service.IPFSObj;
 import quanta.service.IPFSPin;
 import quanta.service.IPFSPubSub;
@@ -153,6 +154,7 @@ public class ServiceBase {
 	public static IPFSObj ipfsObj;
 	public static IPFSDag ipfsDag;
 	public static IPFSName ipfsName;
+	public static IPFSKey ipfsKey;
 	public static IPFSRepo ipfsRepo;
 	public static IPFSSwarm ipfsSwarm;
 	public static IPFSConfig ipfsConfig;
@@ -235,6 +237,7 @@ public class ServiceBase {
 			ipfsObj = getBean(ctx, IPFSObj.class);
 			ipfsDag = getBean(ctx, IPFSDag.class);
 			ipfsName = getBean(ctx, IPFSName.class);
+			ipfsKey = getBean(ctx, IPFSKey.class);
 			ipfsRepo = getBean(ctx, IPFSRepo.class);
 			ipfsSwarm = getBean(ctx, IPFSSwarm.class);
 			ipfsConfig = getBean(ctx, IPFSConfig.class);

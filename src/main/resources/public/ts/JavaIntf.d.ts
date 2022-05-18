@@ -971,6 +971,7 @@ export const enum NodeProp {
     MFS_ENABLE = "sn:mfsEnable",
     USER_BIO = "sn:userBio",
     USER_DID_IPNS = "sn:didIPNS",
+    USER_IPFS_KEY = "sn:ipfsKey",
     USER_TAGS = "sn:tags",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",

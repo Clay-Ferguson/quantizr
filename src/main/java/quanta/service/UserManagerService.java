@@ -648,7 +648,6 @@ public class UserManagerService extends ServiceBase {
 				update.save(ms, userNode);
 				res.setSuccess(true);
 
-				// todo-1: more security here to verify web3 is enabled.
 				if (req.isPublish()) {
 					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
 				}
@@ -667,6 +666,22 @@ public class UserManagerService extends ServiceBase {
 		String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
 		exec.run(() -> {
 			arun.run(ms -> {
+				SubNode userNode = read.getNode(ms, userNodeId, false);
+				String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
+
+				// If we didn't already generate the key for this user, then generate one.
+				if (!sc.getRootId().equals(key)) {
+					// make sure there is an IPFS key with same name as user's root ID.
+					Map<String, Object> keyGenResult = ipfsKey.gen(ms, sc.getRootId());
+					if (no(keyGenResult)) {
+						log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
+						// return null;
+					} else {
+						userNode.set(NodeProp.USER_IPFS_KEY.s(), sc.getRootId());
+						log.debug("Key Gen Result: " + XString.prettyPrint(keyGenResult));
+					}
+				}
+
 				APODID did = new APODID(userName + "@" + prop.getMetaHost());
 				did.put("bio", bio);
 				did.put("displayName", displayName);
@@ -701,10 +716,9 @@ public class UserManagerService extends ServiceBase {
 				cid = pathStat.getHash();
 
 				log.debug("Publishing CID (root folder): " + cid);
-				Map<String, Object> ret = ipfsName.publish(ms, null, cid);
+				Map<String, Object> ret = ipfsName.publish(ms, sc.getRootId(), cid);
 				log.debug("Publishing complete!");
 
-				SubNode userNode = read.getNode(ms, userNodeId, false);
 				userNode.set(NodeProp.USER_DID_IPNS.s(), ret.get("Name"));
 				update.save(ms, userNode);
 

@@ -1477,6 +1477,7 @@ export class Util {
 
             // allow for everyone for now
             s.allowedFeatures = "web3"; // res.allowedFeatures;
+            // s.allowedFeatures = res.allowedFeatures;
 
             // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 

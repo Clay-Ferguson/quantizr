@@ -61,8 +61,9 @@ export class UserProfileDlg extends DialogBase {
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
 
         let web3Div: Div = null;
+        let web3Enabled = this.appState.allowedFeatures && this.appState.allowedFeatures.indexOf("web3") !== -1;
 
-        if (this.appState.allowedFeatures && this.appState.allowedFeatures.indexOf("web3") !== -1) {
+        if (web3Enabled) {
             let web3Comps: CompIntf[] = [];
 
             if (state.userProfile.didIPNS) {
@@ -172,7 +173,7 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    this.appState.isAnonUser || this.readOnly ? null : new Button("Publish Identity", this.publish, {
+                    (this.appState.isAnonUser || this.readOnly || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 
