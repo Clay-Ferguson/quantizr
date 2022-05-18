@@ -575,6 +575,12 @@ public class NodeEditService extends ServiceBase {
 		exec.run(() -> {
 			arun.run(as -> {
 				SubNode ownerNode = read.getNode(as, node.getOwner());
+
+				// only write out files if user has MFS enabled in their UserProfile
+				if (!ownerNode.getBool(NodeProp.MFS_ENABLE)) {
+					return null;
+				}
+
 				if (no(ownerNode)) {
 					throw new RuntimeException("Unable to find owner node.");
 				}
@@ -590,7 +596,7 @@ public class NodeEditService extends ServiceBase {
 
 				// If this gets to be too many files for IPFS to handle, we can always include a year and month, and that would probably
 				// at least create a viable system, proof-of-concept
-				String path = "/" + node.getName() + ".json";
+				String path = "/" + node.getName() + ".txt";
 
 				String mfsPath = pathBase + "/posts" + path;
 				// log.debug("Writing JSON to MFS Path: " + mfsPath);
@@ -610,7 +616,9 @@ public class NodeEditService extends ServiceBase {
 						node.setTags(null);
 					}
 
-					ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
+					// for now let's just write text
+					// ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
+					ipfsFiles.addFile(as, mfsPath, MediaType.TEXT_PLAIN_VALUE, node.getContent());
 				} finally {
 					// retore values after done with json serializing (do NOT use setter methods here)
 					node.mcid = mcid;
