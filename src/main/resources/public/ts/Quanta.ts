@@ -162,9 +162,9 @@ export class Quanta {
                     // console.log("keydown: " + event.code);
                     let state: AppState = store.getState();
 
-                    if (event.code.startsWith("Digit")) {
+                    if (event.code === "Backquote") {
                         if (this.ctrlKey) {
-                            S.util.addAnnotation(event.code);
+                            S.util.addAnnotation();
                         }
                     }
                     else {
@@ -174,7 +174,7 @@ export class Quanta {
                                 this.ctrlKeyTime = new Date().getTime();
                                 break;
                             case "Escape":
-                                S.util.removeAnnotations();
+                                S.util.removeAnnotation();
                                 if (S.util.fullscreenViewerActive(state)) {
                                     S.nav.closeFullScreenViewer(state);
                                 }

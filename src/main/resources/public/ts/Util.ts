@@ -1358,28 +1358,32 @@ export class Util {
         }, 400); // this val is in 3 places. put the TS two in a constants file.
     }
 
-    addAnnotation = (keyCode: string) => {
-        keyCode = this.replaceAll(keyCode, "Digit", "");
-        let d = document.createElement("div");
-
-        if (keyCode !== "0") {
-            let h = document.createElement("h3");
-            h.className = "annotationText";
-            let c: any = document.createTextNode(keyCode);
-            c.className = "annotationText";
-            h.appendChild(c);
-            d.appendChild(h);
+    addAnnotation = () => {
+        let text = window.prompt("Annotation Text:");
+        if (!text) {
+            return;
         }
-        d.className = "annotationCircle";
-        d.style.left = `${this.mouseX + 5}px`;
-        d.style.top = `${this.mouseY + 12}px`;
+
+        let d = document.createElement("div");
+        let h = document.createElement("h4");
+        h.className = "annotationText";
+        let c: any = document.createTextNode(text);
+        c.className = "annotationText";
+        h.appendChild(c);
+        d.appendChild(h);
+
+        d.className = "annotationBox";
+        d.style.left = `${this.mouseX}px`;
+        d.style.top = `${this.mouseY}px`;
         this.annotations.push(d);
         document.body.appendChild(d);
     }
 
-    removeAnnotations = () => {
-        this.annotations.forEach(d => d.parentElement.removeChild(d));
-        this.annotations = [];
+    removeAnnotation = () => {
+        if (this.annotations.length > 0) {
+            let e = this.annotations.pop();
+            e.parentElement.removeChild(e);
+        }
     }
 
     playAudioIfRequested = () => {

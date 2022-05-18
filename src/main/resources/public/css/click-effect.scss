@@ -5,25 +5,22 @@
 //     outline: 2px solid green;
 // }
 
-div.annotationCircle {
+div.annotationBox {
     position: fixed;
-    border-style: solid;
-    border-color: yellow;
-    border-radius: 50%;
+    background-color: yellow;
+    color: black;
+    border-radius: .8em;
 
     /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
        but arguably we can to with any super large z-index here to enxure always on top.
     */
     z-index: 16002000;
-    width: 3em; 
-    height: 3em;
-    transform: translate(-1.5em, -1.5em);
-    border-width: 5px;
 }
 
 .annotationText {
-    margin-left: .25em;
-    color: yellow;
+    margin: .2em;
+    color: black;
+    font-weight: bolder;
 }
 
 div.clickEffect {
@@ -45,7 +42,7 @@ div.clickEffect {
 
 @keyframes clickEffect {
     0% {
-        width: 0em; 
+        width: 0em; 
         height: 0em;
         transform: translate(0em, 0em);
         border-width: 0px;
