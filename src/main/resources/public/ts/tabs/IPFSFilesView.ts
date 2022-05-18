@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { dispatch } from "../AppRedux";
+import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
@@ -16,6 +16,7 @@ import { FilesTable } from "../comp/FilesTable";
 import { FilesTableCell } from "../comp/FilesTableCell";
 import { FilesTableRow } from "../comp/FilesTableRow";
 import { Constants as C } from "../Constants";
+import { ConfirmDlg } from "../dlg/ConfirmDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -199,11 +200,23 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 }, [
                     new Div(null, null, [
                         new Div(entry.Name, {
-                            onClick: () => {
+                            onClick: async () => {
                                 // if it's a file use ipfs.io to view it
                                 if (isFile) {
-                                    // window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
-                                    this.openFile(fullName, entry.Name, entry.Hash);
+                                    // if it's a text file we can open it
+                                    if (entry.Name.endsWith(".txt")) {
+                                        this.openFile(fullName, entry.Name, entry.Hash);
+                                    }
+                                    // otherwise instead if a download option (which we CAN do (todo-1), we just let users try it in ipfs.io if they want, to cross
+                                    // their fingers and hope for the best with the ProtocolLabs server.
+                                    else {
+                                        let state = store.getState();
+                                        let dlg: ConfirmDlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null, state);
+                                        await dlg.open();
+                                        if (dlg.yes) {
+                                            window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
+                                        }
+                                    }
                                 }
                                 // otherwise open the folder in our own viewer
                                 else {

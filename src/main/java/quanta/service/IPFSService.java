@@ -139,8 +139,8 @@ public class IPFSService extends ServiceBase {
     }
 
     /*
-     * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call it
-     * DOES pin the file
+     * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call
+     * it DOES pin the file
      */
     public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
             Val<Integer> streamSize, boolean wrapInFolder) {
@@ -194,23 +194,23 @@ public class IPFSService extends ServiceBase {
                 throw new RuntimeException("Failed. StatusCode: " + response.getStatusCode());
             }
 
-            MediaType contentType = response.getHeaders().getContentType();
+            // MediaType contentType = response.getHeaders().getContentType();
 
-            // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
+            log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
 
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                if (StringUtils.isEmpty(response.getBody())) {
-                    log.debug("no response body");
-                } else {
-                    String body = response.getBody();
-                    try {
-                        ret = XString.jsonMapper.readValue(body, MerkleLink.class);
-                    } catch (Exception e) {
-                        log.debug("Unable to parse response string: " + body);
-                    }
-
-                    // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
+            if (StringUtils.isEmpty(response.getBody())) {
+                log.debug("no response body");
+            } else {
+                String body = response.getBody();
+                try {
+                    ret = XString.jsonMapper.readValue(body, MerkleLink.class);
+                } catch (Exception e) {
+                    // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate that
+                    // until we design better around it, and return a null.
+                    // log.debug("Unable to parse response string: " + body);
                 }
+
+                // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
             }
 
             if (ok(streamSize)) {

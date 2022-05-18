@@ -146,6 +146,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 					wroteFile = true;
 				}
 			} else if ("pdf".equals(format)) {
+				// todo-0: We should have an OPTION to export ONLY and DIRECTLY to IPFS here, and
+				// not even write to a file.
 				out = new FileOutputStream(new File(fullFileName));
 
 				/*
@@ -162,11 +164,23 @@ public class ExportServiceFlexmark extends ServiceBase {
 					FileInputStream is = null;
 					try {
 						is = new FileInputStream(fullFileName);
-						String mime = "application/pdf";
-						MerkleLink ret = ipfs.addFromStream(ms, is, shortFileName, mime, null, false);
-						ipfs.writeIpfsExportNode(ms, ret.getHash(), mime, shortFileName, null);
 
-						res.setIpfsCid(ret.getHash());
+						String mime = "application/pdf";
+
+						//-----------------------------------------------------
+						// DO NOT DELETE
+						// ---------------
+						// this does the regular IPFS file add
+						// MerkleLink ret = ipfs.addFromStream(ms, is, shortFileName, mime, null, false);
+						// ipfs.writeIpfsExportNode(ms, ret.getHash(), mime, shortFileName, null);
+						// res.setIpfsCid(ret.getHash());
+						// ---------------
+						// But let's write to MFS now instead!
+						String mfsPath = "/" + ThreadLocals.getSC().getRootId() + "/exports/" + shortFileName;
+						ipfsFiles.addFileFromStream(ms, mfsPath, is, mime, null);
+						res.setIpfsCid("/exports/" + shortFileName);
+						// ----------------------------------------------------
+
 						res.setIpfsMime(mime);
 					} finally {
 						StreamUtil.close(is);

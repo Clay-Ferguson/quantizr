@@ -88,14 +88,17 @@ export class ExportDlg extends DialogBase {
         // disp=inline (is the other)
         let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
+        // Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, becasue we DO want all our exports to go to
+        // MFS but right now they aren't, and this is actually a pretty easy fix tho (todo-0)
+        let ipfsMessage = (res.ipfsCid && res.ipfsCid.endsWith(".pdf")) ? " You can also use the `IPFS Explorer` to view the IPFS copy of the file." : "";
+
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
-                "Export successful.<p>Use the download link below now, to get the file.",
+                "Export successful.<p>Use the download link below now, to get the file." + ipfsMessage,
                 "Export",
                 null,
                 new VerticalLayout([
-                    !res.ipfsCid ? new Anchor(downloadLink, "Download", { target: "_blank" }) : null,
-                    res.ipfsCid ? new Div("IPFS CID: " + res.ipfsCid, {
+                    res.ipfsCid ? new Div("IPFS Location: " + res.ipfsCid, {
                         className: "ipfsCidText",
                         title: "Click -> Copy to clipboard",
                         onClick: () => {
@@ -103,6 +106,7 @@ export class ExportDlg extends DialogBase {
                             S.util.flashMessage("Copied to Clipboard: " + res.ipfsCid, "Clipboard", true);
                         }
                     }) : null,
+                    new Anchor(downloadLink, "Download", { target: "_blank" }),
                     res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null
                 ]), false, 0, null, this.appState
             ).open();
