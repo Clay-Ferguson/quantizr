@@ -27,6 +27,7 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export class Util {
+    static annotationArrow: string = "tl"; // tl=top left, tr=top right, bl=bottom left, br=bottom right
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
@@ -1359,6 +1360,11 @@ export class Util {
     }
 
     addAnnotation = () => {
+        Util.annotationArrow = window.prompt("Annotation Location: tl,tr,bl,br");
+        if (!Util.annotationArrow) {
+            Util.annotationArrow = "tl";
+        }
+
         let text = window.prompt("Annotation Text:");
         if (!text) {
             return;
@@ -1444,8 +1450,27 @@ export class Util {
             elmnt.style.top = targY + "px";
 
             if (arrow) {
-                arrow.style.left = (targX + 15) + "px";
-                arrow.style.top = (targY - 10) + "px";
+                switch (Util.annotationArrow) {
+                    case "tl":
+                        arrow.style.left = (targX + 15) + "px";
+                        arrow.style.top = (targY - 10) + "px";
+                        break;
+                    case "tr":
+                        arrow.style.left = (targX + elmnt.clientWidth - 30) + "px";
+                        arrow.style.top = (targY - 10) + "px";
+                        break;
+                    case "bl":
+                        arrow.style.left = (targX + 15) + "px";
+                        arrow.style.top = (targY + elmnt.clientHeight - 1) + "px";
+                        arrow.className = "arrow-down";
+                        break;
+                    case "br":
+                        arrow.style.left = (targX + elmnt.clientWidth - 30) + "px";
+                        arrow.style.top = (targY + elmnt.clientHeight - 1) + "px";
+                        arrow.className = "arrow-down";
+                        break;
+                    default: break;
+                }
             }
         }
 
