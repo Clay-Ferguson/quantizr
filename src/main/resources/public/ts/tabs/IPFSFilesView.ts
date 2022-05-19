@@ -204,7 +204,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                 // if it's a file use ipfs.io to view it
                                 if (isFile) {
                                     // if it's a text file we can open it
-                                    if (entry.Name.endsWith(".txt")) {
+                                    if (entry.Name.endsWith(".txt") || entry.Name.endsWith(".json")) {
                                         this.openFile(fullName, entry.Name, entry.Hash);
                                     }
                                     // otherwise instead if a download option (which we CAN do (todo-1), we just let users try it in ipfs.io if they want, to cross
