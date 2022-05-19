@@ -27,7 +27,6 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export class Util {
-    static annotationArrow: string = "tl"; // tl=top left, tr=top right, bl=bottom left, br=bottom right
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
@@ -1324,11 +1323,14 @@ export class Util {
     */
     initClickEffect = () => {
         let clickEffect = (e) => {
-            let state = store.getState();
-            /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
-             and is apparently 0, 0, so we just check the sanity of the coordinates here */
-            if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
-            this.runClickAnimation(e.clientX, e.clientY);
+            // use a timeout so we can call 'getState()' without a react error.
+            setTimeout(() => {
+                let state = store.getState();
+                /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
+                 and is apparently 0, 0, so we just check the sanity of the coordinates here */
+                if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
+                this.runClickAnimation(e.clientX, e.clientY);
+            }, 10);
         };
         document.addEventListener("click", clickEffect);
     }
@@ -1360,9 +1362,9 @@ export class Util {
     }
 
     addAnnotation = () => {
-        Util.annotationArrow = window.prompt("Annotation Location: tl,tr,bl,br");
-        if (!Util.annotationArrow) {
-            Util.annotationArrow = "tl";
+        let arrowOption = window.prompt("Annotation Location: tl,tr,bl,br");
+        if (!arrowOption) {
+            arrowOption = "tl";
         }
 
         let text = window.prompt("Annotation Text:");
@@ -1388,6 +1390,7 @@ export class Util {
         d.className = "annotationBox";
         d.style.left = `${this.mouseX}px`;
         d.style.top = `${this.mouseY}px`;
+        d.setAttribute("arrowOption", arrowOption);
         this.annotations.push(d);
         this.annotations.push(a);
         document.body.appendChild(d);
@@ -1450,7 +1453,7 @@ export class Util {
             elmnt.style.top = targY + "px";
 
             if (arrow) {
-                switch (Util.annotationArrow) {
+                switch (elmnt.getAttribute("arrowOption")) {
                     case "tl":
                         arrow.style.left = (targX + 15) + "px";
                         arrow.style.top = (targY - 10) + "px";
