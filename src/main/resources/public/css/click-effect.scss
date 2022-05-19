@@ -9,7 +9,9 @@ div.annotationBox {
     position: fixed;
     background-color: yellow;
     color: black;
-    border-radius: .8em;
+    border-radius: 10px;
+    min-width: 50px;
+    max-width: 6000px;
 
     /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
        but arguably we can to with any super large z-index here to enxure always on top.
@@ -17,10 +19,49 @@ div.annotationBox {
     z-index: 16002000;
 }
 
+.arrow-up {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid yellow;
+}
+
+.arrow-down {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #f00;
+}
+
+.arrow-right {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-top: 60px solid transparent;
+    border-bottom: 60px solid transparent;
+    border-left: 60px solid green;
+}
+
+.arrow-left {
+    position: fixed;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid blue;
+}
+
 .annotationText {
-    margin: .2em;
     color: black;
     font-weight: bolder;
+    margin-top: 5px;
+    text-align: center;
+    margin: 0px;
+    padding: 5px;
 }
 
 div.clickEffect {
@@ -35,21 +76,21 @@ div.clickEffect {
        but arguably we can to with any super large z-index here to enxure always on top.
     */
     z-index: 16002000;
-    width: 0em; 
+    width: 0em;
     height: 0em;
     border-width: 0px;
 }
 
 @keyframes clickEffect {
     0% {
-        width: 0em; 
+        width: 0em;
         height: 0em;
         transform: translate(0em, 0em);
         border-width: 0px;
     }
 
     100% {
-        width: 5em; 
+        width: 5em;
         height: 5em;
         transform: translate(-2.5em, -2.5em);
         border-width: 7px;

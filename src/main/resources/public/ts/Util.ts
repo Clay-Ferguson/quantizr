@@ -1365,6 +1365,13 @@ export class Util {
         }
 
         let d = document.createElement("div");
+
+        let a = document.createElement("div");
+        a.className = "arrow-up";
+        a.style.left = `${this.mouseX + 15}px`;
+        a.style.top = `${this.mouseY - 10}px`;
+        document.body.appendChild(a);
+
         let h = document.createElement("h4");
         h.className = "annotationText";
         let c: any = document.createTextNode(text);
@@ -1376,19 +1383,23 @@ export class Util {
         d.style.left = `${this.mouseX}px`;
         d.style.top = `${this.mouseY}px`;
         this.annotations.push(d);
+        this.annotations.push(a);
         document.body.appendChild(d);
-        this.dragElement(d);
+        this.dragElement(d, a);
     }
 
     removeAnnotation = () => {
         if (this.annotations.length > 0) {
+            let a = this.annotations.pop();
+            a.parentElement.removeChild(a);
+
             let e = this.annotations.pop();
             e.parentElement.removeChild(e);
         }
     }
 
     // from here: https://www.w3schools.com/howto/howto_js_draggable.asp
-    dragElement(elmnt) {
+    dragElement(elmnt, arrow) {
         let pos1 = 0;
         let pos2 = 0;
         let pos3 = 0;
@@ -1408,11 +1419,11 @@ export class Util {
         function dragMouseDown(e) {
             e = e || window.event;
             e.preventDefault();
-            // get the mouse cursor position at startup:
+
             pos3 = e.clientX;
             pos4 = e.clientY;
             document.onmouseup = closeDragElement;
-            // call a function whenever the cursor moves:
+
             document.onmousemove = elementDrag;
             elmnt.style.cursor = "move";
         }
@@ -1420,14 +1431,22 @@ export class Util {
         function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
-            // calculate the new cursor position:
+
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
             pos3 = e.clientX;
             pos4 = e.clientY;
-            // set the element's new position:
-            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+
+            let targX = elmnt.offsetLeft - pos1;
+            let targY = elmnt.offsetTop - pos2;
+
+            elmnt.style.left = targX + "px";
+            elmnt.style.top = targY + "px";
+
+            if (arrow) {
+                arrow.style.left = (targX + 15) + "px";
+                arrow.style.top = (targY - 10) + "px";
+            }
         }
 
         function closeDragElement() {
