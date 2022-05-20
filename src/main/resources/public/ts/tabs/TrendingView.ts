@@ -14,18 +14,24 @@ import { TrendingRSInfo } from "../TrendingRSInfo";
 
 export class TrendingView extends AppTab {
 
-    loaded: boolean = false;
+    // todo-0: had a bug where this wasn't static and also the pubsub wasn't working right
+    // so look for other similar mistakes. the pub() below was originally subSingleOnce() when it was broken in this way.
+    static loaded: boolean = false;
 
     constructor(data: TabIntf) {
         super(data);
         data.inst = this;
 
-        PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {
-            if (tabName === this.data.id) {
+        // console.log("TrendingView Subscribing tabchange");
 
+        // the lifecyele of this pubsub is jank and needs to be tested (todo-0)
+        // need to check the flow of everywhere we're using any PubSub, and retest ALL pubsub
+        PubSub.sub(C.PUBSUB_tabChanging, (tabName: string) => {
+            // console.log("Tab Changing in TrendingView: " + tabName);
+            if (tabName === this.data.id) {
                 // only ever do this once, just to save CPU load on server.
-                if (this.loaded) return;
-                this.loaded = true;
+                if (TrendingView.loaded) return;
+                TrendingView.loaded = true;
                 this.refresh();
             }
         });

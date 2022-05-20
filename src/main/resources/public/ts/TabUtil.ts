@@ -148,6 +148,8 @@ export class TabUtil {
             return;
         }
 
+        // console.log("Sending tabChange event: " + newTab);
+
         // Log.log("Changing from tab: " + prevTab + " to " + newTab);
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }
