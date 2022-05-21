@@ -17,7 +17,7 @@ export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 # set to 'true' to activate IPFS
 export use_ipfs=
 
-export QUANTA_VER=1.0.25
+export QUANTA_VER=1.0.26
 
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 export PORT=8185

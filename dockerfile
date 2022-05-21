@@ -17,20 +17,18 @@ RUN echo "dummy" > /dev-resource-base/dummy.txt
 RUN mkdir -p /loader-path
 RUN echo "dummy" > /loader-path/dummy.txt
 
-WORKDIR /quanta
-
 EXPOSE ${PORT}
 EXPOSE ${PORT_DEBUG}
 EXPOSE 4001
 # Swarm UDP; should be exposed to the public
 EXPOSE 4001/udp
 
-COPY ${JAR_FILE} /quanta/app.jar
-RUN sh -c 'touch /quanta/app.jar' 
+COPY ${JAR_FILE} app.jar
+RUN sh -c 'touch app.jar' 
 
-COPY ./entrypoint.sh /quanta/entrypoint.sh
-RUN ["chmod", "+x", "/quanta/entrypoint.sh"]
-ENTRYPOINT ["/quanta/entrypoint.sh"]
+COPY ./entrypoint.sh entrypoint.sh
+RUN ["chmod", "+x", "entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 # I had this format for a long time, but then noticed IPFS container was failing finding /bin/bash so I moved to the simpler shell script command above
 # ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint.sh"]

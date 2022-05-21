@@ -58,6 +58,8 @@ fi
 echo ================================================
 echo Quanta Started OK!
 echo http://${quanta_domain}:${PORT}
+# todo-0: need to make this line use http v.s. https based on env var setting.
+echo To Test: curl -X POST  http://${quanta_domain}:${PORT}/mobile/api/ping -H "Accept: application/json" -H 'Content-Type: application/json' -d '{}'
 echo ================================================
 read -p "Press any key."
 

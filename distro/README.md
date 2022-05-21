@@ -12,6 +12,40 @@ NOTE: You should edit the password in `secrets.sh`, before your first run, becau
 
 So to reiterate, this Distro Zip contains everything needed to configure the app, and by default it will have the effect of using the Public Docker image as the executable to run. Below, "Option #2" describes how to run your own executable that you build yourself.
 
+## Troubleshooting 
+
+If something doesn't work, here's some tips to troubleshoot docker and the app:
+
+### Check to see what Docker has Running
+
+    docker ps
+
+Should show something like these two: 'subnode/repo:quanta1.0.26' and 'mongo:4.0'
+
+### Check Docker Images
+
+https://docs.docker.com/engine/reference/commandline/image_ls/
+
+    docker image ls --digests | grep "quanta"
+    docker image ls --digests | grep "mongo"
+    docker image ls --digests | grep "ipfs"
+
+### Inspect your Docker Repository
+
+    docker image inspect subnode/repo:quanta1.0.26
+
+The "RepoDigests" in the output should contain the same digest shown in the "hub.docker.com" website.
+
+### Check Docker Logs
+
+    docker logs quanta-distro
+
+### Try to Pull again. 
+
+Should tell you image is already up to date
+
+    docker image pull subnode/repo:quanta1.0.26
+    
 ## Option #2: Run from Locally-built Executable 
 
 If you want to run Quanta executable code you've built yourself, you'll still use a Distro Zip to create a configuration location and files (by just unzipping the Distro Zip into some folder), but after unzipping this Distro Zip you'll drop in the actual SpringBoot fat-jar file (that you built) onto the Distro Zip directory before running `run-distro.sh`. The scripts in the distro folder will automatically detect that the SpringBoot file exists (by looking for the `${JAR_FILE}` file named in the `setenv*.sh`), and if that JAR file (executable) is found then the script will automatically do a docker build that installs and runs from this local JAR file instead of the Public Docker Repository file.
