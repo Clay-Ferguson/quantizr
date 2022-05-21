@@ -374,7 +374,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Settings", [
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Show Node Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
             new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 
