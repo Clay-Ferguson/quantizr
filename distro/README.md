@@ -6,7 +6,11 @@ The easiest way to run Quanta is to run the Public Docker Repo image, without bu
 
 ## Option #1: Run from Public Docker Image
 
-To run a Quanta instance from the Docker Public Repository you can simply unzip the Distro Zip file (named like `./distro/quanta-1.0.25.tar.gz` in the github project files) onto an empty folder, and then start the app with `run-distro.sh`. This will create an instance running at `http://localhost:8185`. To stop the app run `stop-distro.sh`. The only prerequisite for this is `docker` and `docker-compose`.
+To run a Quanta instance from the Docker Public Repository you can simply unzip the Distro Zip file (named like `./distro/quanta-1.0.25.tar.gz`) onto an empty folder, and then start the app with `run-distro.sh`. This will create an instance running at `http://localhost:8185`. To stop the app run `stop-distro.sh`. The only prerequisite for this is that you have `docker` and `docker-compose` installed first. Also you should comment out the 'build' section from the YAML file (dc-distro-app.yaml) since you won't be duing the build. This means commenting out like the following:
+
+    # build: 
+    #    context: .
+    #    dockerfile: dockerfile
 
 NOTE: You should edit the password in `secrets.sh`, before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user, and the same password will also be the password securing your MongoDB instance. Also before you run the app you should probably at least look in the `setenv-*.sh` file, to see what configs are in there, and perhaps the docker-compose YAML file too, but they should all contain usable defaults right out of the box.
 

@@ -34,14 +34,14 @@ mkdir -p ${MONGO_SCRIPTS}
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.26
+export QUANTA_VER=1.0.29
 
 # Note: define-functions.sh is where we pass the ARGS into dockerfile
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 export PORT=8185
 export PORT_DEBUG=8000
 export XMS=512m
-export XMX=3g
+export XMX=2g
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGO_HOST=mongo-distro
