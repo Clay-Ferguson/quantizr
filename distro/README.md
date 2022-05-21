@@ -12,6 +12,8 @@ To run a Quanta instance from the Docker Public Repository you can simply unzip 
     #    context: .
     #    dockerfile: dockerfile
 
+NOTE: You may have to run with `sudo ./run-distro.sh` for now. I need for finalize the configs and instructions for how to run from a normal user.
+
 NOTE: You should edit the password in `secrets.sh`, before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user, and the same password will also be the password securing your MongoDB instance. Also before you run the app you should probably at least look in the `setenv-*.sh` file, to see what configs are in there, and perhaps the docker-compose YAML file too, but they should all contain usable defaults right out of the box.
 
 So to reiterate, this Distro Zip contains everything needed to configure the app, and by default it will have the effect of using the Public Docker image as the executable to run. Below, "Option #2" describes how to run your own executable that you build yourself.
