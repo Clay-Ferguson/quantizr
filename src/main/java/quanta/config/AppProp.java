@@ -56,18 +56,15 @@ public class AppProp {
 
 			synchronized (yamlMapper) {
 				try {
-					HashMap<String, Object> configMapInternal = readYamlInternal("config-text.yaml");
-					HashMap<String, Object> configMapExternal = readYamlExternal("config-text.yaml");
+					configMap = readYamlExternal("config-text.yaml");
 
-					/* For every key in internal set, override with the external val if found */
-					for (String key : configMapInternal.keySet()) {
-						Object val = configMapExternal.get(key);
-						if (ok(val)) {
-							configMapInternal.put(key, val);
-						}
+					// if we found the external config file in [deploy]/config/ folder then use it's contents
+					if (ok(configMap)) {
+						return configMap;
 					}
 
-					configMap = configMapInternal;
+					// otherwise use the internal version (internal to JAR)
+					configMap = readYamlInternal("config-text.yaml");
 				} catch (Exception e) {
 					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
@@ -122,10 +119,6 @@ public class AppProp {
 				if (file.isFile()) {
 					log.debug("Loading config from file system: " + fileName);
 					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
-				}
-
-				if (no(map)) {
-					map = new HashMap<>();
 				}
 			} catch (Exception e) {
 				ExUtil.error(log, "failed to load help-text.yaml", e);
