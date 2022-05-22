@@ -65,6 +65,10 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         topChildren.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
+                this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
+                    onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
+                    title: "Back to Node that was the source of this Feed"
+                }, "marginRight") : null,
                 this.renderHeading(state),
                 new Span(null, { className: "float-end" }, [
                     newItems,
@@ -81,22 +85,17 @@ export class FeedView extends AppTab<FeedViewProps> {
                     hasSearchField && this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
+                    showBookmarkIcon ? new IconButton("fa-bookmark", null, {
+                        title: "Bookmark this Chat Room",
+                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
+                    }) : null,
+
                     new HelpButton(() => state.config?.help?.fediverse?.feed),
 
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, null, state), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "attentionButton"),
-
-                    showBookmarkIcon ? new Icon({
-                        className: "fa fa-bookmark fa-lg clickable marginRight",
-                        title: "Bookmark Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
-                    }) : null,
-                    this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", "Back", {
-                        onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
-                        title: "Back to Node"
-                    }) : null
+                    }, "attentionButton")
                 ]),
                 new Clearfix()
             ]),
@@ -235,7 +234,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Feed (Chat Room)" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {

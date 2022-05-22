@@ -2057,7 +2057,7 @@ audio::-webkit-media-controls-play-button {
 
 .openGraphLhs {
     margin: 8px;
-    width: 20%;
+    width: 25%;
     // This min width is required when there are some crazy long strings in the RHS, and the browser
     // crowds out the left hand side smashin it down to zero size unless we give a min size.
     min-width: 100px;
@@ -2065,7 +2065,7 @@ audio::-webkit-media-controls-play-button {
 
 .openGraphRhs {
     margin: 8px;
-    width: 80%;
+    width: 75%;
     padding-left: 18px;
     padding-top: 10px;
 }

@@ -47,15 +47,13 @@ export abstract class ResultSetView extends AppTab {
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
-                this.renderHeading(state),
-
                 // include back button if we have a central node this panel is about.
-                this.data.rsInfo.node && this.showContentHeading ? new Span(null, { className: "float-end" }, [
-                    new IconButton("fa-arrow-left", "Back", {
+                this.data.rsInfo.node && this.showContentHeading
+                    ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.rsInfo.node.id),
-                        title: "Back to Node"
-                    })
-                ]) : null
+                        title: "Back to Node that was Searched"
+                    }, "marginRight") : null,
+                this.renderHeading(state)
             ]),
             content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null

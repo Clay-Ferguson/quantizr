@@ -49,7 +49,7 @@ export class TabPanelButtons extends Div {
 
         // slight hack until we have 'name' as a function and not a string.
         if (tabName === "Feed" && feedData?.props?.feedFilterRootNode) {
-            tabName = "Feed (Chat Room)";
+            tabName = "Chat Room";
         }
 
         return new Li(null, {
