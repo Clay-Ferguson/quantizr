@@ -345,7 +345,29 @@ public class MongoDelete extends ServiceBase {
 
 		// in async thread send out all the deletes to the foreign servers.
 		exec.run(() -> {
-			nodes.forEach(n -> apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n)));
+			nodes.forEach(n -> {
+				apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
+				BulkOperations childOps = null;
+
+				// Now Query the entire subgraph of this deleted node 'n'
+				for (SubNode child : read.getSubGraph(ms, n, null, 0, false, false)) {
+
+					apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
+					// lazy instantiate
+					if (no(childOps)) {
+						childOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+					}
+
+					Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
+					childOps.remove(query);
+				}
+
+				// deletes all nodes in this subgraph branch
+				if (ok(childOps)) {
+					BulkWriteResult results = childOps.execute();
+					log.debug("SubGraph of " + n.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
+				}
+			});
 		});
 
 		if (ok(bops)) {
