@@ -243,15 +243,16 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                         new Icon({
                             className: "fa fa-trash fa-lg clickable marginRight",
                             title: "Delete",
-                            // todo-0: need to add confirmation for this delete.
-                            onClick: () => { this.deleteItem(fullName); }
+                            onClick: async () => {
+                                let state = store.getState();
+                                let dlg: ConfirmDlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
+                                    "btn-danger", "alert alert-info", state);
+                                await dlg.open();
+                                if (dlg.yes) {
+                                    this.deleteItem(fullName);
+                                }
+                            }
                         })
-                        // I decided to just make clicking the filename do this...
-                        // new Icon({
-                        //     className: "fa fa-cog fa-lg clickable",
-                        //     title: "Open File",
-                        //     onClick: () => { this.openFile(fullName, entry.Name, entry.Hash); }
-                        // })
                     ]) : null
                 ]) : null
             ]);

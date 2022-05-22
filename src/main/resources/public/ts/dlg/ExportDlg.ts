@@ -88,8 +88,8 @@ export class ExportDlg extends DialogBase {
         // disp=inline (is the other)
         let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
-        // Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, becasue we DO want all our exports to go to
-        // MFS but right now they aren't, and this is actually a pretty easy fix tho (todo-0)
+        // todo-1: Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, becasue we DO want ALL types exports to
+        // be able to go to MFS, and it would be pretty easy to do what the PDFs are doing (recarding save to MFS) for all other types of exports.
         let ipfsMessage = (res.ipfsCid && res.ipfsCid.endsWith(".pdf")) ? " You can also use the `IPFS Explorer` to view the IPFS copy of the file." : "";
 
         if (S.util.checkSuccess("Export", res)) {

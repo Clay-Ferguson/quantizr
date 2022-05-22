@@ -12,6 +12,7 @@ export class AppTab<PropType = any> extends Div {
         });
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
+        // console.log("Constructed AppTab: " + data.id);
     }
 
     getClass = (state: AppState): string => {

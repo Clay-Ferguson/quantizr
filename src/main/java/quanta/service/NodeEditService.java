@@ -338,7 +338,7 @@ public class NodeEditService extends ServiceBase {
 						// set node to dirty only if it just changed.
 						ThreadLocals.dirty(node);
 
-						// todo-0: send undo to foreign server
+						// todo-1: send undo to foreign server
 						// if likes set is now empty make it null.
 						if (node.getLikes().size() == 0) {
 							node.setLikes(null);
