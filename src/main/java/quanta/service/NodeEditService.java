@@ -163,6 +163,11 @@ public class NodeEditService extends ServiceBase {
 				// we always determine the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(null, node, newNode);
 
+				// inherit UNPUBLISHED prop from parent.
+				if (node.getBool(NodeProp.UNPUBLISHED)) {
+					newNode.set(NodeProp.UNPUBLISHED.s(), true);
+				}
+
 				String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
 				if (ok(cipherKey)) {
 					res.setEncrypt(true);
@@ -287,6 +292,11 @@ public class NodeEditService extends ServiceBase {
 			} else {
 				// we always copy the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(null, parentNode, newNode);
+
+				// inherit UNPUBLISHED prop from parent.
+				if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
+					newNode.set(NodeProp.UNPUBLISHED.s(), true);
+				}
 			}
 		}
 

@@ -312,7 +312,9 @@ export class EditNodeDlg extends DialogBase {
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
                 !isPublic ? new IconButton("fa-globe", "Add Public", { onClick: () => { this.makePublic(state, true); } }, "btn-secondary marginLeft") : null,
-                unpublishedStr ? new Span(unpublishedStr, { className: "marginLeft" }) : null
+                unpublishedStr ? new Icon({
+                    className: "fa fa-eye-slash fa-lg marginLeft"
+                }) : null
             ]);
             sharingDivClearFix = new Clearfix();
         }
