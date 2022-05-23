@@ -593,12 +593,34 @@ public class MongoRead extends ServiceBase {
         auth.auth(ms, node, PrivilegeType.READ);
 
         // todo-2: research if there's a way to query for just one, rather than simply
-        // callingfindOne at the end? What's best practice here?
+        // calling findOne at the end? What's best practice here?
         Query q = new Query();
         Criteria crit = MongoRepository.PARENT_OPTIMIZATION && ok(node.getId()) ? //
                 Criteria.where(SubNode.PARENT).is(node.getId())
                 : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
+        q.addCriteria(crit);
+
+        // for 'findOne' is it also advantageous to also setup the query criteria with
+        // something like LIMIT=1 (sql)?
+        SubNode nodeFound = mongoUtil.findOne(q);
+        if (no(nodeFound)) {
+            return 0L;
+        }
+        return nodeFound.getOrdinal();
+    }
+
+    @PerfMon(category = "read")
+    public Long getMinChildOrdinal(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
+
+        // todo-2: research if there's a way to query for just one, rather than simply
+        // calling findOne at the end? What's best practice here?
+        Query q = new Query();
+        Criteria crit = MongoRepository.PARENT_OPTIMIZATION && ok(node.getId()) ? //
+                Criteria.where(SubNode.PARENT).is(node.getId())
+                : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
         // for 'findOne' is it also advantageous to also setup the query criteria with

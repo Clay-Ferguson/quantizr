@@ -26,6 +26,11 @@ import quanta.mongo.model.SubNode;
  */
 @Component
 public class MongoCreate extends ServiceBase {
+	// this large top reserve size means the "insert at top" will always be done with out multiple node
+	// updates
+	// except for once every thousand times.
+	private static long RESERVE_BLOCK_SIZE = 1000;
+
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
@@ -114,14 +119,13 @@ public class MongoCreate extends ServiceBase {
 	private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal) {
 		switch (location) {
 			case FIRST:
-				ordinal = 0L;
-				create.insertOrdinal(ms, parent, 0L, 1L);
+				ordinal = create.insertOrdinal(ms, parent, 0L, 1L);
 				break;
 			case LAST:
 				ordinal = read.getMaxChildOrdinal(ms, parent) + 1;
 				break;
 			case ORDINAL:
-				create.insertOrdinal(ms, parent, ordinal, 1L);
+				ordinal = create.insertOrdinal(ms, parent, ordinal, 1L);
 				break;
 			default:
 				throw new RuntimeException("Unknown ordinal");
@@ -135,10 +139,43 @@ public class MongoCreate extends ServiceBase {
 	 * Shifts all child ordinals down (increments them by rangeSize), that are >= 'ordinal' to make a
 	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
+	 * 
+	 * Example: Inserting at top will normally send the ordinal in that's the same as the current TOP
+	 * ordinal, so the new node will occupy that slot and everythnig else shifts down.
+	 * 
+	 * Returns the ordinal we actually ended up freeing up for use.
 	 */
 	@PerfMon(category = "create")
-	public void insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
-		long maxOrdinal = ordinal + rangeSize;
+	public long insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
+		long minOrdinal = read.getMinChildOrdinal(ms, node);
+
+		// default new ordinal to ordinal
+		long newOrdinal = ordinal;
+		/*
+		 * We detect the special case where we're attempting to insert at 'top' ordinals and if we find room
+		 * to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
+		 * leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
+		 * 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we end
+		 * up trying to insert above it.
+		 */
+
+		// if we're inserting a single node
+		if (rangeSize == 1) {
+			// if the target ordinal is at or below the current minimum
+			if (ordinal <= minOrdinal) {
+				// if we have space below the current minimum we can just use it
+				if (minOrdinal > 0) {
+					log.debug("Found good ordinal: " + (minOrdinal - 1));
+					return minOrdinal - 1;
+				}
+				// else minOrdinal is already at zero so we insert a new block, and then let
+				// "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now
+				else {
+					rangeSize = RESERVE_BLOCK_SIZE;
+					newOrdinal = RESERVE_BLOCK_SIZE - 1;
+				}
+			}
+		}
 
 		auth.auth(ms, node, PrivilegeType.READ);
 
@@ -166,7 +203,7 @@ public class MongoCreate extends ServiceBase {
 			}
 
 			Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
-			Update update = new Update().set(SubNode.ORDINAL, maxOrdinal++);
+			Update update = new Update().set(SubNode.ORDINAL, child.getOrdinal() + rangeSize);
 			bops.updateOne(query, update);
 		}
 
@@ -174,5 +211,7 @@ public class MongoCreate extends ServiceBase {
 			BulkWriteResult results = bops.execute();
 			// log.debug("Bulk Ordinal: updated " + results.getModifiedCount() + " nodes.");
 		}
+
+		return newOrdinal;
 	}
 }

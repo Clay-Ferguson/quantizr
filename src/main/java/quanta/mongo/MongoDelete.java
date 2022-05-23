@@ -351,8 +351,14 @@ public class MongoDelete extends ServiceBase {
 
 				// Now Query the entire subgraph of this deleted node 'n'
 				for (SubNode child : read.getSubGraph(ms, n, null, 0, false, false)) {
+					/*
+					 * NOTE: Disabling this ability to recursively delete from foreign servers because I'm not sure they
+					 * won't interpret that as a DDOS attack if this happens to be a large delete underway. This will
+					 * take some thought, to engineer where perhaps we limit to just 10, and do them over a period of 10
+					 * minutes even, and that kind of thing, but for now we can just get by without this capability
+					 */
+					// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
 
-					apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
 					// lazy instantiate
 					if (no(childOps)) {
 						childOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);

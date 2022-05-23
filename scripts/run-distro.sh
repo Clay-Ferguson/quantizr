@@ -58,7 +58,7 @@ fi
 echo ================================================
 echo Quanta Started OK!
 echo http://${quanta_domain}:${PORT}
-echo To Test: curl -X POST  http://${quanta_domain}:${PORT}/mobile/api/ping -H "Accept: application/json" -H 'Content-Type: application/json' -d '{}'
+echo To Test: curl -X POST  http://${quanta_domain}:${PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
 echo ================================================
 read -p "Press any key."
 

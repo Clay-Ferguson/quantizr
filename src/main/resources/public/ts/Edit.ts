@@ -997,7 +997,7 @@ export class Edit {
             nodeId,
             newNodeName: "",
             typeName: J.NodeType.NONE,
-            createAtTop: false,
+            createAtTop: true,
             content,
             typeLock: false,
             properties: null,

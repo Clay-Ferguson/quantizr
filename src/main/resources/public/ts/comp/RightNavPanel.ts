@@ -84,8 +84,12 @@ export class RightNavPanel extends Div {
 
         let addNoteButton = !state.isAnonUser ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
-            onClick: e => {
-                S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu->Tree->Notes)"), state);
+            onClick: async (e) => {
+                let content = null;
+                if (S.util.ctrlKeyCheck()) {
+                    content = await (navigator as any).clipboard.readText();
+                }
+                S.edit.addNode("~" + J.NodeType.NOTES, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), state);
             },
             title: "Create new Private Note"
         }) : null;
