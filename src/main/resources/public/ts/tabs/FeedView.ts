@@ -159,7 +159,9 @@ export class FeedView extends AppTab<FeedViewProps> {
         else if (this.data.props.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
             if (state.activeTab === C.TAB_FEED) {
-                setTimeout(S.srch.refreshFeed, 100);
+                setTimeout(() => {
+                    S.srch.refreshFeed();
+                }, 100);
             }
             else {
                 children.push(new Heading(4, "Refresh when ready."));

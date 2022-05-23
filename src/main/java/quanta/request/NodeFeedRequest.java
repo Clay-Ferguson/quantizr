@@ -19,6 +19,7 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean nsfw;
 
 	private String searchText;
+	private boolean applyAdminBlocks;
 
 	public String getNodeId() {
 		return nodeId;
@@ -98,5 +99,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setToUser(String toUser) {
 		this.toUser = toUser;
+	}
+
+	public boolean isApplyAdminBlocks() {
+		return applyAdminBlocks;
+	}
+
+	public void setApplyAdminBlocks(boolean applyAdminBlocks) {
+		this.applyAdminBlocks = applyAdminBlocks;
 	}
 }

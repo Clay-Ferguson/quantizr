@@ -343,6 +343,7 @@ export interface NodeFeedRequest extends RequestBase {
     localOnly: boolean;
     nsfw: boolean;
     searchText: string;
+    applyAdminBlocks: boolean;
 }
 
 export interface NodeSearchRequest extends RequestBase {

@@ -23,6 +23,7 @@ export class FeedViewData implements TabIntf {
         feedFilterToUser: null,
         feedFilterToPublic: true,
         feedFilterLocalServer: false,
+        applyAdminBlocks: true,
 
         /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
          for any non-node specific feed query this stays null. */

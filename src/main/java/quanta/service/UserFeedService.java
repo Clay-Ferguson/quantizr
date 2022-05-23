@@ -219,7 +219,7 @@ public class UserFeedService extends ServiceBase {
 			 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
 			 * removed from it.
 			 */
-			if (req.getToPublic()) {
+			if (req.getToPublic() && req.isApplyAdminBlocks()) {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 			}
 

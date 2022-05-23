@@ -90,7 +90,8 @@ export class NodeStatsDlg extends DialogBase {
                 feedFilterToPublic: true,
                 feedFilterLocalServer: false,
                 feedFilterRootNode: null,
-                feedResults: null
+                feedResults: null,
+                applyAdminBlocks: true
             });
         }
         else {

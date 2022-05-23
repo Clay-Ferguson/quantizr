@@ -19,4 +19,5 @@ export interface FeedViewProps {
     feedEndReached?: boolean;
     feedDirtyList?: boolean;
     filterExpanded?: boolean;
+    applyAdminBlocks?: boolean;
 }

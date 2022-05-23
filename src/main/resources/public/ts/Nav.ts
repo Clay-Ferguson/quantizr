@@ -381,7 +381,8 @@ export class Nav {
                     feedFilterToPublic: true,
                     feedFilterLocalServer: true,
                     feedFilterRootNode: node,
-                    feedResults: null
+                    feedResults: null,
+                    applyAdminBlocks: false
                 });
             }, 500);
         }
@@ -414,7 +415,8 @@ export class Nav {
                 feedFilterToPublic: true,
                 feedFilterLocalServer: true,
                 feedFilterRootNode: res.node,
-                feedResults: null
+                feedResults: null,
+                applyAdminBlocks: false
             });
         }
     }
@@ -498,6 +500,9 @@ export class Nav {
             return;
         }
 
+        // we need to go ahead and boost the refresh counter to avoid it doing a double query.
+        feedData.props.refreshCounter++;
+
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
@@ -505,9 +510,14 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             feedData.props = { ...feedData.props, ...props };
+
+            // console.log("feedData.props=" + S.util.prettyPrint(feedData.props));
             return s;
         });
-        setTimeout(S.srch.refreshFeed, 10);
+
+        setTimeout(() => {
+            S.srch.refreshFeed();
+        }, 10);
     }
 
     showMyNewMessages = (): void => {
@@ -519,7 +529,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -532,7 +543,8 @@ export class Nav {
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: true
         });
     }
 
@@ -578,7 +590,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -595,7 +608,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -613,7 +627,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -630,7 +645,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -647,7 +663,8 @@ export class Nav {
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -664,7 +681,8 @@ export class Nav {
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
@@ -683,10 +701,12 @@ export class Nav {
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
             feedFilterRootNode: hltNode,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: false
         });
     }
 
+    // todo-0: First time user runs this query it hits the server TWICE.
     messagesFediverse = () => {
         let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
@@ -700,7 +720,8 @@ export class Nav {
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
-            feedResults: null
+            feedResults: null,
+            applyAdminBlocks: true
         });
     }
 }

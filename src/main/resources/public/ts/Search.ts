@@ -288,6 +288,9 @@ export class Search {
         if (!feedData) {
             return;
         }
+
+        // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
+
         // console.log("Getting results page=" + page);
         let res: J.NodeFeedResponse = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
@@ -299,7 +302,8 @@ export class Search {
             localOnly: feedData.props.feedFilterLocalServer,
             fromFriends: feedData.props.feedFilterFriends,
             nsfw: appState.userPreferences.nsfw,
-            searchText
+            searchText,
+            applyAdminBlocks: feedData.props.applyAdminBlocks
         });
 
         dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
