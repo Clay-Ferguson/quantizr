@@ -199,10 +199,6 @@ export class MenuPanel extends Div {
         // These options will appear on the RHS for desktop mode
         if (state.mobileMode) {
             children.push(new Menu("Feed" + messagesSuffix, [
-                // This works, but will confuse users. Lets make them just create a "Chat Type" node and think of that as their chat room
-                // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
-                // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
-                // new MenuItemSeparator(), //
                 new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
                 new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
                 new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
@@ -305,6 +301,9 @@ export class MenuPanel extends Div {
         ], null, this.makeHelpIcon(":menu-search")));
 
         children.push(new Menu("Timeline", [
+            // todo-1: need to see if this is easy to turn on for non-logged in users.
+            new MenuItem("Live Rev-Chron (Chat Room)", () => S.nav.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
+            new MenuItemSeparator(), //
             new MenuItem("Created", MenuPanel.timelineByCreated, !state.isAnonUser && !!hltNode), //
             new MenuItem("Modified", MenuPanel.timelineByModified, !state.isAnonUser && !!hltNode), //
             new MenuItemSeparator(), //

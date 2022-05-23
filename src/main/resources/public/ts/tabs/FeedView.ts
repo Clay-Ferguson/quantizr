@@ -90,7 +90,8 @@ export class FeedView extends AppTab<FeedViewProps> {
                         onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
                     }) : null,
 
-                    new HelpButton(() => state.config?.help?.fediverse?.feed),
+                    // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
+                    // new HelpButton(() => state.config?.help?.fediverse?.feed),
 
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, null, state), {

@@ -39,15 +39,24 @@ export class FeedViewData implements TabIntf {
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
     getTabSubOptions = (state: AppState): Div => {
-        return !state.isAnonUser
-            ? new Div(null, { className: "tabSubOptions" }, [
-                new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
-                new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
-                new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
-                new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
-                // We need to make this a configurable option.
-                // new MenuItem("From Local Users", S.nav.messagesLocal),
-                new Div("Federated", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
-            ]) : null;
+        if (this.props?.feedFilterRootNode) {
+            return !state.isAnonUser
+                ? new Div(null, { className: "tabSubOptions" }, [
+                    // we close chat by swithing user back to the Fediverse view.
+                    new Div("Close Chat", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                ]) : null;
+        }
+        else {
+            return !state.isAnonUser
+                ? new Div(null, { className: "tabSubOptions" }, [
+                    new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
+                    new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
+                    new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
+                    new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
+                    // We need to make this a configurable option.
+                    // new MenuItem("From Local Users", S.nav.messagesLocal),
+                    new Div("Federated", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                ]) : null;
+        }
     };
 }
