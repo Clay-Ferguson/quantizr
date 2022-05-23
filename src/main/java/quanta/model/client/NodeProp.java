@@ -200,6 +200,9 @@ public enum NodeProp {
     DATE("date", "s"), //
     DATE_FULL("p.date", "s"), //
 
+    // nodes that contain this property are not published to ActPub servers and not allowed to show up in feeds.
+    UNPUBLISHED("unpub", "s"), //
+
     DURATION("duration", "s");
 
     @JsonValue

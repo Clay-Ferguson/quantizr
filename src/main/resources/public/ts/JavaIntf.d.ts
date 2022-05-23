@@ -451,6 +451,11 @@ export interface SetNodePositionRequest extends RequestBase {
     targetName: string;
 }
 
+export interface SetUnpublishedRequest extends RequestBase {
+    nodeId: string;
+    unpublished: boolean;
+}
+
 export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
@@ -614,6 +619,7 @@ export interface GetNodeMetaInfoResponse extends ResponseBase {
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
     owners: string[];
+    unpublished: boolean;
 }
 
 export interface GetNodeStatsResponse extends ResponseBase {
@@ -804,6 +810,9 @@ export interface SetCipherKeyResponse extends ResponseBase {
 }
 
 export interface SetNodePositionResponse extends ResponseBase {
+}
+
+export interface SetUnpublishedResponse extends ResponseBase {
 }
 
 export interface SignupResponse extends ResponseBase {
@@ -1020,6 +1029,7 @@ export const enum NodeProp {
     TYPE_LOCK = "sn:typLoc",
     DATE = "date",
     DATE_FULL = "p.date",
+    UNPUBLISHED = "unpub",
     DURATION = "duration",
 }
 

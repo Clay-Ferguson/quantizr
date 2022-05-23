@@ -43,6 +43,23 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
+                new Checkbox("Unpublished", null, {
+                    setValue: async (checked: boolean): Promise<void> => {
+                        let state: LS = this.getState<LS>();
+                        this.dirty = true;
+                        state.nodePrivsInfo.unpublished = checked;
+                        await S.util.ajax<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
+                            nodeId: this.node.id,
+                            unpublished: checked
+                        });
+
+                        this.mergeState<LS>({ nodePrivsInfo: state.nodePrivsInfo });
+                        return null;
+                    },
+                    getValue: (): boolean => {
+                        return state.nodePrivsInfo.unpublished;
+                    }
+                }),
                 new Checkbox("Apply to all children (that you own)", null, {
                     setValue: (checked: boolean): void => {
                         this.mergeState<LS>({ recursive: checked });
@@ -111,9 +128,8 @@ export class SharingDlg extends DialogBase {
 
     public close(): void {
         super.close();
-        if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
+        if (this.dirty) {
             // console.log("Sharing dirty=true. Full refresh pending.");
-
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
                     let res: J.CopySharingResponse = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {

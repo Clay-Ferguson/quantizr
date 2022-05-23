@@ -204,6 +204,9 @@ public class UserFeedService extends ServiceBase {
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null);
 		}
 
+		// Don't show UNPUBLISHED nodes.
+		crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
+
 		/*
 		 * Save the 'string' representations for blocked user ids for use below, to mask out places where
 		 * users may be following a user that will effectively be blocked

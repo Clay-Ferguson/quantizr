@@ -32,11 +32,13 @@ import quanta.request.CopySharingRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.SetCipherKeyRequest;
+import quanta.request.SetUnpublishedRequest;
 import quanta.response.AddPrivilegeResponse;
 import quanta.response.CopySharingResponse;
 import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
+import quanta.response.SetUnpublishedResponse;
 import quanta.util.ExUtil;
 import quanta.util.XString;
 
@@ -56,6 +58,8 @@ public class AclService extends ServiceBase {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
+
+		res.setUnpublished(node.getBool(NodeProp.UNPUBLISHED));
 
 		if (!req.isIncludeAcl() && !req.isIncludeOwners()) {
 			throw ExUtil.wrapEx("no specific information requested for getNodePrivileges");
@@ -81,6 +85,8 @@ public class AclService extends ServiceBase {
 		SubNode node = read.getNode(ms, req.getNodeId());
 		BulkOperations bops = null;
 
+		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
+
 		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
 
 			// lazy instantiate
@@ -88,13 +94,18 @@ public class AclService extends ServiceBase {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
 
-			auth.ownerAuth(ms, n);
+			try {
+				auth.ownerAuth(ms, n);
+				n.set(NodeProp.UNPUBLISHED.s(), unpublished ? unpublished : null);
 
-			Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
-			// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
+				Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+				// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
 
-			Update update = new Update().set(SubNode.AC, node.getAc());
-			bops.updateOne(query, update);
+				Update update = new Update().set(SubNode.AC, node.getAc()).set(SubNode.PROPS, n.getProps());
+				bops.updateOne(query, update);
+			} catch (Exception e) {
+				// not an error, we just can't properties on nodes we don't own, so we skip them
+			}
 		}
 
 		if (ok(bops)) {
@@ -118,6 +129,21 @@ public class AclService extends ServiceBase {
 
 		boolean success = addPrivilege(ms, null, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
+		return res;
+	}
+
+	/*
+	 * Adds or updates a new privilege to a node
+	 */
+	public SetUnpublishedResponse setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
+		SetUnpublishedResponse res = new SetUnpublishedResponse();
+
+		String nodeId = req.getNodeId();
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
+		node.set(NodeProp.UNPUBLISHED.s(), req.isUnpublished() ? true : null);
+
+		res.setSuccess(true);
 		return res;
 	}
 

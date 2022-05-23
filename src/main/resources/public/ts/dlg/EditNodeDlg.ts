@@ -44,7 +44,7 @@ import { SelectTagsDlg } from "./SelectTagsDlg";
  */
 export class EditNodeDlg extends DialogBase {
 
-    static pendingUploadFile: File = null;f
+    static pendingUploadFile: File = null;
     utl: EditNodeDlgUtil = new EditNodeDlgUtil();
 
     static embedInstance: EditNodeDlg;
@@ -302,6 +302,7 @@ export class EditNodeDlg extends DialogBase {
 
         let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node, this);
         let isPublic = S.props.isPublic(state.node);
+        let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
@@ -310,7 +311,8 @@ export class EditNodeDlg extends DialogBase {
             }, [
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
-                !isPublic ? new IconButton("fa-globe", "Add Public", { onClick: () => { this.makePublic(state, true); } }, "btn-secondary marginLeft") : null
+                !isPublic ? new IconButton("fa-globe", "Add Public", { onClick: () => { this.makePublic(state, true); } }, "btn-secondary marginLeft") : null,
+                unpublishedStr ? new Span(unpublishedStr, { className: "marginLeft" }) : null
             ]);
             sharingDivClearFix = new Clearfix();
         }
@@ -339,7 +341,8 @@ export class EditNodeDlg extends DialogBase {
                 nodeNameTextField,
                 this.createPrioritySelection()
             ]),
-            flowPanel
+            flowPanel,
+            propsCollapsablePanel
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
@@ -365,7 +368,7 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons, propsCollapsablePanel, new Clearfix()]);
+        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons, new Clearfix()]);
         return children;
     }
 

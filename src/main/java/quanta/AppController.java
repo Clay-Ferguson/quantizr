@@ -117,6 +117,7 @@ import quanta.request.SendLogTextRequest;
 import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetNodePositionRequest;
+import quanta.request.SetUnpublishedRequest;
 import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
@@ -667,6 +668,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("addPrivilege", req, session, ms -> {
 			return acl.addPrivilege(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/setUnpublished", method = RequestMethod.POST)
+	public @ResponseBody Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("setUnpublished", req, session, ms -> {
+			return acl.setUnpublished(ms, req);
 		});
 	}
 

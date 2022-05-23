@@ -544,9 +544,12 @@ strong em {
 }
 
 .propsPanelExpanded {
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .propsPanelCollapsed {
+    margin-top: $smallGap;
     margin-bottom: $smallGap;
 }
 

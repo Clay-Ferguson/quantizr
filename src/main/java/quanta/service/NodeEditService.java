@@ -542,9 +542,13 @@ public class NodeEditService extends ServiceBase {
 					String nodeUrl = snUtil.getIdBasedUrl(node);
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 
-					// This broadcasts out to the shared inboxes of all the followers of the user
-					apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments, node.getContent(),
-							nodeUrl);
+					// if there's an unpublished property then we don't send out over ActPub
+					if (no(node.getBool(NodeProp.UNPUBLISHED)) || !node.getBool(NodeProp.UNPUBLISHED)) {
+						// This broadcasts out to the shared inboxes of all the followers of the user
+						apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
+								node.getContent(), nodeUrl);
+					}
+
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}
 
@@ -587,14 +591,17 @@ public class NodeEditService extends ServiceBase {
 
 				String pathBase = "/" + userNodeId;
 
-				// **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files, for a tree on a user's MFS area
-				// but what we do instead is take the NAME of the node, and use that is the filename, and write directly into '[user]/posts/[name]' loation
+				// **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files,
+				// for a tree on a user's MFS area
+				// but what we do instead is take the NAME of the node, and use that is the filename, and write
+				// directly into '[user]/posts/[name]' loation
 				// // make the path of the node relative to the owner by removing the part of the path that is
 				// // the user's root node path
 				// String path = node.getPath().replace(ownerNode.getPath(), "");
 				// path = folderizePath(path);
 
-				// If this gets to be too many files for IPFS to handle, we can always include a year and month, and that would probably
+				// If this gets to be too many files for IPFS to handle, we can always include a year and month, and
+				// that would probably
 				// at least create a viable system, proof-of-concept
 				String path = "/" + node.getName() + ".txt";
 
@@ -648,8 +655,8 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	/*
-	 * Since Quanta stores nodes under other nodes, and file systems are not capable of doing this we have to
-	 * convert names to folders by putting a "-f" on them before writing to MFS
+	 * Since Quanta stores nodes under other nodes, and file systems are not capable of doing this we
+	 * have to convert names to folders by putting a "-f" on them before writing to MFS
 	 */
 	private String folderizePath(String path) {
 		List<String> nameTokens = XString.tokenize(path, "/", true);
