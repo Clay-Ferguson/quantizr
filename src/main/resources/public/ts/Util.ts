@@ -581,7 +581,8 @@ export class Util {
                     status = error.response ? error.response.status : "";
 
                     if (!background) {
-                        this.showMessage("Failed: " + status + " " + (error.message || ""), "Warning", true);
+                        console.error("Failed: " + status + " " + (error.message || ""));
+                        this.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
