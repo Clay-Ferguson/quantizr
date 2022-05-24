@@ -11,6 +11,10 @@ export class NotesNodeTypeHandler extends TypeBase {
         super(J.NodeType.NOTES, "Notes", "fa-sticky-note", false);
     }
 
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
+
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new Heading(4, "Notes", {

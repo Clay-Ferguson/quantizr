@@ -15,6 +15,9 @@ import { NodeCompRow } from "./NodeCompRow";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompVerticalRowLayout extends Div {
+    // I'm hiding this becasue it just doesn't make much sense for users to see these on their tree
+    // unless they specifically navigate to them.
+    static showSpecialNodes = false;
 
     constructor(public node: J.NodeInfo, private tabData: TabIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super();
@@ -63,10 +66,12 @@ export class NodeCompVerticalRowLayout extends Div {
                          because if the user wants their Account root laid out in a grid just let them do that and show everything
                          without doing any collapsedComps. */
                         if (typeHandler && typeHandler.isSpecialAccountNode()) {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, true, state);
+                            if (NodeCompVerticalRowLayout.showSpecialNodes || state.isAdminUser) {
+                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, true, state);
 
-                            // I'm gonna be evil here and do this object without a type.
-                            collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
+                                // I'm gonna be evil here and do this object without a type.
+                                collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
+                            }
                         }
                         else {
                             row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, state);
@@ -147,7 +152,7 @@ export class NodeCompVerticalRowLayout extends Div {
             // put them in subOrdinal order on the page.
             collapsedComps.sort((a: any, b: any) => a.subOrdinal - b.subOrdinal);
 
-            comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (s: boolean) => {
+            comps.push(new CollapsiblePanel("Hidden Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (s: boolean) => {
                 state.otherAccountNodesExpanded = s;
             }, state.otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel", ""));
         }

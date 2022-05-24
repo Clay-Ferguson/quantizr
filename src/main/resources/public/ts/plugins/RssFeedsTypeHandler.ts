@@ -17,6 +17,10 @@ export class RssFeedsTypeHandler extends TypeBase {
         super(J.NodeType.RSS_FEEDS, "RSS Feeds", "fa-rss", false);
     }
 
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case NodeActionType.delete:
