@@ -706,7 +706,6 @@ export class Nav {
         });
     }
 
-    // todo-0: First time user runs this query it hits the server TWICE.
     messagesFediverse = () => {
         let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
