@@ -115,6 +115,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     }, "btn-secondary plusButtonFloatRight")
                 ]));
 
+                // todo-0: document this in tips and tricks
                 S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     const data = evt.dataTransfer.items;
                     for (let i = 0; i < data.length; i++) {

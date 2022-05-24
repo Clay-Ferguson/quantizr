@@ -316,7 +316,6 @@ export class NodeUtil {
             includeOwners: true
         });
 
-        debugger;
         if (editorDlg) {
             let state = editorDlg.getState();
             state.node.ac = res.aclEntries;

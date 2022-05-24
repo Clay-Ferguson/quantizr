@@ -62,6 +62,7 @@ export class SharingDlg extends DialogBase {
                 }),
                 new Checkbox("Apply to all children (that you own)", null, {
                     setValue: (checked: boolean): void => {
+                        this.dirty = true;
                         this.mergeState<LS>({ recursive: checked });
                     },
                     getValue: (): boolean => {

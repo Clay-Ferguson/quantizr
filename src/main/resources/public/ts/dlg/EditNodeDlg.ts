@@ -107,7 +107,9 @@ export class EditNodeDlg extends DialogBase {
             setTimeout(async () => {
                 await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
                 EditNodeDlg.pendingUploadFile = null;
-                this.save();
+
+                // Let's not save automatically, so user can enter text if they want.
+                // this.save();
             }, 250);
         }
     }

@@ -317,7 +317,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("queuecomplete", function (arg) {
                     if (dlg.sent) {
-                        if (dlg.numFiles > 1 && !dlg.uploadFailed) {
+                        if (dlg.fileList.length > 1 && !dlg.uploadFailed) {
                             S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");
                         }
 

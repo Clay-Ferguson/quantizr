@@ -88,6 +88,13 @@ export class RightNavPanel extends Div {
                 let content = null;
                 if (S.util.ctrlKeyCheck()) {
                     content = await (navigator as any).clipboard.readText();
+
+                    if (!content) {
+                        let blob = await S.util.readClipboardFile();
+                        if (blob) {
+                            EditNodeDlg.pendingUploadFile = blob;
+                        }
+                    }
                 }
                 S.edit.addNode("~" + J.NodeType.NOTES, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), state);
             },
@@ -95,6 +102,7 @@ export class RightNavPanel extends Div {
         }) : null;
 
         if (addNoteButton) {
+            // todo-0: need to document this in "Tips and Tricks"
             S.util.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
                 const data = evt.dataTransfer.items;
                 for (let i = 0; i < data.length; i++) {
@@ -102,7 +110,7 @@ export class RightNavPanel extends Div {
                     // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                     if (d.kind === "file") {
                         EditNodeDlg.pendingUploadFile = data[i].getAsFile();
-                        S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu->Tree->Notes)"), state);
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), state);
                         return;
                     }
                 }

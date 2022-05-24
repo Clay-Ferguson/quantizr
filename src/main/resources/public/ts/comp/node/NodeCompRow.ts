@@ -94,6 +94,7 @@ export class NodeCompRow extends Div {
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
                 ]);
 
+                // todo-0: Need to document this in "Tips and Tricks"
                 S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     const data = evt.dataTransfer.items;
                     for (let i = 0; i < data.length; i++) {

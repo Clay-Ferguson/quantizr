@@ -1618,6 +1618,26 @@ export class Util {
     }
 
     ctrlKeyCheck = (): boolean => {
-        return S.quanta.ctrlKey && (new Date().getTime() - S.quanta.ctrlKeyTime) < 2500;
+        return S.quanta.ctrlKey && (new Date().getTime() - S.quanta.ctrlKeyTime) < 5000;
+    }
+
+    readClipboardFile = (): Promise<any> => {
+        return new Promise<any>(async (resolve, reject) => {
+            (navigator as any).clipboard.read().then(async (data) => {
+                let done: boolean = false;
+                let blob = null;
+                for (const item of data) {
+                    for (const type of item.types) {
+                        blob = await item.getType(type);
+                        if (blob) {
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (done) break;
+                }
+                resolve(blob);
+            });
+        });
     }
 }

@@ -209,9 +209,17 @@ export class Edit {
         }
 
         if (S.util.ctrlKeyCheck()) {
+            let blob = null;
             let clipboardText = await (navigator as any).clipboard.readText();
+            if (!clipboardText) {
+                blob = await S.util.readClipboardFile();
+                if (blob) {
+                    EditNodeDlg.pendingUploadFile = blob;
+                }
+            }
+
             if (nodeInsertTarget) {
-                await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                let res: J.InsertNodeResponse = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: false,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -219,8 +227,11 @@ export class Edit {
                     typeName: typeName || "u",
                     initialValue: clipboardText
                 });
+                if (blob) {
+                    this.insertNodeResponse(res, state);
+                }
             } else {
-                await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -231,8 +242,14 @@ export class Edit {
                     properties: null,
                     shareToUserId: null
                 });
+                if (blob) {
+                    this.createSubNodeResponse(res, false, null, null, state);
+                }
             }
-            S.quanta.refresh(state);
+
+            if (!blob) {
+                S.quanta.refresh(state);
+            }
         }
         else {
             if (nodeInsertTarget) {
@@ -876,6 +893,18 @@ export class Edit {
     saveClipboardToChildNode = async (parentId: string): Promise<void> => {
         let clipText: string = await (navigator as any).clipboard.readText();
 
+        if (clipText) {
+            clipText = clipText.trim();
+        }
+
+        let blob = null;
+        if (!clipText) {
+            blob = await S.util.readClipboardFile();
+            if (blob) {
+                EditNodeDlg.pendingUploadFile = blob;
+            }
+        }
+
         // DO NOT DELETE (yet)
         // const items = await (navigator as any).clipboard.read();
         // for (let item of items) {
@@ -887,15 +916,12 @@ export class Edit {
         //     }
         // }
 
-        if (clipText) {
-            clipText = clipText.trim();
-        }
-        if (!clipText) {
+        if (!clipText && !blob) {
             S.util.flashMessage("Nothing saved clipboard is empty!", "Warning", true);
             return;
         }
 
-        await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
@@ -907,10 +933,16 @@ export class Edit {
             shareToUserId: null
         });
 
-        setTimeout(() => {
-            let state: AppState = store.getState();
-            S.view.refreshTree(null, true, false, null, false, false, true, true, false, state);
-        }, 1000);
+        if (blob) {
+            let state = appState(null);
+            this.createSubNodeResponse(res, false, null, null, state);
+        }
+        else {
+            setTimeout(() => {
+                let state: AppState = store.getState();
+                S.view.refreshTree(null, true, false, null, false, false, true, true, false, state);
+            }, 500);
+        }
     }
 
     splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void> => {
