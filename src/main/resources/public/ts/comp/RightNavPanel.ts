@@ -102,7 +102,7 @@ export class RightNavPanel extends Div {
         }) : null;
 
         if (addNoteButton) {
-            // todo-0: need to document this in "Tips and Tricks"
+            // todo-1: need to document this in "Tips and Tricks"
             S.util.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
                 const data = evt.dataTransfer.items;
                 for (let i = 0; i < data.length; i++) {
