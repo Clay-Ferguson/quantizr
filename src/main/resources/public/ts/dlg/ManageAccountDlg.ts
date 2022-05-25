@@ -24,6 +24,10 @@ export class ManageAccountDlg extends DialogBase {
             new ButtonBar([
                 !this.appState.isAdminUser ? new Button("Close Account", this.closeAccount) : null,
                 new Button("Change Password", this.changePassword),
+                new Button("Bulk Delete", () => {
+                    S.edit.bulkDelete();
+                    this.close();
+                }),
                 new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];

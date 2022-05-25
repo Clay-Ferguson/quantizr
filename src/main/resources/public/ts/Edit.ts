@@ -664,7 +664,8 @@ export class Edit {
         if (dlg.yes) {
             await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: ["~" + J.NodeType.INBOX],
-                childrenOnly: true
+                childrenOnly: true,
+                bulkDelete: false
             });
             S.nav.openContentNode(state.homeNodePath, state);
         }
@@ -688,6 +689,26 @@ export class Edit {
                 nodeIds: selNodesArray
             });
             this.joinNodesResponse(res, state);
+        }
+    }
+
+    /*
+    * Deletes all nodes owned by you but NOT rooted in your own account root.
+    */
+    bulkDelete = async (): Promise<void> => {
+        let state = store.getState();
+
+        let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
+        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (dlg.yes) {
+            let res: J.DeleteNodesResponse = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                nodeIds: null,
+                childrenOnly: false,
+                bulkDelete: true
+            });
+            S.util.showMessage(res.message, "Message");
         }
     }
 
@@ -732,7 +753,8 @@ export class Edit {
         if (dlg.yes) {
             let res: J.DeleteNodesResponse = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: selNodesArray,
-                childrenOnly: false
+                childrenOnly: false,
+                bulkDelete: false
             });
             this.removeNodesFromHistory(selNodesArray, state);
             this.removeNodesFromCalendarData(selNodesArray, state);

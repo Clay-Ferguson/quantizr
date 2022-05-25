@@ -943,6 +943,11 @@ public class MongoUtil extends ServiceBase {
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
+	public String regexRecursiveChildrenOfPathIncludeRoot(String path) {
+		path = XString.stripIfEndsWith(path, "/");
+		return "^" + Pattern.quote(path) + "\\/|^" + Pattern.quote(path) + "$";
+	}
+
 	@PerfMon(category = "mongoUtil")
 	public SubNode createUser(MongoSession ms, String user, String email, String password, boolean automated) {
 		SubNode userNode = read.getUserNodeByUserName(ms, user);

@@ -865,7 +865,11 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("deleteNodes", req, session, ms -> {
-			return delete.deleteNodes(ms, req);
+			if (req.isBulkDelete()) {
+				return delete.bulkDeleteNodes(ms, req);
+			} else {
+				return delete.deleteNodes(ms, req);
+			}
 		});
 	}
 

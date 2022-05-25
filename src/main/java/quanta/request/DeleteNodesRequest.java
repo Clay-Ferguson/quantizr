@@ -7,6 +7,7 @@ import quanta.request.base.RequestBase;
 public class DeleteNodesRequest extends RequestBase {
 	private List<String> nodeIds;
 	private boolean childrenOnly;
+	private boolean bulkDelete;
 
 	public List<String> getNodeIds() {
 		return nodeIds;
@@ -22,5 +23,13 @@ public class DeleteNodesRequest extends RequestBase {
 
 	public void setChildrenOnly(boolean childrenOnly) {
 		this.childrenOnly = childrenOnly;
+	}
+
+	public boolean isBulkDelete() {
+		return bulkDelete;
+	}
+
+	public void setBulkDelete(boolean bulkDelete) {
+		this.bulkDelete = bulkDelete;
 	}
 }

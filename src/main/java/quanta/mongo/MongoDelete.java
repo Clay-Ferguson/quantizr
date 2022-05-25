@@ -385,4 +385,44 @@ public class MongoDelete extends ServiceBase {
 		res.setSuccess(true);
 		return res;
 	}
+
+	/*
+	 * Deletes the set of nodes specified in the request
+	 */
+	public DeleteNodesResponse bulkDeleteNodes(MongoSession ms, DeleteNodesRequest req) {
+		boolean dryRun = false;
+		DeleteNodesResponse res = new DeleteNodesResponse();
+
+		SubNode userNode = read.getUserNodeByUserName(null, null);
+		if (no(userNode)) {
+			throw new RuntimeEx("User not found.");
+		}
+
+		Query q = new Query();
+
+		// criteria finds all nodes where we are the owner but they're not decendants under our own tree
+		// root.
+		Criteria crit = Criteria.where(SubNode.OWNER).is(userNode.getOwner()).and(SubNode.PATH).not()
+				.regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
+		q.addCriteria(crit);
+
+		// if dry run just print into log file the stuff to delete
+		if (dryRun) {
+			Iterable<SubNode> results = mongoUtil.find(q);
+			for (SubNode node : results) {
+				log.debug("Node [" + node.getIdStr() + "] " + node.getPath() + " owner=" + node.getOwner().toHexString());
+			}
+		}
+		// otherwise run the actual bulk delete. This will potentially leave orphans and this is fine. We don't bother cleaning orphans
+		// now becasue there's no need.
+		else {
+			DeleteResult delRes = ops.remove(q, SubNode.class);
+			String msg = "Nodes deleted: " + delRes.getDeletedCount();
+			log.debug("Bulk Delete: " + msg);
+			res.setMessage(msg);
+		}
+
+		res.setSuccess(true);
+		return res;
+	}
 }

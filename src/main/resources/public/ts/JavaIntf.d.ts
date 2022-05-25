@@ -160,6 +160,7 @@ export interface DeleteMFSFileRequest extends RequestBase {
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
     childrenOnly: boolean;
+    bulkDelete: boolean;
 }
 
 export interface DeletePropertyRequest extends RequestBase {
