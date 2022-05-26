@@ -106,7 +106,7 @@ public class ActPubOutbox extends ServiceBase {
 
                         if (ok(object)) {
                             if (object instanceof String) {
-                                // todo-1: handle boosts.
+                                // todo-0: handle boosts.
                                 //
                                 // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
                                 // + XString.prettyPrint(obj));
@@ -125,7 +125,7 @@ public class ActPubOutbox extends ServiceBase {
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveNote(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create);
+                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create, null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {
                                     log.debug("Record already existed: " + dke.getMessage());

@@ -8,6 +8,7 @@ public class APType {
     public static final String Note = "Note";
     public static final String Update = "Update";
     public static final String Like = "Like";
+    public static final String Announce = "Announce";
 
     // Note: Pleroma sends these when you DM someone.
     public static final String ChatMessage = "ChatMessage";

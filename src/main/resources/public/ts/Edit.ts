@@ -240,7 +240,8 @@ export class Edit {
                     content: clipboardText,
                     typeLock: false,
                     properties: null,
-                    shareToUserId: null
+                    shareToUserId: null,
+                    boostTarget: null
                 });
                 if (blob) {
                     this.createSubNodeResponse(res, false, null, null, state);
@@ -272,7 +273,8 @@ export class Edit {
                     content: null,
                     typeLock: false,
                     properties: null,
-                    shareToUserId: null
+                    shareToUserId: null,
+                    boostTarget: null
                 });
                 this.createSubNodeResponse(res, false, null, null, state);
             }
@@ -952,7 +954,8 @@ export class Edit {
             content: clipText,
             typeLock: false,
             properties: null,
-            shareToUserId: null
+            shareToUserId: null,
+            boostTarget: null
         });
 
         if (blob) {
@@ -1009,7 +1012,8 @@ export class Edit {
             typeLock: true,
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
-            shareToUserId: null
+            shareToUserId: null,
+            boostTarget: null
         });
         this.createSubNodeResponse(res, true, null, null, state);
     }
@@ -1038,7 +1042,8 @@ export class Edit {
         });
     }
 
-    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, state: AppState) => {
+    /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
+    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -1055,7 +1060,8 @@ export class Edit {
             content,
             typeLock: false,
             properties: null,
-            shareToUserId
+            shareToUserId,
+            boostTarget
         });
 
         this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
@@ -1074,7 +1080,8 @@ export class Edit {
             typeLock: true,
             properties: null,
             payloadType,
-            shareToUserId: null
+            shareToUserId: null,
+            boostTarget: null
         });
 
         // auto-enable edit mode
@@ -1096,7 +1103,8 @@ export class Edit {
             content: null,
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
-            shareToUserId: null
+            shareToUserId: null,
+            boostTarget: null
         });
         this.createSubNodeResponse(res, false, null, null, state);
     }

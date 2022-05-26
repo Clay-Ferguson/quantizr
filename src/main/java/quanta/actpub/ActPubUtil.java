@@ -2,8 +2,8 @@ package quanta.actpub;
 
 import static quanta.actpub.model.AP.apHasProps;
 import static quanta.actpub.model.AP.apList;
-import static quanta.actpub.model.AP.apStr;
 import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.net.URL;
@@ -50,6 +50,7 @@ import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoDeleteEvent;
 import quanta.mongo.MongoRepository;
@@ -177,12 +178,18 @@ public class ActPubUtil extends ServiceBase {
      * admin ms.
      */
     public APObj getJson(MongoSession ms, String userDoingGet, String url, MediaType mediaType) {
-        if (ok(userDoingGet)) {
+
+        if (PrincipalName.ANON.s().equals(userDoingGet)) {
+            userDoingGet = null;
+        }
+        String _userDoingGet = userDoingGet;
+
+        if (ok(_userDoingGet)) {
             return (APObj) arun.run(as -> {
-                String actor = apUtil.makeActorUrlForUserName(userDoingGet);
+                String actor = apUtil.makeActorUrlForUserName(_userDoingGet);
 
                 /* if private key not sent then get it using the session */
-                String privateKey = apCrypto.getPrivateKey(as, userDoingGet);
+                String privateKey = apCrypto.getPrivateKey(as, _userDoingGet);
                 if (no(privateKey)) {
                     throw new RuntimeException("Unable to get private key for user.");
                 }
@@ -793,9 +800,8 @@ public class ActPubUtil extends ServiceBase {
 
                     // if nextPage is a string consider that a reference to the URL of the page and get it
                     if (nextPage instanceof String) {
-                        ocPage = getJson(ms, userDoingAction, (String)nextPage, APConst.MTYPE_ACT_JSON);
-                    }
-                    else {
+                        ocPage = getJson(ms, userDoingAction, (String) nextPage, APConst.MTYPE_ACT_JSON);
+                    } else {
                         ocPage = nextPage;
                     }
                 } else {
@@ -814,7 +820,7 @@ public class ActPubUtil extends ServiceBase {
 
             // if lastPage is a string it's the url
             if (lastPage instanceof String) {
-                ocPage = getJson(ms, userDoingAction, (String)lastPage, APConst.MTYPE_ACT_JSON);
+                ocPage = getJson(ms, userDoingAction, (String) lastPage, APConst.MTYPE_ACT_JSON);
             }
             // else it's the page object
             else {
@@ -912,6 +918,7 @@ public class ActPubUtil extends ServiceBase {
      * already loaded
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
+        log.debug("getNodeThreadView");
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
         LinkedList<NodeInfo> others = loadOthers ? new LinkedList<>() : null;
@@ -926,28 +933,26 @@ public class ActPubUtil extends ServiceBase {
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
                 try {
                     nodes.addFirst(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
-                            false, true));
+                            false, true, true));
 
                     // if inReplyTo exists try to use it first.
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
                     if (ok(inReplyTo)) {
-                        String parentId = apUtil.loadObject(ms, null, inReplyTo);
-                        if (ok(parentId)) {
-                            SubNode replyParent = read.getNode(ms, parentId);
-                            if (ok(replyParent)) {
-                                node = replyParent;
+                        SubNode parentNode = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
+                        if (ok(parentNode)) {
+                            node = parentNode;
 
-                                // if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
-                                // consider
-                                // this a case where there's no conversation to show and bail out here.
-                                if (ok(node) && nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
-                                        || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
-                                    res.setSuccess(true);
-                                    return res;
-                                }
-
-                                continue;
+                            /*
+                             * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
+                             * consider this a case where there's no conversation to show and bail out here.
+                             */
+                            if (nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
+                                    || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                                res.setSuccess(true);
+                                return res;
                             }
+
+                            continue;
                         }
                     }
 
@@ -957,9 +962,10 @@ public class ActPubUtil extends ServiceBase {
                     } else {
                         node = read.getParent(ms, node);
 
-                        // if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
-                        // consider
-                        // this a case where there's no conversation to show and bail out here.
+                        /*
+                         * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
+                         * consider this a case where there's no conversation to show and bail out here.
+                         */
                         if (ok(node) && nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
                                 || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
                             res.setSuccess(true);
@@ -982,7 +988,7 @@ public class ActPubUtil extends ServiceBase {
                             // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition.
                             if (!child.getIdStr().equals(nodeId)) {
                                 others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false,
-                                        false, false, false, true));
+                                        false, false, false, true, true));
                             }
                         }
                     }
@@ -1005,7 +1011,21 @@ public class ActPubUtil extends ServiceBase {
         return res;
     }
 
-    public String loadObject(MongoSession ms, String userDoingAction, String url) {
+    /*
+     * Loads the foreign object into Quanta under the foreign account representing that user, and
+     * returns it. Returns existing node if found instead. If there's no account created yet for the
+     * user we create the account
+     */
+    public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
+        // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
+
+        // Try to look up the node first from the DB.
+        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
+        if (ok(nodeFound)) {
+            return nodeFound;
+        }
+
+        // node not found in DB yet, so we have to get it from off the web from scratch
         APObj obj = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
         if (no(obj)) {
             log.debug("unable to get json: " + url);
@@ -1018,8 +1038,8 @@ public class ActPubUtil extends ServiceBase {
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);
                 if (ok(ownerActorUrl)) {
-                    return (String) arun.run(as -> {
-                        String nodeId = null;
+                    return (SubNode) arun.run(as -> {
+                        SubNode node = null;
                         SubNode accountNode = apub.getAcctNodeByActorUrl(as, userDoingAction, ownerActorUrl);
                         if (ok(accountNode)) {
                             String apUserName = accountNode.getStr(NodeProp.USER);
@@ -1031,11 +1051,10 @@ public class ActPubUtil extends ServiceBase {
                                 return null;
                             }
 
-                            SubNode node =
-                                    apub.saveNote(as, userDoingAction, accountNode, outboxNode, obj, false, true, APType.Create);
-                            nodeId = no(node) ? null : node.getIdStr();
+                            node = apub.saveObj(as, userDoingAction, accountNode, outboxNode, obj, false, true, APType.Create,
+                                    null);
                         }
-                        return nodeId;
+                        return node;
                     });
                 }
                 break;

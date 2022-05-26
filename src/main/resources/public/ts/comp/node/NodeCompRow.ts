@@ -23,9 +23,11 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
+    // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
+    // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
     constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private allowShowThread: boolean, appState: AppState) {
+        public allowInlineInsertButton: boolean, private allowShowThread: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -135,10 +137,17 @@ export class NodeCompRow extends Div {
         }
 
         let indentLevel = this.isTableCell ? 0 : this.level;
-        let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         let focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
-        this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
+
+        if (this.isLinkedNode) {
+            this.attribs.className = "boost-row";
+        }
+        else {
+            this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
+            let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
+            this.attribs.style = style;
+        }
 
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
@@ -146,8 +155,6 @@ export class NodeCompRow extends Div {
             this.attribs.className += " fadeInRowBkgClz";
             S.quanta.fadeStartTime = new Date().getTime();
         }
-
-        this.attribs.style = style;
 
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
@@ -176,6 +183,7 @@ export class NodeCompRow extends Div {
             buttonBar ? new Clearfix("button_bar_clearfix_" + node.id) : null,
             jumpButton,
             new NodeCompContent(node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
+            this.internalComp,
             this.allowHeaders ? new NodeCompRowFooter(node, false, this.allowShowThread) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);

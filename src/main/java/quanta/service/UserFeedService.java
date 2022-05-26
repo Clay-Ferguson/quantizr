@@ -348,7 +348,7 @@ public class UserFeedService extends ServiceBase {
 
 		for (SubNode node : iter) {
 			try {
-				NodeInfo info = convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true);
+				NodeInfo info = convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true);
 				searchResults.add(info);
 			} catch (Exception e) {
 			}

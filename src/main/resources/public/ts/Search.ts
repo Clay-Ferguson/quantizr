@@ -11,6 +11,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
+import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
@@ -497,6 +498,21 @@ export class Search {
             }
         }
 
+        let boostComp: Div = null;
+        if (node.boostedNode) {
+            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, null, false);
+            // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
+
+            let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
+            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.boostedNode.type);
+            // boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, childrenImgSizes, this.allowHeaders, false, true, true, null, state);
+            boostComp = new Div(null, { className: "boost-row" }, [
+                // todo-0: is image going to show up here?
+                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton) : null,
+                boostContent
+            ])
+        }
+
         const div = new Div(null, {
             className: clazz,
             id: cssId,
@@ -505,6 +521,7 @@ export class Search {
         }, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton) : null,
             content,
+            boostComp,
             allowFooter ? new NodeCompRowFooter(node, isFeed, showThreadButton) : null,
             allowFooter ? new Clearfix() : null
         ]);

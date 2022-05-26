@@ -124,11 +124,24 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(node.id, null, null, node.id, null, state);
+                        S.edit.addNode(node.id, null, null, node.id, null, null, state);
                     }
                 }
             }));
         }
+
+        children.push(new Icon({
+            title: "Boost this Node",
+            className: "fa fa-retweet fa-lg marginRight",
+            onClick: () => {
+                if (state.isAnonUser) {
+                    S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+                }
+                else {
+                   S.edit.addNode(null, null, null, null, null, node.id, state)
+                }
+            }
+        }));
 
         let youLiked: boolean = false;
         let likeNames = null;

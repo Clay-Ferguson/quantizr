@@ -67,11 +67,10 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-
                     if (n.children && !inVerticalSpace) {
                         comps.push(new Div(null, { className: "vertical-space" }));
                     }
-                    let row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, true, state);
+                    let row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, true, false, null, state);
                     inVerticalSpace = false;
                     comps.push(row);
                 }

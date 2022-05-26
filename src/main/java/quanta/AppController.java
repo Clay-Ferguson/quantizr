@@ -529,9 +529,9 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("loadActPubObject", req, session, ms -> {
-			String nodeId = apUtil.loadObject(ms, null, req.getUrl());
+			SubNode node = apUtil.loadObject(ms, null, req.getUrl());
 			GetActPubObjectResponse res = new GetActPubObjectResponse();
-			res.setNodeId(nodeId);
+			res.setNodeId(ok(node) ? node.getIdStr() : null);
 			res.setSuccess(true);
 			return res;
 		});

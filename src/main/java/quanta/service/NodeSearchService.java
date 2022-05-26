@@ -94,7 +94,7 @@ public class NodeSearchService extends ServiceBase {
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-						false, false, false);
+						false, false, false, true);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
@@ -109,7 +109,7 @@ public class NodeSearchService extends ServiceBase {
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-						false, false, false);
+						false, false, false, true);
 				searchResults.add(info);
 			}
 		}
@@ -135,7 +135,7 @@ public class NodeSearchService extends ServiceBase {
 						req.isRequirePriority())) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-								false, false, false, false);
+								false, false, false, false, true);
 						searchResults.add(info);
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
@@ -199,7 +199,7 @@ public class NodeSearchService extends ServiceBase {
 			for (SubNode node : accountNodes.getVal()) {
 				try {
 					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-							false, false, false, false);
+							false, false, false, false, false);
 					searchResults.add(info);
 				} catch (Exception e) {
 					ExUtil.error(log, "failed converting user node", e);
@@ -220,7 +220,7 @@ public class NodeSearchService extends ServiceBase {
 				if (ok(userNode)) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
-								false, false, false, false, false);
+								false, false, false, false, false, false);
 
 						searchResults.add(info);
 					} catch (Exception e) {
@@ -290,7 +290,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-					false, false, false);
+					false, false, false, true);
 			searchResults.add(info);
 		}
 

@@ -294,6 +294,10 @@ export class EditNodeDlg extends DialogBase {
 
             if (!customProps || hasContentProp) {
                 let contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
+
+                if (S.props.getProp(J.NodeProp.BOOST, state.node)) {
+                    mainPropsTable.addChild(new Div("Say something about the boosted node, or leave empty."));
+                }
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
             }

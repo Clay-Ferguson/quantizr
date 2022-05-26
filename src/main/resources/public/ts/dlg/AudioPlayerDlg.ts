@@ -225,7 +225,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     postComment = (): void => {
         let link = this.getLink();
-        S.edit.addNode(null, "\n\n" + link, null, null, null, this.appState);
+        S.edit.addNode(null, "\n\n" + link, null, null, null, null, this.appState);
     }
 
     copyToClipboard = (): void => {

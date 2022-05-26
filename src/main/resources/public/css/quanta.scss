@@ -1581,6 +1581,13 @@ i'm backing out for now
     border-left: $highlightBorderSize solid $primary;
 }
 
+.boost-row {
+    border: 2px solid gray;
+    border-radius: $border-radius;
+    margin-left: 40px;
+    padding-top: 8px;
+}
+
 .active-row:hover {
     // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
     // see other places with a lighten function on a ":hover"
@@ -2153,3 +2160,4 @@ audio::-webkit-media-controls-play-button {
     font-family: 'Courier New', Courier, monospace;
     border-bottom: 1px solid gray;
 }
+

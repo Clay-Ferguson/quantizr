@@ -103,14 +103,14 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        let comp: NodeCompMarkdown = new NodeCompMarkdown(node, state);
+        let comp: NodeCompMarkdown = node.content ? new NodeCompMarkdown(node, state) : null;
 
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
         // This OpenGraph logic should maybe be just built into the Markdown component itself?
-        if (comp.urls) {
+        if (comp?.urls) {
             let children: CompIntf[] = [comp];
             let count = 0;
             comp.urls.forEach((url: string) => {
@@ -138,6 +138,7 @@ export class TypeBase implements TypeHandlerIntf {
             }
             // otherwise just return the content component itself.
             else {
+                // if content is empty we return nothing here. need to test. todo-0
                 return comp;
             }
         }

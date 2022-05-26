@@ -8,6 +8,8 @@ import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.security.PublicKey;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -18,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,11 +117,9 @@ public class ActPubService extends ServiceBase {
      * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
      * contain all the mentions that exist in the text of the message.
      * 
-     * sendType can be 'Note' or 'Like' depending on what we're sending.
-     * 
      */
     public void sendActPubForNodeEdit(MongoSession ms, String inReplyTo, String replyToType, HashMap<String, AccessControl> acl,
-            APList attachments, String content, String noteUrl) {
+            APList attachments, String content, String objUrl, String boostTarget) {
         exec.run(() -> {
             try {
                 HashSet<String> toUserNames = new HashSet<>();
@@ -153,8 +154,19 @@ public class ActPubService extends ServiceBase {
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
 
-                APObj message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
-                        noteUrl, privateMessage, attachments);
+                APObj message = null;
+
+                // if this node has a boostTarget, we know it's an Announce so we send out the announce
+                if (!StringUtils.isEmpty(boostTarget)) {
+                    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+                    message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostTarget, now, privateMessage);
+                    log.debug("Outbound Announce: " + message);
+                }
+                // else send out as a note.
+                else {
+                    message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                            objUrl, privateMessage, attachments);
+                }
 
                 // for users that don't have a sharedInbox we collect their inboxes here to send to them
                 // individually
@@ -350,7 +362,7 @@ public class ActPubService extends ServiceBase {
         return attachments;
     }
 
-     /*
+    /*
      * Sends message outbound to other inboxes, for all inboxes corresponding to all 'toUserNames'
      * IMPORTANT: This method doesn't require or expect 'toUserNames' to have been 'imported' into
      * Quanta. That is, there may not even BE a "user node" for any of these users, or there may be. We
@@ -450,7 +462,7 @@ public class ActPubService extends ServiceBase {
          * the very beginning which is to get webFinger first and load from there
          */
         if (no(acctNode)) {
-            log.debug("Loading foreign user: " + apUserName);
+            log.debug("Load:" + apUserName);
             APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, apUserName);
 
             if (ok(webFinger)) {
@@ -642,6 +654,10 @@ public class ActPubService extends ServiceBase {
                 apub.processLikeAction(httpReq, payload, false);
                 break;
 
+            case APType.Announce:
+                apub.processAnnounceAction(httpReq, payload, false);
+                break;
+
             default:
                 log.debug("Unsupported type:" + XString.prettyPrint(payload));
                 break;
@@ -804,6 +820,66 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
+    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, boolean undo) {
+        arun.<Object>run(as -> {
+            apLog.trace("process " + (undo ? "unannounce" : "announe") + " Payload=" + XString.prettyPrint(payload));
+
+            // get actorUrl
+            String actorUrl = apStr(payload, APObj.actor);
+            if (no(actorUrl)) {
+                log.debug("no 'actor' found on create action request posted object");
+                return null;
+            }
+
+            // get actorObj from actorUrl
+            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
+            if (no(actorObj)) {
+                log.debug("Unable to load actorUrl: " + actorUrl);
+                return null;
+            }
+
+            // validate signature
+            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            try {
+                apCrypto.verifySignature(httpReq, pubKey);
+            } catch (Exception e) {
+                log.error("Sig failed.");
+                return null;
+            }
+
+            // get the url of the thing being boosted
+            String objectIdUrl = apStr(payload, APObj.object);
+            if (no(objectIdUrl)) {
+                log.debug("Unable to get object from payload: " + XString.prettyPrint(payload));
+                return null;
+            }
+
+            // find or create an actual node that will hold the target thing being boosted
+            SubNode boostedNode = apUtil.loadObject(as, null, objectIdUrl);
+            if (ok(boostedNode)) {
+                // log.debug("BOOSTING: " + XString.prettyPrint(boostedNode));
+
+                // get account node for person doing the boosting
+                SubNode actorAccountNode = apub.getAcctNodeByActorUrl(as, null, actorUrl);
+                if (ok(actorAccountNode)) {
+                    String userName = actorAccountNode.getStr(NodeProp.USER.s());
+
+                    // get posts node which will be parent we save boost into
+                    SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
+                            NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+
+                    apub.saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce,
+                            boostedNode.getIdStr());
+                }
+            } else {
+                log.debug("Unable to get node being boosted.");
+            }
+
+            return null;
+        });
+    }
+
+    @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(as -> {
             apLog.trace("processDeleteAction");
@@ -882,7 +958,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            apub.saveNote(ms, null, null, nodeBeingRepliedTo, obj, false, false, action);
+            apub.saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -891,12 +967,14 @@ public class ActPubService extends ServiceBase {
          */
         else {
             apLog.trace("not reply to existing Quanta node.");
+
+            // get actor's account node from their actorUrl
             SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, null, actorUrl);
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                apub.saveNote(ms, null, actorAccountNode, postsNode, obj, false, false, action);
+                apub.saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null);
             }
         }
     }
@@ -913,12 +991,12 @@ public class ActPubService extends ServiceBase {
      * 
      * This saves correctly either a obj.type==Note or obj.type==ChatMessage (maybe more to come?)
      * 
-     * action will be APType.Create or APType.Update
+     * action will be APType.Create, APType.Update, or APType.Announce
      */
     @PerfMon(category = "apub")
-    public SubNode saveNote(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
-            boolean forcePublic, boolean temp, String action) {
-        apLog.trace("saveNote" + XString.prettyPrint(obj));
+    public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
+            boolean forcePublic, boolean temp, String action, String boostTargetId) {
+        apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
         String id = apStr(obj, APObj.id);
 
         /*
@@ -936,7 +1014,7 @@ public class ActPubService extends ServiceBase {
 
         Date published = apDate(obj, APObj.published);
         String inReplyTo = apStr(obj, APObj.inReplyTo);
-        String contentHtml = apStr(obj, APObj.content);
+        String contentHtml = APType.Announce.equals(action) ? "" : apStr(obj, APObj.content);
         String objUrl = apStr(obj, APObj.url);
         String objAttributedTo = apStr(obj, APObj.attributedTo);
         String objType = apStr(obj, APObj.type);
@@ -997,8 +1075,6 @@ public class ActPubService extends ServiceBase {
             ThreadLocals.clean(newNode);
         }
 
-        apLog.trace("createNode");
-
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
         // we could be clever and just detect if it DOES have tags and does NOT have
@@ -1036,6 +1112,10 @@ public class ActPubService extends ServiceBase {
         newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), inReplyTo);
         newNode.set(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
         newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
+
+        if (ok(boostTargetId)) {
+            newNode.set(NodeProp.BOOST.s(), boostTargetId);
+        }
 
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);

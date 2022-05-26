@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APODelete;
@@ -34,35 +35,36 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'note' message
 	 */
-	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
-			String content, String noteUrl, boolean privateMessage, APList attachments) {
+	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo,
+			String replyToType, String content, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 
-		APObj payload =
-				newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
+		APObj payload = newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now,
+				privateMessage, attachments);
 
 		return newCreate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
 	}
 
 	public APObj newDeleteForNote(String id, String fromActor) {
 		APObj payload = new APOTombstone(id);
-		return new APODelete(id+"#delete", fromActor, payload, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+		return new APODelete(id + "#delete", fromActor, payload, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 	}
 
-	public APOLike newLike(String id, String objectId, String actor, List<String> to,  List<String> cc) {
+	public APOLike newLike(String id, String objectId, String actor, List<String> to, List<String> cc) {
 		return new APOLike(id, objectId, actor, to, cc);
 	}
 
 	/**
 	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
-			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
+	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo, String inReplyTo,
+			String replyToType, String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = null;
 
 		if (ok(content)) {
-			// convert all double and single spaced lines to <br> for formatting, for servers that don't understand Markdown
+			// convert all double and single spaced lines to <br> for formatting, for servers that don't
+			// understand Markdown
 			content = content.replace("\n", "<br>");
 		}
 
@@ -86,7 +88,8 @@ public class ActPubFactory extends ServiceBase {
 			try {
 				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 
-				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
+				// Local usernames will get a null here, by design, which is hopefully correct. We can call
+				// apUtil.makeActorUrlForUserName(userName)
 				// for local users, but aren't doing that, by design.
 				if (no(actorUrl))
 					continue;
@@ -136,19 +139,78 @@ public class ActPubFactory extends ServiceBase {
 		return ret;
 	}
 
+	/**
+	 * Creates a new Announce
+	 */
+	public APObj newAnnounce(String userDoingAction, String actor, String id, HashSet<String> toUserNames, String boostTargetActPubId,  ZonedDateTime now, boolean privateMessage) {
+		APObj ret = new APOAnnounce(actor, id, now.format(DateTimeFormatter.ISO_INSTANT), boostTargetActPubId, null);
+
+		LinkedList<String> toList = new LinkedList<>();
+		LinkedList<String> ccList = new LinkedList<>();
+
+		for (String userName : toUserNames) {
+			try {
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
+
+				// Local usernames will get a null here, by design, which is hopefully correct. We can call
+				// apUtil.makeActorUrlForUserName(userName)
+				// for local users, but aren't doing that, by design.
+				if (no(actorUrl))
+					continue;
+
+				/*
+				 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
+				 * we do that same thing
+				 */
+				if (!privateMessage) {
+					ccList.add(actorUrl);
+				} else {
+					toList.add(actorUrl);
+				}
+			}
+			// log and continue if any loop (user) fails here.
+			catch (Exception e) {
+				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
+			}
+		}
+
+		if (!privateMessage) {
+			toList.add(APConst.CONTEXT_STREAMS_PUBLIC);
+			/*
+			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
+			 * attributedTo)
+			 */
+			APObj actorObj = apCache.actorsByUrl.get(actor);
+			if (ok(actorObj)) {
+				ccList.add(apStr(actor, APObj.followers));
+			}
+		}
+
+		if (toList.size() > 0) {
+			ret.put(APObj.to, toList);
+		}
+
+		if (ccList.size() > 0) {
+			ret.put(APObj.cc, ccList);
+		}
+
+		return ret;
+	}
+
 	/*
 	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
 	 * above (in newNoteObject() function)
 	 */
-	public APOCreate newCreate(String userDoingAction, APObj object, String fromActor, HashSet<String> toUserNames, String noteUrl, ZonedDateTime now,
-			boolean privateMessage) {
+	public APOCreate newCreate(String userDoingAction, APObj object, String fromActor, HashSet<String> toUserNames,
+			String noteUrl, ZonedDateTime now, boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
 		List<String> toActors = new LinkedList<>();
 		List<String> ccActors = new LinkedList<>();
 		for (String userName : toUserNames) {
 			try {
-				// Local usernames will get a null here, by design, which is hopefully correct. We can call apUtil.makeActorUrlForUserName(userName)
+				// Local usernames will get a null here, by design, which is hopefully correct. We can call
+				// apUtil.makeActorUrlForUserName(userName)
 				// for local users, but aren't doing that, by design.
 				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 				if (no(actorUrl))

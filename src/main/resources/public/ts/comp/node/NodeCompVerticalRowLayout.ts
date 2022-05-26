@@ -36,10 +36,20 @@ export class NodeCompVerticalRowLayout extends Div {
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
 
+        // todo-0: the "boosted" rendering needs to ALSO be done on the page parent node, and on feed views, etc...
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
                 // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
+
+                let boostComp: NodeCompRow = null;
+                if (n.boostedNode) {
+                    // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
+
+                    let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, n.boostedNode);
+                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.boostedNode.type);
+                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, childrenImgSizes, this.allowHeaders, false, true, true, null, state);
+                }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
                     comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
@@ -67,14 +77,14 @@ export class NodeCompVerticalRowLayout extends Div {
                          without doing any collapsedComps. */
                         if (typeHandler && typeHandler.isSpecialAccountNode()) {
                             if (NodeCompVerticalRowLayout.showSpecialNodes || state.isAdminUser) {
-                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, true, state);
+                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, true, false, null, state);
 
                                 // I'm gonna be evil here and do this object without a type.
                                 collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
                             }
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, state);
+                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, false, boostComp, state);
                             comps.push(row);
                         }
                         inVerticalSpace = false;

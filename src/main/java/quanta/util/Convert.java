@@ -44,7 +44,8 @@ public class Convert extends ServiceBase {
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
-			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers, boolean loadLikes) {
+			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
+			boolean loadLikes, boolean attachBoosted) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
@@ -156,21 +157,24 @@ public class Convert extends ServiceBase {
 		// todo-1: enable this some day....
 		// LinkedList<String> likes = null;
 		// if (loadLikes && ok(node.getLikes())) {
-		// 	final LinkedList<String> _likes = new LinkedList<>();
-		// 	node.getLikes().forEach(like -> {
-		// 		// I decided not to risk the performance hit this could cause, and will probably load this asynchronously
-		// 		// whenver I do enable this capability in the future. Also for this special case of loading a property
-		//      // that we might have on a UserNode alrady the we need a way to check first the cache, and THEN the MongoDb
-		//      // node, BEFORE resorting to making an HTTP REST call like the getActorByUrl currently does.
-		// 		// if (like.startsWith("http://") || like.startsWith("https://")) {
-		// 		// 	APObj actor = apUtil.getActorByUrl(like);
-		// 		// 	if (ok(actor)) {
-		// 		// 		like = apStr(actor, APObj.preferredUsername);
-		// 		// 	}
-		// 		// }
-		// 		_likes.add(like);
-		// 	});
-		// 	likes = _likes;
+		// final LinkedList<String> _likes = new LinkedList<>();
+		// node.getLikes().forEach(like -> {
+		// // I decided not to risk the performance hit this could cause, and will probably load this
+		// asynchronously
+		// // whenver I do enable this capability in the future. Also for this special case of loading a
+		// property
+		// // that we might have on a UserNode alrady the we need a way to check first the cache, and THEN
+		// the MongoDb
+		// // node, BEFORE resorting to making an HTTP REST call like the getActorByUrl currently does.
+		// // if (like.startsWith("http://") || like.startsWith("https://")) {
+		// // APObj actor = apUtil.getActorByUrl(like);
+		// // if (ok(actor)) {
+		// // like = apStr(actor, APObj.preferredUsername);
+		// // }
+		// // }
+		// _likes.add(like);
+		// });
+		// likes = _likes;
 		// }
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(),
@@ -208,10 +212,21 @@ public class Convert extends ServiceBase {
 					boolean multiLevel = true;
 
 					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++,
-							multiLevel, lastChild, childrenCheck, false, loadLikes));
+							multiLevel, lastChild, childrenCheck, false, loadLikes, false));
 				}
 			}
 		}
+
+		if (attachBoosted) {
+			String boostTargetId = node.getStr(NodeProp.BOOST.s());
+			if (ok(boostTargetId)) {
+				SubNode boostedNode = read.getNode(ms, boostTargetId);
+				if (ok(boostedNode)) {
+					nodeInfo.setBoostedNode(convertToNodeInfo(sc, ms, boostedNode, false, false, 0, false, false, false, false, false, false));
+				}
+			}
+		}
+
 		// log.debug("NODEINFO: " + XString.prettyPrint(nodeInfo));
 		return nodeInfo;
 	}

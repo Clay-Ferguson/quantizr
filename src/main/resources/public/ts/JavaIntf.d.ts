@@ -134,6 +134,7 @@ export interface CopySharingRequest extends RequestBase {
 
 export interface CreateSubNodeRequest extends RequestBase {
     nodeId: string;
+    boostTarget: string;
     pendingEdit: boolean;
     content: string;
     newNodeName: string;
@@ -881,6 +882,7 @@ export interface NodeInfo {
     avatarVer: string;
     apAvatar: string;
     apImage: string;
+    boostedNode: NodeInfo;
 }
 
 export interface UserPreferences {
@@ -1032,6 +1034,7 @@ export const enum NodeProp {
     DATE = "date",
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
+    BOOST = "boost",
     DURATION = "duration",
 }
 

@@ -91,6 +91,9 @@ public class NodeInfo {
 	private String apAvatar;
 	private String apImage;
 
+	// if this node is a boost we put in the target node (node being boosted here)
+	private NodeInfo boostedNode;
+
 	public NodeInfo() {}
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
@@ -405,5 +408,13 @@ public class NodeInfo {
 
 	public void setLikes(List<String> likes) {
 		this.likes = likes;
+	}
+
+	public NodeInfo getBoostedNode() {
+		return boostedNode;
+	}
+
+	public void setBoostedNode(NodeInfo boostedNode) {
+		this.boostedNode = boostedNode;
 	}
 }

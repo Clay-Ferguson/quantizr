@@ -8,6 +8,7 @@ import quanta.request.base.RequestBase;
 public class CreateSubNodeRequest extends RequestBase {
 
 	private String nodeId;
+	private String boostTarget;
 
 	private boolean pendingEdit;
 	private String content; // optional, default content
@@ -107,5 +108,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setPayloadType(String payloadType) {
 		this.payloadType = payloadType;
+	}
+
+	public String getBoostTarget() {
+		return boostTarget;
+	}
+
+	public void setBoostTarget(String boostTarget) {
+		this.boostTarget = boostTarget;
 	}
 }

@@ -175,9 +175,13 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		if (!StringUtils.isEmpty(req.getBoostTarget())) {
+			newNode.set(NodeProp.BOOST.s(), req.getBoostTarget());
+		}
+
 		update.save(ms, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
+				false, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -301,8 +305,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		update.save(ms, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
+				false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -518,8 +522,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false, true);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
+				false, true, true);
 		res.setNode(newNodeInfo);
 
 		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check
@@ -551,12 +555,13 @@ public class NodeEditService extends ServiceBase {
 					APList attachments = apub.createAttachmentsList(node);
 					String nodeUrl = snUtil.getIdBasedUrl(node);
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
+					String boostTarget = parent.getStr(NodeProp.BOOST);
 
 					// if there's an unpublished property then we don't send out over ActPub
 					if (no(node.getBool(NodeProp.UNPUBLISHED)) || !node.getBool(NodeProp.UNPUBLISHED)) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
 						apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
-								node.getContent(), nodeUrl);
+								node.getContent(), nodeUrl, boostTarget);
 					}
 
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
