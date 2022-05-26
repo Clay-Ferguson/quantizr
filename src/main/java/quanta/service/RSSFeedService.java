@@ -120,13 +120,13 @@ public class RSSFeedService extends ServiceBase {
 	// NOTE: Same value appears in RSSTypeHandler.ts
 	private static final int MAX_FEED_ITEMS = 50;
 
-	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
+	private static final int REFRESH_FREQUENCY_MINS = 240; //4 hrs
 	static boolean run = false;
 
 	/*
 	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.
 	 */
-	@Scheduled(fixedDelay = 30 * 60 * 1000)
+	@Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
 	public void run() {
 		if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
 			return;
@@ -134,10 +134,6 @@ public class RSSFeedService extends ServiceBase {
 		try {
 			run = true;
 			runCount++;
-			if (runCount == 1) {
-				startupPreCache();
-			}
-
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 				log.debug("ignoring RSSFeedService schedule cycle");
 				return;
@@ -150,18 +146,6 @@ public class RSSFeedService extends ServiceBase {
 		} finally {
 			run = false;
 		}
-	}
-
-	public void startupPreCache() {
-		String rssNodeId = prop.getRssAggregatePreCacheNodeId();
-		if (StringUtils.isEmpty(rssNodeId))
-			return;
-
-		arun.run(as -> {
-			log.debug("startupPreCache: node=" + rssNodeId);
-			multiRss(as, rssNodeId, null);
-			return null;
-		});
 	}
 
 	public String refreshFeedCache() {
@@ -189,7 +173,7 @@ public class RSSFeedService extends ServiceBase {
 			}
 
 			for (String url : feedCache.keySet()) {
-				// log.debug("Refreshing feed: " + url);
+				log.debug("Refreshing feed: " + url);
 				SyndFeed feed = getFeed(url, false);
 				if (ok(feed)) {
 					count++;
@@ -203,70 +187,6 @@ public class RSSFeedService extends ServiceBase {
 		}
 	}
 
-	/*
-	 * Streams back an RSS feed that is an aggregate feed of all the children under nodeId
-	 * (recursively!) that have an RSS_FEED_SRC property
-	 * 
-	 * If writer is null it means we are just running without writing to a server like only to prewarm
-	 * the cache during app startup called from startupPreCache
-	 * 
-	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means first page
-	 */
-	public void multiRss(MongoSession ms, String nodeId, Writer writer) {
-		SyndFeed feed = aggregateCache.get(nodeId);
-
-		// if we didn't find in the cache built the feed
-		if (no(feed)) {
-			SubNode node = null;
-			try {
-				node = read.getNode(ms, nodeId);
-				if (no(node)) {
-					return;
-				}
-			} catch (NodeAuthFailedException e) {
-				return;
-			}
-
-			feed = new SyndFeedImpl();
-			feed.setEncoding("UTF-8");
-			feed.setFeedType("rss_2.0");
-			feed.setTitle("");
-			feed.setDescription("");
-			feed.setAuthor("");
-			feed.setLink("");
-
-			List<SyndEntry> entries = new LinkedList<>();
-			feed.setEntries(entries);
-			List<String> urls = new LinkedList<>();
-
-			Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0, true, true);
-			List<SubNode> children = read.iterateToList(iter);
-
-			// Scan to collect all the urls.
-			if (ok(children)) {
-				int count = 0;
-				for (SubNode n : children) {
-					/* avoid infinite recursion here! */
-					if (n.getIdStr().equals(nodeId))
-						continue;
-
-					String feedSrc = n.getStr(NodeProp.RSS_FEED_SRC.s());
-					if (!StringUtils.isEmpty(feedSrc) && !feedSrc.contains(nodeId)) {
-						urls.add(feedSrc);
-						if (++count >= MAX_FEEDS_PER_AGGREGATE) {
-							break;
-						}
-					}
-				}
-			}
-
-			aggregateFeeds(urls, entries, 1);
-			aggregateCache.put(nodeId, feed);
-		}
-
-		writeFeed(feed, writer);
-	}
-
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		try {
 			for (String url : urls) {
@@ -277,8 +197,7 @@ public class RSSFeedService extends ServiceBase {
 					for (SyndEntry entry : inFeed.getEntries()) {
 						if (ok(entry.getPublishedDate())) {
 							entries.add(entry);
-						}
-						else {
+						} else {
 							// log.debug("ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
 						}
 					}
@@ -329,7 +248,7 @@ public class RSSFeedService extends ServiceBase {
 			if (fromCache) {
 				inFeed = feedCache.get(url);
 				if (ok(inFeed)) {
-					// log.debug("CACHE FEED HIT: " + XString.prettyPrint(inFeed));
+					// log.debug("CACHE FEED HIT: " + url); // XString.prettyPrint(inFeed));
 					return inFeed;
 				}
 			}
@@ -405,7 +324,7 @@ public class RSSFeedService extends ServiceBase {
 			// }
 			// }
 
-			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
+			// log.debug("CACHE MISS. Queried Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
 
@@ -479,8 +398,11 @@ public class RSSFeedService extends ServiceBase {
 
 	public GetMultiRssResponse getMultiRssFeed(GetMultiRssRequest req) {
 		GetMultiRssResponse res = new GetMultiRssResponse();
+
+		// parse out list of URLs, and remove commented lines
 		List<String> urlList = XString.tokenize(req.getUrls(), "\n", true);
 		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
+
 		SyndFeed feed = null;
 
 		/* If multiple feeds we build an aggregate */

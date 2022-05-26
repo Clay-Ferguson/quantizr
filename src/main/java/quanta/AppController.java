@@ -365,21 +365,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		return PerformanceReport.getReport();
 	}
 
-	@PerfMon
-	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
-	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
-			HttpServletResponse response) {
-		SessionContext.checkReqToken();
-		arun.run(ms -> {
-			try {
-				rssFeed.multiRss(ms, nodeId, response.getWriter());
-			} catch (Exception e) {
-				throw new RuntimeException("internal server error");
-			}
-			return null;
-		});
-	}
-
 	/*
 	 * This was sort of experimental, but I need to document how it works and put in the User Guide
 	 */

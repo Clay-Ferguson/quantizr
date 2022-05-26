@@ -189,10 +189,6 @@ public class AppProp {
 		return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
 	}
 
-	public String getRssAggregatePreCacheNodeId() {
-		return env.getProperty("rssAggregatePreCacheNodeId");
-	}
-
 	public String getIPFSApiHostAndPort() {
 		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.apiPort");
 	}

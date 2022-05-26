@@ -75,8 +75,6 @@ services:
             ipfs.host: "http://ipfs-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
-            # This is the node name for a feed like this: http://localhost:${PORT}/multiRss?id=:podcast-set to cause that feed to precache
-            rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: quanta-dev
         # depends_on:
         #     - ipfs-dev

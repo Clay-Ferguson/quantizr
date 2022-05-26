@@ -110,10 +110,9 @@ export class RssTypeHandler extends TypeBase {
         else if (state.rssFeedCache[feedSrcHash]) {
             this.renderItem(state.rssFeedCache[feedSrcHash], feedSrc, itemListContainer, state);
         }
-        // otherwise read from the internet
+        // otherwise read from the server
         else {
             itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
-            itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
             /* warning: paging here is not zero offset. First page is number 1 */
             let page: number = state.rssFeedPage[feedSrcHash];
@@ -126,7 +125,7 @@ export class RssTypeHandler extends TypeBase {
                 let res: J.GetMultiRssResponse = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                     urls: feedSrc,
                     page
-                });
+                }, true);
 
                 if (!res?.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
