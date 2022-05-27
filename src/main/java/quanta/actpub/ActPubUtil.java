@@ -413,7 +413,7 @@ public class ActPubUtil extends ServiceBase {
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
      * app restarts at least.
      * 
-     * todo-0: look for places we call this to get data we HAVE or should have locally, for example to
+     * #todo-optimization: look for places we call this to get data we HAVE or should have locally, for example to
      * get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox) ...so we
      * can definitely do a little optimization here around this
      */
@@ -475,7 +475,7 @@ public class ActPubUtil extends ServiceBase {
      * 
      * someuser@ip:port (special testing mode, insecure)
      * 
-     * todo-0: check for any calls to this where we could've gotten the needed data locally 
+     * #todo-optimization: check for any calls to this where we could've gotten the needed data locally 
      */
     public APObj getWebFinger(MongoSession ms, String userDoingAction, String resource) {
         apub.saveFediverseName(resource);
@@ -598,6 +598,7 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
+    // #todo-optimization: we can call apub.getUserProperty() to get the value right? or is there a direct cache entry for this?
     public String getLongUserNameFromActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
         if (no(actorUrl)) {
             return null;

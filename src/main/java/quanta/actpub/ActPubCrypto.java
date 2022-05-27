@@ -167,7 +167,7 @@ public class ActPubCrypto extends ServiceBase {
                 }
             }
 
-            // todo-0: this block will eventually be unneeded once all accounts have pkey in them.
+            // #todo-optimization: this block will eventually be unneeded once all accounts have pkey in them.
             if (no(pkey)) {
                 log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet"); 
 

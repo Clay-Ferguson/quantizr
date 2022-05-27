@@ -370,6 +370,64 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
+     * Gets the property from the userName's account node or else resorts to calling webFinger+actorObj
+     * from web if not found locally. You must supply the actorObject property (apProp) as well as the
+     * SubNode property val name (nodeProp) to retrieve the value, because we might get it from either
+     * place.
+     * 
+     * For special case of retrieving actorUrl we pass apProp=null, and nodeProp=NodeProp.ACT_PUB_ACTOR_URL.s()
+     */
+    public String getUserProperty(MongoSession ms, String userDoingAction, String userName, String apProp, String nodeProp) {
+        // First try to get inbox for toUserName by looking for it the DB (with allowImport=false, to NOT
+        // import)
+        String val = (String) arun.run(as -> {
+            String ival = null;
+            SubNode accntNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, true, false);
+            if (ok(accntNode)) {
+                ival = accntNode.getStr(nodeProp);
+                if (ok(ival)) {
+                    log.debug("FOUND " + nodeProp + " IN DB: " + ival);
+                }
+            }
+            return ival;
+        });
+
+        /*
+         * if this inbox is null here, it just means we haven't imported the user into Quanta and that is
+         * fine, and we don't want to import them now either when all that's happening is they're being sent
+         * a message, so in this case access the user from scratch by getting webFinger, actorObject, etc.
+         */
+        if (no(val)) {
+            // Ignore userNames that are for our own host
+            String userHost = apUtil.getHostFromUserName(userName);
+            if (userHost.equals(prop.getMetaHost())) {
+                throw new RuntimeException("not foreign user.");
+            }
+
+            // log.debug("to Foreign User: " + toUserName);
+            APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, userName);
+            if (no(webFinger)) {
+                apLog.trace("Unable to get webfinger for " + userName);
+                throw new RuntimeException("unable to get webFinger");
+            }
+
+            String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+
+            // special case if we need only ActorUrl return now.
+            if (nodeProp.equals(NodeProp.ACT_PUB_ACTOR_URL.s())) {
+                return toActorUrl;
+            }
+
+            APObj toActorObj = apUtil.getActorByUrl(ms, userDoingAction, toActorUrl);
+            if (ok(toActorObj)) {
+                // log.debug(" actor: " + toActorUrl);
+                val = apStr(toActorObj, apProp);
+            }
+        }
+        return val;
+    }
+
+    /*
      * Sends message outbound to other inboxes, for all inboxes corresponding to all 'toUserNames'
      * IMPORTANT: This method doesn't require or expect 'toUserNames' to have been 'imported' into
      * Quanta. That is, there may not even BE a "user node" for any of these users, or there may be. We
@@ -382,8 +440,6 @@ public class ActPubService extends ServiceBase {
             boolean privateMessage, HashSet<String> skipInboxes) {
         if (no(toUserNames))
             return;
-
-        String host = prop.getMetaHost();
         String fromActor = null;
 
         /*
@@ -397,49 +453,13 @@ public class ActPubService extends ServiceBase {
 
             String inbox = apCache.inboxesByUserName.get(toUserName);
 
-            // if inbox wasn't found in cache we start trying to get it, trying DB first.
             if (no(inbox)) {
-                // First try to get inbox for toUserName by looking for it the DB (with allowImport=false, to NOT
-                // import)
-                inbox = (String) arun.run(as -> {
-                    String ibox = null;
-                    SubNode toUserAccntNode = apub.getAcctNodeByForeignUserName(as, fromUser, toUserName, true, false);
-                    if (ok(toUserAccntNode)) {
-                        ibox = toUserAccntNode.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
-                        if (ok(ibox)) {
-                            log.debug("FOUND INBOX IN DB: " + ibox);
-                        }
-                    }
-                    return ibox;
-                });
-            } else {
-                log.debug("cache hit on inbox: " + inbox);
-            }
-
-            /*
-             * if this inbox is null here, it just means we haven't imported the user into Quanta and that is
-             * fine, and we don't want to import them now either when all that's happening is they're being sent
-             * a message, so in this case access the user from scratch by getting webFinger, actorObject, etc.
-             */
-            if (no(inbox)) {
-                // Ignore userNames that are for our own host
-                String userHost = apUtil.getHostFromUserName(toUserName);
-                if (userHost.equals(host)) {
-                    continue;
+                try {
+                    inbox = getUserProperty(ms, fromUser, toUserName, APObj.inbox, NodeProp.ACT_PUB_ACTOR_INBOX.s());
                 }
-
-                // log.debug("to Foreign User: " + toUserName);
-                APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
-                if (no(webFinger)) {
-                    apLog.trace("Unable to get webfinger for " + toUserName);
+                // by design, we continue here. Yes this is correct.
+                catch (Exception e) {
                     continue;
-                }
-
-                String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-                APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
-                if (ok(toActorObj)) {
-                    // log.debug(" actor: " + toActorUrl);
-                    inbox = apStr(toActorObj, APObj.inbox);
                 }
             }
 

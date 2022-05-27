@@ -215,6 +215,7 @@ public class ActPubFollower extends ServiceBase {
             /* Starting with just actorUrl, lookup the follower count */
             int ret = 0;
             if (ok(actorUrl)) {
+                // #todo-optimization: we can call apub.getUserProperty() to get followersUrl right?
                 APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
                 if (ok(actor)) {
                     String followersUrl = apStr(actor, APObj.followers);

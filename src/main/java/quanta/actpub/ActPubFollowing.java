@@ -61,10 +61,21 @@ public class ActPubFollowing extends ServiceBase {
             }
 
             arun.run(ms -> {
-                // todo-0: inconsistent that we getWebFinger here and not other places???
-                APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(ms, followerUserName, apUserName);
-                String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
-                
+                // try getting actor url from cache first
+                String actorUrlOfUserBeingFollowed = apCache.actorUrlsByUserName.get(apUserName);
+
+                // if not found in cache, get it the harder way.
+                if (no(actorUrlOfUserBeingFollowed)) {
+                    actorUrlOfUserBeingFollowed = apub.getUserProperty(ms, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
+
+                    // if we got the actor url put it in the cache now.
+                    if (ok(actorUrlOfUserBeingFollowed)) {
+                        // are there othere places we can take advantage and load this cache, by chance? #todo-optimization
+                        // (yes I looked, there's about 20ish other places we can take advantage of having both these and just cram into cache)
+                        apCache.actorUrlsByUserName.put(apUserName, actorUrlOfUserBeingFollowed);
+                    }
+                }
+
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
 
                 // generate a bogus id follow id here. We don't need anything more
@@ -84,6 +95,7 @@ public class ActPubFollowing extends ServiceBase {
                             followAction);
                 }
 
+                // #todo-optimization: we can call apub.getUserProperty() to get toInbox right?
                 APObj toActor = apUtil.getActorByUrl(ms, followerUserName, actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
                     String toInbox = apStr(toActor, APObj.inbox);
@@ -120,6 +132,7 @@ public class ActPubFollowing extends ServiceBase {
         Runnable runnable = () -> {
             arun.<APObj>run(as -> {
                 try {
+                    // #todo-optimization: we can call apub.getUserProperty() to get followerUserName right?
                     APObj followerActor = apUtil.getActorByUrl(as, null, followerActorUrl);
                     if (no(followerActor)) {
                         apLog.trace("no followerActor object gettable from actor: " + followerActorUrl);
@@ -412,6 +425,7 @@ public class ActPubFollowing extends ServiceBase {
             /* Starting with just actorUrl, lookup the following count */
             int ret = 0;
             if (ok(actorUrl)) {
+                // #todo-optimization: we can call apub.getUserProperty() to get 'following' prop right?
                 APObj actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
                 if (ok(actor)) {
                     String followingUrl = apStr(actor, APObj.following);
