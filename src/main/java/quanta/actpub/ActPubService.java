@@ -375,7 +375,8 @@ public class ActPubService extends ServiceBase {
      * SubNode property val name (nodeProp) to retrieve the value, because we might get it from either
      * place.
      * 
-     * For special case of retrieving actorUrl we pass apProp=null, and nodeProp=NodeProp.ACT_PUB_ACTOR_URL.s()
+     * For special case of retrieving actorUrl we pass apProp=null, and
+     * nodeProp=NodeProp.ACT_PUB_ACTOR_URL.s()
      */
     public String getUserProperty(MongoSession ms, String userDoingAction, String userName, String apProp, String nodeProp) {
         // First try to get inbox for toUserName by looking for it the DB (with allowImport=false, to NOT
@@ -658,8 +659,13 @@ public class ActPubService extends ServiceBase {
         if (userNode.set(NodeProp.DISPLAY_NAME.s(), apStr(actor, APObj.name)))
             changed = true;
 
+        String actorId = apStr(actor, APObj.id);
+        if (no(actorId)) {
+            log.debug("no actorId on object: " + XString.prettyPrint(actor));
+        }
+
         // this is the URL of the Actor JSON object
-        if (userNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), apStr(actor, APObj.id)))
+        if (userNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), actorId))
             changed = true;
 
         String inbox = apStr(actor, APObj.inbox);
@@ -1609,7 +1615,6 @@ public class ActPubService extends ServiceBase {
     public void refreshActorPropsForAllUsers() {
         Runnable runnable = () -> {
             accountsRefreshed = 0;
-
             arun.run(ms -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
@@ -1620,7 +1625,9 @@ public class ActPubService extends ServiceBase {
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
-                    log.debug("rePullActor: " + userName);
+                    log.debug("rePullActor [" + accountsRefreshed + "]: " + userName);
+
+                    // todo-0: is this correct becasue there's also actor URL?
                     String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {
@@ -1636,8 +1643,10 @@ public class ActPubService extends ServiceBase {
                                 // since we're passing in the account node this importActor will basically just update the
                                 // properties on it and save it.
                                 importActor(ms, acctNode, actor);
-                                // log.debug("import ok");
+                                log.debug("import ok");
                                 accountsRefreshed++;
+                            } else {
+                                log.debug("Unable to get actor obj for url: " + url);
                             }
                         }
                     } catch (Exception e) {
@@ -1645,9 +1654,10 @@ public class ActPubService extends ServiceBase {
                         log.debug("Failed getting actor: " + url);
                     }
 
-                    // we don't want out VPS to think anything nefarious is happening (like we're doing a DDOS or
-                    // something) so we
-                    // sleep a full second between each user
+                    /*
+                     * we don't want out VPS to think anything nefarious is happening (like we're doing a DDOS or
+                     * something) so we sleep a full second between each user
+                     */
                     Util.sleep(1000);
                 }
                 log.debug("Finished refreshActorPropsForAllUsers");
