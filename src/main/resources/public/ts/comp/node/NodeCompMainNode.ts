@@ -13,6 +13,7 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
+import { NodeCompRow } from "./NodeCompRow";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
@@ -96,12 +97,21 @@ export class NodeCompMainNode extends Div {
                 }
             }
 
+            let boostComp: NodeCompRow = null;
+            if (node.boostedNode) {
+                // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
+                let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
+                let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.boostedNode.type);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, childrenImgSizes, true, false, true, true, null, state);
+            }
+
             this.setChildren([
                 header,
                 !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, null) : null,
                 new Clearfix("bbcf_" + node.id),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true),
+                boostComp,
                 new NodeCompRowFooter(node, false, true),
                 new Clearfix()
             ]);

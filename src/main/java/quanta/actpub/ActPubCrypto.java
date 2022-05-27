@@ -134,8 +134,7 @@ public class ActPubCrypto extends ServiceBase {
         }
     }
 
-    public PublicKey getPublicKeyFromActor(Object actorObj) {
-        PublicKey pubKey = null;
+    public String getEncodedPubKeyFromActorObj(Object actorObj) {
         Object pubKeyObj = apObj(actorObj, APObj.publicKey);
         if (no(pubKeyObj))
             return null;
@@ -144,9 +143,68 @@ public class ActPubCrypto extends ServiceBase {
         if (no(pkeyEncoded))
             return null;
 
-        // WARNING: This is a REGEX. replaceAll() uses REGEX.
-        pkeyEncoded = pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
+        // WARNING: This is a REGEX. replaceAll() uses REGEX., we extract out just the data part of the key
+        return pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
+    }
 
+    public PublicKey getPubKeyFromActorUrl(String userDoingAction, String actorUrl) {
+        return (PublicKey) arun.run(as -> {
+            PublicKey pkey = null;
+
+            // get account node for this actorUrl
+            SubNode accntNode = apub.getAcctNodeByActorUrl(as, userDoingAction, actorUrl);
+
+            // if we have account node
+            if (ok(accntNode)) {
+
+                // get pkey property off account
+                String pkEncoded = accntNode.getStr(NodeProp.ACT_PUB_KEYPEM);
+
+                // if the key was there decode it.
+                if (ok(pkEncoded)) {
+                    pkey = getPublicKeyFromEncoding(pkEncoded);
+                    log.debug("Got PK by Node: " + accntNode.getIdStr());
+                }
+            }
+
+            // todo-0: this block will eventually be unneeded once all accounts have pkey in them.
+            if (no(pkey)) {
+                log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet"); 
+
+                // Get ActorObject from actor url.
+                APObj actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
+                if (no(actorObj)) {
+                    log.debug("Unable to load actorUrl: " + actorUrl);
+                    return null;
+                }
+
+                String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);
+
+                // go ahead and repair the account right here and now (this is temporary code, because this outter
+                // if block is temporary.
+                if (ok(accntNode)) {
+                    if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
+                        log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
+                        update.save(as, accntNode, false);
+                    }
+                }
+                pkey = getPublicKeyFromEncoding(pkeyEncoded);
+            }
+
+            return pkey;
+        });
+    }
+
+    public PublicKey getPublicKeyFromActor(Object actorObj) {
+        String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);
+        return getPublicKeyFromEncoding(pkeyEncoded);
+    }
+
+    public PublicKey getPublicKeyFromEncoding(String pkeyEncoded) {
+        if (no(pkeyEncoded))
+            return null;
+
+        PublicKey pubKey = null;
         byte[] key = Base64.getDecoder().decode(pkeyEncoded);
         try {
             X509EncodedKeySpec spec = new X509EncodedKeySpec(key);

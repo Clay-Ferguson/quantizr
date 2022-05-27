@@ -726,7 +726,7 @@ public class NodeEditService extends ServiceBase {
 					exec.run(() -> {
 						arun.run(s -> {
 							if (!ThreadLocals.getSC().isAdmin()) {
-								apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false);
+								apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false, true);
 							}
 
 							/*

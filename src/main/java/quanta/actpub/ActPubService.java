@@ -50,6 +50,7 @@ import quanta.mongo.model.SubNode;
 import quanta.service.NodeSearchService;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /**
@@ -84,6 +85,9 @@ public class ActPubService extends ServiceBase {
             if (no(inbox)) {
                 throw new RuntimeException("No inbox for owner of node: " + node.getIdStr());
             }
+
+            // update cache just because we can
+            apCache.inboxesByUserName.put(likedAccount.getStr(NodeProp.USER.s()), inbox);
 
             // foreign ID of node being liked
             String apId = node.getStr(NodeProp.ACT_PUB_ID);
@@ -337,6 +341,9 @@ public class ActPubService extends ServiceBase {
                         String inbox = followerAccount.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
                         if (ok(inbox)) {
                             userInboxes.add(inbox);
+
+                            // update cache just because we can
+                            apCache.inboxesByUserName.put(followerAccount.getStr(NodeProp.USER.s()), inbox);
                         }
                     }
                 }
@@ -388,24 +395,60 @@ public class ActPubService extends ServiceBase {
                 continue;
             }
 
-            // Ignore userNames that are for our own host
-            String userHost = apUtil.getHostFromUserName(toUserName);
-            if (userHost.equals(host)) {
-                continue;
+            String inbox = apCache.inboxesByUserName.get(toUserName);
+
+            // if inbox wasn't found in cache we start trying to get it, trying DB first.
+            if (no(inbox)) {
+                // First try to get inbox for toUserName by looking for it the DB (with allowImport=false, to NOT
+                // import)
+                inbox = (String) arun.run(as -> {
+                    String ibox = null;
+                    SubNode toUserAccntNode = apub.getAcctNodeByForeignUserName(as, fromUser, toUserName, true, false);
+                    if (ok(toUserAccntNode)) {
+                        ibox = toUserAccntNode.getStr(NodeProp.ACT_PUB_ACTOR_INBOX);
+                        if (ok(ibox)) {
+                            log.debug("FOUND INBOX IN DB: " + ibox);
+                        }
+                    }
+                    return ibox;
+                });
+            } else {
+                log.debug("cache hit on inbox: " + inbox);
             }
 
-            // log.debug("to Foreign User: " + toUserName);
-            APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
-            if (no(webFinger)) {
-                apLog.trace("Unable to get webfinger for " + toUserName);
-                continue;
+            /*
+             * if this inbox is null here, it just means we haven't imported the user into Quanta and that is
+             * fine, and we don't want to import them now either when all that's happening is they're being sent
+             * a message, so in this case access the user from scratch by getting webFinger, actorObject, etc.
+             */
+            if (no(inbox)) {
+                // Ignore userNames that are for our own host
+                String userHost = apUtil.getHostFromUserName(toUserName);
+                if (userHost.equals(host)) {
+                    continue;
+                }
+
+                // log.debug("to Foreign User: " + toUserName);
+                APObj webFinger = apUtil.getWebFinger(ms, fromUser, toUserName);
+                if (no(webFinger)) {
+                    apLog.trace("Unable to get webfinger for " + toUserName);
+                    continue;
+                }
+
+                String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+                APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
+                if (ok(toActorObj)) {
+                    // log.debug(" actor: " + toActorUrl);
+                    inbox = apStr(toActorObj, APObj.inbox);
+                }
             }
 
-            String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-            APObj toActorObj = apUtil.getActorByUrl(ms, fromUser, toActorUrl);
-            if (ok(toActorObj)) {
-                // log.debug(" actor: " + toActorUrl);
-                String inbox = apStr(toActorObj, APObj.inbox);
+            if (!StringUtils.isEmpty(inbox)) {
+                /*
+                 * regardless of how we ended up getting 'inbox' here we cache it by userName, so that future calls
+                 * to this method to send them more messages will be lightning fast (from memory)
+                 */
+                apCache.inboxesByUserName.put(toUserName, inbox);
 
                 // send post if inbox not in skipInboxes
                 if (!skipInboxes.contains(inbox)) {
@@ -428,8 +471,8 @@ public class ActPubService extends ServiceBase {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
      * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName,
-            boolean preferDbNode) {
+    public SubNode getAcctNodeByForeignUserName(MongoSession ms, String userDoingAction, String apUserName, boolean preferDbNode,
+            boolean allowImport) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -447,7 +490,7 @@ public class ActPubService extends ServiceBase {
             acctNode = read.getUserNodeByUserName(ms, apUserName);
         }
 
-        if (no(acctNode)) {
+        if (no(acctNode) && allowImport) {
             /* First try to get a cached actor APObj */
             APObj actor = apCache.actorsByUserName.get(apUserName);
 
@@ -461,7 +504,7 @@ public class ActPubService extends ServiceBase {
          * if we were unable to get the acctNode, then we need to read it from scratch meaning starting at
          * the very beginning which is to get webFinger first and load from there
          */
-        if (no(acctNode)) {
+        if (no(acctNode) && allowImport) {
             log.debug("Load:" + apUserName);
             APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, apUserName);
 
@@ -479,7 +522,11 @@ public class ActPubService extends ServiceBase {
             apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
             apCache.acctNodesByUserName.put(apUserName, acctNode);
         } else {
-            log.error("Unable to load user: " + apUserName);
+            // it's only an error if we were allowing an import, otherwise a null return is *not* an error, but
+            // a normal flow.
+            if (allowImport) {
+                log.error("Unable to load user: " + apUserName);
+            }
         }
         return acctNode;
     }
@@ -595,11 +642,23 @@ public class ActPubService extends ServiceBase {
         if (userNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), apStr(actor, APObj.id)))
             changed = true;
 
-        if (userNode.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), apStr(actor, APObj.inbox)))
+        String inbox = apStr(actor, APObj.inbox);
+
+        // update cache just because we can
+        apCache.inboxesByUserName.put(userNode.getStr(NodeProp.USER.s()), inbox);
+
+        if (userNode.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), inbox))
             changed = true;
 
         // this is the URL of the HTML of the actor.
         if (userNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), apStr(actor, APObj.url)))
+            changed = true;
+
+        // get the pubKey so we can save into our account node
+        String pubKey = apCrypto.getEncodedPubKeyFromActorObj(actor);
+
+        // this is the PublicKey.pubKeyPem, of the user
+        if (userNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pubKey))
             changed = true;
 
         if (changed) {
@@ -718,14 +777,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            // Get ActorObject from actor url.
-            APObj actorObj = apUtil.getActorByUrl(ms, null, actorUrl);
-            if (no(actorObj)) {
-                log.debug("Unable to load actorUrl: " + actorUrl);
-                return null;
-            }
-
-            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -741,12 +793,12 @@ public class ActPubService extends ServiceBase {
             switch (type) {
                 case APType.ChatMessage:
                 case APType.Note:
-                    processCreateOrUpdateNote(ms, actorUrl, actorObj, object, action);
+                    processCreateOrUpdateNote(ms, actorUrl, object, action);
                     break;
 
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Create action");
+                    log.debug("Unhandled Create action: " + type + "\n" + XString.prettyPrint(payload));
                     break;
             }
             return null;
@@ -763,13 +815,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
-            if (no(actorObj)) {
-                log.debug("Unable to load actorUrl: " + actorUrl);
-                return null;
-            }
-
-            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -835,15 +881,8 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            // get actorObj from actorUrl
-            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
-            if (no(actorObj)) {
-                log.debug("Unable to load actorUrl: " + actorUrl);
-                return null;
-            }
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
 
-            // validate signature
-            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
             } catch (Exception e) {
@@ -900,13 +939,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            APObj actorObj = apUtil.getActorByUrl(as, null, actorUrl);
-            if (no(actorObj)) {
-                log.debug("Unable to load actorUrl: " + actorUrl);
-                return null;
-            }
-
-            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -935,7 +968,7 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj, String action) {
+    public void processCreateOrUpdateNote(MongoSession ms, String actorUrl, Object obj, String action) {
         apLog.trace("processCreateOrUpdateNote");
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
@@ -1157,7 +1190,7 @@ public class ActPubService extends ServiceBase {
 
             // make sure username contains @ making it a foreign user.
             if (user.contains("@")) {
-                SubNode userNode = getAcctNodeByForeignUserName(ms, null, user, true);
+                SubNode userNode = getAcctNodeByForeignUserName(ms, null, user, true, true);
                 if (!ok(userNode)) {
                     log.debug("Unable to import user: " + user);
                 }
@@ -1562,13 +1595,12 @@ public class ActPubService extends ServiceBase {
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
                 for (SubNode acctNode : accountNodes) {
-
                     // get userName, and skip over any that aren't foreign accounts
                     String userName = acctNode.getStr(NodeProp.USER.s());
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
-                    // log.debug("get webFinger: " + userName);
+                    log.debug("rePullActor: " + userName);
                     String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {
@@ -1592,6 +1624,11 @@ public class ActPubService extends ServiceBase {
                         // todo-1: eating this for now.
                         log.debug("Failed getting actor: " + url);
                     }
+
+                    // we don't want out VPS to think anything nefarious is happening (like we're doing a DDOS or
+                    // something) so we
+                    // sleep a full second between each user
+                    Util.sleep(1000);
                 }
                 log.debug("Finished refreshActorPropsForAllUsers");
                 return null;
@@ -1603,7 +1640,7 @@ public class ActPubService extends ServiceBase {
     public void loadForeignUser(String userMakingRequest, String userName) {
         arun.run(ms -> {
             apLog.trace("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByForeignUserName(ms, userMakingRequest, userName, false);
+            SubNode userNode = getAcctNodeByForeignUserName(ms, userMakingRequest, userName, false, true);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;

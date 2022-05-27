@@ -411,7 +411,11 @@ public class ActPubUtil extends ServiceBase {
 
     /*
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
-     * app restarts at least, o
+     * app restarts at least.
+     * 
+     * todo-0: look for places we call this to get data we HAVE or should have locally, for example to
+     * get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox) ...so we
+     * can definitely do a little optimization here around this
      */
     @PerfMon(category = "apUtil")
     public APObj getActorByUrl(MongoSession ms, String userDoingAction, String url) {
@@ -445,7 +449,7 @@ public class ActPubUtil extends ServiceBase {
         String actorUrl = null;
 
         MongoSession as = auth.getAdminSession();
-        SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false);
+        SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false, true);
         if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
@@ -470,6 +474,8 @@ public class ActPubUtil extends ServiceBase {
      * someuser@server.org (normal Fediverse, no port)
      * 
      * someuser@ip:port (special testing mode, insecure)
+     * 
+     * todo-0: check for any calls to this where we could've gotten the needed data locally 
      */
     public APObj getWebFinger(MongoSession ms, String userDoingAction, String resource) {
         apub.saveFediverseName(resource);

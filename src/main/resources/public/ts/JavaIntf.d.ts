@@ -959,6 +959,7 @@ export const enum NodeProp {
     ACT_PUB_USER_IMAGE_URL = "ap:userImage",
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
+    ACT_PUB_KEYPEM = "ap:keyPem",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
     ACT_PUB_SENSITIVE = "ap:nsfw",
     ACT_PUB_TAG = "ap:tag",

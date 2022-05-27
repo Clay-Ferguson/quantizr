@@ -61,6 +61,7 @@ public class ActPubFollowing extends ServiceBase {
             }
 
             arun.run(ms -> {
+                // todo-0: inconsistent that we getWebFinger here and not other places???
                 APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(ms, followerUserName, apUserName);
                 String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
                 
@@ -130,7 +131,7 @@ public class ActPubFollowing extends ServiceBase {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user
-                    SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, null, followerUserName, false);
+                    SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, null, followerUserName, false, true);
                     if (no(followerAccountNode)) {
                         apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);

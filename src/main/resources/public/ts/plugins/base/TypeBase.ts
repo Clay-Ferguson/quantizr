@@ -138,7 +138,6 @@ export class TypeBase implements TypeHandlerIntf {
             }
             // otherwise just return the content component itself.
             else {
-                // if content is empty we return nothing here. need to test. todo-0
                 return comp;
             }
         }

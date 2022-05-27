@@ -11,7 +11,9 @@ import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
 
 /**
- * Holds all the global caches related to AP
+ * Holds all the global caches related to AP.
+ * 
+ * todo-0: need a daily timer that cleans each of these out once every 24hrs.
  */
 @Component
 public class ActPubCache extends ServiceBase {
@@ -25,6 +27,9 @@ public class ActPubCache extends ServiceBase {
 
     /* Cache Actor objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> actorsByUserName = new ConcurrentHashMap<>();
+
+     /* Cache Actor objects by UserName in memory only for now */
+     public final ConcurrentHashMap<String, String> inboxesByUserName = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by URL in memory only for now */
     public final ConcurrentHashMap<String, APObj> actorsByUrl = new ConcurrentHashMap<>();

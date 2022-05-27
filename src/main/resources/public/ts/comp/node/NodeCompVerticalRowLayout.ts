@@ -36,7 +36,6 @@ export class NodeCompVerticalRowLayout extends Div {
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
 
-        // todo-0: the "boosted" rendering needs to ALSO be done on the page parent node, and on feed views, etc...
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
             if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {

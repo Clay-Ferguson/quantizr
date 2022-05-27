@@ -26,6 +26,8 @@ public enum NodeProp {
     // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
 
+    ACT_PUB_KEYPEM("ap:keyPem", "s"), //
+
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
