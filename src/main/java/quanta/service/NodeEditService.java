@@ -176,7 +176,13 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
-			newNode.set(NodeProp.BOOST.s(), req.getBoostTarget());
+			/* If the node being boosted is itself a boost then boost the original boost instead */
+			SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
+			if (ok(nodeToBoost)) {
+				String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
+				newNode.set(NodeProp.BOOST.s(), ok(innerBoost) ? innerBoost : req.getBoostTarget());
+
+			}
 		}
 
 		update.save(ms, newNode);
@@ -522,8 +528,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
-				false, true, true);
+		NodeInfo newNodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false, true, true);
 		res.setNode(newNodeInfo);
 
 		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check

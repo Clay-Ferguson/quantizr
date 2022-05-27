@@ -501,7 +501,7 @@ public class ActPubService extends ServiceBase {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (ok(actor)) {
-            acctNode = apub.importActor(ms, null, actor);
+            acctNode = importActor(ms, null, actor);
             if (ok(acctNode)) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
                 apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
@@ -631,7 +631,7 @@ public class ActPubService extends ServiceBase {
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                apub.processCreateOrUpdateAction(httpReq, payload, type);
+                processCreateOrUpdateAction(httpReq, payload, type);
                 break;
 
             case APType.Follow:
@@ -639,23 +639,23 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                apub.processUndoAction(httpReq, payload);
+                processUndoAction(httpReq, payload);
                 break;
 
             case APType.Delete:
-                apub.processDeleteAction(httpReq, payload);
+                processDeleteAction(httpReq, payload);
                 break;
 
             case APType.Accept:
-                apub.processAcceptAction(payload);
+                processAcceptAction(payload);
                 break;
 
             case APType.Like:
-                apub.processLikeAction(httpReq, payload, false);
+                processLikeAction(httpReq, payload, false);
                 break;
 
             case APType.Announce:
-                apub.processAnnounceAction(httpReq, payload, false);
+                processAnnounceAction(httpReq, payload, false);
                 break;
 
             default:
@@ -676,7 +676,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                apub.processLikeAction(httpReq, payload, true);
+                processLikeAction(httpReq, payload, true);
+                break;
+
+            case APType.Announce:
+                processAnnounceAction(httpReq, payload, true);
                 break;
 
             default:
@@ -737,7 +741,7 @@ public class ActPubService extends ServiceBase {
             switch (type) {
                 case APType.ChatMessage:
                 case APType.Note:
-                    apub.processCreateOrUpdateNote(ms, actorUrl, actorObj, object, action);
+                    processCreateOrUpdateNote(ms, actorUrl, actorObj, object, action);
                     break;
 
                 default:
@@ -847,6 +851,13 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
+            // if this is an undo operation we just delete the node and we're done.
+            if (undo) {
+                String id = apStr(payload, APObj.id);
+                delete.deleteByPropVal(as, NodeProp.ACT_PUB_ID.s(), id);
+                return null;
+            }
+
             // get the url of the thing being boosted
             String objectIdUrl = apStr(payload, APObj.object);
             if (no(objectIdUrl)) {
@@ -860,7 +871,7 @@ public class ActPubService extends ServiceBase {
                 // log.debug("BOOSTING: " + XString.prettyPrint(boostedNode));
 
                 // get account node for person doing the boosting
-                SubNode actorAccountNode = apub.getAcctNodeByActorUrl(as, null, actorUrl);
+                SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, actorUrl);
                 if (ok(actorAccountNode)) {
                     String userName = actorAccountNode.getStr(NodeProp.USER.s());
 
@@ -868,7 +879,7 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    apub.saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce,
+                    saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce,
                             boostedNode.getIdStr());
                 }
             } else {
@@ -912,14 +923,10 @@ public class ActPubService extends ServiceBase {
             }
             log.debug("delete: " + type);
 
-            deleteObject(as, actorUrl, actorObj, object);
+            String id = apStr(object, APObj.id);
+            delete.deleteByPropVal(as, NodeProp.ACT_PUB_ID.s(), id);
             return null;
         });
-    }
-
-    public void deleteObject(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
-        String id = apStr(obj, APObj.id);
-        delete.deleteByPropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
 
     /*
@@ -958,7 +965,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            apub.saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null);
+            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -969,12 +976,12 @@ public class ActPubService extends ServiceBase {
             apLog.trace("not reply to existing Quanta node.");
 
             // get actor's account node from their actorUrl
-            SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, null, actorUrl);
+            SubNode actorAccountNode = getAcctNodeByActorUrl(ms, null, actorUrl);
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                apub.saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null);
+                saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null);
             }
         }
     }
@@ -1120,8 +1127,8 @@ public class ActPubService extends ServiceBase {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
-        apub.shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
-        apub.shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
+        shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
+        shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
 
         if (forcePublic) {
             acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
@@ -1150,7 +1157,7 @@ public class ActPubService extends ServiceBase {
 
             // make sure username contains @ making it a foreign user.
             if (user.contains("@")) {
-                SubNode userNode = apub.getAcctNodeByForeignUserName(ms, null, user, true);
+                SubNode userNode = getAcctNodeByForeignUserName(ms, null, user, true);
                 if (!ok(userNode)) {
                     log.debug("Unable to import user: " + user);
                 }
@@ -1198,7 +1205,7 @@ public class ActPubService extends ServiceBase {
          * try that first
          */
         if (!url.contains("/followers")) {
-            apub.shareNodeToActorByUrl(ms, userDoingAction, node, url);
+            shareNodeToActorByUrl(ms, userDoingAction, node, url);
         }
         /*
          * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
