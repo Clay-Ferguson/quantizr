@@ -125,7 +125,8 @@ public class ActPubOutbox extends ServiceBase {
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create, null, null);
+                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create,
+                                            null, null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {
                                     log.debug("Record already existed: " + dke.getMessage());
@@ -275,7 +276,18 @@ public class ActPubOutbox extends ServiceBase {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
+            /*
+             * todo-0: this should actually try to auth with the session if it can, and if there's no quanta
+             * session with a logged in user then it should check to see who the signature is on the headers
+             * (from AP), and if that user signature is successful, then lookup the user associated with the
+             * public key, and THEN allow this if the node is shared with THAT user. This whole process also
+             * needs to be packaged into a function. Check other places this is potentially wrong also.
+             * 
+             * todo-0: also per the above, search everywhere else this kind of thing might be blocking access
+             * when it maybe doesn't need to.
+             */
             if (!AclService.isPublic(as, node)) {
+                log.debug("getResource failed on non-public node: " + node.getIdStr());
                 throw new NodeAuthFailedException();
             }
 
