@@ -255,6 +255,9 @@ export class MediaRecorderDlg extends DialogBase {
         this.recordingTime = 0;
 
         this.mergeState<LS>({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
+
+        // todo-0: need code to enforce the call to clear this timer, no matter when or how this dialog vanishes.
+        // probably needs to be a recact hook.
         this.recordingTimer = setInterval(() => {
             this.recordingTimeslice();
         }, 1000);

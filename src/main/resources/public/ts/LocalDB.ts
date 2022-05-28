@@ -92,8 +92,6 @@ export class LocalDB {
         await this.writeObject({ name: keyPrefix + key, val });
     }
 
-    /* Saves an object under the specified name, assuming the object itself has a 'name' property.
-     Basically emulating a simple "map" with string key. */
     writeObject = async (val: Object): Promise<void> => {
         // We use a Promise here because we're sesolving inside a callback
         return new Promise<void>(async (resolve, reject) => {

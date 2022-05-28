@@ -44,7 +44,11 @@ import { SelectTagsDlg } from "./SelectTagsDlg";
  */
 export class EditNodeDlg extends DialogBase {
 
+    static autoSaveTimer: any = null;
+    static currentInst: EditNodeDlg = null;
+
     static pendingUploadFile: File = null;
+
     utl: EditNodeDlgUtil = new EditNodeDlgUtil();
 
     static embedInstance: EditNodeDlg;
@@ -77,6 +81,9 @@ export class EditNodeDlg extends DialogBase {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
         this.close = this.close.bind(this);
 
+        // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
+        EditNodeDlg.currentInst = this;
+
         if (mode === DialogMode.EMBED) {
             if (EditNodeDlg.embedInstance) {
                 /* we get here if user starts editing another node and abandons the one currently being edited.
@@ -85,6 +92,13 @@ export class EditNodeDlg extends DialogBase {
             }
             EditNodeDlg.embedInstance = this;
         }
+
+        if (S.edit.pendingContent && node.id === S.edit.pendingContentId) {
+            node.content = S.edit.pendingContent;
+            S.edit.pendingContent = null;
+            S.edit.pendingContentId = null;
+        }
+
         this.mergeState<LS>({
             node,
             // selected props is used as a set of all 'selected' (via checkbox) property names
@@ -112,6 +126,28 @@ export class EditNodeDlg extends DialogBase {
                 // this.save();
             }, 250);
         }
+
+        // create one timer one time (singleton pattern)
+        if (!EditNodeDlg.autoSaveTimer) {
+            // save editor state every 3 seconds so user can recover editing if anything goes wrong.
+            // This should be CLEARED upon successful saves only, and have this static var set back to null
+            EditNodeDlg.autoSaveTimer = setInterval(async () => {
+                let state = EditNodeDlg.currentInst.getState<LS>();
+                await S.localDB.setVal(C.STORE_EDITOR_DATA, {
+                    nodeId: state.node.id,
+                    content: EditNodeDlg.currentInst.contentEditorState.getValue()
+                });
+            }, 3000);
+        }
+    }
+
+    resetAutoSaver = async () => {
+        console.log("resetAutoSaver");
+        if (EditNodeDlg.autoSaveTimer) {
+            clearInterval(EditNodeDlg.autoSaveTimer);
+            EditNodeDlg.autoSaveTimer = null;
+        }
+        await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
     }
 
     createLayoutSelection = (): Selection => {
@@ -671,6 +707,11 @@ export class EditNodeDlg extends DialogBase {
 
             this.editorHelp ? new HelpButton(() => this.editorHelp) : null
         ]);
+    }
+
+    closeByUser(): void {
+        super.closeByUser();
+        this.resetAutoSaver();
     }
 
     close(): void {

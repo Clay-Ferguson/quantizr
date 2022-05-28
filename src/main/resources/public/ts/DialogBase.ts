@@ -157,6 +157,10 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         }, 100);
     }
 
+    public closeByUser(): void {
+        // derived classes can hook into this to detect that it was a user click that closed the dialog
+    }
+
     public close(): void {
         if (this.mode === DialogMode.EMBED) {
             return;
@@ -233,7 +237,10 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
         titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
             className: "float-end app-modal-title-close-icon",
-            onClick: this.close,
+            onClick: () => {
+                this.closeByUser();
+                this.close();
+            },
             title: "Close Dialog"
         }));
 

@@ -78,6 +78,10 @@ export class EditNodeDlgUtil {
             node: state.node
         });
 
+        if (res?.success) {
+            dlg.resetAutoSaver();
+        }
+
         /* IMPORTANT: If there's an after edit action function specified on the dialog then that will be the ONLY
          action performed after the saveNode, so if we ever need any of the below logic to be run, in the case with
          afterEditAction we'd have to call that logic inside the afterEditAction function. */
@@ -478,6 +482,7 @@ an upload has been added or removed. */
     }
 
     cancelEdit = (dlg: EditNodeDlg): void => {
+        dlg.closeByUser();
         dlg.close();
 
         // rollback properties.

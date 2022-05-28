@@ -19,6 +19,8 @@ import { FeedView } from "./tabs/FeedView";
 export class Edit {
 
     showReadOnlyProperties: boolean = false;
+    pendingContent: string = null;
+    pendingContentId: string = null;
 
     openChangePasswordDlg = (state: AppState): void => {
         new ChangePasswordDlg(null, state).open();

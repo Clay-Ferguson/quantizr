@@ -1641,4 +1641,14 @@ export class Util {
             });
         });
     }
+
+    resumeEditingOfAbandoned = async (): Promise<void> => {
+        const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
+        if (editorData?.nodeId && editorData?.content) {
+            await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
+            S.edit.pendingContent = editorData.content;
+            S.edit.pendingContentId = editorData.nodeId;
+            S.edit.runEditNode(null, editorData.nodeId, true, false, false, null, null);
+        }
+    }
 }

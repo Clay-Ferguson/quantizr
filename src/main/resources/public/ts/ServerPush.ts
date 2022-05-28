@@ -34,7 +34,7 @@ export class ServerPush {
             // console.log("ServerPush.onerror:" + e);
         };
 
-        this.eventSource.addEventListener("sessionTimeout", (e: any) => {
+        this.eventSource.addEventListener("sessionTimeout", async (e: any) => {
             // console.log("event: sessionTimeout.");
             S.quanta.authToken = null;
             S.quanta.userName = null;
@@ -45,7 +45,13 @@ export class ServerPush {
             // S.nav.login(state);
             // window.location.href = window.location.origin;
 
-            new MessageDlg("Your session has ended due to inactivity.", "Quanta",
+            let message = "";
+            const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
+            if (editorData?.nodeId && editorData?.content) {
+                message = "<p><p>Click to resume editing.";
+            }
+
+            new MessageDlg("Your session has ended due to inactivity." + message, "Quanta",
                 () => {
                     history.go(0);
                 }, null, false, 0, "app-modal-content-tiny-width", state
