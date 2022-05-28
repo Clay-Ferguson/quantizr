@@ -563,8 +563,8 @@ public class NodeEditService extends ServiceBase {
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 					String boostTarget = parent.getStr(NodeProp.BOOST);
 
-					// if there's an unpublished property then we don't send out over ActPub
-					if (no(node.getBool(NodeProp.UNPUBLISHED)) || !node.getBool(NodeProp.UNPUBLISHED)) {
+					// if there's an unpublished property (and true) then we don't send out over ActPub
+					if (!node.getBool(NodeProp.UNPUBLISHED)) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
 						apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
 								node.getContent(), nodeUrl, boostTarget);

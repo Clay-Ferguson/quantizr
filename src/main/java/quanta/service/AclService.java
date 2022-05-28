@@ -85,32 +85,44 @@ public class AclService extends ServiceBase {
 		SubNode node = read.getNode(ms, req.getNodeId());
 		BulkOperations bops = null;
 
+		/*
+		 * todo-0: It seems like maybe batching can't update a collection property? so for now I'm
+		 * disabling, and yes disabling batch mode makes this code work.
+		 */
+		boolean batchMode = false;
+
 		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
 
 		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
+			if (batchMode) {
+				// lazy instantiate
+				if (no(bops)) {
+					bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+				}
 
-			// lazy instantiate
-			if (no(bops)) {
-				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
-			}
+				try {
+					auth.ownerAuth(ms, n);
+					n.set(NodeProp.UNPUBLISHED.s(), unpublished ? unpublished : null);
 
-			try {
+					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+					// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(node.getAc()));
+					Update update = new Update().set(SubNode.AC, node.getAc()).set(SubNode.PROPS, n.getProps());
+					bops.updateOne(query, update);
+				} catch (Exception e) {
+					// not an error, we just can't properties on nodes we don't own, so we skip them
+				}
+			} else {
 				auth.ownerAuth(ms, n);
 				n.set(NodeProp.UNPUBLISHED.s(), unpublished ? unpublished : null);
-
-				Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
-				// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
-
-				Update update = new Update().set(SubNode.AC, node.getAc()).set(SubNode.PROPS, n.getProps());
-				bops.updateOne(query, update);
-			} catch (Exception e) {
-				// not an error, we just can't properties on nodes we don't own, so we skip them
+				n.setAc(node.getAc());
 			}
 		}
 
-		if (ok(bops)) {
+		if (batchMode && ok(bops)) {
 			BulkWriteResult results = bops.execute();
-			// log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+			log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+		} else {
+			update.saveSession(ms);
 		}
 		res.setSuccess(true);
 		return res;
@@ -289,6 +301,9 @@ public class AclService extends ServiceBase {
 
 			// if bulk operation
 			if (ok(bops)) {
+				// todo-0: this needs testing because the other place I'm doing similar code elsewhere refuses to work
+				// somehow. Seems like updating collections might not work in batching. Currently there are no places we call
+				// this method with bops passed in, so this bops branch is not currently being used for that reason.
 				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 				Update update = new Update().set(SubNode.AC, acl);
 				bops.updateOne(query, update);

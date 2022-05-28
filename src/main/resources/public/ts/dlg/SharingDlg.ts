@@ -36,7 +36,7 @@ export class SharingDlg extends DialogBase {
                 new Div("Note: All usernames mentioned in the content text will also be automatically added to this sharing list when you save the node, " +
                     "so you don't need to add users here if they're mentioned when you save.", { className: "marginBottom" }),
                 new EditPrivsTable((allowAppends: boolean) => {
-                    this.shareNodeToPublic(allowAppends, state.recursive);
+                    this.shareNodeToPublic(allowAppends);
                 }, this.getState<LS>().nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
@@ -78,7 +78,7 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
-                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false, state.recursive), null, "btn-secondary"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false), null, "btn-secondary"),
                     new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
@@ -166,7 +166,7 @@ export class SharingDlg extends DialogBase {
         this.mergeState<LS>({ nodePrivsInfo: res });
     }
 
-    shareNodeToPublic = async (allowAppends: boolean, recursive: boolean) => {
+    shareNodeToPublic = async (allowAppends: boolean) => {
         this.dirty = true;
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {

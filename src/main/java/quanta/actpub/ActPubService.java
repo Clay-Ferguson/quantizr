@@ -164,7 +164,6 @@ public class ActPubService extends ServiceBase {
                 if (!StringUtils.isEmpty(boostTarget)) {
                     ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
                     message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostTarget, now, privateMessage);
-                    log.debug("Outbound Announce: " + message);
                 }
                 // else send out as a note.
                 else {
@@ -181,27 +180,25 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = new HashSet<>();
                     getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
-                    if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
-                        for (String inbox : sharedInboxes) {
-                            apLog.trace("Posting to Shared Inbox: " + inbox);
-                            try {
-                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                            }
-                            // catch error from any server, and ignore, go to next server to send to.
-                            catch (Exception e) {
-                                apLog.trace("failed to post to: " + inbox);
-                            }
+                    for (String inbox : sharedInboxes) {
+                        apLog.trace("Posting to Shared Inbox: " + inbox);
+                        try {
+                            apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                         }
+                        // catch error from any server, and ignore, go to next server to send to.
+                        catch (Exception e) {
+                            apLog.trace("failed to post to: " + inbox);
+                        }
+                    }
 
-                        for (String inbox : userInboxes) {
-                            apLog.trace("Posting to User Inbox: " + inbox);
-                            try {
-                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                            }
-                            // catch error from any server, and ignore, go to next server to send to.
-                            catch (Exception e) {
-                                apLog.trace("failed to post to: " + inbox);
-                            }
+                    for (String inbox : userInboxes) {
+                        apLog.trace("Posting to User Inbox: " + inbox);
+                        try {
+                            apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+                        }
+                        // catch error from any server, and ignore, go to next server to send to.
+                        catch (Exception e) {
+                            apLog.trace("failed to post to: " + inbox);
                         }
                     }
                 }
@@ -1091,6 +1088,14 @@ public class ActPubService extends ServiceBase {
         String lang = "0";
         Object context = apObj(obj, APObj.context);
         if (ok(context)) {
+            // todo-1:
+            // Some servers have this for 'context' (i.e. an array), so we need to support and be able to get
+            // language this way...
+            // [ "https://www.w3.org/ns/activitystreams", "https://shitposter.club/schemas/litepub-0.1.jsonld",
+            // {
+            // "@language" : "und"
+            // } ]
+
             String language = apStr(context, "@language");
             if (ok(language)) {
                 lang = language;
@@ -1624,6 +1629,12 @@ public class ActPubService extends ServiceBase {
                     String userName = acctNode.getStr(NodeProp.USER.s());
                     if (no(userName) || !userName.contains("@"))
                         continue;
+
+                    // todo-0: temp code here...(so we can finish assigning keys)
+                    // if we have a key already, continue to next account.
+                    if (ok(acctNode.getStr(NodeProp.ACT_PUB_KEYPEM))) {
+                        continue;
+                    }
 
                     log.debug("rePullActor [" + accountsRefreshed + "]: " + userName);
 

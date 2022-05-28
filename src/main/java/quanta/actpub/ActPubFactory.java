@@ -142,7 +142,8 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new Announce
 	 */
-	public APObj newAnnounce(String userDoingAction, String actor, String id, HashSet<String> toUserNames, String boostTargetActPubId,  ZonedDateTime now, boolean privateMessage) {
+	public APObj newAnnounce(String userDoingAction, String actor, String id, HashSet<String> toUserNames,
+			String boostTargetActPubId, ZonedDateTime now, boolean privateMessage) {
 		APObj ret = new APOAnnounce(actor, id, now.format(DateTimeFormatter.ISO_INSTANT), boostTargetActPubId, null);
 
 		LinkedList<String> toList = new LinkedList<>();
@@ -209,9 +210,15 @@ public class ActPubFactory extends ServiceBase {
 		List<String> ccActors = new LinkedList<>();
 		for (String userName : toUserNames) {
 			try {
-				// Local usernames will get a null here, by design, which is hopefully correct. We can call
-				// apUtil.makeActorUrlForUserName(userName)
-				// for local users, but aren't doing that, by design.
+				/*
+				 * Local usernames will get a null here, by design, which is hopefully correct. We can call
+				 * apUtil.makeActorUrlForUserName(userName) for local users, but aren't doing that, by design.
+				 * 
+				 * todo-0: I think it's a bug that outbound messages like this aren't including local names in these
+				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those users
+				 * but they still need to be in the list so servers can know WHO was 'theoretically' delivered to?
+				 * ...in addition to the fact that they may or may not be 'mentioned' in the content.
+				 */
 				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 				if (no(actorUrl))
 					continue;
@@ -232,10 +239,6 @@ public class ActPubFactory extends ServiceBase {
 
 		if (!privateMessage) {
 			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
-		}
-
-		if (toActors.size() == 0) {
-			throw new RuntimeException("toActors was empty.");
 		}
 
 		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
