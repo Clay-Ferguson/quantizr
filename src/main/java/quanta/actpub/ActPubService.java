@@ -1661,15 +1661,7 @@ public class ActPubService extends ServiceBase {
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
-                    // todo-0: temp code here...(so we can finish assigning keys)
-                    // if we have a key already, continue to next account.
-                    if (ok(acctNode.getStr(NodeProp.ACT_PUB_KEYPEM))) {
-                        continue;
-                    }
-
                     log.debug("rePullActor [" + accountsRefreshed + "]: " + userName);
-
-                    // todo-0: is this correct becasue there's also actor URL?
                     String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {

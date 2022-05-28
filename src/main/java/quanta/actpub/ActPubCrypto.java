@@ -169,7 +169,7 @@ public class ActPubCrypto extends ServiceBase {
                         keyVal.setVal(pkEncoded);
                     }
                     pkey = getPublicKeyFromEncoding(pkEncoded);
-                    log.debug("Got PK by Node: " + accntNode.getIdStr());
+                    // log.debug("Got PK by Node: " + accntNode.getIdStr());
                 }
             }
 
@@ -190,16 +190,14 @@ public class ActPubCrypto extends ServiceBase {
                     keyVal.setVal(pkeyEncoded);
                 }
 
-                // todo-0: we can remove this block once all accounts have key. go ahead and repair the account
-                // right here and
-                // now (this is temporary code, because this outter
-                // if block is temporary.
-                if (ok(accntNode)) {
-                    if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
-                        log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
-                        update.save(as, accntNode, false);
-                    }
-                }
+                // DO NOT DELETE (yet)
+                // repair key if not existing (code no longer needed)
+                // if (ok(accntNode)) {
+                //     if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
+                //         log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
+                //         update.save(as, accntNode, false);
+                //     }
+                // }
                 pkey = getPublicKeyFromEncoding(pkeyEncoded);
             }
 
@@ -261,13 +259,10 @@ public class ActPubCrypto extends ServiceBase {
             throw new RuntimeException("ActPub attempted admin mods.");
         }
 
-        // todo-0: for now we always return true, until we know the server DB has all keys populated. (a process underway 5/28/2022)
-        return true;
-
-        // SubNode accntNode = read.getNode(ms, ownerId);
-        // if (ok(accntNode)) {
-        //     return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
-        // }
-        // return false;
+        SubNode accntNode = read.getNode(ms, ownerId);
+        if (ok(accntNode)) {
+            return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
+        }
+        return false;
     }    
 }

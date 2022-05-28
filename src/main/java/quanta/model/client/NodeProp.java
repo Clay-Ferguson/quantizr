@@ -19,9 +19,6 @@ public enum NodeProp {
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
     ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
     ACT_PUB_USER_IMAGE_URL("ap:userImage", "s"), //
-
-    // todo-0: I have a feeling there's at least one place in the code where actor ID v.s. URL is a bug
-    // points to URL of actor object (APObj.id prop on actual Actor Objects)
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
 
     // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)

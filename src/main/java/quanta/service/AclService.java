@@ -86,7 +86,7 @@ public class AclService extends ServiceBase {
 		BulkOperations bops = null;
 
 		/*
-		 * todo-0: It seems like maybe batching can't update a collection property? so for now I'm
+		 * todo-1: It seems like maybe batching can't update a collection property? so for now I'm
 		 * disabling, and yes disabling batch mode makes this code work.
 		 */
 		boolean batchMode = false;
@@ -301,7 +301,7 @@ public class AclService extends ServiceBase {
 
 			// if bulk operation
 			if (ok(bops)) {
-				// todo-0: this needs testing because the other place I'm doing similar code elsewhere refuses to work
+				// todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to work
 				// somehow. Seems like updating collections might not work in batching. Currently there are no places we call
 				// this method with bops passed in, so this bops branch is not currently being used for that reason.
 				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
