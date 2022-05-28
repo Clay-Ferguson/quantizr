@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
+import quanta.util.Val;
 import quanta.util.XString;
 
 /**
@@ -147,7 +149,7 @@ public class ActPubCrypto extends ServiceBase {
         return pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
     }
 
-    public PublicKey getPubKeyFromActorUrl(String userDoingAction, String actorUrl) {
+    public PublicKey getPubKeyFromActorUrl(String userDoingAction, String actorUrl, Val<String> keyVal) {
         return (PublicKey) arun.run(as -> {
             PublicKey pkey = null;
 
@@ -156,12 +158,16 @@ public class ActPubCrypto extends ServiceBase {
 
             // if we have account node
             if (ok(accntNode)) {
-
                 // get pkey property off account
                 String pkEncoded = accntNode.getStr(NodeProp.ACT_PUB_KEYPEM);
 
                 // if the key was there decode it.
                 if (ok(pkEncoded)) {
+
+                    // if the output param wants the encoded key set it
+                    if (ok(keyVal)) {
+                        keyVal.setVal(pkEncoded);
+                    }
                     pkey = getPublicKeyFromEncoding(pkEncoded);
                     log.debug("Got PK by Node: " + accntNode.getIdStr());
                 }
@@ -169,7 +175,7 @@ public class ActPubCrypto extends ServiceBase {
 
             // #todo-optimization: this block will eventually be unneeded once all accounts have pkey in them.
             if (no(pkey)) {
-                log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet"); 
+                log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet");
 
                 // Get ActorObject from actor url.
                 APObj actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
@@ -180,7 +186,13 @@ public class ActPubCrypto extends ServiceBase {
 
                 String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);
 
-                // go ahead and repair the account right here and now (this is temporary code, because this outter
+                if (ok(keyVal)) {
+                    keyVal.setVal(pkeyEncoded);
+                }
+
+                // todo-0: we can remove this block once all accounts have key. go ahead and repair the account
+                // right here and
+                // now (this is temporary code, because this outter
                 // if block is temporary.
                 if (ok(accntNode)) {
                     if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
@@ -237,4 +249,25 @@ public class ActPubCrypto extends ServiceBase {
         byte[] signableBytes = strToSign.getBytes(StandardCharsets.UTF_8);
         return signableBytes;
     }
+
+    /*
+     * Returns true only if the account node identified by ownerId (i.e. accountNode.id==ownerId) has
+     * the matching ActivityPub key on it.
+     */
+    public boolean ownerHasKey(MongoSession ms, ObjectId ownerId, String key) {
+
+        // This is for activity pub, so any claims on ownerId are rejected, just as one more (unnecessary) precaution.
+        if (ownerId.equals(auth.getAdminSession().getUserNodeId())) {
+            throw new RuntimeException("ActPub attempted admin mods.");
+        }
+
+        // todo-0: for now we always return true, until we know the server DB has all keys populated. (a process underway 5/28/2022)
+        return true;
+
+        // SubNode accntNode = read.getNode(ms, ownerId);
+        // if (ok(accntNode)) {
+        //     return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
+        // }
+        // return false;
+    }    
 }

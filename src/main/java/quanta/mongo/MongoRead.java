@@ -1190,18 +1190,17 @@ public class MongoRead extends ServiceBase {
      * propName and propVal
      */
     @PerfMon(category = "read")
-    public SubNode findNodeByProp(MongoSession ms, SubNode node, String propName, String propVal) {
-
+    public SubNode findNodeByProp(MongoSession ms, SubNode parentNode, String propName, String propVal) {
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = null;
 
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(parentNode.getId())) {
+            crit = Criteria.where(SubNode.PARENT).is(parentNode.getId()) //
                     .and(SubNode.PROPS + "." + propName).is(propVal);
         } else {
             crit = Criteria.where(//
-                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(parentNode.getPath()))//
                     .and(SubNode.PROPS + "." + propName).is(propVal);
         }
 

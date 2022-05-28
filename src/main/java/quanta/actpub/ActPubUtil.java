@@ -1059,7 +1059,7 @@ public class ActPubUtil extends ServiceBase {
                             }
 
                             node = apub.saveObj(as, userDoingAction, accountNode, outboxNode, obj, false, true, APType.Create,
-                                    null);
+                                    null, null);
                         }
                         return node;
                     });

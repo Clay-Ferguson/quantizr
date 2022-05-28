@@ -338,6 +338,11 @@ public class MongoDelete extends ServiceBase {
 					nodes.add(node);
 				}
 
+				/*
+				 * we remove the actual specified nodes synchronously here (instead of including root in
+				 * deleteSubGraphChildren below), so that the client can refresh as soon as it wants and get back
+				 * correct results.
+				 */
 				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 				bops.remove(query);
 			}
@@ -347,32 +352,7 @@ public class MongoDelete extends ServiceBase {
 		exec.run(() -> {
 			nodes.forEach(n -> {
 				apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
-				BulkOperations childOps = null;
-
-				// Now Query the entire subgraph of this deleted node 'n'
-				for (SubNode child : read.getSubGraph(ms, n, null, 0, false, false)) {
-					/*
-					 * NOTE: Disabling this ability to recursively delete from foreign servers because I'm not sure they
-					 * won't interpret that as a DDOS attack if this happens to be a large delete underway. This will
-					 * take some thought, to engineer where perhaps we limit to just 10, and do them over a period of 10
-					 * minutes even, and that kind of thing, but for now we can just get by without this capability
-					 */
-					// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
-
-					// lazy instantiate
-					if (no(childOps)) {
-						childOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
-					}
-
-					Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
-					childOps.remove(query);
-				}
-
-				// deletes all nodes in this subgraph branch
-				if (ok(childOps)) {
-					BulkWriteResult results = childOps.execute();
-					log.debug("SubGraph of " + n.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
-				}
+				deleteSubGraphChildren(ms, n, false);
 			});
 		});
 
@@ -384,6 +364,42 @@ public class MongoDelete extends ServiceBase {
 		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
+	}
+
+	public void deleteSubGraphChildren(MongoSession ms, SubNode node, boolean includeRoot) {
+		BulkOperations childOps = null;
+
+		// if deleting root do it first because the getSubGraph query doesn't include root.
+		if (includeRoot) {
+			childOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+			childOps.remove(query);
+		}
+
+		// Now Query the entire subgraph of this deleted node 'n'
+		for (SubNode child : read.getSubGraph(ms, node, null, 0, false, false)) {
+			/*
+			 * NOTE: Disabling this ability to recursively delete from foreign servers because I'm not sure they
+			 * won't interpret that as a DDOS attack if this happens to be a large delete underway. This will
+			 * take some thought, to engineer where perhaps we limit to just 10, and do them over a period of 10
+			 * minutes even, and that kind of thing, but for now we can just get by without this capability
+			 */
+			// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
+
+			// lazy instantiate
+			if (no(childOps)) {
+				childOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+			}
+
+			Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
+			childOps.remove(query);
+		}
+
+		// deletes all nodes in this subgraph branch
+		if (ok(childOps)) {
+			BulkWriteResult results = childOps.execute();
+			log.debug("SubGraph of " + node.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
+		}
 	}
 
 	/*
@@ -413,8 +429,10 @@ public class MongoDelete extends ServiceBase {
 				log.debug("Node [" + node.getIdStr() + "] " + node.getPath() + " owner=" + node.getOwner().toHexString());
 			}
 		}
-		// otherwise run the actual bulk delete. This will potentially leave orphans and this is fine. We don't bother cleaning orphans
-		// now becasue there's no need.
+		/*
+		 * otherwise run the actual bulk delete. This will potentially leave orphans and this is fine. We
+		 * don't bother cleaning orphans now becasue there's no need.
+		 */
 		else {
 			DeleteResult delRes = ops.remove(q, SubNode.class);
 			String msg = "Nodes deleted: " + delRes.getDeletedCount();

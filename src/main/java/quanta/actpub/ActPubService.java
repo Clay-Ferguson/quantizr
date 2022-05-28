@@ -51,6 +51,7 @@ import quanta.service.NodeSearchService;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.Val;
 import quanta.util.XString;
 
 /**
@@ -800,7 +801,8 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
+            Val<String> keyEncoded = new Val<>();
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -816,7 +818,7 @@ public class ActPubService extends ServiceBase {
             switch (type) {
                 case APType.ChatMessage:
                 case APType.Note:
-                    processCreateOrUpdateNote(ms, actorUrl, object, action);
+                    processCreateOrUpdateNote(ms, actorUrl, object, action, keyEncoded.getVal());
                     break;
 
                 default:
@@ -838,7 +840,8 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
+            Val<String> keyEncoded = new Val<>();
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -904,7 +907,8 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
+            Val<String> keyEncoded = new Val<>();
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -941,8 +945,8 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce,
-                            boostedNode.getIdStr());
+                    saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce, boostedNode.getIdStr(),
+                            null);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");
@@ -962,7 +966,8 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl);
+            Val<String> keyEncoded = new Val<>();
+            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey);
@@ -980,7 +985,24 @@ public class ActPubService extends ServiceBase {
             log.debug("delete: " + type);
 
             String id = apStr(object, APObj.id);
-            delete.deleteByPropVal(as, NodeProp.ACT_PUB_ID.s(), id);
+
+            // find node user wants to delete
+            SubNode delNode = read.findNodeByProp(as, NodeProp.ACT_PUB_ID.s(), id);
+            if (no(delNode))
+                return null;
+
+            // verify the user doing the delete is the owner of the node, before deleting.
+            if (apCrypto.ownerHasKey(as, delNode.getOwner(), keyEncoded.getVal())) {
+                delete.delete(delNode);
+
+                // run subgraph delete asynchronously
+                exec.run(() -> {
+                    delete.deleteSubGraphChildren(as, delNode, false);
+                });
+            } else {
+                log.debug("key match fail. not deleting.");
+            }
+
             return null;
         });
     }
@@ -991,7 +1013,7 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateNote(MongoSession ms, String actorUrl, Object obj, String action) {
+    public void processCreateOrUpdateNote(MongoSession ms, String actorUrl, Object obj, String action, String encodedKey) {
         apLog.trace("processCreateOrUpdateNote");
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
@@ -1021,7 +1043,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null);
+            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null, encodedKey);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1037,7 +1059,7 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null);
+                saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null, encodedKey);
             }
         }
     }
@@ -1058,7 +1080,7 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
-            boolean forcePublic, boolean temp, String action, String boostTargetId) {
+            boolean forcePublic, boolean temp, String action, String boostTargetId, String encodedKey) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
         String id = apStr(obj, APObj.id);
 
@@ -1069,10 +1091,19 @@ public class ActPubService extends ServiceBase {
          */
         SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
 
-        // If we found this node by ID and we aren't going to be updating it, return it as is.
-        if (ok(dupNode) && !action.equals(APType.Update)) {
-            // apLog.trace("duplicate ActivityPub post ignored: " + id);
-            return dupNode;
+        if (ok(dupNode)) {
+            // If we found this node by ID and we aren't going to be updating it, return it as is.
+            if (!action.equals(APType.Update)) {
+                // apLog.trace("duplicate ActivityPub post ignored: " + id);
+                return dupNode;
+            }
+            // if we're updating the node, need to validate they encodedKey owns it.
+            else {
+                if (!apCrypto.ownerHasKey(ms, dupNode.getOwner(), encodedKey)) {
+                    log.debug("unauthorized key [" + encodedKey + "] to access node " + dupNode.getIdStr());
+                    throw new RuntimeException("unauthorized key");
+                }
+            }
         }
 
         Date published = apDate(obj, APObj.published);
