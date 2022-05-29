@@ -256,7 +256,7 @@ public class ActPubUtil extends ServiceBase {
 
     public APObj secureGet(String url, String privateKey, String actor, MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
-        loadSignatureHeaderVals(headers, privateKey, url, actor, null, "get");
+        apCrypto.loadSignatureHeaderVals(headers, privateKey, url, actor, null, "get");
         return getJson(url, mediaType, headers);
     }
 
@@ -269,72 +269,10 @@ public class ActPubUtil extends ServiceBase {
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
 
             HttpHeaders headers = new HttpHeaders();
-            loadSignatureHeaderVals(headers, privateKey, url, actor, bodyBytes, "post");
+            apCrypto.loadSignatureHeaderVals(headers, privateKey, url, actor, bodyBytes, "post");
             postJson(url, body, headers, postType);
         } catch (Exception e) {
             log.error("ALL secure http post failed to: " + url, e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void loadSignatureHeaderVals(HttpHeaders headers, String privKeyStr, String urlStr, String actor, byte[] bodyBytes,
-            String method) {
-        try {
-            // try to get the key from the cache first
-            PrivateKey privKey = apCache.privateKeys.get(privKeyStr);
-
-            // if key not found in cache, generate it, and cache it.
-            if (no(privKey)) {
-                byte[] privKeyBytes = Base64.getDecoder().decode(privKeyStr);
-                KeyFactory kf = KeyFactory.getInstance("RSA");
-                PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
-                privKey = kf.generatePrivate(keySpecPKCS8);
-
-                // put the key in the cache now!
-                apCache.privateKeys.put(privKeyStr, privKey);
-            }
-
-            // WARNING: dateFormat is NOT threasafe. Always create one here.
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String date = dateFormat.format(new Date());
-
-            String digestHeader = ok(bodyBytes)
-                    ? "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes))
-                    : null;
-
-            URL url = new URL(urlStr);
-            String strToSign = "(request-target): " + method + " " + url.getPath() + //
-                    "\nhost: " + url.getHost() + //
-                    "\ndate: " + date;
-
-            if (ok(digestHeader)) {
-                strToSign += "\ndigest: " + digestHeader;
-            }
-
-            Signature sig = Signature.getInstance("SHA256withRSA");
-            sig.initSign(privKey);
-            sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
-            byte[] signature = sig.sign();
-
-            /*
-             * todo-1: Pleroma is including content-length in this headers list but we don't. I should probably
-             * add it but be sure not to break compatability when doing so.
-             */
-            String headerSig = headerPair("keyId", actor + "#main-key") + "," + //
-                    headerPair("headers", "(request-target) host date" + (ok(digestHeader) ? " digest" : "")) + "," + //
-                    headerPair("algorithm", "rsa-sha256") + "," + //
-                    headerPair("signature", Base64.getEncoder().encodeToString(signature));
-
-            headers.add("Host", url.getHost());
-            headers.add("Date", date);
-            headers.add("Signature", headerSig);
-
-            if (ok(digestHeader)) {
-                headers.add("Digest", digestHeader);
-            }
-        } catch (Exception e) {
-            log.error("loadSignatureHeaderVals failed", e);
             throw new RuntimeException(e);
         }
     }
@@ -404,10 +342,6 @@ public class ActPubUtil extends ServiceBase {
     // throw new RuntimeException(e);
     // }
     // }
-
-    private String headerPair(String key, String val) {
-        return key + "=\"" + val + "\"";
-    }
 
     /*
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the

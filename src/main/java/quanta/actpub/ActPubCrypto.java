@@ -4,19 +4,28 @@ import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -26,6 +35,7 @@ import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
 import quanta.util.Val;
 import quanta.util.XString;
+
 
 /**
  * Crypto functions for AP
@@ -60,56 +70,65 @@ public class ActPubCrypto extends ServiceBase {
         return privateKey;
     }
 
-    public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {
-        String reqHeaderSignature = httpReq.getHeader("Signature");
-        if (no(reqHeaderSignature)) {
+    public void parseHttpHeaderSig(HttpServletRequest httpReq, Val<String> keyId, Val<String> signature,
+            Val<List<String>> headers) {
+        String reqSig = httpReq.getHeader("Signature");
+        if (no(reqSig)) {
             throw new RuntimeException("Signature missing from http header.");
         }
 
-        final List<String> sigTokens = XString.tokenize(reqHeaderSignature, ",", true);
-        if (no(sigTokens) || sigTokens.size() < 3) {
+        final List<String> sigToks = XString.tokenize(reqSig, ",", true);
+        if (no(sigToks) || sigToks.size() < 3) {
             throw new RuntimeException("Signature tokens missing from http header.");
         }
 
-        String keyID = null;
-        String signature = null;
-        List<String> headers = null;
-
-        for (String sigToken : sigTokens) {
-            int equalIdx = sigToken.indexOf("=");
+        for (String sigTok : sigToks) {
+            int equalIdx = sigTok.indexOf("=");
 
             // ignore tokens not containing equals
             if (equalIdx == -1)
                 continue;
 
-            String key = sigToken.substring(0, equalIdx);
-            String val = sigToken.substring(equalIdx + 1);
+            String key = sigTok.substring(0, equalIdx);
+            String val = sigTok.substring(equalIdx + 1);
 
             if (val.charAt(0) == '"') {
                 val = val.substring(1, val.length() - 1);
             }
 
             if (key.equalsIgnoreCase("keyId")) {
-                keyID = val;
+                keyId.setVal(val);
             } else if (key.equalsIgnoreCase("headers")) {
-                headers = Arrays.asList(val.split(" "));
+                headers.setVal(Arrays.asList(val.split(" ")));
             } else if (key.equalsIgnoreCase("signature")) {
-                signature = val;
+                signature.setVal(val);
             }
         }
 
-        if (no(keyID))
+        if (no(keyId.getVal()))
             throw new RuntimeException("Header signature missing 'keyId'");
         if (no(headers))
             throw new RuntimeException("Header signature missing 'headers'");
         if (no(signature))
             throw new RuntimeException("Header signature missing 'signature'");
-        if (!headers.contains("(request-target)"))
+
+        if (!headers.getVal().contains("(request-target)"))
             throw new RuntimeException("(request-target) is not in signed headers");
-        if (!headers.contains("date"))
+        if (!headers.getVal().contains("date"))
             throw new RuntimeException("date is not in signed headers");
-        if (!headers.contains("host"))
+        if (!headers.getVal().contains("host"))
             throw new RuntimeException("host is not in signed headers");
+    }
+
+    // todo-0: need a version of this method that wraps the logic of going and getting the publickey
+    // off the original server and updating it into our local db if necessary, and then trying THAT
+    // key before finally failing.
+    public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {
+        Val<String> keyId = new Val<>();
+        Val<String> signature = new Val<>();
+        Val<List<String>> headers = new Val<>();
+
+        parseHttpHeaderSig(httpReq, keyId, signature, headers);
 
         // todo-1: currently not validating time
         // String date = httpReq.getHeader("date");
@@ -121,8 +140,8 @@ public class ActPubCrypto extends ServiceBase {
          * simply verify that they are who they claim to be using the signature check below, and that is all
          * we want. (i.e. unknown users can post in)
          */
-        byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers);
-        byte[] sigBytes = Base64.getDecoder().decode(signature);
+        byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers.getVal());
+        byte[] sigBytes = Base64.getDecoder().decode(signature.getVal());
 
         try {
             Signature verifier = Signature.getInstance("SHA256withRSA");
@@ -193,10 +212,10 @@ public class ActPubCrypto extends ServiceBase {
                 // DO NOT DELETE (yet)
                 // repair key if not existing (code no longer needed)
                 // if (ok(accntNode)) {
-                //     if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
-                //         log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
-                //         update.save(as, accntNode, false);
-                //     }
+                // if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
+                // log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
+                // update.save(as, accntNode, false);
+                // }
                 // }
                 pkey = getPublicKeyFromEncoding(pkeyEncoded);
             }
@@ -254,7 +273,8 @@ public class ActPubCrypto extends ServiceBase {
      */
     public boolean ownerHasKey(MongoSession ms, ObjectId ownerId, String key) {
 
-        // This is for activity pub, so any claims on ownerId are rejected, just as one more (unnecessary) precaution.
+        // This is for activity pub, so any claims on ownerId are rejected, just as one more (unnecessary)
+        // precaution.
         if (ownerId.equals(auth.getAdminSession().getUserNodeId())) {
             throw new RuntimeException("ActPub attempted admin mods.");
         }
@@ -264,5 +284,71 @@ public class ActPubCrypto extends ServiceBase {
             return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
         }
         return false;
-    }    
+    }
+
+    public void loadSignatureHeaderVals(HttpHeaders headers, String privKeyStr, String urlStr, String actor, byte[] bodyBytes,
+            String method) {
+        try {
+            // try to get the key from the cache first
+            PrivateKey privKey = apCache.privateKeys.get(privKeyStr);
+
+            // if key not found in cache, generate it, and cache it.
+            if (no(privKey)) {
+                byte[] privKeyBytes = Base64.getDecoder().decode(privKeyStr);
+                KeyFactory kf = KeyFactory.getInstance("RSA");
+                PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
+                privKey = kf.generatePrivate(keySpecPKCS8);
+
+                // put the key in the cache now!
+                apCache.privateKeys.put(privKeyStr, privKey);
+            }
+
+            // WARNING: dateFormat is NOT threasafe. Always create one here.
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            String date = dateFormat.format(new Date());
+
+            String digestHeader = ok(bodyBytes)
+                    ? "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes))
+                    : null;
+
+            URL url = new URL(urlStr);
+            String strToSign = "(request-target): " + method + " " + url.getPath() + //
+                    "\nhost: " + url.getHost() + //
+                    "\ndate: " + date;
+
+            if (ok(digestHeader)) {
+                strToSign += "\ndigest: " + digestHeader;
+            }
+
+            Signature sig = Signature.getInstance("SHA256withRSA");
+            sig.initSign(privKey);
+            sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
+            byte[] signature = sig.sign();
+
+            /*
+             * todo-1: Pleroma is including content-length in this headers list but we don't. I should probably
+             * add it but be sure not to break compatability when doing so.
+             */
+            String headerSig = headerPair("keyId", actor + "#main-key") + "," + //
+                    headerPair("headers", "(request-target) host date" + (ok(digestHeader) ? " digest" : "")) + "," + //
+                    headerPair("algorithm", "rsa-sha256") + "," + //
+                    headerPair("signature", Base64.getEncoder().encodeToString(signature));
+
+            headers.add("Host", url.getHost());
+            headers.add("Date", date);
+            headers.add("Signature", headerSig);
+
+            if (ok(digestHeader)) {
+                headers.add("Digest", digestHeader);
+            }
+        } catch (Exception e) {
+            log.error("loadSignatureHeaderVals failed", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String headerPair(String key, String val) {
+        return key + "=\"" + val + "\"";
+    }
 }

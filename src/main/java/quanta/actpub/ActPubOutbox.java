@@ -5,10 +5,13 @@ import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,8 +199,8 @@ public class ActPubOutbox extends ServiceBase {
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
     @PerfMon(category = "apOutbox")
-    public APOOrderedCollectionPage generateOutboxPage(String userName, String minId) {
-        APList items = getOutboxItems(userName, minId);
+    public APOOrderedCollectionPage generateOutboxPage(HttpServletRequest httpReq, String userName, String minId) {
+        APList items = getOutboxItems(httpReq, userName, minId);
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
@@ -207,7 +210,11 @@ public class ActPubOutbox extends ServiceBase {
         return ret;
     }
 
-    public APList getOutboxItems(String userName, String minId) {
+    public APList getOutboxItems(HttpServletRequest httpReq, String userName, String minId) {
+        log.debug("getOutboxItems for " + userName);
+
+        // it's safe to have this on even before it's 'done'
+        boolean experimental = true;
         /*
          * For now we only support retrieving public nodes here but we need to do the proper thing here
          * eventually to adhere to the ActivityPub spec regarding authenticating what user is calling this
@@ -218,12 +225,75 @@ public class ActPubOutbox extends ServiceBase {
         APList retItems = null;
         String nodeIdBase = host + "?id=";
 
+        /*
+         * todo-0: I'm trying to be able to return content based on if the user accessing this has some
+         * private nodes shared to them then we can honor that sharing here, rather than ONLY returning
+         * PUBLIC nodes, but this is a work in progress
+         */
+        if (experimental) {
+            Val<String> keyId = new Val<>();
+            Val<String> signature = new Val<>();
+            Val<List<String>> headers = new Val<>();
+
+            apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, headers);
+
+            if (ok(keyId.getVal())) {
+                log.debug("keyId=" + keyId.getVal());
+
+                // keyId should be like this:
+                // actorId + "#main-key"
+                String actorId = keyId.getVal().replace("#main-key", "");
+
+                MongoSession as = auth.getAdminSession();
+                SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
+                if (ok(actorAccnt)) {
+                    log.debug("got Actor: " + actorAccnt.getIdStr());
+
+                    // create a MongoSession representing the user account we just looked up
+                    // MongoSession userSess = MongoSession(actorAccnt.getStr(NodeProp.USER), actorAccnt.getId());
+
+                    // now verify they have access to this node
+                    // for now all we do is show results in log file until we prove this works.
+                    try {
+                        // auth.auth(userSess, node, PrivilegeType.READ);
+                        // log.debug("auth granted.");
+
+                        // final step is just validate the signature.
+                        //
+                        // todo-0: in all cases where we grab a public key off our own DB, and use it, we need to have a
+                        // fallback logic where we check by reading the actual actor object again off the original host
+                        // and if the publickey has changed for whatever reason we need to update it in our own db.
+                        PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
+                        if (ok(pubKey)) {
+                            try {
+                                log.debug("Checking with pubKey.");
+                                apCrypto.verifySignature(httpReq, pubKey);
+                                log.debug("Sig ok.");
+
+                                // this will remain PUBLIC until we set it here.
+                                // by commenting out this settor of sharedTo, we can leave this 'experimental' block harmlessly
+                                // turned on
+                                // just so we collect the logging to tell us if my assumptions are correct.
+                                // sharedTo = actorAccnt.getIdStr();
+                            } catch (Exception e) {
+                                log.error("Sig failed.");
+                                return null;
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.debug("access DENIED.");
+                    }
+                }
+            }
+        }
+
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (no(userNode)) {
                 return null;
             }
 
+            final String _sharedTo = sharedTo;
             retItems = (APList) arun.run(as -> {
                 APList items = new APList();
                 int MAX_PER_PAGE = 25;
@@ -234,10 +304,15 @@ public class ActPubOutbox extends ServiceBase {
                 }
 
                 List<String> sharedToList = new LinkedList<String>();
-                sharedToList.add(sharedTo);
+                sharedToList.add(_sharedTo);
 
                 for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
+
+                    // as a general security rule never send back any admin nodes.
+                    if (child.getOwner().equals(as.getUserNodeId())) {
+                        continue;
+                    }
 
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
@@ -263,9 +338,12 @@ public class ActPubOutbox extends ServiceBase {
         return retItems;
     }
 
-    public APObj getResource(String nodeId) {
+    /* Gets the object identified by nodeId as an ActPub object */
+    public APObj getResource(HttpServletRequest httpReq, String nodeId) {
         if (no(nodeId))
             return null;
+        boolean experimental = true;
+        log.debug("getResource: " + nodeId);
 
         return (APObj) arun.run(as -> {
             String host = prop.getProtocolHostAndPort();
@@ -276,28 +354,96 @@ public class ActPubOutbox extends ServiceBase {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
+            // as a general security rule never send back any admin nodes.
+            if (node.getOwner().equals(as.getUserNodeId())) {
+                throw new NodeAuthFailedException();
+            }
+
+            boolean authSuccess = false;
+
+            // leaving this turned on, for now just to collect info into the logs about how things work.
+            if (experimental) {
+                /*
+                 * todo-0: A basic 'search' for an object by URL in mastodon c/alls into here with a generic
+                 * non-user-specific keyId so I currently don't know how to exercise this code 'in the wild', but
+                 * want to keep it for now.
+                 * 
+                 * Actually the implementation of this needs to be a refactored version which probably uses
+                 * subGraphByAclUser_query since that's a way to get ONLY nodes authorized for specific users in
+                 * query....and after writing this I now realize the above 'outbox query' way of doing this even
+                 * when querying a single node (like we do here) is more efficient? maybe or maybe not. investigate.
+                 */
+                Val<String> keyId = new Val<>();
+                Val<String> signature = new Val<>();
+                Val<List<String>> headers = new Val<>();
+
+                apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, headers);
+
+                if (ok(keyId.getVal())) {
+                    log.debug("keyId=" + keyId.getVal());
+
+                    // keyId should be like this:
+                    // actorId + "#main-key"
+                    String actorId = keyId.getVal().replace("#main-key", "");
+
+                    SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
+                    if (ok(actorAccnt)) {
+                        log.debug("got Actor: " + actorAccnt.getIdStr());
+
+                        // create a MongoSession representing the user account we just looked up
+                        MongoSession userSess = MongoSession(actorAccnt.getStr(NodeProp.USER), actorAccnt.getId());
+
+                        // now verify they have access to this node
+                        // for now all we do is show results in log file until we prove this works.
+                        try {
+                            auth.auth(userSess, node, PrivilegeType.READ);
+                            log.debug("auth granted.");
+
+                            // final step is just validate the signature.
+                            PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
+                            if (ok(pubKey)) {
+                                try {
+                                    log.debug("Checking with pubKey.");
+                                    apCrypto.verifySignature(httpReq, pubKey);
+                                    authSuccess = true;
+                                    log.debug("Sig ok.");
+                                } catch (Exception e) {
+                                    log.error("Sig failed.");
+                                    return null;
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.debug("access DENIED.");
+                        }
+                    }
+                }
+            }
+
             /*
-             * todo-0: this should actually try to auth with the session if it can, and if there's no quanta
-             * session with a logged in user then it should check to see who the signature is on the headers
-             * (from AP), and if that user signature is successful, then lookup the user associated with the
-             * public key, and THEN allow this if the node is shared with THAT user. This whole process also
-             * needs to be packaged into a function. Check other places this is potentially wrong also.
-             * 
              * todo-0: also per the above, search everywhere else this kind of thing might be blocking access
-             * when it maybe doesn't need to.
+             * when it maybe doesn't need to. Like namely populating outboxes. (need all above security logic)
              */
-            if (!AclService.isPublic(as, node)) {
+            // if not authorized and not a public node fail now.
+            if (!authSuccess && !AclService.isPublic(as, node)) {
                 log.debug("getResource failed on non-public node: " + node.getIdStr());
                 throw new NodeAuthFailedException();
             }
 
             String userName = read.getNodeOwner(as, node);
+
+            // todo-0: We should be able to get an object as whatever actual type it is based on the type (not
+            // the Quanta Type, but the
+            // ActPub type of there is one), rather always returning a note here.
             APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
             if (ok(ret)) {
                 apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
             }
             return ret;
         });
+    }
+
+    private MongoSession MongoSession(String str, ObjectId id) {
+        return null;
     }
 
     public APObj makeAPForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {

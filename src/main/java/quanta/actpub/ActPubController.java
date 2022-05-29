@@ -167,7 +167,7 @@ public class ActPubController extends ServiceBase {
 	public @ResponseBody Object getJsonObj(HttpServletRequest req, //
 			@RequestParam(value = "id", required = false) String id) {
 		try {
-			APObj ret = apOutbox.getResource(id);
+			APObj ret = apOutbox.getResource(req, id);
 			if (ok(ret)) {
 				HttpHeaders hdr = new HttpHeaders();
 				setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
@@ -195,7 +195,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
-			ret = apOutbox.generateOutboxPage(userName, minId);
+			ret = apOutbox.generateOutboxPage(req, userName, minId);
 		} else {
 			/*
 			 * Mastodon calls this method, but never calls back in (to generateOutboxPage above) for any pages.
