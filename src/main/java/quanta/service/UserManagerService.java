@@ -651,6 +651,9 @@ public class UserManagerService extends ServiceBase {
 				if (req.isPublish()) {
 					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
 				}
+
+				// todo-0: this is untested. need to test in prod.
+				edit.processAfterSave(ms, userNode);
 			}
 			return null;
 		});

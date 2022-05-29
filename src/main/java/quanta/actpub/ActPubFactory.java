@@ -20,10 +20,13 @@ import quanta.actpub.model.APODelete;
 import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
+import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APOTombstone;
+import quanta.actpub.model.APOUpdate;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
+import quanta.mongo.model.SubNode;
 
 /**
  * Convenience factory for some types of AP objects
@@ -31,6 +34,15 @@ import quanta.config.ServiceBase;
 @Component
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
+
+	// now that we're passing in SubNode, some of the other parameters will be redundant ? (todo-0)
+	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, String noteUrl,
+			boolean privateMessage, SubNode node) {
+		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+		APOPerson payload = apub.generatePersonObj(node);
+
+		return newUpdate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+	}
 
 	/**
 	 * Creates a new 'note' message
@@ -215,9 +227,11 @@ public class ActPubFactory extends ServiceBase {
 				 * apUtil.makeActorUrlForUserName(userName) for local users, but aren't doing that, by design.
 				 * 
 				 * todo-0: I think it's a bug that outbound messages like this aren't including local names in these
-				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those users
-				 * but they still need to be in the list so servers can know WHO was 'theoretically' delivered to?
-				 * ...in addition to the fact that they may or may not be 'mentioned' in the content.
+				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those
+				 * users but they still need to be in the list so servers can know WHO was 'theoretically' delivered
+				 * to? ...in addition to the fact that they may or may not be 'mentioned' in the content.
+				 * 
+				 *  warning: this little block is in at least two places
 				 */
 				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
 				if (no(actorUrl))
@@ -243,6 +257,61 @@ public class ActPubFactory extends ServiceBase {
 
 		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
 				now.format(DateTimeFormatter.ISO_INSTANT), object, null);
+
+		if (toActors.size() > 0) {
+			ret.put(APObj.to, new APList() //
+					.vals(toActors)); //
+		}
+
+		if (ccActors.size() > 0) {
+			ret.put(APObj.cc, new APList() //
+					.vals(ccActors)); //
+		}
+		return ret;
+	}
+
+	public APOUpdate newUpdate(String userDoingAction, APObj object, String fromActor, HashSet<String> toUserNames, String objUrl,
+			ZonedDateTime now, boolean privateMessage) {
+		String idTime = String.valueOf(now.toInstant().toEpochMilli());
+
+		List<String> toActors = new LinkedList<>();
+		List<String> ccActors = new LinkedList<>();
+		for (String userName : toUserNames) {
+			try {
+				/*
+				 * Local usernames will get a null here, by design, which is hopefully correct. We can call
+				 * apUtil.makeActorUrlForUserName(userName) for local users, but aren't doing that, by design.
+				 * 
+				 * todo-0: I think it's a bug that outbound messages like this aren't including local names in these
+				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those
+				 * users but they still need to be in the list so servers can know WHO was 'theoretically' delivered
+				 * to? ...in addition to the fact that they may or may not be 'mentioned' in the content.
+				 * 
+				 * warning: this little block is in at least two places
+				 */
+				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
+				if (no(actorUrl))
+					continue;
+
+				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else
+				// they go in the 'to'.
+				if (!privateMessage) {
+					ccActors.add(actorUrl);
+				} else {
+					toActors.add(actorUrl);
+				}
+			}
+			// log and continue if any loop (user) fails here.
+			catch (Exception e) {
+				log.debug("failed adding user in newCreateMessage: " + userName + " -> " + e.getMessage());
+			}
+		}
+
+		if (!privateMessage) {
+			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
+		}
+
+		APOUpdate ret = new APOUpdate(objUrl + "&apCreateTime=" + idTime, fromActor, object, null);
 
 		if (toActors.size() > 0) {
 			ret.put(APObj.to, new APList() //

@@ -120,7 +120,7 @@ public class ActPubCrypto extends ServiceBase {
             throw new RuntimeException("host is not in signed headers");
     }
 
-    // todo-0: need a version of this method that wraps the logic of going and getting the publickey
+    // todo-1: need a version of this method that wraps the logic of going and getting the publickey
     // off the original server and updating it into our local db if necessary, and then trying THAT
     // key before finally failing.
     public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {

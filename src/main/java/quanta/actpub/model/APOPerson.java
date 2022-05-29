@@ -7,13 +7,10 @@ import quanta.actpub.APConst;
  */
 public class APOPerson extends APObj {
     public APOPerson() {
-        put(context, APConst.CONTEXT_STREAMS);
-        put(type, APType.Person);
-    }
-
-    public APOPerson(String id) {
-        this();
-        put(APObj.id, id);
+        put(APObj.context, new APList() //
+                .val(APConst.CONTEXT_STREAMS) //
+                .val(APConst.CONTEXT_SECURITY));
+        put(APObj.type, APType.Person); //
     }
 
     @Override

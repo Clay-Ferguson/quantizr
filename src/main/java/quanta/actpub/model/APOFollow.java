@@ -36,7 +36,7 @@ public class APOFollow extends APObj {
         // Pleroma always sends back a 400 error.
         put(APObj.object, target); 
 
-        // NOTE: This Person object is the format I've seen some servers use, and we do support this format for inbount follows.
+        // NOTE: This Person object is the format I've seen some servers use, and we do support this format for inbound follows.
         // put(APObj.object, new APOPerson(target));
     }
 

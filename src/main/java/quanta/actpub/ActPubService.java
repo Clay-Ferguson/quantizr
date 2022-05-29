@@ -31,6 +31,7 @@ import quanta.AppController;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
+import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
@@ -122,34 +123,45 @@ public class ActPubService extends ServiceBase {
      * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
      * contain all the mentions that exist in the text of the message.
      * 
+     * todo-0: we should probably extract OUT of this method the actual construction of the 'message'
+     * itself and then pass the message in as a parameter, and we'd be passing in without setting the
+     * 'cc + to' properties on the message and then the message would have those added inside here
+     * insead of building the entire message from scratch.
+     * 
+     * todo-0: Now that 'node' is being passed in, 1) content, 2) objUrl, and 3) acl parameters are
+     * redundant and can be refactored out
      */
-    public void sendActPubForNodeEdit(MongoSession ms, String inReplyTo, String replyToType, HashMap<String, AccessControl> acl,
-            APList attachments, String content, String objUrl, String boostTarget) {
+    public void sendActPubObjOutbound(MongoSession ms, String inReplyTo, String replyToType, HashMap<String, AccessControl> acl,
+            APList attachments, String content, String objUrl, String boostTarget, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
             try {
                 HashSet<String> toUserNames = new HashSet<>();
                 boolean privateMessage = true;
 
-                /*
-                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
-                 */
-                for (String accntId : acl.keySet()) {
-                    if (PrincipalName.PUBLIC.s().equals(accntId)) {
-                        privateMessage = false;
-                    } else {
-                        // try to get account node from cache
-                        SubNode accntNode = apCache.acctNodesById.get(accntId);
+                if (forceSendToPublic) {
+                    privateMessage = false;
+                } else {
+                    /*
+                     * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+                     */
+                    for (String accntId : acl.keySet()) {
+                        if (PrincipalName.PUBLIC.s().equals(accntId)) {
+                            privateMessage = false;
+                        } else {
+                            // try to get account node from cache
+                            SubNode accntNode = apCache.acctNodesById.get(accntId);
 
-                        // if not in cache find the node and ADD to the cache.
-                        if (no(accntNode)) {
-                            accntNode = read.getNode(ms, accntId);
-                            apCache.acctNodesById.put(accntId, accntNode);
-                        }
+                            // if not in cache find the node and ADD to the cache.
+                            if (no(accntNode)) {
+                                accntNode = read.getNode(ms, accntId);
+                                apCache.acctNodesById.put(accntId, accntNode);
+                            }
 
-                        // get username off this node and add to 'toUserNames'
-                        if (ok(accntNode)) {
-                            String userName = accntNode.getStr(NodeProp.USER.s());
-                            toUserNames.add(userName);
+                            // get username off this node and add to 'toUserNames'
+                            if (ok(accntNode)) {
+                                String userName = accntNode.getStr(NodeProp.USER.s());
+                                toUserNames.add(userName);
+                            }
                         }
                     }
                 }
@@ -161,15 +173,25 @@ public class ActPubService extends ServiceBase {
 
                 APObj message = null;
 
-                // if this node has a boostTarget, we know it's an Announce so we send out the announce
-                if (!StringUtils.isEmpty(boostTarget)) {
-                    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-                    message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostTarget, now, privateMessage);
-                }
-                // else send out as a note.
-                else {
-                    message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
-                            objUrl, privateMessage, attachments);
+                if (node.getType().equals(NodeType.ACCOUNT.s())) {
+                    // construct the Update-type wrapper around teh Person object, and send
+                    message = apFactory.newUpdateForPerson(fromUser, toUserNames, fromActor, objUrl, privateMessage, node);
+                    log.debug("Sending updated Person outbound: " + XString.prettyPrint(message));
+
+                } else {
+                    // if this node has a boostTarget, we know it's an Announce so we send out the announce
+                    // todo-0: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
+                    // that right?)
+                    if (!StringUtils.isEmpty(boostTarget)) {
+                        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+                        message =
+                                apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostTarget, now, privateMessage);
+                    }
+                    // else send out as a note.
+                    else {
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                                objUrl, privateMessage, attachments);
+                    }
                 }
 
                 // for users that don't have a sharedInbox we collect their inboxes here to send to them
@@ -611,81 +633,7 @@ public class ActPubService extends ServiceBase {
             }
         }
 
-        boolean changed = false;
-        Object icon = apObj(actor, APObj.icon);
-        if (ok(icon)) {
-            String iconUrl = apStr(icon, APObj.url);
-            if (ok(iconUrl)) {
-                String curIconUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
-                if (!iconUrl.equals(curIconUrl)) {
-                    if (userNode.set(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
-                        changed = true;
-                    }
-                }
-            }
-        }
-
-        Object endpoints = apObj(actor, APObj.endpoints);
-        if (ok(endpoints)) {
-            String sharedInbox = apStr(endpoints, APObj.sharedInbox);
-            if (ok(sharedInbox)) {
-                String curSharedInbox = userNode.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
-                if (!sharedInbox.equals(curSharedInbox)) {
-                    if (userNode.set(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
-                        changed = true;
-                    }
-                }
-            }
-        }
-
-        Object image = apObj(actor, APObj.image);
-        if (ok(image)) {
-            String imageUrl = apStr(image, APObj.url);
-            if (ok(imageUrl)) {
-                String curImageUrl = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
-                if (!imageUrl.equals(curImageUrl)) {
-                    if (userNode.set(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
-                        changed = true;
-                    }
-                }
-            }
-        }
-
-        if (userNode.set(NodeProp.USER_BIO.s(), apStr(actor, APObj.summary)))
-            changed = true;
-
-        if (userNode.set(NodeProp.DISPLAY_NAME.s(), apStr(actor, APObj.name)))
-            changed = true;
-
-        String actorId = apStr(actor, APObj.id);
-        if (no(actorId)) {
-            log.debug("no actorId on object: " + XString.prettyPrint(actor));
-        }
-
-        // this is the URL of the Actor JSON object
-        if (userNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), actorId))
-            changed = true;
-
-        String inbox = apStr(actor, APObj.inbox);
-
-        // update cache just because we can
-        apCache.inboxesByUserName.put(userNode.getStr(NodeProp.USER.s()), inbox);
-
-        if (userNode.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), inbox))
-            changed = true;
-
-        // this is the URL of the HTML of the actor.
-        if (userNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), apStr(actor, APObj.url)))
-            changed = true;
-
-        // get the pubKey so we can save into our account node
-        String pubKey = apCrypto.getEncodedPubKeyFromActorObj(actor);
-
-        // this is the PublicKey.pubKeyPem, of the user
-        if (userNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pubKey))
-            changed = true;
-
-        if (changed) {
+        if (apUtil.updateNodeFromActorObject(userNode, actor)) {
             update.save(ms, userNode, false);
         }
 
@@ -821,9 +769,13 @@ public class ActPubService extends ServiceBase {
                     processCreateOrUpdateNote(ms, actorUrl, object, action, keyEncoded.getVal());
                     break;
 
+                case APType.Person:
+                    processUpdatePerson(ms, actorUrl, object, action, keyEncoded.getVal());
+                    break;
+
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Create action: " + type + "\n" + XString.prettyPrint(payload));
+                    log.debug("Unhandled Action: " + action + "  type=" + type + "\n" + XString.prettyPrint(payload));
                     break;
             }
             return null;
@@ -1005,6 +957,45 @@ public class ActPubService extends ServiceBase {
 
             return null;
         });
+    }
+
+    @PerfMon(category = "apub")
+    public void processUpdatePerson(MongoSession ms, String actorUrl, Object obj, String action, String encodedKey) {
+        apLog.trace("processUpdatePerson");
+
+        String actorId = apStr(obj, APObj.id);
+        MongoSession as = auth.getAdminSession();
+        SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
+        if (no(actorAccnt)) {
+            log.debug("user not found: " + actorId);
+            return;
+        }
+        log.debug("got Actor: " + actorAccnt.getIdStr());
+
+        /*
+         * need to something like this pretty mych every place where we look up a user account and also have
+         * the encodedKey or SHOULD have the encodedKey to check (todo-0 Verify the public key sent in is
+         * indeed the one for the account.
+         */
+        if (!encodedKey.equals(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM))) {
+            throw new RuntimeException("wrong public key");
+        }
+
+        // make sure node is for a foreign user account
+        if (!actorAccnt.getStr(NodeProp.USER).contains("@")) {
+            throw new RuntimeException("Denied modify of Person (for non-remote account).");
+        }
+
+        // just paranoia here. check if this node is admin owned.
+        if (actorAccnt.getOwner().equals(as.getUserNodeId())) {
+            throw new RuntimeException("Access denied.");
+        }
+
+        // and finally if we reach here, put all the properties onto the SubNode and save it.
+        if (apUtil.updateNodeFromActorObject(actorAccnt, obj)) {
+            update.save(as, actorAccnt, false);
+            log.debug("Updated Person from ActPub: NodeId=" + actorAccnt.getIdStr());
+        }
     }
 
     /*
@@ -1406,88 +1397,88 @@ public class ActPubService extends ServiceBase {
         }
     }
 
+    @PerfMon(category = "apub")
+    public APOPerson generatePersonObj(String userName) {
+        SubNode userNode = read.getUserNodeByUserName(null, userName);
+        if (ok(userNode)) {
+            return generatePersonObj(userNode);
+        }
+        return null;
+    }
+
     /*
      * Generates an Actor object for one of our own local users
      */
     @PerfMon(category = "apub")
-    public APObj generateActor(String userName) {
+    public APOPerson generatePersonObj(SubNode userNode) {
         String host = prop.getProtocolHostAndPort();
+        String userName = userNode.getStr(NodeProp.USER);
 
         try {
-            SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (ok(userNode)) {
-                user.ensureValidCryptoKeys(userNode);
+            user.ensureValidCryptoKeys(userNode);
 
-                String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
-                String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
-                String avatarMime = userNode.getStr(NodeProp.BIN_MIME.s());
-                String avatarVer = userNode.getStr(NodeProp.BIN.s());
-                String did = userNode.getStr(NodeProp.USER_DID_IPNS.s());
-                String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
-                        + userNode.getIdStr() + "&v=" + avatarVer;
+            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
+            String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
+            String avatarMime = userNode.getStr(NodeProp.BIN_MIME.s());
+            String avatarVer = userNode.getStr(NodeProp.BIN.s());
+            String did = userNode.getStr(NodeProp.USER_DID_IPNS.s());
+            String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
+                    + userNode.getIdStr() + "&v=" + avatarVer;
 
-                APObj actor = new APObj() //
-                        .put(APObj.context, new APList() //
-                                .val(APConst.CONTEXT_STREAMS) //
-                                .val(APConst.CONTEXT_SECURITY))
+            APOPerson actor = new APOPerson() //
+                    /*
+                     * Note: this is a self-reference, and must be identical to the URL that returns this object
+                     */
+                    .put(APObj.id, apUtil.makeActorUrlForUserName(userName)) //
+                    .put(APObj.did, did) //
+                    .put(APObj.preferredUsername, userName) //
+                    .put(APObj.name, displayName) //
 
-                        /*
-                         * Note: this is a self-reference, and must be identical to the URL that returns this object
-                         */
-                        .put(APObj.id, apUtil.makeActorUrlForUserName(userName)) //
-                        .put(APObj.type, APType.Person) //
-                        .put(APObj.did, did) //
-                        .put(APObj.preferredUsername, userName) //
-                        .put(APObj.name, displayName) //
+                    .put(APObj.icon, new APObj() //
+                            .put(APObj.type, APType.Image) //
+                            .put(APObj.mediaType, avatarMime) //
+                            .put(APObj.url, avatarUrl));
 
-                        .put(APObj.icon, new APObj() //
-                                .put(APObj.type, APType.Image) //
-                                .put(APObj.mediaType, avatarMime) //
-                                .put(APObj.url, avatarUrl));
+            String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
+            if (ok(headerImageMime)) {
+                String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
+                if (ok(headerImageVer)) {
+                    String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+                            + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
 
-                String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
-                if (ok(headerImageMime)) {
-                    String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
-                    if (ok(headerImageVer)) {
-                        String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
-                                + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
-
-                        actor.put(APObj.image, new APObj() //
-                                .put(APObj.type, APType.Image) //
-                                .put(APObj.mediaType, headerImageMime) //
-                                .put(APObj.url, headerImageUrl));
-                    }
+                    actor.put(APObj.image, new APObj() //
+                            .put(APObj.type, APType.Image) //
+                            .put(APObj.mediaType, headerImageMime) //
+                            .put(APObj.url, headerImageUrl));
                 }
-
-                actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO.s())) //
-                        .put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //
-                        .put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
-                        .put(APObj.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
-                        .put(APObj.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
-
-                        /*
-                         * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
-                         * this in our ActPubController. We tolerate Mastodon breaking spec here.
-                         */
-                        .put(APObj.url, host + "/u/" + userName + "/home") //
-                        .put(APObj.endpoints, new APObj().put(APObj.sharedInbox, host + APConst.PATH_INBOX)) //
-
-                        .put(APObj.publicKey, new APObj() //
-                                .put(APObj.id, apStr(actor, APObj.id) + "#main-key") //
-                                .put(APObj.owner, apStr(actor, APObj.id)) //
-                                .put(APObj.publicKeyPem,
-                                        "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n")) //
-
-                        .put(APObj.supportsFriendRequests, true);
-
-                apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
-                return actor;
             }
+
+            actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO.s())) //
+                    .put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //
+                    .put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
+                    .put(APObj.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
+                    .put(APObj.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
+
+                    /*
+                     * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
+                     * this in our ActPubController. We tolerate Mastodon breaking spec here.
+                     */
+                    .put(APObj.url, host + "/u/" + userName + "/home") //
+                    .put(APObj.endpoints, new APObj().put(APObj.sharedInbox, host + APConst.PATH_INBOX)) //
+
+                    .put(APObj.publicKey, new APObj() //
+                            .put(APObj.id, apStr(actor, APObj.id) + "#main-key") //
+                            .put(APObj.owner, apStr(actor, APObj.id)) //
+                            .put(APObj.publicKeyPem, "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n")) //
+
+                    .put(APObj.supportsFriendRequests, true);
+
+            apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
+            return actor;
         } catch (Exception e) {
             log.error("actor query failed", e);
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     /*

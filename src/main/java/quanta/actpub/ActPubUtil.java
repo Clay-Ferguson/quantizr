@@ -347,9 +347,9 @@ public class ActPubUtil extends ServiceBase {
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
      * app restarts at least.
      * 
-     * #todo-optimization: look for places we call this to get data we HAVE or should have locally, for example to
-     * get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox) ...so we
-     * can definitely do a little optimization here around this
+     * #todo-optimization: look for places we call this to get data we HAVE or should have locally, for
+     * example to get: 1) followers 2) inbox (which we alread have a direct entry in apCache for inbox)
+     * ...so we can definitely do a little optimization here around this
      */
     @PerfMon(category = "apUtil")
     public APObj getActorByUrl(MongoSession ms, String userDoingAction, String url) {
@@ -409,7 +409,7 @@ public class ActPubUtil extends ServiceBase {
      * 
      * someuser@ip:port (special testing mode, insecure)
      * 
-     * #todo-optimization: check for any calls to this where we could've gotten the needed data locally 
+     * #todo-optimization: check for any calls to this where we could've gotten the needed data locally
      */
     public APObj getWebFinger(MongoSession ms, String userDoingAction, String resource) {
         apub.saveFediverseName(resource);
@@ -532,7 +532,8 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
-    // #todo-optimization: we can call apub.getUserProperty() to get the value right? or is there a direct cache entry for this?
+    // #todo-optimization: we can call apub.getUserProperty() to get the value right? or is there a
+    // direct cache entry for this?
     public String getLongUserNameFromActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
         if (no(actorUrl)) {
             return null;
@@ -1004,5 +1005,87 @@ public class ActPubUtil extends ServiceBase {
                 break;
         }
         return null;
+    }
+
+    /*
+     * Updates all the ActPub properties from actor object onto the node, and returns true only of
+     * something was indeed changed so that the DB will only get updated if something DID change
+     */
+    public boolean updateNodeFromActorObject(SubNode node, Object actor) {
+        boolean changed = false;
+        Object icon = apObj(actor, APObj.icon);
+        if (ok(icon)) {
+            String iconUrl = apStr(icon, APObj.url);
+            if (ok(iconUrl)) {
+                String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                if (!iconUrl.equals(curIconUrl)) {
+                    if (node.set(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        Object endpoints = apObj(actor, APObj.endpoints);
+        if (ok(endpoints)) {
+            String sharedInbox = apStr(endpoints, APObj.sharedInbox);
+            if (ok(sharedInbox)) {
+                String curSharedInbox = node.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
+                if (!sharedInbox.equals(curSharedInbox)) {
+                    if (node.set(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        Object image = apObj(actor, APObj.image);
+        if (ok(image)) {
+            String imageUrl = apStr(image, APObj.url);
+            if (ok(imageUrl)) {
+                String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
+                if (!imageUrl.equals(curImageUrl)) {
+                    if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        if (node.set(NodeProp.USER_BIO.s(), apStr(actor, APObj.summary)))
+            changed = true;
+
+        if (node.set(NodeProp.DISPLAY_NAME.s(), apStr(actor, APObj.name)))
+            changed = true;
+
+        String actorId = apStr(actor, APObj.id);
+        if (no(actorId)) {
+            log.debug("no actorId on object: " + XString.prettyPrint(actor));
+        }
+
+        // this is the URL of the Actor JSON object
+        if (node.set(NodeProp.ACT_PUB_ACTOR_ID.s(), actorId))
+            changed = true;
+
+        String inbox = apStr(actor, APObj.inbox);
+
+        // update cache just because we can
+        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER.s()), inbox);
+
+        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), inbox))
+            changed = true;
+
+        // this is the URL of the HTML of the actor.
+        if (node.set(NodeProp.ACT_PUB_ACTOR_URL.s(), apStr(actor, APObj.url)))
+            changed = true;
+
+        // get the pubKey so we can save into our account node
+        String pubKey = apCrypto.getEncodedPubKeyFromActorObj(actor);
+
+        // this is the PublicKey.pubKeyPem, of the user
+        if (node.set(NodeProp.ACT_PUB_KEYPEM.s(), pubKey))
+            changed = true;
+
+        return changed;
     }
 }

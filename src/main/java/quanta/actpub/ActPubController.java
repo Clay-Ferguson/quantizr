@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -100,7 +101,7 @@ public class ActPubController extends ServiceBase {
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
 		apLog.trace("getActor: " + userName);
-		Object ret = apub.generateActor(userName);
+		APOPerson ret = apub.generatePersonObj(userName);
 		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);

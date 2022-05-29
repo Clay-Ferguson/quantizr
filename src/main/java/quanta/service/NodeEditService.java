@@ -543,22 +543,36 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	public void processAfterSave(MongoSession ms, SubNode node) {
+
+		// never do any of this logic if this is an admin-owned node being saved.
+		if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
+			return;
+		}
+
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
+			boolean isAccnt = ok(node.getType()) && node.getType().equals(NodeType.ACCOUNT.s());
 
 			// push any chat messages that need to go out.
-			push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+			if (!isAccnt) {
+				push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+			}
 
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
-				auth.saveMentionsToNodeACL(s, node);
+				if (!isAccnt) {
+					auth.saveMentionsToNodeACL(s, node);
+				}
 
-				if (ok(node.getAc())) {
+				// if this is an account type then don't expect it to have any ACL but we still want to broadcast
+				// out to the world the edit that was made to it, as long as it's not admin owned.
+				boolean forceSendToPublic = isAccnt;
+
+				if (forceSendToPublic || ok(node.getAc())) {
 					// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
 					// what the local server version of it is.
-					String inReplyTo = apUtil.buildUrlForReplyTo(s, parent);
-
-					APList attachments = apub.createAttachmentsList(node);
+					String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(s, parent) : null;
+					APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
 					String nodeUrl = snUtil.getIdBasedUrl(node);
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 					String boostTarget = parent.getStr(NodeProp.BOOST);
@@ -566,8 +580,8 @@ public class NodeEditService extends ServiceBase {
 					// if there's an unpublished property (and true) then we don't send out over ActPub
 					if (!node.getBool(NodeProp.UNPUBLISHED)) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
-						apub.sendActPubForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
-								node.getContent(), nodeUrl, boostTarget);
+						apub.sendActPubObjOutbound(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
+								node.getContent(), nodeUrl, boostTarget, node, forceSendToPublic);
 					}
 
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);

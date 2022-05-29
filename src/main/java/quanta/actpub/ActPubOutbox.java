@@ -258,11 +258,13 @@ public class ActPubOutbox extends ServiceBase {
                         // auth.auth(userSess, node, PrivilegeType.READ);
                         // log.debug("auth granted.");
 
-                        // final step is just validate the signature.
-                        //
-                        // todo-0: in all cases where we grab a public key off our own DB, and use it, we need to have a
-                        // fallback logic where we check by reading the actual actor object again off the original host
-                        // and if the publickey has changed for whatever reason we need to update it in our own db.
+                        /*
+                         * final step is just validate the signature.
+                         * 
+                         * todo-1: in all cases where we grab a public key off our own DB, and use it, we need to have a
+                         * fallback logic where we check by reading the actual actor object again off the original host and
+                         * if the publickey has changed for whatever reason we need to update it in our own db.
+                         */
                         PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
                         if (ok(pubKey)) {
                             try {
@@ -364,7 +366,7 @@ public class ActPubOutbox extends ServiceBase {
             // leaving this turned on, for now just to collect info into the logs about how things work.
             if (experimental) {
                 /*
-                 * todo-0: A basic 'search' for an object by URL in mastodon c/alls into here with a generic
+                 * todo-0: A basic 'search' for an object by URL in mastodon calls into here with a generic
                  * non-user-specific keyId so I currently don't know how to exercise this code 'in the wild', but
                  * want to keep it for now.
                  * 
@@ -431,9 +433,10 @@ public class ActPubOutbox extends ServiceBase {
 
             String userName = read.getNodeOwner(as, node);
 
-            // todo-0: We should be able to get an object as whatever actual type it is based on the type (not
-            // the Quanta Type, but the
-            // ActPub type of there is one), rather always returning a note here.
+            /*
+             * todo-0: We should be able to get an object as whatever actual type it is based on the type (not
+             * the Quanta Type, but the ActPub type of there is one), rather always returning a note here.
+             */
             APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
             if (ok(ret)) {
                 apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
