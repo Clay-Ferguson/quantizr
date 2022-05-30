@@ -435,7 +435,7 @@ public class ActPubOutbox extends ServiceBase {
 
             /*
              * todo-0: We should be able to get an object as whatever actual type it is based on the type (not
-             * the Quanta Type, but the ActPub type of there is one), rather always returning a note here.
+             * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
              */
             APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
             if (ok(ret)) {

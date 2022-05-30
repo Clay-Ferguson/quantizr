@@ -3,6 +3,7 @@ package quanta.actpub.model;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +70,7 @@ public class AP {
             } else if (val.getVal() instanceof Boolean) {
                 return ((Boolean) val.getVal()).booleanValue();
             }
-        } 
+        }
 
         log.warn("unhandled type on apBool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
         log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
@@ -89,7 +90,7 @@ public class AP {
             } else if (val.getVal() instanceof String) {
                 return Integer.valueOf((String) val.getVal());
             }
-        } 
+        }
 
         log.warn("unhandled type on apInt(): " + (ok(obj) ? obj.getClass().getName() : "null"));
         log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
@@ -118,8 +119,15 @@ public class AP {
         if (ok(val = getFromMap(obj, prop))) {
             if (no(val.getVal())) {
                 return null;
-            } else if (val.getVal() instanceof List<?>) {
+            }
+            // if we got an instance of a list return it 
+            else if (val.getVal() instanceof List<?>) {
                 return (List<?>) val.getVal();
+            }
+            // if we expected a list and found a String, that's ok, return a list with one entry
+            // the address 'to' and 'cc' properties can have this happen often.
+            else if (val.getVal() instanceof String) {
+                return Arrays.asList(val.getVal());
             }
         }
 

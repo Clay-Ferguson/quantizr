@@ -35,7 +35,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId && !internalComp) {
+        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;
@@ -63,7 +63,7 @@ export class NodeCompRow extends Div {
         let node = this.node;
         let id: string = node.id;
 
-        if (this.allowHeaders && !this.internalComp) {
+        if (this.allowHeaders) {
             this.attribs.nid = id;
             this.attribs.onClick = S.nav.clickNodeRow;
         }
@@ -83,7 +83,7 @@ export class NodeCompRow extends Div {
                 }
             }
 
-            if (!this.internalComp && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+            if (this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
@@ -149,7 +149,7 @@ export class NodeCompRow extends Div {
             this.attribs.style = style;
         }
 
-        if (!this.internalComp && S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
+        if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
             this.attribs.className += " fadeInRowBkgClz";
@@ -172,7 +172,7 @@ export class NodeCompRow extends Div {
         }
 
         // if editMode is on, an this isn't the page root node
-        if (!this.internalComp && state.userPreferences.editMode && this.node.id !== state.node.id) {
+        if (state.userPreferences.editMode && this.node.id !== state.node.id) {
             S.render.setNodeDropHandler(this.attribs, this.node, true, state);
         }
 

@@ -127,14 +127,12 @@ public class ActPubService extends ServiceBase {
      * itself and then pass the message in as a parameter, and we'd be passing in without setting the
      * 'cc + to' properties on the message and then the message would have those added inside here
      * insead of building the entire message from scratch.
-     * 
-     * todo-0: Now that 'node' is being passed in, 1) content, 2) objUrl, and 3) acl parameters are
-     * redundant and can be refactored out
      */
-    public void sendActPubObjOutbound(MongoSession ms, String inReplyTo, String replyToType, HashMap<String, AccessControl> acl,
-            APList attachments, String content, String objUrl, String boostTarget, SubNode node, boolean forceSendToPublic) {
+    public void sendActPubObjOutbound(MongoSession ms, String inReplyTo, String replyToType, APList attachments,
+            String boostTarget, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
             try {
+                HashMap<String, AccessControl> acl = snUtil.cloneAcl(node);
                 HashSet<String> toUserNames = new HashSet<>();
                 boolean privateMessage = true;
 
@@ -170,6 +168,7 @@ public class ActPubService extends ServiceBase {
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
+                String objUrl = snUtil.getIdBasedUrl(node);
 
                 APObj message = null;
 
@@ -189,7 +188,7 @@ public class ActPubService extends ServiceBase {
                     }
                     // else send out as a note.
                     else {
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, node.getContent(),
                                 objUrl, privateMessage, attachments);
                     }
                 }
@@ -929,13 +928,6 @@ public class ActPubService extends ServiceBase {
             }
 
             Object object = apObj(payload, APObj.object);
-            String type = apStr(object, APObj.type);
-            if (no(type)) {
-                log.error("No delete type specified in delete request: " + XString.prettyPrint(payload));
-                return null;
-            }
-            log.debug("delete: " + type);
-
             String id = apStr(object, APObj.id);
 
             // find node user wants to delete
@@ -954,7 +946,6 @@ public class ActPubService extends ServiceBase {
             } else {
                 log.debug("key match fail. not deleting.");
             }
-
             return null;
         });
     }
@@ -972,11 +963,6 @@ public class ActPubService extends ServiceBase {
         }
         log.debug("got Actor: " + actorAccnt.getIdStr());
 
-        /*
-         * need to something like this pretty mych every place where we look up a user account and also have
-         * the encodedKey or SHOULD have the encodedKey to check (todo-0 Verify the public key sent in is
-         * indeed the one for the account.
-         */
         if (!encodedKey.equals(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM))) {
             throw new RuntimeException("wrong public key");
         }

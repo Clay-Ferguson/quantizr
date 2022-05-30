@@ -573,15 +573,13 @@ public class NodeEditService extends ServiceBase {
 					// what the local server version of it is.
 					String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(s, parent) : null;
 					APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
-					String nodeUrl = snUtil.getIdBasedUrl(node);
 					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 					String boostTarget = parent.getStr(NodeProp.BOOST);
 
 					// if there's an unpublished property (and true) then we don't send out over ActPub
 					if (!node.getBool(NodeProp.UNPUBLISHED)) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
-						apub.sendActPubObjOutbound(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments,
-								node.getContent(), nodeUrl, boostTarget, node, forceSendToPublic);
+						apub.sendActPubObjOutbound(s, inReplyTo, replyToType, attachments, boostTarget, node, forceSendToPublic);
 					}
 
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
