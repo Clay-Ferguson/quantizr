@@ -44,6 +44,9 @@ import quanta.util.XString;
 public class ActPubCrypto extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
 
+    public static final String SIGNATURE_ALGO = "SHA256withRSA";
+    public static final String DIGEST_ALGO = "SHA-256";
+
     /* Gets private RSA key from current user session */
     public String getPrivateKey(MongoSession ms, String userName) {
         /* First try to return the key from the cache */
@@ -70,7 +73,7 @@ public class ActPubCrypto extends ServiceBase {
         return privateKey;
     }
 
-    public void parseHttpHeaderSig(HttpServletRequest httpReq, Val<String> keyId, Val<String> signature,
+    public void parseHttpHeaderSig(HttpServletRequest httpReq, Val<String> keyId, Val<String> signature, boolean requireDigest,
             Val<List<String>> headers) {
         String reqSig = httpReq.getHeader("Signature");
         if (no(reqSig)) {
@@ -118,17 +121,22 @@ public class ActPubCrypto extends ServiceBase {
             throw new RuntimeException("date is not in signed headers");
         if (!headers.getVal().contains("host"))
             throw new RuntimeException("host is not in signed headers");
+        if (requireDigest && !headers.getVal().contains("digest"))
+            throw new RuntimeException("digest is not in signed headers");
     }
 
     // todo-1: need a version of this method that wraps the logic of going and getting the publickey
     // off the original server and updating it into our local db if necessary, and then trying THAT
     // key before finally failing.
-    public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {
+    public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey, byte[] bodyBytes) {
+        if (no(pubKey)) {
+            throw new RuntimeException("no pubKey");
+        }
         Val<String> keyId = new Val<>();
         Val<String> signature = new Val<>();
         Val<List<String>> headers = new Val<>();
 
-        parseHttpHeaderSig(httpReq, keyId, signature, headers);
+        parseHttpHeaderSig(httpReq, keyId, signature, ok(bodyBytes), headers);
 
         // todo-1: currently not validating time
         // String date = httpReq.getHeader("date");
@@ -140,11 +148,11 @@ public class ActPubCrypto extends ServiceBase {
          * simply verify that they are who they claim to be using the signature check below, and that is all
          * we want. (i.e. unknown users can post in)
          */
-        byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers.getVal());
+        byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers.getVal(), bodyBytes);
         byte[] sigBytes = Base64.getDecoder().decode(signature.getVal());
 
         try {
-            Signature verifier = Signature.getInstance("SHA256withRSA");
+            Signature verifier = Signature.getInstance(SIGNATURE_ALGO);
             verifier.initVerify(pubKey);
             verifier.update(signableBytes);
             if (!verifier.verify(sigBytes)) {
@@ -199,8 +207,7 @@ public class ActPubCrypto extends ServiceBase {
                 // Get ActorObject from actor url.
                 APObj actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
                 if (no(actorObj)) {
-                    log.debug("Unable to load actorUrl: " + actorUrl);
-                    return null;
+                    throw new RuntimeException("Unable to load actorUrl: " + actorUrl);
                 }
 
                 String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);
@@ -250,13 +257,33 @@ public class ActPubCrypto extends ServiceBase {
         return pubKey;
     }
 
-    private byte[] getHeaderSignatureBytes(HttpServletRequest httpReq, List<String> headers) {
+    // bodyBytes can be null and they simply won't be checked.
+    private byte[] getHeaderSignatureBytes(HttpServletRequest httpReq, List<String> headers, byte[] bodyBytes) {
         ArrayList<String> sigParts = new ArrayList<>();
+
         for (String header : headers) {
             String value;
+
+            // request-target
             if (header.equals("(request-target)")) {
                 value = httpReq.getMethod().toLowerCase() + " " + httpReq.getRequestURI();
-            } else {
+            }
+            // digest
+            else if (header.equals("digest")) {
+                value = httpReq.getHeader(header);
+
+                // if we have body bytes and they don't hash to be what the header claims they should be then that's
+                // a fail.
+                if (ok(bodyBytes)) {
+                    if (!digestFromBodyBytes(bodyBytes).equals(value)) {
+                        throw new RuntimeException("body digest compare fail.");
+                    } else {
+                        log.debug("sig check w/ body ok.");
+                    }
+                }
+            }
+            // all other headers
+            else {
                 value = httpReq.getHeader(header);
             }
             sigParts.add(header + ": " + value);
@@ -308,9 +335,8 @@ public class ActPubCrypto extends ServiceBase {
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = dateFormat.format(new Date());
 
-            String digestHeader = ok(bodyBytes)
-                    ? "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes))
-                    : null;
+            // This is basically calculating the HASH of the bodyBytes
+            String digestHeader = digestFromBodyBytes(bodyBytes);
 
             URL url = new URL(urlStr);
             String strToSign = "(request-target): " + method + " " + url.getPath() + //
@@ -321,7 +347,7 @@ public class ActPubCrypto extends ServiceBase {
                 strToSign += "\ndigest: " + digestHeader;
             }
 
-            Signature sig = Signature.getInstance("SHA256withRSA");
+            Signature sig = Signature.getInstance(SIGNATURE_ALGO);
             sig.initSign(privKey);
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
             byte[] signature = sig.sign();
@@ -345,6 +371,17 @@ public class ActPubCrypto extends ServiceBase {
         } catch (Exception e) {
             log.error("loadSignatureHeaderVals failed", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    // it's NOT an error condition when bodyBytes is null, it just means no body exists.
+    private String digestFromBodyBytes(byte[] bytes) {
+        try {
+            return ok(bytes)
+                    ? DIGEST_ALGO + "=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance(DIGEST_ALGO).digest(bytes))
+                    : null;
+        } catch (Exception e) {
+            throw new RuntimeException("failed making digest.");
         }
     }
 

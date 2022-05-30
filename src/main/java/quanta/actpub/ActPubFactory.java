@@ -35,13 +35,13 @@ import quanta.mongo.model.SubNode;
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
-	// now that we're passing in SubNode, some of the other parameters will be redundant ? (todo-0)
-	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, String noteUrl,
+	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor,
 			boolean privateMessage, SubNode node) {
+		String objUrl = snUtil.getIdBasedUrl(node);
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		APOPerson payload = apub.generatePersonObj(node);
 
-		return newUpdate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+		return newUpdate(userDoingAction, payload, fromActor, toUserNames, objUrl, now, privateMessage);
 	}
 
 	/**

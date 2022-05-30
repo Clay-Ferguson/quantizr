@@ -235,7 +235,7 @@ public class ActPubOutbox extends ServiceBase {
             Val<String> signature = new Val<>();
             Val<List<String>> headers = new Val<>();
 
-            apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, headers);
+            apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
 
             if (ok(keyId.getVal())) {
                 log.debug("keyId=" + keyId.getVal());
@@ -269,7 +269,7 @@ public class ActPubOutbox extends ServiceBase {
                         if (ok(pubKey)) {
                             try {
                                 log.debug("Checking with pubKey.");
-                                apCrypto.verifySignature(httpReq, pubKey);
+                                apCrypto.verifySignature(httpReq, pubKey, null);
                                 log.debug("Sig ok.");
 
                                 // this will remain PUBLIC until we set it here.
@@ -379,7 +379,7 @@ public class ActPubOutbox extends ServiceBase {
                 Val<String> signature = new Val<>();
                 Val<List<String>> headers = new Val<>();
 
-                apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, headers);
+                apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
 
                 if (ok(keyId.getVal())) {
                     log.debug("keyId=" + keyId.getVal());
@@ -406,7 +406,7 @@ public class ActPubOutbox extends ServiceBase {
                             if (ok(pubKey)) {
                                 try {
                                     log.debug("Checking with pubKey.");
-                                    apCrypto.verifySignature(httpReq, pubKey);
+                                    apCrypto.verifySignature(httpReq, pubKey, null);
                                     authSuccess = true;
                                     log.debug("Sig ok.");
                                 } catch (Exception e) {

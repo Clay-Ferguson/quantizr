@@ -119,13 +119,13 @@ public class ActPubController extends ServiceBase {
 			APConst.CTYPE_ACT_JSON, //
 	})
 	public @ResponseBody Object sharedInboxPost(//
-			@RequestBody String body, //
+			@RequestBody byte[] body, //
 			HttpServletRequest req) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
 			apLog.trace("shared INBOX incoming payload: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apub.processInboxPost(req, payload);
+			apub.processInboxPost(req, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -144,14 +144,14 @@ public class ActPubController extends ServiceBase {
 			APConst.CTYPE_ACT_JSON, //
 	})
 	public @ResponseBody Object inboxPost(//
-			@RequestBody String body, //
+			@RequestBody byte[] body, //
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
 			apLog.trace("User INBOX incoming: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apub.processInboxPost(httpReq, payload);
+			apub.processInboxPost(httpReq, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

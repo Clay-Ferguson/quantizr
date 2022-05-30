@@ -15,7 +15,7 @@ public class APObj extends HashMap<String, Object> {
     public static final String context = "@context";
     public static final String type = "type";
     public static final String did = "did";
-    public static final String language = "language";
+    public static final String language = "@language"; // NOTE: I had this as "language" for a long time, which I guess was getting ignored
     public static final String object = "object";
     public static final String actor = "actor";
     public static final String published = "published";

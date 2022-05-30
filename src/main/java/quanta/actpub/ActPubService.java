@@ -5,6 +5,7 @@ import static quanta.actpub.model.AP.apDate;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
+import static quanta.actpub.model.AP.apParseList;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.security.PublicKey;
@@ -174,7 +175,7 @@ public class ActPubService extends ServiceBase {
 
                 if (node.getType().equals(NodeType.ACCOUNT.s())) {
                     // construct the Update-type wrapper around teh Person object, and send
-                    message = apFactory.newUpdateForPerson(fromUser, toUserNames, fromActor, objUrl, privateMessage, node);
+                    message = apFactory.newUpdateForPerson(fromUser, toUserNames, fromActor, privateMessage, node);
                     log.debug("Sending updated Person outbound: " + XString.prettyPrint(message));
 
                 } else {
@@ -188,8 +189,8 @@ public class ActPubService extends ServiceBase {
                     }
                     // else send out as a note.
                     else {
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, node.getContent(),
-                                objUrl, privateMessage, attachments);
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType,
+                                node.getContent(), objUrl, privateMessage, attachments);
                     }
                 }
 
@@ -645,9 +646,12 @@ public class ActPubService extends ServiceBase {
     /*
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
+     * 
+     * double-check that we're doing a signature verify on all these methods called in here: todo-0, and
+     * look to see if we can pull the sig check up to this layer OR higher in the call stack
      */
     @PerfMon(category = "apub")
-    public void processInboxPost(HttpServletRequest httpReq, Object payload) {
+    public void processInboxPost(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
         String type = apStr(payload, APObj.type);
         if (no(type))
             return;
@@ -661,7 +665,7 @@ public class ActPubService extends ServiceBase {
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                processCreateOrUpdateAction(httpReq, payload, type);
+                processCreateOrUpdateAction(httpReq, payload, type, bodyBytes);
                 break;
 
             case APType.Follow:
@@ -669,11 +673,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                processUndoAction(httpReq, payload);
+                processUndoAction(httpReq, payload, bodyBytes);
                 break;
 
             case APType.Delete:
-                processDeleteAction(httpReq, payload);
+                processDeleteAction(httpReq, payload, bodyBytes);
                 break;
 
             case APType.Accept:
@@ -681,11 +685,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, false);
+                processLikeAction(httpReq, payload, false, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, false);
+                processAnnounceAction(httpReq, payload, false, bodyBytes);
                 break;
 
             default:
@@ -696,7 +700,7 @@ public class ActPubService extends ServiceBase {
 
     /* Process inbound undo actions (coming from foreign servers) */
     @PerfMon(category = "apub")
-    public void processUndoAction(HttpServletRequest httpReq, Object payload) {
+    public void processUndoAction(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
         Object obj = apObj(payload, APObj.object);
         String type = apStr(obj, APObj.type);
         apLog.trace("Undo Type: " + type);
@@ -706,11 +710,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, true);
+                processLikeAction(httpReq, payload, true, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, true);
+                processAnnounceAction(httpReq, payload, true, bodyBytes);
                 break;
 
             default:
@@ -737,7 +741,7 @@ public class ActPubService extends ServiceBase {
 
     /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String action) {
+    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String action, byte[] bodyBytes) {
         arun.<Object>run(ms -> {
             apLog.trace("processCreateOrUpdateAction");
 
@@ -751,11 +755,26 @@ public class ActPubService extends ServiceBase {
             Val<String> keyEncoded = new Val<>();
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
+            /*
+             * all calls to verifySignature could be done at a higher layer up perhaps, and it's cleaner not to
+             * have to pass down body bytes into every API method. Need better decoupling and layering (todo-0)
+             */
             try {
-                apCrypto.verifySignature(httpReq, pubKey);
+                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
-                log.error("Sig failed.");
-                return null;
+                log.error("Sig failed, with body bytes");
+
+                /////////////////
+                // Until the bodyBytes is vetted we have this fallback. (todo-0)
+                try {
+                    apCrypto.verifySignature(httpReq, pubKey, null);
+                    log.debug("sig works, ignoring bodyBytes");
+                } catch (Exception e2) {
+                    log.error("Sig failed, second try too.");
+                    return null;
+                }
+                /////////////////
+                // return null;
             }
 
             Object object = apObj(payload, APObj.object);
@@ -782,7 +801,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processLikeAction(HttpServletRequest httpReq, Object payload, boolean unlike) {
+    public void processLikeAction(HttpServletRequest httpReq, Object payload, boolean unlike, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (unlike ? "unlike" : "like"));
             String actorUrl = apStr(payload, APObj.actor);
@@ -795,10 +814,20 @@ public class ActPubService extends ServiceBase {
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
-                apCrypto.verifySignature(httpReq, pubKey);
+                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed.");
-                return null;
+                /////////////////
+                // Until the bodyBytes is vetted we have this fallback. (todo-0)
+                try {
+                    apCrypto.verifySignature(httpReq, pubKey, null);
+                    log.debug("sig works, ignoring bodyBytes");
+                } catch (Exception e2) {
+                    log.error("Sig failed, second try too.");
+                    return null;
+                }
+                /////////////////
+                // return null;
             }
 
             String objectIdUrl = apStr(payload, APObj.object);
@@ -847,7 +876,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, boolean undo) {
+    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, boolean undo, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (undo ? "unannounce" : "announe") + " Payload=" + XString.prettyPrint(payload));
 
@@ -862,10 +891,20 @@ public class ActPubService extends ServiceBase {
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
-                apCrypto.verifySignature(httpReq, pubKey);
+                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed.");
-                return null;
+                /////////////////
+                // Until the bodyBytes is vetted we have this fallback. (todo-0)
+                try {
+                    apCrypto.verifySignature(httpReq, pubKey, null);
+                    log.debug("sig works, ignoring bodyBytes");
+                } catch (Exception e2) {
+                    log.error("Sig failed, second try too.");
+                    return null;
+                }
+                /////////////////
+                // return null;
             }
 
             // if this is an undo operation we just delete the node and we're done.
@@ -908,7 +947,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
+    public void processDeleteAction(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("processDeleteAction");
             String actorUrl = apStr(payload, APObj.actor);
@@ -921,10 +960,20 @@ public class ActPubService extends ServiceBase {
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
 
             try {
-                apCrypto.verifySignature(httpReq, pubKey);
+                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed.");
-                return null;
+                /////////////////
+                // Until the bodyBytes is vetted we have this fallback. (todo-0)
+                try {
+                    apCrypto.verifySignature(httpReq, pubKey, null);
+                    log.debug("sig works, ignoring bodyBytes");
+                } catch (Exception e2) {
+                    log.error("Sig failed, second try too.");
+                    return null;
+                }
+                /////////////////
+                // return null;
             }
 
             Object object = apObj(payload, APObj.object);
@@ -1096,19 +1145,25 @@ public class ActPubService extends ServiceBase {
         String lang = "0";
         Object context = apObj(obj, APObj.context);
         if (ok(context)) {
-            // todo-1:
-            // Some servers have this for 'context' (i.e. an array), so we need to support and be able to get
-            // language this way...
-            // [ "https://www.w3.org/ns/activitystreams", "https://shitposter.club/schemas/litepub-0.1.jsonld",
-            // {
-            // "@language" : "und"
-            // } ]
+            String language = null;
 
-            String language = apStr(context, "@language");
+            // if context is a list we try to dig the language out of one of it's objects
+            if (context instanceof List) {
+                Object langObj = apParseList((List) context, APObj.language);
+                if (langObj instanceof String) {
+                    language = (String) langObj;
+                }
+            }
+
+            // if we didn't get a language that way try the simpler way
+            if (no(language)) {
+                language = apStr(context, APObj.language);
+            }
+
             if (ok(language)) {
                 lang = language;
                 if (!"en".equalsIgnoreCase(language)) {
-                    log.debug("Ignoring Non-English");
+                    log.debug("Ignore Non-English: " + language);
                     return null;
                 }
             }
