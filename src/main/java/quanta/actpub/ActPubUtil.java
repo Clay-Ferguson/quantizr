@@ -160,7 +160,7 @@ public class ActPubUtil extends ServiceBase {
      * a 'rel' property that matches the value in the rel param string
      */
     public Object getLinkByRel(Object webFinger, String rel) {
-        List<?> linksList = apList(webFinger, APObj.links);
+        List<?> linksList = apList(webFinger, APObj.links, false);
 
         if (no(linksList))
             return null;
@@ -598,7 +598,7 @@ public class ActPubUtil extends ServiceBase {
          * addition to the paging, although normally when the collection has the items it means it won't
          * have any paging
          */
-        List<?> orderedItems = apList(collectionObj, APObj.orderedItems);
+        List<?> orderedItems = apList(collectionObj, APObj.orderedItems, false);
         if (ok(orderedItems)) {
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
@@ -637,7 +637,7 @@ public class ActPubUtil extends ServiceBase {
             }
 
             while (ok(ocPage)) {
-                orderedItems = apList(ocPage, APObj.orderedItems);
+                orderedItems = apList(ocPage, APObj.orderedItems, false);
 
                 if (ok(orderedItems)) {
                     for (Object item : orderedItems) {
@@ -703,7 +703,7 @@ public class ActPubUtil extends ServiceBase {
                 ocPage = lastPage;
             }
             if (ok(ocPage)) {
-                orderedItems = apList(ocPage, APObj.orderedItems);
+                orderedItems = apList(ocPage, APObj.orderedItems, false);
 
                 if (ok(orderedItems)) {
                     for (Object item : orderedItems) {

@@ -133,33 +133,43 @@ public class ActPubService extends ServiceBase {
             String boostTarget, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
             try {
-                HashMap<String, AccessControl> acl = snUtil.cloneAcl(node);
+                // toUserNames will hold ALL usernames in the ACL list (both local and foreign user names)
                 HashSet<String> toUserNames = new HashSet<>();
                 boolean privateMessage = true;
 
                 if (forceSendToPublic) {
                     privateMessage = false;
                 } else {
-                    /*
-                     * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
-                     */
-                    for (String accntId : acl.keySet()) {
-                        if (PrincipalName.PUBLIC.s().equals(accntId)) {
-                            privateMessage = false;
-                        } else {
-                            // try to get account node from cache
-                            SubNode accntNode = apCache.acctNodesById.get(accntId);
+                    if (ok(node.getAc())) {
+                        /*
+                         * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+                         */
+                        for (String accntId : node.getAc().keySet()) {
+                            if (PrincipalName.PUBLIC.s().equals(accntId)) {
+                                privateMessage = false;
+                            } else {
+                                /*
+                                 * try to get account node from cache
+                                 * 
+                                 * todo-0: for ALL cached nodes we need some kind of pubsub or something so that whenever a node
+                                 * is saved the mongodb listener can detect that and remove the node from ALL caches where it
+                                 * exists....OR update the cache instead?
+                                 * 
+                                 * todo-0: also blocks like this (check cache, get from DB, update cache) should be wrapped in a
+                                 * function.
+                                 */
+                                SubNode accntNode = apCache.acctNodesById.get(accntId);
 
-                            // if not in cache find the node and ADD to the cache.
-                            if (no(accntNode)) {
-                                accntNode = read.getNode(ms, accntId);
-                                apCache.acctNodesById.put(accntId, accntNode);
-                            }
+                                // if not in cache find the node and ADD to the cache.
+                                if (no(accntNode)) {
+                                    accntNode = read.getNode(ms, accntId);
+                                    apCache.acctNodesById.put(accntId, accntNode);
+                                }
 
-                            // get username off this node and add to 'toUserNames'
-                            if (ok(accntNode)) {
-                                String userName = accntNode.getStr(NodeProp.USER.s());
-                                toUserNames.add(userName);
+                                // get username off this node and add to 'toUserNames'
+                                if (ok(accntNode)) {
+                                    toUserNames.add(accntNode.getStr(NodeProp.USER.s()));
+                                }
                             }
                         }
                     }
@@ -201,6 +211,8 @@ public class ActPubService extends ServiceBase {
                 // When posting a public message we send out to all unique sharedInboxes here
                 if (!privateMessage) {
                     HashSet<String> sharedInboxes = new HashSet<>();
+
+                    // loads ONLY foreign user's inboxes into the two sets.
                     getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
                     for (String inbox : sharedInboxes) {
@@ -226,7 +238,8 @@ public class ActPubService extends ServiceBase {
                     }
                 }
 
-                // Post message to all foreign usernames found in 'toUserNames'
+                // Post message to all foreign usernames found in 'toUserNames', but skip all in userInboxes becasue
+                // we just sent to those above.
                 if (toUserNames.size() > 0) {
                     sendMessageToUsers(ms, toUserNames, fromUser, message, privateMessage, userInboxes);
                 }
@@ -240,6 +253,9 @@ public class ActPubService extends ServiceBase {
 
     // todo-1: this logic can be shared in a generic function if we can separate out 'message' payload
     // from this, and just pass in as argument.
+    //
+    // todo-0: can sendActPubObjOutbound be used in place of this? Can these two methods be merged into
+    // one?
     public void sendActPubForNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
         // if no sharing bail out.
         if (no(acl) || acl.isEmpty())
@@ -334,14 +350,13 @@ public class ActPubService extends ServiceBase {
     public void getSharedInboxesOfFollowers(String userName, HashSet<String> sharedInboxes, HashSet<String> userInboxes) {
         MongoSession as = auth.getAdminSession();
 
-        // This query gets the FRIEND nodes that specifify userName on them
+        // This query gets the FRIEND nodes that specify userName on them
         Query q = apFollower.getFriendsByUserName_query(as, userName);
         if (no(q))
             return;
 
-        Iterable<SubNode> iterable = mongoUtil.find(q);
-
-        for (SubNode node : iterable) {
+        Iterable<SubNode> iterator = mongoUtil.find(q);
+        for (SubNode node : iterator) {
             // log.debug("follower: " + XString.prettyPrint(node));
             /*
              * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
@@ -350,6 +365,8 @@ public class ActPubService extends ServiceBase {
             SubNode followerAccount = read.getNode(as, node.getOwner());
             if (ok(followerAccount)) {
                 String followerUserName = followerAccount.getStr(NodeProp.USER);
+
+                // if this is a foreign user...
                 if (followerUserName.contains("@")) {
                     String sharedInbox = followerAccount.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                     if (ok(sharedInbox)) {
@@ -754,6 +771,9 @@ public class ActPubService extends ServiceBase {
 
             Val<String> keyEncoded = new Val<>();
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
+            if (no(pubKey)) {
+                return null;
+            }
 
             /*
              * all calls to verifySignature could be done at a higher layer up perhaps, and it's cleaner not to
@@ -762,7 +782,7 @@ public class ActPubService extends ServiceBase {
             try {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
-                log.error("Sig failed, with body bytes");
+                log.error("Sig failed, with body bytes: processCreateOrUpdateAction");
 
                 /////////////////
                 // Until the bodyBytes is vetted we have this fallback. (todo-0)
@@ -812,11 +832,14 @@ public class ActPubService extends ServiceBase {
 
             Val<String> keyEncoded = new Val<>();
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
+            if (no(pubKey)) {
+                return null;
+            }
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
-                log.error("Sig failed.");
+                log.error("Sig failed: processLikeAction");
                 /////////////////
                 // Until the bodyBytes is vetted we have this fallback. (todo-0)
                 try {
@@ -889,11 +912,14 @@ public class ActPubService extends ServiceBase {
 
             Val<String> keyEncoded = new Val<>();
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
+            if (no(pubKey)) {
+                return null;
+            }
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
-                log.error("Sig failed.");
+                log.error("Sig failed: in boost");
                 /////////////////
                 // Until the bodyBytes is vetted we have this fallback. (todo-0)
                 try {
@@ -958,11 +984,14 @@ public class ActPubService extends ServiceBase {
 
             Val<String> keyEncoded = new Val<>();
             PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
+            if (no(pubKey)) {
+                return null;
+            }
 
             try {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
-                log.error("Sig failed.");
+                log.error("Sig failed: processDeleteAction");
                 /////////////////
                 // Until the bodyBytes is vetted we have this fallback. (todo-0)
                 try {
@@ -1139,7 +1168,7 @@ public class ActPubService extends ServiceBase {
         String objAttributedTo = apStr(obj, APObj.attributedTo);
         String objType = apStr(obj, APObj.type);
         Boolean sensitive = apBool(obj, APObj.sensitive);
-        Object tagArray = apList(obj, APObj.tag);
+        Object tagArray = apList(obj, APObj.tag, false);
 
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
@@ -1299,7 +1328,7 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     private void shareToAllObjectRecipients(MongoSession ms, String userDoingAction, SubNode node, Object obj, String propName) {
-        List<?> list = apList(obj, propName);
+        List<?> list = apList(obj, propName, true);
         if (ok(list)) {
             /* Build up all the access controls */
             for (Object to : list) {
@@ -1421,7 +1450,7 @@ public class ActPubService extends ServiceBase {
     }
 
     private void addAttachmentIfExists(MongoSession ms, SubNode node, Object obj) {
-        List<?> attachments = apList(obj, APObj.attachment);
+        List<?> attachments = apList(obj, APObj.attachment, false);
         if (no(attachments))
             return;
 
@@ -1629,14 +1658,24 @@ public class ActPubService extends ServiceBase {
             names.add(userName);
         }
 
-        // shuffle just to reduce likelyhood we might hit the same server too many times, and yes I realize
-        // keySet wasn't even sorted to begin with
-        // but nor do I want to count on it's randomness.
+        /*
+         * shuffle just to reduce likelyhood we might hit the same server too many times, and yes I realize
+         * keySet wasn't even sorted to begin with but nor do I want to count on it's randomness.
+         */
         Collections.shuffle(names);
 
+        String lastServer = null;
         for (String userName : names) {
             if (!prop.isDaemonsEnabled())
                 break;
+
+            // never hit the same server twice here, which is good to not do too much traffic on any one
+            String server = apUtil.getHostFromUserName(userName);
+            if (ok(server) && server.equals(lastServer)) {
+                continue;
+            }
+            lastServer = server;
+
             try {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
                 if (done)
@@ -1645,8 +1684,10 @@ public class ActPubService extends ServiceBase {
                 /*
                  * This may hurt performance of the app so let's throttle it way back to a few seconds between
                  * loops. Also we don't want to put too much unwelcome load on other instances.
+                 * 
+                 * what we can do here is be sure any GIVEN server is only accessed at 4second intervals!!!
                  */
-                Thread.sleep(4000);
+                Thread.sleep(3000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);

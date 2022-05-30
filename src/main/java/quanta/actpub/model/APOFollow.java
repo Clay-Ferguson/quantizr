@@ -29,8 +29,8 @@ public class APOFollow extends APObj {
 
         // NOTE: I saw on a Pleroma forum that they DO need these cc and to as LISTS
         // even though the AP SPEC allows for strings.
-        put(APObj.cc, new APList()); 
-        put(APObj.to, new APList().val(target));
+        put(APObj.cc, new APList());  
+        put(APObj.to, new APList().val(target)); 
         
         // This format is known to work on all platforms except Pleroma. Never have gotten Pleroma to work
         // Pleroma always sends back a 400 error.

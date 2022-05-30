@@ -278,7 +278,7 @@ public class ActPubOutbox extends ServiceBase {
                                 // just so we collect the logging to tell us if my assumptions are correct.
                                 // sharedTo = actorAccnt.getIdStr();
                             } catch (Exception e) {
-                                log.error("Sig failed.");
+                                log.error("Sig failed: getOutboxItems user=" + userName);
                                 return null;
                             }
                         }
@@ -410,7 +410,7 @@ public class ActPubOutbox extends ServiceBase {
                                     authSuccess = true;
                                     log.debug("Sig ok.");
                                 } catch (Exception e) {
-                                    log.error("Sig failed.");
+                                    log.error("Sig failed. getResource: nodeId=" + nodeId);
                                     return null;
                                 }
                             }

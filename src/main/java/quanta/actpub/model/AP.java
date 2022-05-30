@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
+import quanta.util.Val;
 import quanta.util.XString;
 
 /**
@@ -33,7 +34,7 @@ public class AP {
         return type.equalsIgnoreCase(apStr(obj, APObj.type));
     }
 
-    /**
+     /**
      * Looks in all elements of list, to find all elements that are Objects, and returns the value of
      * the first one containing the prop val as a property of it
      * 
@@ -50,48 +51,48 @@ public class AP {
             return null;
         for (Object element : list) {
             // see if we can get it, no matter what type element is
-            Object val = getFromMap(element, prop);
-            if (ok(val))
-                return val;
+            Val<Object> val = getFromMap(element, prop);
+            if (ok(val)) {
+                return val.getVal();
+            }
         }
         return null;
     }
-
     public static String apStr(Object obj, String prop) {
-        Object val = null;
+        Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
-            if (no(val)) {
+            if (no(val.getVal())) {
                 return null;
-            } else if (val instanceof String) {
-                return (String) val;
-            } else if (val instanceof ArrayList) {
+            } else if (val.getVal() instanceof String) {
+                return (String) val.getVal();
+            } else if (val.getVal() instanceof ArrayList) {
                 log.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
                         + XString.prettyPrint(obj));
                 return null;
             } else {
                 log.error("unhandled type on str() return val: "
-                        + (ok(val) ? val.getClass().getName() : "null on object"));
+                        + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object"));
                 log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
                 return null;
             }
         }
 
-        log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null") + "\n   Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
     public static Boolean apBool(Object obj, String prop) {
-        Object val = null;
+        Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
-            if (no(val)) {
+            if (no(val.getVal())) {
                 return false;
-            } else if (val instanceof String) {
-                return ((String) val).equalsIgnoreCase(APConst.TRUE);
-            } else if (val instanceof Boolean) {
-                return ((Boolean) val).booleanValue();
+            } else if (val.getVal() instanceof String) {
+                return ((String) val.getVal()).equalsIgnoreCase(APConst.TRUE);
+            } else if (val.getVal() instanceof Boolean) {
+                return ((Boolean) val.getVal()).booleanValue();
             }
         }
 
@@ -101,17 +102,17 @@ public class AP {
     }
 
     public static Integer apInt(Object obj, String prop) {
-        Object val = null;
+        Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
-            if (no(val)) {
+            if (no(val.getVal())) {
                 return 0;
-            } else if (val instanceof Integer) {
-                return ((Integer) val).intValue();
-            } else if (val instanceof Long) {
-                return ((Long) val).intValue();
-            } else if (val instanceof String) {
-                return Integer.valueOf((String) val);
+            } else if (val.getVal() instanceof Integer) {
+                return ((Integer) val.getVal()).intValue();
+            } else if (val.getVal() instanceof Long) {
+                return ((Long) val.getVal()).intValue();
+            } else if (val.getVal() instanceof String) {
+                return Integer.valueOf((String) val.getVal());
             }
         }
 
@@ -121,13 +122,13 @@ public class AP {
     }
 
     public static Date apDate(Object obj, String prop) {
-        Object val = null;
+        Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
-            if (no(val)) {
+            if (no(val.getVal())) {
                 return null;
-            } else if (val instanceof String) {
-                return DateUtil.parseISOTime((String) val);
+            } else if (val.getVal() instanceof String) {
+                return DateUtil.parseISOTime((String) val.getVal());
             }
         }
 
@@ -136,21 +137,21 @@ public class AP {
         return null;
     }
 
-    public static List<?> apList(Object obj, String prop) {
-        Object val = null;
+    public static List<?> apList(Object obj, String prop, boolean allowConvertString) {
+        Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
-            if (no(val)) {
+            if (no(val.getVal())) {
                 return null;
             }
-            // if we got an instance of a list return it
-            else if (val instanceof List<?>) {
-                return (List<?>) val;
+            // if we got an instance of a list return it 
+            else if (val.getVal() instanceof List<?>) {
+                return (List<?>) val.getVal();
             }
             // if we expected a list and found a String, that's ok, return a list with one entry
             // the address 'to' and 'cc' properties can have this happen often.
-            else if (val instanceof String) {
-                return Arrays.asList(val);
+            else if (allowConvertString && val.getVal() instanceof String) {
+                return Arrays.asList(val.getVal());
             }
         }
 
@@ -171,12 +172,13 @@ public class AP {
         return null;
     }
 
-    private static Object getFromMap(Object obj, String prop) {
+    // instanceof Map won't always work as instanceof when LinkedHashMap
+    private static Val<Object> getFromMap(Object obj, String prop) {
         if (obj instanceof LinkedHashMap<?, ?>) {
-            return ((LinkedHashMap<?, ?>) obj).get(prop);
+            return new Val<Object>(((LinkedHashMap<?, ?>) obj).get(prop));
         } //
         else if (obj instanceof Map<?, ?>) {
-            return ((Map<?, ?>) obj).get(prop);
+            return new Val<Object>(((Map<?, ?>) obj).get(prop));
         }
         return null;
     }

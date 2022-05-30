@@ -120,7 +120,7 @@ public class RSSFeedService extends ServiceBase {
 	// NOTE: Same value appears in RSSTypeHandler.ts
 	private static final int MAX_FEED_ITEMS = 50;
 
-	private static final int REFRESH_FREQUENCY_MINS = 240; //4 hrs
+	private static final int REFRESH_FREQUENCY_MINS = 240; // 4 hrs
 	static boolean run = false;
 
 	/*
@@ -190,7 +190,7 @@ public class RSSFeedService extends ServiceBase {
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		try {
 			for (String url : urls) {
-				log.debug("Processing Feed: " + url);
+				// log.debug("Processing Feed: " + url);
 
 				SyndFeed inFeed = getFeed(url, true);
 				if (ok(inFeed)) {
@@ -303,6 +303,7 @@ public class RSSFeedService extends ServiceBase {
 			}
 
 			if (USE_SPRING_READER) {
+				log.debug("rss network read: " + url);
 				inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
 					SyndFeedInput input = new SyndFeedInput();
 					try {
@@ -324,7 +325,8 @@ public class RSSFeedService extends ServiceBase {
 			// }
 			// }
 
-			// log.debug("CACHE MISS. Queried Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
+			// log.debug("CACHE MISS. Queried Feed " + url + " has " + inFeed.getEntries().size() + "
+			// entries.");
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
 

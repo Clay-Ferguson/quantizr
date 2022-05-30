@@ -158,6 +158,7 @@ public class ActPubCrypto extends ServiceBase {
             if (!verifier.verify(sigBytes)) {
                 throw new RuntimeException("Signature verify failed.");
             }
+            log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) : "none"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -207,7 +208,8 @@ public class ActPubCrypto extends ServiceBase {
                 // Get ActorObject from actor url.
                 APObj actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
                 if (no(actorObj)) {
-                    throw new RuntimeException("Unable to load actorUrl: " + actorUrl);
+                    log.warn("Unable to load actorUrl: " + actorUrl);
+                    return null;
                 }
 
                 String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);

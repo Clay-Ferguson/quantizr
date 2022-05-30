@@ -35,8 +35,8 @@ import quanta.mongo.model.SubNode;
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
-	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor,
-			boolean privateMessage, SubNode node) {
+	public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor, boolean privateMessage,
+			SubNode node) {
 		String objUrl = snUtil.getIdBasedUrl(node);
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		APOPerson payload = apub.generatePersonObj(node);
@@ -70,8 +70,9 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo, String inReplyTo,
-			String replyToType, String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
+	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
+			String inReplyTo, String replyToType, String content, String noteUrl, ZonedDateTime now, boolean privateMessage,
+			APList attachments) {
 		APObj ret = null;
 
 		if (ok(content)) {
@@ -92,61 +93,7 @@ public class ActPubFactory extends ServiceBase {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);
 		}
 
-		LinkedList<String> toList = new LinkedList<>();
-		LinkedList<String> ccList = new LinkedList<>();
-
-		APList tagList = new APList();
-		for (String userName : toUserNames) {
-			try {
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
-
-				// Local usernames will get a null here, by design, which is hopefully correct. We can call
-				// apUtil.makeActorUrlForUserName(userName)
-				// for local users, but aren't doing that, by design.
-				if (no(actorUrl))
-					continue;
-
-				/*
-				 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
-				 * we do that same thing
-				 */
-				if (!privateMessage) {
-					ccList.add(actorUrl);
-				} else {
-					toList.add(actorUrl);
-				}
-
-				// prepend character to make it like '@user@server.com'
-				tagList.val(new APOMention(actorUrl, "@" + userName));
-			}
-			// log and continue if any loop (user) fails here.
-			catch (Exception e) {
-				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
-			}
-		}
-		ret.put(APObj.tag, tagList);
-
-		if (!privateMessage) {
-			toList.add(APConst.CONTEXT_STREAMS_PUBLIC);
-
-			/*
-			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
-			 * attributedTo)
-			 */
-			APObj actor = apCache.actorsByUrl.get(attributedTo);
-			if (ok(actor)) {
-				ccList.add(apStr(actor, APObj.followers));
-			}
-		}
-
-		if (toList.size() > 0) {
-			ret.put(APObj.to, toList);
-		}
-
-		if (ccList.size() > 0) {
-			ret.put(APObj.cc, ccList);
-		}
-
+		setRecipients(attributedTo, userDoingAction, ret, toUserNames, privateMessage, true);
 		ret.put(APObj.attachment, attachments);
 		return ret;
 	}
@@ -156,57 +103,8 @@ public class ActPubFactory extends ServiceBase {
 	 */
 	public APObj newAnnounce(String userDoingAction, String actor, String id, HashSet<String> toUserNames,
 			String boostTargetActPubId, ZonedDateTime now, boolean privateMessage) {
-		APObj ret = new APOAnnounce(actor, id, now.format(DateTimeFormatter.ISO_INSTANT), boostTargetActPubId, null);
-
-		LinkedList<String> toList = new LinkedList<>();
-		LinkedList<String> ccList = new LinkedList<>();
-
-		for (String userName : toUserNames) {
-			try {
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
-
-				// Local usernames will get a null here, by design, which is hopefully correct. We can call
-				// apUtil.makeActorUrlForUserName(userName)
-				// for local users, but aren't doing that, by design.
-				if (no(actorUrl))
-					continue;
-
-				/*
-				 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
-				 * we do that same thing
-				 */
-				if (!privateMessage) {
-					ccList.add(actorUrl);
-				} else {
-					toList.add(actorUrl);
-				}
-			}
-			// log and continue if any loop (user) fails here.
-			catch (Exception e) {
-				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
-			}
-		}
-
-		if (!privateMessage) {
-			toList.add(APConst.CONTEXT_STREAMS_PUBLIC);
-			/*
-			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
-			 * attributedTo)
-			 */
-			APObj actorObj = apCache.actorsByUrl.get(actor);
-			if (ok(actorObj)) {
-				ccList.add(apStr(actor, APObj.followers));
-			}
-		}
-
-		if (toList.size() > 0) {
-			ret.put(APObj.to, toList);
-		}
-
-		if (ccList.size() > 0) {
-			ret.put(APObj.cc, ccList);
-		}
-
+		APObj ret = new APOAnnounce(actor, id, now.format(DateTimeFormatter.ISO_INSTANT), boostTargetActPubId);
+		setRecipients(actor, userDoingAction, ret, toUserNames, privateMessage, false);
 		return ret;
 	}
 
@@ -218,24 +116,31 @@ public class ActPubFactory extends ServiceBase {
 			String noteUrl, ZonedDateTime now, boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
+		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
+				now.format(DateTimeFormatter.ISO_INSTANT), object, null);
+		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, false);
+		return ret;
+	}
+
+	// todo-0: all calls to this need to have includeTags verified, some might easily need to be 'true'
+	public void setRecipients(String fromActor, String userDoingAction, APObj object, HashSet<String> toUserNames,
+			boolean privateMessage, boolean includeTags) {
 		List<String> toActors = new LinkedList<>();
 		List<String> ccActors = new LinkedList<>();
+		APList tagList = includeTags ? new APList() : null;
+
 		for (String userName : toUserNames) {
 			try {
-				/*
-				 * Local usernames will get a null here, by design, which is hopefully correct. We can call
-				 * apUtil.makeActorUrlForUserName(userName) for local users, but aren't doing that, by design.
-				 * 
-				 * todo-0: I think it's a bug that outbound messages like this aren't including local names in these
-				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those
-				 * users but they still need to be in the list so servers can know WHO was 'theoretically' delivered
-				 * to? ...in addition to the fact that they may or may not be 'mentioned' in the content.
-				 * 
-				 *  warning: this little block is in at least two places
-				 */
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
-				if (no(actorUrl))
-					continue;
+				String actorUrl = null;
+
+				// build an actorUrl for either foreign or local users. Both are included.
+				if (userName.contains("@")) {
+					actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
+					if (no(actorUrl))
+						continue;
+				} else {
+					actorUrl = apUtil.makeActorUrlForUserName(userName);
+				}
 
 				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else
 				// they go in the 'to'.
@@ -244,6 +149,11 @@ public class ActPubFactory extends ServiceBase {
 				} else {
 					toActors.add(actorUrl);
 				}
+
+				if (ok(tagList)) {
+					// prepend character to make it like '@user@server.com'
+					tagList.val(new APOMention(actorUrl, "@" + userName));
+				}
 			}
 			// log and continue if any loop (user) fails here.
 			catch (Exception e) {
@@ -251,77 +161,37 @@ public class ActPubFactory extends ServiceBase {
 			}
 		}
 
-		if (!privateMessage) {
-			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
+		if (ok(tagList)) {
+			object.put(APObj.tag, tagList);
 		}
 
-		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
-				now.format(DateTimeFormatter.ISO_INSTANT), object, null);
+		if (!privateMessage) {
+			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
+
+			/*
+			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
+			 * attributedTo)
+			 */
+			APObj fromActorObj = apUtil.getActorByUrl(auth.getAdminSession(), userDoingAction, fromActor);
+			if (ok(fromActorObj)) {
+				ccActors.add(apStr(fromActorObj, APObj.followers));
+			}
+		}
 
 		if (toActors.size() > 0) {
-			ret.put(APObj.to, new APList() //
-					.vals(toActors)); //
+			object.put(APObj.to, new APList().vals(toActors));
 		}
 
 		if (ccActors.size() > 0) {
-			ret.put(APObj.cc, new APList() //
-					.vals(ccActors)); //
+			object.put(APObj.cc, new APList().vals(ccActors));
 		}
-		return ret;
 	}
 
 	public APOUpdate newUpdate(String userDoingAction, APObj object, String fromActor, HashSet<String> toUserNames, String objUrl,
 			ZonedDateTime now, boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
-
-		List<String> toActors = new LinkedList<>();
-		List<String> ccActors = new LinkedList<>();
-		for (String userName : toUserNames) {
-			try {
-				/*
-				 * Local usernames will get a null here, by design, which is hopefully correct. We can call
-				 * apUtil.makeActorUrlForUserName(userName) for local users, but aren't doing that, by design.
-				 * 
-				 * todo-0: I think it's a bug that outbound messages like this aren't including local names in these
-				 * toActors or ccActors. Yes, it's true we won't be SENDING those out as posted messages to those
-				 * users but they still need to be in the list so servers can know WHO was 'theoretically' delivered
-				 * to? ...in addition to the fact that they may or may not be 'mentioned' in the content.
-				 * 
-				 * warning: this little block is in at least two places
-				 */
-				String actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
-				if (no(actorUrl))
-					continue;
-
-				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else
-				// they go in the 'to'.
-				if (!privateMessage) {
-					ccActors.add(actorUrl);
-				} else {
-					toActors.add(actorUrl);
-				}
-			}
-			// log and continue if any loop (user) fails here.
-			catch (Exception e) {
-				log.debug("failed adding user in newCreateMessage: " + userName + " -> " + e.getMessage());
-			}
-		}
-
-		if (!privateMessage) {
-			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
-		}
-
 		APOUpdate ret = new APOUpdate(objUrl + "&apCreateTime=" + idTime, fromActor, object, null);
-
-		if (toActors.size() > 0) {
-			ret.put(APObj.to, new APList() //
-					.vals(toActors)); //
-		}
-
-		if (ccActors.size() > 0) {
-			ret.put(APObj.cc, new APList() //
-					.vals(ccActors)); //
-		}
+		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, false);
 		return ret;
 	}
 }
