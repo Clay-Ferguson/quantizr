@@ -54,9 +54,20 @@ public class ActPubOutbox extends ServiceBase {
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
+     * 
+     * Returns true only if everything successful
      */
-    public void loadForeignOutbox(MongoSession ms, String userDoingAction, Object actor, SubNode userNode, String apUserName) {
+    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, Object actor, SubNode userNode, String apUserName) {
+        Val<Boolean> success = new Val<>(true);
         try {
+            // try to read outboxUrl first and if we can't we just return false
+            String outboxUrl = apStr(actor, APObj.outbox);
+            APObj outbox = getOutbox(ms, userDoingAction, outboxUrl);
+            if (no(outbox)) {
+                log.debug("outbox read fail: " + apUserName);
+                return false;
+            }
+
             if (no(userNode)) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
             }
@@ -64,20 +75,14 @@ public class ActPubOutbox extends ServiceBase {
             SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
             if (no(outboxNode)) {
-                log.debug("no outbox for user: " + apUserName);
-                return;
+                log.debug("no posts node for user: " + apUserName);
+                return false;
             }
 
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false);
-            String outboxUrl = apStr(actor, APObj.outbox);
-            APObj outbox = getOutbox(ms, userDoingAction, outboxUrl);
-            if (no(outbox)) {
-                log.debug("Unable to get outbox for AP user: " + apUserName);
-                return;
-            }
 
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
@@ -144,13 +149,16 @@ public class ActPubOutbox extends ServiceBase {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("Failes processing collection item.", e);
+                    log.error("Failed processing collection item.", e);
+                    success.setVal(false);
                 }
                 return (count.getVal() < ActPubService.MAX_MESSAGES);
             });
         } catch (Exception e) {
             log.error("Error reading outbox of: " + apUserName, e);
+            success.setVal(false);
         }
+        return success.getVal();
     }
 
     public APObj getOutbox(MongoSession ms, String userDoingAction, String url) {

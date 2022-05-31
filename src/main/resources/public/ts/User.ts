@@ -184,7 +184,6 @@ export class User {
                 this.checkMessages();
                 setTimeout(() => {
                     S.util.loadBookmarks();
-                    S.push.init();
                     S.util.resumeEditingOfAbandoned();
                 }, 600);
             }

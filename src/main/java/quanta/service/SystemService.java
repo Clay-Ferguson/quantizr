@@ -9,6 +9,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -27,6 +28,7 @@ import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.response.PushPageMessage;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
@@ -192,6 +194,22 @@ public class SystemService extends ServiceBase {
 		// Run command inside container
 		// sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
 		return sb.toString();
+	}
+
+	// For now this is for server restart notify, but will eventually be a general broadcast messenger.
+	// work in progress.
+	public String sendAdminNote() {
+		int sessionCount = 0;
+		for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
+			HttpSession httpSess = ThreadLocals.getHttpSession();
+			log.debug("Send admin note to: " + sc.getUserName() + " sessId: " + httpSess.getId());
+			// need custom messages support pushed by admin
+			push.sendServerPushInfo(sc, new PushPageMessage("Server " + prop.getMetaHost()
+					+ "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.", true));
+			sessionCount++;
+		}
+
+		return String.valueOf(sessionCount) + " sessions notified.";
 	}
 
 	public String getSessionActivity() {

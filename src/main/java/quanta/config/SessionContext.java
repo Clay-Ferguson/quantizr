@@ -89,6 +89,8 @@ public class SessionContext extends ServiceBase {
 	private int captchaFails = 0;
 
 	private String userToken;
+	private String appGuid;
+
 	private boolean enableIPSM;
 
 	public boolean isEnableIPSM() {
@@ -290,13 +292,23 @@ public class SessionContext extends ServiceBase {
 		return userToken;
 	}
 
-	public static List<SessionContext> getAllSessions(boolean requireToken) {
+	public static List<SessionContext> getAllSessions(boolean requireToken, boolean requireAppGuid) {
 		List<SessionContext> ret = new LinkedList<>();
 		HashSet<String> tokens = new HashSet<>();
+		HashSet<String> guids = new HashSet<>();
+
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (sc.isLive()) {
-					if (requireToken) {
+					if (requireAppGuid) {
+						if (ok(sc.getAppGuid())) {
+							if (!guids.contains(sc.getAppGuid())) {
+								ret.add(sc);
+								guids.add(sc.getAppGuid());
+							}
+						}
+					} 
+					else if (requireToken) {
 						if (ok(sc.getUserToken())) {
 							if (!tokens.contains(sc.getUserToken())) {
 								ret.add(sc);
@@ -534,5 +546,13 @@ public class SessionContext extends ServiceBase {
 		// turning on for everyone for now
 		return true;
 		// return getAllowedFeatures().contains("web3");
+	}
+
+	public String getAppGuid() {
+		return appGuid;
+	}
+
+	public void setAppGuid(String appGuid) {
+		this.appGuid = appGuid;
 	}
 }

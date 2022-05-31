@@ -3,6 +3,7 @@ package quanta.response;
 public class PushPageMessage extends ServerPushInfo {
 
 	private String payload;
+	private boolean usePopup;
 
 	public String getPayload() {
 		return payload;
@@ -16,8 +17,17 @@ public class PushPageMessage extends ServerPushInfo {
 	public PushPageMessage() {
 	}
 
-	public PushPageMessage(String payload) {
+	public PushPageMessage(String payload, boolean usePopup) {
 		super("pushPageMessage");
 		this.payload = payload;
+		this.usePopup = usePopup;
+	}
+
+	public boolean isUsePopup() {
+		return usePopup;
+	}
+
+	public void setUsePopup(boolean usePopup) {
+		this.usePopup = usePopup;
 	}
 }

@@ -4,8 +4,8 @@ import static quanta.actpub.model.AP.apBool;
 import static quanta.actpub.model.AP.apDate;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
-import static quanta.actpub.model.AP.apStr;
 import static quanta.actpub.model.AP.apParseList;
+import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.security.PublicKey;
@@ -783,18 +783,7 @@ public class ActPubService extends ServiceBase {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed, with body bytes: processCreateOrUpdateAction");
-
-                /////////////////
-                // Until the bodyBytes is vetted we have this fallback. (todo-0)
-                try {
-                    apCrypto.verifySignature(httpReq, pubKey, null);
-                    log.debug("sig works, ignoring bodyBytes");
-                } catch (Exception e2) {
-                    log.error("Sig failed, second try too.");
-                    return null;
-                }
-                /////////////////
-                // return null;
+                return null;
             }
 
             Object object = apObj(payload, APObj.object);
@@ -840,17 +829,7 @@ public class ActPubService extends ServiceBase {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed: processLikeAction");
-                /////////////////
-                // Until the bodyBytes is vetted we have this fallback. (todo-0)
-                try {
-                    apCrypto.verifySignature(httpReq, pubKey, null);
-                    log.debug("sig works, ignoring bodyBytes");
-                } catch (Exception e2) {
-                    log.error("Sig failed, second try too.");
-                    return null;
-                }
-                /////////////////
-                // return null;
+                return null;
             }
 
             String objectIdUrl = apStr(payload, APObj.object);
@@ -920,17 +899,7 @@ public class ActPubService extends ServiceBase {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed: in boost");
-                /////////////////
-                // Until the bodyBytes is vetted we have this fallback. (todo-0)
-                try {
-                    apCrypto.verifySignature(httpReq, pubKey, null);
-                    log.debug("sig works, ignoring bodyBytes");
-                } catch (Exception e2) {
-                    log.error("Sig failed, second try too.");
-                    return null;
-                }
-                /////////////////
-                // return null;
+                return null;
             }
 
             // if this is an undo operation we just delete the node and we're done.
@@ -992,21 +961,25 @@ public class ActPubService extends ServiceBase {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {
                 log.error("Sig failed: processDeleteAction");
-                /////////////////
-                // Until the bodyBytes is vetted we have this fallback. (todo-0)
-                try {
-                    apCrypto.verifySignature(httpReq, pubKey, null);
-                    log.debug("sig works, ignoring bodyBytes");
-                } catch (Exception e2) {
-                    log.error("Sig failed, second try too.");
-                    return null;
-                }
-                /////////////////
-                // return null;
+                return null;
             }
 
             Object object = apObj(payload, APObj.object);
-            String id = apStr(object, APObj.id);
+            String id = null;
+
+            // if the object to be deleted is specified as a string, assume it's the ID.
+            if (object instanceof String) {
+                id = (String)object;
+            } 
+            // otherwise we assume it's an object, with an ID in it.
+            else {
+                id = apStr(object, APObj.id);
+            }
+
+            if (no(id)) {
+                log.debug("Unable to get actorId for use in processDeleteAction: payload=" + XString.prettyPrint(payload));
+                return null;
+            }
 
             // find node user wants to delete
             SubNode delNode = read.findNodeByProp(as, NodeProp.ACT_PUB_ID.s(), id);
@@ -1014,7 +987,7 @@ public class ActPubService extends ServiceBase {
                 return null;
 
             // verify the user doing the delete is the owner of the node, before deleting.
-            if (apCrypto.ownerHasKey(as, delNode.getOwner(), keyEncoded.getVal())) {
+            if (apCrypto.ownerHasKey(as, delNode, keyEncoded.getVal())) {
                 delete.delete(delNode);
 
                 // run subgraph delete asynchronously
@@ -1022,7 +995,8 @@ public class ActPubService extends ServiceBase {
                     delete.deleteSubGraphChildren(as, delNode, false);
                 });
             } else {
-                log.debug("key match fail. not deleting.");
+                log.debug("key match fail. rejecting attempt to delete node: " + XString.prettyPrint(delNode)
+                        + "   \ninbound payload: " + XString.prettyPrint(payload));
             }
             return null;
         });
@@ -1154,8 +1128,9 @@ public class ActPubService extends ServiceBase {
             }
             // if we're updating the node, need to validate they encodedKey owns it.
             else {
-                if (!apCrypto.ownerHasKey(ms, dupNode.getOwner(), encodedKey)) {
-                    log.debug("unauthorized key [" + encodedKey + "] to access node " + dupNode.getIdStr());
+                if (!apCrypto.ownerHasKey(ms, dupNode, encodedKey)) {
+                    log.warn("unauthorized key [" + encodedKey + "] tried action " + action + " on node " + dupNode.getIdStr()
+                            + " with object " + XString.prettyPrint(obj));
                     throw new RuntimeException("unauthorized key");
                 }
             }
@@ -1186,7 +1161,7 @@ public class ActPubService extends ServiceBase {
 
             // if we didn't get a language that way try the simpler way
             if (no(language)) {
-                language = apStr(context, APObj.language);
+                language = apStr(context, APObj.language, false);
             }
 
             if (ok(language)) {
@@ -1687,7 +1662,7 @@ public class ActPubService extends ServiceBase {
                  * 
                  * what we can do here is be sure any GIVEN server is only accessed at 4second intervals!!!
                  */
-                Thread.sleep(3000);
+                Thread.sleep(4000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
@@ -1786,7 +1761,10 @@ public class ActPubService extends ServiceBase {
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
             APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
             if (ok(actor)) {
-                apOutbox.loadForeignOutbox(ms, userMakingRequest, actor, userNode, userName);
+                // if their outbox fails just, stop processing and don't bother trying to get followers or following,.
+                if (!apOutbox.loadForeignOutbox(ms, userMakingRequest, actor, userNode, userName)) {
+                    return null;
+                }
 
                 /*
                  * I was going to load followerCounts into userNode, but I decided to just query them live when

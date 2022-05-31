@@ -1232,6 +1232,9 @@ public class MongoRead extends ServiceBase {
      * Returns one (or first) node that has a matching propName and propVal
      */
     public SubNode findNodeByProp(MongoSession ms, String propName, String propVal) {
+        if (no(propVal)) {
+            return null;
+        }
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PROPS + "." + propName).is(propVal);
         q.addCriteria(crit);

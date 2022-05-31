@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -158,7 +157,7 @@ public class ActPubCrypto extends ServiceBase {
             if (!verifier.verify(sigBytes)) {
                 throw new RuntimeException("Signature verify failed.");
             }
-            log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) : "none"));
+            // log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) : "none"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -274,14 +273,14 @@ public class ActPubCrypto extends ServiceBase {
             else if (header.equals("digest")) {
                 value = httpReq.getHeader(header);
 
-                // if we have body bytes and they don't hash to be what the header claims they should be then that's
-                // a fail.
+                /*
+                 * if we have body bytes and they don't hash to be what the header claims they should be then that's
+                 * a fail
+                 */
                 if (ok(bodyBytes)) {
                     if (!digestFromBodyBytes(bodyBytes).equals(value)) {
                         throw new RuntimeException("body digest compare fail.");
-                    } else {
-                        log.debug("sig check w/ body ok.");
-                    }
+                    } 
                 }
             }
             // all other headers
@@ -300,15 +299,16 @@ public class ActPubCrypto extends ServiceBase {
      * Returns true only if the account node identified by ownerId (i.e. accountNode.id==ownerId) has
      * the matching ActivityPub key on it.
      */
-    public boolean ownerHasKey(MongoSession ms, ObjectId ownerId, String key) {
+    public boolean ownerHasKey(MongoSession ms, SubNode node, String key) {
 
         // This is for activity pub, so any claims on ownerId are rejected, just as one more (unnecessary)
         // precaution.
-        if (ownerId.equals(auth.getAdminSession().getUserNodeId())) {
-            throw new RuntimeException("ActPub attempted admin mods.");
+        if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
+            log.warn("ActPub attempted admin mods.");
+            return false;
         }
 
-        SubNode accntNode = read.getNode(ms, ownerId);
+        SubNode accntNode = read.getNode(ms, node.getOwner());
         if (ok(accntNode)) {
             return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
         }

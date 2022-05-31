@@ -19,6 +19,9 @@ export class ServerPush {
     }
 
     init = (): any => {
+        // if already inititlized do nothing
+        if (this.eventSource) return;
+
         console.log("ServerPush.init");
         this.eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 
@@ -96,7 +99,12 @@ export class ServerPush {
             let state = store.getState();
             const data: J.PushPageMessage = JSON.parse(e.data);
             // console.log("pagePushMessage: " + data.payload);
-            S.util.showPageMessage(data.payload);
+            if (data.usePopup) {
+                S.util.showMessage(data.payload, "Admin Message");
+            }
+            else {
+                S.util.showPageMessage(data.payload);
+            }
         }, false);
 
         this.eventSource.addEventListener("newInboxNode", (e: any) => {

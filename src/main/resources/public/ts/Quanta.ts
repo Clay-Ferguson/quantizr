@@ -11,6 +11,7 @@ import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
 export class Quanta {
+    static appGuid: string = "appid." + Math.random();
     mainMenu: MainMenuDlg;
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
@@ -292,7 +293,10 @@ export class Quanta {
 
             // This timer delay is just for asthetics and should not be required.
             setTimeout(async () => {
-                let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", null, true);
+                S.push.init();
+                let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+                    appGuid: Quanta.appGuid
+                }, true);
                 if (res.config) {
                     dispatch("Action_configUpdates", (s: AppState): AppState => {
                         s.config = res.config;

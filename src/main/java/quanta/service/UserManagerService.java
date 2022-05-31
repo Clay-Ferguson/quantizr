@@ -705,7 +705,7 @@ public class UserManagerService extends ServiceBase {
 				// Now we have to read the file we just wrote to get it's CID so we can publish it.
 				IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
 				if (no(pathStat)) {
-					push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED"));
+					push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED", true));
 					return null;
 				}
 
@@ -724,7 +724,7 @@ public class UserManagerService extends ServiceBase {
 				userNode.set(NodeProp.USER_DID_IPNS.s(), ret.get("Name"));
 				update.save(ms, userNode);
 
-				push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete."));
+				push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete.", false));
 				return null;
 			});
 		});

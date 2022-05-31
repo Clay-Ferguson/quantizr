@@ -240,7 +240,7 @@ public class IPFSPubSub extends ServiceBase {
             pushInfo = new IPSMPushInfo(payload);
         }
 
-        for (SessionContext sc : SessionContext.getAllSessions(true)) {
+        for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 
             // only consider sessions that have viewed their IPSM tab
             if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {

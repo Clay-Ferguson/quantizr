@@ -34,7 +34,7 @@ public class AP {
         return type.equalsIgnoreCase(apStr(obj, APObj.type));
     }
 
-     /**
+    /**
      * Looks in all elements of list, to find all elements that are Objects, and returns the value of
      * the first one containing the prop val as a property of it
      * 
@@ -58,7 +58,12 @@ public class AP {
         }
         return null;
     }
+
     public static String apStr(Object obj, String prop) {
+        return apStr(obj, prop, true);
+    }
+
+    public static String apStr(Object obj, String prop, boolean warnIfMissing) {
         Val<Object> val = null;
 
         if (ok(val = getFromMap(obj, prop))) {
@@ -71,15 +76,19 @@ public class AP {
                         + XString.prettyPrint(obj));
                 return null;
             } else {
-                log.error("unhandled type on str() return val: "
-                        + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object"));
-                log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+                if (warnIfMissing) {
+                    log.warn("unhandled type on apStr() return val: "
+                            + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object")
+                            + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+                }
                 return null;
             }
         }
 
-        log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        if (warnIfMissing) {
+            log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null") + "\nUnable to get property "
+                    + prop + " from obj " + XString.prettyPrint(obj));
+        }
         return null;
     }
 
@@ -144,7 +153,7 @@ public class AP {
             if (no(val.getVal())) {
                 return null;
             }
-            // if we got an instance of a list return it 
+            // if we got an instance of a list return it
             else if (val.getVal() instanceof List<?>) {
                 return (List<?>) val.getVal();
             }

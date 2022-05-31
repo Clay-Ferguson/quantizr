@@ -194,6 +194,7 @@ export interface GetBookmarksRequest extends RequestBase {
 }
 
 export interface GetConfigRequest extends RequestBase {
+    appGuid: string;
 }
 
 export interface GetFollowersRequest extends RequestBase {
@@ -756,6 +757,7 @@ export interface PublishNodeToIpfsResponse extends ResponseBase {
 
 export interface PushPageMessage extends ServerPushInfo {
     payload: string;
+    usePopup: boolean;
 }
 
 export interface RemovePrivilegeResponse extends ResponseBase {

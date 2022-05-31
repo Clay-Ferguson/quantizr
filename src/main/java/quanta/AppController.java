@@ -1360,6 +1360,13 @@ public class AppController extends ServiceBase implements ErrorController {
 		GetConfigResponse res = new GetConfigResponse();
 		HashMap<String, Object> map = prop.getConfig();
 
+		// Identifier generated once on Browser, can uniquely identify one single session to associate with
+		// the given webpage/tab
+		if (ok(ThreadLocals.getSC())) {
+			ThreadLocals.getSC().setAppGuid(req.getAppGuid());
+			log.debug("BrowserGuid: " + req.getAppGuid());
+		}
+
 		// if we have a 'userMessage' on the session send it back now, and then forget it.
 		if (ok(ThreadLocals.getSC()) && ok(ThreadLocals.getSC().getUserMessage())) {
 			/*
@@ -1470,6 +1477,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 				case "getSessionActivity":
 					res.getMessages().add(new InfoMessage(system.getSessionActivity(), null));
+					break;
+
+				case "sendAdminNote":
+					res.getMessages().add(new InfoMessage(system.sendAdminNote(), null));
 					break;
 
 				case "getJson":

@@ -8,15 +8,8 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
@@ -246,6 +240,12 @@ public class ActPubUtil extends ServiceBase {
                 ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
             }
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
+        } catch (HttpClientErrorException.Gone goneEx) {
+            log.debug("http says Gone: " + url);
+            return null;
+        } catch (HttpClientErrorException.Forbidden forbiddenEx) {
+            log.debug("http says Forbidden: " + url);
+            return null;
         } catch (Exception e) {
             log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class=" + e.getClass().getName()
                     + " respCode=" + responseCode);
@@ -894,6 +894,8 @@ public class ActPubUtil extends ServiceBase {
      */
     public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
         // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
+        if (no(url))
+            return null;
 
         // Try to look up the node first from the DB.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
