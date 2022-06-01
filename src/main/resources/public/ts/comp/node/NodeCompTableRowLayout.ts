@@ -108,9 +108,11 @@ export class NodeCompTableRowLayout extends Div {
             children.push(curRow);
         }
 
+        let isMine = S.props.isMine(state.node, state);
+
         /* I'll leave this block here, for future reference, but it's dead code. If editMode is on we never do the
         table layout but show each node as if it were vertical layout instead */
-        if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
             if (state.userPreferences.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);

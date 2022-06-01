@@ -35,6 +35,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
+        let isMine = S.props.isMine(state.node, state);
 
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
@@ -83,7 +84,7 @@ export class NodeCompVerticalRowLayout extends Div {
                             }
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, false, boostComp, state);
+                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, isMine, true, false, boostComp, state);
                             comps.push(row);
                         }
                         inVerticalSpace = false;
@@ -106,7 +107,7 @@ export class NodeCompVerticalRowLayout extends Div {
             rowIdx++;
         });
 
-        if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
             if (state.userPreferences.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
@@ -114,7 +115,8 @@ export class NodeCompVerticalRowLayout extends Div {
 
             if (this.level <= 1) {
                 let insertButton: Button = null;
-                // todo-1: this button should have same enabelement as "new" button, on the page root
+                // todo-1: this button should have same enablement as "new" button, on the page root
+                // Note: this is the very last "+" button at the bottom, to insert below last child
                 comps.push(new Div(null, { className: (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row") }, [
                     insertButton = new Button(null, e => {
                         if (lastNode) {

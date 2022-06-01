@@ -160,8 +160,9 @@ export class NodeCompButtonBar extends Div {
                 }
             }
             let editInsertAllowed = S.edit.isInsertAllowed(node, state);
+            let isMine = S.props.isMine(node, state);
 
-            if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
+            if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     iconclass: "fa fa-plus",
                     nid: node.id,
