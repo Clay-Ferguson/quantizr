@@ -466,7 +466,7 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
-	// todo-0: remove this after it's done converting!
+	// todo-0: remove this after it's done converting on prod
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
 		Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());

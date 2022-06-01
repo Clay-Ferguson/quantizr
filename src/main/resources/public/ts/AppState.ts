@@ -94,10 +94,10 @@ export class AppState {
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
 
-    highlightSearchNode: J.NodeInfo = null;
+    highlightSearchNodeId: string;
 
     /* maps node.id values to NodeInfo.java objects
-    Make this use a Map type (typescript)
+    Make this use a Map type (typescript), I have a feeling we can get comletely rid of this map now (todo-0)
     */
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 

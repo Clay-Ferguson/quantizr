@@ -1314,6 +1314,15 @@ Will come back later and study this more. todo-1 */
     margin-left: 0px;
 }
 
+.reply-indicator {
+    padding: 6px;
+    margin-right: 8px;
+    margin-left: 6px;
+    border-radius: $border-radius;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
+}
+
 .header-text {
     font-size: small;
     margin-left: 8px;

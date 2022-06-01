@@ -159,7 +159,7 @@ export class NodeCompRow extends Div {
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
         if (this.allowHeaders && state.userPreferences.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
-            header = new NodeCompRowHeader(node, true, true, false, false, true);
+            header = new NodeCompRowHeader(node, true, true, false, false, true, false);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

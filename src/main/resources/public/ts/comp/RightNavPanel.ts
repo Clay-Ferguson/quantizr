@@ -11,6 +11,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Icon } from "./core/Icon";
+import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
@@ -124,6 +125,7 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
+                    !state.userPreferences.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
                     state.isAnonUser ? new Div("Login / Signup", {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }

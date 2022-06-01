@@ -795,7 +795,11 @@ export class Util {
         hours = hours % 12;
         hours = hours ? hours : 12; // the hour '0' should be '12'
         const strTime = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ampm;
-        return (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getFullYear() + " " + strTime;
+        let year = date.getFullYear();
+        if (year > 2000) {
+            year -= 2000;
+        }
+        return (date.getMonth() + 1) + "-" + date.getDate() + "-" + year + " " + strTime;
     }
 
     formatDateShort = (date): string => {

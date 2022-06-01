@@ -21,7 +21,8 @@ import { Comp } from "../base/Comp";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
+        private isBoost: boolean) {
         super(null, {
             className: "header-text"
         });
@@ -183,7 +184,11 @@ export class NodeCompRowHeader extends Div {
         });
 
         if (node.lastModified) {
-            floatUpperRightDiv.addChild(new Span((S.props.getPropStr(J.NodeProp.REPLY, node) ? "Reply " : "") + S.util.formatDate(new Date(node.lastModified))));
+            let reply = S.props.getPropStr(J.NodeProp.REPLY, node);
+            if (reply) {
+                floatUpperRightDiv.addChild(new Span("Reply", { className: "reply-indicator", title: "This Post is a reply to it's parent Post" }));
+            }
+            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
         }
 
         if (node.name) {

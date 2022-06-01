@@ -98,10 +98,7 @@ export class Search {
 
         if (res.nodes && res.nodes.length > 0) {
             dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
-                let nodeFound = this.idToNodeMap.get(node.id);
-                if (nodeFound) {
-                    s.highlightSearchNode = nodeFound;
-                }
+                s.highlightSearchNodeId = node.id;
 
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
@@ -504,7 +501,7 @@ export class Search {
             // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
             boostComp = new Div(null, { className: "boost-row" }, [
-                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton) : null,
+                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true) : null,
                 boostContent
             ])
         }
@@ -515,14 +512,14 @@ export class Search {
             nid: node.id
             // tabIndex: "-1"
         }, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false) : null,
             content,
             boostComp,
             allowFooter ? new NodeCompRowFooter(node, isFeed, showThreadButton) : null,
             allowFooter ? new Clearfix() : null
         ]);
 
-        let divClass: string = state.highlightSearchNode?.id === node.id ? "userFeedItemHighlight" : "userFeedItem";
+        let divClass: string = state.highlightSearchNodeId === node.id ? "userFeedItemHighlight" : "userFeedItem";
 
         return new Div(null, {
             className: isParent ? "userFeedItemParent" : divClass
@@ -530,20 +527,16 @@ export class Search {
     }
 
     clickSearchNode = (id: string, state: AppState) => {
-        dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-            /*
-             * update highlight node to point to the node clicked on, just to persist it for later
-             */
-            s.highlightSearchNode = this.idToNodeMap.get(id);
-            if (!s.highlightSearchNode) {
-                throw new Error("Unable to find uid in search results: " + id);
-            }
+        setTimeout(() => {
+            S.view.jumpToId(id);
 
-            setTimeout(() => {
-                S.view.jumpToId(s.highlightSearchNode.id);
-            }, 500);
-            return s;
-        });
+            if (this.idToNodeMap.get(id)) {
+                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    s.highlightSearchNodeId = id;
+                    return s;
+                });
+            }
+        }, 10);
     }
 
     searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): Promise<void> => {
