@@ -9,7 +9,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class APPostsTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.ACT_PUB_POSTS, "Posts", "fa-comments-o", true);
+        super(J.NodeType.ACT_PUB_POSTS, "Fediverse Posts", "fa-comments-o", false);
     }
 
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {

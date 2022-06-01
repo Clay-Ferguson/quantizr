@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
     // Activity Pub Properties
-    ACT_PUB_ID("apid", "s"), //
+    ACT_PUB_ID("apid", "s"), //todo-1: should renmae to "ap:id" 
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
@@ -154,7 +154,7 @@ public enum NodeProp {
     NOWRAP("sn:nowrap", "s"), //
 
     BIN_DATA("sn:jcrData", "s"), //
-    BIN("bin", "s"), //
+    BIN("bin", "s"), // see isSavableProperty
 
     // Attachments that are not stored locally but by external url use this.
     BIN_URL("sn:extUrl", "s"),
@@ -165,10 +165,10 @@ public enum NodeProp {
     CHILDREN_IMG_SIZES("sn:childrenImgSizes", "s"), //
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot", "s"), //
+    BIN_TOTAL("sn:binTot", "s"),  // see isSavableProperty
 
     // amount of bytes the user is ALLOWED to save.
-    BIN_QUOTA("sn:binQuota", "s"), //
+    BIN_QUOTA("sn:binQuota", "s"), // see isSavableProperty
 
     // if this contains web3, then web3 active, etc.
     ALLOWED_FEATURES("sn:features", "s"), //

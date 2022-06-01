@@ -190,7 +190,6 @@ public class ActPubCrypto extends ServiceBase {
 
                 // if the key was there decode it.
                 if (ok(pkEncoded)) {
-
                     // if the output param wants the encoded key set it
                     if (ok(keyVal)) {
                         keyVal.setVal(pkEncoded);
@@ -217,17 +216,8 @@ public class ActPubCrypto extends ServiceBase {
                     keyVal.setVal(pkeyEncoded);
                 }
 
-                // DO NOT DELETE (yet)
-                // repair key if not existing (code no longer needed)
-                // if (ok(accntNode)) {
-                // if (accntNode.set(NodeProp.ACT_PUB_KEYPEM.s(), pkeyEncoded)) {
-                // log.debug("Fixed PKEY: " + accntNode.getStr(NodeProp.USER));
-                // update.save(as, accntNode, false);
-                // }
-                // }
                 pkey = getPublicKeyFromEncoding(pkeyEncoded);
             }
-
             return pkey;
         });
     }
@@ -248,11 +238,6 @@ public class ActPubCrypto extends ServiceBase {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(spec);
         } catch (Exception ex) {
             log.debug("Failed to generate publicKey from encoded: " + pkeyEncoded);
-            // Notes from other Platform code:
-            // a simpler RSA key format, used at least by Misskey
-            // Misskey user objects also contain a key "isCat" which I ignore
-            // RSAPublicKeySpec spec=decodeSimpleRSAKey(key);
-            // pubKey=KeyFactory.getInstance("RSA").generatePublic(spec);
         }
 
         return pubKey;
@@ -290,8 +275,7 @@ public class ActPubCrypto extends ServiceBase {
             sigParts.add(header + ": " + value);
         }
 
-        String strToSign = String.join("\n", sigParts);
-        byte[] signableBytes = strToSign.getBytes(StandardCharsets.UTF_8);
+        byte[] signableBytes = String.join("\n", sigParts).getBytes(StandardCharsets.UTF_8);
         return signableBytes;
     }
 

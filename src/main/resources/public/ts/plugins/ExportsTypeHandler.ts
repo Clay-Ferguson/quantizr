@@ -9,7 +9,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class ExportsTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.EXPORTS, "Exports", "fa-briefcase", true);
+        super(J.NodeType.EXPORTS, "Exports", "fa-briefcase", false);
     }
 
     getAllowRowHeader(): boolean {

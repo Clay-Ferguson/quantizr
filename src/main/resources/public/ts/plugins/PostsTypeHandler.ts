@@ -9,7 +9,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class PostsTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.POSTS, "Posts", "fa-comments-o", true);
+        super(J.NodeType.POSTS, "Posts", "fa-comments-o", false);
     }
 
     isSpecialAccountNode(): boolean {

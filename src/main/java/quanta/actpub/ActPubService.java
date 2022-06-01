@@ -775,10 +775,6 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            /*
-             * all calls to verifySignature could be done at a higher layer up perhaps, and it's cleaner not to
-             * have to pass down body bytes into every API method. Need better decoupling and layering (todo-0)
-             */
             try {
                 apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
             } catch (Exception e) {

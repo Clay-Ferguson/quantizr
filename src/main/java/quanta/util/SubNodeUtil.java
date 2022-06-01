@@ -30,17 +30,6 @@ import quanta.mongo.model.SubNode;
 public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
-	/*
-	 * These are properties we should never allow the client to send back as part of a save operation.
-	 */
-	private static HashSet<String> nonSavableProperties = new HashSet<>();
-
-	static {
-		nonSavableProperties.add(NodeProp.BIN.s());
-		nonSavableProperties.add(NodeProp.BIN_TOTAL.s());
-		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
-	}
-
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID.s());
 	}
@@ -103,8 +92,24 @@ public class SubNodeUtil extends ServiceBase {
 	 * before even fixing the client I decided to just make the server side block those. This is more
 	 * secure to always have the server allow misbehaving javascript for security reasons.
 	 */
-	public static boolean isSavableProperty(String propertyName) {
-		return !nonSavableProperties.contains(propertyName);
+	public static boolean isReadonlyProp(String propName) {
+		// we don't allow users to modify directly ActPub properties, because we rely on looking up nodes by these values
+		// and this would allow someone to hijack or masquerade stuff, maily by setting objectID values or ActorIDs.
+		if (propName.startsWith("ap:")) {
+			return false;
+		}
+		switch (propName) {
+			case "apid":
+
+			// we don't allow user to modify storage, becasue only admin can control storage.
+			case "bin":
+			case "sn:binTot":
+			case "sn:binQuota":
+				return false;
+			default:
+				break;
+		}
+		return true;
 	}
 
 	public void setNodePublicAppendable(SubNode node) {

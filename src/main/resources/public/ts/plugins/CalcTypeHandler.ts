@@ -14,7 +14,8 @@ let win: any = window;
 export class CalcTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", true);
+        // false=disabling user's ability to select
+        super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", false);
     }
 
     getEditorHelp(): string {

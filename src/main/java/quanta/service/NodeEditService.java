@@ -452,7 +452,7 @@ public class NodeEditService extends ServiceBase {
 					 * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
 					 * client code, for security and robustness.
 					 */
-					if (ms.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
+					if (ms.isAdmin() || SubNodeUtil.isReadonlyProp(property.getName())) {
 						// log.debug("Property to save: " + property.getName() + "=" +
 						// property.getValue());
 						node.set(property.getName(), property.getValue());
