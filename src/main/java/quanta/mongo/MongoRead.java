@@ -545,17 +545,22 @@ public class MongoRead extends ServiceBase {
         return mongoUtil.find(q);
     }
 
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
+        return getChildren(ms, node, sort, limit, skip, null);
+    }
+
     /*
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node
      */
-    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
+            Criteria moreCriteria) {
         auth.auth(ms, node, PrivilegeType.READ);
 
         if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            return read.getChildren(ms, node.getId(), sort, limit, skip, null, null);
+            return read.getChildren(ms, node.getId(), sort, limit, skip, null, moreCriteria);
         } else {
-            return read.getChildren(ms, node.getPath(), sort, limit, skip, null, null);
+            return read.getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria);
         }
     }
 

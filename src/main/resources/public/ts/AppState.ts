@@ -81,6 +81,7 @@ export class AppState {
         showMetaData: false,
         nsfw: false,
         showParents: false,
+        showReplies: true,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
         enableIPSM: false,

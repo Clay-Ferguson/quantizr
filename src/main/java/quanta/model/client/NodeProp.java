@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
     // Activity Pub Properties
-    ACT_PUB_ID("apid", "s"), //todo-1: should renmae to "ap:id" 
+    ACT_PUB_ID("apid", "s"), // todo-1: should renmae to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
@@ -38,11 +38,12 @@ public enum NodeProp {
      * encrypted with the public key of the user it's being shared to so that user can use their private
      * key to decrypt this key and gain access to the actual data.
      */
-    ENC_KEY("sn:encKey", "s"),
+    ENC_KEY("sn:encKey", "s"), //
 
     // finding this on a node means it can be safely deleted without affecting any
     // local users
-    TEMP("tmp", "s"),
+    TEMP("tmp", "s"), //
+    REPLY("reply", "s"), //
 
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
@@ -55,6 +56,7 @@ public enum NodeProp {
     USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
     USER_PREF_NSFW("sn:nsfw", "s"), //
     USER_PREF_SHOW_PARENTS("sn:showParents", "s"), //
+    USER_PREF_SHOW_REPLIES("sn:showReplies", "s"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", "s"), //
     USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols", "s"), //
@@ -140,7 +142,8 @@ public enum NodeProp {
     BIN_MIME("sn:mimeType", "s"), //
     BIN_FILENAME("sn:fileName", "s"), //
 
-    // todo-1: Currently this size doesn't take into account IPFS storage of nodes with SubNode.CID property, that is.
+    // todo-1: Currently this size doesn't take into account IPFS storage of nodes with SubNode.CID
+    // property, that is.
     BIN_SIZE("sn:size", "s"), //
 
     /*
@@ -165,7 +168,7 @@ public enum NodeProp {
     CHILDREN_IMG_SIZES("sn:childrenImgSizes", "s"), //
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot", "s"),  // see isSavableProperty
+    BIN_TOTAL("sn:binTot", "s"), // see isSavableProperty
 
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"), // see isSavableProperty
@@ -188,7 +191,7 @@ public enum NodeProp {
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 
     INLINE_CHILDREN("inlineChildren", "s"), //
-    
+
     PRIORITY("priority", "s"), //
     PRIORITY_FULL("p.priority", "s"), //
 
@@ -196,14 +199,16 @@ public enum NodeProp {
     ORDER_BY("orderBy", "s"), NO_OPEN_GRAPH("noOpenGraph", "s"), //
 
     TYPE_LOCK("sn:typLoc", "s"), //
-    
+
     DATE("date", "s"), //
     DATE_FULL("p.date", "s"), //
 
-    // nodes that contain this property are not published to ActPub servers and not allowed to show up in feeds.
+    // nodes that contain this property are not published to ActPub servers and not allowed to show up
+    // in feeds.
     UNPUBLISHED("unpub", "s"), //
 
-    // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the node is s boost.
+    // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the
+    // node is s boost.
     BOOST("boost", "s"), //
     DURATION("duration", "s");
 

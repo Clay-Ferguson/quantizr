@@ -85,7 +85,7 @@ public class MongoRepository extends ServiceBase {
 			// be sure to disable the deamon processing also, which can be
 			// done with setDaemonsEnabled(false)
 			// mongoUtil.setParentNodes(as);
-			// mongoUtil.processAccounts(as);
+			mongoUtil.processAccounts(as);
 			// mongoUtil.convertProperties(as);
 
 			mongoUtil.createAdminUser(as);

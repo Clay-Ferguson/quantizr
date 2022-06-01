@@ -26,6 +26,9 @@ public class CreateSubNodeRequest extends RequestBase {
 	// for a DM this can be optionally provided to share the node with this person immeidately.
 	private String shareToUserId;
 
+	// this causes the node to get a reply=true property.
+	private boolean reply;
+
 	public String getShareToUserId() {
 		return shareToUserId;
 	}
@@ -116,5 +119,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setBoostTarget(String boostTarget) {
 		this.boostTarget = boostTarget;
+	}
+
+	public boolean isReply() {
+		return reply;
+	}
+
+	public void setReply(boolean reply) {
+		this.reply = reply;
 	}
 }

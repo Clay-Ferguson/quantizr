@@ -599,6 +599,7 @@ public class UserManagerService extends ServiceBase {
 			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), reqUserPrefs.isShowMetaData());
 			prefsNode.set(NodeProp.USER_PREF_NSFW.s(), reqUserPrefs.isNsfw());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS.s(), reqUserPrefs.isShowParents());
+			prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), reqUserPrefs.isShowReplies());
 			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), reqUserPrefs.isRssHeadlinesOnly());
 			prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), reqUserPrefs.getMainPanelCols());
 
@@ -606,10 +607,11 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
 			userPrefs.setNsfw(reqUserPrefs.isNsfw());
 			userPrefs.setShowParents(reqUserPrefs.isShowParents());
+			userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
 
-			// log.debug("saveUserPreferences: " + XString.prettyPrint(prefsNode));
+			// log.debug("saveUserPreferences: [hashCode=" + userPrefs.hashCode() + "] " + XString.prettyPrint(userPrefs));
 			res.setSuccess(true);
 			return null;
 		});
@@ -971,6 +973,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
 			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
 			userPrefs.setShowParents(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PARENTS));
+			userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
 			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
 
 			long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA);

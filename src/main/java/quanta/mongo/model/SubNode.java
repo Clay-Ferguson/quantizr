@@ -404,6 +404,8 @@ public class SubNode {
 		}
 	}
 
+	// todo-0: need version of set that takes NodeProp as key
+
 	@Transient
 	@JsonIgnore
 	public boolean set(String key, Object val) {

@@ -133,6 +133,7 @@ export class MenuPanel extends Div {
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
     static toggleNsfw = () => S.edit.toggleNsfw(appState(null));
     static toggleParents = () => S.edit.toggleShowParents(appState(null));
+    static toggleReplies = () => S.edit.toggleShowReplies(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
 
@@ -376,6 +377,7 @@ export class MenuPanel extends Div {
             new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
             new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
+            new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => state.userPreferences.showReplies), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

@@ -10,6 +10,7 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean nsfw;
 	private boolean showParents;
+	private boolean showReplies;
 
 	private boolean rssHeadlinesOnly;
 
@@ -81,6 +82,14 @@ public class UserPreferences {
 
 	public void setShowParents(boolean showParents) {
 		this.showParents = showParents;
+	}
+
+	public boolean isShowReplies() {
+		return showReplies;
+	}
+
+	public void setShowReplies(boolean showReplies) {
+		this.showReplies = showReplies;
 	}
 
 	public boolean isNsfw() {

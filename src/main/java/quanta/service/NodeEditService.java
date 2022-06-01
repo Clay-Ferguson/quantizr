@@ -185,6 +185,10 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		if (req.isReply()) {
+			newNode.set(NodeProp.REPLY.s(), Boolean.TRUE);
+		}
+
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
 				false, false));

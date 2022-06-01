@@ -46,6 +46,7 @@ export class PrefsDlg extends DialogBase {
                     showMetaData: this.appState.userPreferences.showMetaData,
                     nsfw: this.appState.userPreferences.nsfw,
                     showParents: this.appState.userPreferences.showParents,
+                    showReplies: this.appState.userPreferences.showReplies,
                     rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
                     mainPanelCols: this.appState.userPreferences.mainPanelCols,
                     maxUploadFileSize: -1,

@@ -466,17 +466,21 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
+	// todo-0: remove this after it's done converting!
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
 		Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
 		for (SubNode acctNode : accountNodes) {
-			acctNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), 6);
+			acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
 
 			if (ThreadLocals.getDirtyNodeCount() > 200) {
 				update.saveSession(ms);
 			}
 		}
+
+		// should be unnecessary but let's save here too.
+		update.saveSession(ms);
 	}
 
 	/*
@@ -974,6 +978,7 @@ public class MongoUtil extends ServiceBase {
 		userNode.set(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
 		userNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 		userNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
+		userNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
 		userNode.set(NodeProp.BIN_TOTAL.s(), 0);
 		userNode.set(NodeProp.LAST_LOGIN_TIME.s(), 0);
 		userNode.set(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
@@ -1007,6 +1012,7 @@ public class MongoUtil extends ServiceBase {
 			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
+			adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
 			update.save(ms, adminNode);
 
 			/*

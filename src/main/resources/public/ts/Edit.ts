@@ -243,7 +243,8 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    boostTarget: null
+                    boostTarget: null,
+                    reply: false
                 });
                 if (blob) {
                     this.createSubNodeResponse(res, false, null, null, state);
@@ -276,7 +277,8 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    boostTarget: null
+                    boostTarget: null,
+                    reply: false
                 });
                 this.createSubNodeResponse(res, false, null, null, state);
             }
@@ -457,6 +459,14 @@ export class Edit {
     toggleShowParents = (state: AppState): void => {
         state.userPreferences.showParents = !state.userPreferences.showParents;
         S.util.saveUserPreferences(state, false);
+        S.quanta.refresh(state);
+    }
+
+    // without the await on saveUserPreferences the refresh will be done with WRONG userProfile SO...look for
+    // other places we need to have this await and perhaps don't.
+    toggleShowReplies = async (state: AppState): Promise<void> => {
+        state.userPreferences.showReplies = !state.userPreferences.showReplies;
+        await S.util.saveUserPreferences(state, false);
         S.quanta.refresh(state);
     }
 
@@ -957,7 +967,8 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            boostTarget: null
+            boostTarget: null,
+            reply: false
         });
 
         if (blob) {
@@ -1015,7 +1026,8 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
-            boostTarget: null
+            boostTarget: null,
+            reply: false
         });
         this.createSubNodeResponse(res, true, null, null, state);
     }
@@ -1045,7 +1057,7 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, state: AppState) => {
+    addNode = async (nodeId: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -1063,7 +1075,8 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId,
-            boostTarget
+            boostTarget,
+            reply
         });
 
         this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
@@ -1083,7 +1096,8 @@ export class Edit {
             properties: null,
             payloadType,
             shareToUserId: null,
-            boostTarget: null
+            boostTarget: null,
+            reply: false
         });
 
         // auto-enable edit mode
@@ -1106,7 +1120,8 @@ export class Edit {
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
-            boostTarget: null
+            boostTarget: null,
+            reply: false
         });
         this.createSubNodeResponse(res, false, null, null, state);
     }

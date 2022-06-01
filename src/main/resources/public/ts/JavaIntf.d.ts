@@ -143,6 +143,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
+    reply: boolean;
     payloadType?: string;
 }
 
@@ -892,6 +893,7 @@ export interface UserPreferences {
     showMetaData: boolean;
     nsfw: boolean;
     showParents: boolean;
+    showReplies: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
     enableIPSM: boolean;
@@ -967,6 +969,7 @@ export const enum NodeProp {
     ACT_PUB_TAG = "ap:tag",
     ENC_KEY = "sn:encKey",
     TEMP = "tmp",
+    REPLY = "reply",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
@@ -974,6 +977,7 @@ export const enum NodeProp {
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_NSFW = "sn:nsfw",
     USER_PREF_SHOW_PARENTS = "sn:showParents",
+    USER_PREF_SHOW_REPLIES = "sn:showReplies",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
     USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",

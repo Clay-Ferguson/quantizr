@@ -11,9 +11,11 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
@@ -69,7 +71,20 @@ public class NodeRenderService extends ServiceBase {
 	@PerfMon(category = "render")
 	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
 		RenderNodeResponse res = new RenderNodeResponse();
-		ms = ThreadLocals.ensure(ms);
+
+		// by default we do showReplies
+		boolean showReplies = true;
+
+		SessionContext sc = ThreadLocals.getSC();
+
+		// this is not anon user, we set the flag based on their preferences
+		// (need preferences saving to update the SessionContenxt!! todo-0)
+		if (ok(sc) && !sc.isAnonUser()) {
+			showReplies = sc.getUserPreferences().isShowReplies();
+
+			// log.debug("rendering with user prefs: [hashCode=" + sc.getUserPreferences().hashCode() + "] " + XString.prettyPrint(sc.getUserPreferences()));
+		}
+
 		String targetId = req.getNodeId();
 		boolean isActualUplevelRequest = req.isUpLevel();
 
@@ -95,18 +110,19 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		// NOTE: This code was for loading MFS defined content live as it's rendered, but for now we don't do this, and only have a kind of import/export to/from
+		// NOTE: This code was for loading MFS defined content live as it's rendered, but for now we don't
+		// do this, and only have a kind of import/export to/from
 		// a node and MFS as a menu option that must be explicitly run.
 		// if (ok(node.getStr(NodeProp.IPFS_SCID))) {
-		// 	SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
-		// 	svc.loadNode(ms, node);
+		// SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
+		// svc.loadNode(ms, node);
 		// }
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo =
-					convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false, true, true);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
+					false, true, true);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -204,7 +220,7 @@ public class NodeRenderService extends ServiceBase {
 		res.setBreadcrumbs(breadcrumbs);
 		render.getBreadcrumbs(ms, highestUpParent, breadcrumbs);
 
-		NodeInfo nodeInfo = render.processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
+		NodeInfo nodeInfo = render.processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
 		nodeInfo.setParents(parentNodes);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
@@ -219,7 +235,7 @@ public class NodeRenderService extends ServiceBase {
 
 	@PerfMon(category = "render")
 	public NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
-			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
+			SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
 
 		/*
 		 * see also: tag #getNodeMetaInfo
@@ -277,7 +293,12 @@ public class NodeRenderService extends ServiceBase {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 		}
 
-		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset);
+		Criteria moreCriteria = null;
+		if (!showReplies) {
+			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.REPLY.s()).is(null);
+		}
+
+		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 		int idx = offset;
 
@@ -333,7 +354,8 @@ public class NodeRenderService extends ServiceBase {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = render.processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit);
+								ninfo = render.processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit,
+										showReplies);
 								nodeInfo.getChildren().add(0, ninfo);
 
 								/*
@@ -375,7 +397,7 @@ public class NodeRenderService extends ServiceBase {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = render.processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit);
+			ninfo = render.processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
 			nodeInfo.getChildren().add(ninfo);
 
 			if (nodeInfo.getChildren().size() >= limit) {
@@ -400,7 +422,7 @@ public class NodeRenderService extends ServiceBase {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = render.processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit);
+					ninfo = render.processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit, showReplies);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done
@@ -464,7 +486,8 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false, false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false,
+				false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -527,7 +550,7 @@ public class NodeRenderService extends ServiceBase {
 	public void populateSocialCardProps(SubNode node, Model model) {
 		if (no(node))
 			return;
-			
+
 		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());

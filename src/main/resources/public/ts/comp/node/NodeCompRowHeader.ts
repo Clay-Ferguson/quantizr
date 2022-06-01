@@ -117,14 +117,14 @@ export class NodeCompRowHeader extends Div {
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         if (!publicReadOnly || actPubId) {
             children.push(new Icon({
-                title: "Reply to this Node",
+                title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
                 onClick: () => {
                     if (state.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(node.id, null, null, node.id, null, null, state);
+                        S.edit.addNode(node.id, true, null, null, node.id, null, null, state);
                     }
                 }
             }));
@@ -138,7 +138,7 @@ export class NodeCompRowHeader extends Div {
                     S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                 }
                 else {
-                   S.edit.addNode(null, null, null, null, null, node.id, state)
+                    S.edit.addNode(null, false, null, null, null, null, node.id, state)
                 }
             }
         }));
@@ -183,7 +183,7 @@ export class NodeCompRowHeader extends Div {
         });
 
         if (node.lastModified) {
-            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
+            floatUpperRightDiv.addChild(new Span((S.props.getPropStr(J.NodeProp.REPLY, node) ? "Reply " : "") + S.util.formatDate(new Date(node.lastModified))));
         }
 
         if (node.name) {
