@@ -114,7 +114,7 @@ public class ActPubOutbox extends ServiceBase {
 
                         if (ok(object)) {
                             if (object instanceof String) {
-                                // todo-0: handle boosts.
+                                // todo-1: handle boosts.
                                 //
                                 // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
                                 // + XString.prettyPrint(obj));
@@ -234,7 +234,7 @@ public class ActPubOutbox extends ServiceBase {
         String nodeIdBase = host + "?id=";
 
         /*
-         * todo-0: I'm trying to be able to return content based on if the user accessing this has some
+         * todo-1: I'm trying to be able to return content based on if the user accessing this has some
          * private nodes shared to them then we can honor that sharing here, rather than ONLY returning
          * PUBLIC nodes, but this is a work in progress
          */
@@ -371,7 +371,7 @@ public class ActPubOutbox extends ServiceBase {
             // leaving this turned on, for now just to collect info into the logs about how things work.
             if (experimental) {
                 /*
-                 * todo-0: A basic 'search' for an object by URL in mastodon calls into here with a generic
+                 * todo-1: A basic 'search' for an object by URL in mastodon calls into here with a generic
                  * non-user-specific keyId so I currently don't know how to exercise this code 'in the wild', but
                  * want to keep it for now.
                  * 
@@ -426,10 +426,6 @@ public class ActPubOutbox extends ServiceBase {
                 }
             }
 
-            /*
-             * todo-0: also per the above, search everywhere else this kind of thing might be blocking access
-             * when it maybe doesn't need to. Like namely populating outboxes. (need all above security logic)
-             */
             // if not authorized and not a public node fail now.
             if (!authSuccess && !AclService.isPublic(as, node)) {
                 log.debug("getResource failed on non-public node: " + node.getIdStr());
@@ -439,7 +435,7 @@ public class ActPubOutbox extends ServiceBase {
             String userName = read.getNodeOwner(as, node);
 
             /*
-             * todo-0: We should be able to get an object as whatever actual type it is based on the type (not
+             * todo-1: We should be able to get an object as whatever actual type it is based on the type (not
              * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
              */
             APObj ret = makeAPForNote(as, userName, nodeIdBase, node);

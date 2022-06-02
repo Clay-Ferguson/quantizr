@@ -555,17 +555,17 @@ public class NodeEditService extends ServiceBase {
 
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
-			boolean isAccnt = ok(node.getType()) && node.getType().equals(NodeType.ACCOUNT.s());
+			boolean isAccnt = NodeType.ACCOUNT.s().equals(node.getType());
 
 			// push any chat messages that need to go out.
 			if (!isAccnt) {
-				push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+				push.pushNodeToBrowsers(s, sessionsPushed, node);
 			}
 
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
 				if (!isAccnt) {
-					auth.saveMentionsToNodeACL(s, node);
+					auth.saveMentionsToACL(s, node);
 				}
 
 				// if this is an account type then don't expect it to have any ACL but we still want to broadcast
@@ -573,17 +573,10 @@ public class NodeEditService extends ServiceBase {
 				boolean forceSendToPublic = isAccnt;
 
 				if (forceSendToPublic || ok(node.getAc())) {
-					// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
-					// what the local server version of it is.
-					String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(s, parent) : null;
-					APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
-					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
-					String boostTarget = parent.getStr(NodeProp.BOOST);
-
 					// if there's an unpublished property (and true) then we don't send out over ActPub
 					if (!node.getBool(NodeProp.UNPUBLISHED)) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
-						apub.sendActPubObjOutbound(s, inReplyTo, replyToType, attachments, boostTarget, node, forceSendToPublic);
+						apub.sendObjOutbound(s, parent, node, forceSendToPublic);
 					}
 
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);

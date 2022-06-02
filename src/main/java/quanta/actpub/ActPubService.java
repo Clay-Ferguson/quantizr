@@ -129,10 +129,17 @@ public class ActPubService extends ServiceBase {
      * 'cc + to' properties on the message and then the message would have those added inside here
      * insead of building the entire message from scratch.
      */
-    public void sendActPubObjOutbound(MongoSession ms, String inReplyTo, String replyToType, APList attachments,
-            String boostTarget, SubNode node, boolean forceSendToPublic) {
+    public void sendObjOutbound(MongoSession ms, SubNode parent, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
             try {
+                boolean isAccnt = NodeType.ACCOUNT.s().equals(node.getType());
+                // Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
+                // what the local server version of it is.
+                String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
+                APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
+                String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
+                String boostTarget = parent.getStr(NodeProp.BOOST);
+
                 // toUserNames will hold ALL usernames in the ACL list (both local and foreign user names)
                 HashSet<String> toUserNames = new HashSet<>();
                 boolean privateMessage = true;
@@ -1153,7 +1160,7 @@ public class ActPubService extends ServiceBase {
          * todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
          * but we at least know other instances of Quanta will have these extractable this way.
          */
-        HashSet<String> mentionsSet = auth.parseMentionsFromString(null, contentHtml);
+        HashSet<String> mentionsSet = auth.parseMentions(null, contentHtml);
         importUsers(ms, mentionsSet);
         if (ok(mentionsSet)) {
             for (String mentionName : mentionsSet) {

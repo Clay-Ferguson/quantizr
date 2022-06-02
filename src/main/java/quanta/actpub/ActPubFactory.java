@@ -118,11 +118,10 @@ public class ActPubFactory extends ServiceBase {
 
 		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
 				now.format(DateTimeFormatter.ISO_INSTANT), object, null);
-		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, false);
+		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, true);
 		return ret;
 	}
 
-	// todo-0: all calls to this need to have includeTags verified, some might easily need to be 'true'
 	public void setRecipients(String fromActor, String userDoingAction, APObj object, HashSet<String> toUserNames,
 			boolean privateMessage, boolean includeTags) {
 		List<String> toActors = new LinkedList<>();
@@ -191,7 +190,7 @@ public class ActPubFactory extends ServiceBase {
 			ZonedDateTime now, boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 		APOUpdate ret = new APOUpdate(objUrl + "&apCreateTime=" + idTime, fromActor, object, null);
-		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, false);
+		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, true);
 		return ret;
 	}
 }

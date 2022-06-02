@@ -85,7 +85,7 @@ public class PushService extends ServiceBase {
 	 * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
 	 * node. This means 'viewing that node as a chat room')
 	 */
-	public void pushNodeToMonitoringBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
+	public void pushNodeToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true, false)) {

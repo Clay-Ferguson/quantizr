@@ -202,7 +202,7 @@ public class MongoAuth extends ServiceBase {
 			 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
 			 * mentioned in the tags array
 			 */
-			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
+			HashSet<String> mentions = auth.parseMentions(null, parent);
 
 			// if no content, and the parent isn't our own node
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
@@ -619,7 +619,7 @@ public class MongoAuth extends ServiceBase {
 	 * 
 	 * Names will NOT have '@' prefix, but will be like "clay@tld.com"
 	 */
-	public HashSet<String> parseMentionsFromString(HashSet<String> namesSet, String message) {
+	public HashSet<String> parseMentions(HashSet<String> namesSet, String message) {
 		if (no(message))
 			return null;
 
@@ -670,7 +670,7 @@ public class MongoAuth extends ServiceBase {
 			} ],
 	 * </pre>
 	 */
-	public HashSet<String> parseMentionsFromNode(HashSet<String> namesSet, SubNode node) {
+	public HashSet<String> parseMentions(HashSet<String> namesSet, SubNode node) {
 		if (no(node))
 			return null;
 
@@ -733,8 +733,8 @@ public class MongoAuth extends ServiceBase {
 	 * names (i.e. short names being the name with the DNS/TLD stripped off). Short names is better to
 	 * have appearing in the text.
 	 */
-	public HashSet<String> saveMentionsToNodeACL(MongoSession ms, SubNode node) {
-		HashSet<String> mentionsSet = parseMentionsFromString(null, node.getContent());
+	public HashSet<String> saveMentionsToACL(MongoSession ms, SubNode node) {
+		HashSet<String> mentionsSet = parseMentions(null, node.getContent());
 		apub.importUsers(ms, mentionsSet);
 		if (no(mentionsSet)) {
 			return null;
@@ -748,10 +748,10 @@ public class MongoAuth extends ServiceBase {
 			node.setContent(node.getContent().replace("@" + mention, "@" + shortMention));
 		}
 
-		return saveMentionsToNodeACL(mentionsSet, ms, node);
+		return saveMentionsToACL(mentionsSet, ms, node);
 	}
 
-	public HashSet<String> saveMentionsToNodeACL(HashSet<String> mentionsSet, MongoSession ms, SubNode node) {
+	public HashSet<String> saveMentionsToACL(HashSet<String> mentionsSet, MongoSession ms, SubNode node) {
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();
 
