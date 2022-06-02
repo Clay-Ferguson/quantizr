@@ -379,7 +379,7 @@ public class UserManagerService extends ServiceBase {
 					if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
 						return "processSignupCode should not be called for admin user.";
 					} else {
-						node.delete(NodeProp.SIGNUP_PENDING.s());
+						node.delete(NodeProp.SIGNUP_PENDING);
 						update.save(ms, node);
 						return "Signup Successful. You may login now.";
 					}
@@ -1037,7 +1037,7 @@ public class UserManagerService extends ServiceBase {
 				}
 
 				userNode.getVal().set(NodeProp.PWD_HASH, mongoUtil.getHashOfPassword(password));
-				userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
 
 				// note: the adminRunner.run saves the session so we don't do that here.
 				return null;
@@ -1056,7 +1056,7 @@ public class UserManagerService extends ServiceBase {
 			String password = req.getNewPassword();
 			userName.setVal(userNode.getVal().getStr(NodeProp.USER));
 			userNode.getVal().set(NodeProp.PWD_HASH, mongoUtil.getHashOfPassword(password));
-			userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+			userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
 
 			update.save(ms, userNode.getVal());
 		}

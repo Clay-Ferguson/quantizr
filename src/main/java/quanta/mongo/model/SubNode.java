@@ -438,6 +438,12 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	public void delete(NodeProp prop) {
+		delete(prop.s());
+	}
+
+	@Transient
+	@JsonIgnore
 	public void delete(String key) {
 		if (no(props))
 			return;

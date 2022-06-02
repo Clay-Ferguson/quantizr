@@ -31,7 +31,7 @@ public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
 	public void removeUnwantedPropsForIPFS(SubNode node) {
-		node.delete(NodeProp.IPFS_CID.s());
+		node.delete(NodeProp.IPFS_CID);
 	}
 
 	public boolean validNodeName(String name) {
@@ -61,19 +61,19 @@ public class SubNodeUtil extends ServiceBase {
 		/* If layout=="v" then remove the property */
 		String layout = node.getStr(NodeProp.LAYOUT);
 		if ("v".equals(layout)) {
-			node.delete(NodeProp.LAYOUT.s());
+			node.delete(NodeProp.LAYOUT);
 		}
 
 		/* If layout=="v" then remove the property */
 		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES);
 		if ("n".equals(childrenImageSizes)) {
-			node.delete(NodeProp.CHILDREN_IMG_SIZES.s());
+			node.delete(NodeProp.CHILDREN_IMG_SIZES);
 		}
 
 		/* If priority=="0" then remove the property */
 		String priority = node.getStr(NodeProp.PRIORITY);
 		if ("0".equals(priority)) {
-			node.delete(NodeProp.PRIORITY.s());
+			node.delete(NodeProp.PRIORITY);
 		}
 
 		if (ok(node.getProps()) && node.getProps().size() == 0) {

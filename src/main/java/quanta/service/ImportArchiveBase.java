@@ -68,7 +68,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						 * delete the BIN prop now, because it will have to be added during this import, and the existing
 						 * BIN id will no longer apply
 						 */
-						n.delete(NodeProp.BIN.s());
+						n.delete(NodeProp.BIN);
 
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
