@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,7 +150,7 @@ public class ActPubService extends ServiceBase {
                                 privateMessage = false;
                             } else {
                                 SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
-                            
+
                                 // get username off this node and add to 'toUserNames'
                                 if (ok(accntNode)) {
                                     toUserNames.add(accntNode.getStr(NodeProp.USER.s()));
@@ -955,8 +956,8 @@ public class ActPubService extends ServiceBase {
 
             // if the object to be deleted is specified as a string, assume it's the ID.
             if (object instanceof String) {
-                id = (String)object;
-            } 
+                id = (String) object;
+            }
             // otherwise we assume it's an object, with an ID in it.
             else {
                 id = apStr(object, APObj.id);
@@ -1687,7 +1688,8 @@ public class ActPubService extends ServiceBase {
             accountsRefreshed = 0;
             arun.run(ms -> {
                 // Query to pull all user accounts
-                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
+                Iterable<SubNode> accountNodes =
+                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
@@ -1747,7 +1749,8 @@ public class ActPubService extends ServiceBase {
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
             APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
             if (ok(actor)) {
-                // if their outbox fails just, stop processing and don't bother trying to get followers or following,.
+                // if their outbox fails just, stop processing and don't bother trying to get followers or
+                // following,.
                 if (!apOutbox.loadForeignOutbox(ms, userMakingRequest, actor, userNode, userName)) {
                     return null;
                 }
@@ -1818,12 +1821,20 @@ public class ActPubService extends ServiceBase {
         cycleOutboxQueryCount = 0;
         newPostsInCycle = 0;
 
+        HashSet<ObjectId> blockedUserIds = new HashSet<>();
+        userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+
+
         arun.run(ms -> {
             Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
                     break;
+
+                // if this user is blocked by admin, skip them.
+                if (blockedUserIds.contains(node.getId()))
+                    continue;
 
                 String userName = node.getStr(NodeProp.USER.s());
                 if (no(userName) || !userName.contains("@"))
