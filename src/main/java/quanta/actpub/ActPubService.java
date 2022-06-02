@@ -654,9 +654,6 @@ public class ActPubService extends ServiceBase {
     /*
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
-     * 
-     * double-check that we're doing a signature verify on all these methods called in here: todo-0, and
-     * look to see if we can pull the sig check up to this layer OR higher in the call stack
      */
     @PerfMon(category = "apub")
     public void processInboxPost(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
@@ -666,6 +663,21 @@ public class ActPubService extends ServiceBase {
         type = type.trim();
         apLog.trace("inbox type: " + type);
 
+        /*
+         * todo-0: verify that for follow types the actorUrl can be obtained also from payload, rather than
+         * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
+         */
+        String actorUrl = apStr(payload, APObj.actor);
+        if (no(actorUrl)) {
+            log.error("no 'actor' found on payload: " + XString.prettyPrint(payload));
+            throw new RuntimeException("No actor on payload");
+        }
+
+        Val<String> keyEncoded = new Val<>();
+        if (!apCrypto.verifySignature(httpReq, payload, actorUrl, bodyBytes, keyEncoded)) {
+            throw new RuntimeException("Signature check fail: " + XString.prettyPrint(payload));
+        }
+
         switch (type) {
             case APType.Create:
             case APType.Update:
@@ -673,19 +685,19 @@ public class ActPubService extends ServiceBase {
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                processCreateOrUpdateAction(httpReq, payload, type, bodyBytes);
+                processCreateOrUpdateAction(httpReq, payload, actorUrl, type, bodyBytes, keyEncoded);
                 break;
 
             case APType.Follow:
-                apFollowing.processFollowAction(payload, false);
+                apFollowing.processFollowAction(payload, actorUrl, false);
                 break;
 
             case APType.Undo:
-                processUndoAction(httpReq, payload, bodyBytes);
+                processUndoAction(httpReq, payload, actorUrl, bodyBytes);
                 break;
 
             case APType.Delete:
-                processDeleteAction(httpReq, payload, bodyBytes);
+                processDeleteAction(httpReq, payload, actorUrl, bodyBytes, keyEncoded);
                 break;
 
             case APType.Accept:
@@ -693,11 +705,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, false, bodyBytes);
+                processLikeAction(httpReq, payload, actorUrl, false, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, false, bodyBytes);
+                processAnnounceAction(httpReq, payload, actorUrl, false, bodyBytes);
                 break;
 
             default:
@@ -708,21 +720,21 @@ public class ActPubService extends ServiceBase {
 
     /* Process inbound undo actions (coming from foreign servers) */
     @PerfMon(category = "apub")
-    public void processUndoAction(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
+    public void processUndoAction(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes) {
         Object obj = apObj(payload, APObj.object);
         String type = apStr(obj, APObj.type);
         apLog.trace("Undo Type: " + type);
         switch (type) {
             case APType.Follow:
-                apFollowing.processFollowAction(obj, true);
+                apFollowing.processFollowAction(obj, actorUrl, true);
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, true, bodyBytes);
+                processLikeAction(httpReq, payload, actorUrl, true, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, true, bodyBytes);
+                processAnnounceAction(httpReq, payload, actorUrl, true, bodyBytes);
                 break;
 
             default:
@@ -749,29 +761,10 @@ public class ActPubService extends ServiceBase {
 
     /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String action, byte[] bodyBytes) {
+    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String actorUrl, String action,
+            byte[] bodyBytes, Val<String> keyEncoded) {
         arun.<Object>run(ms -> {
             apLog.trace("processCreateOrUpdateAction");
-
-            // get actor url from payload object
-            String actorUrl = apStr(payload, APObj.actor);
-            if (no(actorUrl)) {
-                log.debug("no 'actor' found on create action request posted object");
-                return null;
-            }
-
-            Val<String> keyEncoded = new Val<>();
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
-            if (no(pubKey)) {
-                return null;
-            }
-
-            try {
-                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
-            } catch (Exception e) {
-                log.error("Sig failed, with body bytes: processCreateOrUpdateAction");
-                return null;
-            }
 
             Object object = apObj(payload, APObj.object);
             String type = apStr(object, APObj.type);
@@ -797,27 +790,9 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processLikeAction(HttpServletRequest httpReq, Object payload, boolean unlike, byte[] bodyBytes) {
+    public void processLikeAction(HttpServletRequest httpReq, Object payload, String actorUrl, boolean unlike, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (unlike ? "unlike" : "like"));
-            String actorUrl = apStr(payload, APObj.actor);
-            if (no(actorUrl)) {
-                log.debug("no 'actor' found on create action request posted object");
-                return null;
-            }
-
-            Val<String> keyEncoded = new Val<>();
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
-            if (no(pubKey)) {
-                return null;
-            }
-
-            try {
-                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
-            } catch (Exception e) {
-                log.error("Sig failed: processLikeAction");
-                return null;
-            }
 
             String objectIdUrl = apStr(payload, APObj.object);
 
@@ -865,29 +840,10 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, boolean undo, byte[] bodyBytes) {
+    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, String actorUrl, boolean undo,
+            byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (undo ? "unannounce" : "announe") + " Payload=" + XString.prettyPrint(payload));
-
-            // get actorUrl
-            String actorUrl = apStr(payload, APObj.actor);
-            if (no(actorUrl)) {
-                log.debug("no 'actor' found on create action request posted object");
-                return null;
-            }
-
-            Val<String> keyEncoded = new Val<>();
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
-            if (no(pubKey)) {
-                return null;
-            }
-
-            try {
-                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
-            } catch (Exception e) {
-                log.error("Sig failed: in boost");
-                return null;
-            }
 
             // if this is an undo operation we just delete the node and we're done.
             if (undo) {
@@ -929,27 +885,10 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processDeleteAction(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
+    public void processDeleteAction(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes,
+            Val<String> keyEncoded) {
         arun.<Object>run(as -> {
             apLog.trace("processDeleteAction");
-            String actorUrl = apStr(payload, APObj.actor);
-            if (no(actorUrl)) {
-                log.debug("no 'actor' found on create action request posted object");
-                return null;
-            }
-
-            Val<String> keyEncoded = new Val<>();
-            PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
-            if (no(pubKey)) {
-                return null;
-            }
-
-            try {
-                apCrypto.verifySignature(httpReq, pubKey, bodyBytes);
-            } catch (Exception e) {
-                log.error("Sig failed: processDeleteAction");
-                return null;
-            }
 
             Object object = apObj(payload, APObj.object);
             String id = null;

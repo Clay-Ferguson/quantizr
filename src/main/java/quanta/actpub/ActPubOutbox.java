@@ -364,10 +364,7 @@ public class ActPubOutbox extends ServiceBase {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
-            // as a general security rule never send back any admin nodes.
-            if (node.getOwner().equals(as.getUserNodeId())) {
-                throw new NodeAuthFailedException();
-            }
+            acl.failIfAdminOwned(node);
 
             boolean authSuccess = false;
 

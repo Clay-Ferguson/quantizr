@@ -489,8 +489,6 @@ public class MongoUtil extends ServiceBase {
 		// 		if (!NodeType.ACCOUNT.s().equals(acctNode.getType())) {
 		// 			acctNode.setType(NodeType.ACCOUNT.s());
 		// 		}
-
-		// 		// todo-0: remove this after it's done converting on prod
 		// 		acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
 		// 	}
 

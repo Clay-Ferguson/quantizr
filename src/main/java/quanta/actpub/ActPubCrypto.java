@@ -157,7 +157,8 @@ public class ActPubCrypto extends ServiceBase {
             if (!verifier.verify(sigBytes)) {
                 throw new RuntimeException("Signature verify failed.");
             }
-            // log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) : "none"));
+            // log.debug("Signature ok. bodyBytes=" + (ok(bodyBytes) ? String.valueOf(bodyBytes.length) :
+            // "none"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -265,7 +266,7 @@ public class ActPubCrypto extends ServiceBase {
                 if (ok(bodyBytes)) {
                     if (!digestFromBodyBytes(bodyBytes).equals(value)) {
                         throw new RuntimeException("body digest compare fail.");
-                    } 
+                    }
                 }
             }
             // all other headers
@@ -284,14 +285,8 @@ public class ActPubCrypto extends ServiceBase {
      * the matching ActivityPub key on it.
      */
     public boolean ownerHasKey(MongoSession ms, SubNode node, String key) {
-
-        // This is for activity pub, so any claims on ownerId are rejected, just as one more (unnecessary)
-        // precaution.
-        if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
-            log.warn("ActPub attempted admin mods.");
-            return false;
-        }
-
+        acl.failIfAdminOwned(node);
+        
         SubNode accntNode = read.getNode(ms, node.getOwner());
         if (ok(accntNode)) {
             return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
@@ -373,5 +368,23 @@ public class ActPubCrypto extends ServiceBase {
 
     private String headerPair(String key, String val) {
         return key + "=\"" + val + "\"";
+    }
+
+    /* Returns true if signaure check is successful */
+    public boolean verifySignature(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes,
+            Val<String> keyEncoded) {
+        PublicKey pubKey = apCrypto.getPubKeyFromActorUrl(null, actorUrl, keyEncoded);
+        if (no(pubKey)) {
+            return false;
+        }
+
+        try {
+            verifySignature(httpReq, pubKey, bodyBytes);
+        } catch (Exception e) {
+            log.error("Sig failed.");
+            return false;
+        }
+
+        return true;
     }
 }

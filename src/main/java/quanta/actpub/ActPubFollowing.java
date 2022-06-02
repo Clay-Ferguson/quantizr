@@ -120,15 +120,7 @@ public class ActPubFollowing extends ServiceBase {
      * 
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
-    public void processFollowAction(Object followAction, boolean unFollow) {
-
-        // Actor URL of actor doing the following
-        String followerActorUrl = apStr(followAction, APObj.actor);
-        if (no(followerActorUrl)) {
-            apLog.trace("no 'actor' found on follows action request posted object");
-            return;
-        }
-
+    public void processFollowAction(Object followAction, String followerActorUrl, boolean unFollow) {
         Runnable runnable = () -> {
             arun.<APObj>run(as -> {
                 try {

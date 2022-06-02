@@ -78,7 +78,6 @@ public class NodeRenderService extends ServiceBase {
 		SessionContext sc = ThreadLocals.getSC();
 
 		// this is not anon user, we set the flag based on their preferences
-		// (need preferences saving to update the SessionContenxt!! todo-0)
 		if (ok(sc) && !sc.isAnonUser()) {
 			showReplies = sc.getUserPreferences().isShowReplies();
 

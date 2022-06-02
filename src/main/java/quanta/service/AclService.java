@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
+import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -301,9 +302,12 @@ public class AclService extends ServiceBase {
 
 			// if bulk operation
 			if (ok(bops)) {
-				// todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to work
-				// somehow. Seems like updating collections might not work in batching. Currently there are no places we call
-				// this method with bops passed in, so this bops branch is not currently being used for that reason.
+				/*
+				 * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
+				 * work somehow. Seems like updating collections might not work in batching. Currently there are no
+				 * places we call this method with bops passed in, so this bops branch is not currently being used
+				 * for that reason.
+				 */
 				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 				Update update = new Update().set(SubNode.AC, acl);
 				bops.updateOne(query, update);
@@ -502,5 +506,15 @@ public class AclService extends ServiceBase {
 				node.putAc(key, new AccessControl(null, prvs));
 			}
 		}
+	}
+
+	public void failIfAdminOwned(SubNode node) {
+		if (isAdminOwned(node)) {
+			throw new NodeAuthFailedException();
+		}
+	}
+
+	public boolean isAdminOwned(SubNode node) {
+		return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
 	}
 }
