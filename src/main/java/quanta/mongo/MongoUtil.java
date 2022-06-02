@@ -466,21 +466,41 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
-	// todo-0: remove this after it's done converting on prod
+	/* DO NOT DELETE
+	 * 
+	 * Use this for various one-off data conversions.
+	 */
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
-		Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+		// Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getPath(), null, 0, 0, null, null);
 
-		for (SubNode acctNode : accountNodes) {
-			acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
+		// for (SubNode acctNode : accountNodes) {
 
-			if (ThreadLocals.getDirtyNodeCount() > 200) {
-				update.saveSession(ms);
-			}
-		}
+		// 	// if this is a foreign node ignore it.
+		// 	String userName = acctNode.getStr(NodeProp.USER.s());
+		// 	log.debug("Processing Account: " + acctNode.getIdStr() + " user: " + userName);
 
-		// should be unnecessary but let's save here too.
-		update.saveSession(ms);
+		// 	if (no(userName) || userName.contains("@")) {
+		// 		// invalid userName or foreign user, ignore.
+		// 	} else {
+		// 		// any node that's a child here and doesn't have ACCOUNT type should be set to account type
+		// 		// Need to signup a new user and make sure it's working to set the account type WITHOUT this stupid
+		// 		// fix.
+		// 		if (!NodeType.ACCOUNT.s().equals(acctNode.getType())) {
+		// 			acctNode.setType(NodeType.ACCOUNT.s());
+		// 		}
+
+		// 		// todo-0: remove this after it's done converting on prod
+		// 		acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
+		// 	}
+
+		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// 		update.saveSession(ms);
+		// 	}
+		// }
+
+		// // should be unnecessary but let's save here too.
+		// update.saveSession(ms);
 	}
 
 	/*
@@ -651,7 +671,7 @@ public class MongoUtil extends ServiceBase {
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
 
-		// The pinning cleanup was originally written to look these up, but 
+		// The pinning cleanup was originally written to look these up, but
 		// I've about concluded that MFS files don't need to be pinned at all.
 		// createIndex(ms, SubNode.class, SubNode.CID);
 

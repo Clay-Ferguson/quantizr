@@ -89,7 +89,7 @@ public class MongoRepository extends ServiceBase {
 
 			mongoUtil.createAdminUser(as);
 
-			mongoUtil.processAccounts(as);
+			// mongoUtil.processAccounts(as);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())

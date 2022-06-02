@@ -1165,8 +1165,8 @@ public class MongoRead extends ServiceBase {
     /*
      * Finds nodes matching 'type' under 'path' (recursively)
      */
-    public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type) {
-        Query q = typedNodesUnderPath_query(ms, node, type);
+    public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type, boolean recursive) {
+        Query q = typedNodesUnderPath_query(ms, node, type, recursive);
         return mongoUtil.find(q);
     }
 
@@ -1174,13 +1174,15 @@ public class MongoRead extends ServiceBase {
      * Counts nodes matching 'type' under 'path' (recursively)
      */
     public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type) {
-        Query q = typedNodesUnderPath_query(ms, node, type);
+        Query q = typedNodesUnderPath_query(ms, node, type, true);
         return ops.count(q, SubNode.class);
     }
 
-    public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type) {
+    public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type, boolean recursive) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()))//
+        Criteria crit = Criteria.where(SubNode.PATH)
+                .regex(recursive ? mongoUtil.regexRecursiveChildrenOfPath(node.getPath())
+                        : mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.TYPE).is(type);
 
         crit = auth.addSecurityCriteria(ms, crit);

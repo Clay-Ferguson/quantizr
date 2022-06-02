@@ -1697,7 +1697,7 @@ public class ActPubService extends ServiceBase {
             accountsRefreshed = 0;
             arun.run(ms -> {
                 // Query to pull all user accounts
-                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
@@ -1829,7 +1829,7 @@ public class ActPubService extends ServiceBase {
         newPostsInCycle = 0;
 
         arun.run(ms -> {
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1857,7 +1857,7 @@ public class ActPubService extends ServiceBase {
             return "ActivityPub not enabled";
 
         return arun.run(ms -> {
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1904,7 +1904,7 @@ public class ActPubService extends ServiceBase {
 
         return arun.run(ms -> {
             long totalDelCount = 0;
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());
