@@ -148,24 +148,8 @@ public class ActPubService extends ServiceBase {
                             if (PrincipalName.PUBLIC.s().equals(accntId)) {
                                 privateMessage = false;
                             } else {
-                                /*
-                                 * try to get account node from cache
-                                 * 
-                                 * todo-00: for ALL cached nodes we need some kind of pubsub or something so that whenever a node
-                                 * is saved the mongodb listener can detect that and remove the node from ALL caches where it
-                                 * exists....OR update the cache instead?
-                                 * 
-                                 * todo-0: also blocks like this (check cache, get from DB, update cache) should be wrapped in a
-                                 * function.
-                                 */
-                                SubNode accntNode = apCache.acctNodesById.get(accntId);
-
-                                // if not in cache find the node and ADD to the cache.
-                                if (no(accntNode)) {
-                                    accntNode = read.getNode(ms, accntId);
-                                    apCache.acctNodesById.put(accntId, accntNode);
-                                }
-
+                                SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
+                            
                                 // get username off this node and add to 'toUserNames'
                                 if (ok(accntNode)) {
                                     toUserNames.add(accntNode.getStr(NodeProp.USER.s()));
@@ -251,6 +235,18 @@ public class ActPubService extends ServiceBase {
         });
     }
 
+    public SubNode cachedGetAccntNodeById(MongoSession ms, String id) {
+        // try to get the node from the cache first
+        SubNode node = apCache.acctNodesById.get(id);
+
+        // if not in cache find the node from the DB and ADD to the cache.
+        if (no(node)) {
+            node = read.getNode(ms, id);
+            apCache.acctNodesById.put(id, node);
+        }
+        return node;
+    }
+
     // todo-1: this logic can be shared in a generic function if we can separate out 'message' payload
     // from this, and just pass in as argument.
     //
@@ -274,13 +270,7 @@ public class ActPubService extends ServiceBase {
                         privateMessage = false;
                     } else {
                         // try to get account node from cache
-                        SubNode accntNode = apCache.acctNodesById.get(accntId);
-
-                        // if not in cache find the node and ADD to the cache.
-                        if (no(accntNode)) {
-                            accntNode = read.getNode(ms, accntId);
-                            apCache.acctNodesById.put(accntId, accntNode);
-                        }
+                        SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
 
                         // get username off this node and add to 'toUserNames'
                         if (ok(accntNode)) {
@@ -1966,14 +1956,7 @@ public class ActPubService extends ServiceBase {
             }
 
             try {
-                // try to get account node from cache
-                SubNode accntNode = apCache.acctNodesById.get(accntId);
-
-                // if not in cache find the node and ADD to the cache.
-                if (no(accntNode)) {
-                    accntNode = read.getNode(ms, accntId);
-                    apCache.acctNodesById.put(accntId, accntNode);
-                }
+                SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
 
                 // get username off this node and add to 'toUserNames'
                 if (ok(accntNode)) {

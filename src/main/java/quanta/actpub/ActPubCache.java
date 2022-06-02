@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -13,7 +14,7 @@ import quanta.mongo.model.SubNode;
 /**
  * Holds all the global caches related to AP.
  * 
- * #todo-optimization: need a daily timer that cleans each of these out once every 24hrs.
+ * #todo-optimization: need timer that cleans each of these out once every 8hrs.
  */
 @Component
 public class ActPubCache extends ServiceBase {
@@ -28,11 +29,11 @@ public class ActPubCache extends ServiceBase {
     /* Cache Actor objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> actorsByUserName = new ConcurrentHashMap<>();
 
-     /* Cache Actor URLS by UserName in memory only for now */
-     public final ConcurrentHashMap<String, String> actorUrlsByUserName = new ConcurrentHashMap<>();
+    /* Cache Actor URLS by UserName in memory only for now */
+    public final ConcurrentHashMap<String, String> actorUrlsByUserName = new ConcurrentHashMap<>();
 
-     /* Cache inboxes by UserName in memory only for now */
-     public final ConcurrentHashMap<String, String> inboxesByUserName = new ConcurrentHashMap<>();
+    /* Cache inboxes by UserName in memory only for now */
+    public final ConcurrentHashMap<String, String> inboxesByUserName = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by URL in memory only for now */
     public final ConcurrentHashMap<String, APObj> actorsByUrl = new ConcurrentHashMap<>();
@@ -57,4 +58,30 @@ public class ActPubCache extends ServiceBase {
 
     /* Maps the string representation of a key to the PrivateKey object */
     public final ConcurrentHashMap<String, PrivateKey> privateKeys = new ConcurrentHashMap<>();
+
+    /*
+     * Update cache, when nodes chagne. Yes, this is a bit of a tight-coupling to be calling this from
+     * the MongoEventListener, when we could be using more of a pub-sub mode.
+     */
+    public void saveNotify(SubNode node) {
+        final ObjectId objId = node.getId();
+
+        acctNodesByActorUrl.forEach((k, v) -> {
+            if (v.getId().equals(objId)) {
+                acctNodesByActorUrl.put(k, node);
+            }
+        });
+
+        acctNodesByUserName.forEach((k, v) -> {
+            if (v.getId().equals(objId)) {
+                acctNodesByUserName.put(k, node);
+            }
+        });
+
+        acctNodesById.forEach((k, v) -> {
+            if (v.getId().equals(objId)) {
+                acctNodesById.put(k, node);
+            }
+        });
+    }
 }

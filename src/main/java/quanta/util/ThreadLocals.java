@@ -199,6 +199,7 @@ public class ThreadLocals {
 		cachedNodes.set(cn);
 	}
 
+	// Since this cache is thread specific there's no thread-sync mutext required here.
 	private static LinkedHashMap<String, SubNode> getCachedNodes() {
 		if (no(cachedNodes.get())) {
 			// #LRU
@@ -269,8 +270,20 @@ public class ThreadLocals {
 		getDirtyNodes().remove(node.getId());
 	}
 
+	/*
+	 * We cache nodes based on various arbitrary key formats, with this method, but we also call
+	 * cacheNode on each one too because it's always good to have the path-based and ID-based entries in
+	 * the cache too.
+	 */
 	public static void cacheNode(String key, SubNode node) {
 		getCachedNodes().put(key, node);
+		cacheNode(node);
+	}
+
+	public static void pathChanged(String oldPath, SubNode node) {
+		if (StringUtils.isEmpty(oldPath))
+			return;
+		getCachedNodes().remove(oldPath);
 		cacheNode(node);
 	}
 
@@ -278,11 +291,13 @@ public class ThreadLocals {
 		if (no(node))
 			return;
 
+		LinkedHashMap<String, SubNode> cn = getCachedNodes();
 		if (ok(node.getPath())) {
-			getCachedNodes().put(node.getPath(), node);
+			cn.put(node.getPath(), node);
 		}
+
 		if (ok(node.getId())) {
-			getCachedNodes().put(node.getIdStr(), node);
+			cn.put(node.getIdStr(), node);
 		}
 	}
 

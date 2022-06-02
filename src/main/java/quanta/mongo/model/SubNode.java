@@ -109,7 +109,7 @@ public class SubNode {
 	@Field(MCID)
 	public String mcid;
 
-	//  (the M means this CID is from MFS, and no need to pin or unpin ever)
+	// (the M means this CID is from MFS, and no need to pin or unpin ever)
 	public static final String PREV_MCID = "prevMcid";
 	@Field(PREV_MCID)
 	public String prevMcid;
@@ -149,8 +149,7 @@ public class SubNode {
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
 			SubNode.PROPS, //
-			SubNode.LIKES
-		};
+			SubNode.LIKES};
 
 	private boolean disableParentCheck;
 
@@ -237,10 +236,12 @@ public class SubNode {
 
 		ServiceBase.auth.ownerAuth(this);
 		ThreadLocals.dirty(this);
-		this.path = path;
 
-		// NOTE: We CANNOT update the cache here, because all the validation for a node
-		// is done and MongoEventListener, so this node is currently "untrusted" with it's new path.
+		// NOTE: the ordering of these is critical. pathChanged() call needs to have 'this' object already
+		// updated INCLUDING path
+		String oldPath = this.path;
+		this.path = path;
+		ThreadLocals.pathChanged(oldPath, this);
 	}
 
 	@JsonProperty(ORDINAL)

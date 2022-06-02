@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
 import quanta.EventPublisher;
+import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
 import quanta.mongo.model.SubNode;
 import quanta.util.SubNodeUtil;
@@ -50,6 +51,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private EventPublisher publisher;
+
+	@Autowired
+	private ActPubCache apCache;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -196,14 +200,18 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		ThreadLocals.clean(node);
 		// log.debug(
-		// 		"MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
+		// "MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" +
+		// node.getBool(NodeProp.USER_PREF_EDIT_MODE));
 	}
 
 	@Override
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
+
+		// update cache objects during save
 		if (ok(node)) {
 			ThreadLocals.cacheNode(node);
+			apCache.saveNotify(node);
 		}
 
 		String dbRoot = "/" + NodePath.ROOT;
@@ -245,7 +253,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		ThreadLocals.cacheNode(node);
 
 		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
-		// 		+ node.getBool(NodeProp.USER_PREF_EDIT_MODE));
+		// + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
 	}
 
 	@Override
