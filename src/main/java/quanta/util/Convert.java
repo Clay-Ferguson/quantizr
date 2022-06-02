@@ -56,14 +56,14 @@ public class Convert extends ServiceBase {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
-		String mimeType = node.getStr(NodeProp.BIN_MIME.s());
+		String mimeType = node.getStr(NodeProp.BIN_MIME);
 		if (ok(mimeType)) {
 			boolean isImage = mongoUtil.isImageAttached(node);
 
 			if (isImage) {
 				imageSize = mongoUtil.getImageSize(node);
 
-				String dataUrlProp = node.getStr(NodeProp.BIN_DATA_URL.s());
+				String dataUrlProp = node.getStr(NodeProp.BIN_DATA_URL);
 				if (ok(dataUrlProp)) {
 					dataUrl = attach.getStringByNode(ms, node);
 
@@ -77,7 +77,7 @@ public class Convert extends ServiceBase {
 
 		// ensure we have the best mimeType we can if not set in the data.
 		if (StringUtils.isEmpty(mimeType)) {
-			String binUrl = node.getStr(NodeProp.BIN_URL.s());
+			String binUrl = node.getStr(NodeProp.BIN_URL);
 			if (!StringUtils.isEmpty(binUrl)) {
 				mimeType = URLConnection.guessContentTypeFromName(binUrl);
 				if (!StringUtils.isEmpty(mimeType)) {
@@ -112,9 +112,9 @@ public class Convert extends ServiceBase {
 		SubNode userNode = read.getOwner(ms, node, false);
 
 		if (ok(userNode)) {
-			nameProp = userNode.getStr(NodeProp.USER.s());
-			avatarVer = userNode.getStr(NodeProp.BIN.s());
-			displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
+			nameProp = userNode.getStr(NodeProp.USER);
+			avatarVer = userNode.getStr(NodeProp.BIN);
+			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
 			apAvatar = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
 			owner = nameProp;
@@ -218,7 +218,7 @@ public class Convert extends ServiceBase {
 		}
 
 		if (attachBoosted) {
-			String boostTargetId = node.getStr(NodeProp.BOOST.s());
+			String boostTargetId = node.getStr(NodeProp.BOOST);
 			if (ok(boostTargetId)) {
 				SubNode boostedNode = read.getNode(ms, boostTargetId);
 				if (ok(boostedNode)) {

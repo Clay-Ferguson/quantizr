@@ -20,7 +20,7 @@ public class FriendType extends TypeBase {
     @Override
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
         // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
-        String userUrl = node.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
+        String userUrl = node.getStr(NodeProp.ACT_PUB_ACTOR_URL);
         if (ok(userUrl)) {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
         }
@@ -47,25 +47,25 @@ public class FriendType extends TypeBase {
              */
             if (ok(accountNode)) {
                 /* NOTE: This will be the bio for both ActivityPub users and local users */
-                String userBio = accountNode.getStr(NodeProp.USER_BIO.s());
+                String userBio = accountNode.getStr(NodeProp.USER_BIO);
                 if (ok(userBio)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
                 }
 
-                userUrl = accountNode.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
+                userUrl = accountNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
                 if (ok(userUrl)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
                 }
 
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntId", accountId));
-                nodeInfo.safeGetClientProps().add(new PropertyInfo("accntUser", accountNode.getStr(NodeProp.USER.s())));
+                nodeInfo.safeGetClientProps().add(new PropertyInfo("accntUser", accountNode.getStr(NodeProp.USER)));
 
-                String friendAvatarVer = accountNode.getStr(NodeProp.BIN.s());
+                String friendAvatarVer = accountNode.getStr(NodeProp.BIN);
                 if (ok(friendAvatarVer)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
                 }
 
-                String friendDisplayName = accountNode.getStr(NodeProp.DISPLAY_NAME.s());
+                String friendDisplayName = accountNode.getStr(NodeProp.DISPLAY_NAME);
                 if (ok(friendDisplayName)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
                 }
@@ -75,7 +75,7 @@ public class FriendType extends TypeBase {
                  * the live URL of their account avatar as it was found in their Actor object
                  */
 
-                String userIconUrl = accountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                String userIconUrl = accountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
                 if (ok(userIconUrl)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
                 }

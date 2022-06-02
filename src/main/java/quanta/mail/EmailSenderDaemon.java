@@ -97,9 +97,9 @@ public class EmailSenderDaemon extends ServiceBase {
 					for (SubNode node : nodes) {
 						log.debug("Iterating node to email. nodeId:" + node.getIdStr());
 
-						String email = node.getStr(NodeProp.EMAIL_RECIP.s());
-						String subject = node.getStr(NodeProp.EMAIL_SUBJECT.s());
-						String content = node.getStr(NodeProp.EMAIL_CONTENT.s());
+						String email = node.getStr(NodeProp.EMAIL_RECIP);
+						String subject = node.getStr(NodeProp.EMAIL_SUBJECT);
+						String content = node.getStr(NodeProp.EMAIL_CONTENT);
 
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 

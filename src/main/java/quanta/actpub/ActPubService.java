@@ -90,7 +90,7 @@ public class ActPubService extends ServiceBase {
             }
 
             // update cache just because we can
-            apCache.inboxesByUserName.put(likedAccount.getStr(NodeProp.USER.s()), inbox);
+            apCache.inboxesByUserName.put(likedAccount.getStr(NodeProp.USER), inbox);
 
             // foreign ID of node being liked
             String apId = node.getStr(NodeProp.ACT_PUB_ID);
@@ -152,7 +152,7 @@ public class ActPubService extends ServiceBase {
 
                                 // get username off this node and add to 'toUserNames'
                                 if (ok(accntNode)) {
-                                    toUserNames.add(accntNode.getStr(NodeProp.USER.s()));
+                                    toUserNames.add(accntNode.getStr(NodeProp.USER));
                                 }
                             }
                         }
@@ -274,7 +274,7 @@ public class ActPubService extends ServiceBase {
 
                         // get username off this node and add to 'toUserNames'
                         if (ok(accntNode)) {
-                            String userName = accntNode.getStr(NodeProp.USER.s());
+                            String userName = accntNode.getStr(NodeProp.USER);
                             toUserNames.add(userName);
                         }
                     }
@@ -370,7 +370,7 @@ public class ActPubService extends ServiceBase {
                             userInboxes.add(inbox);
 
                             // update cache just because we can
-                            apCache.inboxesByUserName.put(followerAccount.getStr(NodeProp.USER.s()), inbox);
+                            apCache.inboxesByUserName.put(followerAccount.getStr(NodeProp.USER), inbox);
                         }
                     }
                 }
@@ -866,7 +866,7 @@ public class ActPubService extends ServiceBase {
                 // get account node for person doing the boosting
                 SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, actorUrl);
                 if (ok(actorAccountNode)) {
-                    String userName = actorAccountNode.getStr(NodeProp.USER.s());
+                    String userName = actorAccountNode.getStr(NodeProp.USER);
 
                     // get posts node which will be parent we save boost into
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
@@ -1010,7 +1010,7 @@ public class ActPubService extends ServiceBase {
             // get actor's account node from their actorUrl
             SubNode actorAccountNode = getAcctNodeByActorUrl(ms, null, actorUrl);
             if (ok(actorAccountNode)) {
-                String userName = actorAccountNode.getStr(NodeProp.USER.s());
+                String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
                 saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null, encodedKey);
@@ -1387,11 +1387,11 @@ public class ActPubService extends ServiceBase {
         try {
             user.ensureValidCryptoKeys(userNode);
 
-            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
-            String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
-            String avatarMime = userNode.getStr(NodeProp.BIN_MIME.s());
-            String avatarVer = userNode.getStr(NodeProp.BIN.s());
-            String did = userNode.getStr(NodeProp.USER_DID_IPNS.s());
+            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
+            String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+            String avatarMime = userNode.getStr(NodeProp.BIN_MIME);
+            String avatarVer = userNode.getStr(NodeProp.BIN);
+            String did = userNode.getStr(NodeProp.USER_DID_IPNS);
             String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                     + userNode.getIdStr() + "&v=" + avatarVer;
 
@@ -1423,7 +1423,7 @@ public class ActPubService extends ServiceBase {
                 }
             }
 
-            actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO.s())) //
+            actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO)) //
                     .put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //
                     .put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
                     .put(APObj.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
@@ -1631,12 +1631,12 @@ public class ActPubService extends ServiceBase {
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
-                    String userName = acctNode.getStr(NodeProp.USER.s());
+                    String userName = acctNode.getStr(NodeProp.USER);
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
                     log.debug("rePullActor [" + accountsRefreshed + "]: " + userName);
-                    String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
+                    String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
                     try {
                         if (ok(url)) {
@@ -1684,7 +1684,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
+            String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
             APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
             if (ok(actor)) {
                 // if their outbox fails just, stop processing and don't bother trying to get followers or
@@ -1774,7 +1774,7 @@ public class ActPubService extends ServiceBase {
                 if (blockedUserIds.contains(node.getId()))
                     continue;
 
-                String userName = node.getStr(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER);
                 if (no(userName) || !userName.contains("@"))
                     continue;
 
@@ -1801,7 +1801,7 @@ public class ActPubService extends ServiceBase {
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
-                String userName = node.getStr(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER);
                 if (no(userName))
                     continue;
                 knownUsers.add(userName);
@@ -1846,7 +1846,7 @@ public class ActPubService extends ServiceBase {
             Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
 
             for (SubNode node : accountNodes) {
-                String userName = node.getStr(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER);
                 if (no(userName) || !userName.contains("@"))
                     continue;
 
@@ -1909,7 +1909,7 @@ public class ActPubService extends ServiceBase {
 
                 // get username off this node and add to 'toUserNames'
                 if (ok(accntNode)) {
-                    String userName = accntNode.getStr(NodeProp.USER.s());
+                    String userName = accntNode.getStr(NodeProp.USER);
                     userNames.add(userName);
                 }
             } catch (Exception e) {

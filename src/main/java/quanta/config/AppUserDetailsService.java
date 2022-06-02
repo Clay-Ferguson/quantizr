@@ -25,7 +25,7 @@ public class AppUserDetailsService extends ServiceBase implements UserDetailsSer
         } else {
             SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
             if (ok(userNode)) {
-                String pwdHash = userNode.getStr(NodeProp.PWD_HASH.s());
+                String pwdHash = userNode.getStr(NodeProp.PWD_HASH);
                 return new AppUserDetails(userName, pwdHash);
             } else {
                 throw new UsernameNotFoundException("Not found: " + userName);

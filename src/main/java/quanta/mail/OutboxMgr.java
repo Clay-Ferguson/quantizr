@@ -99,8 +99,8 @@ public class OutboxMgr extends ServiceBase {
 	 * shared node in the email.
 	 */
 	public void sendEmailNotification(MongoSession ms, String fromUserName, SubNode toUserNode, SubNode node) {
-		String email = toUserNode.getStr(NodeProp.EMAIL.s());
-		String toUserName = toUserNode.getStr(NodeProp.USER.s());
+		String email = toUserNode.getStr(NodeProp.EMAIL);
+		String toUserName = toUserNode.getStr(NodeProp.USER);
 		// log.debug("sending node notification email to: " + email);
 
 		String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);

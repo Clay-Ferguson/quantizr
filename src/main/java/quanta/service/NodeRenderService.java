@@ -280,7 +280,7 @@ public class NodeRenderService extends ServiceBase {
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
 
-		String orderBy = node.getStr(NodeProp.ORDER_BY.s());
+		String orderBy = node.getStr(NodeProp.ORDER_BY);
 		Sort sort = null;
 
 		if (!StringUtils.isEmpty(orderBy)) {
@@ -583,7 +583,7 @@ public class NodeRenderService extends ServiceBase {
 			item.setId(n.getIdStr());
 			item.setStart(n.getInt(NodeProp.DATE));
 
-			String durationStr = n.getStr(NodeProp.DURATION.s());
+			String durationStr = n.getStr(NodeProp.DURATION);
 			long duration = DateUtil.getMillisFromDuration(durationStr);
 			if (duration == 0) {
 				duration = 60 * 60 * 1000;

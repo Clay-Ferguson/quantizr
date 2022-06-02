@@ -168,7 +168,7 @@ public class NodeEditService extends ServiceBase {
 					newNode.set(NodeProp.UNPUBLISHED, true);
 				}
 
-				String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
+				String cipherKey = node.getStr(NodeProp.ENC_KEY);
 				if (ok(cipherKey)) {
 					res.setEncrypt(true);
 				}
@@ -208,12 +208,12 @@ public class NodeEditService extends ServiceBase {
 					properties, parentFriendsList.getOwner(), true);
 			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
-			String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
+			String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 			if (ok(userToFollowActorId)) {
 				newNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
 			}
 
-			String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
+			String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 			if (ok(userToFollowActorUrl)) {
 				newNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
 			}
@@ -472,7 +472,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		// If removing encryption, remove it from all the ACL entries too.
-		String encKey = node.getStr(NodeProp.ENC_KEY.s());
+		String encKey = node.getStr(NodeProp.ENC_KEY);
 		if (no(encKey)) {
 			mongoUtil.removeAllEncryptionKeys(node);
 		}
@@ -490,7 +490,7 @@ public class NodeEditService extends ServiceBase {
 
 			// if there's no 'ref' property this is not a foreign reference, which means we
 			// DO pin this.
-			if (no(node.getStr(NodeProp.IPFS_REF.s()))) {
+			if (no(node.getStr(NodeProp.IPFS_REF))) {
 				/*
 				 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
 				 * user quota
@@ -719,9 +719,9 @@ public class NodeEditService extends ServiceBase {
 	 * server
 	 */
 	public void updateSavedFriendNode(String userDoingAction, SubNode node) {
-		String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
+		String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
 
-		String friendUserName = node.getStr(NodeProp.USER.s());
+		String friendUserName = node.getStr(NodeProp.USER);
 		if (ok(friendUserName)) {
 			// if a foreign user, update thru ActivityPub.
 			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {

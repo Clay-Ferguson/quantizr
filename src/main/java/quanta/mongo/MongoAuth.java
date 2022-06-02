@@ -180,7 +180,7 @@ public class MongoAuth extends ServiceBase {
 		 */
 		if (parent.getType().equals(NodeType.FRIEND.s())) {
 			// get user prop from node
-			String userName = parent.getStr(NodeProp.USER.s());
+			String userName = parent.getStr(NodeProp.USER);
 
 			// if we have a userProp, find the account node for the user
 			if (ok(userName)) {
@@ -480,9 +480,9 @@ public class MongoAuth extends ServiceBase {
 			if (no(principalNode)) {
 				return null;
 			}
-			principalName = principalNode.getStr(NodeProp.USER.s());
-			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME.s());
-			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY.s());
+			principalName = principalNode.getStr(NodeProp.USER);
+			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
+			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 			avatarVer = principalNode.getStr(NodeProp.BIN);
 		}
 

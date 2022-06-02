@@ -631,12 +631,12 @@ public class AttachmentService extends ServiceBase {
 			SubNode node = read.getNode(ms, nodeId, false);
 			auth.auth(ms, node, PrivilegeType.READ);
 
-			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s());
+			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME);
 			if (no(mimeTypeProp)) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStr(NodeProp.BIN_FILENAME.s());
+			String fileName = node.getStr(NodeProp.BIN_FILENAME);
 			if (no(fileName)) {
 				fileName = "filename";
 			}
@@ -1083,7 +1083,7 @@ public class AttachmentService extends ServiceBase {
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
-		String id = node.getStr("bin");
+		String id = node.getStr(NodeProp.BIN);
 		if (no(id)) {
 			return null;
 		}

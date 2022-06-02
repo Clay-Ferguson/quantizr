@@ -68,7 +68,7 @@ public class MongoDelete extends ServiceBase {
 			if (no(node.getOwner()))
 				continue;
 
-			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID.s());
+			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID);
 			if (keys.contains(key)) {
 				delete(node);
 			} else {

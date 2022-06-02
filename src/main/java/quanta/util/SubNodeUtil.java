@@ -59,19 +59,19 @@ public class SubNodeUtil extends ServiceBase {
 	public void removeDefaultProps(SubNode node) {
 
 		/* If layout=="v" then remove the property */
-		String layout = node.getStr(NodeProp.LAYOUT.s());
+		String layout = node.getStr(NodeProp.LAYOUT);
 		if ("v".equals(layout)) {
 			node.delete(NodeProp.LAYOUT.s());
 		}
 
 		/* If layout=="v" then remove the property */
-		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES.s());
+		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES);
 		if ("n".equals(childrenImageSizes)) {
 			node.delete(NodeProp.CHILDREN_IMG_SIZES.s());
 		}
 
 		/* If priority=="0" then remove the property */
-		String priority = node.getStr(NodeProp.PRIORITY.s());
+		String priority = node.getStr(NodeProp.PRIORITY);
 		if ("0".equals(priority)) {
 			node.delete(NodeProp.PRIORITY.s());
 		}
@@ -323,7 +323,7 @@ public class SubNodeUtil extends ServiceBase {
 		}
 
 		String url = getAttachmentUrl(node);
-		String mime = node.getStr(NodeProp.BIN_MIME.s());
+		String mime = node.getStr(NodeProp.BIN_MIME);
 
 		if (no(url)) {
 			url = prop.getHostAndPort() + "/branding/logo-200px-tr.jpg";

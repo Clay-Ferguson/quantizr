@@ -176,7 +176,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (SubNode n : children) {
-				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN.s());
+				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 
 				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
@@ -217,7 +217,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (SubNode n : children) {
-				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN.s());
+				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 				String folder = n.getIdStr();
 
@@ -283,7 +283,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 
 			String ext = null;
-			String binFileNameProp = node.getStr(NodeProp.BIN_FILENAME.s());
+			String binFileNameProp = node.getStr(NodeProp.BIN_FILENAME);
 			if (ok(binFileNameProp)) {
 				ext = FilenameUtils.getExtension(binFileNameProp);
 				if (!StringUtils.isEmpty(ext)) {
@@ -292,7 +292,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 			String binFileNameStr = ok(binFileNameProp) ? binFileNameProp : "binary";
 
-			String mimeType = node.getStr(NodeProp.BIN_MIME.s());
+			String mimeType = node.getStr(NodeProp.BIN_MIME);
 
 			String imgUrl = null;
 			String attachmentUrl = null;
@@ -301,7 +301,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			/*
 			 * if this is a 'data:' encoded image read it from binary storage and put that directly in url src
 			 */
-			String dataUrl = node.getStr(NodeProp.BIN_DATA_URL.s());
+			String dataUrl = node.getStr(NodeProp.BIN_DATA_URL);
 			if ("t".equals(dataUrl)) {
 				imgUrl = attach.getStringByNode(ms, node);
 
@@ -321,7 +321,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				if (no(imgUrl) && mimeType.startsWith("image/")) {
 
 					// If this is an external URL (just a URL to an image on the web)
-					String extUrl = node.getStr(NodeProp.BIN_URL.s());
+					String extUrl = node.getStr(NodeProp.BIN_URL);
 					if (ok(extUrl)) {
 						binFileNameStr = "External image";
 						imgUrl = extUrl;

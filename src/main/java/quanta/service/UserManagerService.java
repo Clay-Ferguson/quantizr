@@ -128,7 +128,7 @@ public class UserManagerService extends ServiceBase {
 		else {
 			// lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
 			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
-			String userName = userNode.getStr(NodeProp.USER.s());
+			String userName = userNode.getStr(NodeProp.USER);
 
 			String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
 			// springLogin throws exception if it fails.
@@ -249,7 +249,7 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public void ensureValidCryptoKeys(SubNode userNode) {
 		try {
-			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
+			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
 			if (no(publicKey)) {
 				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 				kpg.initialize(2048);
@@ -374,7 +374,7 @@ public class UserManagerService extends ServiceBase {
 				if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
 					return "Signup Complete. You may login now.";
 				} else {
-					String userName = node.getStr(NodeProp.USER.s());
+					String userName = node.getStr(NodeProp.USER);
 
 					if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
 						return "processSignupCode should not be called for admin user.";
@@ -588,7 +588,7 @@ public class UserManagerService extends ServiceBase {
 				throw new RuntimeException("Unable to update preferences.");
 
 			// Make sure the account node we're about to modify does belong to the current user.
-			if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER.s()))) {
+			if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER))) {
 				throw new RuntimeException("Not your node.");
 			}
 
@@ -886,8 +886,8 @@ public class UserManagerService extends ServiceBase {
 
 			if (ok(userNode)) {
 				UserProfile userProfile = new UserProfile();
-				String nodeUserName = userNode.getStr(NodeProp.USER.s());
-				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
+				String nodeUserName = userNode.getStr(NodeProp.USER);
+				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
 				SubNode userHomeNode = read.getNodeByName(ms, nodeUserName + ":" + NodeName.HOME);
 
 				res.setUserProfile(userProfile);
@@ -901,10 +901,10 @@ public class UserManagerService extends ServiceBase {
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
 				userProfile.setMfsEnable(userNode.getBool(NodeProp.MFS_ENABLE));
-				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO.s()));
+				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
-				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS.s()));
-				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN.s()));
+				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
+				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN));
 				userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
 				userProfile.setUserNodeId(userNode.getIdStr());
 				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
@@ -1024,13 +1024,13 @@ public class UserManagerService extends ServiceBase {
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
-				String nodeCodePart = userNode.getVal().getStr(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				String nodeCodePart = userNode.getVal().getStr(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
 				if (!codePart.equals(nodeCodePart)) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
-				userName.setVal(userNode.getVal().getStr(NodeProp.USER.s()));
+				userName.setVal(userNode.getVal().getStr(NodeProp.USER));
 
 				if (PrincipalName.ADMIN.s().equals(userName.getVal())) {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
@@ -1054,7 +1054,7 @@ public class UserManagerService extends ServiceBase {
 			}
 
 			String password = req.getNewPassword();
-			userName.setVal(userNode.getVal().getStr(NodeProp.USER.s()));
+			userName.setVal(userNode.getVal().getStr(NodeProp.USER));
 			userNode.getVal().set(NodeProp.PWD_HASH, mongoUtil.getHashOfPassword(password));
 			userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
@@ -1097,7 +1097,7 @@ public class UserManagerService extends ServiceBase {
 			 *
 			 * verify that the email address provides IS A MATCH to the email address for this user!
 			 */
-			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL.s());
+			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL);
 			if (no(nodeEmail) || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
@@ -1145,14 +1145,14 @@ public class UserManagerService extends ServiceBase {
 			List<FriendInfo> friends = new LinkedList<>();
 
 			for (SubNode friendNode : friendNodes) {
-				String userName = friendNode.getStr(NodeProp.USER.s());
+				String userName = friendNode.getStr(NodeProp.USER);
 				if (ok(userName)) {
 					FriendInfo fi = new FriendInfo();
 					fi.setUserName(userName);
 
 					SubNode userNode = read.getUserNodeByUserName(null, userName);
 					if (ok(userNode)) {
-						fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME.s()));
+						fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 					}
 
 					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);

@@ -74,7 +74,7 @@ public class MongoRead extends ServiceBase {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
         SubNode userNode = read.getNode(ms, node.getOwner());
-        return userNode.getStr(NodeProp.USER.s());
+        return userNode.getStr(NodeProp.USER);
     }
 
     // Used this for troubleshooting a constraint violation on one of the partial indexes

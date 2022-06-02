@@ -433,7 +433,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStr(NodeProp.BIN_MIME.s());
+		String mime = node.getStr(NodeProp.BIN_MIME);
 		return ImageUtil.isImageMime(mime);
 	}
 

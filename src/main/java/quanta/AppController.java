@@ -981,9 +981,9 @@ public class AppController extends ServiceBase implements ErrorController {
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
 					if (no(_gid)) {
-						_gid = node.getStr(NodeProp.IPFS_LINK.s());
+						_gid = node.getStr(NodeProp.IPFS_LINK);
 						if (no(_gid)) {
-							_gid = node.getStr(NodeProp.BIN.s());
+							_gid = node.getStr(NodeProp.BIN);
 						}
 
 						if (ok(_gid)) {

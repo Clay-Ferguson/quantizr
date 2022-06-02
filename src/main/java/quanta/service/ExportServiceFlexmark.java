@@ -261,14 +261,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void writeImage(SubNode node) {
-		String bin = node.getStr(NodeProp.BIN.s());
+		String bin = node.getStr(NodeProp.BIN);
 		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 		if (no(bin) && no(ipfsLink)) {
 			return;
 		}
 
 		String style = "";
-		String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
+		String imgSize = node.getStr(NodeProp.IMG_SIZE);
 		if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
 			style = " style='width:" + imgSize + "'";
 		}

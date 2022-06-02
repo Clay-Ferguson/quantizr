@@ -374,7 +374,7 @@ public class UserFeedService extends ServiceBase {
 				return null;
 
 			for (SubNode node : nodeList) {
-				String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
+				String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
 				// log.debug("BLOCKED: " + userNodeId);
 				ObjectId oid = new ObjectId(userNodeId);
 				set.add(oid);

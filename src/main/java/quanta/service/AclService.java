@@ -170,7 +170,7 @@ public class AclService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
+		String cipherKey = node.getStr(NodeProp.ENC_KEY);
 		if (no(cipherKey)) {
 			throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
 		}
@@ -208,7 +208,7 @@ public class AclService extends ServiceBase {
 			return false;
 		principal = principal.trim();
 
-		String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
+		String cipherKey = node.getStr(NodeProp.ENC_KEY);
 		String mapKey = null;
 
 		SubNode principalNode = null;
@@ -241,7 +241,7 @@ public class AclService extends ServiceBase {
 			 * the server to store in this sharing entry
 			 */
 			if (ok(cipherKey)) {
-				String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY.s());
+				String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 				if (no(principalPubKey)) {
 					if (ok(res)) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
@@ -454,7 +454,7 @@ public class AclService extends ServiceBase {
 				 * ownership info we need to show user. ownerSet.add(p.getUserNodeId());
 				 */
 				SubNode userNode = read.getNode(ms, p.getUserNodeId());
-				String userName = userNode.getStr(NodeProp.USER.s());
+				String userName = userNode.getStr(NodeProp.USER);
 				ownerSet.add(userName);
 			}
 

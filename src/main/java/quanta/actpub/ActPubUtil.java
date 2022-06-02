@@ -319,7 +319,7 @@ public class ActPubUtil extends ServiceBase {
         MongoSession as = auth.getAdminSession();
         SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false, true);
         if (ok(userNode)) {
-            actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
+            actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
         }
 
         // DO NOT DELETE: this is the other way to get the actorUrl without reading or creating the user
@@ -770,7 +770,7 @@ public class ActPubUtil extends ServiceBase {
         arun.run(ms -> {
             SubNode node = read.getNode(ms, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
-                String friendUserName = node.getStr(NodeProp.USER.s());
+                String friendUserName = node.getStr(NodeProp.USER);
                 if (ok(friendUserName)) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@") && ok(ThreadLocals.getSC()) && !ThreadLocals.getSC().isAdmin()) {
@@ -953,7 +953,7 @@ public class ActPubUtil extends ServiceBase {
         if (ok(icon)) {
             String iconUrl = apStr(icon, APObj.url);
             if (ok(iconUrl)) {
-                String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
                 if (!iconUrl.equals(curIconUrl)) {
                     if (node.set(NodeProp.ACT_PUB_USER_ICON_URL, iconUrl)) {
                         changed = true;
@@ -966,7 +966,7 @@ public class ActPubUtil extends ServiceBase {
         if (ok(endpoints)) {
             String sharedInbox = apStr(endpoints, APObj.sharedInbox);
             if (ok(sharedInbox)) {
-                String curSharedInbox = node.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
+                String curSharedInbox = node.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                 if (!sharedInbox.equals(curSharedInbox)) {
                     if (node.set(NodeProp.ACT_PUB_SHARED_INBOX, sharedInbox)) {
                         changed = true;
@@ -979,7 +979,7 @@ public class ActPubUtil extends ServiceBase {
         if (ok(image)) {
             String imageUrl = apStr(image, APObj.url);
             if (ok(imageUrl)) {
-                String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
+                String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
                 if (!imageUrl.equals(curImageUrl)) {
                     if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL, imageUrl)) {
                         changed = true;
