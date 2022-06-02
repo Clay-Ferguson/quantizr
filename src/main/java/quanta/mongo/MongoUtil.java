@@ -991,22 +991,22 @@ public class MongoUtil extends ServiceBase {
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
-		userNode.set(NodeProp.USER.s(), user);
-		userNode.set(NodeProp.EMAIL.s(), email);
-		userNode.set(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
-		userNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-		userNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
-		userNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
-		userNode.set(NodeProp.BIN_TOTAL.s(), 0);
-		userNode.set(NodeProp.LAST_LOGIN_TIME.s(), 0);
-		userNode.set(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
-		userNode.set(NodeProp.ALLOWED_FEATURES.s(), "0");
+		userNode.set(NodeProp.USER, user);
+		userNode.set(NodeProp.EMAIL, email);
+		userNode.set(NodeProp.PWD_HASH, getHashOfPassword(password));
+		userNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
+		userNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
+		userNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
+		userNode.set(NodeProp.BIN_TOTAL, 0);
+		userNode.set(NodeProp.LAST_LOGIN_TIME, 0);
+		userNode.set(NodeProp.BIN_QUOTA, Const.DEFAULT_USER_QUOTA);
+		userNode.set(NodeProp.ALLOWED_FEATURES, "0");
 
 		userNode.setContent("### Account: " + user);
 		userNode.touch();
 
 		if (!automated) {
-			userNode.set(NodeProp.SIGNUP_PENDING.s(), true);
+			userNode.set(NodeProp.SIGNUP_PENDING, true);
 		}
 
 		update.save(ms, userNode);
@@ -1027,10 +1027,10 @@ public class MongoUtil extends ServiceBase {
 		if (no(adminNode)) {
 			adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
-			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
-			adminNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-			adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
-			adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
+			adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
+			adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
+			adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
+			adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
 			update.save(ms, adminNode);
 
 			/*

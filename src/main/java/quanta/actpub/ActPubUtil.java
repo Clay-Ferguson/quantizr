@@ -15,9 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -35,6 +32,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -955,7 +955,7 @@ public class ActPubUtil extends ServiceBase {
             if (ok(iconUrl)) {
                 String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
-                    if (node.set(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
+                    if (node.set(NodeProp.ACT_PUB_USER_ICON_URL, iconUrl)) {
                         changed = true;
                     }
                 }
@@ -968,7 +968,7 @@ public class ActPubUtil extends ServiceBase {
             if (ok(sharedInbox)) {
                 String curSharedInbox = node.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
                 if (!sharedInbox.equals(curSharedInbox)) {
-                    if (node.set(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
+                    if (node.set(NodeProp.ACT_PUB_SHARED_INBOX, sharedInbox)) {
                         changed = true;
                     }
                 }
@@ -981,17 +981,17 @@ public class ActPubUtil extends ServiceBase {
             if (ok(imageUrl)) {
                 String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
                 if (!imageUrl.equals(curImageUrl)) {
-                    if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
+                    if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL, imageUrl)) {
                         changed = true;
                     }
                 }
             }
         }
 
-        if (node.set(NodeProp.USER_BIO.s(), apStr(actor, APObj.summary)))
+        if (node.set(NodeProp.USER_BIO, apStr(actor, APObj.summary)))
             changed = true;
 
-        if (node.set(NodeProp.DISPLAY_NAME.s(), apStr(actor, APObj.name)))
+        if (node.set(NodeProp.DISPLAY_NAME, apStr(actor, APObj.name)))
             changed = true;
 
         String actorId = apStr(actor, APObj.id);
@@ -1000,26 +1000,26 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // this is the URL of the Actor JSON object
-        if (node.set(NodeProp.ACT_PUB_ACTOR_ID.s(), actorId))
+        if (node.set(NodeProp.ACT_PUB_ACTOR_ID, actorId))
             changed = true;
 
         String inbox = apStr(actor, APObj.inbox);
 
         // update cache just because we can
-        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER.s()), inbox);
+        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), inbox);
 
-        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), inbox))
+        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, inbox))
             changed = true;
 
         // this is the URL of the HTML of the actor.
-        if (node.set(NodeProp.ACT_PUB_ACTOR_URL.s(), apStr(actor, APObj.url)))
+        if (node.set(NodeProp.ACT_PUB_ACTOR_URL, apStr(actor, APObj.url)))
             changed = true;
 
         // get the pubKey so we can save into our account node
         String pubKey = apCrypto.getEncodedPubKeyFromActorObj(actor);
 
         // this is the PublicKey.pubKeyPem, of the user
-        if (node.set(NodeProp.ACT_PUB_KEYPEM.s(), pubKey))
+        if (node.set(NodeProp.ACT_PUB_KEYPEM, pubKey))
             changed = true;
 
         return changed;

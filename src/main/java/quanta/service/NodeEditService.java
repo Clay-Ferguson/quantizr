@@ -131,14 +131,14 @@ public class NodeEditService extends ServiceBase {
 		newNode.touch();
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-			newNode.set(NodeProp.TARGET_ID.s(), req.getNodeId());
+			newNode.set(NodeProp.TARGET_ID, req.getNodeId());
 
 			// adding bookmark should disallow sharing.
 			allowSharing = false;
 		}
 
 		if (req.isTypeLock()) {
-			newNode.set(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 		}
 
 		// If we're inserting a node under the POSTS it should be public, rather than inherit.
@@ -165,7 +165,7 @@ public class NodeEditService extends ServiceBase {
 
 				// inherit UNPUBLISHED prop from parent.
 				if (node.getBool(NodeProp.UNPUBLISHED)) {
-					newNode.set(NodeProp.UNPUBLISHED.s(), true);
+					newNode.set(NodeProp.UNPUBLISHED, true);
 				}
 
 				String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
@@ -180,13 +180,13 @@ public class NodeEditService extends ServiceBase {
 			SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
 			if (ok(nodeToBoost)) {
 				String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
-				newNode.set(NodeProp.BOOST.s(), ok(innerBoost) ? innerBoost : req.getBoostTarget());
+				newNode.set(NodeProp.BOOST, ok(innerBoost) ? innerBoost : req.getBoostTarget());
 
 			}
 		}
 
 		if (req.isReply()) {
-			newNode.set(NodeProp.REPLY.s(), Boolean.TRUE);
+			newNode.set(NodeProp.REPLY, Boolean.TRUE);
 		}
 
 		update.save(ms, newNode);
@@ -206,16 +206,16 @@ public class NodeEditService extends ServiceBase {
 
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
 					properties, parentFriendsList.getOwner(), true);
-			newNode.set(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
 			String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 			if (ok(userToFollowActorId)) {
-				newNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), userToFollowActorId);
+				newNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
 			}
 
 			String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
 			if (ok(userToFollowActorUrl)) {
-				newNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), userToFollowActorUrl);
+				newNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
 			}
 
 			apLog.trace("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
@@ -309,7 +309,7 @@ public class NodeEditService extends ServiceBase {
 
 				// inherit UNPUBLISHED prop from parent.
 				if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
-					newNode.set(NodeProp.UNPUBLISHED.s(), true);
+					newNode.set(NodeProp.UNPUBLISHED, true);
 				}
 			}
 		}
@@ -763,7 +763,7 @@ public class NodeEditService extends ServiceBase {
 
 				if (ok(userNode.getVal())) {
 					userNodeId = userNode.getVal().getIdStr();
-					node.set(NodeProp.USER_NODE_ID.s(), userNodeId);
+					node.set(NodeProp.USER_NODE_ID, userNodeId);
 				}
 			}
 		}

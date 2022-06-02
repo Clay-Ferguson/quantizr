@@ -107,7 +107,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		SubNode node = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
 
 		// APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
-		node.set(NodeProp.ACT_PUB_TAG.s(), new APList().val(new APObj() //
+		node.set(NodeProp.ACT_PUB_TAG, new APList().val(new APObj() //
 				.put("name", ":catjam:") //
 				.put("icon", new APObj() //
 						.put("url",

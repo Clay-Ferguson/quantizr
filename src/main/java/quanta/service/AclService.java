@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import com.mongodb.bulk.BulkWriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -18,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -103,7 +103,7 @@ public class AclService extends ServiceBase {
 
 				try {
 					auth.ownerAuth(ms, n);
-					n.set(NodeProp.UNPUBLISHED.s(), unpublished ? unpublished : null);
+					n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
 
 					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
 					// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(node.getAc()));
@@ -114,7 +114,7 @@ public class AclService extends ServiceBase {
 				}
 			} else {
 				auth.ownerAuth(ms, n);
-				n.set(NodeProp.UNPUBLISHED.s(), unpublished ? unpublished : null);
+				n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
 				n.setAc(node.getAc());
 			}
 		}
@@ -154,7 +154,7 @@ public class AclService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
-		node.set(NodeProp.UNPUBLISHED.s(), req.isUnpublished() ? true : null);
+		node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
 
 		res.setSuccess(true);
 		return res;

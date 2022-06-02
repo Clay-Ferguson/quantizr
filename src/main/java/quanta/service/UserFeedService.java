@@ -178,7 +178,7 @@ public class UserFeedService extends ServiceBase {
 					 * 
 					 * todo-1: don't do this? It's better to just have a 'read' button like Pleroma does?
 					 */
-					_myAcntNode.set(NodeProp.LAST_ACTIVE_TIME.s(), lastActiveTime);
+					_myAcntNode.set(NodeProp.LAST_ACTIVE_TIME, lastActiveTime);
 					update.save(_s, _myAcntNode);
 				});
 			}

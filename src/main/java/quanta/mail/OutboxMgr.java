@@ -71,7 +71,7 @@ public class OutboxMgr extends ServiceBase {
 					notifyNode.setOwner(userInbox.getOwner());
 					notifyNode.setContent(content);
 					notifyNode.touch();
-					notifyNode.set(NodeProp.TARGET_ID.s(), node.getIdStr());
+					notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
 					update.save(ms, notifyNode);
 				}
 
@@ -123,9 +123,9 @@ public class OutboxMgr extends ServiceBase {
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
 		outboundEmailNode.setOwner(ms.getUserNodeId());
-		outboundEmailNode.set(NodeProp.EMAIL_CONTENT.s(), content);
-		outboundEmailNode.set(NodeProp.EMAIL_SUBJECT.s(), subject);
-		outboundEmailNode.set(NodeProp.EMAIL_RECIP.s(), recipients);
+		outboundEmailNode.set(NodeProp.EMAIL_CONTENT, content);
+		outboundEmailNode.set(NodeProp.EMAIL_SUBJECT, subject);
+		outboundEmailNode.set(NodeProp.EMAIL_RECIP, recipients);
 
 		update.save(ms, outboundEmailNode);
 		notify.setOutboxDirty();

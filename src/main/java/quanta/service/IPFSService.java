@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -259,9 +259,9 @@ public class IPFSService extends ServiceBase {
             // use export filename here
             node.setContent("IPFS Export: " + cid + "\n\nMime: " + mime);
             node.touch();
-            node.set(NodeProp.IPFS_LINK.s(), cid);
-            node.set(NodeProp.BIN_MIME.s(), mime);
-            node.set(NodeProp.BIN_FILENAME.s(), fileName);
+            node.set(NodeProp.IPFS_LINK, cid);
+            node.set(NodeProp.BIN_MIME, mime);
+            node.set(NodeProp.BIN_FILENAME, fileName);
             update.save(ms, node);
 
             if (ok(childrenFiles)) {
@@ -272,10 +272,10 @@ public class IPFSService extends ServiceBase {
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
                     child.touch();
-                    child.set(NodeProp.IPFS_LINK.s(), file.getCid());
-                    child.set(NodeProp.BIN_MIME.s(), file.getMime());
-                    child.set(NodeProp.BIN_FILENAME.s(), file.getFileName());
-                    child.set(NodeProp.IMG_SIZE.s(), "200px");
+                    child.set(NodeProp.IPFS_LINK, file.getCid());
+                    child.set(NodeProp.BIN_MIME, file.getMime());
+                    child.set(NodeProp.BIN_FILENAME, file.getFileName());
+                    child.set(NodeProp.IMG_SIZE, "200px");
                     update.save(ms, child);
                 }
             }

@@ -6,12 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +15,12 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -403,6 +403,12 @@ public class SubNode {
 		synchronized (likesLock) {
 			this.likes = likes;
 		}
+	}
+
+	@Transient
+	@JsonIgnore
+	public boolean set(NodeProp nt, Object val) {
+		return set(nt.s(), val);
 	}
 
 	// todo-0: need version of set that takes NodeProp as key

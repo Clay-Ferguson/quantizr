@@ -20,11 +20,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletResponse;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSFindIterable;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
@@ -54,6 +49,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -182,12 +182,12 @@ public class AttachmentService extends ServiceBase {
 			// if we have enough images to lay it out into a square of 3 cols switch to that
 			// layout
 			if (imageCount >= 9) {
-				node.set(NodeProp.LAYOUT.s(), "c3");
+				node.set(NodeProp.LAYOUT, "c3");
 			}
 			// otherwise, if we have enough images to lay it out into a square of 2 cols
 			// switch to that layout.
 			else if (imageCount >= 2) {
-				node.set(NodeProp.LAYOUT.s(), "c2");
+				node.set(NodeProp.LAYOUT, "c2");
 			}
 
 			update.saveSession(ms);
@@ -711,17 +711,17 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		auth.ownerAuth(node);
-		node.set(NodeProp.IPFS_LINK.s(), req.getCid().trim());
+		node.set(NodeProp.IPFS_LINK, req.getCid().trim());
 		String mime = req.getMime().trim().replace(".", "");
 
 		// If an extension was given (not a mime), then use it to make a filename, and
 		// generate the mime from it.
 		if (!mime.contains("/")) {
-			node.set(NodeProp.BIN_FILENAME.s(), "file." + mime);
+			node.set(NodeProp.BIN_FILENAME, "file." + mime);
 			mime = MimeTypeUtils.getMimeType(mime);
 		}
 
-		node.set(NodeProp.BIN_MIME.s(), mime);
+		node.set(NodeProp.BIN_MIME, mime);
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;

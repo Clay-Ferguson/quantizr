@@ -8,7 +8,6 @@ import static quanta.actpub.model.AP.apParseList;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.security.PublicKey;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -1147,7 +1146,7 @@ public class ActPubService extends ServiceBase {
 
         // If we have a tagArray object save it on the node properties.
         if (tagArray != null) {
-            newNode.set(NodeProp.ACT_PUB_TAG.s(), tagArray);
+            newNode.set(NodeProp.ACT_PUB_TAG, tagArray);
         }
 
         /*
@@ -1164,21 +1163,21 @@ public class ActPubService extends ServiceBase {
         newNode.setModifyTime(published);
 
         if (ok(sensitive) && sensitive.booleanValue()) {
-            newNode.set(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
+            newNode.set(NodeProp.ACT_PUB_SENSITIVE, "y");
         }
 
         if (temp) {
-            newNode.set(NodeProp.TEMP.s(), "1");
+            newNode.set(NodeProp.TEMP, "1");
         }
 
-        newNode.set(NodeProp.ACT_PUB_ID.s(), id);
-        newNode.set(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
-        newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), inReplyTo);
-        newNode.set(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
-        newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
+        newNode.set(NodeProp.ACT_PUB_ID, id);
+        newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
+        newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, inReplyTo);
+        newNode.set(NodeProp.ACT_PUB_OBJ_TYPE, objType);
+        newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, objAttributedTo);
 
         if (ok(boostTargetId)) {
-            newNode.set(NodeProp.BOOST.s(), boostTargetId);
+            newNode.set(NodeProp.BOOST, boostTargetId);
         }
 
         // part of troubleshooting the non-english language detection

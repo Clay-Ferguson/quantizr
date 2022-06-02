@@ -81,7 +81,7 @@ public class Convert extends ServiceBase {
 			if (!StringUtils.isEmpty(binUrl)) {
 				mimeType = URLConnection.guessContentTypeFromName(binUrl);
 				if (!StringUtils.isEmpty(mimeType)) {
-					node.set(NodeProp.BIN_MIME.s(), mimeType);
+					node.set(NodeProp.BIN_MIME, mimeType);
 				}
 			}
 		}
