@@ -8,6 +8,7 @@ import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
 
 export class IPFSViewData implements TabIntf {
     name = "IPFS Explorer";
+    tooltip = "Explorer for IPFS content and folders";
     id = C.TAB_IPFSVIEW;
     rsInfo = null;
     scrollPos = 0;

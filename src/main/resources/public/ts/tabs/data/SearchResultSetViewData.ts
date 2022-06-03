@@ -8,6 +8,7 @@ import { SearchResultSetView } from "../SearchResultSetView";
 
 export class SearchResultSetViewData implements TabIntf {
     name = "Search";
+    tooltip = "Showing the results of your most recent search";
     id = C.TAB_SEARCH;
     rsInfo = new ResultSetInfo();
     scrollPos = 0;

@@ -6,6 +6,7 @@ import { ServerInfoView } from "../ServerInfoView";
 
 export class ServerInfoViewData implements TabIntf {
     name = "Info View";
+    tooltip = "Displaying the information view for the most recently requested info";
     id = C.TAB_SERVERINFO;
     rsInfo = null;
     scrollPos = 0;

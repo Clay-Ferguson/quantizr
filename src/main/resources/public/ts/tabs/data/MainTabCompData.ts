@@ -8,6 +8,7 @@ import { MainTabComp } from "../MainTabComp";
 
 export class MainTabCompData implements TabIntf {
     name = "Quanta";
+    tooltip = "Quanta global tree-like Database";
     id = C.TAB_MAIN;
     rsInfo = null;
     scrollPos = 0;

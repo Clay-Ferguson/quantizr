@@ -7,6 +7,7 @@ import { ThreadView } from "../ThreadView";
 
 export class ThreadViewData implements TabIntf {
     name = "Thread";
+    tooltip = "View of Posts in top-down chronological order showing the full reply chain"
     id = C.TAB_THREAD;
     rsInfo = new ThreadRSInfo();
     scrollPos = 0;

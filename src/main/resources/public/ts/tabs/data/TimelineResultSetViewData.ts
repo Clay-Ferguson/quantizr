@@ -8,6 +8,7 @@ import { TimelineResultSetView } from "../TimelineResultSetView";
 
 export class TimelineResultSetViewData implements TabIntf {
     name = "Timeline";
+    tooltip = "Reverse-chronological list of the entire subgraph of all nodes under one node"
     id = C.TAB_TIMELINE;
     rsInfo = new TimelineRSInfo();
     scrollPos = 0;

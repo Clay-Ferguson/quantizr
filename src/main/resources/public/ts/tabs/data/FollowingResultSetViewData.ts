@@ -8,6 +8,7 @@ import { FollowingResultSetView } from "../FollowingResultSetView";
 
 export class FollowingResultSetViewData implements TabIntf {
     name = "Following";
+    tooltip = "List of people the person is following";
     id = C.TAB_FOLLOWING;
     rsInfo = new FollowingRSInfo();
     scrollPos = 0;

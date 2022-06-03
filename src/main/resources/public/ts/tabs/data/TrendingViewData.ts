@@ -8,6 +8,7 @@ import { TrendingView } from "../TrendingView";
 
 export class TrendingViewData implements TabIntf {
     name = "Trending";
+    tooltip = "What's popular right now on the Fediverse";
     id = C.TAB_TRENDING;
     rsInfo = new TrendingRSInfo();
     scrollPos = 0;

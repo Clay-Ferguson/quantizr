@@ -9,6 +9,7 @@ import { FeedViewProps } from "../FeedViewProps";
 
 export class FeedViewData implements TabIntf {
     name = "Feed";
+    tooltip = "Reverse-chronological list of Fediverse posts";
     id = C.TAB_FEED;
     rsInfo = null;
     scrollPos = 0;
