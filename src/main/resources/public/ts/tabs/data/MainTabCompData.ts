@@ -20,7 +20,7 @@ export class MainTabCompData implements TabIntf {
 
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            !state.isAnonUser ? new Div("My Root", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }) : null,
+            !state.isAnonUser ? new Div("My Account", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }) : null,
             !state.isAnonUser ? new Div("My Home", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode(":" + state.userName + ":home") }) : null,
             !state.isAnonUser ? new Div("My Posts", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode("~" + J.NodeType.POSTS) }) : null,
 

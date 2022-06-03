@@ -184,7 +184,7 @@ export class MenuPanel extends Div {
 
         if (!state.isAnonUser) {
             children.push(new Menu("Quanta", [
-                new MenuItem("My Root", S.nav.navHome, !state.isAnonUser),
+                new MenuItem("My Account", S.nav.navHome, !state.isAnonUser),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
                 new MenuItemSeparator(),
