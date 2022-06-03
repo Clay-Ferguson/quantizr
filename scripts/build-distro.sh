@@ -10,8 +10,12 @@ clear
 # show commands as they are run.
 # set -x
 
-# change to folder this script file is in
-cd $(dirname $(realpath $0))
+# Make the folder holding this script become the current working directory
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+echo "cd $SCRIPTPATH"
+cd "$SCRIPTPATH"
+
 source ./setenv-distro.sh
 
 # remove this to be sure we will notice if it doesn't successfully build

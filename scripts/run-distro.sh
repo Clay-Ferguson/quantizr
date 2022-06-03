@@ -10,8 +10,12 @@
 #
 # ===================================================================
 
-# change to folder this script file is in
-cd $(dirname $(realpath $0))
+# Make the folder holding this script become the current working directory
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+echo "cd $SCRIPTPATH"
+cd "$SCRIPTPATH"
+
 source ./setenv-distro-runner.sh
 
 ./stop-distro.sh
