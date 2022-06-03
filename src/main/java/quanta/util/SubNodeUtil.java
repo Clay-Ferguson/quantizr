@@ -55,30 +55,38 @@ public class SubNodeUtil extends ServiceBase {
 	 * (such as vertical layout is assumed if no layout property is specified) we remove those
 	 * properties when the client is passing them in to be saved, or from any other source they are
 	 * being passed to be saved
+	 * 
+	 * returns 'true' only if something changed
 	 */
-	public void removeDefaultProps(SubNode node) {
+	public boolean removeDefaultProps(SubNode node) {
+		boolean ret = false;
 
 		/* If layout=="v" then remove the property */
 		String layout = node.getStr(NodeProp.LAYOUT);
 		if ("v".equals(layout)) {
 			node.delete(NodeProp.LAYOUT);
+			ret = true;
 		}
 
 		/* If layout=="v" then remove the property */
 		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES);
 		if ("n".equals(childrenImageSizes)) {
 			node.delete(NodeProp.CHILDREN_IMG_SIZES);
+			ret = true;
 		}
 
 		/* If priority=="0" then remove the property */
 		String priority = node.getStr(NodeProp.PRIORITY);
 		if ("0".equals(priority)) {
 			node.delete(NodeProp.PRIORITY);
+			ret = true;
 		}
 
 		if (ok(node.getProps()) && node.getProps().size() == 0) {
+			ret = true;
 			node.setProps(null);
 		}
+		return ret;
 	}
 
 	public HashMap<String, AccessControl> cloneAcl(SubNode node) {

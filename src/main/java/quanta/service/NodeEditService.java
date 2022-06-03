@@ -163,10 +163,11 @@ public class NodeEditService extends ServiceBase {
 				// we always determine the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(null, node, newNode);
 
+				// Moved to below to let isFediSend always control UNPUBLISHED prop
 				// inherit UNPUBLISHED prop from parent.
-				if (node.getBool(NodeProp.UNPUBLISHED)) {
-					newNode.set(NodeProp.UNPUBLISHED, true);
-				}
+				// if (node.getBool(NodeProp.UNPUBLISHED)) {
+				// newNode.set(NodeProp.UNPUBLISHED, true);
+				// }
 
 				String cipherKey = node.getStr(NodeProp.ENC_KEY);
 				if (ok(cipherKey)) {
@@ -175,13 +176,14 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
+
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
 			/* If the node being boosted is itself a boost then boost the original boost instead */
 			SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
 			if (ok(nodeToBoost)) {
 				String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
 				newNode.set(NodeProp.BOOST, ok(innerBoost) ? innerBoost : req.getBoostTarget());
-
 			}
 		}
 
@@ -192,6 +194,81 @@ public class NodeEditService extends ServiceBase {
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
 				false, false));
+		res.setSuccess(true);
+		return res;
+	}
+
+		/*
+	 * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
+	 * node specified in the request. Should ONLY be called by the controller that accepts a node being
+	 * created by the GUI/user
+	 */
+	public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
+		InsertNodeResponse res = new InsertNodeResponse();
+		String parentNodeId = req.getParentId();
+		log.debug("Inserting under parent: " + parentNodeId);
+		SubNode parentNode = read.getNode(ms, parentNodeId);
+		if (no(parentNode)) {
+			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
+		}
+
+		auth.authForChildNodeCreate(ms, parentNode);
+		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+				CreateNodeLocation.ORDINAL, null, null, true);
+
+		if (ok(req.getInitialValue())) {
+			newNode.setContent(req.getInitialValue());
+		} else {
+			newNode.setContent("");
+		}
+		newNode.touch();
+
+		// '/r/p/' = pending (nodes not yet published, being edited created by users)
+		if (req.isPendingEdit()) {
+			mongoUtil.setPendingPath(newNode, true);
+		}
+
+		boolean allowSharing = true;
+		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+			// adding bookmark should disallow sharing.
+			allowSharing = false;
+		}
+
+		if (allowSharing) {
+			// If we're inserting a node under the POSTS it should be public, rather than inherit.
+			// Note: some logic may be common between this insertNode() and the createSubNode()
+			if (parentNode.isType(NodeType.POSTS)) {
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
+						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+			} else {
+				// we always copy the access controls from the parent for any new nodes
+				auth.setDefaultReplyAcl(null, parentNode, newNode);
+
+				// Moved to below to let isFediSend always control UNPUBLISHED prop
+				// inherit UNPUBLISHED prop from parent.
+				// // inherit UNPUBLISHED prop from parent.
+				// if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
+				// 	newNode.set(NodeProp.UNPUBLISHED, true);
+				// }
+			}
+		}
+
+		// It's not a bug that there's no isFediSend on this request. It happens to be the case that all nodes created thru 
+		// this method are done by interactions that will not ever send an isFediSend=true. These are mainly the '+'-buttons
+		// that are only active when a user is modifying his OWN nodes, and ALL of these shold be unpublished.
+		// newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
+		newNode.set(NodeProp.UNPUBLISHED, Boolean.TRUE);
+
+		update.save(ms, newNode);
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
+				false, false));
+
+		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
+		// // don't evern send notifications when 'admin' is the one doing the editing.
+		// && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
+		// outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
+		// }
+
 		res.setSuccess(true);
 		return res;
 	}
@@ -258,73 +335,6 @@ public class NodeEditService extends ServiceBase {
 		update.save(ms, newNode);
 
 		res.setMessage("Drop Accepted: Created link to: " + data);
-		return res;
-	}
-
-	/*
-	 * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
-	 * node specified in the request. Should ONLY be called by the controller that accepts a node being
-	 * created by the GUI/user
-	 */
-	public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
-		InsertNodeResponse res = new InsertNodeResponse();
-		String parentNodeId = req.getParentId();
-		log.debug("Inserting under parent: " + parentNodeId);
-		SubNode parentNode = read.getNode(ms, parentNodeId);
-		if (no(parentNode)) {
-			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
-		}
-
-		auth.authForChildNodeCreate(ms, parentNode);
-		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-				CreateNodeLocation.ORDINAL, null, null, true);
-
-		if (ok(req.getInitialValue())) {
-			newNode.setContent(req.getInitialValue());
-		} else {
-			newNode.setContent("");
-		}
-		newNode.touch();
-
-		// '/r/p/' = pending (nodes not yet published, being edited created by users)
-		if (req.isPendingEdit()) {
-			mongoUtil.setPendingPath(newNode, true);
-		}
-
-		boolean allowSharing = true;
-		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-			// adding bookmark should disallow sharing.
-			allowSharing = false;
-		}
-
-		if (allowSharing) {
-			// If we're inserting a node under the POSTS it should be public, rather than inherit.
-			// Note: some logic may be common between this insertNode() and the createSubNode()
-			if (parentNode.isType(NodeType.POSTS)) {
-				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
-						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-			} else {
-				// we always copy the access controls from the parent for any new nodes
-				auth.setDefaultReplyAcl(null, parentNode, newNode);
-
-				// inherit UNPUBLISHED prop from parent.
-				if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
-					newNode.set(NodeProp.UNPUBLISHED, true);
-				}
-			}
-		}
-
-		update.save(ms, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
-				false, false));
-
-		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
-		// // don't evern send notifications when 'admin' is the one doing the editing.
-		// && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-		// outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
-		// }
-
-		res.setSuccess(true);
 		return res;
 	}
 
@@ -549,12 +559,15 @@ public class NodeEditService extends ServiceBase {
 	public void processAfterSave(MongoSession ms, SubNode node) {
 
 		// never do any of this logic if this is an admin-owned node being saved.
+		// todo-0: I think there's an acl method for ALL patterns like this?
 		if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
 			return;
 		}
 
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
+
+			// todo-0: crate a node.isType(NodeType) for this.
 			boolean isAccnt = NodeType.ACCOUNT.s().equals(node.getType());
 
 			// push any chat messages that need to go out.

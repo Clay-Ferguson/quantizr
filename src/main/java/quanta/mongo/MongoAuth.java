@@ -153,7 +153,9 @@ public class MongoAuth extends ServiceBase {
 	 * done)
 	 */
 	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
-		if (no(parent) || no(child))
+
+		// if parent or child is null or parent is an ACCOUNT node do nothing here.
+		if (no(parent) || parent.isType(NodeType.ACCOUNT) || no(child))
 			return;
 
 		if (no(ms)) {

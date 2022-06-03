@@ -174,7 +174,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		snUtil.removeDefaultProps(node);
+		if (snUtil.removeDefaultProps(node)) {
+			dbObj.put(SubNode.PROPS, node.getProps());
+		}
 
 		if (ok(node.getAc())) {
 			/*

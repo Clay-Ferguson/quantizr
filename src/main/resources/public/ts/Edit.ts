@@ -244,7 +244,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    reply: false
+                    reply: false,
+                    fediSend: false
                 });
                 if (blob) {
                     this.createSubNodeResponse(res, false, null, null, state);
@@ -278,7 +279,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    reply: false
+                    reply: false,
+                    fediSend: false
                 });
                 this.createSubNodeResponse(res, false, null, null, state);
             }
@@ -968,7 +970,8 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             boostTarget: null,
-            reply: false
+            reply: false,
+            fediSend: false
         });
 
         if (blob) {
@@ -1027,7 +1030,8 @@ export class Edit {
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
             boostTarget: null,
-            reply: false
+            reply: false,
+            fediSend: false
         });
         this.createSubNodeResponse(res, true, null, null, state);
     }
@@ -1057,7 +1061,7 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (nodeId: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, state: AppState) => {
+    addNode = async (nodeId: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, fediSend: boolean, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -1076,7 +1080,8 @@ export class Edit {
             properties: null,
             shareToUserId,
             boostTarget,
-            reply
+            reply,
+            fediSend
         });
 
         this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
@@ -1097,7 +1102,8 @@ export class Edit {
             payloadType,
             shareToUserId: null,
             boostTarget: null,
-            reply: false
+            reply: false,
+            fediSend: false
         });
 
         // auto-enable edit mode
@@ -1121,7 +1127,8 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
             boostTarget: null,
-            reply: false
+            reply: false,
+            fediSend: false
         });
         this.createSubNodeResponse(res, false, null, null, state);
     }

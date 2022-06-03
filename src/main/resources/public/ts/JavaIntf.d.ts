@@ -144,6 +144,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     properties: PropertyInfo[];
     shareToUserId: string;
     reply: boolean;
+    fediSend: boolean;
     payloadType?: string;
 }
 

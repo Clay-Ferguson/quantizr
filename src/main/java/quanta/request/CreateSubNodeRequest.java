@@ -29,6 +29,10 @@ public class CreateSubNodeRequest extends RequestBase {
 	// this causes the node to get a reply=true property.
 	private boolean reply;
 
+	// send out over Fediverse only if this is true. Will generally be either something created by a
+	// "Post" button or a "Reply" button only
+	private boolean fediSend;
+
 	public String getShareToUserId() {
 		return shareToUserId;
 	}
@@ -127,5 +131,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setReply(boolean reply) {
 		this.reply = reply;
+	}
+
+	public boolean isFediSend() {
+		return fediSend;
+	}
+
+	public void setFediSend(boolean fediSend) {
+		this.fediSend = fediSend;
 	}
 }
