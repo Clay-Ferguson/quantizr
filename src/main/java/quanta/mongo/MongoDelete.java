@@ -108,12 +108,6 @@ public class MongoDelete extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
 				.and(SubNode.MODIFY_TIME).lt(date); //
 
-		/*
-		 * once we've had the TEMP prop in place for 7 days, we can then process this code from the root
-		 * path of all users rather than running it once on each foreign user node, and remove 'ForUser'
-		 * from method name and(SubNode.PROPS+ "." + NodeProp.TEMP.s()).ne(null));
-		 */
-
 		q.addCriteria(crit);
 
 		// Example: Time Range check:

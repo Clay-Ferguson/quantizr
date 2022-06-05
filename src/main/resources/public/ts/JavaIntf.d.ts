@@ -969,7 +969,6 @@ export const enum NodeProp {
     ACT_PUB_SENSITIVE = "ap:nsfw",
     ACT_PUB_TAG = "ap:tag",
     ENC_KEY = "sn:encKey",
-    TEMP = "tmp",
     REPLY = "reply",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",

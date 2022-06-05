@@ -133,7 +133,7 @@ public class ActPubOutbox extends ServiceBase {
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, true, APType.Create,
+                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create,
                                             null, null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {

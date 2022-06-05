@@ -879,7 +879,7 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveObj(as, null, actorAccountNode, postsNode, payload, false, false, APType.Announce, boostedNode.getIdStr(),
+                    saveObj(as, null, actorAccountNode, postsNode, payload, false, APType.Announce, boostedNode.getIdStr(),
                             null);
                 }
             } else {
@@ -1004,7 +1004,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, false, action, null, encodedKey);
+            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, action, null, encodedKey);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1020,7 +1020,7 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveObj(ms, null, actorAccountNode, postsNode, obj, false, false, action, null, encodedKey);
+                saveObj(ms, null, actorAccountNode, postsNode, obj, false, action, null, encodedKey);
             }
         }
     }
@@ -1041,7 +1041,7 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
-            boolean forcePublic, boolean temp, String action, String boostTargetId, String encodedKey) {
+            boolean forcePublic, String action, String boostTargetId, String encodedKey) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
         String id = apStr(obj, APObj.id);
 
@@ -1168,13 +1168,10 @@ public class ActPubService extends ServiceBase {
             }
         }
         newNode.setModifyTime(published);
+        newNode.setCreateTime(published);
 
         if (ok(sensitive) && sensitive.booleanValue()) {
             newNode.set(NodeProp.ACT_PUB_SENSITIVE, "y");
-        }
-
-        if (temp) {
-            newNode.set(NodeProp.TEMP, "1");
         }
 
         newNode.set(NodeProp.ACT_PUB_ID, id);

@@ -39,10 +39,6 @@ public enum NodeProp {
      * key to decrypt this key and gain access to the actual data.
      */
     ENC_KEY("sn:encKey", "s"), //
-
-    // finding this on a node means it can be safely deleted without affecting any
-    // local users
-    TEMP("tmp", "s"), //
     REPLY("reply", "s"), //
 
     /*
