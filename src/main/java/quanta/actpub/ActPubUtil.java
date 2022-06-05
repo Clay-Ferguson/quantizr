@@ -260,6 +260,20 @@ public class ActPubUtil extends ServiceBase {
         return getJson(url, mediaType, headers);
     }
 
+    /* Posts to all inboxes */
+    public void securePostEx(HashSet<String> inboxes, String fromActor, String privateKey, String actor, APObj message, MediaType postType) {
+        if (no(inboxes)) return;
+        for (String inbox : inboxes) {
+            try {
+                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
+            }
+            // catch error from any server, and ignore, go to next server to send to.
+            catch (Exception e) {
+                apLog.trace("failed to post to: " + inbox);
+            }
+        }
+    }
+
     public void securePostEx(String url, String privateKey, String actor, APObj message, MediaType postType) {
         try {
             apLog.trace("Secure post to " + url);
@@ -929,8 +943,8 @@ public class ActPubUtil extends ServiceBase {
                                 return null;
                             }
 
-                            node = apub.saveObj(as, userDoingAction, accountNode, outboxNode, obj, false, APType.Create,
-                                    null, null);
+                            node = apub.saveObj(as, userDoingAction, accountNode, outboxNode, obj, false, APType.Create, null,
+                                    null);
                         }
                         return node;
                     });

@@ -206,27 +206,10 @@ public class ActPubService extends ServiceBase {
                     // loads ONLY foreign user's inboxes into the two sets.
                     getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
-                    for (String inbox : sharedInboxes) {
-                        apLog.trace("Posting to Shared Inbox: " + inbox);
-                        try {
-                            apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                        }
-                        // catch error from any server, and ignore, go to next server to send to.
-                        catch (Exception e) {
-                            apLog.trace("failed to post to: " + inbox);
-                        }
-                    }
-
-                    for (String inbox : userInboxes) {
-                        apLog.trace("Posting to User Inbox: " + inbox);
-                        try {
-                            apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                        }
-                        // catch error from any server, and ignore, go to next server to send to.
-                        catch (Exception e) {
-                            apLog.trace("failed to post to: " + inbox);
-                        }
-                    }
+                    // merge both sets of inboxes into allInboxes and send to them
+                    HashSet<String> allInboxes = new HashSet<>(userInboxes);
+                    allInboxes.addAll(sharedInboxes);
+                    apUtil.securePostEx(allInboxes, fromActor, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
 
                 // Post message to all foreign usernames found in 'toUserNames', but skip all in userInboxes becasue
@@ -254,12 +237,7 @@ public class ActPubService extends ServiceBase {
         return node;
     }
 
-    // todo-1: this logic can be shared in a generic function if we can separate out 'message' payload
-    // from this, and just pass in as argument.
-    //
-    // todo-0: can sendActPubObjOutbound be used in place of this? Can these two methods be merged into
-    // one?
-    public void sendActPubForNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
+    public void sendNodeDelete(MongoSession ms, String actPubId, HashMap<String, AccessControl> acl) {
         // if no sharing bail out.
         if (no(acl) || acl.isEmpty())
             return;
@@ -302,30 +280,10 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = new HashSet<>();
                     getSharedInboxesOfFollowers(fromUser, sharedInboxes, userInboxes);
 
-                    if (sharedInboxes.size() > 0 || userInboxes.size() > 0) {
-
-                        for (String inbox : sharedInboxes) {
-                            apLog.trace("send Delete to Shared Inbox: " + inbox);
-                            try {
-                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                            }
-                            // catch error from any server, and ignore, go to next server to send to.
-                            catch (Exception e) {
-                                apLog.trace("failed to post to: " + inbox);
-                            }
-                        }
-
-                        for (String inbox : userInboxes) {
-                            apLog.trace("send Delete to User Inbox: " + inbox);
-                            try {
-                                apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
-                            }
-                            // catch error from any server, and ignore, go to next server to send to.
-                            catch (Exception e) {
-                                apLog.trace("failed to delete to: " + inbox);
-                            }
-                        }
-                    }
+                    // merge both sets of inboxes into allInboxes and send to them
+                    HashSet<String> allInboxes = new HashSet<>(userInboxes);
+                    allInboxes.addAll(sharedInboxes);
+                    apUtil.securePostEx(allInboxes, fromActor, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
 
                 // Post message to all foreign usernames found in 'toUserNames'
@@ -879,8 +837,7 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveObj(as, null, actorAccountNode, postsNode, payload, false, APType.Announce, boostedNode.getIdStr(),
-                            null);
+                    saveObj(as, null, actorAccountNode, postsNode, payload, false, APType.Announce, boostedNode.getIdStr(), null);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");

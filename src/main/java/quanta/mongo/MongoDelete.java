@@ -345,7 +345,7 @@ public class MongoDelete extends ServiceBase {
 		// in async thread send out all the deletes to the foreign servers.
 		exec.run(() -> {
 			nodes.forEach(n -> {
-				apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
+				apub.sendNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
 				deleteSubGraphChildren(ms, n, false);
 			});
 		});
