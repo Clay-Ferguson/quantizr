@@ -24,6 +24,26 @@ Quanta is a browser-based SPA (Single Page App), that works on both mobile and d
 
 The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS+Redux front end. Deployed and installed via docker (docker compose), MongoDB as the data store, as well as the GO Lang version of IPFS.
 
+## WARNING to VSCode Users
+
+Starting with version 1.68, VSCode apparently added new more strict error checking making lines like the following now be considered an error:
+
+```
+myVar: MyType = null;
+
+```
+
+whereas they think the "correct" code is this:
+
+
+```
+myVar: MyType | null = null;
+
+```
+
+I'm hoping I can find a linter setting to disable this checking becasue this makes tens of thousands of lines of this project get reported as errors that absolutely should not, in my opinion. Pretty much everywhere I'm using a null is reported as an error in version 1.68, because I have 100% TypeSafe code and VSCode has decided nulls are no longer by default safe to assign to a typed object! Completely insane.
+
+
 ## Project Funding
 
 Help support this project by making a financial contribution here: [Contribute to Quanta](https://www.paypal.com/donate/?hosted_button_id=4S3DEDU4BLYEW)
