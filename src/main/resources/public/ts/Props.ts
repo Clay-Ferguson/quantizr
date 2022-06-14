@@ -288,7 +288,8 @@ export class Props {
             J.NodeProp.IPFS_LINK, //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.TYPE_LOCK, //
-            J.NodeProp.UNPUBLISHED
+            J.NodeProp.UNPUBLISHED, //
+            J.NodeProp.REPLY
         ]);
 
         S.util.addAllToSet(this.controlBasedPropertyList, [ //

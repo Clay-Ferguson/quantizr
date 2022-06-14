@@ -120,7 +120,7 @@ public class RSSFeedService extends ServiceBase {
 	// NOTE: Same value appears in RSSTypeHandler.ts
 	private static final int MAX_FEED_ITEMS = 50;
 
-	private static final int REFRESH_FREQUENCY_MINS = 240; // 4 hrs
+	private static final int REFRESH_FREQUENCY_MINS = 120; // 2 hrs
 	static boolean run = false;
 
 	/*
