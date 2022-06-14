@@ -33,6 +33,7 @@ myVar: MyType = null;
 ```
 whereas they think the "correct" code is this:
 
+
 ```
 myVar: MyType | null = null;
 ```
