@@ -205,7 +205,8 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		// Don't show UNPUBLISHED nodes.
-		crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
+		// #unpublish-disabled
+		// crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
 
 		/*
 		 * Save the 'string' representations for blocked user ids for use below, to mask out places where

@@ -43,23 +43,26 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                new Checkbox("Unpublished", null, {
-                    setValue: async (checked: boolean): Promise<void> => {
-                        let state: LS = this.getState<LS>();
-                        this.dirty = true;
-                        state.nodePrivsInfo.unpublished = checked;
-                        await S.util.ajax<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
-                            nodeId: this.node.id,
-                            unpublished: checked
-                        });
+                // todo-0: There's a bug in turning this OFF and also it just needs more thought in the design, becasue it's too
+                // easy to create a node and share it with someone and then have it NOT end up visible in the feeds of the people it's shared to.
+                // #unpublish-disabled
+                // new Checkbox("Unpublished", null, {
+                //     setValue: async (checked: boolean): Promise<void> => {
+                //         let state: LS = this.getState<LS>();
+                //         this.dirty = true;
+                //         state.nodePrivsInfo.unpublished = checked;
+                //         await S.util.ajax<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
+                //             nodeId: this.node.id,
+                //             unpublished: checked
+                //         });
 
-                        this.mergeState<LS>({ nodePrivsInfo: state.nodePrivsInfo });
-                        return null;
-                    },
-                    getValue: (): boolean => {
-                        return state.nodePrivsInfo.unpublished;
-                    }
-                }),
+                //         this.mergeState<LS>({ nodePrivsInfo: state.nodePrivsInfo });
+                //         return null;
+                //     },
+                //     getValue: (): boolean => {
+                //         return state.nodePrivsInfo.unpublished;
+                //     }
+                // }),
                 new Checkbox("Apply to all children (that you own)", null, {
                     setValue: (checked: boolean): void => {
                         this.dirty = true;
