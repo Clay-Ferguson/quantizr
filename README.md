@@ -30,15 +30,11 @@ Starting with version 1.68, VSCode apparently added new more strict error checki
 
 ```
 myVar: MyType = null;
-
 ```
-
 whereas they think the "correct" code is this:
-
 
 ```
 myVar: MyType | null = null;
-
 ```
 
 I'm hoping I can find a linter setting to disable this checking becasue this makes tens of thousands of lines of this project get reported as errors that absolutely should not, in my opinion. Pretty much everywhere I'm using a null is reported as an error in version 1.68, because I have 100% TypeSafe code and VSCode has decided nulls are no longer by default safe to assign to a typed object! Completely insane.
