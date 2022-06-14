@@ -1,3 +1,6 @@
+// WARNING: Be careful renaming this file. If it's not named 'tsconfig.json' the VSCode won't find it,
+// and things like the missing 'strictNullChecks=false' will cause thousands of errors to get identified
+// which are not errors
 {
     "compilerOptions": {
         "target": "es6",
@@ -6,6 +9,7 @@
         "moduleResolution": "node",
         "jsx": "react",
         "noImplicitAny": false,
+        "strictNullChecks": false,
 
         "noImplicitUseStrict": false,
         "removeComments": true,
