@@ -103,7 +103,9 @@ public class AclService extends ServiceBase {
 
 				try {
 					auth.ownerAuth(ms, n);
-					n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
+					
+					// #unpublish-disabled
+					//n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
 
 					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
 					// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(node.getAc()));
@@ -114,7 +116,9 @@ public class AclService extends ServiceBase {
 				}
 			} else {
 				auth.ownerAuth(ms, n);
-				n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
+
+				// #unpublish-disabled
+				// n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
 				n.setAc(node.getAc());
 			}
 		}
@@ -154,7 +158,9 @@ public class AclService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
-		node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
+
+		// #unpublish-disabled
+		// node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
 
 		res.setSuccess(true);
 		return res;

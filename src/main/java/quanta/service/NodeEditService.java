@@ -176,7 +176,8 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
-		newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
+		// #unpublish-disabled
+		// newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
 
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
 			/* If the node being boosted is itself a boost then boost the original boost instead */
@@ -257,7 +258,9 @@ public class NodeEditService extends ServiceBase {
 		// this method are done by interactions that will not ever send an isFediSend=true. These are mainly the '+'-buttons
 		// that are only active when a user is modifying his OWN nodes, and ALL of these shold be unpublished.
 		// newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
-		newNode.set(NodeProp.UNPUBLISHED, Boolean.TRUE);
+
+		// #unpublish-disabled
+		// newNode.set(NodeProp.UNPUBLISHED, Boolean.TRUE);
 
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
