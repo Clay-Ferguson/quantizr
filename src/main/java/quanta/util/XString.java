@@ -283,4 +283,26 @@ public class XString {
 		// log.debug("Short name of [" + fileName + "] is [" + shortName + "]");
 		return pathPart;
 	}
+
+	public static boolean isChinaRussia(String s) {
+		return containsChinese(s) || containsRussian(s);
+	}
+
+	public static boolean containsChinese(String s) {
+		// This is specifically for Chinese
+		// return s.codePoints().anyMatch(codepoint -> Character.UnicodeScript.of(codepoint) ==
+		// Character.UnicodeScript.HAN);
+
+		// This is more general.
+		return s.codePoints().anyMatch(codepoint -> Character.isIdeographic(codepoint));
+	}
+
+	public static boolean containsRussian(String s) {
+		for (int i = 0; i < s.length(); i++) {
+			if (Character.UnicodeBlock.of(s.charAt(i)).equals(Character.UnicodeBlock.CYRILLIC)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

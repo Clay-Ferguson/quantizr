@@ -87,11 +87,12 @@ public class UserFeedService extends ServiceBase {
 	/*
 	 * Generated content of the "Feed" for a user.
 	 * 
-	 * Note: When 'req.toUser' is set we query actually for the bidiretional conversatio of us to that person or that person to us
-	 * queried in a single list.
+	 * Note: When 'req.toUser' is set we query actually for the bidiretional conversatio of us to that
+	 * person or that person to us queried in a single list.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
-		// if bidirectional means query for the conversation between me and the other person (both senders), and we do that 
+		// if bidirectional means query for the conversation between me and the other person (both senders),
+		// and we do that
 		// always for now when toUser is present.
 		boolean bidirectional = StringUtils.isNotEmpty(req.getToUser());
 
@@ -213,6 +214,7 @@ public class UserFeedService extends ServiceBase {
 		 * users may be following a user that will effectively be blocked
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
+		boolean allowNonEnglish = true;
 
 		if (!bidirectional) {
 			HashSet<ObjectId> blockedUserIds = new HashSet<>();
@@ -222,6 +224,8 @@ public class UserFeedService extends ServiceBase {
 			 */
 			if (req.getToPublic() && req.isApplyAdminBlocks()) {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+
+				allowNonEnglish = false;
 			}
 
 			// Add criteria for blocking users using the 'not in' list (nin)
@@ -235,8 +239,11 @@ public class UserFeedService extends ServiceBase {
 			}
 		}
 
-		// for bidirectional we do an OR of "us to them" and "them to us" kind of sharing to the other user, to result in what
-		// will end up being all conversations between us and the other person mixed into a single rev-chron.
+		/*
+		 * for bidirectional we do an OR of "us to them" and "them to us" kind of sharing to the other user,
+		 * to result in what will end up being all conversations between us and the other person mixed into
+		 * a single rev-chron.
+		 */
 		if (bidirectional) {
 			SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
 
@@ -255,14 +262,14 @@ public class UserFeedService extends ServiceBase {
 				// sharing from the other user to us.
 				if (bidirectional) {
 					orCriteria.add(
-						// where node is owned by us.
-						Criteria.where(SubNode.OWNER).is(toUserNode.getOwner()) //
-								// and the node has any sharing on it.
-								.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
+							// where node is owned by us.
+							Criteria.where(SubNode.OWNER).is(toUserNode.getOwner()) //
+									// and the node has any sharing on it.
+									.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
 				}
 			}
 		}
-		
+
 		if (!testQuery && doAuth && req.getFromMe()) {
 			if (no(myAcntNode)) {
 				myAcntNode = read.getNode(ms, sc.getRootId());
@@ -347,15 +354,25 @@ public class UserFeedService extends ServiceBase {
 
 		Iterable<SubNode> iter = mongoUtil.find(q);
 
+		int skipped = 0;
 		for (SubNode node : iter) {
+
+			// low threshold will still work on detecting foreign posts
+			if (!allowNonEnglish && !english.isEnglish(node.getContent(), 0.30f)) {
+				// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
+				skipped++;
+				continue;
+			}
+
 			try {
-				NodeInfo info = convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true);
+				NodeInfo info =
+						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true);
 				searchResults.add(info);
 			} catch (Exception e) {
 			}
 		}
 
-		if (searchResults.size() < MAX_FEED_ITEMS) {
+		if (searchResults.size() < MAX_FEED_ITEMS - skipped) {
 			res.setEndReached(true);
 		}
 

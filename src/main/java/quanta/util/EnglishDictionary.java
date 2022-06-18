@@ -118,12 +118,14 @@ public class EnglishDictionary extends ServiceBase {
 	 * Unfortunately this will currently kick out computer code as non-english, but it I have some ideas
 	 * for how fix that by detecting an unusual high number of free floating '{' or '=' or lines ending
 	 * in semicolon for example to detect and allow code.
+	 * 
+	 * example threshold=0.60f -> 60% english)
 	 */
-	public boolean isEnglish(String text) {
+	public boolean isEnglish(String text, float threshold) {
 		if (dictWords.size() == 0)
 			throw new RuntimeException("called isEnglish before dictionary was loaded.");
 		if (no(text))
-			return false;
+			return true;
 
 		// log.debug("Checking english: " + text);
 		int englishCount = 0;
@@ -141,6 +143,11 @@ public class EnglishDictionary extends ServiceBase {
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
+
+			if (XString.isChinaRussia(token)) {
+				unknownCount++;
+				continue;
+			}
 
 			// only consider words that are all alpha characters
 			if (!StringUtils.isAlpha(token) || token.length() < 5) {
@@ -164,11 +171,10 @@ public class EnglishDictionary extends ServiceBase {
 		float percent = (float) englishCount / (englishCount + unknownCount);
 		// log.debug("eng=" + englishCount + " nonEng=" + unknownCount + " %=" + percent);
 
-		// if it's over 60% English, return true
-		return percent > 0.60f;
+		return percent > threshold;
 	}
 
 	public void test() {
-		log.debug("English TEST1=" + isEnglish("ooga booga wooga tooga"));
+		log.debug("English TEST1=" + isEnglish("ooga booga wooga tooga", 0.60f));
 	}
 }
