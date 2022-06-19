@@ -79,7 +79,7 @@ public class ActPubService extends ServiceBase {
     public static String lastRefreshForeignUsersCycleTime = "n/a";
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
-    public static boolean bigRefresh = false;
+    public static boolean refreshingForeignUsers = false;
 
     public void sendLikeMessage(MongoSession ms, String userDoingLike, SubNode node) {
         exec.run(() -> {
@@ -1474,14 +1474,7 @@ public class ActPubService extends ServiceBase {
         if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
-        if (bigRefresh)
-            return;
-        try {
-            bigRefresh = true;
-            refreshForeignUsers();
-        } finally {
-            bigRefresh = false;
-        }
+        refreshForeignUsers();
     }
 
     /*
@@ -1715,46 +1708,55 @@ public class ActPubService extends ServiceBase {
     }
 
     public void refreshForeignUsers() {
-        if (!prop.isActPubEnabled())
+        if (!prop.isActPubEnabled() || refreshingForeignUsers)
             return;
 
-        lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());
-        refreshForeignUsersCycles++;
-        refreshForeignUsersQueuedCount = 0;
-        cycleOutboxQueryCount = 0;
-        newPostsInCycle = 0;
-
-        HashSet<ObjectId> blockedUserIds = new HashSet<>();
-        userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-
         arun.run(ms -> {
-            /*
-             * todo-0: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
-             * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
-             * accounts. Need to make these parameters configurable by admin.
-             */
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false,
-                    Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1000);
+            if (refreshingForeignUsers)
+                return null;
+                
+            try {
+                refreshingForeignUsers = true;
 
-            for (SubNode node : accountNodes) {
-                if (!prop.isDaemonsEnabled())
-                    break;
+                lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());
+                refreshForeignUsersCycles++;
+                refreshForeignUsersQueuedCount = 0;
+                cycleOutboxQueryCount = 0;
+                newPostsInCycle = 0;
 
-                // if this user is blocked by admin, skip them.
-                if (blockedUserIds.contains(node.getId()))
-                    continue;
+                HashSet<ObjectId> blockedUserIds = new HashSet<>();
+                userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
-                String userName = node.getStr(NodeProp.USER);
-                if (no(userName) || !userName.contains("@"))
-                    continue;
+                /*
+                 * todo-0: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
+                 * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
+                 * accounts. Need to make these parameters configurable by admin.
+                 */
+                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
+                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1000);
 
-                refreshForeignUsersQueuedCount++;
-                queueUserForRefresh(userName, true);
-            }
+                for (SubNode node : accountNodes) {
+                    if (!prop.isDaemonsEnabled())
+                        break;
 
-            /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
-            synchronized (NodeSearchService.trendingFeedInfoLock) {
-                NodeSearchService.trendingFeedInfo = null;
+                    // if this user is blocked by admin, skip them.
+                    if (blockedUserIds.contains(node.getId()))
+                        continue;
+
+                    String userName = node.getStr(NodeProp.USER);
+                    if (no(userName) || !userName.contains("@"))
+                        continue;
+
+                    refreshForeignUsersQueuedCount++;
+                    queueUserForRefresh(userName, true);
+                }
+
+                /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
+                synchronized (NodeSearchService.trendingFeedInfoLock) {
+                    NodeSearchService.trendingFeedInfo = null;
+                }
+            } finally {
+                refreshingForeignUsers = false;
             }
             return null;
         });
