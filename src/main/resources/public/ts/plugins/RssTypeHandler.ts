@@ -113,7 +113,8 @@ export class RssTypeHandler extends TypeBase {
         // otherwise read from the server
         else {
             itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
-
+            itemListContainer.addChild(new Spinner());
+            
             /* warning: paging here is not zero offset. First page is number 1 */
             let page: number = state.rssFeedPage[feedSrcHash];
             if (!page) {
