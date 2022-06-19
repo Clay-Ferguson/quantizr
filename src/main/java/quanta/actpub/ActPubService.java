@@ -1658,8 +1658,10 @@ public class ActPubService extends ServiceBase {
                  * I was going to load followerCounts into userNode, but I decided to just query them live when
                  * needed on the UserPreferences dialog
                  */
-                int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
-                int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
+                // todo-0: need a flag to enable these to allow for agressive collection of usernames, but for now we have more than enough users
+                // so I'm disabling this.
+                // int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
+                // int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
             } else {
                 log.debug("Unable to get actor from url: " + actorUrl);
             }

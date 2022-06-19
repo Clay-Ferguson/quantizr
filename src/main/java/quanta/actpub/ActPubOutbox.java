@@ -82,7 +82,8 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false);
+            // Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false); // slow way (was using this for years)
+            Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode);
 
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
