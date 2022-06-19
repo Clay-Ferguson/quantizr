@@ -1056,6 +1056,7 @@ export const enum NodeType {
     BOOKMARK_LIST = "sn:bookmarkList",
     EXPORTS = "sn:exports",
     CALCULATOR = "sn:calculator",
+    CALENDAR = "sn:calendar",
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",

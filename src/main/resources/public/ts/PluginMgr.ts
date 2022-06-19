@@ -5,6 +5,7 @@ import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
+import { CalendarTypeHandler } from "./plugins/CalendarTypeHandler";
 import { ExportsTypeHandler } from "./plugins/ExportsTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
@@ -55,6 +56,7 @@ export class PluginMgr {
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new CalcTypeHandler());
         this.addTypeHandler(new RoomTypeHandler());
+        this.addTypeHandler(new CalendarTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new AccountTypeHandler());
