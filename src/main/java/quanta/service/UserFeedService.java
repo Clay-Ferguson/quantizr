@@ -373,10 +373,6 @@ public class UserFeedService extends ServiceBase {
 				continue;
 			}
 
-			// this didn't work as intended AND I think what I need to do is 
-			// set a flag/property ON the nodes at the time of the save to determine this.
-			// (may have somehow been blank lines in the file breaking things? Anyway it did NOT work, and was MOSTLY false positives!!!!)
-			// todo-0: To troubleshoot this, need to make it PRINT into the log file what bad word was found
 			if (!allowBadWords && english.hasBadWords(node.getContent())) {
 				skipped++;
 				continue;

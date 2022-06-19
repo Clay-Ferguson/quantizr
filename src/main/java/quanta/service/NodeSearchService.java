@@ -342,12 +342,14 @@ public class NodeSearchService extends ServiceBase {
 		long nodeCount = 0;
 		long totalWords = 0;
 		Iterable<SubNode> iter = null;
+		boolean strictFiltering = false;
 
 		/*
 		 * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
 		 * a bunch of options but just the public feed query
 		 */
 		if (req.isFeed()) {
+			strictFiltering = true;
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
 			Criteria crit =
@@ -406,6 +408,11 @@ public class NodeSearchService extends ServiceBase {
 			String content = node.getContent();
 			if (ok(node.getTags())) {
 				content += " " + node.getTags();
+			}
+
+			// if strict content filtering ignore non-english or bad words posts completely
+			if (strictFiltering && (!english.isEnglish(content, 0.50f) || english.hasBadWords(content))) {
+				continue;
 			}
 
 			HashSet<String> knownTokens = null;
