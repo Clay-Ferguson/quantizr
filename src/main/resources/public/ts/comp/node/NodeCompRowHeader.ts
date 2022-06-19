@@ -116,7 +116,9 @@ export class NodeCompRowHeader extends Div {
         let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        if (!publicReadOnly || actPubId) {
+        // todo-0: we have a bug where replying to a boost breaks the entire page so disable this case for now,
+        // and also I'm disabling all buttons that would reference this 'node.id' becasue I think that's the problem.
+        if (!this.isBoost && (!publicReadOnly || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
@@ -131,18 +133,20 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        children.push(new Icon({
-            title: "Boost this Node",
-            className: "fa fa-retweet fa-lg marginRight",
-            onClick: () => {
-                if (state.isAnonUser) {
-                    S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+        if (!this.isBoost) {
+            children.push(new Icon({
+                title: "Boost this Node",
+                className: "fa fa-retweet fa-lg marginRight",
+                onClick: () => {
+                    if (state.isAnonUser) {
+                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+                    }
+                    else {
+                        S.edit.addNode(null, false, null, null, null, null, node.id, false, state)
+                    }
                 }
-                else {
-                    S.edit.addNode(null, false, null, null, null, null, node.id, false, state)
-                }
-            }
-        }));
+            }));
+        }
 
         let youLiked: boolean = false;
         let likeNames = null;
@@ -247,7 +251,7 @@ export class NodeCompRowHeader extends Div {
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isMainTree && state.userPreferences.editMode) {
+        if (!this.isBoost && !this.isMainTree && state.userPreferences.editMode) {
             if (editingAllowed && editableNode) {
                 editButton = new IconButton("fa-edit", null, {
                     className: "marginLeft",
