@@ -24,45 +24,47 @@ public class EnglishDictionary extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
+	private static final HashSet<String> badWords = new HashSet<>();
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		ServiceBase.init(event.getApplicationContext());
 		log.debug("ContextRefreshedEvent");
-		initDictWords();
-		initStopWords();
+		loadWords("classpath:public/data/english-dictionary.txt", dictWords);
+		loadWords("classpath:public/data/stop-words.txt", stopWords);
+		loadWords("classpath:public/data/bad-words.txt", badWords);
 	}
 
-	public void initStopWords() {
-		if (stopWords.size() > 0)
+	public void loadWords(String fileName, HashSet<String> words) {
+		if (words.size() > 0)
 			return;
 
 		try {
-			/* 
-			 * todo-1: Update: I have a shell script now and here's the entirity of it (below), which starts with
-			 * unsorted ununique 'words.txt' and processes it into unique sorted list in 'words-unique.txt'
-			 * 
-			 *    sed 's/[[:blank:]]//g' words.txt > cleaned.txt
-			 *    awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt
+			/*
+			 * todo-1: Update: I have a shell script now and here's the entirity of it (below), which starts
+			 * with unsorted ununique 'words.txt' and processes it into unique sorted list in 'words-unique.txt'
 			 */
-			Resource resource = context.getResource("classpath:public/data/stop-words.txt");
+			// sed 's/[[:blank:]]//g' words.txt > cleaned.txt
+			// awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt
+
+			Resource resource = context.getResource(fileName);
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
 				String line;
 				while (ok(line = in.readLine())) {
-					StringTokenizer tokens = new StringTokenizer(line, " \n\r\t.,", false);
-					while (tokens.hasMoreTokens()) {
-						stopWords.add(tokens.nextToken().trim());
+					line = line.trim();
+					if (line.length() > 0) {
+						words.add(line.toLowerCase());
 					}
 				}
 			} finally {
 				StreamUtil.close(in);
 			}
-			log.debug("stop word import successful: Word Count=" + stopWords.size());
+			log.debug(fileName + " Word Count=" + words.size());
 		} catch (Exception ex) {
 			// log and ignore.
-			log.error("Failed initializing dictionary", ex);
+			log.error("Failed to load " + fileName, ex);
 		}
 	}
 
@@ -88,29 +90,6 @@ public class EnglishDictionary extends ServiceBase {
 		return stopWords.contains(word.toLowerCase());
 	}
 
-	public void initDictWords() {
-		if (dictWords.size() > 0)
-			return;
-
-		try {
-			Resource resource = context.getResource("classpath:public/data/english-dictionary.txt");
-			InputStream is = resource.getInputStream();
-			BufferedReader in = new BufferedReader(new InputStreamReader(is));
-			try {
-				String line;
-				while (ok(line = in.readLine())) {
-					dictWords.add(line.trim().toLowerCase());
-				}
-			} finally {
-				StreamUtil.close(in);
-			}
-			log.debug("dictionary import successful: Word Count=" + dictWords.size());
-		} catch (Exception ex) {
-			// log and ignore.
-			log.error("Failed initializing dictionary", ex);
-		}
-		test();
-	}
 
 	/*
 	 * Tokenizes text (like a paragraph of text) to determine if it appears to be English.
@@ -173,6 +152,24 @@ public class EnglishDictionary extends ServiceBase {
 
 		return percent > threshold;
 	}
+
+	public boolean hasBadWords(String text) {
+		if (badWords.size() == 0)
+			throw new RuntimeException("called isBadWord before dictionary was loaded.");
+		if (no(text))
+			return false;
+
+		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#", false);
+		while (tokens.hasMoreTokens()) {
+			String token = tokens.nextToken().trim().toLowerCase();
+			if (badWords.contains(token)) {
+				// log.debug("BadWord[" + token + "]");
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	public void test() {
 		log.debug("English TEST1=" + isEnglish("ooga booga wooga tooga", 0.60f));

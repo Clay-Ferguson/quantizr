@@ -200,9 +200,12 @@ public class UserFeedService extends ServiceBase {
 		// limit to just markdown types (no type)
 		crit = crit.and(SubNode.TYPE).is(NodeType.NONE.s());
 
+		boolean allowBadWords = true;
+
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null);
+			allowBadWords = false;
 		}
 
 		// Don't show UNPUBLISHED nodes.
@@ -226,6 +229,7 @@ public class UserFeedService extends ServiceBase {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
 				allowNonEnglish = false;
+				allowBadWords = false;
 			}
 
 			// Add criteria for blocking users using the 'not in' list (nin)
@@ -346,7 +350,10 @@ public class UserFeedService extends ServiceBase {
 		} else {
 			q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 		}
-		q.limit(MAX_FEED_ITEMS);
+
+		// we get up to 2x the max item so that if large numbers of them are being filtered,
+		// we can still return a page of results hopefully
+		q.limit(MAX_FEED_ITEMS*2);
 
 		if (req.getPage() > 0) {
 			q.skip(MAX_FEED_ITEMS * req.getPage());
@@ -358,8 +365,19 @@ public class UserFeedService extends ServiceBase {
 		for (SubNode node : iter) {
 
 			// low threshold will still work on detecting foreign posts
-			if (!allowNonEnglish && !english.isEnglish(node.getContent(), 0.30f)) {
+			// todo-0: This is a bad way to filter. We need to check isEnglish when node is saved and automatically set a flag
+			// on the node that can be filtered against as PART of the query itself.
+			if (!allowNonEnglish && !english.isEnglish(node.getContent(), 0.50f)) {
 				// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
+				skipped++;
+				continue;
+			}
+
+			// this didn't work as intended AND I think what I need to do is 
+			// set a flag/property ON the nodes at the time of the save to determine this.
+			// (may have somehow been blank lines in the file breaking things? Anyway it did NOT work, and was MOSTLY false positives!!!!)
+			// todo-0: To troubleshoot this, need to make it PRINT into the log file what bad word was found
+			if (!allowBadWords && english.hasBadWords(node.getContent())) {
 				skipped++;
 				continue;
 			}
@@ -368,6 +386,10 @@ public class UserFeedService extends ServiceBase {
 				NodeInfo info =
 						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true);
 				searchResults.add(info);
+
+				if (searchResults.size() >= MAX_FEED_ITEMS) {
+					break;
+				}
 			} catch (Exception e) {
 			}
 		}
