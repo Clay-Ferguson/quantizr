@@ -89,7 +89,8 @@ public class MongoDelete extends ServiceBase {
 		LocalDate ldt = LocalDate.now().minusDays(90);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
+		Criteria crit = // Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
+				Criteria.where(SubNode.PARENT).is(parent.getId())
 				.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).ne(null) //
 				.and(SubNode.MODIFY_TIME).lt(date);
 

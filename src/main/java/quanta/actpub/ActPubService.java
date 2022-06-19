@@ -25,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -1546,7 +1547,7 @@ public class ActPubService extends ServiceBase {
                  * This may hurt performance of the app so let's throttle it way back to a few seconds between
                  * loops. Also we don't want to put too much unwelcome load on other instances.
                  * 
-                 * what we can do here is be sure any GIVEN server is only accessed at 4second intervals!!!
+                 * what we can do here is be sure any GIVEN server is only accessed at 4 second intervals!!!
                  */
                 Thread.sleep(4000);
 
@@ -1588,7 +1589,7 @@ public class ActPubService extends ServiceBase {
             arun.run(ms -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
+                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
@@ -1658,7 +1659,8 @@ public class ActPubService extends ServiceBase {
                  * I was going to load followerCounts into userNode, but I decided to just query them live when
                  * needed on the UserPreferences dialog
                  */
-                // todo-0: need a flag to enable these to allow for agressive collection of usernames, but for now we have more than enough users
+                // todo-0: need a flag to enable these to allow for agressive collection of usernames, but for now
+                // we have more than enough users
                 // so I'm disabling this.
                 // int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
                 // int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
@@ -1725,9 +1727,14 @@ public class ActPubService extends ServiceBase {
         HashSet<ObjectId> blockedUserIds = new HashSet<>();
         userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
-
         arun.run(ms -> {
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
+            /*
+             * todo-0: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
+             * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
+             * accounts. Need to make these parameters configurable by admin.
+             */
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false,
+                    Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1000);
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1759,7 +1766,8 @@ public class ActPubService extends ServiceBase {
             return "ActivityPub not enabled";
 
         return arun.run(ms -> {
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
+            Iterable<SubNode> accountNodes =
+                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1806,16 +1814,26 @@ public class ActPubService extends ServiceBase {
 
         return arun.run(ms -> {
             long totalDelCount = 0;
-            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false);
+            Iterable<SubNode> accountNodes =
+                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER);
                 if (no(userName) || !userName.contains("@"))
                     continue;
 
-                long delCount = delete.deleteOldActPubPosts(node, ms);
-                totalDelCount += delCount;
-                log.debug("User: " + userName + ". Deletes: " + delCount);
+                // get the user's posts node
+                SubNode postsNode = read.findSubNodeByType(ms, node, NodeType.ACT_PUB_POSTS.s());
+
+                if (ok(postsNode)) {
+                    long delCount = delete.deleteOldActPubPosts(postsNode, ms);
+                    totalDelCount += delCount;
+                    log.debug("User: " + userName + ". Deletes: " + delCount);
+
+                    // this will take a long time to complete, but let's sleep 500ms between runs so the server
+                    // performance isn't hosed.
+                    Util.sleep(500);
+                }
             }
             String message = "AP Maintence Complete. Deleted " + String.valueOf(totalDelCount) + " old posts.";
             log.debug(message);

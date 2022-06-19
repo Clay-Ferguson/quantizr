@@ -1165,25 +1165,35 @@ public class MongoRead extends ServiceBase {
     /*
      * Finds nodes matching 'type' under 'path' (recursively)
      */
-    public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type, boolean recursive) {
-        Query q = typedNodesUnderPath_query(ms, node, type, recursive);
+    public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type, boolean recursive, Sort sort,
+            Integer limit) {
+        Query q = typedNodesUnderPath_query(ms, node, type, recursive, sort, limit);
         return mongoUtil.find(q);
     }
 
     /*
      * Counts nodes matching 'type' under 'path' (recursively)
      */
-    public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type) {
-        Query q = typedNodesUnderPath_query(ms, node, type, true);
+    public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type, Sort sort, Integer limit) {
+        Query q = typedNodesUnderPath_query(ms, node, type, true, sort, limit);
         return ops.count(q, SubNode.class);
     }
 
-    public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type, boolean recursive) {
+    public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type, boolean recursive, Sort sort,
+            Integer limit) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH)
                 .regex(recursive ? mongoUtil.regexRecursiveChildrenOfPath(node.getPath())
                         : mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.TYPE).is(type);
+
+        if (ok(sort)) {
+            q.with(sort);
+        }
+
+        if (ok(limit)) {
+            q.limit(limit);
+        }
 
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
