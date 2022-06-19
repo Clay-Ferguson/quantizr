@@ -312,16 +312,13 @@ export class MenuPanel extends Div {
             new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, !state.isAnonUser && !!hltNode) //
         ], null, this.makeHelpIcon(":menu-timeline")));
 
-        // let's make calendar an admin-only function for now.
-        if (state.isAdminUser) {
-            children.push(new Menu("Calendar", [
-                new MenuItem("Display", MenuPanel.showCalendar, !state.isAnonUser && !!hltNode),
-                new MenuItemSeparator(), //
-                new MenuItem("Future", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
-                new MenuItem("Past", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
-                new MenuItem("All", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
-            ]));
-        }
+        children.push(new Menu("Calendar", [
+            new MenuItem("Display", MenuPanel.showCalendar, !state.isAnonUser && !!hltNode),
+            new MenuItemSeparator(), //
+            new MenuItem("Future", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
+            new MenuItem("Past", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
+            new MenuItem("All", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
+        ]));
 
         children.push(new Menu("Tools", [
             // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
