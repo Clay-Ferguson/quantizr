@@ -276,7 +276,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			content = content.trim();
 
 			String escapedContent = StringEscapeUtils.escapeHtml4(content);
-			if (node.getType().equals(NodeType.PLAIN_TEXT.s())) {
+			if (node.isType(NodeType.PLAIN_TEXT)) {
 				html.append("\n<pre>" + escapedContent + "\n</pre>");
 			} else {
 				html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>");

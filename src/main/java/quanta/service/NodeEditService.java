@@ -568,9 +568,7 @@ public class NodeEditService extends ServiceBase {
 
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
-
-			// todo-0: crate a node.isType(NodeType) for this.
-			boolean isAccnt = NodeType.ACCOUNT.s().equals(node.getType());
+			boolean isAccnt = node.isType(NodeType.ACCOUNT);
 
 			// push any chat messages that need to go out.
 			if (!isAccnt) {

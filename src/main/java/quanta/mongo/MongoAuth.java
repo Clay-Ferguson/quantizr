@@ -180,7 +180,7 @@ public class MongoAuth extends ServiceBase {
 		 * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
 		 * message to the user that friend node represents
 		 */
-		if (parent.getType().equals(NodeType.FRIEND.s())) {
+		if (parent.isType(NodeType.FRIEND)) {
 			// get user prop from node
 			String userName = parent.getStr(NodeProp.USER);
 

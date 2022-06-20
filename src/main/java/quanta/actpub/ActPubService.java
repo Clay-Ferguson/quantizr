@@ -128,7 +128,7 @@ public class ActPubService extends ServiceBase {
     public void sendObjOutbound(MongoSession ms, SubNode parent, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
             try {
-                boolean isAccnt = NodeType.ACCOUNT.s().equals(node.getType());
+                boolean isAccnt = node.isType(NodeType.ACCOUNT);
                 // Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
                 // what the local server version of it is.
                 String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
@@ -170,7 +170,7 @@ public class ActPubService extends ServiceBase {
 
                 APObj message = null;
 
-                if (node.getType().equals(NodeType.ACCOUNT.s())) {
+                if (node.isType(NodeType.ACCOUNT)) {
                     // construct the Update-type wrapper around teh Person object, and send
                     message = apFactory.newUpdateForPerson(fromUser, toUserNames, fromActor, privateMessage, node);
                     log.debug("Sending updated Person outbound: " + XString.prettyPrint(message));

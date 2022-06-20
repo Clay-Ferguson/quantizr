@@ -261,8 +261,10 @@ public class ActPubUtil extends ServiceBase {
     }
 
     /* Posts to all inboxes */
-    public void securePostEx(HashSet<String> inboxes, String fromActor, String privateKey, String actor, APObj message, MediaType postType) {
-        if (no(inboxes)) return;
+    public void securePostEx(HashSet<String> inboxes, String fromActor, String privateKey, String actor, APObj message,
+            MediaType postType) {
+        if (no(inboxes))
+            return;
         for (String inbox : inboxes) {
             try {
                 apUtil.securePostEx(inbox, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
@@ -783,7 +785,7 @@ public class ActPubUtil extends ServiceBase {
 
         arun.run(ms -> {
             SubNode node = read.getNode(ms, nodeId);
-            if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
+            if (ok(node) && node.isType(NodeType.FRIEND)) {
                 String friendUserName = node.getStr(NodeProp.USER);
                 if (ok(friendUserName)) {
                     // if a foreign user, update thru ActivityPub
@@ -836,8 +838,7 @@ public class ActPubUtil extends ServiceBase {
                              * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
                              * consider this a case where there's no conversation to show and bail out here.
                              */
-                            if (nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
-                                    || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                            if (nodes.size() == 1 && (node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS))) {
                                 res.setSuccess(true);
                                 return res;
                             }
@@ -856,8 +857,8 @@ public class ActPubUtil extends ServiceBase {
                          * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
                          * consider this a case where there's no conversation to show and bail out here.
                          */
-                        if (ok(node) && nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
-                                || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                        if (ok(node) && nodes.size() == 1
+                                && (node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS))) {
                             res.setSuccess(true);
                             return res;
                         }
@@ -868,8 +869,8 @@ public class ActPubUtil extends ServiceBase {
                      * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
                      * parentt
                      */
-                    if (loadOthers && nodes.size() == 1 && !node.getType().equals(NodeType.POSTS.s())
-                            && !node.getType().equals(NodeType.ACT_PUB_POSTS.s())) {
+                    if (loadOthers && nodes.size() == 1 && !node.isType(NodeType.POSTS)
+                            && !node.isType(NodeType.ACT_PUB_POSTS)) {
                         // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them
                         // all)
                         Iterable<SubNode> iter =
