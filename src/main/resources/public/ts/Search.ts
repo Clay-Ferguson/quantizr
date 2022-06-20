@@ -50,7 +50,7 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, null, state).open();
+            S.util.showMessage("No search results found for " + type + " shared nodes", "Search");
         }
     }
 
@@ -126,7 +126,7 @@ export class Search {
                 }
             }
 
-            new MessageDlg(msg, "Thread", null, null, false, 0, null, state).open();
+            S.util.showMessage(msg, "Thread");
         }
     }
 
@@ -194,7 +194,7 @@ export class Search {
         }
 
         if (!node) {
-            S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
+            S.util.showMessage("No node is selected to 'timeline' under.", "Timeline");
             return;
         }
 
@@ -213,6 +213,11 @@ export class Search {
             recursive,
             requirePriority: false
         });
+
+        if (page === 0 && (!res.searchResults || res.searchResults.length === 0)) {
+            S.util.showMessage("Nothing found", "Timeline");
+            return;
+        }
 
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
             S.domUtil.focusId(C.TAB_TIMELINE);
@@ -415,7 +420,7 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found.", "Followers", null, null, false, 0, null, state).open();
+            S.util.showMessage("No search results found.", "Followers");
         }
     }
 
@@ -457,7 +462,7 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found.", "Following", null, null, false, 0, null, state).open();
+            S.util.showMessage("No search results found.", "Following");
         }
     }
 
