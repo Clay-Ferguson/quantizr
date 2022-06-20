@@ -124,11 +124,6 @@ public class ActPubService extends ServiceBase {
      * can only be users ALREADY imported into the system, however this is ok, because we will have
      * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
      * contain all the mentions that exist in the text of the message.
-     * 
-     * todo-0: we should probably extract OUT of this method the actual construction of the 'message'
-     * itself and then pass the message in as a parameter, and we'd be passing in without setting the
-     * 'cc + to' properties on the message and then the message would have those added inside here
-     * insead of building the entire message from scratch.
      */
     public void sendObjOutbound(MongoSession ms, SubNode parent, SubNode node, boolean forceSendToPublic) {
         exec.run(() -> {
@@ -181,9 +176,12 @@ public class ActPubService extends ServiceBase {
                     log.debug("Sending updated Person outbound: " + XString.prettyPrint(message));
 
                 } else {
-                    // if this node has a boostTarget, we know it's an Announce so we send out the announce
-                    // todo-0: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
-                    // that right?)
+                    /*
+                     * if this node has a boostTarget, we know it's an Announce so we send out the announce
+                     * 
+                     * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
+                     * that right?)
+                     */
                     if (!StringUtils.isEmpty(boostTarget)) {
                         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
                         message =
@@ -629,7 +627,7 @@ public class ActPubService extends ServiceBase {
         apLog.trace("inbox type: " + type);
 
         /*
-         * todo-0: verify that for follow types the actorUrl can be obtained also from payload, rather than
+         * todo-1: verify that for follow types the actorUrl can be obtained also from payload, rather than
          * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
          */
         String actorUrl = apStr(payload, APObj.actor);
@@ -1652,7 +1650,7 @@ public class ActPubService extends ServiceBase {
                  * I was going to load followerCounts into userNode, but I decided to just query them live when
                  * needed on the UserPreferences dialog
                  */
-                // todo-0: need a flag to enable these to allow for agressive collection of usernames, but for now
+                // todo-1: need a flag to enable these to allow for agressive collection of usernames, but for now
                 // we have more than enough users
                 // so I'm disabling this.
                 // int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
@@ -1714,7 +1712,7 @@ public class ActPubService extends ServiceBase {
         arun.run(ms -> {
             if (refreshingForeignUsers)
                 return null;
-                
+
             try {
                 refreshingForeignUsers = true;
 
@@ -1728,9 +1726,21 @@ public class ActPubService extends ServiceBase {
                 userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
                 /*
-                 * todo-0: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
+                 * todo-1: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
                  * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
                  * accounts. Need to make these parameters configurable by admin.
+                 * 
+                 * The reason the oldest 1000 accounts (1000 limit below) are the "best" is because they were the
+                 * most closely seeded (like direct friend of a friend) to the original 50 or so friends I used to
+                 * get this server started. That is, I had 50 people I liked originally, and let the system
+                 * naturally add all additional users that exist as they were encountered, so that ended up with
+                 * about 6000. It turns out once you get past that first 1000 or so, the "quality" of the people
+                 * goes down significantly, and contains lots of foreign language stuff, unwanted sexual content,
+                 * bots, etc, so I noticed if I only update the "original" 1000 accounts this creates a fairly
+                 * "high quality" feed that I enjoy seeing, in the "Federated" tab.
+                 * 
+                 * There could be other algorighms used to select the accounts to auto-crawl, like ranking them or
+                 * something but for now just going with first 1000 accounts created works.
                  */
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1000);

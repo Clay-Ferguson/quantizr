@@ -239,8 +239,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// log.debug("MongoEventListener.onAfterConvert: " + node.getContent());
 		if (no(node.getOwner())) {
 			if (ok(auth.getAdminSession())) {
-				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
-				node.setOwner(ownerId);
+				node.setOwner(auth.getAdminSession().getUserNodeId());
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
 		}

@@ -562,8 +562,7 @@ public class NodeEditService extends ServiceBase {
 	public void processAfterSave(MongoSession ms, SubNode node) {
 
 		// never do any of this logic if this is an admin-owned node being saved.
-		// todo-0: I think there's an acl method for ALL patterns like this?
-		if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
+		if (acl.isAdminOwned(node)) {
 			return;
 		}
 
