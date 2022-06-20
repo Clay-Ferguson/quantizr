@@ -353,7 +353,7 @@ public class UserFeedService extends ServiceBase {
 
 		// we get up to 2x the max item so that if large numbers of them are being filtered,
 		// we can still return a page of results hopefully
-		q.limit(MAX_FEED_ITEMS*2);
+		q.limit(MAX_FEED_ITEMS * 2);
 
 		if (req.getPage() > 0) {
 			q.skip(MAX_FEED_ITEMS * req.getPage());
@@ -363,10 +363,16 @@ public class UserFeedService extends ServiceBase {
 
 		int skipped = 0;
 		for (SubNode node : iter) {
-
-			// low threshold will still work on detecting foreign posts
-			// todo-0: This is a bad way to filter. We need to check isEnglish when node is saved and automatically set a flag
-			// on the node that can be filtered against as PART of the query itself.
+			/*
+			 * todo-1: We could theoretically pre-calculate the 'isEnglish' and 'hasBadWords' state at the time
+			 * the node is saved, and ONLY set properties when they are NOT english or are bad. This way we
+			 * could avoid the hack of checking the isEnglish and hasBadWords here, and we'd be able to write a
+			 * query that can do this filtering based on property existence.
+			 * 
+			 * I'll leave this as is for now, because it's not a big problem, afaik, although the 'skipped'
+			 * counting we're doing could eventually lead to pagination problems if we get to where MOST items
+			 * are skipped and not accepted.
+			 */
 			if (!allowNonEnglish && !english.isEnglish(node.getContent(), 0.50f)) {
 				// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
 				skipped++;
