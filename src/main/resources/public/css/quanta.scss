@@ -544,13 +544,13 @@ strong em {
 }
 
 .propsPanelExpanded {
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
+    // margin-top: $smallGap;
+    // margin-bottom: $smallGap;
 }
 
 .propsPanelCollapsed {
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
+    // margin-top: $smallGap;
+    // margin-bottom: $smallGap;
 }
 
 .collapse-panel-link {
@@ -1888,11 +1888,11 @@ audio::-webkit-media-controls-play-button {
 }
 
 .dateTimeDisplay {
-    border: 2px solid $nodeBorderBottomColor;
-    padding: 4px;
+    padding: 0 4px 0 4px;
     display: inline-block;
     margin-left: 10px;
-    border-radius: $border-radius;
+    background-color: cadetblue;
+    color: black;
 }
 
 .nodeNameDisp {

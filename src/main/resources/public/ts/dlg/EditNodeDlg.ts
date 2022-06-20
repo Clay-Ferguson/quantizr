@@ -221,7 +221,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
-            EditNodeDlg.morePanelExpanded = true;
+            EditNodeDlg.propsPanelExpanded = true;
             if (!span) span = new Span();
             span.addChild(new Icon({
                 title: "Node has a 'Date' property.",
@@ -369,15 +369,15 @@ export class EditNodeDlg extends DialogBase {
 
         let propsCollapsablePanel: CollapsiblePanel = null;
         if (propsTable) {
-            propsCollapsablePanel = new CollapsiblePanel("Show Properties", "Hide Properties", null, [
+            propsCollapsablePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
                 propsTable
-            ], true,
+            ], false,
                 (state: boolean) => {
                     EditNodeDlg.propsPanelExpanded = state;
-                }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed", "div");
+                }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
-        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
+        let collapsiblePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             new Div(null, { className: "row align-items-end" }, [
                 new TextField({ label: "Tags", outterClass: "marginTop col-10", val: this.tagsState }),
                 this.createSearchFieldIconButtons()
@@ -386,15 +386,18 @@ export class EditNodeDlg extends DialogBase {
                 nodeNameTextField,
                 this.createPrioritySelection()
             ]),
-            flowPanel,
-            propsCollapsablePanel
+            flowPanel
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "marginRight", "", "", "div") : null;
 
-        let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
+        let morePanel = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel
+        ]);
+
+        let propsPanel = new Div(null, null, [
+            propsCollapsablePanel
         ]);
 
         // Allows user to drag-n-drop files onto editor to upload
@@ -413,7 +416,7 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons, new Clearfix()]);
+        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, propsPanel, morePanel, new Clearfix()]);
         return children;
     }
 
@@ -667,7 +670,6 @@ export class EditNodeDlg extends DialogBase {
 
             allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
                 onClick: async () => {
-                    EditNodeDlg.morePanelExpanded = true;
                     EditNodeDlg.propsPanelExpanded = true;
                     await this.utl.addProperty(this);
                 },
