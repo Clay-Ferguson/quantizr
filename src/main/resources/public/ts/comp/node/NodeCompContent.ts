@@ -6,6 +6,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Clearfix } from "../core/Clearfix";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
@@ -105,8 +106,9 @@ export class NodeCompContent extends Div {
 
             children.push(new Div(displayName + ": " + S.util.formatDate(dateVal) + //
                 " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "dateTimeDisplay"
+                className: "dateTimeDisplay float-end"
             }));
+            children.push(new Clearfix());
         }
     }
 
