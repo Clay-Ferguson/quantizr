@@ -1513,7 +1513,7 @@ Will come back later and study this more. todo-1 */
 
 .row-border {
     /* If no border is defined here then borders only show up during edit or metadata display modes */
-    /* border-bottom: 1px solid $nodeBorderBottomColor; */
+    border-bottom: 1px dotted $nodeBorderBottomColor;
 }
 
 .row-border-inline-children {
@@ -1888,6 +1888,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .dateTimeDisplay {
+    margin: 5px;
     padding: 0 8px 0 8px;
     display: inline-block;
     border-radius: $border-radius;
