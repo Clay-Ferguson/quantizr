@@ -335,9 +335,9 @@ public class NodeSearchService extends ServiceBase {
 			}
 		}
 
-		HashMap<String, WordStats> wordMap = new HashMap<>();
-		HashMap<String, WordStats> tagMap = new HashMap<>();
-		HashMap<String, WordStats> mentionMap = new HashMap<>();
+		HashMap<String, WordStats> wordMap = req.isGetWords() ? new HashMap<>() : null;
+		HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
+		HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
 
 		long nodeCount = 0;
 		long totalWords = 0;
@@ -470,12 +470,14 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 						}
 
-						WordStats ws = wordMap.get(lcToken);
-						if (no(ws)) {
-							ws = new WordStats(token);
-							wordMap.put(lcToken, ws);
+						if (ok(wordMap)) {
+							WordStats ws = wordMap.get(lcToken);
+							if (no(ws)) {
+								ws = new WordStats(token);
+								wordMap.put(lcToken, ws);
+							}
+							ws.count++;
 						}
-						ws.count++;
 					}
 				}
 				totalWords++;
@@ -484,43 +486,58 @@ public class NodeSearchService extends ServiceBase {
 			nodeCount++;
 		}
 
-		List<WordStats> wordList = new ArrayList<>(wordMap.values());
-		List<WordStats> tagList = new ArrayList<>(tagMap.values());
-		List<WordStats> mentionList = new ArrayList<>(mentionMap.values());
+		List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
+		List<WordStats> tagList = req.isGetTags() ? new ArrayList<>(tagMap.values()) : null;
+		List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
 
-		wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
-		tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
-		mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
+		if (ok(wordList))
+			wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
+
+		if (ok(tagList))
+			tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
+
+		if (ok(mentionList))
+			mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Node count: " + nodeCount + ", ");
 		sb.append("Total Words: " + totalWords + ", ");
-		sb.append("Unique Words: " + wordList.size());
+
+		if (ok(wordList)) {
+			sb.append("Unique Words: " + wordList.size());
+		}
 		res.setStats(sb.toString());
 
-		ArrayList<String> topWords = new ArrayList<>();
-		res.setTopWords(topWords);
-		for (WordStats ws : wordList) {
-			topWords.add(ws.word); // + "," + ws.count);
-			if (topWords.size() >= 100)
-				break;
+		if (ok(wordList)) {
+			ArrayList<String> topWords = new ArrayList<>();
+			res.setTopWords(topWords);
+			for (WordStats ws : wordList) {
+				topWords.add(ws.word); // + "," + ws.count);
+				if (topWords.size() >= 100)
+					break;
+			}
 		}
 
-		ArrayList<String> topTags = new ArrayList<>();
-		res.setTopTags(topTags);
-		for (WordStats ws : tagList) {
-			topTags.add(ws.word); // + "," + ws.count);
-			if (topTags.size() >= 100)
-				break;
+		if (ok(tagList)) {
+			ArrayList<String> topTags = new ArrayList<>();
+			res.setTopTags(topTags);
+			for (WordStats ws : tagList) {
+				topTags.add(ws.word); // + "," + ws.count);
+				if (topTags.size() >= 100)
+					break;
+			}
 		}
 
-		ArrayList<String> topMentions = new ArrayList<>();
-		res.setTopMentions(topMentions);
-		for (WordStats ws : mentionList) {
-			topMentions.add(ws.word); // + "," + ws.count);
-			if (topMentions.size() >= 100)
-				break;
+		if (ok(mentionList)) {
+			ArrayList<String> topMentions = new ArrayList<>();
+			res.setTopMentions(topMentions);
+			for (WordStats ws : mentionList) {
+				topMentions.add(ws.word); // + "," + ws.count);
+				if (topMentions.size() >= 100)
+					break;
+			}
 		}
+
 		res.setSuccess(true);
 
 		/*

@@ -7,6 +7,8 @@ import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
 import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { EditTagsDlg } from "./EditTagsDlg";
 
@@ -30,8 +32,19 @@ export class SelectTagsDlg extends DialogBase {
     /* modeOption = search | edit */
     constructor(private modeOption: string, state: AppState) {
         super("Select Hashtags", "app-modal-content-medium-width", false, state);
+
         let tags = this.parseTags();
-        this.mergeState({ selectedTags: new Set<string>(), tags });
+        this.mergeState({ selectedTags: new Set<string>(), tags, suggestTags: false });
+    }
+
+    reload = () => {
+        if (this.getState().suggestTags) {
+            this.updateSuggestTags();
+        }
+        else {
+            let tags = this.parseTags();
+            this.mergeState({ selectedTags: new Set<string>(), tags });
+        }
     }
 
     renderDlg(): CompIntf[] {
@@ -42,17 +55,18 @@ export class SelectTagsDlg extends DialogBase {
             switch (this.modeOption) {
                 case "search":
                     buttons = [
-                        // todo-1: Match Any is currently broken for tag searches becasue MongoDb will treat
+                        // todo-1: Match Any is currently broken for tag searches because MongoDb will treat
                         // a search for "#tag1 #tag2" as just "tag1 tag2" and find anything containing the words.
                         // This appears to be a MongoDb with no viable workaround, so doing "any" matches will
                         // consider NON-tags as well as TAGS in the results.
+                        // update: I think this note may be obsolete, and it works ok now?
 
-                        new Button("Match Any", () => {
-                            this.matchAny = true;
-                            this.select();
-                        }, null, "btn-primary"),
                         new Button("Match All", () => {
                             this.matchAll = true;
+                            this.select();
+                        }, null, "btn-primary"),
+                        new Button("Match Any", () => {
+                            this.matchAny = true;
                             this.select();
                         })
                     ];
@@ -69,6 +83,16 @@ export class SelectTagsDlg extends DialogBase {
 
         return [
             new Form(null, [
+                new Checkbox("Suggest Tags", { className: "float-end" }, {
+                    setValue: (checked: boolean): void => {
+                        this.mergeState({ suggestTags: checked });
+                        setTimeout(this.reload, 250);
+                    },
+                    getValue: (): boolean => {
+                        let state = this.getState();
+                        return state.suggestTags;
+                    }
+                }, "form-switch form-check-inline"),
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,
@@ -77,6 +101,27 @@ export class SelectTagsDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
+    }
+
+    updateSuggestTags = async () => {
+        const node = this.appState.node;
+
+        let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+            nodeId: node ? node.id : null,
+            trending: false,
+            feed: false,
+            getWords: false,
+            getTags: true,
+            getMentions: false
+        });
+
+        if (res.topTags?.length > 0) {
+            let tags = [];
+            res.topTags.forEach(tag => {
+                tags.push({ tag, description: null });
+            });
+            this.mergeState({ selectedTags: new Set<string>(), tags });
+        }
     }
 
     /* returns an array of objects like {tag, description} */

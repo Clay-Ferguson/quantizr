@@ -239,6 +239,9 @@ export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
     trending: boolean;
     feed: boolean;
+    getWords: boolean;
+    getMentions: boolean;
+    getTags: boolean;
 }
 
 export interface GetOpenGraphRequest extends RequestBase {

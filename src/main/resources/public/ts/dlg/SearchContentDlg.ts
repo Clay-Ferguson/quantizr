@@ -131,7 +131,7 @@ export class SearchContentDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new Button("Graph", this.graph, null, "btn-primary"),
+                    new Button("Graph", this.graph),
                     new HelpButton(() => this.appState.config?.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
@@ -154,9 +154,9 @@ export class SearchContentDlg extends DialogBase {
 
     /* todo-1: put typesafety here on dlgState */
     addTagsToSearchField = (dlg: any) => {
-        let val = this.searchTextState.getValue();
+        let val = ""; // this.searchTextState.getValue();
         dlg.getState().selectedTags.forEach(tag => {
-            if (val.indexOf(tag) !== -1) return;
+            // if (val.indexOf(tag) !== -1) return;
             if (val) val += " ";
             if (dlg.matchAny) {
                 val += tag;

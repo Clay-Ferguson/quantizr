@@ -359,7 +359,10 @@ export class View {
         let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,
-            feed
+            feed,
+            getWords: true,
+            getTags: true,
+            getMentions: true
         });
         new NodeStatsDlg(res, trending, feed, state).open();
     }

@@ -42,7 +42,10 @@ export class TrendingView extends AppTab {
         let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: null,
             trending: true,
-            feed: true
+            feed: true,
+            getWords: true,
+            getTags: true,
+            getMentions: true
         });
         dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
             let data = s.tabData.find(d => d.id === this.data.id);
