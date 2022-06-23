@@ -221,7 +221,6 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
-            EditNodeDlg.propsPanelExpanded = true;
             if (!span) span = new Span();
             span.addChild(new Icon({
                 title: "Node has a 'Date' property.",
@@ -496,7 +495,7 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async e => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.appState);
+                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue(), this.appState);
                     await dlg.open();
                     this.addTagsToTextField(dlg);
                 },
@@ -507,9 +506,8 @@ export class EditNodeDlg extends DialogBase {
 
     /* todo-1: put typesafety here on dlgState */
     addTagsToTextField = (dlg: any) => {
-        let val = this.tagsState.getValue();
+        let val = "";
         dlg.getState().selectedTags.forEach(tag => {
-            if (val.indexOf(tag) !== -1) return;
             if (val) val += " ";
             val += tag;
         });

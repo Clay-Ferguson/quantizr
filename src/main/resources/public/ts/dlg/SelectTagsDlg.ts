@@ -9,12 +9,15 @@ import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { EditTagsDlg } from "./EditTagsDlg";
 
 interface LS { // Local State
     tags: Tag[];
+    suggestedTags: Tag[];
+
+    // holds the set of all tags selected by the user (via. checkboxes)
     selectedTags?: Set<string>;
+    suggestTags: boolean;
 }
 
 interface Tag {
@@ -25,26 +28,30 @@ interface Tag {
 
 // need to disable this for anonymous
 export class SelectTagsDlg extends DialogBase {
-    tagsState: ValidatedState<any> = new ValidatedState<any>();
     matchAny = false;
     matchAll = false;
 
+    indenting = false;
+
     /* modeOption = search | edit */
-    constructor(private modeOption: string, state: AppState) {
+    constructor(private modeOption: string, private curTags: string, state: AppState) {
         super("Select Hashtags", "app-modal-content-medium-width", false, state);
 
         let tags = this.parseTags();
-        this.mergeState({ selectedTags: new Set<string>(), tags, suggestTags: false });
+        this.mergeState({ selectedTags: this.makeDefaultSelectedTags(), tags, suggestedTags: [], suggestTags: false });
     }
 
-    reload = () => {
-        if (this.getState().suggestTags) {
-            this.updateSuggestTags();
+    makeDefaultSelectedTags = (): Set<string> => {
+        let selectedTags = new Set<string>();
+
+        if (this.curTags) {
+            let tags = this.curTags.split(/ /);
+            tags.forEach(t => {
+                selectedTags.add(t);
+            });
         }
-        else {
-            let tags = this.parseTags();
-            this.mergeState({ selectedTags: new Set<string>(), tags });
-        }
+
+        return selectedTags;
     }
 
     renderDlg(): CompIntf[] {
@@ -75,6 +82,9 @@ export class SelectTagsDlg extends DialogBase {
                     buttons = [
                         new Button("Select", () => {
                             this.select();
+                        }, null, "btn-primary"),
+                        new Button("Clear", () => {
+                            this.clear();
                         })
                     ];
                     break;
@@ -86,7 +96,9 @@ export class SelectTagsDlg extends DialogBase {
                 new Checkbox("Suggest Tags", { className: "float-end" }, {
                     setValue: (checked: boolean): void => {
                         this.mergeState({ suggestTags: checked });
-                        setTimeout(this.reload, 250);
+                        if (checked && this.getState().suggestedTags.length === 0) {
+                            setTimeout(this.updateSuggestTags, 250);
+                        }
                     },
                     getValue: (): boolean => {
                         let state = this.getState();
@@ -116,11 +128,11 @@ export class SelectTagsDlg extends DialogBase {
         });
 
         if (res.topTags?.length > 0) {
-            let tags = [];
+            let suggestedTags = [];
             res.topTags.forEach(tag => {
-                tags.push({ tag, description: null });
+                suggestedTags.push({ tag, description: null });
             });
-            this.mergeState({ selectedTags: new Set<string>(), tags });
+            this.mergeState({ suggestedTags });
         }
     }
 
@@ -164,36 +176,23 @@ export class SelectTagsDlg extends DialogBase {
         let div: Div = null;
         if (state.tags?.length > 0) {
             div = new Div();
-            let indenting = false;
-            state.tags.forEach(tagObj => {
-                let attribs: any = null;
-                if (tagObj.description && tagObj.tag) {
-                    attribs = { title: tagObj.tag };
-                }
 
-                if (!tagObj.tag) {
-                    div.addChild(new Heading(4, tagObj.description, { className: "marginTop" }));
-                    indenting = true;
-                }
-                else {
-                    let checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
-                        setValue: (checked: boolean): void => {
-                            let state = this.getState<LS>();
-                            if (checked) {
-                                state.selectedTags.add(tagObj.tag);
-                            }
-                            else {
-                                state.selectedTags.delete(tagObj.tag);
-                            }
-                            this.mergeState(state);
-                        },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().selectedTags.has(tagObj.tag);
-                        }
-                    });
-                    div.addChild(new Div(null, { className: indenting ? "tagIndent" : "" }, [checkbox]));
-                }
+            state.tags.forEach(tagObj => {
+                this.processAddCheckboxOrHeading(div, tagObj);
             });
+
+            if (state.suggestTags && state.suggestedTags.length > 0) {
+                div.addChild(new Heading(4, "Suggestions", { className: "marginTop" }));
+
+                state.suggestedTags.forEach(tagObj => {
+                    // don't duplicate any we've already added above
+                    if (state.tags.find(o => o.tag === tagObj.tag)) {
+                        return;
+                    }
+
+                    this.processAddCheckboxOrHeading(div, tagObj);
+                });
+            }
         }
 
         if (!div || !div.hasChildren()) {
@@ -203,7 +202,42 @@ export class SelectTagsDlg extends DialogBase {
         return div;
     }
 
+    processAddCheckboxOrHeading = (div: Div, tagObj: Tag) => {
+        let attribs: any = null;
+        if (tagObj.description && tagObj.tag) {
+            attribs = { title: tagObj.tag };
+        }
+
+        if (!tagObj.tag) {
+            div.addChild(new Heading(4, tagObj.description, { className: "marginTop" }));
+            this.indenting = true;
+        }
+        else {
+            let checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
+                setValue: (checked: boolean): void => {
+                    let state = this.getState<LS>();
+                    if (checked) {
+                        state.selectedTags.add(tagObj.tag);
+                    }
+                    else {
+                        state.selectedTags.delete(tagObj.tag);
+                    }
+                    this.mergeState(state);
+                },
+                getValue: (): boolean => {
+                    return this.getState<LS>().selectedTags.has(tagObj.tag);
+                }
+            });
+            div.addChild(new Div(null, { className: this.indenting ? "tagIndent" : "" }, [checkbox]));
+        }
+    }
+
     select = () => {
+        this.close();
+    }
+
+    clear = () => {
+        this.mergeState({ selectedTags: new Set<string>() });
         this.close();
     }
 

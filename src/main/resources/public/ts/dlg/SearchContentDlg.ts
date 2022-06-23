@@ -143,7 +143,7 @@ export class SearchContentDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async e => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("search", this.appState);
+                    let dlg: SelectTagsDlg = new SelectTagsDlg("search", null, this.appState);
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },
