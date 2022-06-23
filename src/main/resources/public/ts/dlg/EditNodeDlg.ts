@@ -376,11 +376,13 @@ export class EditNodeDlg extends DialogBase {
                 }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
+        let tagsEditRow: Div = new Div(null, { className: "marginBottom row align-items-end" }, [
+            new TextField({ label: "Tags", outterClass: "col-10", val: this.tagsState }),
+            this.createTagsIconButtons()
+        ]);
+
         let collapsiblePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
-            new Div(null, { className: "row align-items-end" }, [
-                new TextField({ label: "Tags", outterClass: "marginTop col-10", val: this.tagsState }),
-                this.createSearchFieldIconButtons()
-            ]),
+            this.tagsState.getValue() ? null : tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
                 this.createPrioritySelection()
@@ -415,7 +417,9 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, propsPanel, morePanel, new Clearfix()]);
+        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
+            this.tagsState.getValue() ? tagsEditRow : null,
+            propsPanel, morePanel, new Clearfix()]);
         return children;
     }
 
@@ -491,7 +495,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    createSearchFieldIconButtons = (): Comp => {
+    createTagsIconButtons = (): Comp => {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async e => {
