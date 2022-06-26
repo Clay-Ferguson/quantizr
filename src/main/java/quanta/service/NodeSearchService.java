@@ -434,12 +434,14 @@ public class NodeSearchService extends ServiceBase {
 						}
 						knownTokens.add(lcToken);
 
-						WordStats ws = mentionMap.get(lcToken);
-						if (no(ws)) {
-							ws = new WordStats(token);
-							mentionMap.put(lcToken, ws);
+						if (ok(mentionMap)) {
+							WordStats ws = mentionMap.get(lcToken);
+							if (no(ws)) {
+								ws = new WordStats(token);
+								mentionMap.put(lcToken, ws);
+							}
+							ws.count++;
 						}
-						ws.count++;
 					}
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
@@ -457,12 +459,14 @@ public class NodeSearchService extends ServiceBase {
 						}
 						knownTokens.add(lcToken);
 
-						WordStats ws = tagMap.get(lcToken);
-						if (no(ws)) {
-							ws = new WordStats(token);
-							tagMap.put(lcToken, ws);
+						if (ok(tagMap)) {
+							WordStats ws = tagMap.get(lcToken);
+							if (no(ws)) {
+								ws = new WordStats(token);
+								tagMap.put(lcToken, ws);
+							}
+							ws.count++;
 						}
-						ws.count++;
 					}
 					// ordinary word
 					else {
