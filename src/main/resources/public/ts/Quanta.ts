@@ -9,6 +9,7 @@ import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
+// import { runClassDemoTest } from "./ClassDemoTest";
 
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
@@ -72,6 +73,8 @@ export class Quanta {
     initApp = async (): Promise<void> => {
         try {
             Log.log("initApp()");
+
+            // runClassDemoTest();
 
             // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
             // and if this value isn't set it prints a message just saying the browser isn't supported.

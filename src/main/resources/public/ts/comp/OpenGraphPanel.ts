@@ -25,7 +25,6 @@ export class OpenGraphPanel extends Div {
             title: url,
             key
         });
-        this.domAddEvent = this.domAddEvent.bind(this);
 
         /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
          pull of the open graph data should result in og being an empty object and not null. */

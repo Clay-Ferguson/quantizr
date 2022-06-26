@@ -10,8 +10,6 @@ export class AppTab<PropType = any> extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "2"
         });
-        this.domAddEvent = this.domAddEvent.bind(this);
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         // console.log("Constructed AppTab: " + data.id);
     }
 
@@ -36,6 +34,7 @@ export class AppTab<PropType = any> extends Div {
         elm.scrollTop = this.data.scrollPos === -1 ? elm.scrollHeight : this.data.scrollPos;
     }
 
+    // use NON-Arrow for inheritance compatability
     domAddEvent(): void {
         if (C.DEBUG_SCROLLING) {
             console.log("domAddEvent: " + this.data.name);
@@ -56,7 +55,8 @@ export class AppTab<PropType = any> extends Div {
         super.domAddEvent();
     }
 
-    domPreUpdateEvent(): void {
+    // use NON-Arrow for inheritance compatability
+    domPreUpdateEven(): void {
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);

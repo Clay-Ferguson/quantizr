@@ -9,7 +9,6 @@ export class PieChart extends Div {
 
     constructor(private width: number, private className: string, private data: any[]) {
         super(null, { className: "marginBottom" });
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     preRender(): void {

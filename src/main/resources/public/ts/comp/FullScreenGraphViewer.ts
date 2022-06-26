@@ -23,10 +23,6 @@ export class FullScreenGraphViewer extends Main {
 
     constructor(appState: AppState) {
         super();
-        this.domRemoveEvent = this.domRemoveEvent.bind(this);
-        this.domUpdateEvent = this.domUpdateEvent.bind(this);
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
-
         this.nodeId = appState.fullScreenGraphId;
         let node: J.NodeInfo = S.nodeUtil.findNodeById(appState, this.nodeId);
 

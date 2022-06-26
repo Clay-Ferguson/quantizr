@@ -51,6 +51,10 @@ export abstract class Comp implements CompIntf {
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
     constructor(attribs?: any, private stateMgr?: State) {
+
+        // We bind these (to 'this') because they're passed to other functions and can loose context otherwise.
+        // Remember, inheritance always works "as expected" in TypeScript (same as C++ OOP) except when called from callbacks
+        // and except when passed to other functions. So in those two cases you must either bind or use fat arrow to preserve 'this'
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domRemoveEvent = this.domRemoveEvent.bind(this);
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
@@ -425,15 +429,19 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
+    // NON-Arrow function to support calling thru 'super'
     public domPreUpdateEvent(): void {
     }
 
+    // NON-Arrow function to support calling thru 'super'
     public domUpdateEvent(): void {
     }
 
+    // NON-Arrow function to support calling thru 'super'
     public domRemoveEvent(): void {
     }
 
+    // leave NON-Arrow function to support calling thru 'super'
     public domAddEvent(): void {
         // console.log("domAddEvent: " + this.jsClassName);
 

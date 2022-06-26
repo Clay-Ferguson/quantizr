@@ -96,9 +96,7 @@ export class AppState {
 
     highlightSearchNodeId: string;
 
-    /* maps node.id values to NodeInfo.java objects
-    Make this use a Map type (typescript), I have a feeling we can get comletely rid of this map now (todo-0)
-    */
+    /* maps node.id values to NodeInfo.java objects */
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     isAdminUser: boolean;

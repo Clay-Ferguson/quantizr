@@ -28,7 +28,6 @@ interface LS { // Local State
 export class Html extends Comp {
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         this.setChildren(initialChildren);
         this.setText(content);
     }

@@ -116,8 +116,6 @@ export class NodeCompRowHeader extends Div {
         let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        // todo-0: we have a bug where replying to a boost breaks the entire page so disable this case for now,
-        // and also I'm disabling all buttons that would reference this 'node.id' becasue I think that's the problem.
         if (!this.isBoost && (!publicReadOnly || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",

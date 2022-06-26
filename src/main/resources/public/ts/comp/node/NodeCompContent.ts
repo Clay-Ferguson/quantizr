@@ -25,7 +25,6 @@ export class NodeCompContent extends Div {
         super(null, {
             id: (idPrefix ? idPrefix : "n") + node?.id
         });
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     preRender(): void {

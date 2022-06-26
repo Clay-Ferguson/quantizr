@@ -10,7 +10,6 @@ export class FullScreenImgViewer extends Main {
 
     constructor() {
         super();
-        this.domUpdateEvent = this.domUpdateEvent.bind(this);
     }
 
     preRender(): void {

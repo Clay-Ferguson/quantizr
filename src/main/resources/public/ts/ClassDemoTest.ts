@@ -13,31 +13,63 @@
  */
 
 class Animal {
+    type: string = "AnimalType";
 
     constructor(public name: string) {
         console.log("Constructor: Animal");
         // this.askGoForWalk = this.askGoForWalk.bind(this);
     }
 
+    // NON-arrow is required in order to call on 'super.printName'
     printName() {
-        console.log("name is:" + this.name);
+        console.log("printName(Animal): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
     }
 
-    askGoForWalk() {
-        console.log("Try to walk animal: " + this.name);
+    askGoForWalk = () => {
+        console.log("goForWalk(Animal): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
     }
 }
 
 class Dog extends Animal {
+    type: string = "DogType";
+
     constructor(public name: string) {
         super(name);
         console.log("Constructor: Dog");
         // this.askGoForWalk = this.askGoForWalk.bind(this);
     }
 
-    askGoForWalk() {
-        super.askGoForWalk();
-        console.log("Dog " + this.name + " says let's walk!");
+    // NON-arrow is required in order to call on 'super.printName'
+    printName() {
+        super.printName();
+        console.log("printName(Dog): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
+    }
+
+    askGoForWalk = () => {
+         // NOTE: This fails. Super will not have askGoForWalk since it was created with fat arrow.
+        // super.askGoForWalk();
+        console.log("goForWalk(Dog): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
+    }
+}
+
+class Labrador extends Dog {
+    type: string = "LabradorType";
+
+    constructor(public name: string) {
+        super(name);
+        console.log("Constructor: Labrador");
+        // this.askGoForWalk = this.askGoForWalk.bind(this);
+    }
+
+    printName = () => {
+        super.printName();
+        console.log("printName(Labrador): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
+    }
+
+    askGoForWalk = () => {
+        // NOTE: This fails. Super will not have askGoForWalk since it was created with fat arrow.
+        // super.askGoForWalk();
+        console.log("goForWalk(Labrador): name is:" + this.name + " type=" + this.type + " this.constructor.name=" + this.constructor.name);
     }
 }
 
@@ -53,22 +85,23 @@ export function runClassDemoTest() {
         // }
         // S.util.perfEnd("Test completed: iters=" + iters, startTime);
 
-        const fido = new Dog("Fido");
+        debugger;
+        const fido = new Labrador("Fido");
         fido.askGoForWalk();
         fido.printName();
 
-        console.log("Calling bound function as property of different object.");
+        // console.log("Calling bound function as property of different object.");
 
-        /* This works and demonstrates a function being separable from what calls it when not bound */
-        let buffy = new Dog("Buffy");
-        let askGoForWalk2 = fido.askGoForWalk;
-        (buffy as any).askGoForWalk2 = askGoForWalk2;
-        (buffy as any).askGoForWalk2(); // prints buffy even though function ref came off fido
+        // /* This works and demonstrates a function being separable from what calls it when not bound */
+        // let buffy = new Labrador("Buffy");
+        // let askGoForWalk2 = fido.askGoForWalk;
+        // (buffy as any).askGoForWalk2 = askGoForWalk2;
+        // (buffy as any).askGoForWalk2(); // prints buffy even though function ref came off fido
 
-        buffy = new Dog("Buffy");
-        askGoForWalk2 = fido.askGoForWalk.bind(fido);
-        (buffy as any).askGoForWalk2 = askGoForWalk2;
-        (buffy as any).askGoForWalk2(); // prints fido even though function is called on buffy (due to binding)
+        // buffy = new Labrador("Buffy");
+        // askGoForWalk2 = fido.askGoForWalk.bind(fido);
+        // (buffy as any).askGoForWalk2 = askGoForWalk2;
+        // (buffy as any).askGoForWalk2(); // prints fido even though function is called on buffy (due to binding)
 
         console.log("----------------- end of test");
     }, 100);

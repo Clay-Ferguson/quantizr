@@ -21,8 +21,7 @@ export class LeftNavPanel extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "1"
         });
-        this.domAddEvent = this.domAddEvent.bind(this);
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
+
         let state: AppState = store.getState();
 
         let panelCols = state.userPreferences.mainPanelCols || 6;
