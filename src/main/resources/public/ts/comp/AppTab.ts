@@ -28,7 +28,7 @@ export class AppTab<PropType = any> extends Div {
     reScroll = (elm: HTMLElement): void => {
         if (!elm) return;
         if (C.DEBUG_SCROLLING) {
-            console.log("reScroll [" + this.data.name + "]: " + elm.scrollTop);
+            console.log("reScroll [" + this.data.name + "]: elm.scrollTop=" + elm.scrollTop + " elm.scrollHeight=" + elm.scrollHeight);
         }
 
         elm.scrollTop = this.data.scrollPos === -1 ? elm.scrollHeight : this.data.scrollPos;
@@ -37,7 +37,7 @@ export class AppTab<PropType = any> extends Div {
     // use NON-Arrow for inheritance compatability
     domAddEvent(): void {
         if (C.DEBUG_SCROLLING) {
-            console.log("domAddEvent: " + this.data.name);
+            console.log("domAddEvent(a): " + this.data.name);
         }
         let elm = this.getRef();
         if (elm) {
@@ -45,7 +45,7 @@ export class AppTab<PropType = any> extends Div {
 
             elm.addEventListener("scroll", () => {
                 if (C.DEBUG_SCROLLING) {
-                    console.log("Scroll Evt [" + this.data.name + "]: " + elm.scrollTop);
+                    console.log("Scroll Evt [" + this.data.name + "]: elm.scrollTop=" + elm.scrollTop);
                 }
 
                 this.data.scrollPos = elm.scrollTop;
@@ -56,9 +56,12 @@ export class AppTab<PropType = any> extends Div {
     }
 
     // use NON-Arrow for inheritance compatability
-    domPreUpdateEven(): void {
+    domPreUpdateEvent(): void {
         let elm = this.getRef();
         if (elm) {
+            if (C.DEBUG_SCROLLING) {
+                console.log("domPreUpdateEvent calling reScroll")
+            }
             this.reScroll(elm);
         }
         super.domPreUpdateEvent();

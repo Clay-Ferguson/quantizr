@@ -113,6 +113,7 @@ export class View {
     /* Part of 'infinite scrolling' this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
     growPage = (state: AppState): void => {
+        // console.log("growPage");
         let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             let targetOffset = lastChildNode.logicalOrdinal + 1;
@@ -145,7 +146,7 @@ export class View {
                 let scrollToTop = true;
 
                 /* if the response has some children, and we already have local children we can add to, and we haven't reached
-                max dynamic rows yet, then make our children equal the concatenatio existing rows plus new rows */
+                max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
                 if (res?.node?.children && state?.node?.children && state.node.children.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     let idSet: Set<string> = new Set<string>();

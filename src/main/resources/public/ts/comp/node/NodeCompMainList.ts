@@ -76,8 +76,8 @@ export class NodeCompMainList extends Div {
                 // the nextButton scrolls into view, we load in more nodes!
                 nextButton.whenElm((elm: HTMLElement) => {
                     let observer = new IntersectionObserver(entries => {
-                        /* We have to STILL check these conditions becasue this observer can be getting called any time
-                         and these conditions will always apply about controll if we want to grow page or not. */
+                        /* We have to STILL check these conditions because this observer can be getting called any time
+                         and these conditions will always apply about control if we want to grow page or not. */
 
                         let state = store.getState();
 

@@ -221,6 +221,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                                             return;
                                         }
 
+                                        // console.log("Loading more...");
                                         S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
                                     }
                                 });

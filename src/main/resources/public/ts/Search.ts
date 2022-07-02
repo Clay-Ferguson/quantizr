@@ -294,7 +294,7 @@ export class Search {
 
         // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
 
-        // console.log("Getting results page=" + page);
+        // console.log("Getting results page=" + page + " growResults=" + growResults);
         let res: J.NodeFeedResponse = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: feedData.props.feedFilterRootNode?.id,
