@@ -201,7 +201,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	}
 
 	@Bean
-	public GridFsTemplate gridFsTemplate() throws Exception {
+	public GridFsTemplate gridFsTemplate(MappingMongoConverter converter) throws Exception {
 		if (connectionFailed)
 			return null;
 
@@ -209,10 +209,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			log.debug("create gridFsTemplate");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
-				if (no(ops)) {
-					throw new RuntimeException("called gridFsTemplate before mongoTemplate is ready");
-				}
-				grid = new GridFsTemplate(mdbf, ops.getConverter());
+				grid = new GridFsTemplate(mdbf, converter);
 			} else {
 				return null;
 			}
