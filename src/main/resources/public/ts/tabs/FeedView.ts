@@ -173,9 +173,21 @@ export class FeedView extends AppTab<FeedViewProps> {
         else {
             let i = 0;
 
-            this.removeBoostDuplicates();
+            // holds ids of all boosts (nodes BEING boosted)
+            let boosts: Set<string> = new Set<string>();
+
+            // scan all 'feedResults' to build up boosts set of IDs
+            this.data.props.feedResults.forEach((node: J.NodeInfo) => {
+                if (node.boostedNode) {
+                    boosts.add(node.boostedNode.id);
+                }
+            });
 
             this.data.props.feedResults.forEach((node: J.NodeInfo) => {
+                // if this node will be showing up as a boost don't display it on the page, skip it.
+                if (boosts.has(node.id)) {
+                    return;
+                }
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
                 if (editingExistingItem && node.id === state.editNode.id) {
@@ -237,21 +249,6 @@ export class FeedView extends AppTab<FeedViewProps> {
             }
         }
         this.setChildren([new Div(null, { className: "feedView" }, children)]);
-    }
-
-    removeBoostDuplicates = (): void => {
-        // holds ids of all boosts (nodes BEING boosted)
-        let boosts: Set<string> = new Set<string>();
-
-        // scan all 'feedResults' to build up boosts set of IDs
-        this.data.props.feedResults.forEach((node: J.NodeInfo) => {
-            if (node.boostedNode) {
-                boosts.add(node.boostedNode.id);
-            }
-        });
-
-        // now filter out from feedResults all nodes that were boosts.
-        this.data.props.feedResults = this.data.props.feedResults.filter(node => !boosts.has(node.id));
     }
 
     /* overridable (don't use arrow function) */
