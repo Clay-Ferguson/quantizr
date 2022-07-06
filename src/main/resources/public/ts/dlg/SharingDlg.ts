@@ -43,7 +43,7 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                // todo-0: There's a bug in turning this OFF and also it just needs more thought in the design, becasue it's too
+                // todo-1: There's a bug in turning this OFF and also it just needs more thought in the design, becasue it's too
                 // easy to create a node and share it with someone and then have it NOT end up visible in the feeds of the people it's shared to.
                 // #unpublish-disabled
                 // new Checkbox("Unpublished", null, {

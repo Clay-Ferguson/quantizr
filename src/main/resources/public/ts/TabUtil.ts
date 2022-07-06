@@ -122,7 +122,6 @@ export class TabUtil {
         return data ? data.inst : null;
     }
 
-    // may need to call this just before a grow to update size (todo-0) ?
     tabScroll = (state: AppState, tabName: string, pos: number) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Scrolling tab " + tabName + " to offset " + pos);
