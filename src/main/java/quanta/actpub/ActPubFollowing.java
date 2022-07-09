@@ -340,7 +340,7 @@ public class ActPubFollowing extends ServiceBase {
             Iterable<SubNode> iter = findFollowingOfUser(ms, userName);
 
             for (SubNode n : iter) {
-                log.debug("    Found Friend Node: " + n.getIdStr());
+                // log.debug("    Found Friend Node: " + n.getIdStr());
                 // if this Friend node is a foreign one it will have the actor url property
                 // fyi: we had ACT_PUB_ACTOR_URL here before, which was a bug.
                 String remoteActorUrl = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);

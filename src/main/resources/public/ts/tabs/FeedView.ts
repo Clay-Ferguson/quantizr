@@ -10,7 +10,6 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { HelpButton } from "../comp/core/HelpButton";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";

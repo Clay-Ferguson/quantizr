@@ -126,6 +126,8 @@ public class ActPubService extends ServiceBase {
      * contain all the mentions that exist in the text of the message.
      */
     public void sendObjOutbound(MongoSession ms, SubNode parent, SubNode node, boolean forceSendToPublic) {
+        // log.debug("sendObjOutbound: " + XString.prettyPrint(node));
+
         exec.run(() -> {
             try {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
@@ -134,7 +136,7 @@ public class ActPubService extends ServiceBase {
                 String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
                 APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
                 String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
-                String boostTarget = parent.getStr(NodeProp.BOOST);
+                String boostTarget = node.getStr(NodeProp.BOOST);
 
                 // toUserNames will hold ALL usernames in the ACL list (both local and foreign user names)
                 HashSet<String> toUserNames = new HashSet<>();
@@ -181,16 +183,40 @@ public class ActPubService extends ServiceBase {
                      * 
                      * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
                      * that right?)
+                     * 
+                     * todo-0: wow, looks like (discovered on 7/8/22) this code branch was never executing becasue
+                     * boostTarget was null due to getting it off 'parent' instead of 'node', above. Need to verify this 
+                     * branch of code is correct now.
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
-                        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-                        message =
-                                apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostTarget, now, privateMessage);
+                        // todo-0: also check how outbox is rendering this boostedUrl. It will also need the fix.
+
+                        // need to convert boostTarget from local node to foreign....i think outbox is doing this.
+                        SubNode boostTargetNode = read.getNode(ms, boostTarget);
+                        if (ok(boostTargetNode)) {
+                            String boostedUrl = boostTargetNode.getStr(NodeProp.ACT_PUB_OBJ_URL);
+
+                            if (no(boostedUrl)) {
+                                String host = prop.getProtocolHostAndPort();
+                                String nodeIdBase = host + "?id=";
+                                boostedUrl = nodeIdBase + boostTarget;
+                            }
+
+                            if (ok(boostedUrl)) {
+                                ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+                                message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostedUrl, now,
+                                        privateMessage);
+
+                                // log.debug("Outbound Announce: " + XString.prettyPrint(message));
+                            }
+                        }
                     }
                     // else send out as a note.
                     else {
                         message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType,
                                 node.getContent(), objUrl, privateMessage, attachments);
+
+                        // log.debug("Outbound Note: " + XString.prettyPrint(message));
                     }
                 }
 

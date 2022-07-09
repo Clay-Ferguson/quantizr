@@ -131,20 +131,22 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        if (!this.isBoost) {
-            children.push(new Icon({
-                title: "Boost this Node",
-                className: "fa fa-retweet fa-lg marginRight",
-                onClick: () => {
-                    if (state.isAnonUser) {
-                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
-                    }
-                    else {
-                        S.edit.addNode(null, false, null, null, null, null, node.id, false, state)
-                    }
-                }
-            }));
-        }
+        // todo-0: AFTER better testing we can bring back boost feature
+        // Taking this away (7/8/22) after discovering it never really rendered correctly on FOREIGN servers.
+        // if (!this.isBoost) {
+        //     children.push(new Icon({
+        //         title: "Boost this Node",
+        //         className: "fa fa-retweet fa-lg marginRight",
+        //         onClick: () => {
+        //             if (state.isAnonUser) {
+        //                 S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+        //             }
+        //             else {
+        //                 S.edit.addNode(null, false, null, null, null, null, node.id, false, state)
+        //             }
+        //         }
+        //     }));
+        // }
 
         let youLiked: boolean = false;
         let likeNames = null;

@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APONote;
@@ -82,7 +84,8 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            // Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false); // slow way (was using this for years)
+            // Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false); // slow
+            // way (was using this for years)
             Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode);
 
             /*
@@ -134,8 +137,8 @@ public class ActPubOutbox extends ServiceBase {
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create,
-                                            null, null);
+                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create, null,
+                                            null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {
                                     log.debug("Record already existed: " + dke.getMessage());
@@ -310,15 +313,19 @@ public class ActPubOutbox extends ServiceBase {
                 int MAX_PER_PAGE = 25;
                 boolean collecting = false;
 
+                // todo-0: is this just unfinished code or a bug? Either way this paging is broken.
                 if (no(minId)) {
                     collecting = true;
                 }
 
+                // log.debug("collecting = " + collecting);
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(_sharedTo);
 
                 for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
+
+                    // log.debug("OUTBOX ID: " + child.getIdStr());
 
                     // as a general security rule never send back any admin nodes.
                     if (child.getOwner().equals(as.getUserNodeId())) {
@@ -332,7 +339,33 @@ public class ActPubOutbox extends ServiceBase {
                     }
 
                     if (collecting) {
-                        APObj ret = makeAPActivityForNote(as, userName, nodeIdBase, child);
+                        String boostTarget = child.getStr(NodeProp.BOOST);
+
+                        APObj ret = null;
+
+                        // I was unable to test this branch of the code, because apparently mastodon doesn't call it for
+                        // the scenario I thought it would. I was trying to nav to a user in masto and click their "posts and replies"
+                        // and expecting it to call into here, but it doesn't. Need way to test this branch of code. todo-0
+                        if (!StringUtils.isEmpty(boostTarget)) {
+                            // log.debug("processing boostTarget: " + boostTarget + " in outbox gen for " + userName);
+                            String published = DateUtil.isoStringFromDate(child.getModifyTime());
+                            String actor = apUtil.makeActorUrlForUserName(userName);
+                            String id = nodeIdBase + child.getIdStr();
+
+                            // To create an Announce that other instances can consume we go to the boosted Node ID,
+                            // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
+                            SubNode boostTargetNode = read.getNode(as, boostTarget);
+                            if (ok(boostTargetNode)) {
+                                String objUrl = boostTargetNode.getStr(NodeProp.ACT_PUB_OBJ_URL);
+                                if (ok(objUrl)) {
+                                    ret = new APOAnnounce(actor, id, published, objUrl);
+                                }
+                            }
+                        } else {
+                            // log.debug("not a boost.");
+                            ret = makeAPActivityForNote(as, userName, nodeIdBase, child);
+                        }
+
                         if (ok(ret)) {
                             items.add(ret);
                         }
