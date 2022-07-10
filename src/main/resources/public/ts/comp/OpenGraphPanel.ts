@@ -162,6 +162,12 @@ export class OpenGraphPanel extends Div {
                 ]);
             }
             else {
+                if (state?.og?.image) {
+                    // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
+                    // apparently that interfered wit rendering. Wasn't able to repro on localhost because of using http I think, so
+                    // this code is probably harmless even if I'm making a mistake blaming the scrolling glitch on this.
+                    state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
+                }
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new HorizontalLayout([
                     new Div(null, { className: "openGraphLhs" }, [

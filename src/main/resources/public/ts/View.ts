@@ -11,7 +11,6 @@ declare var BUILDTIME;
 declare var PROFILE;
 
 export class View {
-
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string, forceRenderParent: boolean = false): void => {
@@ -110,12 +109,15 @@ export class View {
         // this.loadPage(true, targetOffset, state);
     }
 
-    /* Part of 'infinite scrolling' this gets called when the user scrolls to the end of a page and we
+    /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
     growPage = (state: AppState): void => {
         // console.log("growPage");
         let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
+            // todo-0: review this 'targetOffset'. Is this correct now that duplicates are being removed
+            // as part of the algorithm. In other words, when we add DOM elements, are we sure the logicalOrdinal 
+            // being used here will be correct?
             let targetOffset = lastChildNode.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, true, state);
         }
@@ -162,16 +164,15 @@ export class View {
                 }
 
                 if (scrollToTop) {
-                    S.view.scrollAllTop(state);
-
-                    // This is the currently untested final way to try to get the scroll to top to happen
-                    // regarding the bug mentioned above this if block.
-                    setTimeout(() => {
+                    // todo-0: testing pending for this.
+                    // S.view.scrollAllTop(state);
+                    // setTimeout(() => {
                         if (C.DEBUG_SCROLLING) {
                             console.log("loadPage(1) -> renderPageFromData (scrollTop=" + scrollToTop + ")");
                         }
+                        console.log("renderPageFromData scrollTop");
                         S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
-                    }, 1000);
+                    // }, 1000);
                 }
                 else {
                     if (C.DEBUG_SCROLLING) {

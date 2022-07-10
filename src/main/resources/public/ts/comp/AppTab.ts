@@ -25,6 +25,7 @@ export class AppTab<PropType = any> extends Div {
         return className;
     }
 
+    // sets scroll position to the value the 'data' specifies.
     reScroll = (elm: HTMLElement): void => {
         if (!elm) return;
         if (C.DEBUG_SCROLLING) {
@@ -54,6 +55,14 @@ export class AppTab<PropType = any> extends Div {
 
         super.domAddEvent();
     }
+
+    // Let's keep this code, but it's currently unused
+    // recordCurrentScrollPos = (): void => {
+    //     let elm = this.getRef();
+    //     if (elm) {
+    //         this.data.scrollPos = elm.scrollTop;
+    //     }
+    // }
 
     // use NON-Arrow for inheritance compatability
     domPreUpdateEvent(): void {

@@ -16,6 +16,7 @@ import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetVi
 import { ThreadViewData } from "./tabs/data/ThreadViewData";
 import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
 import { TrendingViewData } from "./tabs/data/TrendingViewData";
+import { AppTab } from "./comp/AppTab";
 
 export class TabUtil {
     selectTab = (tabName: string): void => {
@@ -116,7 +117,7 @@ export class TabUtil {
         return data;
     }
 
-    getActiveTabComp = (state: AppState): CompIntf => {
+    getActiveTabComp = (state: AppState): AppTab => {
         if (!state.tabData) return null;
         let data = state.tabData.find(d => d.id === state.activeTab);
         return data ? data.inst : null;
