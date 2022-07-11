@@ -1487,6 +1487,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
 					break;
 
+				case "getActPubJson":
+					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, req.getNodeId()), null));
+					break;
+
 				default:
 					throw new RuntimeEx("Invalid command: " + req.getCommand());
 			}

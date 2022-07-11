@@ -98,6 +98,7 @@ export class MenuPanel extends Div {
     static mouseEffects = () => { S.util.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node Data", "", appState(null));
+    static showActPubJson = () => S.view.runServerCommand("getActPubJson", "ActivityPub JSON", "", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     // DO NOT DELETE
@@ -355,6 +356,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Show URLs", MenuPanel.showUrls, !!hltNode), //
             new MenuItem("Show Raw Data", MenuPanel.showRawData, !state.isAnonUser && selNodeIsMine), //
+            state.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
             new MenuItemSeparator(), //
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?

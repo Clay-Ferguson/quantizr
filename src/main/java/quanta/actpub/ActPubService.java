@@ -185,7 +185,7 @@ public class ActPubService extends ServiceBase {
                      * that right?)
                      * 
                      * todo-0: wow, looks like (discovered on 7/8/22) this code branch was never executing becasue
-                     * boostTarget was null due to getting it off 'parent' instead of 'node', above. Need to verify this 
+                     * boostTarget was null due to getting it off 'parent' instead of 'node', above. Need to verify this
                      * branch of code is correct now.
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
@@ -1968,5 +1968,30 @@ public class ActPubService extends ServiceBase {
             }
         }
         return tagList;
+    }
+
+    public String getRemoteJson(MongoSession ms, String nodeId) {
+        SubNode node = read.getNode(ms, nodeId);
+        if (no(node)) {
+            return "Node not found.";
+        }
+        String objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+        if (no(objUrl)) {
+            return "Node has no ActivityPub URL";
+        }
+
+        String userDoingAction = ThreadLocals.getSC().getUserName();
+        try {
+            APObj obj = apUtil.getJson(ms, userDoingAction, objUrl, APConst.MTYPE_ACT_JSON);
+            if (ok(obj)) {
+                return "URL: " + objUrl + "\n\n" + XString.prettyPrint(obj);
+            } else {
+                return "Unable to load data.";
+            }
+
+        } catch (Exception e) {
+            log.error("Unable to get JSON from url: " + objUrl);
+            return "Error: " + e.getMessage();
+        }
     }
 }
