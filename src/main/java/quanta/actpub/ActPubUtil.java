@@ -820,7 +820,6 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
 
         if (ok(node)) {
-
             // iterate up the parent chain or chain of inReplyTo for ActivityPub
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
                 try {
@@ -925,8 +924,8 @@ public class ActPubUtil extends ServiceBase {
             return null;
         }
 
-        String type = apStr(obj, APObj.type);
-
+        // todo-1: we only support "Note" for now.
+        String type = apStr(obj, APObj.type); 
         switch (type) {
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);

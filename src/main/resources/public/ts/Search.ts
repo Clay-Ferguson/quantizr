@@ -116,7 +116,9 @@ export class Search {
             });
         }
         else {
-            let msg = "Top-level post. No conversation to display.";
+            // The most common known reason we can get here due to lack of feature support is when something like 
+            // a "object.type=Video" (a type not yet supprted) is encountered as we attempted to read the thread.
+            let msg = "Thread not available, or not supported";
 
             // make 'msg' a little more specific if we know there's a 'remote link' showing.
             let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
