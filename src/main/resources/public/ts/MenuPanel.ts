@@ -447,23 +447,26 @@ export class MenuPanel extends Div {
                 new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", "Toggle Daemons", null, state)), //
                 new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", "Session Activity", null, state)), //
                 new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", "Admin Note", null, state)), //
-                new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", "Refresh RSS Cache", null, state)), //
-                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
-                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", "Refresh AP Accounts", null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state))
             ]));
 
             children.push(new Menu("Admin - DB", [
-                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
-                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state)), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
                 new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", "Run DB Conversion", null, state)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
                 new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),
                 new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", "Delete node leaving orphans", null, state)) //
+            ]));
+
+            children.push(new Menu("Admin - ActivityPub", [
+                new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
+                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
+                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", "Refresh AP Accounts", null, state)), //
+                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
+                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state))
             ]));
 
             children.push(new Menu("Admin - Test", [
