@@ -23,6 +23,9 @@ export class CalendarTypeHandler extends TypeBase {
         return new Div(null, null, [
             baseComp,
             new ButtonBar([
+                new Button("Past", () => {
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, state, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+                }, null),
                 new Button("Future", () => {
                     S.srch.timeline(node, J.NodeProp.DATE_FULL, state, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
                 }, null),
