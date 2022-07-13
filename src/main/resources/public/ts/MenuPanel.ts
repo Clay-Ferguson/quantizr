@@ -286,25 +286,25 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
 
-        children.push(new Menu("Share", [
+        children.push(new Menu("Search", [
+            new MenuItem("By Content", MenuPanel.searchByContent, !state.isAnonUser && !!hltNode), //
+            new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser), //
+            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser), //
+
             // moved into editor dialog
             // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-            new MenuItem("Show All Shared Nodes", MenuPanel.showAllShares, //
+            new MenuItemSeparator(), //
+
+            new MenuItem("Shared Nodes", MenuPanel.showAllShares, //
                 !state.isAnonUser && !!hltNode),
 
-            new MenuItem("Show Public Read-only", MenuPanel.showPublicReadonlyShares, //
+            new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, //
                 !state.isAnonUser && !!hltNode),
 
-            new MenuItem("Show Public Appendable", MenuPanel.showPublicWritableShares, //
+            new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, //
                 !state.isAnonUser && !!hltNode)
-        ], null, this.makeHelpIcon(":menu-share")));
-
-        children.push(new Menu("Search", [
-            new MenuItem("By Content", MenuPanel.searchByContent, !state.isAnonUser && !!hltNode), //
-            new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser), //
-            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
