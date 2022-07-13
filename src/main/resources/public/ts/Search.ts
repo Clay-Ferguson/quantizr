@@ -11,7 +11,6 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
@@ -130,6 +129,22 @@ export class Search {
 
             S.util.showMessage(msg, "Thread");
         }
+    }
+
+    listSubgraphByPriority = async (state: AppState) => {
+        let node = S.nodeUtil.getHighlightedNode(state);
+        if (!node) {
+            S.util.showMessage("No node is selected to search under.", "Warning");
+            return;
+        }
+        S.srch.search(node, null, null, state, null, "Priority Listing",
+            false,
+            false, 0, 
+            true, 
+            J.NodeProp.PRIORITY_FULL, 
+            "asc", 
+            true, 
+            null); 
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {

@@ -92,6 +92,7 @@ export class MenuPanel extends Div {
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
     static import = () => S.edit.openImportDlg(appState(null));
+    static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(appState(null));
     static export = () => S.edit.openExportDlg(appState(null));
     static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
@@ -304,6 +305,11 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!hltNode),
 
             new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, //
+                !state.isAnonUser && !!hltNode),
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, //
                 !state.isAnonUser && !!hltNode)
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
