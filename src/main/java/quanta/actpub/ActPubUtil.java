@@ -454,7 +454,7 @@ public class ActPubUtil extends ServiceBase {
                     String fullHost = parts[1];
 
                     // strip the port number off if exists
-                    String host = XString.truncateAfterFirst(fullHost, ":");
+                    String host = XString.truncAfterFirst(fullHost, ":");
 
                     if (host.equals(prop.getMetaHost())) {
                         String username = parts[0];

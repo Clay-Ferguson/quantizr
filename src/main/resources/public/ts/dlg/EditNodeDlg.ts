@@ -348,7 +348,7 @@ export class EditNodeDlg extends DialogBase {
         let sharingDivClearFix = null;
         if (shareComps) {
             sharingDiv = new Div(null, {
-                className: "float-end clickable"
+                className: "float-end clickable marginBottom"
             }, [
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,

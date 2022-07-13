@@ -1011,7 +1011,7 @@ public class UserManagerService extends ServiceBase {
 			 */
 			arun.run(as -> {
 
-				String userNodeId = XString.truncateAfterFirst(passCode, "-");
+				String userNodeId = XString.truncAfterFirst(passCode, "-");
 
 				if (no(userNodeId)) {
 					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);

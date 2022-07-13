@@ -251,7 +251,7 @@ public class SubNodeUtil extends ServiceBase {
 	public String getExportFileName(String fileName, SubNode node) {
 		if (!StringUtils.isEmpty(fileName)) {
 			// truncate any file name extension.
-			fileName = XString.truncateAfterLast(fileName, ".");
+			fileName = XString.truncAfterLast(fileName, ".");
 			return fileName;
 		} else if (ok(node.getName())) {
 			return node.getName();

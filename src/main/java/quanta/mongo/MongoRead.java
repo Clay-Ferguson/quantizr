@@ -90,7 +90,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public String getParentPath(SubNode node) {
-        return XString.truncateAfterLast(node.getPath(), "/");
+        return XString.truncAfterLast(node.getPath(), "/");
     }
 
     @PerfMon(category = "read")
@@ -385,7 +385,7 @@ public class MongoRead extends ServiceBase {
         if ("/".equals(path)) {
             return null;
         }
-        String parentPath = XString.truncateAfterLast(path, "/");
+        String parentPath = XString.truncAfterLast(path, "/");
         if (StringUtils.isEmpty(parentPath))
             return null;
 

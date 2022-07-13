@@ -165,7 +165,7 @@ public class XString {
 	}
 
 	/* Truncates after delimiter including truncating the delimiter */
-	public static String truncateAfterFirst(String text, String delim) {
+	public static String truncAfterFirst(String text, String delim) {
 		if (no(text))
 			return null;
 
@@ -196,7 +196,7 @@ public class XString {
 		return str.substring(0, str.length() - 1);
 	}
 
-	public static String truncateAfterLast(String text, String delim) {
+	public static String truncAfterLast(String text, String delim) {
 		if (no(text))
 			return null;
 
@@ -233,7 +233,7 @@ public class XString {
 	/**
 	 * input: abc--file.txt, -- output: file.txt
 	 */
-	public String truncateBefore(String fileName, String delims) {
+	public String truncBefore(String fileName, String delims) {
 		if (no(fileName))
 			return null;
 
@@ -251,7 +251,7 @@ public class XString {
 	/**
 	 * input: abc--file.txt, . output: abc--file
 	 */
-	public String truncateAfter(String fileName, String delims) {
+	public String truncAfter(String fileName, String delims) {
 		if (no(fileName))
 			return null;
 

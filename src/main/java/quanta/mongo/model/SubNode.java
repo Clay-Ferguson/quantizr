@@ -214,7 +214,7 @@ public class SubNode {
 	public String getParentPath() {
 		if (no(getPath()))
 			return null;
-		return XString.truncateAfterLast(getPath(), "/");
+		return XString.truncAfterLast(getPath(), "/");
 	}
 
 	@Transient

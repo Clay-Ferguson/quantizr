@@ -140,7 +140,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				if (sb.length() > 0) {
 					sb.append(" / ");
 				}
-				String friendlyName = generateFileNameFromNode(bcNode);
+				String friendlyName = generateFriendlyName(bcNode);
 				if (ok(friendlyName)) {
 					sb.append(friendlyName);
 				}
@@ -459,15 +459,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		addEntry(fileName, is, length);
 	}
 
-	private String generateFileNameFromNode(SubNode node) {
+	private String generateFriendlyName(SubNode node) {
 		String fileName = node.getName();
 
 		if (StringUtils.isEmpty(fileName)) {
 			fileName = node.getContent();
 			if (ok(fileName)) {
 				fileName = fileName.trim();
-				fileName = XString.truncateAfterFirst(fileName, "\n");
-				fileName = XString.truncateAfterFirst(fileName, "\r");
+				fileName = XString.truncAfterFirst(fileName, "\n");
+				fileName = XString.truncAfterFirst(fileName, "\r");
 			}
 		}
 

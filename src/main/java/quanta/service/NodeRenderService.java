@@ -666,8 +666,8 @@ public class NodeRenderService extends ServiceBase {
 			return null;
 
 		content = stripRenderTags(content);
-		content = XString.truncateAfterFirst(content, "\n");
-		content = XString.truncateAfterFirst(content, "\r");
+		content = XString.truncAfterFirst(content, "\n");
+		content = XString.truncAfterFirst(content, "\r");
 		while (content.startsWith("#")) {
 			content = content.substring(1);
 		}

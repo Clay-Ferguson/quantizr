@@ -125,7 +125,7 @@ public class GraphNodesService extends ServiceBase {
 				continue;
 
 			GraphNode n = mapByPath.get(path);
-			String parentPath = XString.truncateAfterLast(n.getPath(), "/");
+			String parentPath = XString.truncAfterLast(n.getPath(), "/");
 			// log.debug("Looking for Parent (b): " + parentPath);
 			GraphNode parent = mapByPath.get(parentPath);
 			if (ok(parent)) {
@@ -142,7 +142,7 @@ public class GraphNodesService extends ServiceBase {
 		if (no(path) || path.length() < 3)
 			return;
 
-		String parentPath = XString.truncateAfterLast(path, "/");
+		String parentPath = XString.truncAfterLast(path, "/");
 		if (parentPath.equals(rootPath))
 			return;
 
