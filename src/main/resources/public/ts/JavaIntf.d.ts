@@ -250,6 +250,7 @@ export interface GetOpenGraphRequest extends RequestBase {
 
 export interface GetServerInfoRequest extends RequestBase {
     command: string;
+    parameter: string;
     nodeId: string;
 }
 

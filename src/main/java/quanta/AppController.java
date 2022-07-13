@@ -1488,7 +1488,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					break;
 
 				case "getActPubJson":
-					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, req.getNodeId()), null));
+					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, req.getNodeId(), req.getParameter()), null));
 					break;
 
 				default:

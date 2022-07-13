@@ -1970,14 +1970,20 @@ public class ActPubService extends ServiceBase {
         return tagList;
     }
 
-    public String getRemoteJson(MongoSession ms, String nodeId) {
-        SubNode node = read.getNode(ms, nodeId);
-        if (no(node)) {
-            return "Node not found.";
-        }
-        String objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
-        if (no(objUrl)) {
-            return "Node has no ActivityPub URL";
+    /* We're expected to have a nodeId here --or-- a url, but not both */
+    public String getRemoteJson(MongoSession ms, String nodeId, String objUrl) {
+
+        // if we have a nodeId try to use it to get the objUrl from and ignore objUrl param, otherwise 
+        // we'll just end up using the passed objUrl
+        if (ok(nodeId)) {
+            SubNode node = read.getNode(ms, nodeId);
+            if (no(node)) {
+                return "Node not found.";
+            }
+            objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+            if (no(objUrl)) {
+                return "Node has no ActivityPub URL";
+            }
         }
 
         String userDoingAction = ThreadLocals.getSC().getUserName();

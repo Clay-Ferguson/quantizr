@@ -97,9 +97,17 @@ export class MenuPanel extends Div {
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
     static mouseEffects = () => { S.util.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
-    static showRawData = () => S.view.runServerCommand("getJson", "Node Data", "", appState(null));
-    static showActPubJson = () => S.view.runServerCommand("getActPubJson", "ActivityPub JSON", "", appState(null));
+    static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", appState(null));
+    static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
+
+    static readJSONfromURL = () => {
+        // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
+        let url = window.prompt("ActivityPub Object URL: ");
+        if (url) {
+            S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "", appState(null));
+        }
+    }
 
     // DO NOT DELETE
     // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
@@ -443,34 +451,35 @@ export class MenuPanel extends Div {
             children.push(new Menu("Admin - Utils", [
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
-                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Info View", null, state)), //
-                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", "Toggle Daemons", null, state)), //
-                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", "Session Activity", null, state)), //
-                new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", "Admin Note", null, state)), //
+                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null, state)), //
+                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null, state)), //
+                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, state)), //
+                new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, state)), //
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
-                new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", "Refresh RSS Cache", null, state)), //
+                new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state))
             ]));
 
             children.push(new Menu("Admin - DB", [
-                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
-                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
-                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", "Run DB Conversion", null, state)), //
-                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
-                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),
-                new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", "Delete node leaving orphans", null, state)) //
+                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, state)), //
+                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, state)), //
+                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null, state)), //
+                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null, state)), //
+                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null, state)),
+                new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null, state)) //
             ]));
 
             children.push(new Menu("Admin - ActivityPub", [
                 new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
-                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
-                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", "Refresh AP Accounts", null, state)), //
-                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
-                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state))
+                new MenuItem("Get JSON from URL", MenuPanel.readJSONfromURL), //
+                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null, state)), //
+                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null, state)), //
+                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null, state)), //
+                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null, state))
             ]));
 
             children.push(new Menu("Admin - Test", [
-                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", "PubSub Test", null, state)), //
+                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null, state)), //
                 new MenuItem("Send Email", () => S.util.sendTestEmail()),
                 new MenuItem("Server Log Text", () => S.util.sendLogText()),
                 new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),

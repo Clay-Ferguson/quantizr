@@ -7,7 +7,10 @@ public class GetServerInfoRequest extends RequestBase {
     //command to run before sending back info about the command.
     private String command;
 
-    //currently selected node on the GUI
+    // we support one up to one parameter to go with the function
+    private String parameter;
+
+    // currently selected node on the GUI
     private String nodeId;
 
     public String getCommand() {
@@ -24,5 +27,13 @@ public class GetServerInfoRequest extends RequestBase {
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    public String getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
     }
 }

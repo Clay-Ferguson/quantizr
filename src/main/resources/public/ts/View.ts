@@ -363,17 +363,18 @@ export class View {
             trending,
             feed,
             getWords: true,
-            getTags: true,
+        getTags: true,
             getMentions: true
         });
         new NodeStatsDlg(res, trending, feed, state).open();
     }
 
-    runServerCommand = async (command: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void> => {
+    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void> => {
         const node = S.nodeUtil.getHighlightedNode(state);
 
         let res: J.GetServerInfoResponse = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,
+            parameter,
             nodeId: node ? node.id : null
         });
 
