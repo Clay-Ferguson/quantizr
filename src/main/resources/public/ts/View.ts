@@ -163,23 +163,10 @@ export class View {
                     scrollToTop = false;
                 }
 
-                if (scrollToTop) {
-                    // todo-0: testing pending for this.
-                    // S.view.scrollAllTop(state);
-                    // setTimeout(() => {
-                        if (C.DEBUG_SCROLLING) {
-                            console.log("loadPage(1) -> renderPageFromData (scrollTop=" + scrollToTop + ")");
-                        }
-                        console.log("renderPageFromData scrollTop");
-                        S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
-                    // }, 1000);
+                if (C.DEBUG_SCROLLING) {
+                    console.log("loadPage -> renderPageFromData (scrollTop=" + scrollToTop + ")");
                 }
-                else {
-                    if (C.DEBUG_SCROLLING) {
-                        console.log("loadPage(2) -> renderPageFromData (scrollTop=" + scrollToTop + ")");
-                    }
-                    S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
-                }
+                S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {
@@ -363,7 +350,7 @@ export class View {
             trending,
             feed,
             getWords: true,
-        getTags: true,
+            getTags: true,
             getMentions: true
         });
         new NodeStatsDlg(res, trending, feed, state).open();

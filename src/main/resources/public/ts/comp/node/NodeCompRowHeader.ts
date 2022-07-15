@@ -132,7 +132,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         // todo-0: AFTER better testing we can bring back boost feature
-        // Taking this away (7/8/22) after discovering it never really rendered correctly on FOREIGN servers. 
+        // Taking this away (7/8/22) after discovering it never was rendering correctly on FOREIGN servers. 
         // if (!this.isBoost) {
         //     children.push(new Icon({
         //         title: "Boost this Node",

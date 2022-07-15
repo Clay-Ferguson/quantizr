@@ -184,9 +184,9 @@ public class ActPubService extends ServiceBase {
                      * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
                      * that right?)
                      * 
-                     * todo-0: wow, looks like (discovered on 7/8/22) this code branch was never executing becasue
-                     * boostTarget was null due to getting it off 'parent' instead of 'node', above. Need to verify this
-                     * branch of code is correct now.
+                     * todo-0: Discovered on 7/8/22, this code branch was never executing becasue boostTarget was null
+                     * due to getting it off 'parent' instead of 'node', above. Need to verify this branch of code is
+                     * correct now.
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
                         // todo-0: also check how outbox is rendering this boostedUrl. It will also need the fix.
@@ -1973,7 +1973,7 @@ public class ActPubService extends ServiceBase {
     /* We're expected to have a nodeId here --or-- a url, but not both */
     public String getRemoteJson(MongoSession ms, String nodeId, String objUrl) {
 
-        // if we have a nodeId try to use it to get the objUrl from and ignore objUrl param, otherwise 
+        // if we have a nodeId try to use it to get the objUrl from and ignore objUrl param, otherwise
         // we'll just end up using the passed objUrl
         if (ok(nodeId)) {
             SubNode node = read.getNode(ms, nodeId);

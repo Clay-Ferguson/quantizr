@@ -343,9 +343,12 @@ public class ActPubOutbox extends ServiceBase {
 
                         APObj ret = null;
 
-                        // I was unable to test this branch of the code, because apparently mastodon doesn't call it for
-                        // the scenario I thought it would. I was trying to nav to a user in masto and click their "posts and replies"
-                        // and expecting it to call into here, but it doesn't. Need way to test this branch of code. todo-0
+                        /*
+                         * I was unable to test this branch of the code, because apparently mastodon doesn't call it for the
+                         * scenario I thought it would. I was trying to nav to a user in masto and click their
+                         * "posts and replies" and expecting it to call into here, but it doesn't. Need way to test this
+                         * branch of code. todo-0
+                         */
                         if (!StringUtils.isEmpty(boostTarget)) {
                             // log.debug("processing boostTarget: " + boostTarget + " in outbox gen for " + userName);
                             String published = DateUtil.isoStringFromDate(child.getModifyTime());

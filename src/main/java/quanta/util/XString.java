@@ -22,6 +22,9 @@ import quanta.exception.base.RuntimeEx;
 
 /**
  * General string utilities.
+ * 
+ * todo-0: Look for ways to use this: Java 11 adds a few new methods to the String class: isBlank,
+ * lines, strip, stripLeading, stripTrailing, and repeat.
  */
 public class XString {
 	private static final Logger log = LoggerFactory.getLogger(XString.class);
