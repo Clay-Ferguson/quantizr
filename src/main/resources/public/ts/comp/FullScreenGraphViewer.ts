@@ -5,7 +5,6 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { Main } from "./Main";
-import { appState } from "../AppRedux";
 
 // https://observablehq.com/@d3/force-directed-tree
 // https://www.npmjs.com/package/d3
@@ -270,6 +269,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domRemoveEvent(): void {
+        console.log("Graph stopSim");
         this.stopSim();
     }
 

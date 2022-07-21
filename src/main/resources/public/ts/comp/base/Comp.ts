@@ -24,6 +24,7 @@ export abstract class Comp implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
+    // todo-0: remove this. It's not worth the cognitive load.
     e: Function = createElement;
 
     attribs: any;
@@ -55,10 +56,11 @@ export abstract class Comp implements CompIntf {
         // We bind these (to 'this') because they're passed to other functions and can loose context otherwise.
         // Remember, inheritance always works "as expected" in TypeScript (same as C++ OOP) except when called from callbacks
         // and except when passed to other functions. So in those two cases you must either bind or use fat arrow to preserve 'this'
-        this.domAddEvent = this.domAddEvent.bind(this);
-        this.domRemoveEvent = this.domRemoveEvent.bind(this);
-        this.domUpdateEvent = this.domUpdateEvent.bind(this);
-        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
+        // todo-1: delete this obsolete code only after more extensive testing.
+        // this.domAddEvent = this.domAddEvent.bind(this);
+        // this.domRemoveEvent = this.domRemoveEvent.bind(this);
+        // this.domUpdateEvent = this.domUpdateEvent.bind(this);
+        // this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
 
         if (!stateMgr) {
             this.stateMgr = new State();
@@ -71,7 +73,12 @@ export abstract class Comp implements CompIntf {
         this.setId(id);
     }
 
+    // todo-0: This is ugly. Use a useRef, or research forwardRef if necessary.
     public getRef = (): HTMLElement => {
+        // if (this.ref) {
+        //     console.log("ref ok: " + this.getId());
+        //     return this.ref;
+        // }
         let elm: HTMLElement = document.getElementById(this.getId());
         return (elm && elm.isConnected) ? elm : null;
 
@@ -380,7 +387,7 @@ export abstract class Comp implements CompIntf {
         return this.stateMgr.state;
     }
 
-    // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
+    // Core 'render' function used by react.
     _render = (): ReactNode => {
         if (this.debug) {
             console.log("_render(): " + this.jsClassName);
@@ -393,15 +400,26 @@ export abstract class Comp implements CompIntf {
 
             // With 'useRef()' we sometimes get error:
             // Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef(
-            // this.attribs.ref = useRef(null);
-            // this.attribs.ref = ref => this.ref = ref;
 
-            useEffect(this.domAddEvent, []);
-            useEffect(this.domUpdateEvent);
-            useLayoutEffect(this.domPreUpdateEvent);
-            // this works too...
-            // useLayoutEffect(() => this.domPreUpdateEvent(), []);
-            useEffect(() => this.domRemoveEvent, []);
+            // original pattern for add/remove event
+            //     useEffect(this.domAddEvent, []);
+            //     useEffect(() => this.domRemoveEvent, []);
+            // new pattern for add/remove events
+            // todo-0: We need to stop using inheritance/overriding of these effect event methods and allow them
+            // to remain null most of the time, for most components, to simplify and speed up performance and memory consumption.
+            //
+            useEffect(() => {
+                // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
+                this.domAddEvent();
+
+                // the return value of the useEffect function is what will get called when component unmounts
+                return () => {
+                    this.domRemoveEvent();
+                };
+            }, []);
+
+            useEffect(() => this.domUpdateEvent());
+            useLayoutEffect(() => this.domPreUpdateEvent());
 
             this.stateMgr.updateVisAndEnablement();
 
