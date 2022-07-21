@@ -36,7 +36,7 @@ export class AppTab<PropType = any> extends Div {
     }
 
     // use NON-Arrow for inheritance compatability
-    domAddEvent(): void {
+    domAddEvent = (): void => {
         if (C.DEBUG_SCROLLING) {
             console.log("domAddEvent(a): " + this.data.name);
         }
@@ -52,8 +52,6 @@ export class AppTab<PropType = any> extends Div {
                 this.data.scrollPos = elm.scrollTop;
             }, { passive: true });
         }
-
-        super.domAddEvent();
     }
 
     // Let's keep this code, but it's currently unused
@@ -64,8 +62,7 @@ export class AppTab<PropType = any> extends Div {
     //     }
     // }
 
-    // use NON-Arrow for inheritance compatability
-    domPreUpdateEvent(): void {
+    domPreUpdateEvent = (): void => {
         let elm = this.getRef();
         if (elm) {
             if (C.DEBUG_SCROLLING) {
@@ -73,6 +70,5 @@ export class AppTab<PropType = any> extends Div {
             }
             this.reScroll(elm);
         }
-        super.domPreUpdateEvent();
     }
 }

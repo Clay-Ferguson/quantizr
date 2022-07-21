@@ -72,6 +72,5 @@ export class Html extends Comp {
     //         // let href = el.getAttribute("href");
     //         el.setAttribute("target", "_blank");
     //     });
-    //     super.domPreUpdateEvent();
     // }
 }

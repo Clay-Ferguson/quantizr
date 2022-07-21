@@ -41,6 +41,13 @@ export abstract class Comp implements CompIntf {
 
     renderRawHtml: boolean = false;
 
+    // default all these to null so that unless derived class sets the value we never need
+    // to create some of the useEffect calls
+    public domPreUpdateEvent = null;
+    public domUpdateEvent = null;
+    public domRemoveEvent = null;
+    public domAddEvent = null;
+
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
      * controlled by ReactJS (rather than our own innerHTML)
@@ -49,16 +56,6 @@ export abstract class Comp implements CompIntf {
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
     constructor(attribs?: any, private stateMgr?: State) {
-
-        // We bind these (to 'this') because they're passed to other functions and can loose context otherwise.
-        // Remember, inheritance always works "as expected" in TypeScript (same as C++ OOP) except when called from callbacks
-        // and except when passed to other functions. So in those two cases you must either bind or use fat arrow to preserve 'this'
-        // todo-1: delete this obsolete code only after more extensive testing.
-        // this.domAddEvent = this.domAddEvent.bind(this);
-        // this.domRemoveEvent = this.domRemoveEvent.bind(this);
-        // this.domUpdateEvent = this.domUpdateEvent.bind(this);
-        // this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
-
         if (!stateMgr) {
             this.stateMgr = new State();
         }
@@ -398,27 +395,22 @@ export abstract class Comp implements CompIntf {
         try {
             this.stateMgr.useState();
 
-            // original pattern for add/remove event
-            //     useEffect(this.domAddEvent, []);
-            //     useEffect(() => this.domRemoveEvent, []);
-            // new pattern for add/remove events
-            // todo-0: We need to stop using inheritance/overriding of these effect event methods and allow them
-            // to remain null most of the time, for most components, to simplify and speed up performance and memory consumption.
-            //
             useEffect(() => {
                 this.mounted = true;
+
                 // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
-                this.domAddEvent();
+                this.domAdd(); // call non-overridable method.
+                if (this.domAddEvent) this.domAddEvent(); // call overridable method.
 
                 // the return value of the useEffect function is what will get called when component unmounts
                 return () => {
                     this.mounted = false;
-                    this.domRemoveEvent();
+                    if (this.domRemoveEvent) this.domRemoveEvent();
                 };
             }, []);
 
-            useEffect(() => this.domUpdateEvent());
-            useLayoutEffect(() => this.domPreUpdateEvent());
+            if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
+            if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
 
             this.stateMgr.updateVisAndEnablement();
 
@@ -447,20 +439,8 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    // NON-Arrow function to support calling thru 'super'
-    public domPreUpdateEvent(): void {
-    }
-
-    // NON-Arrow function to support calling thru 'super'
-    public domUpdateEvent(): void {
-    }
-
-    // NON-Arrow function to support calling thru 'super'
-    public domRemoveEvent(): void {
-    }
-
     // leave NON-Arrow function to support calling thru 'super'
-    public domAddEvent(): void {
+    domAdd(): void {
         // console.log("domAddEvent: " + this.jsClassName);
 
         let elm: HTMLElement = this.getRef();

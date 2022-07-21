@@ -42,7 +42,7 @@ export class FullScreenGraphViewer extends Main {
         this.setChildren([new Div(null, { className: "d3Graph" })]);
     }
 
-    domPreUpdateEvent(): void {
+    domPreUpdateEvent = (): void => {
         let state = this.getState<LS>();
         if (!state.data) return;
 
@@ -51,7 +51,6 @@ export class FullScreenGraphViewer extends Main {
         d3.select(".d3Graph")
             .datum(state.data)
             .call(customForceDirectedTree);
-        super.domPreUpdateEvent();
     }
 
     forceDirectedTree = () => {
@@ -268,19 +267,18 @@ export class FullScreenGraphViewer extends Main {
             .style("top", (y - 50) + "px");
     }
 
-    domRemoveEvent(): void {
+    domRemoveEvent = (): void => {
         console.log("Graph stopSim");
         this.stopSim();
     }
 
-    domUpdateEvent(): void {
+    domUpdateEvent = (): void => {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollTop=0");
         }
         if (S.view.docElm) {
             S.view.docElm.scrollTop = 0;
         }
-        super.domUpdateEvent();
     }
 
     stopSim = () => {

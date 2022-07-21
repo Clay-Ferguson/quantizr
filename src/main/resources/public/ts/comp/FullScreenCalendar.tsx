@@ -106,10 +106,9 @@ export class FullScreenCalendar extends Main {
         S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, this.state);
     }
 
-    domUpdateEvent(): void {
+    domUpdateEvent = (): void => {
         // #DEBUG-SCROLLING
         S.view.docElm.scrollTop = 0;
-        super.domUpdateEvent();
     }
 }
 

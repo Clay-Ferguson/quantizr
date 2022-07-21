@@ -111,10 +111,9 @@ export class NodeCompContent extends Div {
         }
     }
 
-    domPreUpdateEvent(): void {
+    domPreUpdateEvent = (): void => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }
-        super.domPreUpdateEvent();
     }
 }

@@ -34,7 +34,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    domAddEvent(): void {
+    domAddEvent = (): void => {
         let elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
@@ -75,7 +75,6 @@ export class OpenGraphPanel extends Div {
         else {
             this.mergeState<LS>({ og });
         }
-        super.domAddEvent();
     }
 
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a

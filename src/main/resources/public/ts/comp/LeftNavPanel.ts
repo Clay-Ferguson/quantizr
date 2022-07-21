@@ -87,7 +87,7 @@ export class LeftNavPanel extends Div {
         }
     }
 
-    domAddEvent(): void {
+    domAddEvent = (): void => {
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);
@@ -96,15 +96,13 @@ export class LeftNavPanel extends Div {
                 LeftNavPanel.scrollPos = elm.scrollTop;
             }, { passive: true });
         }
-        super.domAddEvent();
     }
 
-    domPreUpdateEvent(): void {
+    domPreUpdateEvent = (): void => {
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);
         }
-        super.domPreUpdateEvent();
     }
 
     // This was originally on the toolbar at top of page but if we bring this back it will be here (probably)
@@ -159,6 +157,5 @@ export class LeftNavPanel extends Div {
     //             // }
     //         }
     //     });
-    //     super.domAddEvent();
     // }
 }
