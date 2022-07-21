@@ -2,7 +2,7 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect } from "react";
+import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
@@ -20,6 +20,7 @@ export abstract class Comp implements CompIntf {
     static focusElmId: string = null;
     public rendered: boolean = false;
     public debug: boolean = false;
+    public mounted: boolean = false;
 
     public debugState: boolean = false;
     private static guid: number = 0;
@@ -39,7 +40,6 @@ export abstract class Comp implements CompIntf {
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     renderRawHtml: boolean = false;
-    // ref: HTMLElement;
 
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
@@ -70,23 +70,23 @@ export abstract class Comp implements CompIntf {
         this.setId(id);
     }
 
-    // todo-0: This is ugly. Use a useRef, or research forwardRef if necessary.
     public getRef = (): HTMLElement => {
-        // if (this.ref) {
-        //     console.log("ref ok: " + this.getId());
-        //     return this.ref;
-        // }
-        let elm: HTMLElement = document.getElementById(this.getId());
-        return (elm && elm.isConnected) ? elm : null;
+        if (this.attribs?.ref?.current) {
+            // console.log("ref: " + this.attribs.ref.current.id);
+            return (this.attribs.ref.current.isConnected) ? this.attribs.ref.current : null;
+        }
 
-        // if (!this.ref) {
-        //     // console.log("ref not set in id: " + this.getId() + " " + this.jsClassName);
-        //     return null;
+        // Returning null is not an error condition. Methods like 'whenElm' do call this in cases where we return
+        // null here, and it's normal flow to do so.
+        return null;
+        // todo-1: we no longer ever need this, so we can eventually delete
+        // else {
+        //     // tip: When this happens it probably means your top level createElement in your render method of the component,
+        //     // is neglecting to use the 'this.attribs.ref' attribute and that breaks the ref.
+        //     console.log("ref fail. trying getElement: " + this.getId() + " class=" + this.jsClassName + " mounted=" + this.mounted);
+        //     let elm: HTMLElement = document.getElementById(this.getId());
+        //     return (elm && elm.isConnected) ? elm : null;
         // }
-        // if (!this.ref.isConnected) {
-        //     console.log("warning: ref for dom id was not connected: " + this.getId());
-        // }
-        // return this.ref;
     }
 
     private setId(id: string) {
@@ -116,6 +116,8 @@ export abstract class Comp implements CompIntf {
     whenElm(func: (elm: HTMLElement) => void) {
         // console.log("whenElm running for " + this.jsClassName);
 
+        // If we happen to already have the ref, we can run the 'func' immediately and be done
+        // or else we add 'func' to the queue of functions to call when component does get mounted.
         let elm = this.getRef();
         if (elm) {
             // console.log("Looked for and FOUND on DOM: " + this.jsClassName);
@@ -396,9 +398,6 @@ export abstract class Comp implements CompIntf {
         try {
             this.stateMgr.useState();
 
-            // With 'useRef()' we sometimes get error:
-            // Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef(
-
             // original pattern for add/remove event
             //     useEffect(this.domAddEvent, []);
             //     useEffect(() => this.domRemoveEvent, []);
@@ -407,11 +406,13 @@ export abstract class Comp implements CompIntf {
             // to remain null most of the time, for most components, to simplify and speed up performance and memory consumption.
             //
             useEffect(() => {
+                this.mounted = true;
                 // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
                 this.domAddEvent();
 
                 // the return value of the useEffect function is what will get called when component unmounts
                 return () => {
+                    this.mounted = false;
                     this.domRemoveEvent();
                 };
             }, []);
@@ -437,6 +438,7 @@ export abstract class Comp implements CompIntf {
                 console.log("render: " + this.jsClassName + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
+            this.attribs.ref = useRef();
             ret = this.compRender();
         }
         catch (e) {

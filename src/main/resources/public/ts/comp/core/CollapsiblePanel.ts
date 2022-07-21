@@ -30,6 +30,9 @@ export class CollapsiblePanel extends Comp {
         this.mergeState<LS>({ expanded });
     }
 
+    // todo-0: Some components like this one, aren't using this.attibs in the root element they return, and
+    // this breaks things teh base class expects to have put in there, namely the 'ref' property.
+    // Need to look over all 'compRender()' methods and fix this globally
     compRender(): ReactNode {
         let state = this.getState<LS>();
         let style = this.textLink ? "collapse-panel-link" : "btn btn-info ";
@@ -40,7 +43,8 @@ export class CollapsiblePanel extends Comp {
         if (state.expanded) {
             return createElement(this.elementName, {
                 key: "panel_" + this.getId(),
-                className: this.extraDivStyleExpanded
+                className: this.extraDivStyleExpanded,
+                ref: this.attribs.ref
             },
                 // This div and it's children holds the actual collapsible content.
                 createElement("div", {
@@ -63,7 +67,8 @@ export class CollapsiblePanel extends Comp {
         else {
             return createElement(this.elementName, {
                 key: "panel_" + this.getId(),
-                className: this.extraDivStyleCollapsed
+                className: this.extraDivStyleCollapsed,
+                ref: this.attribs.ref
             },
                 // This span is the expande/collapse button itself
                 createElement("span", {
