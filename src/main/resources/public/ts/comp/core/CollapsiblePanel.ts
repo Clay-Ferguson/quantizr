@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -38,18 +38,18 @@ export class CollapsiblePanel extends Comp {
         /* If the component is expanded we render the button INSIDE the main area,
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
-            return this.e(this.elementName, {
+            return createElement(this.elementName, {
                 key: "panel_" + this.getId(),
                 className: this.extraDivStyleExpanded
             },
                 // This div and it's children holds the actual collapsible content.
-                this.e("div", {
+                createElement("div", {
                     className: collapseClass,
                     id: this.getId(),
                     key: "content_" + this.getId()
                 },
                     // This span is the expande/collapse button itself
-                    this.e("span", {
+                    createElement("span", {
                         className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                         // Warning: This can't be camel case!
                         "data-bs-toggle": collapseClass,
@@ -61,12 +61,12 @@ export class CollapsiblePanel extends Comp {
                 ));
         }
         else {
-            return this.e(this.elementName, {
+            return createElement(this.elementName, {
                 key: "panel_" + this.getId(),
                 className: this.extraDivStyleCollapsed
             },
                 // This span is the expande/collapse button itself
-                this.e("span", {
+                createElement("span", {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                     // Warning: This can't be camel case!
                     "data-bs-toggle": collapseClass,
@@ -76,7 +76,7 @@ export class CollapsiblePanel extends Comp {
                 }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
 
                 // This div and it's children holds the actual collapsible content.
-                this.e("div", {
+                createElement("div", {
                     className: collapseClass,
                     id: this.getId(),
                     key: "content_" + this.getId()

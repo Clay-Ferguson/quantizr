@@ -9,6 +9,7 @@ import { Span } from "./comp/core/Span";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
 import { S } from "./Singletons";
+import { createElement } from "react";
 
 export abstract class DialogBase extends Div implements DialogBaseImpl {
 
@@ -142,10 +143,10 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     domRender(): void {
-        const reactElm = this.e(this._render, this.attribs);
+        const reactElm = createElement(<any>this._render, this.attribs);
 
         // console.log("Rendering with provider");
-        const provider = this.e(Provider, { store }, reactElm);
+        const provider = createElement(Provider, { store }, reactElm);
         ReactDOM.render(provider, this.backdrop);
     }
 

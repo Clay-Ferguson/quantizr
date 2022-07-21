@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Spinner extends Comp {
@@ -11,6 +11,6 @@ export class Spinner extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("div", this.attribs);
+        return createElement("div", this.attribs);
     }
 }

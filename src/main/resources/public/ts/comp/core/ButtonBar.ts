@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class ButtonBar extends Comp {
@@ -18,14 +18,14 @@ export class ButtonBar extends Comp {
         if (!this.hasChildren()) return null;
 
         if (this.wrapperClass) {
-            return this.e("div", {
+            return createElement("div", {
                 className: this.wrapperClass,
                 key: this.getId() + "_wrp"
             },
-                this.e("div", this.attribs, this.buildChildren()));
+                createElement("div", this.attribs, this.buildChildren()));
         }
         else {
-            return this.e("div", this.attribs, this.buildChildren());
+            return createElement("div", this.attribs, this.buildChildren());
         }
     }
 }

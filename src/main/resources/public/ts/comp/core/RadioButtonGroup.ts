@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { RadioButton } from "./RadioButton";
 
@@ -17,6 +17,6 @@ export class RadioButtonGroup extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("div", this.attribs, this.buildChildren());
+        return createElement("div", this.attribs, this.buildChildren());
     }
 }

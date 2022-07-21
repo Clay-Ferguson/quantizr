@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
@@ -10,7 +10,7 @@ export class ButtonTag extends Comp {
 
     /* Div element is a special case where it renders just its children if there are any, and if not it renders 'content' */
     compRender(): ReactNode {
-        return this.e("button", this.attribs, this.e("span", {
+        return createElement("button", this.attribs, createElement("span", {
             key: "s_" + this.getId()
         }));
     }

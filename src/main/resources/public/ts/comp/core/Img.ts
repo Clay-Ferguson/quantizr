@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Img extends Comp {
@@ -12,6 +12,6 @@ export class Img extends Comp {
         // this.attribs.style = this.attribs.style || {};
         // this.attribs.style.maxWidth = "calc(100% - 12px)";
         // this.attribs.style.width = "calc(100% - 12px)";
-        return this.e("img", this.attribs);
+        return createElement("img", this.attribs);
     }
 }

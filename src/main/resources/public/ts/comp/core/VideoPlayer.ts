@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class VideoPlayer extends Comp {
@@ -13,6 +13,6 @@ export class VideoPlayer extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("video", this.attribs);
+        return createElement("video", this.attribs);
     }
 }

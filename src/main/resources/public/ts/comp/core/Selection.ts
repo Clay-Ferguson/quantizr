@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { store } from "../../AppRedux";
 import { ValueIntf } from "../../Interfaces";
 import { S } from "../../Singletons";
@@ -52,7 +52,7 @@ export class Selection extends Comp {
         let children = [];
 
         if (this.label) {
-            children.push(this.e("label", {
+            children.push(createElement("label", {
                 id: this.getId() + "_label",
                 key: this.getId() + "_label",
                 htmlFor: this.getId(),
@@ -62,7 +62,7 @@ export class Selection extends Comp {
 
         children.push(this.tagRender("select", null, this.attribs));
 
-        return this.e("div", {
+        return createElement("div", {
             id: this.getId() + "_sel",
             key: this.getId() + "_sel",
             className: this.outterClasses || ""

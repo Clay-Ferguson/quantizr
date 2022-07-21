@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { Comp } from "../base/Comp";
 
@@ -46,12 +46,12 @@ export class RadioButton extends Comp {
     compRender(): ReactNode {
         this.attribs.checked = !!this.valueIntf.getValue();
 
-        return this.e("span", {
+        return createElement("span", {
             key: this.attribs.id + "_span",
             className: "form-check"
         },
-            this.e("input", this.attribs),
-            this.e("label", {
+            createElement("input", this.attribs),
+            createElement("label", {
                 key: this.attribs.id + "_label",
                 htmlFor: this.attribs.id,
                 className: "form-check-label radioLabel"

@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
+import { S } from "../Singletons";
+import { CompIntf } from "./base/CompIntf";
 
 interface LS { // Local State
     visible: boolean;

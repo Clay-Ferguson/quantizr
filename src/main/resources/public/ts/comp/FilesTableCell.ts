@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, createElement } from "react";
 import { Comp } from "./base/Comp";
 
 export class FilesTableCell extends Comp {

@@ -24,9 +24,6 @@ export abstract class Comp implements CompIntf {
     public debugState: boolean = false;
     private static guid: number = 0;
 
-    // todo-0: remove this. It's not worth the cognitive load.
-    e: Function = createElement;
-
     attribs: any;
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
@@ -235,12 +232,12 @@ export abstract class Comp implements CompIntf {
 
             (this._render as any).displayName = this.jsClassName;
             this.wrapClickFunc(this.attribs);
-            let reactElm = this.e(this._render, this.attribs);
+            let reactElm = createElement(<any>this._render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
                 // console.log("Rendering with provider");
-                let provider = this.e(Provider, { store }, reactElm);
+                let provider = createElement(Provider, { store }, reactElm);
                 ReactDOM.render(provider, elm);
             }
             else {
@@ -287,7 +284,8 @@ export abstract class Comp implements CompIntf {
                     // console.log("ChildRender: " + child.jsClassName);
                     (this._render as any).displayName = child.jsClassName;
                     this.wrapClickFunc(child.attribs);
-                    reChild = this.e(child._render, child.attribs);
+                    // this <any> was a hack here. Need to investigate (todo-0)
+                    reChild = createElement(<any>child._render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -338,15 +336,15 @@ export abstract class Comp implements CompIntf {
                 // https://github.com/facebook/react/issues/5652
                 if (tag === "table") {
                     // this is just wrapping the children in a tbody and giving it a key so react won't panic.
-                    return this.e(tag, props, [this.e("tbody", { key: props.key + "_tbody" }, children)]);
+                    return createElement(tag, props, [createElement("tbody", { key: props.key + "_tbody" }, children)]);
                 }
                 else {
-                    return this.e(tag, props, children);
+                    return createElement(tag, props, children);
                 }
             }
             else {
                 // console.log("Render Tag no children.");
-                return this.e(tag, props);
+                return createElement(tag, props);
             }
         }
         catch (e) {

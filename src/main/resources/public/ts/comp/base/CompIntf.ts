@@ -4,7 +4,6 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
     clazz: string;
-    e : Function;
     attribs: any;
     jsClassName: string;
     renderRawHtml: boolean;

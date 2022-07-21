@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
@@ -17,6 +17,6 @@ export class Input extends Comp {
 
     compRender(): ReactNode {
         this.attribs.value = this.getState<LS>().value || "";
-        return this.e("input", this.attribs);
+        return createElement("input", this.attribs);
     }
 }

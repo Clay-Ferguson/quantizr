@@ -3,7 +3,7 @@ import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
-import React, { ReactNode } from "react";
+import React, { ReactNode, createElement } from "react";
 import { dispatch } from "../AppRedux";
 
 /* ========= WARNING =========
@@ -34,10 +34,10 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return this.e("div", {
+        return createElement("div", {
             className: "marginAll"
         },
-            this.e(FullCalendar, {
+            createElement(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
                     left: "prev,next today,weekendsEventButton,addEventButton,closeCalendarButton",

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Progress extends Comp {
@@ -15,6 +15,6 @@ export class Progress extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("div", this.attribs);
+        return createElement("div", this.attribs);
     }
 }

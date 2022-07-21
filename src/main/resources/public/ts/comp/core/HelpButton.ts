@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { store } from "../../AppRedux";
-import { Markdown } from "./Markdown";
 import { MessageDlg } from "../../dlg/MessageDlg";
 import { Comp } from "../base/Comp";
+import { Markdown } from "./Markdown";
 
 export class HelpButton extends Comp {
 
@@ -34,11 +34,11 @@ export class HelpButton extends Comp {
     }
 
     compRender(): ReactNode {
-        let icon = this.e("i", {
+        let icon = createElement("i", {
             key: "s_" + this.getId(),
             className: "fa fa-question-circle"
         });
 
-        return this.e("button", this.attribs, [icon]);
+        return createElement("button", this.attribs, [icon]);
     }
 }

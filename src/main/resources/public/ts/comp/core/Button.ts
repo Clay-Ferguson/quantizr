@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -29,7 +29,7 @@ export class Button extends Comp {
         let text: string = this.getState<LS>().text;
         let icon: any;
         if (this.attribs.iconclass) {
-            icon = this.e("i", {
+            icon = createElement("i", {
                 key: "s_" + this.getId(),
                 className: this.attribs.iconclass,
                 style: {
@@ -45,6 +45,6 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        return this.e("button", this.attribs, [icon, text]);
+        return createElement("button", this.attribs, [icon, text]);
     }
 }

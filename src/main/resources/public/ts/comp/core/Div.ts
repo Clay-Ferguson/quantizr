@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
@@ -21,7 +21,7 @@ export class Div extends Comp {
         if (this.renderRawHtml) {
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: this.content };
-            return this.e("div", { ...this.attribs, ..._p });
+            return createElement("div", { ...this.attribs, ..._p });
         }
         else {
             return this.tagRender("div", this.getState<LS>().content, this.attribs);

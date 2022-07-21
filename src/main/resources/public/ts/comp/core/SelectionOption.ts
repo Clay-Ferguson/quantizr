@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class SelectionOption extends Comp {
@@ -14,6 +14,6 @@ export class SelectionOption extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("option", this.attribs, this.val);
+        return createElement("option", this.attribs, this.val);
     }
 }

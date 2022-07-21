@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Heading extends Comp {
@@ -8,6 +8,6 @@ export class Heading extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("h" + this.level, this.attribs, this.content);
+        return createElement("h" + this.level, this.attribs, this.content);
     }
 }

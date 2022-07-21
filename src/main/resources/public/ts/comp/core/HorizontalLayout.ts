@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 import { Div } from "./Div";
 
