@@ -51,6 +51,9 @@ export class Selection extends Comp {
         this.attribs.value = this.valueIntf.getValue();
         let children = [];
 
+        let attribsClone = { ...this.attribs };
+        delete attribsClone.ref;
+
         if (this.label) {
             children.push(createElement("label", {
                 id: this.getId() + "_label",
@@ -60,12 +63,13 @@ export class Selection extends Comp {
             }, this.label));
         }
 
-        children.push(this.tagRender("select", null, this.attribs));
+        children.push(this.tagRender("select", null, attribsClone));
 
         return createElement("div", {
             id: this.getId() + "_sel",
             key: this.getId() + "_sel",
-            className: this.outterClasses || ""
+            className: this.outterClasses || "",
+            ref: this.attribs.ref
         }, children);
     }
 }

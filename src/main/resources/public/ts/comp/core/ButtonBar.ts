@@ -17,12 +17,18 @@ export class ButtonBar extends Comp {
     compRender(): ReactNode {
         if (!this.hasChildren()) return null;
 
+        // we have this clone becasue we want our 'ref' to point to the correct top level element 
+        // todo-0: however, if we do this wrapperClass logic externally and not inside this comp!
+        let attribsClone = { ...this.attribs };
+        delete attribsClone.ref;
+
         if (this.wrapperClass) {
             return createElement("div", {
                 className: this.wrapperClass,
-                key: this.getId() + "_wrp"
+                key: this.getId() + "_wrp",
+                ref: this.attribs.ref
             },
-                createElement("div", this.attribs, this.buildChildren()));
+                createElement("div", attribsClone, this.buildChildren()));
         }
         else {
             return createElement("div", this.attribs, this.buildChildren());

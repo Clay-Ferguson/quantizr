@@ -50,13 +50,17 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         this.attribs.checked = !!this.valueIntf.getValue();
         this.layoutClass = this.layoutClass || "form-check-inline";
 
+        let attribsClone = { ...this.attribs };
+        delete attribsClone.ref;
+
         return createElement("span", {
             key: this.attribs.id + "_span",
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
             // NOTE: custom-switch or custom-checkbox will work here with all other things being identical! The custom-switch shows
             // a little slider switch button instead of a box with a check.
-            className: "form-check " + this.layoutClass + " " + this.outterClassName + " clickable"
-        }, createElement("input", this.attribs),
+            className: "form-check " + this.layoutClass + " " + this.outterClassName + " clickable",
+            ref: this.attribs.ref
+        }, createElement("input", attribsClone),
             // warning without this label element the entire control fails to render, and this is apparently related to bootstrap itself.
             createElement("label", {
                 key: this.attribs.id + "_label",

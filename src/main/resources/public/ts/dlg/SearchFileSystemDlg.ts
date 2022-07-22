@@ -18,7 +18,7 @@ export class SearchFileSystemDlg extends DialogBase {
     constructor(state: AppState) {
         super("Search File System", null, false, state);
         this.whenElm((elm: HTMLElement) => {
-            this.searchTextField.focus();
+            this.searchTextField?.focus();
         });
         this.searchTextState.setValue(SearchFileSystemDlg.defaultSearchText);
     }

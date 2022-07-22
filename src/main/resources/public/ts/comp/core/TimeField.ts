@@ -14,7 +14,7 @@ export class TimeField extends Div implements I.ValueIntf {
     // Overriding base class so we can focus the correct part of this composite component.
     focus(): void {
         this.whenElm((elm: HTMLElement) => {
-            this.input.focus();
+            this.input?.focus();
         });
     }
 

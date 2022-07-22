@@ -46,11 +46,15 @@ export class RadioButton extends Comp {
     compRender(): ReactNode {
         this.attribs.checked = !!this.valueIntf.getValue();
 
+        let attribsClone = { ...this.attribs };
+        delete attribsClone.ref;
+
         return createElement("span", {
             key: this.attribs.id + "_span",
-            className: "form-check"
+            className: "form-check",
+            ref: this.attribs.ref
         },
-            createElement("input", this.attribs),
+            createElement("input", attribsClone),
             createElement("label", {
                 key: this.attribs.id + "_label",
                 htmlFor: this.attribs.id,

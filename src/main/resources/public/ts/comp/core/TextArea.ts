@@ -38,13 +38,11 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     insertTextAtCursor = (text: string) => {
-        if (this.input) {
-            this.input.whenElm((elm: any) => {
-                if (elm.selectionStart >= 0) {
-                    this.setValue(S.util.insertString(this.getValue(), text, elm.selectionStart));
-                }
-            });
-        }
+        this.input?.whenElm((elm: any) => {
+            if (elm.selectionStart >= 0) {
+                this.setValue(S.util.insertString(this.getValue(), text, elm.selectionStart));
+            }
+        });
     }
 
     setMode(mode: string): void {
@@ -64,9 +62,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
     focus(): void {
         this.whenElm((elm: HTMLElement) => {
-            if (this.input) {
-                this.input.focus();
-            }
+            this.input?.focus();
         });
     }
 

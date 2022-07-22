@@ -12,7 +12,7 @@ export class DateField extends Div implements I.ValueIntf {
 
     focus(): void {
         this.whenElm((elm: HTMLElement) => {
-            this.input.focus();
+            this.input?.focus();
         });
     }
 

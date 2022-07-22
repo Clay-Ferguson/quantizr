@@ -44,7 +44,7 @@ export class SearchContentDlg extends DialogBase {
         super("Search", null, null, state);
 
         this.whenElm((elm: HTMLElement) => {
-            this.searchTextField.focus();
+            this.searchTextField?.focus();
         });
 
         this.mergeState<LS>(SearchContentDlg.dlgState);

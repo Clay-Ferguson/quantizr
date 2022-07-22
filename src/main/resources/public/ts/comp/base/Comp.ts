@@ -100,7 +100,6 @@ export abstract class Comp implements CompIntf {
         return this.attribs.id;
     }
 
-    // WARNING: Use whenElmEx for DialogBase derived components!
     whenElm(func: (elm: HTMLElement) => void) {
         // console.log("whenElm running for " + this.jsClassName);
 
@@ -119,11 +118,10 @@ export abstract class Comp implements CompIntf {
 
         // queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
-            this.domAddFuncs = [func];
+            this.domAddFuncs = [];
         }
-        else {
-            this.domAddFuncs.push(func);
-        }
+
+        this.domAddFuncs.push(func);
     }
 
     setVisible(visible: boolean) {
@@ -294,15 +292,23 @@ export abstract class Comp implements CompIntf {
 
     focus(): void {
         // console.log("Comp.focus " + this.getId());
+        // immediately assign this as the focused element ID
         Comp.focusElmId = this.getId();
+
         this.whenElm((elm: HTMLElement) => {
-            Comp.focusElmId = this.getId();
-            // console.log("elm focus: id=" + this.getId());
-            S.domUtil.focusId(Comp.focusElmId);
+            // if we're still the focused id, then we do the focus, but due to async nature some other thing
+            // could have technically taken over focus and we might do nothing here.
+            if (Comp.focusElmId === this.getId()) {
+                // console.log("elm focus: id=" + this.getId());
+                S.domUtil.focusId(Comp.focusElmId);
+            }
         });
     }
 
-    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
+    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
+    
+    todo-0: take a look into if we can get rid of this method in some clean way?
+    */
     tagRender(tag: any, content: string, props: any) {
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
         this.stateMgr.updateVisAndEnablement();
