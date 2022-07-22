@@ -218,9 +218,9 @@ export abstract class Comp implements CompIntf {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            (this._render as any).displayName = this.jsClassName;
+            (this.render as any).displayName = this.jsClassName;
             this.wrapClickFunc(this.attribs);
-            let reactElm = createElement(this._render, this.attribs);
+            let reactElm = createElement(this.render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
@@ -270,9 +270,9 @@ export abstract class Comp implements CompIntf {
                 let reChild: ReactNode = null;
                 try {
                     // console.log("ChildRender: " + child.jsClassName);
-                    (this._render as any).displayName = child.jsClassName;
+                    (this.render as any).displayName = child.jsClassName;
                     this.wrapClickFunc(child.attribs);
-                    reChild = createElement(child._render, child.attribs);
+                    reChild = createElement(child.render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -381,9 +381,9 @@ export abstract class Comp implements CompIntf {
     }
 
     // Core 'render' function used by react.
-    _render = (): any => {
+    render = (): any => {
         if (this.debug) {
-            console.log("_render(): " + this.jsClassName);
+            console.log("render(): " + this.jsClassName);
         }
         this.rendered = true;
 
