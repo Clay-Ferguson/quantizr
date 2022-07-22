@@ -4,7 +4,6 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 
 export interface CompIntf {
     attribs: any;
-    jsClassName: string;
     renderRawHtml: boolean;
 
     getId(): string;
@@ -15,8 +14,6 @@ export interface CompIntf {
     mergeState(moreState: any, reuseChildren?: boolean): any;
     setEnabled(enabled: boolean);
     setClass(clazz: string): void;
-    reactRenderHtmlInDiv(type: any): string;
-    reactRenderHtmlInSpan(type: any): string;
     updateDOM(store: any, id: string): void;
     setInnerHTML(html: string);
     getAttribs() : Object;
@@ -30,5 +27,6 @@ export interface CompIntf {
     getRef(): HTMLElement;
     domAddEvent(): void;
     render(): any;
+    getCompClass(): string;
     domUpdateEvent: Function;
 }

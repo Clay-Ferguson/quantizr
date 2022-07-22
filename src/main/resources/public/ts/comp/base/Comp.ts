@@ -31,8 +31,6 @@ export abstract class Comp implements CompIntf {
     */
     private children: CompIntf[];
 
-    jsClassName: string;
-
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
@@ -79,13 +77,20 @@ export abstract class Comp implements CompIntf {
         // }
     }
 
+    getId(): string {
+        return this.attribs.id;
+    }
+
     private setId(id: string) {
         this.attribs.id = id;
 
         if (!this.attribs.key) {
             this.attribs.key = id;
         }
-        this.jsClassName = this.constructor.name + "_" + id;
+    }
+
+    getCompClass = (): string => {
+        return this.constructor.name + "_" + this.getId();
     }
 
     static nextGuid(): number {
@@ -94,10 +99,6 @@ export abstract class Comp implements CompIntf {
 
     static nextHex(): string {
         return (++Comp.guid).toString(16)
-    }
-
-    getId(): string {
-        return this.attribs.id;
     }
 
     whenElm(func: (elm: HTMLElement) => void) {
@@ -113,7 +114,7 @@ export abstract class Comp implements CompIntf {
         }
 
         if (this.debug) {
-            console.log("queueing whenElm function on " + this.jsClassName);
+            console.log("queueing whenElm function on " + this.getCompClass());
         }
 
         // queue up the 'func' to be called once the domAddEvent gets executed.
@@ -124,10 +125,12 @@ export abstract class Comp implements CompIntf {
         this.domAddFuncs.push(func);
     }
 
+    // todo-0: this doesn't belong here. remove from this class
     setVisible(visible: boolean) {
         this.mergeState({ visible } as any);
     }
 
+    // todo-0: this doesn't belong here. remove from this class
     setEnabled(enabled: boolean) {
         this.mergeState({ enabled } as any);
     }
@@ -145,21 +148,17 @@ export abstract class Comp implements CompIntf {
     addChild(comp: CompIntf): void {
         if (!comp) return;
         if (!this.children) {
-            this.children = [comp];
+            this.children = [];
         }
-        else {
-            this.children.push(comp);
-        }
+        this.children.push(comp);
     }
 
     addChildren(comps: Comp[]): void {
         if (!comps || comps.length === 0) return;
         if (!this.children) {
-            this.children = [...comps];
+            this.children = [];
         }
-        else {
-            this.children.push.apply(this.children, comps);
-        }
+        this.children.push.apply(this.children, comps);
     }
 
     /* Returns true if there are any non-null children */
@@ -191,16 +190,6 @@ export abstract class Comp implements CompIntf {
         return renderToString(elm);
     }
 
-    reactRenderHtmlInDiv(): string {
-        this.updateDOM(null, this.getId() + "_re");
-        return "<div id='" + this.getId() + "_re'></div>";
-    }
-
-    reactRenderHtmlInSpan(): string {
-        this.updateDOM(null, this.getId() + "_re");
-        return "<span id='" + this.getId() + "_re'></span>";
-    }
-
     /* Attaches a react element directly to the dom at the DOM id specified.
        WARNING: This can only re-render the *children* under the target node and not the attributes or tag of the node itself.
 
@@ -218,7 +207,6 @@ export abstract class Comp implements CompIntf {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            // (this.render as any).displayName = this.jsClassName; // this was a testing hack right?
             this.wrapClickFunc(this.attribs);
             let reactElm = createElement(this.render, this.attribs);
 
@@ -263,30 +251,19 @@ export abstract class Comp implements CompIntf {
     buildChildren(): ReactNode[] {
         // console.log("buildChildren: " + this.jsClassName);
         if (!this.children || this.children.length === 0) return null;
-        let reChildren: ReactNode[] = [];
 
-        this.children.forEach((child: CompIntf) => {
-            if (child) {
-                let reChild: ReactNode = null;
-                try {
-                    // console.log("ChildRender: " + child.jsClassName);
-                    // (this.render as any).displayName = child.jsClassName; // this was a testing hack right?
-                    this.wrapClickFunc(child.attribs);
-                    reChild = createElement(child.render, child.attribs);
-                }
-                catch (e) {
-                    console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
-                }
-
-                if (reChild) {
-                    reChildren.push(reChild);
-                }
-                else {
-                    // console.log("ChildRendered to null: " + child.jsClassName);
-                }
+        return this.children.map((child: CompIntf) => {
+            if (!child) return null;
+            try {
+                // console.log("ChildRender: " + child.jsClassName);
+                this.wrapClickFunc(child.attribs);
+                return createElement(child.render, child.attribs);
             }
-        });
-        return reChildren;
+            catch (e) {
+                console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
+                return null;
+            }
+        }).filter(child => !!child);
     }
 
     focus(): void {
@@ -340,7 +317,7 @@ export abstract class Comp implements CompIntf {
             }
         }
         catch (e) {
-            console.error("Failed in Comp.tagRender" + this.jsClassName + " attribs=" + S.util.prettyPrint(this.attribs));
+            console.error("Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
         }
     }
 
@@ -380,11 +357,9 @@ export abstract class Comp implements CompIntf {
     // Core 'render' function used by react.
     render = (): any => {
         if (this.debug) {
-            console.log("render(): " + this.jsClassName);
+            console.log("render(): " + this.getCompClass());
         }
         this.rendered = true;
-
-        let ret: ReactNode = null;
         try {
             this.stateMgr.useState();
 
@@ -393,12 +368,12 @@ export abstract class Comp implements CompIntf {
                 // Supposedly React 18+ will call useEffect twice on a mount so that's the only reason
                 // I'm checking for !mounted here in this if condition.
                 if (!this.mounted) {
+                    this.mounted = true;
                     // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
                     this.domAdd(); // call non-overridable method.
                     if (this.domAddEvent) this.domAddEvent(); // call overridable method.
                 }
 
-                this.mounted = true;
                 // the return value of the useEffect function is what will get called when component unmounts
                 return () => {
                     this.mounted = false;
@@ -418,54 +393,53 @@ export abstract class Comp implements CompIntf {
             DO NOT DELETE THE COMMENTED IF BELOW (it serves as warning of what NOT to do.)
             */
             if (this.debug) {
-                console.log("Calling preRender: " + this.jsClassName);
+                console.log("Calling preRender: " + this.getCompClass());
             }
             this.preRender();
 
             Comp.renderCounter++;
             if (this.debug) {
-                console.log("render: " + this.jsClassName + " counter=" + Comp.renderCounter + " ID=" + this.getId());
+                console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
             this.attribs.ref = useRef();
-            ret = this.compRender();
+            return this.compRender();
         }
         catch (e) {
-            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + "\nError: " + e);
+            console.error("Failed to render child (in render method)" + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e);
+            return null;
         }
-        return ret;
     }
 
     // leave NON-Arrow function to support calling thru 'super'
     domAdd(): void {
         // console.log("domAddEvent: " + this.jsClassName);
-
         let elm: HTMLElement = this.getRef();
         if (!elm) {
-            // I'm getting this happening during rendering a timeline (somehow also dependent on WHAT kind of rows
-            // are IN the timeline), but I'm not convinced yet it's a bug, rather than
-            // just a component that's now gone, and somehow gets here despite being gone.
-            // console.error("elm not found in domAddEvent: " + this.jsClassName);
             return;
         }
-        else {
-            /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
-            if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
-                // console.log("React render auto focus.");
-                S.domUtil.focusId(Comp.focusElmId);
-            }
-        }
 
-        if (this.domAddFuncs) {
-            // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
-            this.domAddFuncs.forEach(function (func) {
-                func(elm);
-            }, this);
-            this.domAddFuncs = null;
+        this.maybeFocus();
+        this.runQueuedFuncs(elm);
+    }
+
+    maybeFocus = (): void => {
+        /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
+        if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
+            // console.log("React render auto focus.");
+            S.domUtil.focusId(Comp.focusElmId);
         }
     }
 
-    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should also be
+    runQueuedFuncs = (elm: HTMLElement): void => {
+        // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
+        this.domAddFuncs?.forEach(function (func) {
+            func(elm);
+        }, this);
+        this.domAddFuncs = null;
+    }
+
+    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this method should be
     just to set the children */
     preRender(): void {
     }
