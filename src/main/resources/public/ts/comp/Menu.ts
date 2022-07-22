@@ -21,7 +21,8 @@ export class Menu extends Div {
         });
     }
 
-    compRender(): ReactNode {
+    super_compRender = this.compRender;
+    compRender = (): ReactNode => {
         let state = this.getState<LS>();
         let appState: AppState = useSelector((state: AppState) => state);
         this.attribs.style = {
@@ -83,6 +84,6 @@ export class Menu extends Div {
             ])
         ]);
 
-        return super.compRender();
+        return this.super_compRender();
     }
 }

@@ -13,6 +13,7 @@ export class HorizontalLayout extends Div {
         this.attribs.className = classes;
     }
 
+    super_compRender = this.compRender;
     compRender(): ReactNode {
         if (this.comps) {
             for (let comp of this.comps) {
@@ -33,6 +34,6 @@ export class HorizontalLayout extends Div {
         }
 
         this.setChildren([new Div(null, { className: "displayRow" }, this.comps)]);
-        return super.compRender();
+        return this.super_compRender();
     }
 }

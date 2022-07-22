@@ -130,8 +130,9 @@ export class SharingDlg extends DialogBase {
         this.removePrivilegeResponse();
     }
 
-    public close(): void {
-        super.close();
+    super_close = this.close;
+    close = (): void => {
+        this.super_close();
         if (this.dirty) {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {

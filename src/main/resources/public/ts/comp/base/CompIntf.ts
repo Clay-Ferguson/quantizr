@@ -28,5 +28,6 @@ export interface CompIntf {
     domAddEvent(): void;
     render(): any;
     getCompClass(): string;
+    create(): ReactNode;
     domUpdateEvent: Function;
 }

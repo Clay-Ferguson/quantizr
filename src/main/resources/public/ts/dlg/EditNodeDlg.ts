@@ -141,7 +141,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     resetAutoSaver = async () => {
-        console.log("resetAutoSaver");
         if (EditNodeDlg.autoSaveTimer) {
             clearInterval(EditNodeDlg.autoSaveTimer);
             EditNodeDlg.autoSaveTimer = null;
@@ -713,15 +712,22 @@ export class EditNodeDlg extends DialogBase {
         ]);
     }
 
+    super_closeByUser = this.closeByUser;
     // We need to call 'super' so 'close' method is not using fat arrow.
-    closeByUser(): void {
-        super.closeByUser();
+    closeByUser = (): void => {
+        this.super_closeByUser();
         this.resetAutoSaver();
     }
 
+    // todo-0: the bind calls I removed today did break some of the inheritance based uses of them, and I think I'll 
+    // switch to this pattern from now on, for overriding methods and getting access to super class methods in a way 
+    // that always works and never needs binding. Need to fix globally, by diging up code to see the handful off where the
+    // bind() calls were removed from.
+    super_close = this.close;
+
     // We need to call 'super' so 'close' method is not using fat arrow.
-    close(): void {
-        super.close();
+    close = (): void => {
+        this.super_close();
         if (this.mode === DialogMode.EMBED) {
             EditNodeDlg.embedInstance = null;
             dispatch("Action_endEditing", (s: AppState): AppState => {

@@ -24,10 +24,6 @@ export class PostsTypeHandler extends TypeBase {
         ]);
     }
 
-    getIconClass(): string {
-        return super.getIconClass();
-    }
-
     getEditorHelp(): string {
         let state = store.getState();
         return state.config?.help?.editor?.dialog;

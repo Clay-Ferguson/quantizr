@@ -43,12 +43,13 @@ export class VideoPlayerDlg extends DialogBase {
         return this.videoPlayer.getVideoElement();
     }
 
+    super_close = this.close;
     /* When the dialog closes we need to stop and remove the player */
-    close(): void {
+    close = (): void => {
         // console.log("VideoPlayerDialog cancel()");
         // todo-2: need to check over, and document flow of this function as it relates to calling "podcast.destroyPlayer(this);"
         this.destroyPlayer();
-        super.close();
+        this.super_close();
     }
 
     destroyPlayer = (): void => {

@@ -9,10 +9,6 @@ export class MarkdownTypeHandler extends TypeBase {
         super(J.NodeType.NONE, "Markdown", "fa-align-left", true);
     }
 
-    getIconClass(): string {
-        return super.getIconClass();
-    }
-
     getEditorHelp(): string {
         let state = store.getState();
         return state.config?.help?.editor?.dialog;

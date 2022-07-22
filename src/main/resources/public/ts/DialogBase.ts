@@ -163,7 +163,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     // We need to call thru 'super' so method is not using fat arrow.
-    public close(): void {
+    close = (): void => {
         if (this.mode === DialogMode.EMBED) {
             return;
         }

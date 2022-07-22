@@ -208,18 +208,22 @@ export abstract class Comp implements CompIntf {
             ReactDOM.unmountComponentAtNode(elm);
 
             this.wrapClickFunc(this.attribs);
-            let reactElm = createElement(this.render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
                 // console.log("Rendering with provider");
-                let provider = createElement(Provider, { store }, reactElm);
+                let provider = createElement(Provider, { store }, this.create());
                 ReactDOM.render(provider, elm);
             }
             else {
-                ReactDOM.render(reactElm, elm);
+                // todo-0: is this code path dead? we get a syntax error without <any> here which I need to investigate.
+                ReactDOM.render(<any>this.create(), elm);
             }
         });
+    }
+
+    create = (): ReactNode => {
+        return createElement(this.render, this.attribs);
     }
 
     wrapClickFunc = (obj: any) => {
@@ -244,6 +248,7 @@ export abstract class Comp implements CompIntf {
         if (!state.mouseEffect || !obj) return;
         // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
         if (obj.onClick) {
+            // todo-0: need to use some way that can ensure (detect) that we don't can never double-wap by calling twice.
             obj.onClick = S.util.delayFunc(obj.onClick);
         }
     }
@@ -257,7 +262,7 @@ export abstract class Comp implements CompIntf {
             try {
                 // console.log("ChildRender: " + child.jsClassName);
                 this.wrapClickFunc(child.attribs);
-                return createElement(child.render, child.attribs);
+                return child.create(); // createElement(child.render, child.attribs);
             }
             catch (e) {
                 console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
@@ -281,8 +286,20 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
-    tagRender(tag: any, content: string, props: any) {
+    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
+    
+    Note: Tag can also be a type here, not just a string.
+    */
+    tagRender(tag: any, content: string, props?: any, childrenArg?: CompIntf[]) {
+        if (!props) {
+            props = this.attribs;
+        }
+
+        // if children were provided use them.
+        if (childrenArg) {
+            this.children = childrenArg;
+        }
+        
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
         this.stateMgr.updateVisAndEnablement();
 
