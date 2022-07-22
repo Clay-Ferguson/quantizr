@@ -17,9 +17,10 @@ export class MessageDlg extends DialogBase {
 
         if (this.flashTimeout > 0) {
             setTimeout(() => {
-                this.whenElmEx((elm: HTMLElement) => {
+                if (this.mounted) {
+                    alert("closing flash message");
                     this.close();
-                });
+                }
             }, this.flashTimeout);
         }
     }

@@ -3,14 +3,12 @@ import { ReactNode } from "react";
 export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[]) => React.ReactNode;
 
 export interface CompIntf {
-    clazz: string;
     attribs: any;
     jsClassName: string;
     renderRawHtml: boolean;
 
     getId(): string;
     whenElm(func: Function);
-    whenElmEx(func: Function);
     setVisible(visible: boolean);
     setState(newState: any): void;
     getState(): any;

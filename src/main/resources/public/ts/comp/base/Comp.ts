@@ -21,7 +21,6 @@ export abstract class Comp implements CompIntf {
     public rendered: boolean = false;
     public debug: boolean = false;
     public mounted: boolean = false;
-
     public debugState: boolean = false;
     private static guid: number = 0;
 
@@ -32,9 +31,7 @@ export abstract class Comp implements CompIntf {
     */
     private children: CompIntf[];
 
-    logEnablementLogic: boolean = true;
     jsClassName: string;
-    clazz: string;
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -56,15 +53,11 @@ export abstract class Comp implements CompIntf {
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
     constructor(attribs?: any, private stateMgr?: State) {
-        if (!stateMgr) {
-            this.stateMgr = new State();
-        }
+        this.stateMgr = stateMgr || new State();
         this.attribs = attribs || {};
 
         /* If an ID was specifically provided, then use it, or else generate one */
-        let id = this.attribs.id || ("c" + Comp.nextGuid().toString(16));
-        this.clazz = this.constructor.name;
-        this.setId(id);
+        this.setId(this.attribs.id || ("c" + Comp.nextHex()));
     }
 
     public getRef = (): HTMLElement => {
@@ -99,14 +92,12 @@ export abstract class Comp implements CompIntf {
         return ++Comp.guid;
     }
 
-    getId(): string {
-        return this.attribs.id;
+    static nextHex(): string {
+        return (++Comp.guid).toString(16)
     }
 
-    // This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
-    // and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
-    whenElmEx(func: (elm: HTMLElement) => void) {
-        S.domUtil.getElm(this.getId(), func);
+    getId(): string {
+        return this.attribs.id;
     }
 
     // WARNING: Use whenElmEx for DialogBase derived components!
@@ -396,12 +387,16 @@ export abstract class Comp implements CompIntf {
             this.stateMgr.useState();
 
             useEffect(() => {
+
+                // Supposedly React 18+ will call useEffect twice on a mount so that's the only reason
+                // I'm checking for !mounted here in this if condition.
+                if (!this.mounted) {
+                    // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
+                    this.domAdd(); // call non-overridable method.
+                    if (this.domAddEvent) this.domAddEvent(); // call overridable method.
+                }
+
                 this.mounted = true;
-
-                // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
-                this.domAdd(); // call non-overridable method.
-                if (this.domAddEvent) this.domAddEvent(); // call overridable method.
-
                 // the return value of the useEffect function is what will get called when component unmounts
                 return () => {
                     this.mounted = false;
