@@ -713,7 +713,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     super_closeByUser = this.closeByUser;
-    // We need to call 'super' so 'close' method is not using fat arrow.
     closeByUser = (): void => {
         this.super_closeByUser();
         this.resetAutoSaver();
@@ -724,8 +723,6 @@ export class EditNodeDlg extends DialogBase {
     // that always works and never needs binding. Need to fix globally, by diging up code to see the handful off where the
     // bind() calls were removed from.
     super_close = this.close;
-
-    // We need to call 'super' so 'close' method is not using fat arrow.
     close = (): void => {
         this.super_close();
         if (this.mode === DialogMode.EMBED) {

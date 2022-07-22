@@ -157,12 +157,10 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         }, 100);
     }
 
-    // We need to call thru 'super' so method is not using fat arrow.
-    public closeByUser(): void {
+    closeByUser = (): void => {
         // derived classes can hook into this to detect that it was a user click that closed the dialog
     }
 
-    // We need to call thru 'super' so method is not using fat arrow.
     close = (): void => {
         if (this.mode === DialogMode.EMBED) {
             return;
