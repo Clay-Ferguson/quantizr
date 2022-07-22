@@ -220,7 +220,7 @@ export abstract class Comp implements CompIntf {
 
             (this._render as any).displayName = this.jsClassName;
             this.wrapClickFunc(this.attribs);
-            let reactElm = createElement(<any>this._render, this.attribs);
+            let reactElm = createElement(this._render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
             if (store) {
@@ -272,8 +272,7 @@ export abstract class Comp implements CompIntf {
                     // console.log("ChildRender: " + child.jsClassName);
                     (this._render as any).displayName = child.jsClassName;
                     this.wrapClickFunc(child.attribs);
-                    // this <any> was a hack here. Need to investigate (todo-0)
-                    reChild = createElement(<any>child._render, child.attribs);
+                    reChild = createElement(child._render, child.attribs);
                 }
                 catch (e) {
                     console.error("Failed to render child " + child.jsClassName + " attribs.key=" + child.attribs.key);
@@ -382,7 +381,7 @@ export abstract class Comp implements CompIntf {
     }
 
     // Core 'render' function used by react.
-    _render = (): ReactNode => {
+    _render = (): any => {
         if (this.debug) {
             console.log("_render(): " + this.jsClassName);
         }

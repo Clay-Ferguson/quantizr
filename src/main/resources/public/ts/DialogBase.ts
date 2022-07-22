@@ -143,7 +143,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     domRender(): void {
-        const reactElm = createElement(<any>this._render, this.attribs);
+        const reactElm = createElement(this._render, this.attribs);
 
         // console.log("Rendering with provider");
         const provider = createElement(Provider, { store }, reactElm);
