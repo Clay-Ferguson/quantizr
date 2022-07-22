@@ -85,7 +85,6 @@ export function runClassDemoTest() {
         // }
         // S.util.perfEnd("Test completed: iters=" + iters, startTime);
 
-        debugger;
         const fido = new Labrador("Fido");
         fido.askGoForWalk();
         fido.printName();

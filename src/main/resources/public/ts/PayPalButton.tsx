@@ -6,7 +6,6 @@ import "../css/tsx-test.scss";
 
 function PayPalButton() {
     return (
-
        <div>PayPal Button HTML goes here</div>
     );
 }

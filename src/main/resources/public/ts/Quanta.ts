@@ -266,10 +266,8 @@ export class Quanta {
             // This is the root react App component that contains the entire application
             this.app = new App(); // new AppDemo
 
-            if ((window as any).__page === "index") {
-                console.log("DOM app element set.");
-                this.app.updateDOM(store, "app");
-            }
+            console.log("DOM app element set.");
+            this.app.updateDOM(store, "app");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from

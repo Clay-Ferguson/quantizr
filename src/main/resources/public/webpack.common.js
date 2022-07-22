@@ -94,6 +94,16 @@ module.exports = {
             filename: "../../templates/demo/tsx-test.html",
             template: "tsx-testTemplate.html",
 
+            // we don't want any path prefix on our bundle fie so this is empty.
+            publicPath: "/dist"
+            // scriptLoading: "blocking",
+            // inject: "head"
+        }),
+
+        new HtmlWebpackPlugin({
+            filename: "../../templates/demo/tutorial.html",
+            template: "tutorialTemplate.html",
+
             // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
             // scriptLoading: "blocking",
