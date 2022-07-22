@@ -218,7 +218,7 @@ export abstract class Comp implements CompIntf {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            (this.render as any).displayName = this.jsClassName;
+            // (this.render as any).displayName = this.jsClassName; // this was a testing hack right?
             this.wrapClickFunc(this.attribs);
             let reactElm = createElement(this.render, this.attribs);
 
@@ -270,7 +270,7 @@ export abstract class Comp implements CompIntf {
                 let reChild: ReactNode = null;
                 try {
                     // console.log("ChildRender: " + child.jsClassName);
-                    (this.render as any).displayName = child.jsClassName;
+                    // (this.render as any).displayName = child.jsClassName; // this was a testing hack right?
                     this.wrapClickFunc(child.attribs);
                     reChild = createElement(child.render, child.attribs);
                 }
@@ -304,16 +304,13 @@ export abstract class Comp implements CompIntf {
         });
     }
 
-    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
-    
-    todo-0: take a look into if we can get rid of this method in some clean way?
-    */
+    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender(tag: any, content: string, props: any) {
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
         this.stateMgr.updateVisAndEnablement();
 
         try {
-            let children: any[] = this.buildChildren();
+            let children: ReactNode[] = this.buildChildren();
             if (children) {
                 if (content) {
                     children.unshift(content);
@@ -324,7 +321,7 @@ export abstract class Comp implements CompIntf {
             }
 
             this.wrapClickFunc(props);
-            if (children && children.length > 0) {
+            if (children?.length > 0) {
                 // console.log("Render Tag with children.");
 
                 // special case where tbody always needs to be immediate child of table

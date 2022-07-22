@@ -18,7 +18,7 @@ export class ButtonBar extends Comp {
         if (!this.hasChildren()) return null;
 
         // we have this clone becasue we want our 'ref' to point to the correct top level element 
-        // todo-0: however, if we do this wrapperClass logic externally and not inside this comp!
+        // todo-1: would be cleaner if we do this wrapperClass logic externally and not inside this comp!
         let attribsClone = { ...this.attribs };
         delete attribsClone.ref;
 

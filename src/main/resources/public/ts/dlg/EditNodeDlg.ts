@@ -80,9 +80,6 @@ export class EditNodeDlg extends DialogBase {
     constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
 
-        // todo-0: get rid of this 'bind' call and all others. Only a couple are left.
-        this.close = this.close.bind(this);
-
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;
 
@@ -716,11 +713,13 @@ export class EditNodeDlg extends DialogBase {
         ]);
     }
 
+    // We need to call 'super' so 'close' method is not using fat arrow.
     closeByUser(): void {
         super.closeByUser();
         this.resetAutoSaver();
     }
 
+    // We need to call 'super' so 'close' method is not using fat arrow.
     close(): void {
         super.close();
         if (this.mode === DialogMode.EMBED) {

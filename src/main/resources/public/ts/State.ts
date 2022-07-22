@@ -22,6 +22,10 @@ export class State {
         });
     }
 
+    /* We start out with this initial function which will allow us to set a state even before the 'useState' has been called
+      because for functional components (which we're using) the useState hook won't (and cannot) be even called ever until
+      the react function itself is currently executing. One of the "Rules of Hooks"
+    */
     setStateEx<ST>(state: ST) {
         if (!state) {
             state = {} as ST;
@@ -37,9 +41,13 @@ export class State {
     useState = () => {
         const [state, setStateEx] = useState(this.state);
         this.state = state;
+
+        // Yes, this is a bit odd but correct. We override our default setStateEx method here with the one
+        // react provides us for state management, now that react state management is going into effect.
         this.setStateEx = setStateEx.bind(this);
     }
 
+    // todo-1: this is an ugly oddball method. Can we get rid of this? 
     updateVisAndEnablement = () => {
         if (this.state.enabled === undefined) {
             this.state.enabled = true;

@@ -45,7 +45,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     */
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
-        this.close = this.close.bind(this);
 
         this.appState = appState;
         if (!appState) {
@@ -158,10 +157,12 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         }, 100);
     }
 
+    // We need to call thru 'super' so method is not using fat arrow.
     public closeByUser(): void {
         // derived classes can hook into this to detect that it was a user click that closed the dialog
     }
 
+    // We need to call thru 'super' so method is not using fat arrow.
     public close(): void {
         if (this.mode === DialogMode.EMBED) {
             return;

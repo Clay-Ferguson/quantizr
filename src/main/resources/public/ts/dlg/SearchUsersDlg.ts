@@ -29,9 +29,6 @@ export class SearchUsersDlg extends DialogBase {
     constructor(state: AppState) {
         super("Search Users", "app-modal-content-medium-width", null, state);
 
-        // todo-0: this pattern of code is in a lot of places and needs to be done better, so try to
-        // do this without having searchTextField need to be in this class variable.
-        // only trick is to be sure it only happens when the dialog is first rendered.
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
         });
