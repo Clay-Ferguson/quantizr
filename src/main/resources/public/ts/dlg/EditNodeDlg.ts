@@ -488,7 +488,7 @@ export class EditNodeDlg extends DialogBase {
                 ], null, "float-end");
 
                 // adds the button bar to the top of the list of children.
-                propsParent.safeGetChildren().unshift(propsButtonBar);
+                propsParent.insertFirstChild(propsButtonBar);
             }
         }
     }

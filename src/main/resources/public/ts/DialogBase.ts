@@ -218,7 +218,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     preRender(): void {
-        let timesIcon: Comp;
+        let timesIcon: Span;
         // Dialog Header with close button (x) right justified on it.
         const children: CompIntf[] = [];
         const titleIconComp: CompIntf = this.getTitleIconComp();
@@ -250,7 +250,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             },
                 titleChildren
             ));
-            timesIcon.renderRawHtml = true;
+            timesIcon.rawHtml = true;
         }
 
         let contentAttribs: any = null;

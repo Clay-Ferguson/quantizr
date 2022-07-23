@@ -20,7 +20,6 @@ export abstract class Comp implements CompIntf {
     static focusElmId: string = null;
     public debug: boolean = false;
     public mounted: boolean = false;
-    public debugState: boolean = false;
     private static guid: number = 0;
 
     attribs: any;
@@ -32,8 +31,6 @@ export abstract class Comp implements CompIntf {
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
-
-    renderRawHtml: boolean = false;
 
     // default all these to null so that unless derived class sets the value we never need
     // to create some of the useEffect calls
@@ -134,6 +131,14 @@ export abstract class Comp implements CompIntf {
         });
     }
 
+    insertFirstChild(comp: CompIntf): void {
+        if (!comp) return;
+        if (!this.children) {
+            this.children = [];
+        }
+        this.children.unshift(comp);
+    }
+
     addChild(comp: CompIntf): void {
         if (!comp) return;
         if (!this.children) {
@@ -152,19 +157,11 @@ export abstract class Comp implements CompIntf {
 
     /* Returns true if there are any non-null children */
     hasChildren(): boolean {
-        if (!this.children || this.children.length === 0) return false;
-        return this.children.some(child => !!child);
+        return this.children?.some(child => !!child);
     }
 
     setChildren(comps: CompIntf[]) {
         this.children = comps;
-    }
-
-    safeGetChildren(): CompIntf[] {
-        if (!this.children) {
-            this.children = [];
-        }
-        return this.children;
     }
 
     getChildren(): CompIntf[] {

@@ -43,7 +43,7 @@ export class HistoryPanel extends Div {
             if (!h.content) return;
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
-            let d = null;
+            let d: Span = null;
 
             let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
             if (typeHandler) {
@@ -81,7 +81,7 @@ export class HistoryPanel extends Div {
             ]));
 
             this.makeDropTarget(parentDropTarg.attribs, h.id);
-            d.renderRawHtml = true;
+            d.rawHtml = true;
 
             if (h.subItems) {
                 let count = 0;
@@ -132,7 +132,7 @@ export class HistoryPanel extends Div {
                         ]));
 
                         this.makeDropTarget(dropTarg.attribs, h.id);
-                        d.renderRawHtml = true;
+                        d.rawHtml = true;
                     }
                     else {
                         if (!dotsShown) {

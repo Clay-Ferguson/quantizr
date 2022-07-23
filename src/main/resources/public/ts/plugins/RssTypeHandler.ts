@@ -174,7 +174,7 @@ export class RssTypeHandler extends TypeBase {
             page = 1;
         }
 
-        itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
+        itemListContainer.addChild(new Checkbox("Headlines Only", {
             className: "float-end"
         }, {
             setValue: (checked: boolean): void => {
@@ -188,7 +188,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }));
 
-        itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
+        itemListContainer.addChild(this.makeNavButtonBar(page, feedSrcHash, state));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -231,14 +231,14 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
-        itemListContainer.safeGetChildren().push(feedOutDiv);
+        itemListContainer.addChild(feedOutDiv);
 
         for (let item of feed.entries) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
-            itemListContainer.safeGetChildren().push(this.buildFeedItem(feed, item, state));
+            itemListContainer.addChild(this.buildFeedItem(feed, item, state));
         }
 
-        itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
+        itemListContainer.addChild(this.makeNavButtonBar(page, feedSrcHash, state));
     }
 
     makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {

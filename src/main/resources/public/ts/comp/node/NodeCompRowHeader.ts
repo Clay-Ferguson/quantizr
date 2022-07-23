@@ -65,7 +65,7 @@ export class NodeCompRowHeader extends Div {
                 }
             }));
 
-            span.renderRawHtml = true;
+            span.rawHtml = true;
         }
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
