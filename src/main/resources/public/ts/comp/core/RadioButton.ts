@@ -1,5 +1,6 @@
 import { createElement, ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
+import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
 /* I never got state management working with this radio button properly.
@@ -11,7 +12,7 @@ it might finally work now.
 export class RadioButton extends Comp {
 
     constructor(public label: string, public checked: boolean, groupName: string, attribs: any, private valueIntf: ValueIntf) {
-        super(attribs);
+        super(attribs, new State());
 
         this.attribs.onChange = (evt: any) => {
             this.updateValFunc(evt.target.checked);

@@ -141,7 +141,7 @@ export class MediaRecorderDlg extends DialogBase {
             });
 
             /* this is required to get the video live after every re-render, but I really need to learn react 'refs'
-            to do this slightly cleaner without a whenElm. We have to call this even if we didn't just create
+            to do this slightly cleaner without a onMount. We have to call this even if we didn't just create
             the video element because react can unmount the old one during re-renders. */
             this.displayStream();
         }
@@ -265,7 +265,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     displayStream = () => {
         if (this.videoPlayer && this.stream) {
-            this.videoPlayer.whenElm((elm: HTMLElement): void => {
+            this.videoPlayer.onMount((elm: HTMLElement): void => {
                 (elm as HTMLVideoElement).srcObject = this.stream;
             });
         }

@@ -16,7 +16,7 @@ export class SearchByNameDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search Node Names", "app-modal-content-medium-width", false, state);
-        this.whenElm((elm: HTMLElement) => {
+        this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();
         });
         this.searchTextState.setValue(SearchByNameDlg.defaultSearchText);

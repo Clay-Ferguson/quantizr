@@ -43,7 +43,7 @@ export class SearchContentDlg extends DialogBase {
     constructor(state: AppState) {
         super("Search", null, null, state);
 
-        this.whenElm((elm: HTMLElement) => {
+        this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();
         });
 

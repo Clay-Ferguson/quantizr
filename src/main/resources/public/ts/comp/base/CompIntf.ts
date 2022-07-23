@@ -4,7 +4,7 @@ export interface CompIntf {
     attribs: any;
 
     getId(): string;
-    whenElm(func: Function): void;
+    onMount(func: Function): void;
     setState(newState: any): void;
     getState(): any;
     mergeState(moreState: any): void;

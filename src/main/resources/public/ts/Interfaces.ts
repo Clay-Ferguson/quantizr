@@ -33,7 +33,7 @@ export interface TextEditorIntf {
     getValue(): string;
     setValue(val: string): void;
     focus(): void;
-    whenElm(func: Function): void;
+    onMount(func: Function): void;
     setError(error: string): void;
 }
 

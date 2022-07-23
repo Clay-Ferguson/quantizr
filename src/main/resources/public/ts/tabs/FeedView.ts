@@ -221,7 +221,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 if (C.FEED_INFINITE_SCROLL) {
                     if (this.data.props.feedResults?.length < C.MAX_DYNAMIC_ROWS) {
                         // When the 'more' button scrolls into view go ahead and load more records.
-                        moreButton.whenElm((elm: HTMLElement) => {
+                        moreButton.onMount((elm: HTMLElement) => {
                             let observer = new IntersectionObserver(entries => {
 
                                 entries.forEach((entry: any) => {

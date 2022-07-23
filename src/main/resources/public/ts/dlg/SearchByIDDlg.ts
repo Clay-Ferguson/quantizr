@@ -16,7 +16,7 @@ export class SearchByIDDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search for Node ID", "app-modal-content-medium-width", false, state);
-        this.whenElm((elm: HTMLElement) => {
+        this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();
         });
 

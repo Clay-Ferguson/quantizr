@@ -137,7 +137,7 @@ export class DomUtil {
     domElm = (id: string): HTMLElement => {
         if (!id) return null;
         if (id.startsWith("#")) {
-            console.log("whenElm removed obsolete preceding # from ID " + id);
+            console.log("domElm removed obsolete preceding # from ID " + id);
             id = id.substring(1);
         }
 

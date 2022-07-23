@@ -1,10 +1,11 @@
 import { ValueIntf } from "../Interfaces";
 import { Div } from "../comp/core/Div";
+import { State } from "../State";
 
 export class ListBox extends Div {
 
     constructor(public valueIntf: ValueIntf) {
-        super();
+        super(null, new State());
         this.setClass("list-group marginBottom");
     }
 

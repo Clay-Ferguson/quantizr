@@ -2,13 +2,14 @@ import { createElement, ReactNode } from "react";
 import { store } from "../../AppRedux";
 import { ValueIntf } from "../../Interfaces";
 import { S } from "../../Singletons";
+import { State } from "../../State";
 import { Comp } from "../base/Comp";
 import { SelectionOption } from "./SelectionOption";
 
 export class Selection extends Comp {
 
     constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
-        super(attribs);
+        super(attribs, new State());
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
         this.attribs.className = "form-select " + moreClasses;

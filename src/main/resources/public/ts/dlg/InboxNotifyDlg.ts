@@ -18,7 +18,7 @@ export class InboxNotifyDlg extends DialogBase {
         S.util.showSystemNotification("New Message", text);
 
         // setTimeout(() => {
-        //     this.whenElmEx((elm: HTMLElement) => {
+        //     this.onMount((elm: HTMLElement) => {
         //         this.close();
         //     });
         // }, InboxNotifyDlg.CLOSE_TIMEOUT);

@@ -169,7 +169,7 @@ export class AudioPlayerDlg extends DialogBase {
             ])
         ];
 
-        this.audioPlayer.whenElm((elm: HTMLElement) => {
+        this.audioPlayer.onMount((elm: HTMLElement) => {
             this.player = elm as HTMLAudioElement;
             if (!this.player) return;
             this.player.onpause = (event) => {
@@ -190,10 +190,10 @@ export class AudioPlayerDlg extends DialogBase {
         if (!this.player) return;
 
         // todo-1: this is very bad practice if modifying DOM without react state. fix it
-        this.playButton.whenElm((elm: HTMLElement) => {
+        this.playButton.onMount((elm: HTMLElement) => {
             elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
         });
-        this.pauseButton.whenElm((elm: HTMLElement) => {
+        this.pauseButton.onMount((elm: HTMLElement) => {
             elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
         });
     }

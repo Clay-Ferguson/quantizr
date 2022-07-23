@@ -2,6 +2,7 @@ import { createElement, ReactNode } from "react";
 import { CompValueHolder } from "../../CompValueHolder";
 import * as I from "../../Interfaces";
 import { ValueIntf } from "../../Interfaces";
+import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
 export class Checkbox extends Comp implements I.CheckboxIntf {
@@ -10,7 +11,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
 
     /* To turn this into a slider switch, just add 'form-switch' to layoutClass style */
     constructor(public label: string = null, attribs: Object = null, private valueIntf: ValueIntf, private layoutClass: string = null) {
-        super(attribs);
+        super(attribs, new State());
 
         if (!valueIntf) {
             this.valueIntf = new CompValueHolder<string>(this, "val");

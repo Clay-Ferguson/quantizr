@@ -855,7 +855,7 @@ export class EditNodeDlg extends DialogBase {
         let wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, this.appState.node) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
-        this.contentEditor.whenElm((elm: HTMLElement) => {
+        this.contentEditor.onMount((elm: HTMLElement) => {
             if (encrypted) {
                 // console.log("decrypting: " + value);
                 let cipherText = value.substring(J.Constant.ENC_TAG.length);

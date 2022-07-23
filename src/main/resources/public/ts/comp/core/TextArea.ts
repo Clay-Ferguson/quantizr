@@ -39,7 +39,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     insertTextAtCursor = (text: string) => {
-        this.input?.whenElm((elm: any) => {
+        this.input?.onMount((elm: any) => {
             if (elm.selectionStart >= 0) {
                 this.setValue(S.util.insertString(this.getValue(), text, elm.selectionStart));
             }
@@ -62,7 +62,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     focus(): void {
-        this.whenElm((elm: HTMLElement) => {
+        this.onMount((elm: HTMLElement) => {
             this.input?.focus();
         });
     }

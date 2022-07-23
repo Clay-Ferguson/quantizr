@@ -73,7 +73,7 @@ export abstract class Comp implements CompIntf {
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause
      the function to run immediately of the component is already mounted */
-    whenElm(func: (elm: HTMLElement) => void) {
+    onMount(func: (elm: HTMLElement) => void) {
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
         let elm = this.getRef();
@@ -83,7 +83,7 @@ export abstract class Comp implements CompIntf {
         }
 
         if (this.debug) {
-            console.log("queueing whenElm function on " + this.getCompClass());
+            console.log("queueing onMount function on " + this.getCompClass());
         }
 
         // queue up the 'func' to be called once the domAddEvent gets executed.
@@ -196,7 +196,7 @@ export abstract class Comp implements CompIntf {
         // immediately assign this as the focused element ID
         Comp.focusElmId = this.getId();
 
-        this.whenElm((elm: HTMLElement) => {
+        this.onMount((elm: HTMLElement) => {
             // if we're still the focused id, then we do the focus, but due to async nature some other thing
             // could have technically taken over focus and we might do nothing here.
             if (Comp.focusElmId === this.getId()) {
