@@ -9,6 +9,6 @@ export class PropTableCell extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender("td", this.content || "", this.attribs);
+        return this.tag("td", this.content || "", this.attribs);
     }
 }

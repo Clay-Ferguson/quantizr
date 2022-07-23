@@ -33,7 +33,7 @@ export class MenuItem extends Div {
             this.floatRightComp
         ]);
 
-        return this.tagRender("div", null, {
+        return this.tag("div", null, {
             ...this.attribs,
             ...enablement,
             ...{

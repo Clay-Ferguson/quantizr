@@ -17,7 +17,7 @@ export class Span<LocalState = any> extends Comp {
             return createElement("span", { ...this.attribs, ..._p });
         }
         else {
-            return this.tagRender("span", this.content, this.attribs);
+            return this.tag("span", this.content, this.attribs);
         }
     }
 }

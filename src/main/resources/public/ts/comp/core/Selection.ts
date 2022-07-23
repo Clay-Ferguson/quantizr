@@ -63,7 +63,7 @@ export class Selection extends Comp {
             }, this.label));
         }
 
-        children.push(this.tagRender("select", null, attribsClone));
+        children.push(this.tag("select", null, attribsClone));
 
         return createElement("div", {
             id: this.getId() + "_sel",

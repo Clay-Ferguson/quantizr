@@ -10,6 +10,6 @@ export class PropTableRow extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender("tr", null, this.attribs);
+        return this.tag("tr", null, this.attribs);
     }
 }

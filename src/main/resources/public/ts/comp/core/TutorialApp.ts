@@ -25,7 +25,7 @@ export class TutorialApp extends Comp {
         // NOTE: This is another way to render a raw div, which actually doesn't use the base class, and still works.
         // return (new Div(this.getState<LS>().content, this.attribs)).create();
 
-        return this.tagRender("div", this.getState<LS>().content, null, [
+        return this.tag("div", this.getState<LS>().content, null, [
             new Div("Child Div"),
             new Button("My Button", this.buttonClick)
         ]);

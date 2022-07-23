@@ -16,6 +16,6 @@ export class Svg extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tagRender("svg", this.getState<LS>().content, this.attribs);
+        return this.tag("svg", this.getState<LS>().content, this.attribs);
     }
 }

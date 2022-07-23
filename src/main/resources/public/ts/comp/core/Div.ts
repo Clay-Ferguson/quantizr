@@ -23,7 +23,7 @@ export class Div extends Comp {
             return createElement("div", { ...this.attribs, ..._p });
         }
         else {
-            return this.tagRender("div", this.getState<LS>().content, this.attribs);
+            return this.tag("div", this.getState<LS>().content, this.attribs);
         }
     }
 }

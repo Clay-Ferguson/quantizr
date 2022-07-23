@@ -247,7 +247,7 @@ export abstract class Comp implements CompIntf {
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
     Note: Tag can also be a type here, not just a string.
     */
-    tagRender(tag: any, content: string, props?: any, childrenArg?: CompIntf[]) {
+    tag(type: any, content: string, props?: any, childrenArg?: CompIntf[]) {
         if (!props) {
             props = this.attribs;
         }
@@ -275,17 +275,17 @@ export abstract class Comp implements CompIntf {
             if (children?.length > 0) {
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652
-                if (tag === "table") {
+                if (type === "table") {
                     // this is just wrapping the children in a tbody and giving it a key so react won't panic.
-                    return createElement(tag, props, [createElement("tbody", { key: props.key + "_tbody" }, children)]);
+                    return createElement(type, props, [createElement("tbody", { key: props.key + "_tbody" }, children)]);
                 }
                 else {
-                    return createElement(tag, props, children);
+                    return createElement(type, props, children);
                 }
             }
             else {
                 // console.log("Render Tag no children.");
-                return createElement(tag, props);
+                return createElement(type, props);
             }
         }
         catch (e) {
