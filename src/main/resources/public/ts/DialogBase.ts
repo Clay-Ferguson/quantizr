@@ -1,15 +1,14 @@
+import { createElement } from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Span } from "./comp/core/Span";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
 import { S } from "./Singletons";
-import { createElement } from "react";
 
 export abstract class DialogBase extends Div implements DialogBaseImpl {
 
@@ -142,10 +141,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     domRender(): void {
-        const reactElm = createElement(this.render, this.attribs);
-
         // console.log("Rendering with provider");
-        const provider = createElement(Provider, { store }, reactElm);
+        const provider = createElement(Provider, { store }, this.create());
         ReactDOM.render(provider, this.backdrop);
     }
 

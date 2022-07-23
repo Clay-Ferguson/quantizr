@@ -182,6 +182,8 @@ export abstract class Comp implements CompIntf {
             id = this.getId();
         }
         
+        // We call getElm here out of paranoia, but it's not needed. There are no places in our code where
+        // we call into here when the element doesn't already exist.
         S.domUtil.getElm(id, (elm: HTMLElement) => {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
