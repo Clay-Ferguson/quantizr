@@ -46,15 +46,4 @@ export class State {
         // react provides us for state management, now that react state management is going into effect.
         this.setStateEx = setStateEx.bind(this);
     }
-
-    // todo-1: this is an ugly oddball method. Can we get rid of this? 
-    updateVisAndEnablement = () => {
-        if (this.state.enabled === undefined) {
-            this.state.enabled = true;
-        }
-
-        if (this.state.visible === undefined) {
-            this.state.visible = true;
-        }
-    }
 }

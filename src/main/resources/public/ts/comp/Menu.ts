@@ -19,6 +19,7 @@ export class Menu extends Div {
         super(null, {
             className: "card menuCard accordion-item"
         });
+        this.mergeState({ visible: true });
     }
 
     super_compRender = this.compRender;

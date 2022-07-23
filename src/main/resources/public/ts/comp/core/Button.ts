@@ -19,6 +19,11 @@ export class Button extends Comp {
         this.attribs.type = "button";
         this.attribs.onClick = callback;
         this.setText(text);
+        this.setEnabled(true);
+    }
+
+    setEnabled = (enabled: boolean): void => {
+        this.mergeState({ enabled });
     }
 
     setText(text: string): void {

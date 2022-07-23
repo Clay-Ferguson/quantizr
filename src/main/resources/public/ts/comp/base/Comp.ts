@@ -125,16 +125,6 @@ export abstract class Comp implements CompIntf {
         this.domAddFuncs.push(func);
     }
 
-    // todo-0: this doesn't belong here. remove from this class
-    setVisible(visible: boolean) {
-        this.mergeState({ visible } as any);
-    }
-
-    // todo-0: this doesn't belong here. remove from this class
-    setEnabled(enabled: boolean) {
-        this.mergeState({ enabled } as any);
-    }
-
     setClass(clazz: string): void {
         this.attribs.className = clazz;
     }
@@ -301,8 +291,6 @@ export abstract class Comp implements CompIntf {
         }
         
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
-        this.stateMgr.updateVisAndEnablement();
-
         try {
             let children: ReactNode[] = this.buildChildren();
             if (children) {
@@ -338,9 +326,6 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
-       both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
-       */
     mergeState<ST = any>(moreState: ST): any {
         this.stateMgr.mergeState<ST>(moreState);
     }
@@ -400,8 +385,6 @@ export abstract class Comp implements CompIntf {
 
             if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
             if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
-
-            this.stateMgr.updateVisAndEnablement();
 
             /* Theoretically we could avoid calling preRender if it weren't for the fact that React monitors
             which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using

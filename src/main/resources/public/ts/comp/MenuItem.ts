@@ -16,7 +16,7 @@ export class MenuItem extends Div {
         private floatRightComp: CompIntf = null) {
         super(name);
         this.onClick = this.onClick.bind(this);
-        this.setEnabled(enabled);
+        this.mergeState({ visible: true, enabled });
     }
 
     compRender(): ReactNode {

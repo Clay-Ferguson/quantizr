@@ -8,11 +8,9 @@ export interface CompIntf {
 
     getId(): string;
     whenElm(func: Function);
-    setVisible(visible: boolean);
     setState(newState: any): void;
     getState(): any;
     mergeState(moreState: any, reuseChildren?: boolean): any;
-    setEnabled(enabled: boolean);
     setClass(clazz: string): void;
     updateDOM(store: any, id: string): void;
     setInnerHTML(html: string);

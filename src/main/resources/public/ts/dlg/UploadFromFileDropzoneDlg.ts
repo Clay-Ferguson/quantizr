@@ -109,7 +109,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             ])
         ];
 
-        this.uploadButton.setVisible(false);
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
@@ -384,13 +383,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     hasAnyZipFiles = (): boolean => {
-        let ret: boolean = false;
+        // todo-1: use the some() funcion here instead.
         for (let file of this.fileList) {
-            if (file.name && file.name.toLowerCase().endsWith(".zip")) {
+            if (file.name?.toLowerCase().endsWith(".zip")) {
                 return true;
             }
         }
-        return ret;
+        return false;
     }
 
     runButtonEnablement = (): void => {

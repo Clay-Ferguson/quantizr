@@ -12,6 +12,7 @@ export class IconButton extends Comp {
         this.attribs.type = "button";
         // somehow this 'clickable' class seems to have no effect
         this.attribs.className = "btn align-middle clickable " + specialClasses;
+        this.mergeState({ visible: true });
     }
 
     compRender(): ReactNode {
