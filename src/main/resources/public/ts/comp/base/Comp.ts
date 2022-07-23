@@ -1,7 +1,3 @@
-// https://reactjs.org/docs/react-api.html
-// https://reactjs.org/docs/hooks-reference.html#usestate
-// #RulesOfHooks: https://fb.me/rules-of-hooks
-
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
@@ -12,14 +8,15 @@ import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
 
 /**
- * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
- * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS.
+ * Base class for all components which encapsulates a lot of React functionality so that our implementation 
+ * code can ignore those details.
  */
 export abstract class Comp implements CompIntf {
     static renderCounter: number = 0;
     static focusElmId: string = null;
     public debug: boolean = false;
     public mounted: boolean = false;
+    public rendered: boolean = false;
     private static guid: number = 0;
 
     attribs: any;
@@ -39,15 +36,7 @@ export abstract class Comp implements CompIntf {
     public domRemoveEvent = null;
     public domAddEvent = null;
 
-    /**
-     * 'react' should be true only if this component and all its decendants are true React components that are rendered and
-     * controlled by ReactJS (rather than our own innerHTML)
-     *
-     * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
-     * whatever reason we want to disable react rendering, and fall back on render-to-text approach
-     */
     constructor(attribs?: any, private stateMgr?: State) {
-        this.stateMgr = stateMgr || new State();
         this.attribs = attribs || {};
 
         /* If an ID was specifically provided, then use it, or else generate one */
@@ -55,22 +44,7 @@ export abstract class Comp implements CompIntf {
     }
 
     public getRef = (): HTMLElement => {
-        if (this.attribs?.ref?.current) {
-            // console.log("ref: " + this.attribs.ref.current.id);
-            return (this.attribs.ref.current.isConnected) ? this.attribs.ref.current : null;
-        }
-
-        // Returning null is not an error condition. Methods like 'whenElm' do call this in cases where we return
-        // null here, and it's normal flow to do so.
-        return null;
-        // todo-1: we no longer ever need this, so we can eventually delete
-        // else {
-        //     // tip: When this happens it probably means your top level createElement in your render method of the component,
-        //     // is neglecting to use the 'this.attribs.ref' attribute and that breaks the ref.
-        //     console.log("ref fail. trying getElement: " + this.getId() + " class=" + this.jsClassName + " mounted=" + this.mounted);
-        //     let elm: HTMLElement = document.getElementById(this.getId());
-        //     return (elm && elm.isConnected) ? elm : null;
-        // }
+        return this.attribs.ref?.current?.isConnected ? this.attribs.ref.current : null;
     }
 
     getId(): string {
@@ -97,14 +71,13 @@ export abstract class Comp implements CompIntf {
         return (++Comp.guid).toString(16)
     }
 
+    /* Schedules a function to get run whenever this element comes into existence, or will cause
+     the function to run immediately of the component is already mounted */
     whenElm(func: (elm: HTMLElement) => void) {
-        // console.log("whenElm running for " + this.jsClassName);
-
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
         let elm = this.getRef();
         if (elm) {
-            // console.log("Looked for and FOUND on DOM: " + this.jsClassName);
             func(elm);
             return;
         }
@@ -123,12 +96,6 @@ export abstract class Comp implements CompIntf {
 
     setClass(clazz: string): void {
         this.attribs.className = clazz;
-    }
-
-    setInnerHTML(html: string) {
-        this.whenElm(function (elm: HTMLElement) {
-            elm.innerHTML = html;
-        });
     }
 
     insertFirstChild(comp: CompIntf): void {
@@ -181,17 +148,16 @@ export abstract class Comp implements CompIntf {
         if (!id) {
             id = this.getId();
         }
-        
+
         // We call getElm here out of paranoia, but it's not needed. There are no places in our code where
         // we call into here when the element doesn't already exist.
         S.domUtil.getElm(id, (elm: HTMLElement) => {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            this.wrapClickFunc(this.attribs);
+            this.wrapClick(this.attribs);
 
             /* wrap with the Redux Provider to make it all reactive */
-            // console.log("Rendering with provider");
             let provider = createElement(Provider, { store }, this.create());
             ReactDOM.render(provider, elm);
         });
@@ -201,10 +167,9 @@ export abstract class Comp implements CompIntf {
         return createElement(this.render, this.attribs);
     }
 
-    wrapClickFunc = (obj: any) => {
+    wrapClick = (obj: any) => {
         let state = store.getState();
         if (!state.mouseEffect || !obj) return;
-        // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
         if (obj.onClick) {
             // todo-0: need to use some way that can ensure (detect) that we don't can never double-wap by calling twice.
             obj.onClick = S.util.delayFunc(obj.onClick);
@@ -212,15 +177,13 @@ export abstract class Comp implements CompIntf {
     }
 
     buildChildren(): ReactNode[] {
-        // console.log("buildChildren: " + this.jsClassName);
         if (!this.children || this.children.length === 0) return null;
 
         return this.children.map((child: CompIntf) => {
             if (!child) return null;
             try {
-                // console.log("ChildRender: " + child.jsClassName);
-                this.wrapClickFunc(child.attribs);
-                return child.create(); // createElement(child.render, child.attribs);
+                this.wrapClick(child.attribs);
+                return child.create();
             }
             catch (e) {
                 console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
@@ -230,7 +193,6 @@ export abstract class Comp implements CompIntf {
     }
 
     focus(): void {
-        // console.log("Comp.focus " + this.getId());
         // immediately assign this as the focused element ID
         Comp.focusElmId = this.getId();
 
@@ -238,7 +200,6 @@ export abstract class Comp implements CompIntf {
             // if we're still the focused id, then we do the focus, but due to async nature some other thing
             // could have technically taken over focus and we might do nothing here.
             if (Comp.focusElmId === this.getId()) {
-                // console.log("elm focus: id=" + this.getId());
                 S.domUtil.focusId(Comp.focusElmId);
             }
         });
@@ -271,7 +232,7 @@ export abstract class Comp implements CompIntf {
                 children = content ? [content] : null;
             }
 
-            this.wrapClickFunc(props);
+            this.wrapClick(props);
             if (children?.length > 0) {
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652
@@ -284,7 +245,6 @@ export abstract class Comp implements CompIntf {
                 }
             }
             else {
-                // console.log("Render Tag no children.");
                 return createElement(type, props);
             }
         }
@@ -293,42 +253,53 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    mergeState<ST = any>(moreState: ST): any {
+    checkState = (): boolean => {
+        if (!this.stateMgr) {
+            if (!this.rendered) {
+                // we allow a lazy creation of a State as long as component hasn't rendered yet. This is becasue the
+                // 'useState' can only be called inside the render method due to the "Rules of Hooks".
+                // The normal pattern is that a component will call mergeState in the constructor to initialize some state
+                this.stateMgr = new State();
+            }
+            else {
+                console.error("non-state component " + this.getCompClass() + " attempted to use stateMgr, after renderd");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    mergeState<ST = any>(moreState: ST): void {
+        if (!this.checkState()) return;
         this.stateMgr.mergeState<ST>(moreState);
     }
 
-    setState = <ST = any>(newState: ST): any => {
+    setState = <ST = any>(newState: ST): void => {
+        if (!this.checkState()) return;
         this.stateMgr.setState<ST>(newState);
     }
 
+    getState<ST = any>(): ST {
+        if (!this.checkState()) return null;
+        return this.stateMgr.state;
+    }
+
+    // todo-0: figure out why this hacky function is here, or if it's no longer needed.
     forceRender() {
         this.mergeState({ forceRender: Comp.nextGuid() } as any);
     }
 
-    /* Note: this method performs a direct state mod, until react overrides it using useState return value
-
-    To add new properties...use this pattern (mergeState above does this)
-    setStateFunc(prevState => {
-        return {...prevState, ...updatedValues};
-    });
-
-    There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
-    */
-    setStateEx<ST = any>(state: ST) {
-        this.stateMgr.setStateEx<ST>(state);
-    }
-
-    getState<ST = any>(): ST {
-        return this.stateMgr.state;
-    }
-
     // Core 'render' function used by react. This is THE function for the functional component this object represents
     render = (): any => {
+        this.rendered = true;
+
         if (this.debug) {
             console.log("render(): " + this.getCompClass());
         }
         try {
-            this.stateMgr.useState();
+            if (this.stateMgr) {
+                this.stateMgr.useState();
+            }
 
             useEffect(() => {
                 // Supposedly React 18+ will call useEffect twice on a mount so that's the only reason
@@ -384,16 +355,12 @@ export abstract class Comp implements CompIntf {
     maybeFocus = (): void => {
         /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
         if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
-            // console.log("React render auto focus.");
             S.domUtil.focusId(Comp.focusElmId);
         }
     }
 
     runQueuedFuncs = (elm: HTMLElement): void => {
-        // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
-        this.domAddFuncs?.forEach(function (func) {
-            func(elm);
-        }, this);
+        this.domAddFuncs?.forEach(func => func(elm));
         this.domAddFuncs = null;
     }
 

@@ -7,10 +7,9 @@ export interface CompIntf {
     whenElm(func: Function): void;
     setState(newState: any): void;
     getState(): any;
-    mergeState(moreState: any, reuseChildren?: boolean): any;
+    mergeState(moreState: any): void;
     setClass(clazz: string): void;
     updateDOM(store: any, id: string): void;
-    setInnerHTML(html: string): void;
     getAttribs() : Object;
     compRender(): ReactNode;
     forceRender(): void;

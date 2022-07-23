@@ -18,7 +18,7 @@ export class CompDemoButton extends Div {
             id: "CompDemoButton_id_" + idx,
             key: "CompDemoButton_key_" + idx
         });
-        this.setStateEx({ counter: 0, idx: idx });
+        this.mergeState({ counter: 0, idx: idx });
     }
 
     preRender(): void {

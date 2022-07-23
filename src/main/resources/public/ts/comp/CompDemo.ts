@@ -13,7 +13,7 @@ export class CompDemo extends Div {
 
     constructor() {
         super();
-        this.setStateEx({ counter: 0 });
+        this.mergeState({ counter: 0 });
         this.dateTimeState.setValue("" + new Date().getTime());
     }
 
