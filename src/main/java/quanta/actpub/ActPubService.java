@@ -114,7 +114,7 @@ public class ActPubService extends ServiceBase {
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
-     * notification to foreign servers. This call returns immediately and delegates the actuall
+     * notification to foreign servers. This call returns immediately and delegates the actual
      * proccessing to a daemon thread.
      * 
      * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even

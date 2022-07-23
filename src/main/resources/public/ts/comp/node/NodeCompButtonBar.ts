@@ -19,7 +19,7 @@ export class NodeCompButtonBar extends Div {
 
     constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[], private extraClass: string) {
         super(null, {
-            id: "NodeCompButtonBar_" + node.id,
+            id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")
         });
     }
@@ -191,7 +191,6 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
-
                     if (node.logicalOrdinal > 0) {
                         moveNodeUpButton = new Icon({
                             className: "fa fa-arrow-up buttonBarIcon",

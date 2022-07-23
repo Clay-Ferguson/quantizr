@@ -176,6 +176,7 @@ export abstract class Comp implements CompIntf {
         }
     }
 
+    // todo-0: rename to createChildren
     buildChildren(): ReactNode[] {
         if (!this.children || this.children.length === 0) return null;
 

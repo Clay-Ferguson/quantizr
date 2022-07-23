@@ -1,5 +1,7 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { Icon } from "./Icon";
+import { PlainString } from "./PlainString";
 
 interface LS { // Local State
     text?: string;
@@ -32,9 +34,9 @@ export class Button extends Comp {
 
     compRender = (): ReactNode => {
         let text: string = this.getState<LS>().text;
-        let icon: any;
+        let icon: Icon;
         if (this.attribs.iconclass) {
-            icon = createElement("i", {
+            icon = new Icon({
                 key: "s_" + this.getId(),
                 className: this.attribs.iconclass,
                 style: {
@@ -50,6 +52,9 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        return createElement("button", this.attribs, [icon, text]);
+        // todo-0: Should we go with the pattern where we ALWAYS call only 'this.tag()' in cases like this
+        //         This will require that all children are specified as Comp-derived components too.
+        //         NOTE: Ultimately we'll also end up with only one creatElement in the code and it's in Comp.
+        return this.tag("button", null, this.attribs, [icon, new PlainString(text)]);
     }
 }
