@@ -31,10 +31,12 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
-        Object.assign(this.attribs, {
-            name: this.getId(),
-            className: "textField " + (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
-        });
+        this.attribs = {
+            ...this.attribs, ...{
+                name: this.getId(),
+                className: "textField " + (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
+            }
+        };
 
         this.mergeState<LS>({
             inputType: this.cfg.pwd ? "password" : "text"

@@ -11,9 +11,11 @@ export class DateTimeField extends Span {
     // dateTimeState holds the string value of the date number milliseconds
     constructor(private dateTimeState: ValidatedState<any>) {
         super(null);
-        Object.assign(this.attribs, {
-            className: "input-group marginTop"
-        });
+        this.attribs = {
+            ...this.attribs, ...{
+                className: "input-group marginTop"
+            }
+        };
 
         this.dateState.v.stateTranslator = (s: any): any => {
             try {

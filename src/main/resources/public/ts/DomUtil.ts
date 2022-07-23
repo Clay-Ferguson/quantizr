@@ -17,10 +17,9 @@ export class DomUtil {
             }
         }
 
-        if (!val) {
-            console.log("Unable to get prop " + prop + " from parameter or html element or any parents.");
-        }
-
+        // It's normal flow to sometimes return null here. Like deleting from the left hand menu where it calls
+        // the same method as the onClick method but there's no event info or node attributes passed in that case,
+        // and this is fine.
         return val;
     }
 

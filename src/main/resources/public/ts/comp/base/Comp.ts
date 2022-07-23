@@ -310,7 +310,6 @@ export abstract class Comp implements CompIntf {
 
     To add new properties...use this pattern (mergeState above does this)
     setStateFunc(prevState => {
-        // Object.assign would also work
         return {...prevState, ...updatedValues};
     });
 

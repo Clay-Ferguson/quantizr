@@ -6,8 +6,8 @@ import { Markdown } from "./Markdown";
 
 export class HelpButton extends Comp {
 
-    constructor(private getHelpText: () => string, _attribs: Object = null, moreClasses: string = "btn-secondary") {
-        super(_attribs);
+    constructor(private getHelpText: () => string, attribs: Object = null, moreClasses: string = "btn-secondary") {
+        super(attribs);
         if (!this.attribs.className) {
             this.attribs.className = "";
         }

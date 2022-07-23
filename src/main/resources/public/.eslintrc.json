@@ -63,6 +63,7 @@
         "no-debugger": "off",
         "keyword-spacing": "off",
         "no-trailing-spaces": "off",
-        "space-infix-ops": "off"
+        "space-infix-ops": "off",
+        "object-property-newline": "off"
       }
 }

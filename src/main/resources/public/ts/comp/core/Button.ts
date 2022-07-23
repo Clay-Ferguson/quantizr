@@ -8,8 +8,8 @@ interface LS { // Local State
 
 export class Button extends Comp {
 
-    constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string = "btn-secondary") {
-        super(_attribs);
+    constructor(text: string, public callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary") {
+        super(attribs);
         if (!this.attribs.className) {
             this.attribs.className = "";
         }

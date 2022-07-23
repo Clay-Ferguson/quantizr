@@ -10,8 +10,8 @@ it might finally work now.
 */
 export class RadioButton extends Comp {
 
-    constructor(public label: string, public checked: boolean, groupName: string, _attribs: any, private valueIntf: ValueIntf) {
-        super(_attribs);
+    constructor(public label: string, public checked: boolean, groupName: string, attribs: any, private valueIntf: ValueIntf) {
+        super(attribs);
 
         this.attribs.onChange = (evt: any) => {
             this.updateValFunc(evt.target.checked);

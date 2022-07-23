@@ -9,8 +9,8 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
     outterClassName: string;
 
     /* To turn this into a slider switch, just add 'form-switch' to layoutClass style */
-    constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf, private layoutClass: string = null) {
-        super(_attribs);
+    constructor(public label: string = null, attribs: Object = null, private valueIntf: ValueIntf, private layoutClass: string = null) {
+        super(attribs);
 
         if (!valueIntf) {
             this.valueIntf = new CompValueHolder<string>(this, "val");

@@ -11,7 +11,6 @@ interface LS { // Local State
 }
 
 export class TextArea extends Span implements I.TextEditorIntf {
-
     input: TextareaTag;
     textareaAttribs: any = {};
 
@@ -20,11 +19,13 @@ export class TextArea extends Span implements I.TextEditorIntf {
         super(null);
 
         if (attribs) {
-            Object.assign(this.textareaAttribs, attribs);
+            this.textareaAttribs = { ...this.textareaAttribs, ...attribs };
         }
-        Object.assign(this.textareaAttribs, {
-            className: "form-control pre-textarea " + moreClasses
-        });
+        this.textareaAttribs = {
+            ...this.textareaAttribs, ...{
+                className: "form-control pre-textarea " + moreClasses
+            }
+        };
 
         if (!this.textareaAttribs.rows) {
             this.textareaAttribs.rows = "1";
@@ -68,9 +69,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
     preRender(): void {
         let state = this.getState<LS>();
-        let children = [];
-
-        children.push(new ErrorDiv(this.valState.e));
+        let children = [new ErrorDiv(this.valState.e)];
 
         if (this.label) {
             children.push(new Label(this.label, {
@@ -79,26 +78,26 @@ export class TextArea extends Span implements I.TextEditorIntf {
             }));
         }
 
-        let _attribs = { ...this.textareaAttribs };
+        let att = { ...this.textareaAttribs };
 
         // only if 'id' not already provided we set a default id for textarea,
         // sometimes id is provided in order to help with persistence of focus
         // across react re-renders.
         if (!this.textareaAttribs.id) {
-            _attribs.id = this.getId() + "_textarea";
+            att.id = this.getId() + "_textarea";
         }
 
         if (!state.wordWrap) {
-            _attribs.style = {
+            att.style = {
                 whiteSpace: "nowrap",
                 overflow: "auto"
             };
         }
 
-        if (!_attribs.style) {
-            _attribs.style = {};
+        if (!att.style) {
+            att.style = {};
         }
-        _attribs.style.fontFamily = "monospace";
+        att.style.fontFamily = "monospace";
 
         // Getting a bizarre React error whenver 'onKeyUp' is used.
         //     Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
@@ -110,7 +109,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         //     let newHeight = 20 + numberOfLineBreaks * 20 + 12 + 2;
         //     return newHeight;
         // }
-        // _attribs.onKeyUp = function () {
+        //  att.onKeyUp = function () {
         //     console.log("keyup.");
         // };
         // let textarea = document.querySelector(".resize-ta");
@@ -118,7 +117,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         //     textarea.style.height = calcHeight(textarea.value) + "px";
         // });
 
-        children.push(this.input = new TextareaTag(_attribs, this.valState.v, this.calcRows));
+        children.push(this.input = new TextareaTag(att, this.valState.v, this.calcRows));
         this.setChildren(children);
     }
 }
