@@ -15,7 +15,7 @@ export class IconButton extends Comp {
         this.mergeState({ visible: true });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         let state = this.getState<LS>();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 

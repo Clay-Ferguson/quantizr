@@ -8,7 +8,7 @@ export class Para extends Comp {
         super(attribs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("p", this.attribs, this.content || "");
     }
 }

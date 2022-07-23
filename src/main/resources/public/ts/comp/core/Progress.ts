@@ -14,7 +14,7 @@ export class Progress extends Comp {
         });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("div", this.attribs);
     }
 }

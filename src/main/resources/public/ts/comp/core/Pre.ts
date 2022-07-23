@@ -9,7 +9,7 @@ export class Pre extends Comp {
         this.attribs.dangerouslySetInnerHTML = { __html: this.content };
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("pre", this.attribs);
     }
 }

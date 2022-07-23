@@ -33,7 +33,7 @@ export class HelpButton extends Comp {
         }
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         let icon = createElement("i", {
             key: "s_" + this.getId(),
             className: "fa fa-question-circle"

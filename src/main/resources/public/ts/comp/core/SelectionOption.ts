@@ -13,7 +13,7 @@ export class SelectionOption extends Comp {
         // }
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("option", this.attribs, this.val);
     }
 }

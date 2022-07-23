@@ -43,7 +43,7 @@ export class RadioButton extends Comp {
         return this.valueIntf.getValue();
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         this.attribs.checked = !!this.valueIntf.getValue();
 
         let attribsClone = { ...this.attribs };

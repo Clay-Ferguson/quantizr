@@ -9,7 +9,7 @@ export class Li extends Comp {
         this.setChildren(this.initialChildren);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("li", this.attribs, this.buildChildren());
     }
 }

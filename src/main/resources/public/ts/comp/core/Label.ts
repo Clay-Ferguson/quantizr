@@ -16,7 +16,7 @@ export class Label extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return this.tagRender("label", this.getState<LS>().content, this.attribs);
     }
 }

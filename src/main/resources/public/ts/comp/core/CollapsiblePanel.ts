@@ -30,7 +30,7 @@ export class CollapsiblePanel extends Comp {
         this.mergeState<LS>({ expanded });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         let state = this.getState<LS>();
         let style = this.textLink ? "collapse-panel-link" : "btn btn-info ";
         let collapseClass = state.expanded ? "expand" : "collapse";

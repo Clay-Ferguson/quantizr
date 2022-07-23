@@ -9,7 +9,7 @@ export class Span<LocalState = any> extends Comp {
         this.setChildren(initialChildren);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         if (this.renderRawHtml) {
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: this.content };

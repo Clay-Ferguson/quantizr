@@ -16,7 +16,7 @@ export class RadioButtonGroup extends Comp {
         }, this);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("div", this.attribs, this.buildChildren());
     }
 }

@@ -15,7 +15,7 @@ export class EmojiPicker extends Comp {
         };
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return this.tagRender(Picker, null, this.attribs);
     }
 }

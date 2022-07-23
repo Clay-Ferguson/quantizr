@@ -14,7 +14,7 @@ export class ButtonBar extends Comp {
         this.setChildren(initialButtons);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         if (!this.hasChildren()) return null;
 
         // we have this clone becasue we want our 'ref' to point to the correct top level element 

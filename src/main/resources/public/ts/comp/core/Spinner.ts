@@ -10,7 +10,7 @@ export class Spinner extends Comp {
         });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("div", this.attribs);
     }
 }

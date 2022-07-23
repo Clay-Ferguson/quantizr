@@ -47,7 +47,7 @@ export class Selection extends Comp {
         }
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         this.attribs.value = this.valueIntf.getValue();
         let children = [];
 

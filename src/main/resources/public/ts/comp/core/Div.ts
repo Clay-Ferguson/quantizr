@@ -2,9 +2,6 @@ import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
-// So that users of this class don't need a state deriving from one with a 'content' prop
-// we use an 'as any' in here. Just a convenient tradeoff.
-
 interface LS { // Local State
     content?: string;
 }
@@ -17,7 +14,7 @@ export class Div extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         if (this.renderRawHtml) {
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: this.content };

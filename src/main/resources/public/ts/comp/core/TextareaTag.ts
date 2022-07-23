@@ -54,7 +54,7 @@ export class TextareaTag extends Comp {
         return rows;
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         this.attribs.value = this.getState<LS>().value;
         if (this.calcRows) {
             this.attribs.rows = "" + this.calcRowsFunc(this.attribs.value);

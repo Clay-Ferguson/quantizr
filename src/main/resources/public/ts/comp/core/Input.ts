@@ -15,7 +15,7 @@ export class Input extends Comp {
         };
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         this.attribs.value = this.getState<LS>().value || "";
         return createElement("input", this.attribs);
     }

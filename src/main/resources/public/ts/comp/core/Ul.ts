@@ -9,7 +9,7 @@ export class Ul extends Comp {
         this.setChildren(this.initialChildren);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("ul", this.attribs, this.buildChildren());
     }
 }

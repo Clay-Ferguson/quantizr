@@ -18,7 +18,6 @@ import { CompIntf } from "./CompIntf";
 export abstract class Comp implements CompIntf {
     static renderCounter: number = 0;
     static focusElmId: string = null;
-    public rendered: boolean = false;
     public debug: boolean = false;
     public mounted: boolean = false;
     public debugState: boolean = false;
@@ -180,35 +179,22 @@ export abstract class Comp implements CompIntf {
         return renderToString(elm);
     }
 
-    /* Attaches a react element directly to the dom at the DOM id specified.
-       WARNING: This can only re-render the *children* under the target node and not the attributes or tag of the node itself.
-
-       Also this can only re-render TOP LEVEL elements, meaning elements that are not children of other React Elements, but attached
-       to the DOM old-school.
-    */
+    /* Attaches a react element directly to the dom at the DOM id specified. */
     updateDOM(store: any = null, id: string = null) {
         if (!id) {
             id = this.getId();
         }
-        // if (!this.render) {
-        //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
-        // }
+        
         S.domUtil.getElm(id, (elm: HTMLElement) => {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
             this.wrapClickFunc(this.attribs);
 
-            /* If this component has a store then wrap with the Redux Provider to make it all reactive */
-            if (store) {
-                // console.log("Rendering with provider");
-                let provider = createElement(Provider, { store }, this.create());
-                ReactDOM.render(provider, elm);
-            }
-            else {
-                // todo-0: is this code path dead? we get a syntax error without <any> here which I need to investigate.
-                ReactDOM.render(<any>this.create(), elm);
-            }
+            /* wrap with the Redux Provider to make it all reactive */
+            // console.log("Rendering with provider");
+            let provider = createElement(Provider, { store }, this.create());
+            ReactDOM.render(provider, elm);
         });
     }
 
@@ -217,23 +203,6 @@ export abstract class Comp implements CompIntf {
     }
 
     wrapClickFunc = (obj: any) => {
-        /*
-        DO NOT DELETE
-        (I want to keep this a while to be SURE I never need it again, before deleting it)
-
-        Whenever we have a mouse click function which triggers a React Re-render cycle
-         react doesn't have the ability to maintain focus correctly, so we have this crutch
-         to help accomplish that. It's debatable whether this is a 'hack' or good code. */
-        // if (obj && obj.onClick) {
-        //     let func = obj.onClick;
-        //     // wrap the click function to maintain focus element.
-        //     obj.onClick = (arg: any) => {
-        //         S.domUtil.focusId(obj.id);
-        //         // console.log("Click (wrapped): " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
-        //         func(arg);
-        //     };
-        // }
-
         let state = store.getState();
         if (!state.mouseEffect || !obj) return;
         // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
@@ -277,7 +246,6 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
-    
     Note: Tag can also be a type here, not just a string.
     */
     tagRender(tag: any, content: string, props?: any, childrenArg?: CompIntf[]) {
@@ -289,23 +257,23 @@ export abstract class Comp implements CompIntf {
         if (childrenArg) {
             this.children = childrenArg;
         }
-        
-        // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
+
         try {
             let children: ReactNode[] = this.buildChildren();
+
+            // if we have children then add content as the first child ahead of all children
             if (children) {
                 if (content) {
                     children.unshift(content);
                 }
             }
+            // otherwise use 'content' as the single array element or null if no content
             else {
                 children = content ? [content] : null;
             }
 
             this.wrapClickFunc(props);
             if (children?.length > 0) {
-                // console.log("Render Tag with children.");
-
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652
                 if (tag === "table") {
@@ -356,17 +324,15 @@ export abstract class Comp implements CompIntf {
         return this.stateMgr.state;
     }
 
-    // Core 'render' function used by react.
+    // Core 'render' function used by react. This is THE function for the functional component this object represents
     render = (): any => {
         if (this.debug) {
             console.log("render(): " + this.getCompClass());
         }
-        this.rendered = true;
         try {
             this.stateMgr.useState();
 
             useEffect(() => {
-
                 // Supposedly React 18+ will call useEffect twice on a mount so that's the only reason
                 // I'm checking for !mounted here in this if condition.
                 if (!this.mounted) {
@@ -386,12 +352,6 @@ export abstract class Comp implements CompIntf {
             if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
             if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
 
-            /* Theoretically we could avoid calling preRender if it weren't for the fact that React monitors
-            which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using
-            the children it generates, react will still throw an error becasue the calls to those hooks will not have been made.
-
-            DO NOT DELETE THE COMMENTED IF BELOW (it serves as warning of what NOT to do.)
-            */
             if (this.debug) {
                 console.log("Calling preRender: " + this.getCompClass());
             }

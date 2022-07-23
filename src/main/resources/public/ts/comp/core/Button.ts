@@ -30,7 +30,7 @@ export class Button extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         let text: string = this.getState<LS>().text;
         let icon: any;
         if (this.attribs.iconclass) {

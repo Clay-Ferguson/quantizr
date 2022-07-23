@@ -8,7 +8,7 @@ export class Form extends Comp {
         super(attribs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         this.setChildren(this.initialChildren);
         return createElement("div", this.attribs, this.buildChildren());
     }

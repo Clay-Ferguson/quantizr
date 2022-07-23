@@ -7,7 +7,7 @@ export class PropTable extends Comp {
         super(attribs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return this.tagRender("table", null, this.attribs);
     }
 }

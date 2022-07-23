@@ -7,7 +7,7 @@ export class Img extends Comp {
         super(attribs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         // console.log("Render IMG: id="+this.getId());
         // this.attribs.style = this.attribs.style || {};
         // this.attribs.style.maxWidth = "calc(100% - 12px)";

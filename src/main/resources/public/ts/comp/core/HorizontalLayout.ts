@@ -14,7 +14,7 @@ export class HorizontalLayout extends Div {
     }
 
     super_compRender = this.compRender;
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         if (this.comps) {
             for (let comp of this.comps) {
                 if (!comp) continue;

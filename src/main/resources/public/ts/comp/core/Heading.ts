@@ -7,7 +7,7 @@ export class Heading extends Comp {
         super(attrs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("h" + this.level, this.attribs, this.content);
     }
 }

@@ -44,7 +44,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         return this.valueIntf.getValue();
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         // double-bang is important here becasue we do need to support the 'getvalue' comming back as null, or undefined, and in all cases
         // convert that to exactly the value 'true' or else React itself (internal to React) will fail
         this.attribs.checked = !!this.valueIntf.getValue();

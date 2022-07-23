@@ -14,7 +14,7 @@ export class ErrorDiv extends Comp {
         this.attribs.className = "validationError";
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return this.tagRender("div", this.getState<LS>().error, this.attribs);
     }
 }

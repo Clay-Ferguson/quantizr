@@ -21,7 +21,7 @@ export class TutorialApp extends Comp {
         this.mergeState<LS>({ content: "You clicked a button!" });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         // NOTE: This is another way to render a raw div, which actually doesn't use the base class, and still works.
         // return (new Div(this.getState<LS>().content, this.attribs)).create();
 

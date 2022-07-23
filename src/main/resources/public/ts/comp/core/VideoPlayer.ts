@@ -12,7 +12,7 @@ export class VideoPlayer extends Comp {
         return <HTMLVideoElement>this.getRef();
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("video", this.attribs);
     }
 }

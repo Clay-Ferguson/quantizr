@@ -12,7 +12,7 @@ export class Anchor extends Comp {
         }
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         if (this.attribs.dangerouslySetInnerHTML) {
             return createElement("a", this.attribs);
         }

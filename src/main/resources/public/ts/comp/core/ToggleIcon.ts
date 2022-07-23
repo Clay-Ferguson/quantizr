@@ -21,7 +21,7 @@ export class ToggleIcon extends Comp {
         this.mergeState<LS>({ toggle: !state.toggle });
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         let state = this.getState<LS>();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
         /* Yes Icon used "i" tag, this is not a mistake */

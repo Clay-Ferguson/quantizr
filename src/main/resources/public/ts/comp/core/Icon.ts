@@ -7,7 +7,7 @@ export class Icon extends Comp {
         super(attribs);
     }
 
-    compRender(): ReactNode {
+    compRender = (): ReactNode => {
         return createElement("i", this.attribs, this.label);
     }
 }
