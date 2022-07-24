@@ -75,16 +75,16 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         let state = this.getState<LS>();
 
         let label = this.cfg.label ? new Label(this.cfg.label, {
-            key: this.getId() + "_label",
+            key: this.getId("label_"),
             className: "txtFieldLabel",
-            htmlFor: "inputId_" + this.getId()
+            htmlFor: this.getId("inputId_")
         }) : null;
 
         let input = this.input = new Input({
             placeholder: this.cfg.placeholder || "",
             className: "form-control pre-textfield " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
-            id: "inputId_" + this.getId()
+            id: this.getId("inputId_")
         }, this.cfg.val.v);
 
         let passwordEye = this.cfg.pwd ? new Span(null, {

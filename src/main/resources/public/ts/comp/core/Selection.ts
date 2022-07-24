@@ -23,8 +23,8 @@ export class Selection extends Comp {
 
         if (this.label) {
             children.push(new Label(this.label, {
-                id: this.getId() + "_label",
-                key: this.getId() + "_label",
+                id: this.getId("label_"),
+                key: this.getId("label_"),
                 htmlFor: this.getId(),
                 className: "selectLabel"
             }));
@@ -34,8 +34,8 @@ export class Selection extends Comp {
         this.setChildren(children);
 
         return this.tag("div", {
-            id: this.getId() + "_sel",
-            key: this.getId() + "_sel",
+            id: this.getId("sel_"),
+            key: this.getId("sel_"),
             className: this.outterClasses || "",
             ref: this.attribs.ref
         });

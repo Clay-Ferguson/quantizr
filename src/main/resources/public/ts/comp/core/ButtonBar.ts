@@ -26,7 +26,7 @@ export class ButtonBar extends Comp {
         if (this.wrapperClass) {
             return this.tag("div", {
                 className: this.wrapperClass,
-                key: this.getId() + "_wrp",
+                key: this.getId("w_"),
                 ref: this.attribs.ref
             },
                 [new Div(null, attribsClone, this.getChildren())]);

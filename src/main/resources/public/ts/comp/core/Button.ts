@@ -9,22 +9,18 @@ interface LS { // Local State
 
 export class Button extends Comp {
 
-    constructor(text: string, public callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary") {
+    constructor(text: string, callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary") {
         super(attribs);
-        if (!this.attribs.className) {
-            this.attribs.className = "";
-        }
-
-        // somehow this 'clickable' class seems to have no effect
-        this.attribs.className += " btn clickable " + moreClasses;
         this.attribs.type = "button";
         this.attribs.onClick = callback;
+        this.attribs.className = this.attribs.className || "";
+        this.attribs.className += " btn clickable " + moreClasses;
         this.setText(text);
         this.setEnabled(true);
     }
 
     setEnabled = (enabled: boolean): void => {
-        this.mergeState({ enabled });
+        this.mergeState<LS>({ enabled });
     }
 
     setText(text: string): void {
@@ -33,16 +29,6 @@ export class Button extends Comp {
 
     compRender = (): ReactNode => {
         let text: string = this.getState<LS>().text;
-        let icon: Icon;
-        if (this.attribs.iconclass) {
-            icon = new Icon({
-                key: "s_" + this.getId(),
-                className: this.attribs.iconclass,
-                style: {
-                    marginRight: text ? "6px" : "0px"
-                }
-            });
-        }
 
         if (this.getState<LS>().enabled) {
             delete this.attribs.disabled;
@@ -51,6 +37,13 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        return this.tag("button", null, [icon, text]);
+        return this.tag("button", null, [
+            this.attribs.iconclass ? new Icon({
+                key: this.getId("s_"),
+                className: this.attribs.iconclass,
+                style: {
+                    marginRight: text ? "6px" : "0px"
+                }
+            }) : null, text]);
     }
 }

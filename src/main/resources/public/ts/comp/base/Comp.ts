@@ -48,7 +48,7 @@ export abstract class Comp implements CompIntf {
         /* If an ID was specifically provided, then use it, or else generate one */
         this.setId(this.attribs.id || ("c" + Comp.nextHex()));
     }
-    
+
     public managesState = (): boolean => {
         return !!this.stateMgr;
     }
@@ -69,8 +69,8 @@ export abstract class Comp implements CompIntf {
         return ret;
     }
 
-    getId(): string {
-        return this.attribs.id;
+    getId(prefix: string = null): string {
+        return prefix ? prefix + this.attribs.id : this.attribs.id;
     }
 
     private setId(id: string) {
@@ -182,8 +182,6 @@ export abstract class Comp implements CompIntf {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
-            this.wrapClick(this.attribs);
-
             /* wrap with the Redux Provider to make it all reactive */
             let provider = createElement(Provider, { store }, this.create());
             ReactDOM.render(provider, elm);
@@ -191,14 +189,14 @@ export abstract class Comp implements CompIntf {
     }
 
     create = (): ReactNode => {
+        this.wrapClick(this.attribs);
         return createElement(this.render, this.attribs);
     }
 
     wrapClick = (obj: any) => {
-        let state = store.getState();
-        if (!state.mouseEffect || !obj) return;
-        if (obj.onClick) {
-            // todo-0: need to use some way that can ensure (detect) that we don't can never double-wap by calling twice.
+        // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to 
+        // give the animation time to run.
+        if (obj?.onClick && store.getState().mouseEffect) {
             obj.onClick = S.util.delayFunc(obj.onClick);
         }
     }
@@ -214,7 +212,6 @@ export abstract class Comp implements CompIntf {
 
             if (!child) return null;
             try {
-                this.wrapClick(child.attribs);
                 return child.create();
             }
             catch (e) {
@@ -358,7 +355,6 @@ export abstract class Comp implements CompIntf {
             //     console.log("Calling preRender: " + this.getCompClass());
             // }
 
-            // todo-0: We no longer need preRender, it's just part of compRender right?
             this.preRender();
             return this.compRender();
         }

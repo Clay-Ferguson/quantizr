@@ -73,7 +73,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
         if (this.label) {
             children.push(new Label(this.label, {
-                htmlFor: this.getId() + "_textarea",
+                htmlFor: this.getId("textarea_"),
                 className: "marginTop"
             }));
         }
@@ -84,7 +84,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         // sometimes id is provided in order to help with persistence of focus
         // across react re-renders.
         if (!this.textareaAttribs.id) {
-            att.id = this.getId() + "_textarea";
+            att.id = this.getId("textarea_");
         }
 
         if (!state.wordWrap) {

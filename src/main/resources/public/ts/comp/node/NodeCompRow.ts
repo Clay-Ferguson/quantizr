@@ -182,7 +182,7 @@ export class NodeCompRow extends Div {
             this.isTableCell ? null : insertInlineButton,
             header,
             buttonBar,
-            buttonBar ? new Clearfix("button_bar_clearfix_" + node.id) : null,
+            buttonBar ? new Clearfix() : null,
             jumpButton,
             new NodeCompContent(node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
             this.internalComp,

@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 export interface CompIntf {
     attribs: any;
 
-    getId(): string;
+    getId(prefix?: string): string;
     onMount(func: Function): void;
     setState(newState: any): void;
     getState(): any;

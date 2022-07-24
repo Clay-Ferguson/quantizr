@@ -145,7 +145,7 @@ export class App extends Main {
                 onClick: e => { S.nav.login(state); }
             }, "btn-primary marginRight", "off") : null;
 
-            let logo = new Img(this.getId() + "_logo", {
+            let logo = new Img(this.getId("logo_"), {
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
                 onClick: () => { window.location.href = window.location.origin; },

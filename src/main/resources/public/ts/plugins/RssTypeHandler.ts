@@ -407,7 +407,7 @@ export class RssTypeHandler extends TypeBase {
 
         let tabData = state.tabData.find(d => d.id === C.TAB_MAIN);
         if (anchor) {
-            let og = new OpenGraphPanel(state, tabData, "og_rss_" + anchor.getId(), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            let og = new OpenGraphPanel(state, tabData, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
             if (tabData) {

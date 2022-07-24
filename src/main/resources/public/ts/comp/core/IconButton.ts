@@ -36,19 +36,19 @@ export class IconButton extends Comp {
         let children = [];
         if (this.imageUrl) {
             children.push(new Img(null, {
-                key: "s_img_" + this.getId(),
+                key: this.getId("s_img_"),
                 src: this.imageUrl
             }));
         }
 
         children.push(new Italic({
-            key: "i_" + this.getId(),
+            key: this.getId("i_"),
             className: iconClazz
         }));
 
         if (this.text) {
             children.push(new Span(this.text, {
-                key: "s_txt_" + this.getId(),
+                key: this.getId("s_txt_"),
                 className: "icon-button-font"
             }));
         }

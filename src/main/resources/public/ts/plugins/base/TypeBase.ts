@@ -116,7 +116,7 @@ export class TypeBase implements TypeHandlerIntf {
             comp.urls.forEach((url: string) => {
                 // allow max of 10 urls.
                 if (count++ < 10) {
-                    let og = new OpenGraphPanel(state, tabData, "og" + count + "_" + comp.getId(), url, "openGraphPanel", "openGraphImage", true, true, true);
+                    let og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url, "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {

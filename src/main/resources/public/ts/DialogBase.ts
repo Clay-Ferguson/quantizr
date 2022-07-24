@@ -82,7 +82,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.
                 this.backdrop = document.createElement("div");
-                this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
+                this.backdrop.setAttribute("id", this.getId(DialogBase.BACKDROP_PREFIX));
 
                 // WARNING: Don't use 'className' here, this is pure javascript, and not React!
                 this.backdrop.setAttribute("class", "app-modal " + (this.appState.mobileMode ? "normalScrollbar" : "customScrollbar"));
@@ -172,7 +172,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 this.preUnmount();
                 ReactDOM.unmountComponentAtNode(this.backdrop);
                 S.domUtil.domElmRemove(this.getId());
-                S.domUtil.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
+                S.domUtil.domElmRemove(this.getId(DialogBase.BACKDROP_PREFIX));
 
                 if (--DialogBase.refCounter <= 0) {
                     if (this.appState.mobileMode) {

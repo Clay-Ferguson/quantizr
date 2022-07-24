@@ -18,7 +18,7 @@ export class RadioButton extends Comp {
         this.attribs.name = groupName;
         this.attribs.type = "radio";
         this.attribs.label = label;
-        this.attribs.value = "val-" + this.getId();
+        this.attribs.value = this.getId("val-");
         this.attribs.className = "form-check-input";
     }
 

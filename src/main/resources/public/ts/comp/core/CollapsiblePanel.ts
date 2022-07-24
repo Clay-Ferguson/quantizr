@@ -41,7 +41,7 @@ export class CollapsiblePanel extends Comp {
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
             return this.tag(this.elementName, {
-                key: "panel_" + this.getId(),
+                key: this.getId("panel_"),
                 className: this.extraDivStyleExpanded,
                 ref: this.attribs.ref
             }, [
@@ -49,15 +49,15 @@ export class CollapsiblePanel extends Comp {
                 new Div(null, {
                     className: collapseClass,
                     id: this.getId(),
-                    key: "content_" + this.getId()
+                    key: this.getId("content_")
                 }, [
                     // This span is the expande/collapse button itself
                     new Span(this.expandedButtonText, {
                         className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                         // Warning: This can't be camel case!
                         "data-bs-toggle": collapseClass,
-                        id: "btn_" + this.getId(),
-                        key: "btn_" + this.getId(),
+                        id: this.getId("btn_"),
+                        key: this.getId("btn_"),
                         onClick: this.onToggle
                     }),
                     ...this.getChildren()
@@ -66,7 +66,7 @@ export class CollapsiblePanel extends Comp {
         }
         else {
             return this.tag(this.elementName, {
-                key: "panel_" + this.getId(),
+                key: this.getId("panel_"),
                 className: this.extraDivStyleCollapsed,
                 ref: this.attribs.ref
             }, [
@@ -75,8 +75,8 @@ export class CollapsiblePanel extends Comp {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                     // Warning: This can't be camel case!
                     "data-bs-toggle": collapseClass,
-                    id: "btn_" + this.getId(),
-                    key: "btn_" + this.getId(),
+                    id: this.getId("btn_"),
+                    key: this.getId("btn_"),
                     onClick: this.onToggle
                 }),
 
@@ -84,7 +84,7 @@ export class CollapsiblePanel extends Comp {
                 new Div(null, {
                     className: collapseClass,
                     id: this.getId(),
-                    key: "content_" + this.getId()
+                    key: this.getId("content_")
                 },
                     this.getChildren())
             ]);

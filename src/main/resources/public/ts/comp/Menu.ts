@@ -39,14 +39,14 @@ export class Menu extends Div {
                 "aria-expanded": appState.activeMenu === this.name ? "true" : "false",
                 "data-bs-toggle": "collapse",
                 // "data-target": "#collapse" + this.getId(),
-                href: "#collapse" + this.getId(),
+                href: this.getId("#collapse"),
                 role: "tab",
-                id: "heading" + this.getId(),
+                id: this.getId("heading"),
                 onClick: (elm) => {
                     setTimeout(() => {
                         /* "aria-expanded" attribute won't have been updated yet when this onClick is called, so we have a delay
                         timer here to wait for it to get updated */
-                        let headingElm = document.getElementById("heading" + this.getId());
+                        let headingElm = document.getElementById(this.getId("heading"));
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         let activeName = expanded ? this.name : null;
 
@@ -68,10 +68,10 @@ export class Menu extends Div {
                 , [appState.activeMenu === this.name ? this.floatRightComp : null]),
 
             new Div(null, {
-                id: "collapse" + this.getId(),
+                id: this.getId("collapse"),
                 className: "accordion-collapse collapse" + (show ? " show" : ""),
                 role: "tabpanel",
-                "aria-labelledby": "heading" + this.getId(),
+                "aria-labelledby": this.getId("heading"),
                 "data-bs-parent": "#accordion"
             }, [
                 new Div(null, {
