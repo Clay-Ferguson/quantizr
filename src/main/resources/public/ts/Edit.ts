@@ -16,6 +16,7 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 import { FeedView } from "./tabs/FeedView";
+
 export class Edit {
 
     showReadOnlyProperties: boolean = false;
@@ -62,7 +63,18 @@ export class Edit {
     private insertBookResponse = (res: J.InsertBookResponse, state: AppState): void => {
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, true, false, null, false, true, true, true, false, state);
+        S.view.refreshTree({
+            nodeId: null,
+            zeroOffset: true,
+            renderParentIfLeaf: false,
+            highlightId: null,
+            forceIPFSRefresh: false,
+            scrollToTop: true,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            state
+        });
         S.view.scrollToNode(state);
     }
 
@@ -70,7 +82,18 @@ export class Edit {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
             S.nodeUtil.clearSelNodes(state);
-            S.view.refreshTree(state.node.id, false, false, null, false, false, true, true, false, state);
+            S.view.refreshTree({
+                nodeId: state.node.id,
+                zeroOffset: false,
+                renderParentIfLeaf: false,
+                highlightId: null,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                state
+            });
         }
     }
 
@@ -131,7 +154,18 @@ export class Edit {
 
             // if pasting do a kind of refresh which will maintain us at the same page parent.
             if (pasting) {
-                S.view.refreshTree(null, false, false, nodeId, false, false, true, true, false, state);
+                S.view.refreshTree({
+                    nodeId: null,
+                    zeroOffset: false,
+                    renderParentIfLeaf: false,
+                    highlightId: nodeId,
+                    forceIPFSRefresh: false,
+                    scrollToTop: false,
+                    allowScroll: true,
+                    setTab: true,
+                    forceRenderParent: false,
+                    state
+                });
             }
             else {
                 S.view.jumpToId(nodeId);
@@ -981,7 +1015,18 @@ export class Edit {
         else {
             setTimeout(() => {
                 let state: AppState = store.getState();
-                S.view.refreshTree(null, true, false, null, false, false, true, true, false, state);
+                S.view.refreshTree({
+                    nodeId: null,
+                    zeroOffset: true,
+                    renderParentIfLeaf: false,
+                    highlightId: null,
+                    forceIPFSRefresh: false,
+                    scrollToTop: false,
+                    allowScroll: true,
+                    setTab: true,
+                    forceRenderParent: false,
+                    state
+                });
             }, 500);
         }
     }
@@ -1006,7 +1051,18 @@ export class Edit {
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false, false, null, false, false, true, true, false, state);
+            S.view.refreshTree({
+                nodeId: null,
+                zeroOffset: false,
+                renderParentIfLeaf: false,
+                highlightId: null,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                state
+            });
             S.view.scrollToNode(state);
         }
     }
@@ -1159,16 +1215,18 @@ export class Edit {
                     return s;
                 });
                 let state: AppState = store.getState();
-                S.view.refreshTree(null, // nodeId
-                    false, // zeroOffset
-                    false, // renderLeafIfParent
-                    null, // highlightId
-                    false, // forceIPFSRefresh
-                    false, // scrollToTop
-                    false, // allowScroll
-                    false, // setTab
-                    false, // forceRenderParent
-                    state);
+                S.view.refreshTree({
+                    nodeId: null,
+                    zeroOffset: false,
+                    renderParentIfLeaf: false,
+                    highlightId: null,
+                    forceIPFSRefresh: false,
+                    scrollToTop: false,
+                    allowScroll: false,
+                    setTab: false,
+                    forceRenderParent: false,
+                    state
+                });
             }
         }
         else {

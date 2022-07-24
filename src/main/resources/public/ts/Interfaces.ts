@@ -4,6 +4,19 @@ import * as J from "./JavaIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
 
+// export interface RefreshTreeArgs {
+//     nodeId: string;
+//     zeroOffset: boolean;
+//     renderParentIfLeaf: boolean;
+//     highlightId: string;
+//     forceIPFSRefresh: boolean;
+//     scrollToTop: boolean;
+//     allowScroll: boolean;
+//     setTab: boolean;
+//     forceRenderParent: boolean;
+//     state: AppState
+// }
+
 export interface ValueIntf {
     getValue(): any;
     setValue(val: any);

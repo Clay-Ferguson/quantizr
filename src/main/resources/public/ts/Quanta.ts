@@ -67,7 +67,18 @@ export class Quanta {
             console.log("Quanta.refresh");
         }
         // S.view.jumpToId(state.node.id);
-        S.view.refreshTree(null, false, true, null, false, true, true, true, false, state);
+        S.view.refreshTree({
+            nodeId: null,
+            zeroOffset: false,
+            renderParentIfLeaf: true,
+            highlightId: null,
+            forceIPFSRefresh: false,
+            scrollToTop: true,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            state
+        });
     }
 
     initApp = async (): Promise<void> => {
@@ -126,7 +137,18 @@ export class Quanta {
                 Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, false, store.getState());
+                    S.view.refreshTree({
+                        nodeId: event.state.nodeId,
+                        zeroOffset: true,
+                        renderParentIfLeaf: true,
+                        highlightId: event.state.highlightId,
+                        forceIPFSRefresh: false,
+                        scrollToTop: false,
+                        allowScroll: true,
+                        setTab: true,
+                        forceRenderParent: false,
+                        state: store.getState()
+                    });
                     S.tabUtil.selectTab(C.TAB_MAIN);
                 }
             };

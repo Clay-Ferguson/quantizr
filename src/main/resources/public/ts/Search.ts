@@ -139,12 +139,12 @@ export class Search {
         }
         S.srch.search(node, null, null, state, null, "Priority Listing",
             false,
-            false, 0, 
-            true, 
-            J.NodeProp.PRIORITY_FULL, 
-            "asc", 
-            true, 
-            null); 
+            false, 0,
+            true,
+            J.NodeProp.PRIORITY_FULL,
+            "asc",
+            true,
+            null);
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {
@@ -568,7 +568,18 @@ export class Search {
             search,
             replace
         });
-        S.view.refreshTree(null, false, false, null, false, false, true, true, false, state);
+        S.view.refreshTree({
+            nodeId: null,
+            zeroOffset: false,
+            renderParentIfLeaf: false,
+            highlightId: null,
+            forceIPFSRefresh: false,
+            scrollToTop: false,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            state
+        });
         S.util.showMessage(res.message, "Success");
     }
 

@@ -219,7 +219,18 @@ export class User {
                 }
             }
             // console.log("loginResponse final refresh id chosen: " + id);
-            S.view.refreshTree(id, true, renderLeafIfParent, childId, false, false, true, true, false, state);
+            S.view.refreshTree({
+                nodeId: id,
+                zeroOffset: true,
+                renderParentIfLeaf: renderLeafIfParent, // fix typeo (names inconsistent) todo-0
+                highlightId: childId,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                state
+            });
         } else {
             console.log("LocalDb login failed.");
 

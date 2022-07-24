@@ -84,7 +84,18 @@ export class TransferNodeDlg extends DialogBase {
             toUser: this.toUserState.getValue()
         });
 
-        S.view.refreshTree(null, false, false, null, false, true, true, true, false, this.appState);
+        S.view.refreshTree({
+            nodeId: null,
+            zeroOffset: false,
+            renderParentIfLeaf: false,
+            highlightId: null,
+            forceIPFSRefresh: false,
+            scrollToTop: true,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent: false,
+            state: this.appState
+        });
         S.util.showMessage(res.message, "Success");
         this.close();
     }

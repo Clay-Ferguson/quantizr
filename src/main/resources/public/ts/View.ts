@@ -19,29 +19,39 @@ export class View {
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
-        this.refreshTree(id, true, true, id, false, false, true, true, forceRenderParent, state);
+        this.refreshTree({
+            nodeId: id,
+            zeroOffset: true,
+            renderParentIfLeaf: true,
+            highlightId: id,
+            forceIPFSRefresh: false,
+            scrollToTop: false,
+            allowScroll: true,
+            setTab: true,
+            forceRenderParent,
+            state
+        });
     }
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
-    refreshTree = async (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
-        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, forceRenderParent: boolean, state: AppState): Promise<void> => {
+    refreshTree = async (a: RefreshTreeArgs): Promise<void> => {
 
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
         // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
-        if (!nodeId && state.node) {
-            nodeId = state.node.id;
+        if (!a.nodeId && a.state.node) {
+            a.nodeId = a.state.node.id;
         }
 
-        if (!highlightId) {
-            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-            highlightId = currentSelNode ? currentSelNode.id : nodeId;
+        if (!a.highlightId) {
+            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(a.state);
+            a.highlightId = currentSelNode ? currentSelNode.id : a.nodeId;
         }
 
         let offset = 0;
-        if (!zeroOffset) {
-            let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+        if (!a.zeroOffset) {
+            let firstChild: J.NodeInfo = S.edit.getFirstChildNode(a.state);
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
@@ -50,28 +60,28 @@ export class View {
         /* named nodes aren't persisting in url without this and i may decide to just get rid
          of 'renderParentIfLeaf' altogether (todo-2) but for now i'm just fixing the case when we are
          rendering a named node. */
-        if (nodeId.indexOf(":") !== -1) {
-            renderParentIfLeaf = false;
+        if (a.nodeId.indexOf(":") !== -1) {
+            a.renderParentIfLeaf = false;
         }
 
         try {
             let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId,
+                nodeId: a.nodeId,
                 upLevel: false,
                 siblingOffset: 0,
-                renderParentIfLeaf,
-                forceRenderParent,
+                renderParentIfLeaf: a.renderParentIfLeaf,
+                forceRenderParent: a.forceRenderParent,
                 offset,
                 goToLastPage: false,
-                forceIPFSRefresh,
+                forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: state.userPreferences.showParents ? 1 : 0
+                parentCount: a.state.userPreferences.showParents ? 1 : 0
             });
             if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
-                console.log("refreshTree -> renderPageFromData (scrollTop=" + scrollToTop + ")");
+                console.log("refreshTree -> renderPageFromData (scrollTop=" + a.scrollToTop + ")");
             }
-            S.render.renderPageFromData(res, scrollToTop, highlightId, setTab, allowScroll);
+            S.render.renderPageFromData(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
@@ -391,4 +401,17 @@ export class View {
             });
         }
     }
+}
+
+interface RefreshTreeArgs {
+    nodeId: string;
+    zeroOffset: boolean;
+    renderParentIfLeaf: boolean;
+    highlightId: string;
+    forceIPFSRefresh: boolean;
+    scrollToTop: boolean;
+    allowScroll: boolean;
+    setTab: boolean;
+    forceRenderParent: boolean;
+    state: AppState
 }

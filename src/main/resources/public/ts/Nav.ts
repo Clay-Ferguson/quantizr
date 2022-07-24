@@ -252,7 +252,18 @@ export class Nav {
                 console.log("openNodeById");
             }
             // NOTE: Passing true for "scrollToTop" is new on 11/6/21
-            S.view.refreshTree(node.id, true, true, null, false, true, true, true, false, state);
+            S.view.refreshTree({
+                nodeId: node.id,
+                zeroOffset: true,
+                renderParentIfLeaf: true,
+                highlightId: null,
+                forceIPFSRefresh: false,
+                scrollToTop: true,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                state
+            });
         }
     }
 
