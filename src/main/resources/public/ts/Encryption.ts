@@ -328,7 +328,7 @@ export class Encryption {
 
             // yes we export to spki for PEM (not a bug)
             const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
-            var pem = this.spkiToPEM(privDatSpki);
+            let pem = this.spkiToPEM(privDatSpki);
             ret += "Public Key (PEM Format):\n" + pem + "\n\n";
         }
 

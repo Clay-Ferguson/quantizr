@@ -27,14 +27,14 @@ export class RadioButton extends Comp {
         delete attribsClone.ref;
 
         return this.tag("span", {
-            key: this.attribs.id + "_span",
+            key: this.getId("s_"),
             className: "form-check",
             ref: this.attribs.ref
         }, [
             new CheckboxInput(attribsClone, null, this.valueIntf),
             new Label(this.label || "", {
-                key: this.attribs.id + "_label",
-                htmlFor: this.attribs.id,
+                key: this.getId("l_"),
+                htmlFor: this.getId(),
                 className: "form-check-label radioLabel"
             })
         ]);

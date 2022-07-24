@@ -45,8 +45,9 @@ export abstract class Comp implements CompIntf {
             this.attribs = { c: this.constructor.name, ...this.attribs };
         }
 
-        /* If an ID was specifically provided, then use it, or else generate one */
-        this.setId(this.attribs.id || ("c" + Comp.nextHex()));
+        /* If an ID was specifically provided, then use it, or else generate one. We prefix with 'c' only because
+        IDs can't start with a number. */
+        this.setId(this.attribs.id || ("c" + (++Comp.guid).toString(36)));
     }
 
     public managesState = (): boolean => {
@@ -87,10 +88,6 @@ export abstract class Comp implements CompIntf {
 
     static nextGuid(): number {
         return ++Comp.guid;
-    }
-
-    static nextHex(): string {
-        return (++Comp.guid).toString(16)
     }
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause

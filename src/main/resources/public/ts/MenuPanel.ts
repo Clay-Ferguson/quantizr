@@ -504,7 +504,7 @@ export class MenuPanel extends Div {
 
                     /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
-                    var sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
+                    let sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                     tts.speak(sayThis);
                 })
             ]));

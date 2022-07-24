@@ -30,18 +30,18 @@ export class PieChart extends Div {
             colors.push(d.color);
         }
 
-        var color = d3.scaleOrdinal(colors);
+        let color = d3.scaleOrdinal(colors);
 
         // Generate the pie
-        var pie = d3.pie().value((d: any) => { return d.value; });
+        let pie = d3.pie().value((d: any) => { return d.value; });
 
         // Generate the arcs
-        var arc = d3.arc()
+        let arc = d3.arc()
             .innerRadius(0)
             .outerRadius(radius);
 
         // Generate groups
-        var arcs = g.selectAll("." + this.className)
+        let arcs = g.selectAll("." + this.className)
             .data(pie(this.data))
             .enter()
             .append("g")
