@@ -5,6 +5,7 @@ import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
+import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
@@ -215,7 +216,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     preRender(): void {
-        let timesIcon: Span;
         // Dialog Header with close button (x) right justified on it.
         const children: CompIntf[] = [];
         const titleIconComp: CompIntf = this.getTitleIconComp();
@@ -232,14 +232,17 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             titleChildren = titleChildren.concat(extraHeaderComps);
         }
 
-        titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
-            className: "float-end app-modal-title-close-icon",
-            onClick: () => {
-                this.closeByUser();
-                this.close();
-            },
-            title: "Close Dialog"
-        }));
+        titleChildren = titleChildren.concat(
+            new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+                new Icon({
+                    className: "fa fa-times fa-lg",
+                    onClick: () => {
+                        this.closeByUser();
+                        this.close();
+                    },
+                    title: "Close Dialog"
+                })
+            ]));
 
         if (this.title) {
             children.push(new Div(null, {
@@ -247,7 +250,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             },
                 titleChildren
             ));
-            timesIcon.rawHtml = true;
         }
 
         let contentAttribs: any = null;
