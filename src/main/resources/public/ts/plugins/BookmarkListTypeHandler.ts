@@ -20,7 +20,7 @@ export class BookmarkListTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName, {
                 className: "marginAll"

@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -25,6 +25,6 @@ export class ToggleIcon extends Comp {
         let state = this.getState<LS>();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
         /* Yes Icon used "i" tag, this is not a mistake */
-        return createElement("i", this.attribs);
+        return this.tag("i");
     }
 }

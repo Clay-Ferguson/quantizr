@@ -2,26 +2,26 @@ import { ValueIntf } from "../Interfaces";
 import { Div } from "../comp/core/Div";
 import { State } from "../State";
 
+interface LS { // Local State
+    value: string
+}
 export class ListBox extends Div {
 
     constructor(public valueIntf: ValueIntf) {
         super(null, new State());
         this.setClass("list-group marginBottom");
+
+        if (this.valueIntf) {
+            this.mergeState({ value: valueIntf.getValue() });
+        }
     }
 
     // Handler to update state
-    updateValFunc(value: string): void {
+    updateVal(value: string): void {
         /* For list boxes that just present a list and don't have the goal of letting the user 'choose' one, we won't have a valueIntf */
-        if (!this.valueIntf) {
-            return;
-        }
-
-        if (value !== this.valueIntf.getValue()) {
+        if (this.valueIntf) {
             this.valueIntf.setValue(value);
-
-            // needing this line took a while to figure out. If nothing is setting any actual detectable state change
-            // during his call we have to do this here.
-            this.forceRender();
+            this.mergeState({ value });
         }
     }
 }

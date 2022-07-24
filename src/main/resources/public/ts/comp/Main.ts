@@ -16,6 +16,6 @@ export class Main extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tag("main", this.getState<LS>().content, this.attribs);
+        return this.tag("main", null, this.getChildrenWithFirst(this.getState<LS>().content));
     }
 }

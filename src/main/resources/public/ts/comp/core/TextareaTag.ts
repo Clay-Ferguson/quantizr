@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
@@ -59,6 +59,6 @@ export class TextareaTag extends Comp {
         if (this.calcRows) {
             this.attribs.rows = "" + this.calcRowsFunc(this.attribs.value);
         }
-        return createElement("textarea", this.attribs);
+        return this.tag("textarea");
     }
 }

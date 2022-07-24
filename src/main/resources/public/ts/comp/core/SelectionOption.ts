@@ -1,8 +1,8 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class SelectionOption extends Comp {
-    constructor(public key: string, public val : string) {
+    constructor(public key: string, public val: string) {
         super(null);
         this.attribs.value = this.key;
 
@@ -14,6 +14,6 @@ export class SelectionOption extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return createElement("option", this.attribs, this.val);
+        return this.tag("option", null, [this.val]);
     }
 }

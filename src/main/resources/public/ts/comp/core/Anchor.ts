@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Anchor extends Comp {
@@ -10,11 +10,6 @@ export class Anchor extends Comp {
     }
 
     compRender = (): ReactNode => {
-        if (this.attribs.dangerouslySetInnerHTML) {
-            return createElement("a", this.attribs);
-        }
-        else {
-            return createElement("a", this.attribs, this.buildChildren() || this.content || this.url);
-        }
+        return this.tag("a", null, this.getChildrenWithFirst(this.content || this.url));
     }
 }

@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { RadioButton } from "./RadioButton";
 
@@ -10,13 +10,13 @@ export class RadioButtonGroup extends Comp {
         this.setChildren(initialButtons);
 
         initialButtons.forEach(function(row: RadioButton) {
-            if (row && row.attribs && row.attribs.checked === "checked") {
+            if (row?.attribs?.checked === "checked") {
                 this.attribs.selected = (<any>row.attribs).name;
             }
         }, this);
     }
 
     compRender = (): ReactNode => {
-        return createElement("div", this.attribs, this.buildChildren());
+        return this.tag("div");
     }
 }

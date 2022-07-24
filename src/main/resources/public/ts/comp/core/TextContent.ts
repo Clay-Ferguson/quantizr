@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -26,11 +26,11 @@ export class TextContent extends Comp {
             // console.log("Dangerously setting html: "+this.jsClassName);
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: state.text };
-            return createElement(this.preformatted ? "pre" : "div", { ...this.attribs, ..._p });
+            return this.tag(this.preformatted ? "pre" : "div", { ...this.attribs, ..._p });
         }
         else {
             // console.log("Building (TextContent) react element: " + this.attribs.id);
-            return createElement(this.preformatted ? "pre" : "div", this.attribs, state.text);
+            return this.tag(this.preformatted ? "pre" : "div", null, [state.text]);
         }
     }
 }

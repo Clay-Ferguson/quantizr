@@ -15,7 +15,7 @@ export class FriendsTable extends ListBox {
         if (this.friends) {
             this.friends.forEach((friend: FriendInfo) => {
                 children.push(new FriendsTableRow(friend, () => {
-                    this.updateValFunc(friend.userName);
+                    this.updateVal(friend.userName);
                 }, this.valueIntf.getValue() === friend.userName));
             });
         }

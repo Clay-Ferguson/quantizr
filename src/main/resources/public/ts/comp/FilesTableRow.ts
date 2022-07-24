@@ -10,6 +10,6 @@ export class FilesTableRow extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tag("tr", null, this.attribs);
+        return this.tag("tr");
     }
 }

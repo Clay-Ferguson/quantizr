@@ -6,17 +6,11 @@ interface LS { // Local State
 }
 
 export class Label extends Comp {
-
-    constructor(content: string = "", attribs: Object = {}) {
+    constructor(private content: string = "", attribs: Object = {}) {
         super(attribs);
-        this.setText(content);
-    }
-
-    setText = (content: string) => {
-        this.mergeState<LS>({ content });
     }
 
     compRender = (): ReactNode => {
-        return this.tag("label", this.getState<LS>().content, this.attribs);
+        return this.tag("label", null, this.getChildrenWithFirst(this.content));
     }
 }

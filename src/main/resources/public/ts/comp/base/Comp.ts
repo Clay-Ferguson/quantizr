@@ -18,6 +18,7 @@ export abstract class Comp implements CompIntf {
     public mounted: boolean = false;
     public rendered: boolean = false;
     private static guid: number = 0;
+    private static renderClassInDom: boolean = false;
 
     attribs: any;
 
@@ -39,12 +40,33 @@ export abstract class Comp implements CompIntf {
     constructor(attribs?: any, private stateMgr?: State) {
         this.attribs = attribs || {};
 
+        // for debugging, shows classname in every dom element as an attribute.
+        if (Comp.renderClassInDom) {
+            this.attribs = { c: this.constructor.name, ...this.attribs };
+        }
+
         /* If an ID was specifically provided, then use it, or else generate one */
         this.setId(this.attribs.id || ("c" + Comp.nextHex()));
     }
+    
+    public managesState = (): boolean => {
+        return !!this.stateMgr;
+    }
 
-    public getRef = (): HTMLElement => {
-        return this.attribs.ref?.current?.isConnected ? this.attribs.ref.current : null;
+    public getRef = (warn: boolean = true): HTMLElement => {
+        let ret = null;
+        if (this.attribs.ref) {
+            ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
+        }
+        // else {
+        //     let elm: HTMLElement = document.getElementById(this.getId());
+        //     ret = (elm && elm.isConnected) ? elm : null;
+        // }
+
+        if (!ret && warn) {
+            console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted);
+        }
+        return ret;
     }
 
     getId(): string {
@@ -76,7 +98,7 @@ export abstract class Comp implements CompIntf {
     onMount(func: (elm: HTMLElement) => void) {
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
-        let elm = this.getRef();
+        let elm = this.getRef(false);
         if (elm) {
             func(elm);
             return;
@@ -135,6 +157,11 @@ export abstract class Comp implements CompIntf {
         return this.children;
     }
 
+    getChildrenWithFirst(first: any): any[] {
+        if (!first) return this.children;
+        return this.children ? [first, ...this.children] : [first];
+    }
+
     getAttribs(): Object {
         return this.attribs;
     }
@@ -176,11 +203,15 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    // todo-0: rename to createChildren
-    buildChildren(): ReactNode[] {
-        if (!this.children || this.children.length === 0) return null;
+    // We take an array of 'any', because some of the children may be strings.
+    createChildren(children: any[]): ReactNode[] {
+        if (!children || children.length === 0) return null;
 
-        return this.children.map((child: CompIntf) => {
+        return children.map((child: any) => {
+            if (typeof child === "string" || child instanceof String) {
+                return child;
+            }
+
             if (!child) return null;
             try {
                 this.wrapClick(child.attribs);
@@ -209,29 +240,27 @@ export abstract class Comp implements CompIntf {
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
     Note: Tag can also be a type here, not just a string.
     */
-    tag(type: any, content: string, props?: any, childrenArg?: CompIntf[]) {
-        if (!props) {
-            props = this.attribs;
+    tag = (type: any, props?: object, childrenArg?: any[]): ReactNode => {
+        if (Array.isArray(props)) {
+            console.error("tag called with props as array in " + this.getCompClass());
+            return;
+        }
+        props = props || this.attribs;
+
+        // for debugging, shows classname in every dom element as an attribute.
+        if (Comp.renderClassInDom) {
+            props = { c: this.constructor.name, ...props };
         }
 
-        // if children were provided use them.
-        if (childrenArg) {
-            this.children = childrenArg;
+        // If this is a raw HTML component just render using 'attribs', which is what react expects.
+        if ((props as any).dangerouslySetInnerHTML) {
+            return createElement(type, this.attribs);
         }
+
+        childrenArg = childrenArg || this.children;
 
         try {
-            let children: ReactNode[] = this.buildChildren();
-
-            // if we have children then add content as the first child ahead of all children
-            if (children) {
-                if (content) {
-                    children.unshift(content);
-                }
-            }
-            // otherwise use 'content' as the single array element or null if no content
-            else {
-                children = content ? [content] : null;
-            }
+            let children: ReactNode[] = this.createChildren(childrenArg);
 
             this.wrapClick(props);
             if (children?.length > 0) {
@@ -239,7 +268,7 @@ export abstract class Comp implements CompIntf {
                 // https://github.com/facebook/react/issues/5652
                 if (type === "table") {
                     // this is just wrapping the children in a tbody and giving it a key so react won't panic.
-                    return createElement(type, props, [createElement("tbody", { key: props.key + "_tbody" }, children)]);
+                    return createElement(type, props, [createElement("tbody", { key: (props as any).key + "_tbody" }, children)]);
                 }
                 else {
                     return createElement(type, props, children);
@@ -285,18 +314,10 @@ export abstract class Comp implements CompIntf {
         return this.stateMgr.state;
     }
 
-    // todo-0: figure out why this hacky function is here, or if it's no longer needed.
-    forceRender() {
-        this.mergeState({ forceRender: Comp.nextGuid() } as any);
-    }
-
     // Core 'render' function used by react. This is THE function for the functional component this object represents
     render = (): any => {
         this.rendered = true;
 
-        if (this.debug) {
-            console.log("render(): " + this.getCompClass());
-        }
         try {
             if (this.stateMgr) {
                 this.stateMgr.useState();
@@ -322,17 +343,23 @@ export abstract class Comp implements CompIntf {
             if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
             if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
 
-            if (this.debug) {
-                console.log("Calling preRender: " + this.getCompClass());
-            }
-            this.preRender();
-
             Comp.renderCounter++;
             if (this.debug) {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
+            // React intermittently has a problem where it say use forwardRef. Even after 
+            // a ton of testing that all went fine sometimes React will just start complaining with the error that
+            // we should be using forwardRef, which I haven't yet found a way to do that's compatable with the rest 
+            // of our framework (i.e. this Comp class)
             this.attribs.ref = useRef();
+
+            // if (this.debug) {
+            //     console.log("Calling preRender: " + this.getCompClass());
+            // }
+
+            // todo-0: We no longer need preRender, it's just part of compRender right?
+            this.preRender();
             return this.compRender();
         }
         catch (e) {

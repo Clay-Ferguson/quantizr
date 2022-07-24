@@ -18,7 +18,7 @@ export class NodeTypeListBox extends ListBox {
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (this.appState.isAdminUser || typeHandler.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(typeHandler, () => {
-                    this.updateValFunc(typeHandler.getTypeName());
+                    this.updateVal(typeHandler.getTypeName());
                 }, this.valueIntf.getValue() === typeHandler.getTypeName()));
             }
             return true;

@@ -31,7 +31,7 @@ export class CalcTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
         if (!S.props.isMine(node, state)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }

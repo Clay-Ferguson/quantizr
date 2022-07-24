@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
@@ -14,10 +14,10 @@ export class Span<LocalState = any> extends Comp {
         if (this.rawHtml) {
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: this.content };
-            return createElement("span", { ...this.attribs, ..._p });
+            return this.tag("span", { ...this.attribs, ..._p });
         }
         else {
-            return this.tag("span", this.content, this.attribs);
+            return this.tag("span", null, this.getChildrenWithFirst(this.content));
         }
     }
 }

@@ -1,5 +1,8 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { Img } from "./Img";
+import { Italic } from "./Italic";
+import { Span } from "./Span";
 
 interface LS { // Local State
     visible: boolean;
@@ -32,24 +35,23 @@ export class IconButton extends Comp {
 
         let children = [];
         if (this.imageUrl) {
-            children.push(createElement("img", {
+            children.push(new Img(null, {
                 key: "s_img_" + this.getId(),
                 src: this.imageUrl
             }));
         }
 
-        children.push(createElement("i", {
+        children.push(new Italic({
             key: "i_" + this.getId(),
             className: iconClazz
         }));
 
         if (this.text) {
-            children.push(
-                createElement("span", {
-                    key: "s_txt_" + this.getId(),
-                    className: "icon-button-font"
-                }, this.text));
+            children.push(new Span(this.text, {
+                key: "s_txt_" + this.getId(),
+                className: "icon-button-font"
+            }));
         }
-        return createElement("button", this.attribs, children);
+        return this.tag("button", null, children);
     }
 }

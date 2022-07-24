@@ -1,5 +1,4 @@
 import DOMPurify from "dompurify";
-import { createElement } from "react";
 import { Util } from "../../Util";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
@@ -42,14 +41,14 @@ export class Html extends Comp {
         let content =
             DOMPurify.sanitize((this.getState<LS>() as any).content, Util.DOM_PURIFY_CONFIG);
         this.attribs.dangerouslySetInnerHTML = { __html: content };
-        return createElement("div", this.attribs);
+        return this.tag("div");
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to
         // enable the attribs! These are the two older ways of parsing emojis. For now we're just letting
         // the font itself do all the work, and don't need this.
         // METHOD 1:
         // this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState<LS>().content) };
-        // return createElement("div", this.attribs);
+        // return this.tag("div", this.attribs);
         //
         // METHOD 2: (note: You'll need to rename this file to '.tsx' extention to use JSX here)
         // return <div>{parseEmojisAndHtml(this.getState<LS>().content)}</div>;

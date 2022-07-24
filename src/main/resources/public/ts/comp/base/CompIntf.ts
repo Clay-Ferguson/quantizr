@@ -12,15 +12,15 @@ export interface CompIntf {
     updateDOM(store: any, id: string): void;
     getAttribs() : Object;
     compRender(): ReactNode;
-    forceRender(): void;
     addChild(comp: CompIntf): void;
     insertFirstChild(comp: CompIntf): void;
     hasChildren(): boolean;
     setChildren(comps: CompIntf[]): void;
     getChildren(): CompIntf[];
-    getRef(): HTMLElement;
+    getRef(warn: boolean): HTMLElement;
     domAddEvent(): void;
     render(): any;
     getCompClass(): string;
     create(): ReactNode;
+    tag(type: any, props?: object, childrenArg?: any[]): ReactNode;
 }

@@ -1,7 +1,11 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { Anchor } from "./Anchor";
 import { Button } from "./Button";
+import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
+import { Li } from "./Li";
+import { Ul } from "./Ul";
 
 interface LS { // Local State
     content?: string;
@@ -12,9 +16,21 @@ This is a Simple app that will be running at `http://localhost:8182/demo/tutoria
 example of using the Quanta React Framework.
 */
 export class TutorialApp extends Comp {
+    private static checkboxVal: boolean = false;
+
     constructor() {
         super();
         this.mergeState<LS>({ content: "Quanta GUI Framework works!" });
+
+        setTimeout(() => {
+            let ref = this.getRef();
+            if (!ref) {
+                console.log("Unable to get ref.");
+            }
+            else {
+                console.log("ref loaded ok");
+            }
+        }, 1000);
     }
 
     buttonClick = (): void => {
@@ -22,11 +38,29 @@ export class TutorialApp extends Comp {
     }
 
     compRender = (): ReactNode => {
-        // NOTE: This is another way to render a raw div, which actually doesn't use the base class, and still works.
-        // return (new Div(this.getState<LS>().content, this.attribs)).create();
-
-        return this.tag("div", this.getState<LS>().content, null, [
-            new Div("Child Div"),
+        return this.tag("div", null, [
+            this.getState<LS>().content,
+            new Div(null, null, [
+                new Anchor("https://drudgereport.com", "My Link")
+            ]),
+            new Div("Child Div", null, [
+                new Ul("Unordered List", null, [
+                    new Li("item 1"),
+                    new Li("item 2"),
+                    new Li("item 3")
+                ]),
+                new Div("SubDiv2"),
+                new Div("SubDiv3"),
+                new Checkbox("Test Checkbox", null, {
+                    setValue: (checked: boolean): void => {
+                        TutorialApp.checkboxVal = checked;
+                        console.log("checkbox=" + TutorialApp.checkboxVal)
+                    },
+                    getValue: (): boolean => {
+                        return TutorialApp.checkboxVal;
+                    }
+                })
+            ]),
             new Button("My Button", this.buttonClick)
         ]);
     }

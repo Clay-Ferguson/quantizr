@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
@@ -10,6 +10,6 @@ export class Li extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return createElement("li", this.attribs, this.buildChildren());
+        return this.tag("li", null, this.getChildrenWithFirst(this.content));
     }
 }

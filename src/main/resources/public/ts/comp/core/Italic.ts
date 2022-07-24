@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
-import { Comp } from "./base/Comp";
+import { Comp } from "../base/Comp";
 
-export class PropTable extends Comp {
+export class Italic extends Comp {
 
     constructor(attribs : Object = {}) {
         super(attribs);
     }
 
     compRender = (): ReactNode => {
-        return this.tag("table");
+        return this.tag("i");
     }
 }

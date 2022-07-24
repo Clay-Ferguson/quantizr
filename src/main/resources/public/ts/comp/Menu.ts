@@ -1,6 +1,6 @@
-import { ReactNode, createElement } from "react";
+import { ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { dispatch, store } from "../AppRedux";
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { CompIntf } from "./base/CompIntf";

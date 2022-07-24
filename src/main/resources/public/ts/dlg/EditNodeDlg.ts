@@ -718,10 +718,6 @@ export class EditNodeDlg extends DialogBase {
         this.resetAutoSaver();
     }
 
-    // todo-0: the bind calls I removed today did break some of the inheritance based uses of them, and I think I'll 
-    // switch to this pattern from now on, for overriding methods and getting access to super class methods in a way 
-    // that always works and never needs binding. Need to fix globally, by diging up code to see the handful off where the
-    // bind() calls were removed from.
     super_close = this.close;
     close = (): void => {
         this.super_close();

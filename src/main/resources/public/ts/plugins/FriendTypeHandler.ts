@@ -61,7 +61,7 @@ export class FriendTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
         let user: string = S.props.getPropStr(J.NodeProp.USER, node);
         let userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

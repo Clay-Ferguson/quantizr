@@ -1,14 +1,14 @@
-import { ReactNode, createElement } from "react";
+import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
 export class FilesTableCell extends Comp {
 
-    constructor(public content: string = null, attribs : Object = {}, initialChildren: Comp[] = null) {
+    constructor(public content: string = null, attribs: Object = {}, initialChildren: Comp[] = null) {
         super(attribs);
         this.setChildren(initialChildren);
     }
 
     compRender = (): ReactNode => {
-        return this.tag("td", this.content || "", this.attribs);
+        return this.tag("td", null, this.getChildrenWithFirst(this.content));
     }
 }

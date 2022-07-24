@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
@@ -10,6 +10,6 @@ export class Form extends Comp {
 
     compRender = (): ReactNode => {
         this.setChildren(this.initialChildren);
-        return createElement("div", this.attribs, this.buildChildren());
+        return this.tag("div");
     }
 }

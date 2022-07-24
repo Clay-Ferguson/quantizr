@@ -8,6 +8,6 @@ export class FilesTable extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tag("table", null, this.attribs);
+        return this.tag("table");
     }
 }

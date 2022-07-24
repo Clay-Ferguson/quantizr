@@ -1,5 +1,6 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { Div } from "./Div";
 
 export class ButtonBar extends Comp {
 
@@ -23,15 +24,15 @@ export class ButtonBar extends Comp {
         delete attribsClone.ref;
 
         if (this.wrapperClass) {
-            return createElement("div", {
+            return this.tag("div", {
                 className: this.wrapperClass,
                 key: this.getId() + "_wrp",
                 ref: this.attribs.ref
             },
-                createElement("div", attribsClone, this.buildChildren()));
+                [new Div(null, attribsClone, this.getChildren())]);
         }
         else {
-            return createElement("div", this.attribs, this.buildChildren());
+            return this.tag("div");
         }
     }
 }

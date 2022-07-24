@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
@@ -9,7 +9,8 @@ interface LS { // Local State
 export class Input extends Comp {
 
     constructor(attribs: Object = {}, s?: State) {
-        super(attribs, s);
+        super(attribs, s || new State());
+
         this.attribs.onChange = (evt) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
@@ -17,6 +18,6 @@ export class Input extends Comp {
 
     compRender = (): ReactNode => {
         this.attribs.value = this.getState<LS>().value || "";
-        return createElement("input", this.attribs);
+        return this.tag("input");
     }
 }

@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Icon extends Comp {
@@ -8,6 +8,6 @@ export class Icon extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return createElement("i", this.attribs, this.label);
+        return this.tag("i", null, [this.label]);
     }
 }

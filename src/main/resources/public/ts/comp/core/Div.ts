@@ -20,10 +20,10 @@ export class Div extends Comp {
         if (this.rawHtml) {
             let _p: any = { id: this.getId(), key: this.getId() };
             _p.dangerouslySetInnerHTML = { __html: this.content };
-            return createElement("div", { ...this.attribs, ..._p });
+            return this.tag("div", { ...this.attribs, ..._p });
         }
         else {
-            return this.tag("div", this.getState<LS>().content, this.attribs);
+            return this.tag("div", null, this.getChildrenWithFirst(this.getState<LS>().content));
         }
     }
 }
