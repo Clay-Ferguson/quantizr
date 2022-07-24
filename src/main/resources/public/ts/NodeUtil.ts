@@ -143,12 +143,12 @@ export class NodeUtil {
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
 
         if (!node) {
-            node = feedData.props.feedResults.find(n => n.id === nodeId);
+            node = feedData?.props?.feedResults?.find(n => n.id === nodeId);
         }
 
         if (!node) {
             for (let data of state.tabData) {
-                if (data.rsInfo && data.rsInfo.results) {
+                if (data.rsInfo?.results) {
                     node = data.rsInfo.results.find(n => n.id === nodeId);
                     if (node) break;
                 }

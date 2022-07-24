@@ -21,7 +21,7 @@ export class FullScreenImgViewer extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        let isAnAccountNode = node && node.ownerId && node.id === node.ownerId;
+        let isAnAccountNode = node?.ownerId && node.id === node.ownerId;
         let children = [];
 
         if (node && S.props.hasBinary(node) && !isAnAccountNode) {
