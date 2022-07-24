@@ -32,8 +32,7 @@ export class NodeCompButtonBar extends Div {
             this.makeDropTarget(this.attribs, this.node.id);
         }
 
-        let node = this.node;
-        if (!node) {
+        if (!this.node) {
             this.setChildren(null);
             return;
         }
@@ -51,8 +50,8 @@ export class NodeCompButtonBar extends Div {
         let pasteButtons: Span;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        let editingAllowed = S.edit.isEditAllowed(node, state);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;
 
@@ -63,9 +62,9 @@ export class NodeCompButtonBar extends Div {
         }
         else if (typeHandler) {
             if (editingAllowed) {
-                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
-                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
-                editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
+                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
+                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, this.node, state);
+                editableNode = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
             }
         }
         else {
@@ -81,7 +80,7 @@ export class NodeCompButtonBar extends Div {
             deleteAllowed = false;
         }
 
-        if (S.props.isEncrypted(node)) {
+        if (S.props.isEncrypted(this.node)) {
             encIcon = new Icon({
                 className: "fa fa-lock fa-lg rowIcon",
                 title: "Node is Encrypted."
@@ -105,7 +104,7 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
-        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, node);
+        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
         /*
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
@@ -113,12 +112,12 @@ export class NodeCompButtonBar extends Div {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
-        if (node.hasChildren && !isPageRootNode &&
+        if (this.node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
             openButton = new Button(null, S.nav.openNodeById, {
                 iconclass: "fa fa-folder-open",
-                nid: node.id,
+                nid: this.node.id,
                 title: "Open Node"
             }, "btn-primary");
         }
@@ -129,24 +128,24 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPreferences.editMode) {
-            let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state));
+            let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, this.node, state));
             let checkboxForDelete = state.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
-                node.id !== state.homeNodeId) {
+                this.node.id !== state.homeNodeId) {
                 selButton = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
                 }, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            state.selectedNodes.add(node.id);
+                            state.selectedNodes.add(this.node.id);
                         } else {
-                            state.selectedNodes.delete(node.id);
+                            state.selectedNodes.delete(this.node.id);
                         }
                     },
                     getValue: (): boolean => {
-                        return state.selectedNodes.has(node.id);
+                        return state.selectedNodes.has(this.node.id);
                     }
                 }, "float-start");
             }
@@ -154,57 +153,57 @@ export class NodeCompButtonBar extends Div {
             let insertAllowed = true;
 
             // if this is our own account node, we can always leave insertAllowed=true
-            if (state.homeNodeId !== node.id) {
+            if (state.homeNodeId !== this.node.id) {
                 if (typeHandler) {
-                    insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+                    insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, this.node, state);
                 }
             }
-            let editInsertAllowed = S.edit.isInsertAllowed(node, state);
-            let isMine = S.props.isMine(node, state);
+            let editInsertAllowed = S.edit.isInsertAllowed(this.node, state);
+            let isMine = S.props.isMine(this.node, state);
 
             if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     iconclass: "fa fa-plus",
-                    nid: node.id,
+                    nid: this.node.id,
                     title: "Create new Node (as child of this node)"
                 });
             }
 
-            let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
+            let userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.homeNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         iconclass: "fa fa-edit",
                         title: "Edit Node",
-                        nid: node.id
+                        nid: this.node.id
                     });
                 }
 
-                if (!isPageRootNode && node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
+                if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
                     cutNodeButton = new Icon({
                         className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",
-                        nid: node.id,
+                        nid: this.node.id,
                         onClick: S.edit.cutSelNodes
                     });
                 }
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
-                    if (node.logicalOrdinal > 0) {
+                    if (this.node.logicalOrdinal > 0) {
                         moveNodeUpButton = new Icon({
                             className: "fa fa-arrow-up buttonBarIcon",
                             title: "Move Node up one position (higher)",
-                            nid: node.id,
+                            nid: this.node.id,
                             onClick: S.edit.moveNodeUp
                         });
                     }
 
-                    if (!node.lastChild && state.node.children && state.node.children.length > 1) {
+                    if (!this.node.lastChild && state.node.children && state.node.children.length > 1) {
                         moveNodeDownButton = new Icon({
                             className: "fa fa-arrow-down buttonBarIcon",
                             title: "Move Node down one position (lower)",
-                            nid: node.id,
+                            nid: this.node.id,
                             onClick: S.edit.moveNodeDown
                         });
                     }
@@ -213,11 +212,11 @@ export class NodeCompButtonBar extends Div {
 
             if (deleteAllowed) {
                 // not user's account node!
-                if (node.id !== state.homeNodeId) {
+                if (this.node.id !== state.homeNodeId) {
                     deleteNodeButton = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
-                        nid: node.id,
+                        nid: this.node.id,
                         onClick: S.edit.deleteSelNodes
                     });
                 }
@@ -226,10 +225,10 @@ export class NodeCompButtonBar extends Div {
             if (!!state.nodesToMove && userCanPaste) {
                 pasteButtons = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
-                        S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton"),
+                        S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
 
-                    node.id !== state.homeNodeId
-                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: node.id }, "btn-secondary pasteButton") : null
+                        this.node.id !== state.homeNodeId
+                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }
         }
@@ -245,7 +244,7 @@ export class NodeCompButtonBar extends Div {
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-folder", "Up", {
-                        nid: node.id,
+                        nid: this.node.id,
                         /* For onclick functions I need a new approach for some (not all) where I can get by
                         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                         directly off the DOM */
@@ -268,18 +267,18 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        if (isPageRootNode && node.hasChildren) {
+        if (isPageRootNode && this.node.hasChildren) {
             searchButton = new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search underneath Node",
-                nid: node.id,
+                nid: this.node.id,
                 onClick: S.nav.runSearch
             });
 
             timelineButton = new Icon({
                 className: "fa fa-clock-o fa-lg buttonBarIcon",
                 title: "View Timeline (by Mod Time)",
-                nid: node.id,
+                nid: this.node.id,
                 onClick: S.nav.runTimeline
             });
         }

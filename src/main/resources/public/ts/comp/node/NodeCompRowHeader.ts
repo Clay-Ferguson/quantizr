@@ -30,52 +30,51 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node;
         let children = [];
         let avatarImg: Img = null;
 
-        if (this.allowAvatars && node.owner !== J.PrincipalName.ADMIN) {
-            avatarImg = S.render.makeAvatarImage(node, state);
+        if (this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
+            avatarImg = S.render.makeAvatarImage(this.node, state);
             if (avatarImg) {
                 children.push(avatarImg);
             }
         }
 
-        let priorityVal = S.props.getPropStr(J.NodeProp.PRIORITY, node);
+        let priorityVal = S.props.getPropStr(J.NodeProp.PRIORITY, this.node);
         let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
-        if (node.owner && node.owner !== "?" && node.owner !== "admin") {
-            let displayName = node.displayName || ("@" + node.owner);
+        if (this.node.owner && this.node.owner !== "?" && this.node.owner !== "admin") {
+            let displayName = this.node.displayName || ("@" + this.node.owner);
 
-            displayName = S.util.insertActPubTags(displayName, node);
+            displayName = S.util.insertActPubTags(displayName, this.node);
 
             // If user had nothin but ":tags:" in their display name, then display there userName
             if (!displayName) {
-                displayName = node.owner;
+                displayName = this.node.owner;
             }
 
             let span: Span = null;
             children.push(span = new Span(displayName, {
-                className: (node.owner === state.userName) ? "created-by-me" : "created-by-other",
+                className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
                 onClick: (evt: any) => {
-                    new UserProfileDlg(node.ownerId, state).open();
+                    new UserProfileDlg(this.node.ownerId, state).open();
                 }
             }));
 
             span.rawHtml = true;
         }
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 children.push(new Icon({
                     className: iconClass + " rowTypeIcon",
                     title: "Node Type: " + typeHandler.getName(),
-                    onMouseOver: () => { S.quanta.draggableId = node.id; },
+                    onMouseOver: () => { S.quanta.draggableId = this.node.id; },
                     onMouseOut: () => { S.quanta.draggableId = null; }
                 }));
             }
@@ -85,22 +84,22 @@ export class NodeCompRowHeader extends Div {
         the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
         if (state.isAdminUser) {
             // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
-            let ordinal = node.logicalOrdinal === -1 ? "" : node.logicalOrdinal;
-            children.push(new Span(ordinal + " [" + node.ordinal + "] " + node.type, { className: "marginRight" }));
+            let ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
+            children.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
         }
 
         children.push(new Icon({
             className: "fa fa-link fa-lg marginRight",
             title: "Show URLs for this node",
-            onClick: () => S.render.showNodeUrl(node, state)
+            onClick: () => S.render.showNodeUrl(this.node, state)
         }));
 
         // Allow bookmarking any kind of node other than bookmark nodes.
-        if (!state.isAnonUser && node.type !== J.NodeType.BOOKMARK && node.type !== J.NodeType.BOOKMARK_LIST) {
+        if (!state.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
             children.push(new Icon({
                 className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
-                onClick: () => S.edit.addBookmark(node, state)
+                onClick: () => S.edit.addBookmark(this.node, state)
             }));
         }
 
@@ -108,12 +107,12 @@ export class NodeCompRowHeader extends Div {
             children.push(new Icon({
                 className: "fa fa-th-list fa-lg marginRight",
                 title: "Show Full Thread History",
-                onClick: () => S.srch.showThread(node, state)
+                onClick: () => S.srch.showThread(this.node, state)
             }));
         }
 
-        let publicReadOnly = S.props.isPublicReadOnly(node);
-        let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
+        let publicReadOnly = S.props.isPublicReadOnly(this.node);
+        let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         if (!this.isBoost && (!publicReadOnly || actPubId)) {
@@ -125,7 +124,7 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(node.id, true, null, null, node.id, null, null, true, state);
+                        S.edit.addNode(this.node.id, true, null, null, this.node.id, null, null, true, state);
                     }
                 }
             }));
@@ -150,13 +149,13 @@ export class NodeCompRowHeader extends Div {
 
         let youLiked: boolean = false;
         let likeNames = null;
-        if (node.likes) {
-            youLiked = !!node.likes.find(u => u === state.userName);
+        if (this.node.likes) {
+            youLiked = !!this.node.likes.find(u => u === state.userName);
             likeNames = "Liked by:";
             if (youLiked) {
                 likeNames += "\nYou";
             }
-            node.likes.forEach(u => {
+            this.node.likes.forEach(u => {
                 if (u !== state.userName) {
                     likeNames += "\n" + u;
                 }
@@ -172,10 +171,10 @@ export class NodeCompRowHeader extends Div {
                     S.util.showMessage("Login to like and create content.", "Login!");
                 }
                 else {
-                    S.edit.likeNode(node, !youLiked, state);
+                    S.edit.likeNode(this.node, !youLiked, state);
                 }
             }
-        }, node.likes?.length > 0 ? node.likes.length.toString() : ""));
+        }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
 
         if (priority) {
             children.push(new Span(priority, {
@@ -187,17 +186,17 @@ export class NodeCompRowHeader extends Div {
             className: "float-end floatRightHeaderDiv"
         });
 
-        if (node.lastModified) {
-            let reply = S.props.getPropStr(J.NodeProp.REPLY, node);
+        if (this.node.lastModified) {
+            let reply = S.props.getPropStr(J.NodeProp.REPLY, this.node);
             if (reply) {
                 floatUpperRightDiv.addChild(new Span("Reply", { className: "reply-indicator", title: "This Post is a reply to it's parent Post" }));
             }
-            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
+            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(this.node.lastModified))));
         }
 
-        if (node.name) {
-            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
-            floatUpperRightDiv.addChild(new Span(node.name, {
+        if (this.node.name) {
+            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(this.node);
+            floatUpperRightDiv.addChild(new Span(this.node.name, {
                 className: "nodeNameDisp",
                 title: "Node name (Click to copy link to clipboard)",
                 onClick: () => {
@@ -208,16 +207,16 @@ export class NodeCompRowHeader extends Div {
         }
 
         // If node is shared to public we just show the globe icon and not the rest of the shares that may be present.
-        if (S.props.isPublic(node)) {
-            let appendNode = S.props.isPublicWritable(node) ? "Anyone can reply" : "No Replies Allowed";
+        if (S.props.isPublic(this.node)) {
+            let appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
             floatUpperRightDiv.addChild(new Icon({
                 className: "fa fa-globe fa-lg sharingGlobeIcon",
                 title: "Node is Public\n(" + appendNode + ")"
             }));
         }
         // Show all the share names
-        else if (S.props.isShared(node)) {
-            let shareComps: Comp[] = S.nodeUtil.getSharingNames(state, node, null);
+        else if (S.props.isShared(this.node)) {
+            let shareComps: Comp[] = S.nodeUtil.getSharingNames(state, this.node, null);
             floatUpperRightDiv.addChild(
                 new Span(null, {
                     className: "rowHeaderSharingNames"
@@ -229,7 +228,7 @@ export class NodeCompRowHeader extends Div {
                 ]));
         }
 
-        let editingAllowed = S.edit.isEditAllowed(node, state);
+        let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;
 
@@ -240,9 +239,9 @@ export class NodeCompRowHeader extends Div {
         }
         else if (typeHandler) {
             if (editingAllowed) {
-                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
-                editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
-                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
+                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
+                editableNode = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
+                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, this.node, state);
             }
         }
 
@@ -257,15 +256,15 @@ export class NodeCompRowHeader extends Div {
                     className: "marginLeft",
                     onClick: S.edit.runEditNodeByClick,
                     title: "Edit Node",
-                    nid: node.id
+                    nid: this.node.id
                 });
             }
 
-            if (deleteAllowed && node.id !== state.homeNodeId) {
+            if (deleteAllowed && this.node.id !== state.homeNodeId) {
                 floatUpperRightDiv.addChild(new Icon({
                     className: "fa fa-trash fa-lg buttonBarIcon",
                     title: "Delete node(s)",
-                    nid: node.id,
+                    nid: this.node.id,
                     onClick: S.edit.deleteSelNodes
                 }));
             }
@@ -295,7 +294,7 @@ export class NodeCompRowHeader extends Div {
         if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
-                onClick: () => S.srch.clickSearchNode(node.id, state),
+                onClick: () => S.srch.clickSearchNode(this.node.id, state),
                 title: "Jump to Tree"
             });
         }

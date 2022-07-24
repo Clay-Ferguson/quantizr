@@ -29,19 +29,18 @@ export class NodeCompContent extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node;
 
-        if (!node) {
+        if (!this.node) {
             this.setChildren(null);
             return;
         }
 
         let children: CompIntf[] = [];
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
         let embeddedImg = false;
 
         if (state.showProperties) {
-            let propTable = S.props.renderProperties(node.properties);
+            let propTable = S.props.renderProperties(this.node.properties);
             if (propTable) {
                 children.push(propTable);
             }
@@ -51,28 +50,28 @@ export class NodeCompContent extends Div {
                 typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
             }
 
-            if (node.content && ( //
-                node.content.indexOf("{{imgUrl}}") !== -1 ||
-                node.content.indexOf("{{img}}") !== -1 ||
-                node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
-                node.content.indexOf("{{imgUpperRight}}") !== -1 ||
-                node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
+            if (this.node.content && ( //
+            this.node.content.indexOf("{{imgUrl}}") !== -1 ||
+            this.node.content.indexOf("{{img}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
                 embeddedImg = true;
             }
 
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
-            children.push(typeHandler.render(node, this.tabData, this.rowStyling, this.isTreeView, state));
+            children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, state));
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
          showing the normal attachment for this node, because that will the same as the avatar */
-        let isAnAccountNode = node.ownerId && node.id === node.ownerId;
+        let isAnAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
 
-        if (!embeddedImg && S.props.hasBinary(node) && !isAnAccountNode) {
-            children.push(new NodeCompBinary(node, false, false, this.imgSizeOverride));
+        if (!embeddedImg && S.props.hasBinary(this.node) && !isAnAccountNode) {
+            children.push(new NodeCompBinary(this.node, false, false, this.imgSizeOverride));
         }
 
-        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", node);
+        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", this.node);
         this.setChildren(children);
     }
 

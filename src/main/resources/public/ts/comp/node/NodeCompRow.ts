@@ -60,11 +60,9 @@ export class NodeCompRow extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.node;
-        let id: string = node.id;
 
         if (this.allowHeaders) {
-            this.attribs.nid = id;
+            this.attribs.nid = this.node.id;
             this.attribs.onClick = S.nav.clickNodeRow;
         }
 
@@ -85,13 +83,13 @@ export class NodeCompRow extends Div {
 
             let isMine = S.props.isMine(state.node, state);
 
-            if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+            if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(this.node, state)) {
 
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     insertButton = new Button(null, e => {
-                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                        S.edit.insertNode(this.node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     }, {
                         iconclass: "fa fa-plus",
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
@@ -106,7 +104,7 @@ export class NodeCompRow extends Div {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                         if (d.kind === "file") {
                             EditNodeDlg.pendingUploadFile = data[i].getAsFile();
-                            S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                            S.edit.insertNode(this.node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                             return;
                         }
                     }
@@ -116,7 +114,7 @@ export class NodeCompRow extends Div {
 
         let buttonBar: Comp = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
-            buttonBar = new NodeCompButtonBar(node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
+            buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row");
@@ -130,7 +128,7 @@ export class NodeCompRow extends Div {
         // else if (layout && layout.indexOf("c") === 0 && (isInlineChildren || this.node.id === state.node.id)) {
         // }
         else {
-            if (isInlineChildren && node.hasChildren && !isPageRootNode) {
+            if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
                 layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border-inline-children";
             }
             else {
@@ -140,7 +138,7 @@ export class NodeCompRow extends Div {
 
         let indentLevel = this.isTableCell ? 0 : this.level;
         let focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        let selected: boolean = (focusNode && focusNode.id === id);
+        let selected: boolean = (focusNode && focusNode.id === this.node.id);
 
         if (this.isLinkedNode) {
             this.attribs.className = "boost-row";
@@ -151,7 +149,7 @@ export class NodeCompRow extends Div {
             this.attribs.style = style;
         }
 
-        if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
+        if (S.render.enableRowFading && S.render.fadeInId === this.node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
             this.attribs.className += " fadeInRowBkgClz";
@@ -161,10 +159,10 @@ export class NodeCompRow extends Div {
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
         if (this.allowHeaders && state.userPreferences.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
-            header = new NodeCompRowHeader(node, true, true, false, false, true, false);
+            header = new NodeCompRowHeader(this.node, true, true, false, false, true, false);
         }
         else {
-            const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
+            const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     onClick: () => S.view.jumpToId(targetId),
@@ -184,9 +182,9 @@ export class NodeCompRow extends Div {
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,
-            new NodeCompContent(node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
+            new NodeCompContent(this.node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
             this.internalComp,
-            this.allowHeaders ? new NodeCompRowFooter(node, false, this.allowShowThread) : null,
+            this.allowHeaders ? new NodeCompRowFooter(this.node, false, this.allowShowThread) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
     }
