@@ -20,12 +20,10 @@ export class BookmarkTypeHandler extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
         let audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
-        let comp: NodeCompMarkdown = new NodeCompMarkdown(node, state);
         return new Div(null, null, [
-            comp,
+            new NodeCompMarkdown(node, state),
             audioUrl ? new Button("Play Audio", () => {
-                let dlg = new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0, state);
-                dlg.open();
+                new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0, state).open();
             }, null, "btn-primary marginLeft") : null
         ]);
     }

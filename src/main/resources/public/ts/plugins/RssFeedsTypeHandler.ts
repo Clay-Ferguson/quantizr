@@ -37,11 +37,7 @@ export class RssFeedsTypeHandler extends TypeBase {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-end"),
-            new Heading(4, "RSS Feed Subscriptions", {
-                className: "marginAll"
-            })
-            // new Clearfix(),
-            // new HelpButton(() => state.config?.help?.type?.friendsList?.render)
+            new Heading(4, "RSS Feed Subscriptions", { className: "marginAll" })
         ]);
     }
 }

@@ -16,10 +16,6 @@ export class RoomTypeHandler extends TypeBase {
         super(J.NodeType.ROOM, "Chat Room", "fa-comments", true);
     }
 
-    // getEditorHelp(): string {
-    //     return state.config?.help?.type?.friend?.editor;
-    // }
-
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         return true;
     }

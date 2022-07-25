@@ -35,9 +35,7 @@ export class InboxNodeTypeHandler extends TypeBase {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([
-                new Button("Clear Inbox", () => {
-                    S.edit.clearInbox(state);
-                })
+                new Button("Clear Inbox", () => S.edit.clearInbox(state))
             ], null, "float-end marginBottom"),
             new Clearfix()
         ], "displayTable systemNodeContent marginAll");

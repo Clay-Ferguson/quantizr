@@ -26,9 +26,7 @@ export class FriendsListTypeHandler extends TypeBase {
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => state.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
-            new Heading(4, "Friends", {
-                className: "marginAll"
-            }),
+            new Heading(4, "Friends", { className: "marginAll" }),
             new Div("These are the people you follow. Delete from this list to unfollow the person.", { className: "marginLeft" }),
             new Button("Find People", () => {
                 new SearchUsersDlg(state).open();

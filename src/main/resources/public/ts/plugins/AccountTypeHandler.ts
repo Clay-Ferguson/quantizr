@@ -38,7 +38,7 @@ export class AccountTypeHandler extends TypeBase {
         }, [
             new Heading(4, "User: " + node.owner, {
                 className: "clickable accountNode",
-                onClick: (evt: any) => {
+                onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
                     // their own account this is not a way to do it.
                     if (!S.props.isMine(node, state)) {

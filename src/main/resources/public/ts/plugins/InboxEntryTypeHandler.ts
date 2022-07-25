@@ -28,17 +28,4 @@ export class InboxEntryTypeHandler extends TypeBase {
     allowPropertyEdit(propName: string, state: AppState): boolean {
         return false;
     }
-
-    // render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
-    //     return new Div(null, null, [
-    //         new NodeCompMarkdown(node, state),
-    //         new Div(null, { className: "marginLeft" }, [
-    //             new Icon({
-    //                 title: "Reply",
-    //                 className: "fa fa-comment fa-lg rowFooterIcon",
-    //                 onClick: () => S.edit.addNode(node, null, state)
-    //             })
-    //         ])
-    //     ]);
-    // }
 }
