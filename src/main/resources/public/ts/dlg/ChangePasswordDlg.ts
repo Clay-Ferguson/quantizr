@@ -63,7 +63,7 @@ export class ChangePasswordDlg extends DialogBase {
         }
         let pwd = this.pwdState.getValue();
 
-        if (pwd && pwd.length >= 4) {
+        if (pwd?.length >= 4) {
             let res: J.ChangePasswordResponse = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 newPassword: pwd,
                 passCode: this.passCode
@@ -83,14 +83,13 @@ export class ChangePasswordDlg extends DialogBase {
                 msg += `<p>You can now login as <b>${res.user}</b> with your new password.`;
             }
 
-            let dlg = new MessageDlg(msg, "Password Change",
+            new MessageDlg(msg, "Password Change",
                 () => {
                     if (this.passCode) {
                         window.location.href = window.location.origin;
                     }
                 }, null, false, 0, null, this.appState
-            );
-            dlg.open();
+            ).open();
         }
     }
 }

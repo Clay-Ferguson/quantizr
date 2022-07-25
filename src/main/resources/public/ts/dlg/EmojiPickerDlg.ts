@@ -12,7 +12,6 @@ interface LS { // Local State
 }
 
 export class EmojiPickerDlg extends DialogBase {
-
     selectionValueIntf: ValueIntf;
 
     constructor(state: AppState) {

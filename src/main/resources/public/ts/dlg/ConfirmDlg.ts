@@ -7,7 +7,6 @@ import { Form } from "../comp/core/Form";
 import { TextContent } from "../comp/core/TextContent";
 
 export class ConfirmDlg extends DialogBase {
-
     yes: boolean = false;
 
     constructor(private text: string, title: string, private yesButtonClass: string, private textClass: string, state: AppState) {

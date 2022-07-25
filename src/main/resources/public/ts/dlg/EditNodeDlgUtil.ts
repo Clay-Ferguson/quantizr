@@ -19,9 +19,7 @@ export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
         let state = dlg.getState<LS>();
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        let customProps: string[] = null;
         if (typeHandler) {
-            customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(state.node);
             dlg.editorHelp = typeHandler.getEditorHelp();
         }
@@ -117,7 +115,6 @@ export class EditNodeDlgUtil {
                 // console.log("Save prop iterator: name=" + prop.name);
                 let propState = dlg.propStates.get(prop.name);
                 if (propState) {
-
                     // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
                     if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
                         try {
@@ -168,9 +165,7 @@ export class EditNodeDlgUtil {
         state.node.properties.push({
             name: J.NodeProp.DATE,
             value: new Date().getTime()
-        });
-
-        state.node.properties.push({
+        }, {
             name: J.NodeProp.DURATION,
             value: "01:00"
         });
@@ -182,7 +177,6 @@ export class EditNodeDlgUtil {
         let state = dlg.getState<LS>();
         await S.edit.editNodeSharing(dlg.appState, state.node);
         dlg.mergeState<LS>({ node: state.node });
-        return null;
     }
 
     upload = async (file: File, dlg: EditNodeDlg): Promise<void> => {
@@ -295,7 +289,7 @@ export class EditNodeDlgUtil {
             dlg.mergeState<LS>({ node: state.node });
 
             if (dlg.mode === DialogMode.EMBED) {
-                dispatch("Action_editNodeUpdated", (s: AppState): AppState => {
+                dispatch("Action_uploadDeleted", (s: AppState): AppState => {
                     s.editNode = state.node;
                     return s;
                 });
