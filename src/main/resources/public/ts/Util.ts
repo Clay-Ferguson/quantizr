@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import * as marked from "marked";
-import { appState, dispatch, store } from "./AppRedux";
+import { getAppState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -1529,7 +1529,7 @@ export class Util {
                     }
                     return;
                 }
-                state = appState(state);
+                state = getAppState(state);
                 console.log("renderPageFromData for anonymous");
                 S.render.renderPageFromData(res, false, null, true, true);
             }

@@ -29,8 +29,7 @@ export function rootReducer(state: AppState = initialState, action: AppAction) {
 
 export const store = createStore(rootReducer);
 
-/* For syntactical sugar we allow a state to get passed or not */
-export const appState = (state?: AppState): AppState => {
+export const getAppState = (state?: AppState): AppState => {
     return state || store.getState();
 };
 

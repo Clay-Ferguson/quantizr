@@ -1,4 +1,4 @@
-import { appState, dispatch, store } from "./AppRedux";
+import { getAppState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -585,7 +585,7 @@ export class Search {
 
     /* If target is non-null we only return shares to that particlar person (or public) */
     findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null) => {
-        state = appState(state);
+        state = getAppState(state);
         const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!focusNode) {
             return;

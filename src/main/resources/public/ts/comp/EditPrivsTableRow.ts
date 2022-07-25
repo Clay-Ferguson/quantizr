@@ -1,4 +1,4 @@
-import { appState } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -48,7 +48,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: (evt: any) => {
-                    new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open();
+                    new UserProfileDlg(this.aclEntry.principalNodeId, getAppState(null)).open();
                 }
             });
         }
@@ -69,7 +69,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),
                         onClick: (evt: any) => {
-                            new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open();
+                            new UserProfileDlg(this.aclEntry.principalNodeId, getAppState(null)).open();
                         }
                     }),
                 isPublic

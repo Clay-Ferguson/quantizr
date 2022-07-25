@@ -1,4 +1,4 @@
-import { appState, dispatch, store } from "./AppRedux";
+import { getAppState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Span } from "./comp/core/Span";
@@ -58,7 +58,7 @@ export class NodeUtil {
     }
 
     clearSelNodes = (state: AppState = null) => {
-        state = appState(state);
+        state = getAppState(state);
         dispatch("Action_ClearSelections", (s: AppState): AppState => {
             s.selectedNodes.clear();
             return s;
@@ -85,7 +85,7 @@ export class NodeUtil {
     }
 
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
-        state = appState(state);
+        state = getAppState(state);
         if (!state.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(state.node.id);
         if (id) {

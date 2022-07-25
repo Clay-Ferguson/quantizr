@@ -1,4 +1,4 @@
-import { appState, store } from "../AppRedux";
+import { getAppState, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
@@ -162,7 +162,7 @@ export class RightNavPanel extends Div {
                     // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
                         className: "clickable",
-                        onClick: () => { new UserProfileDlg(null, appState(null)).open(); }
+                        onClick: () => { new UserProfileDlg(null, getAppState(null)).open(); }
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,

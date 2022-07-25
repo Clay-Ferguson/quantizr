@@ -1,4 +1,4 @@
-import { appState, dispatch } from "./AppRedux";
+import { getAppState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Button } from "./comp/core/Button";
 import { ButtonBar } from "./comp/core/ButtonBar";
@@ -24,12 +24,12 @@ export class Nav {
     }
 
     logout = (state: AppState = null) => {
-        state = appState(state);
+        state = getAppState(state);
         S.user.logout(true, state);
     }
 
     signup = (state: AppState) => {
-        state = appState(state);
+        state = getAppState(state);
         S.user.openSignupPg(state);
     }
 
@@ -83,7 +83,7 @@ export class Nav {
     }
 
     navToSibling = async (siblingOffset: number, state?: AppState) => {
-        state = appState(state);
+        state = getAppState(state);
         if (!state.node) return null;
 
         try {
@@ -115,7 +115,7 @@ export class Nav {
     }
 
     navUpLevel = async (processingDelete: boolean) => {
-        const state = appState();
+        const state = getAppState();
         if (!state.node) return null;
 
         if (!this.parentVisibleToUser(state)) {
@@ -179,7 +179,7 @@ export class Nav {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
-            state = appState(state);
+            state = getAppState(state);
 
             /* First check if this node is already highlighted and if so just return */
             const hltNode = S.nodeUtil.getHighlightedNode();
@@ -215,7 +215,7 @@ export class Nav {
     }
 
     openContentNode = async (nodePathOrId: string, state: AppState = null) => {
-        state = appState(state);
+        state = getAppState(state);
         // console.log("openContentNode(): " + nodePathOrId);
 
         try {
@@ -241,7 +241,7 @@ export class Nav {
 
     openNodeById = (evt: Event, id: string, state: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        state = appState(state);
+        state = getAppState(state);
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         S.nodeUtil.highlightNode(node, false, state);
 
@@ -269,7 +269,7 @@ export class Nav {
 
     setNodeSel = (selected: boolean, id: string, state: AppState) => {
         if (!id) return;
-        state = appState(state);
+        state = getAppState(state);
         if (selected) {
             state.selectedNodes.add(id);
         } else {
@@ -315,7 +315,7 @@ export class Nav {
     }
 
     navHome = async (state: AppState = null) => {
-        state = appState(state);
+        state = getAppState(state);
         S.view.scrollAllTop(state);
 
         // console.log("navHome()");
@@ -350,7 +350,7 @@ export class Nav {
 
     runSearch = (evt: Event) => {
         let id = S.util.allowIdFromEvent(evt, null);
-        const state = appState();
+        const state = getAppState();
         this.clickNodeRow(null, id);
         setTimeout(() => {
             new SearchContentDlg(state).open();
@@ -359,7 +359,7 @@ export class Nav {
 
     runTimeline = (evt: Event) => {
         let id = S.util.allowIdFromEvent(evt, null);
-        const state = appState();
+        const state = getAppState();
         this.clickNodeRow(null, id);
 
         setTimeout(() => {
@@ -373,7 +373,7 @@ export class Nav {
 
     openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const state = appState();
+        const state = getAppState();
 
         let node: J.NodeInfo = state.idToNodeMap.get(id);
         // Try to get node from local memory...

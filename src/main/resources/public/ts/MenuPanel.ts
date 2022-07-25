@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { appState, dispatch, store } from "./AppRedux";
+import { getAppState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
@@ -67,46 +67,46 @@ export class MenuPanel extends Div {
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
-    static openHomeNode = () => S.nav.openContentNode(":" + appState(null).userName + ":home");
+    static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static transferNode = () => { new TransferNodeDlg(appState(null)).open(); };
-    static searchAndReplace = () => { new SearchAndReplaceDlg(appState(null)).open(); };
-    static splitNode = () => { new SplitNodeDlg(null, appState(null)).open(); }
+    static transferNode = () => { new TransferNodeDlg(getAppState(null)).open(); };
+    static searchAndReplace = () => { new SearchAndReplaceDlg(getAppState(null)).open(); };
+    static splitNode = () => { new SplitNodeDlg(null, getAppState(null)).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
     static showPublicWritableShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null, null); }
-    static searchByContent = () => { new SearchContentDlg(appState(null)).open(); };
-    static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
-    static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
-    static findUsers = () => { new SearchUsersDlg(appState(null)).open(); };
+    static searchByContent = () => { new SearchContentDlg(getAppState(null)).open(); };
+    static searchByName = () => { new SearchByNameDlg(getAppState(null)).open(); }
+    static searchById = () => { new SearchByIDDlg(getAppState(null)).open(); };
+    static findUsers = () => { new SearchUsersDlg(getAppState(null)).open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
-    static timelineByCreated = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time", 0, true);
-    static timelineByModified = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time", 0, true);
-    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time (non-Recursive)", 0, false);
-    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time (non-Recursive)", 0, false);
-    static showCalendar = () => S.render.showCalendar(null, appState(null));
-    static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
-    static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
-    static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, appState(null), "all", "All calendar dates", 0, true);
+    static timelineByCreated = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time", 0, true);
+    static timelineByModified = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time", 0, true);
+    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time (non-Recursive)", 0, false);
+    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time (non-Recursive)", 0, false);
+    static showCalendar = () => S.render.showCalendar(null, getAppState(null));
+    static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAppState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
+    static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAppState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+    static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAppState(null), "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
-    static import = () => S.edit.openImportDlg(appState(null));
-    static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(appState(null));
-    static export = () => S.edit.openExportDlg(appState(null));
-    static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
-    static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
+    static import = () => S.edit.openImportDlg(getAppState(null));
+    static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(getAppState(null));
+    static export = () => S.edit.openExportDlg(getAppState(null));
+    static testMicrophone = () => { new MediaRecorderDlg(getAppState(null), false, false).open(); };
+    static testWebCam = () => { new MediaRecorderDlg(getAppState(null), true, false).open(); };
     static mouseEffects = () => { S.util.toggleMouseEffect(); };
-    static showUrls = () => S.render.showNodeUrl(null, appState(null));
-    static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", appState(null));
-    static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", appState(null));
-    static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
+    static showUrls = () => S.render.showNodeUrl(null, getAppState(null));
+    static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", getAppState(null));
+    static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", getAppState(null));
+    static nodeStats = () => S.view.getNodeStats(getAppState(null), false, false);
 
     static readJSONfromURL = () => {
         // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
         let url = window.prompt("ActivityPub Object URL: ");
         if (url) {
-            S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "", appState(null));
+            S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "", getAppState(null));
         }
     }
 
@@ -121,29 +121,29 @@ export class MenuPanel extends Div {
             return s;
         });
 
-        let state = appState(null);
+        let state = getAppState(null);
         state.userPreferences.enableIPSM = true;
         S.util.saveUserPreferences(state);
     };
 
     static showKeys = () => {
         let f = async () => {
-            new ManageEncryptionKeysDlg(appState(null)).open();
+            new ManageEncryptionKeysDlg(getAppState(null)).open();
         };
         f();
     };
 
-    static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };
+    static generateKeys = () => { S.util.generateNewCryptoKeys(getAppState(null)); };
     static publishKeys = () => { S.encryption.initKeys(false, true, true); };
-    static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };
-    static profile = () => { new UserProfileDlg(null, appState(null)).open(); };
-    static accountSettings = () => { new ManageAccountDlg(appState(null)).open(); };
-    static storageSpace = () => { new ManageStorageDlg(appState(null)).open(); };
-    static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
-    static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
-    static toggleNsfw = () => S.edit.toggleNsfw(appState(null));
-    static toggleParents = () => S.edit.toggleShowParents(appState(null));
-    static toggleReplies = () => S.edit.toggleShowReplies(appState(null));
+    static importKeys = () => { new ImportCryptoKeyDlg(getAppState(null)).open(); };
+    static profile = () => { new UserProfileDlg(null, getAppState(null)).open(); };
+    static accountSettings = () => { new ManageAccountDlg(getAppState(null)).open(); };
+    static storageSpace = () => { new ManageStorageDlg(getAppState(null)).open(); };
+    static toggleEditMode = () => S.edit.toggleEditMode(getAppState(null));
+    static toggleMetaData = () => S.edit.toggleShowMetaData(getAppState(null));
+    static toggleNsfw = () => S.edit.toggleNsfw(getAppState(null));
+    static toggleParents = () => S.edit.toggleShowParents(getAppState(null));
+    static toggleReplies = () => S.edit.toggleShowReplies(getAppState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
 
