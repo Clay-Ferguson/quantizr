@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
@@ -17,7 +17,7 @@ export class NodeCompTableRowLayout extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let nodesToMove = state.nodesToMove;
         let curRow = new Div(null, { className: "node-grid-row" });
         let children: Comp[] = [];

@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
@@ -15,7 +15,7 @@ export class TabPanelButtons extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let tabButtons = new Div(null, {
             className: "tab-buttons-container"
         }, [

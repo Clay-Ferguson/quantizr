@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
@@ -22,7 +22,7 @@ export class NodeCompVerticalRowLayout extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
         let collapsedComps: Object[] = [];

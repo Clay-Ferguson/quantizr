@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { AppState } from "../AppState";
+import { useAppState } from "../AppRedux";
 import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -13,7 +12,7 @@ export class FullScreenImgViewer extends Main {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let nodeId = state.fullScreenViewId;
         let node: J.NodeInfo = S.nodeUtil.findNodeById(state, nodeId);
 

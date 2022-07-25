@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { getAppState, dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store, useAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
@@ -148,7 +147,7 @@ export class MenuPanel extends Div {
     static mobileToggle = () => S.util.switchBrowsingMode();
 
     preRender(): void {
-        const state: AppState = useSelector((state: AppState) => state);
+        const state = useAppState();
 
         const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");

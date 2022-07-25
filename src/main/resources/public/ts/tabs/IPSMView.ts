@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
@@ -15,7 +15,7 @@ export class IPSMView extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         this.attribs.className = this.getClass(state);
         let children: Comp[] = [];

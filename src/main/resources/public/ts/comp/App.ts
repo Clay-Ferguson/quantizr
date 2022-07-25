@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -28,7 +28,7 @@ export class App extends Main {
     }
 
     preRender(): void {
-        const state: AppState = useSelector((state: AppState) => state);
+        const state = useAppState();
 
         if (!state.guiReady) {
             this.setChildren(null);

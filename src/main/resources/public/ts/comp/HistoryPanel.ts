@@ -1,14 +1,13 @@
+import { useAppState } from "../AppRedux";
+import { Checkbox } from "../comp/core/Checkbox";
+import { Div } from "../comp/core/Div";
+import { Icon } from "../comp/core/Icon";
+import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { Checkbox } from "../comp/core/Checkbox";
-import { Div } from "../comp/core/Div";
-import { Icon } from "../comp/core/Icon";
-import { Span } from "../comp/core/Span";
-import { AppState } from "../AppState";
-import { useSelector } from "react-redux";
 
 export class HistoryPanel extends Div {
     private static MAX_SUBITEMS = 5;
@@ -21,7 +20,7 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         if (S.quanta.nodeHistory.length === 0) {
             this.setChildren(null);

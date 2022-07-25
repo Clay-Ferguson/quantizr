@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { dispatch } from "../AppRedux";
+import { dispatch, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
@@ -24,7 +23,7 @@ export class MainTabComp extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         this.attribs.className = this.getClass(state);
 
         if (!state.node) {

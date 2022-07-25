@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
@@ -14,7 +14,7 @@ export class NodeCompRowFooter extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let children = [];
 
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link

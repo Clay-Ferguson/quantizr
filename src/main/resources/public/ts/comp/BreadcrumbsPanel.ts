@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
@@ -15,7 +15,7 @@ export class BreadcrumbsPanel extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         this.setChildren([this.createBreadcrumbs(state)]);
     }
 

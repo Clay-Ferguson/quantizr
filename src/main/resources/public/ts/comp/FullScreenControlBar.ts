@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
+import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 
 export class FullScreenControlBar extends Div {
 
@@ -14,7 +14,7 @@ export class FullScreenControlBar extends Div {
     }
 
     preRender(): void {
-        const state: AppState = useSelector((state: AppState) => state);
+        const state = useAppState();
         let buttons: Comp[] = this.getButtons(state);
         this.setChildren(buttons);
     }

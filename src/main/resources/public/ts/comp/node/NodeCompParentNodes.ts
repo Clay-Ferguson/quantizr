@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
@@ -18,7 +18,7 @@ export class NodeCompParentNodes extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
          from 'parents' array, but the system architecture is such that if we ever want to display

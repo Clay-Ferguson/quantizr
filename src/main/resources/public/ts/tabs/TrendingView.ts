@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { dispatch } from "../AppRedux";
+import { dispatch, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
@@ -56,9 +55,8 @@ export class TrendingView extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         this.attribs.className = this.getClass(state);
-
         let data = state.tabData.find(d => d.id === this.data.id);
         let res = data ? (data.rsInfo as TrendingRSInfo).res : null;
 

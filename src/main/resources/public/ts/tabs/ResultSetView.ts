@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -24,7 +24,7 @@ export abstract class ResultSetView extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let results = this.data && this.data.rsInfo.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;

@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
@@ -16,7 +16,7 @@ export class ServerInfoView extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         this.attribs.className = this.getClass(state);
         this.setChildren([
             new Div(null, { className: "marginTop" }, [

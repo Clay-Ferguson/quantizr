@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import { useSelector } from "react-redux";
-import { dispatch } from "../AppRedux";
+import { dispatch, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { CompIntf } from "./base/CompIntf";
@@ -25,7 +24,7 @@ export class Menu extends Div {
     super_compRender = this.compRender;
     compRender = (): ReactNode => {
         let state = this.getState<LS>();
-        let appState: AppState = useSelector((state: AppState) => state);
+        let appState = useAppState();
         this.attribs.style = {
             display: (state.visible && !state.disabled ? "" : "none"),
             expanded: false

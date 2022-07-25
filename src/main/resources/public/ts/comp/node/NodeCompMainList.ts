@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { store } from "../../AppRedux";
+import { store, useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -18,7 +17,7 @@ export class NodeCompMainList extends Div {
 
     preRender(): void {
         // todo-0: are we being consistent about when we call useSelector like this across the app?
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         let children: Comp[] = [];
         if (state.node && state.node.children) {

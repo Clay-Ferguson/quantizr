@@ -1,13 +1,12 @@
-import { useSelector } from "react-redux";
-import { store } from "../AppRedux";
+import { store, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
+import { Div } from "../comp/core/Div";
+import { Img } from "../comp/core/Img";
+import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
-import { Div } from "../comp/core/Div";
-import { Img } from "../comp/core/Img";
-import { Span } from "../comp/core/Span";
 
 declare var g_brandingAppName;
 
@@ -41,7 +40,7 @@ export class LeftNavPanel extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         let s = state.newMessageCount > 1 ? "s" : "";

@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -29,7 +29,7 @@ export class NodeCompRowHeader extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let children = [];
         let avatarImg: Img = null;
 

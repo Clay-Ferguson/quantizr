@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { AppState } from "../../AppState";
+import { useAppState } from "../../AppRedux";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -25,7 +24,7 @@ export class NodeCompButtonBar extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         // make drop target if not a drop-on-self
         if (S.quanta.draggableId !== this.node.id) {

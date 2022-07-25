@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -38,7 +38,7 @@ export class NodeCompMainNode extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
-        // let state: AppState = useSelector((state: AppState) => state);
+        // let state = useAppState();
         /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
         getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
         have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
@@ -55,7 +55,7 @@ export class NodeCompMainNode extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let node = state.node;
 
         if (!node) {

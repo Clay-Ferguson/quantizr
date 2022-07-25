@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { AppState } from "../../AppState";
+import { useAppState } from "../../AppRedux";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
@@ -28,7 +27,7 @@ export class NodeCompContent extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         if (!this.node) {
             this.setChildren(null);

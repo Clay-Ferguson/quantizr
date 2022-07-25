@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { store } from "../AppRedux";
+import { store, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -20,7 +19,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
         let results = this.data?.rsInfo?.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;

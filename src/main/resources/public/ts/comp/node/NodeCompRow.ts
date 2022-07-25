@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
@@ -59,7 +59,7 @@ export class NodeCompRow extends Div {
     }
 
     preRender(): void {
-        let state: AppState = useSelector((state: AppState) => state);
+        let state = useAppState();
 
         if (this.allowHeaders) {
             this.attribs.nid = this.node.id;
