@@ -68,7 +68,7 @@ export class ExportDlg extends DialogBase {
         });
     }
 
-    exportNodes = async (): Promise<void> => {
+    exportNodes = async () => {
         let state = this.getState<LS>();
         let res = await S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,

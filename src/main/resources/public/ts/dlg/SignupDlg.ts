@@ -126,7 +126,7 @@ export class SignupDlg extends DialogBase {
         this.signupResponse(res);
     }
 
-    signupResponse = async (res: J.SignupResponse): Promise<void> => {
+    signupResponse = async (res: J.SignupResponse) => {
         if (res.success) {
             /* close the signup dialog */
             this.close();

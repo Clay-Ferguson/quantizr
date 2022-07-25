@@ -70,7 +70,7 @@ export class LoginDlg extends DialogBase {
         S.nav.signup(this.appState);
     }
 
-    login = async (): Promise<void> => {
+    login = async () => {
         let usr = this.userState.getValue();
 
         /* The word admin is not a secret so let's make it easy for the admin to login using only his password */

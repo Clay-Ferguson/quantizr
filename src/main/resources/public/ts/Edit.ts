@@ -238,7 +238,7 @@ export class Edit {
     * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
-    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): Promise<void> => {
+    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState) => {
         if (!this.isInsertAllowed(parentNode, state)) {
             // console.log("Rejecting request to edit. Not authorized");
             return;
@@ -341,7 +341,7 @@ export class Edit {
         }
     }
 
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
 
@@ -394,7 +394,7 @@ export class Edit {
         }
     }
 
-    refreshNodeFromServer = async (nodeId: string): Promise<void> => {
+    refreshNodeFromServer = async (nodeId: string) => {
         // console.log("refreshNodeFromServer: " + nodeId);
         let state = store.getState();
 
@@ -435,7 +435,7 @@ export class Edit {
         });
     }
 
-    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {
+    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]) => {
         if (!aclEntries || !S.props.isEncrypted(node)) {
             return;
         }
@@ -447,12 +447,12 @@ export class Edit {
         // console.log("Key distribution complete.");
     }
 
-    setRssHeadlinesOnly = async (state: AppState, val: boolean): Promise<void> => {
+    setRssHeadlinesOnly = async (state: AppState, val: boolean) => {
         state.userPreferences.rssHeadlinesOnly = val;
         S.util.saveUserPreferences(state);
     }
 
-    toggleEditMode = async (state: AppState): Promise<void> => {
+    toggleEditMode = async (state: AppState) => {
         state.userPreferences.editMode = !state.userPreferences.editMode;
         S.util.saveUserPreferences(state);
 
@@ -486,7 +486,7 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    toggleNsfw = async (state: AppState): Promise<void> => {
+    toggleNsfw = async (state: AppState) => {
         state.userPreferences.nsfw = !state.userPreferences.nsfw;
         return S.util.saveUserPreferences(state, true);
     }
@@ -499,13 +499,13 @@ export class Edit {
 
     // without the await on saveUserPreferences the refresh will be done with WRONG userProfile SO...look for
     // other places we need to have this await and perhaps don't.
-    toggleShowReplies = async (state: AppState): Promise<void> => {
+    toggleShowReplies = async (state: AppState) => {
         state.userPreferences.showReplies = !state.userPreferences.showReplies;
         await S.util.saveUserPreferences(state, false);
         S.quanta.refresh(state);
     }
 
-    moveNodeUp = async (evt: Event, id: string, state?: AppState): Promise<void> => {
+    moveNodeUp = async (evt: Event, id: string, state?: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -523,7 +523,7 @@ export class Edit {
         }
     }
 
-    moveNodeDown = async (evt: Event, id: string, state: AppState): Promise<void> => {
+    moveNodeDown = async (evt: Event, id: string, state: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -541,7 +541,7 @@ export class Edit {
         }
     }
 
-    moveNodeToTop = async (id: string = null, state: AppState = null): Promise<void> => {
+    moveNodeToTop = async (id: string = null, state: AppState = null) => {
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
@@ -557,7 +557,7 @@ export class Edit {
         }
     }
 
-    moveNodeToBottom = async (id: string = null, state: AppState = null): Promise<void> => {
+    moveNodeToBottom = async (id: string = null, state: AppState = null) => {
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
@@ -657,7 +657,7 @@ export class Edit {
         }
     }
 
-    newSubNode = async (evt: Event, id: string): Promise<void> => {
+    newSubNode = async (evt: Event, id: string) => {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
@@ -696,7 +696,7 @@ export class Edit {
         this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0, state);
     }
 
-    selectAllNodes = async (state: AppState): Promise<void> => {
+    selectAllNodes = async (state: AppState) => {
         const highlightNode = S.nodeUtil.getHighlightedNode(state);
         let res = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
@@ -704,7 +704,7 @@ export class Edit {
         S.nodeUtil.selectAllNodes(res.nodeIds);
     }
 
-    clearInbox = async (state: AppState): Promise<void> => {
+    clearInbox = async (state: AppState) => {
         S.nodeUtil.clearSelNodes(state);
 
         let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
@@ -720,7 +720,7 @@ export class Edit {
         }
     }
 
-    joinNodes = async (state?: AppState): Promise<void> => {
+    joinNodes = async (state?: AppState) => {
         state = appState(state);
 
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
@@ -744,7 +744,7 @@ export class Edit {
     /*
     * Deletes all nodes owned by you but NOT rooted in your own account root.
     */
-    bulkDelete = async (): Promise<void> => {
+    bulkDelete = async () => {
         let state = store.getState();
 
         let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
@@ -765,7 +765,7 @@ export class Edit {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = async (evt: Event = null, id: string = null): Promise<void> => {
+    deleteSelNodes = async (evt: Event = null, id: string = null) => {
         let state = store.getState();
         id = S.util.allowIdFromEvent(evt, id);
 
@@ -905,7 +905,7 @@ export class Edit {
     }
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
-    pasteSelNodes = async (nodeId: string, location: string, state?: AppState): Promise<void> => {
+    pasteSelNodes = async (nodeId: string, location: string, state?: AppState) => {
         state = appState(state);
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
@@ -930,7 +930,7 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    insertBookWarAndPeace = async (state: AppState): Promise<void> => {
+    insertBookWarAndPeace = async (state: AppState) => {
         let dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
             "Confirm", null, null, state);
         await dlg.open();
@@ -961,7 +961,7 @@ export class Edit {
     //     });
     // }
 
-    saveClipboardToChildNode = async (parentId: string): Promise<void> => {
+    saveClipboardToChildNode = async (parentId: string) => {
         let clipText: string = await (navigator as any).clipboard.readText();
 
         if (clipText) {
@@ -1030,7 +1030,7 @@ export class Edit {
         }
     }
 
-    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void> => {
+    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }
@@ -1070,7 +1070,7 @@ export class Edit {
         this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, state);
     }
 
-    addLinkBookmark = async (content: any, audioUrl: string, state: AppState): Promise<void> => {
+    addLinkBookmark = async (content: any, audioUrl: string, state: AppState) => {
         state = appState(state);
 
         let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -1188,7 +1188,7 @@ export class Edit {
         this.createSubNodeResponse(res, false, null, null, state);
     }
 
-    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean): Promise<void> => {
+    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean) => {
         // console.log("targetNodeId=" + targetNodeId);
 
         /* if node being dropped on itself, then ignore */
@@ -1233,7 +1233,7 @@ export class Edit {
         }
     }
 
-    updateHeadings = async (state: AppState): Promise<void> => {
+    updateHeadings = async (state: AppState) => {
         state = appState(state);
         const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (node) {
@@ -1247,7 +1247,7 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (state: AppState, node: J.NodeInfo): Promise<void> => {
+    editNodeSharing = async (state: AppState, node: J.NodeInfo) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }
@@ -1265,7 +1265,7 @@ export class Edit {
    the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
    can use their private key to decrypt the key to the data, to view the node.
    */
-    addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
+    addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
         if (principalNodeId === "public") {
             console.warn("public node has encryption turned on. This is a bug.");
             return;

@@ -51,7 +51,7 @@ export class Props {
     /*
      * Toggles display of properties in the gui.
      */
-    propsToggle = async (state: AppState): Promise<void> => {
+    propsToggle = async (state: AppState) => {
         state.showProperties = !state.showProperties;
     }
 

@@ -36,7 +36,7 @@ export class View {
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
-    refreshTree = async (a: RefreshTreeArgs): Promise<void> => {
+    refreshTree = async (a: RefreshTreeArgs) => {
 
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
         // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
@@ -134,7 +134,7 @@ export class View {
     }
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
-    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState): Promise<void> => {
+    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState) => {
         console.log("loadPage nodeId=" + state.node.id);
 
         try {
@@ -346,7 +346,7 @@ export class View {
         });
     }
 
-    scrollToTop = async (): Promise<void> => {
+    scrollToTop = async () => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             let state = store.getState();
             this.scrollAllTop(state);
@@ -366,7 +366,7 @@ export class View {
         new NodeStatsDlg(res, trending, feed, state).open();
     }
 
-    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void> => {
+    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
         const node = S.nodeUtil.getHighlightedNode(state);
 
         let res = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {

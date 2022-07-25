@@ -351,7 +351,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    updateFileList = async (dropzoneEvt: any): Promise<void> => {
+    updateFileList = async (dropzoneEvt: any) => {
         this.fileList = dropzoneEvt.getAddedFiles();
         this.fileList = this.fileList.concat(dropzoneEvt.getQueuedFiles());
 

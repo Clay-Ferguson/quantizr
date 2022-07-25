@@ -1255,7 +1255,7 @@ export class Util {
         }, 500);
     }
 
-    loadBookmarks = async (): Promise<void> => {
+    loadBookmarks = async () => {
         let state: AppState = store.getState();
         if (!state.isAnonUser) {
             let res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
@@ -1510,7 +1510,7 @@ export class Util {
         }
     }
 
-    loadAnonPageHome = async (state: AppState): Promise<void> => {
+    loadAnonPageHome = async (state: AppState) => {
         console.log("loadAnonPageHome()");
 
         try {
@@ -1547,7 +1547,7 @@ export class Util {
         }
     }
 
-    saveUserPreferences = async (state: AppState, dispatchNow: boolean = true): Promise<void> => {
+    saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
         if (!state.isAnonUser) {
             await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
@@ -1646,7 +1646,7 @@ export class Util {
         });
     }
 
-    resumeEditingOfAbandoned = async (): Promise<void> => {
+    resumeEditingOfAbandoned = async () => {
         const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
         if (editorData?.nodeId && editorData?.content) {
             await S.localDB.setVal(C.STORE_EDITOR_DATA, null);

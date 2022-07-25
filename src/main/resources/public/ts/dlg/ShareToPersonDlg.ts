@@ -70,7 +70,7 @@ export class ShareToPersonDlg extends DialogBase {
         this.reload(res);
     }
 
-    reload = async (res: J.AddPrivilegeResponse): Promise<void> => {
+    reload = async (res: J.AddPrivilegeResponse) => {
         if (S.util.checkSuccess("Share Node with Person", res)) {
             this.close();
             if (res.principalPublicKey) {

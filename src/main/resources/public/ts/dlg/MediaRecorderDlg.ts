@@ -67,7 +67,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    scanDevices = async (): Promise<void> => {
+    scanDevices = async () => {
         let audioInputOptions = [];
         let videoInputOptions = [];
 
@@ -327,7 +327,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cancel = async (): Promise<void> => {
+    cancel = async () => {
         if (this.recorded) {
             let dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
                 "btn-danger", "alert alert-danger", this.appState);

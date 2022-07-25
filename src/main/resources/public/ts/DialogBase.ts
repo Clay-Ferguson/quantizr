@@ -137,7 +137,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render (excepet in EMBED mode) in case we need to
     get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
     from the server before displaying */
-    async preLoad(): Promise<void> {
+    async preLoad() {
         return null;
     }
 

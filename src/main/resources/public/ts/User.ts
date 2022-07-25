@@ -15,7 +15,7 @@ export class User {
         window.location.href = window.location.origin;
     }
 
-    closeAccount = async (): Promise<void> => {
+    closeAccount = async () => {
         let state = store.getState();
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             null, null, state);
@@ -51,7 +51,7 @@ export class User {
         new SignupDlg(state).open();
     }
 
-    refreshLogin = async (state: AppState): Promise<void> => {
+    refreshLogin = async (state: AppState) => {
         console.log("refreshLogin.");
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
@@ -115,7 +115,7 @@ export class User {
         }
     }
 
-    logout = async (updateLocalDb: any, state: AppState): Promise<void> => {
+    logout = async (updateLocalDb: any, state: AppState) => {
         if (state.isAnonUser) {
             return;
         }
@@ -156,7 +156,7 @@ export class User {
     }
 
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,
-        state: AppState): Promise<void> => {
+        state: AppState) => {
         if (S.util.checkSuccess("Login", res)) {
 
             // if login was successful and we're an authenticated user
@@ -246,7 +246,7 @@ export class User {
         }
     }
 
-    checkMessages = async (): Promise<void> => {
+    checkMessages = async () => {
         let res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
             dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
@@ -256,7 +256,7 @@ export class User {
         }
     }
 
-    queryUserProfile = async (userId: string): Promise<void> => {
+    queryUserProfile = async (userId: string) => {
         let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId
         });

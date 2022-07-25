@@ -21,7 +21,7 @@ export class Search {
 
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
-    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): Promise<void> => {
+    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState) => {
         let res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
@@ -147,7 +147,7 @@ export class Search {
             null);
     }
 
-    search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {
+    search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
         let res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
@@ -399,7 +399,7 @@ export class Search {
         }
     }
 
-    showFollowers = async (page: number, userName: string): Promise<void> => {
+    showFollowers = async (page: number, userName: string) => {
         let state: AppState = store.getState();
         if (state.isAnonUser) return;
 
@@ -441,7 +441,7 @@ export class Search {
         }
     }
 
-    showFollowing = async (page: number, userName: string): Promise<void> => {
+    showFollowing = async (page: number, userName: string) => {
         let state: AppState = store.getState();
         if (state.isAnonUser) return;
 
@@ -561,7 +561,7 @@ export class Search {
         }, 10);
     }
 
-    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): Promise<void> => {
+    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState) => {
         let res = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,

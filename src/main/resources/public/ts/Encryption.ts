@@ -88,7 +88,7 @@ export class Encryption {
         return "";
     }
 
-    secureMessagingTest = async (): Promise<void> => {
+    secureMessagingTest = async () => {
         console.log("running secureMessagingTest...");
         const clearText = "This is cleartext";
         const skdp: SymKeyDataPackage = await this.encryptSharableString(null, clearText);
@@ -227,7 +227,7 @@ export class Encryption {
         }
     }
 
-    initSymetricKey = async (forceUpdate: boolean = false): Promise<void> => {
+    initSymetricKey = async (forceUpdate: boolean = false) => {
         const val: any = await S.localDB.readObject(this.STORE_SYMKEY);
         if (!val) {
             forceUpdate = true;
@@ -248,7 +248,7 @@ export class Encryption {
     }
 
     /* Note: a 'forceUpdate' always triggers the 'republish' */
-    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<void> => {
+    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 

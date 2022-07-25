@@ -57,7 +57,7 @@ export class ChangePasswordDlg extends DialogBase {
      * where it will validate the passCode, and if it's valid use it to perform the correct password change on the correct
      * user.
      */
-    changePassword = async (): Promise<void> => {
+    changePassword = async () => {
         if (!this.validate()) {
             return;
         }

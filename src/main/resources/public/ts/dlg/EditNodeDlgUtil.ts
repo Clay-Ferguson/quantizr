@@ -47,7 +47,7 @@ export class EditNodeDlgUtil {
         return numPropsShowing;
     }
 
-    public saveNode = async (dlg: EditNodeDlg): Promise<void> => {
+    public saveNode = async (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
 
         let content: string;
@@ -133,7 +133,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    addProperty = async (dlg: EditNodeDlg): Promise<void> => {
+    addProperty = async (dlg: EditNodeDlg) => {
         let state: LS = dlg.getState<LS>();
         let propDlg = new EditPropertyDlg(state.node, dlg.appState);
         await propDlg.open();
@@ -173,13 +173,13 @@ export class EditNodeDlgUtil {
         dlg.mergeState<LS>(state);
     }
 
-    share = async (dlg: EditNodeDlg): Promise<void> => {
+    share = async (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
         await S.edit.editNodeSharing(dlg.appState, state.node);
         dlg.mergeState<LS>({ node: state.node });
     }
 
-    upload = async (file: File, dlg: EditNodeDlg): Promise<void> => {
+    upload = async (file: File, dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
 
         let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, dlg.appState, async () => {
@@ -212,7 +212,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    deletePropertiesButtonClick = async (dlg: EditNodeDlg): Promise<void> => {
+    deletePropertiesButtonClick = async (dlg: EditNodeDlg) => {
         let confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             "btn-danger", "alert alert-danger", dlg.appState);
         await confirmDlg.open();
@@ -276,7 +276,7 @@ export class EditNodeDlgUtil {
         })();
     }
 
-    deleteUpload = async (dlg: EditNodeDlg): Promise<void> => {
+    deleteUpload = async (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
@@ -300,7 +300,7 @@ export class EditNodeDlgUtil {
     }
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo): Promise<void> => {
+    refreshBinaryPropsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
         let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
@@ -455,7 +455,7 @@ an upload has been added or removed. */
         }
     }
 
-    insertMention = async (dlg: EditNodeDlg): Promise<void> => {
+    insertMention = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
             let friendDlg: FriendsDlg = new FriendsDlg(null, dlg.appState, true);
             await friendDlg.open();
@@ -465,7 +465,7 @@ an upload has been added or removed. */
         }
     }
 
-    insertEmoji = async (dlg: EditNodeDlg): Promise<void> => {
+    insertEmoji = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
             let emojiDlg: EmojiPickerDlg = new EmojiPickerDlg(dlg.appState);
             await emojiDlg.open();

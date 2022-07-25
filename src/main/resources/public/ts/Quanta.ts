@@ -81,7 +81,7 @@ export class Quanta {
         });
     }
 
-    initApp = async (): Promise<void> => {
+    initApp = async () => {
         try {
             Log.log("initApp()");
 

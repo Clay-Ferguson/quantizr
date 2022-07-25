@@ -300,7 +300,7 @@ export class NodeUtil {
         new LoadNodeFromIpfsDlg(state).open();
     }
 
-    removePublicShare = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
+    removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
         let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: "public",
@@ -309,7 +309,7 @@ export class NodeUtil {
         this.removePrivilegeResponse(node, editorDlg);
     }
 
-    removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
+    removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp) => {
         let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: true,

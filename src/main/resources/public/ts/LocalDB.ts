@@ -86,13 +86,13 @@ export class LocalDB {
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    setVal = async (key: string, val: any, userName: string = null): Promise<void> => {
+    setVal = async (key: string, val: any, userName: string = null) => {
         const keyPrefix = this.getKeyPrefix(userName);
         // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
         await this.writeObject({ name: keyPrefix + key, val });
     }
 
-    writeObject = async (val: Object): Promise<void> => {
+    writeObject = async (val: Object) => {
         // We use a Promise here because we're sesolving inside a callback
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,

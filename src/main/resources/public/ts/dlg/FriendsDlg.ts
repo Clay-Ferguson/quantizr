@@ -81,7 +81,7 @@ export class FriendsDlg extends DialogBase {
         ];
     }
 
-    shareToPersonDlg = async (): Promise<void> => {
+    shareToPersonDlg = async () => {
         let dlg = new ShareToPersonDlg(this.node, null, this.appState);
         await dlg.open();
 

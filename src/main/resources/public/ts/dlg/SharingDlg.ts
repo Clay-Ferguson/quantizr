@@ -47,7 +47,7 @@ export class SharingDlg extends DialogBase {
                 // easy to create a node and share it with someone and then have it NOT end up visible in the feeds of the people it's shared to.
                 // #unpublish-disabled
                 // new Checkbox("Unpublished", null, {
-                //     setValue: async (checked: boolean): Promise<void> => {
+                //     setValue: async (checked: boolean) => {
                 //         let state: LS = this.getState<LS>();
                 //         this.dirty = true;
                 //         state.nodePrivsInfo.unpublished = checked;

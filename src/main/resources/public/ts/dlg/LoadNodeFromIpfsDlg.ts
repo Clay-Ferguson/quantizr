@@ -45,7 +45,7 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
         return valid;
     }
 
-    load = async (): Promise<void> => {
+    load = async () => {
         if (!this.validate()) {
             return;
         }

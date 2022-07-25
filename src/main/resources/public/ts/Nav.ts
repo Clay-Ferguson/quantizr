@@ -82,7 +82,7 @@ export class Nav {
         S.nav.navToSibling(1);
     }
 
-    navToSibling = async (siblingOffset: number, state?: AppState): Promise<void> => {
+    navToSibling = async (siblingOffset: number, state?: AppState) => {
         state = appState(state);
         if (!state.node) return null;
 
@@ -107,14 +107,14 @@ export class Nav {
         }
     }
 
-    navUpLevelClick = async (evt: Event = null, id: string = null): Promise<void> => {
+    navUpLevelClick = async (evt: Event = null, id: string = null) => {
         // for state management, especially for scrolling, we need to run the node click on the node
         // before upLeveling from it.
         await this.clickNodeRow(evt, id);
         this.navUpLevel(false);
     }
 
-    navUpLevel = async (processingDelete: boolean): Promise<void> => {
+    navUpLevel = async (processingDelete: boolean) => {
         const state = appState();
         if (!state.node) return null;
 
@@ -175,7 +175,7 @@ export class Nav {
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
-    clickNodeRow = async (evt: Event, id: string, state?: AppState): Promise<void> => {
+    clickNodeRow = async (evt: Event, id: string, state?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
@@ -214,7 +214,7 @@ export class Nav {
         });
     }
 
-    openContentNode = async (nodePathOrId: string, state: AppState = null): Promise<void> => {
+    openContentNode = async (nodePathOrId: string, state: AppState = null) => {
         state = appState(state);
         // console.log("openContentNode(): " + nodePathOrId);
 
@@ -314,7 +314,7 @@ export class Nav {
         S.quanta.mainMenu.open();
     }
 
-    navHome = async (state: AppState = null): Promise<void> => {
+    navHome = async (state: AppState = null) => {
         state = appState(state);
         S.view.scrollAllTop(state);
 
@@ -371,7 +371,7 @@ export class Nav {
         }, 500);
     }
 
-    openNodeFeed = async (evt: Event, id: string): Promise<void> => {
+    openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = appState();
 
