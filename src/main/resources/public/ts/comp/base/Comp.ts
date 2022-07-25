@@ -12,6 +12,7 @@ import { CompIntf } from "./CompIntf";
  * code can ignore those details.
  */
 export abstract class Comp implements CompIntf {
+    private parent: Comp = null; // only used for debugging (can be deleted without impacting app)
     static renderCounter: number = 0;
     static focusElmId: string = null;
     public debug: boolean = false;
@@ -199,12 +200,13 @@ export abstract class Comp implements CompIntf {
     }
 
     // We take an array of 'any', because some of the children may be strings.
-    createChildren(children: any[]): ReactNode[] {
+    private createChildren(children: any[]): ReactNode[] {
         if (!children || children.length === 0) return null;
 
         return children.map((child: any) => {
             if (child instanceof Comp) {
                 try {
+                    child.parent = this; // only done for debugging.
                     return child.create();
                 }
                 catch (e) {
@@ -356,9 +358,21 @@ export abstract class Comp implements CompIntf {
             return this.compRender();
         }
         catch (e) {
-            console.error("Failed to render child (in render method)" + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e);
+            console.error("Failed to render child (in render method)" + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
+                "\nELEMENTS Stack: " + this.getElementStack());
             return null;
         }
+    }
+
+    /* Get a printable string that contains the parentage of the component as far as we know it back to the root level */
+    getElementStack() {
+        let stack = "";
+        let comp: Comp = this;
+        while (comp) {
+            stack = comp.getCompClass() + (stack ? " -> " : "") + stack;
+            comp = comp.parent;
+        }
+        return stack;
     }
 
     // leave NON-Arrow function to support calling thru 'super'
