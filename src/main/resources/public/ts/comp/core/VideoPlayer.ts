@@ -5,7 +5,6 @@ export class VideoPlayer extends Comp {
 
     constructor(attrib: any) {
         super(attrib);
-        // console.log("Created VideoPlayer Comp: ID=" + this.getId());
     }
 
     getVideoElement(): HTMLVideoElement {

@@ -196,13 +196,13 @@ export class User {
             /* set ID to be the page we want to show user right after login */
             let id: string = null;
             let childId: string = null;
-            let renderLeafIfParent = true;
+            let renderParentIfLeaf = true;
 
             if (res.homeNodeOverride) {
                 id = res.homeNodeOverride;
                 // console.log("homeNodeOverride=" + id);
                 if (id && id.startsWith("~")) {
-                    renderLeafIfParent = false;
+                    renderParentIfLeaf = false;
                 }
             } //
             else {
@@ -218,11 +218,10 @@ export class User {
                     // console.log("Node selected from homeNodeId: id=" + id);
                 }
             }
-            // console.log("loginResponse final refresh id chosen: " + id);
             S.view.refreshTree({
                 nodeId: id,
                 zeroOffset: true,
-                renderParentIfLeaf: renderLeafIfParent, // fix typeo (names inconsistent) todo-0
+                renderParentIfLeaf,
                 highlightId: childId,
                 forceIPFSRefresh: false,
                 scrollToTop: false,

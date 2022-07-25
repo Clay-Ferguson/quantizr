@@ -3,18 +3,17 @@ import { Div } from "./Div";
 
 export class VerticalLayout extends Div {
 
-    constructor(initialComps: Comp[] = null, justify: string = "left-justified") {
+    constructor(children: Comp[] = null, justify: string = "left-justified") {
         super();
         this.attribs.className = "vertical " + justify + " layout vertical-layout-row";
 
-        // Wrap all the children provided in Divs, and then make those be the children
-        let divWrapComps: Comp[] = [];
-        initialComps.forEach(function (child: Comp) {
-            if (child) {
-                divWrapComps.push(new Div(null, null, [child]));
-            }
-        });
+        if (children) {
+            // Wrap all the children provided in Divs, and make those be the children
+            children = children.map(child => {
+                return child ? new Div(null, null, [child]) : null;
+            }).filter(c => !!c);
 
-        this.setChildren(divWrapComps);
+            this.setChildren(children);
+        }
     }
 }

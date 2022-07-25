@@ -135,7 +135,7 @@ export class NodeCompBinary extends Div {
             let fileType: string = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
-            if (fileType && (fileType === "application/pdf" || fileType.startsWith("text/"))) {
+            if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
                 viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "View", {
                     target: "_blank",
                     className: "downloadLink"
