@@ -137,7 +137,7 @@ export class NodeCompButtonBar extends Div {
                 selButton = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
                 }, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             state.selectedNodes.add(this.node.id);
                         } else {

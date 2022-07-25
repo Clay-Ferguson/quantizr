@@ -298,7 +298,7 @@ export abstract class Comp implements CompIntf {
         this.stateMgr.mergeState<ST>(moreState);
     }
 
-    setState = <ST = any>(newState: ST): void => {
+    setState = <ST = any>(newState: ST) => {
         if (!this.checkState()) return;
         this.stateMgr.setState<ST>(newState);
     }
@@ -373,14 +373,14 @@ export abstract class Comp implements CompIntf {
         this.runQueuedFuncs(elm);
     }
 
-    maybeFocus = (): void => {
+    maybeFocus = () => {
         /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
         if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
             S.domUtil.focusId(Comp.focusElmId);
         }
     }
 
-    runQueuedFuncs = (elm: HTMLElement): void => {
+    runQueuedFuncs = (elm: HTMLElement) => {
         this.domAddFuncs?.forEach(func => func(elm));
         this.domAddFuncs = null;
     }

@@ -147,7 +147,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         ReactDOM.render(provider, this.backdrop);
     }
 
-    public abort = (): void => {
+    public abort = () => {
         if (this.aborted) return;
         this.aborted = true;
         setTimeout(() => {
@@ -155,11 +155,11 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         }, 100);
     }
 
-    closeByUser = (): void => {
+    closeByUser = () => {
         // derived classes can hook into this to detect that it was a user click that closed the dialog
     }
 
-    close = (): void => {
+    close = () => {
         if (this.mode === DialogMode.EMBED) {
             return;
         }

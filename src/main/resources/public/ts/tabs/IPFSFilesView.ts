@@ -97,7 +97,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             children.push(new Div(null, null, [
                 new Span(null, { className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             dispatch("Action_setListCids", (s: AppState): AppState => {
                                 this.data.props.listCids = checked;
                                 return s;

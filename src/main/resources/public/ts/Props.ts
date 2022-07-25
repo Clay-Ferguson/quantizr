@@ -25,7 +25,7 @@ export class Props {
     }
 
     /* copies all the binary properties from source node to destination node */
-    transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo): void => {
+    transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo) => {
         if (!srcNode.properties) return;
         dstNode.properties = dstNode.properties || [];
 
@@ -55,7 +55,7 @@ export class Props {
         state.showProperties = !state.showProperties;
     }
 
-    deleteProp = (node: J.NodeInfo, propertyName: string): void => {
+    deleteProp = (node: J.NodeInfo, propertyName: string) => {
         if (node.properties) {
             for (let i = 0; i < node.properties.length; i++) {
                 if (propertyName === node.properties[i].name) {
@@ -221,7 +221,7 @@ export class Props {
         return prop ? prop.value : null;
     }
 
-    setPropVal = (propertyName: string, node: J.NodeInfo, val: any): void => {
+    setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {
         let prop: J.PropertyInfo = this.getProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
@@ -241,7 +241,7 @@ export class Props {
         }
     }
 
-    setProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
+    setProp = (node: J.NodeInfo, newProp: J.PropertyInfo) => {
         if (!newProp) return;
         const prop: J.PropertyInfo = this.getProp(newProp.name, node);
 

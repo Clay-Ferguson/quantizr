@@ -63,7 +63,7 @@ export class SharingDlg extends DialogBase {
                 //     }
                 // }),
                 new Checkbox("Apply to all children (that you own)", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         this.dirty = true;
                         this.mergeState<LS>({ recursive: checked });
                     },
@@ -130,7 +130,7 @@ export class SharingDlg extends DialogBase {
     }
 
     super_close = this.close;
-    close = (): void => {
+    close = () => {
         this.super_close();
         if (this.dirty) {
             // console.log("Sharing dirty=true. Full refresh pending.");

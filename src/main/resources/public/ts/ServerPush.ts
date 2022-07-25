@@ -114,7 +114,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo, feedData: TabIntf, state: AppState): void => {
+    forceFeedItem = (nodeInfo: J.NodeInfo, feedData: TabIntf, state: AppState) => {
         if (!nodeInfo) return;
         feedData.props.feedResults = feedData.props.feedResults || [];
 
@@ -157,7 +157,7 @@ export class ServerPush {
         });
     }
 
-    feedPushItem = (nodeInfo: J.NodeInfo, state: AppState): void => {
+    feedPushItem = (nodeInfo: J.NodeInfo, state: AppState) => {
         if (!nodeInfo) return;
 
         console.log("feedPushItem: " + nodeInfo.content);

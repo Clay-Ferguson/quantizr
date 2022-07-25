@@ -65,7 +65,7 @@ export class LoginDlg extends DialogBase {
         this.pwdState.setValue(pwd);
     }
 
-    signup = (): void => {
+    signup = () => {
         this.close();
         S.nav.signup(this.appState);
     }

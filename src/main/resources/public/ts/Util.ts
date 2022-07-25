@@ -382,12 +382,12 @@ export class Util {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    initProgressMonitor = (): void => {
+    initProgressMonitor = () => {
         // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
         setInterval(this.progressInterval, 1000);
     }
 
-    progressInterval = (state: AppState): void => {
+    progressInterval = (state: AppState) => {
         /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
          querying server like the APP would do (index.html) */
         if (__page !== "index") return;
@@ -646,11 +646,11 @@ export class Util {
         return res.success;
     }
 
-    flashMessage = (message: string, title: string, preformatted: boolean = false): void => {
+    flashMessage = (message: string, title: string, preformatted: boolean = false) => {
         new MessageDlg(message, title, null, null, preformatted, 3000, "app-modal-content-narrow-width", null).open();
     }
 
-    flashMessageQuick = (message: string, title: string, preformatted: boolean = false): void => {
+    flashMessageQuick = (message: string, title: string, preformatted: boolean = false) => {
         new MessageDlg(message, title, null, null, preformatted, 2000, "app-modal-content-narrow-width", null).open();
     }
 
@@ -659,7 +659,7 @@ export class Util {
         return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();
     }
 
-    addAllToSet = (set: Set<string>, array): void => {
+    addAllToSet = (set: Set<string>, array) => {
         if (!array) return;
         array.forEach(v => {
             set.add(v);
@@ -708,7 +708,7 @@ export class Util {
 
     /* Iterates by callling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
-    forEachProp = (obj: Object, callback: I.PropertyIterator): void => {
+    forEachProp = (obj: Object, callback: I.PropertyIterator) => {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
         if (names) {
@@ -808,7 +808,7 @@ export class Util {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
+    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState) => {
         if (!node) {
             node = appState.node;
         }
@@ -862,7 +862,7 @@ export class Util {
         this.updateNodeHistory(node, childNode, appState);
     }
 
-    removeHistorySubItem = (nodeId: string): void => {
+    removeHistorySubItem = (nodeId: string) => {
         /* First whenever we have a new 'node' we need to remove 'node' from any of the
          subItems that exist, because any top level item doesn't need to also exist as a subItem */
         S.quanta.nodeHistory.forEach(h => {
@@ -874,7 +874,7 @@ export class Util {
         });
     }
 
-    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
+    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState) => {
         if (S.quanta.nodeHistoryLocked) return;
         let subItems = null;
 
@@ -1029,7 +1029,7 @@ export class Util {
         return performance.now();
     }
 
-    perfEnd = (message: string, startTime: number): void => {
+    perfEnd = (message: string, startTime: number) => {
         const endTime = performance.now();
         console.log(message + " Time=" + (endTime - startTime));
     }
@@ -1042,7 +1042,7 @@ export class Util {
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
-    setDropHandler = (attribs: any, fullOutline: boolean, func: (elm: any) => void): void => {
+    setDropHandler = (attribs: any, fullOutline: boolean, func: (elm: any) => void) => {
         // console.log("setDropHandler: nodeId=" + attribs.id);
         const nonDragBorder = "";
 
@@ -1167,7 +1167,7 @@ export class Util {
         return currencyFormatter.format(n);
     }
 
-    showBrowserInfo = (): void => {
+    showBrowserInfo = () => {
         let info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
 
         info += "\n\nType: ";
@@ -1181,7 +1181,7 @@ export class Util {
         this.showMessage(info, "Browser Info");
     }
 
-    switchBrowsingMode = (): void => {
+    switchBrowsingMode = () => {
         dispatch("Action_SwitchBrowsingMode", (s: AppState): AppState => {
             s.mobileMode = !s.mobileMode;
             return s;
@@ -1222,7 +1222,7 @@ export class Util {
         }
     }
 
-    showSystemNotification = (title: string, message: string): void => {
+    showSystemNotification = (title: string, message: string) => {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user
                 message = S.util.removeHtmlTags(message);
@@ -1279,7 +1279,7 @@ export class Util {
     If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
     getState and then dispatching the change.
     */
-    refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
+    refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {
         if (!node || !state.node || !state.node.children) return;
         let doDispatch = !state;
         if (!state) {
@@ -1501,7 +1501,7 @@ export class Util {
         }
     }
 
-    processUrlParams = (state: AppState): void => {
+    processUrlParams = (state: AppState) => {
         let passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
@@ -1571,7 +1571,7 @@ export class Util {
         return val.split(char).length - 1;
     }
 
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse) => {
         if (!res) return;
 
         dispatch("Action_LoginResponse", (s: AppState): AppState => {

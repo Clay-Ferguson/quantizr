@@ -119,7 +119,7 @@ export class NodeUtil {
         return ret;
     }
 
-    highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
+    highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState) => {
         // console.log("highlightNode: " + node.id);
         if (!node || !state.node) {
             return;
@@ -157,7 +157,7 @@ export class NodeUtil {
         return node;
     }
 
-    clearLastNodeIds = (): void => {
+    clearLastNodeIds = () => {
         S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, null);
         S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, null);
     }
@@ -189,7 +189,7 @@ export class NodeUtil {
         return ret;
     }
 
-    updateNodeMap = (node: J.NodeInfo, state: AppState): void => {
+    updateNodeMap = (node: J.NodeInfo, state: AppState) => {
         if (!node) return;
 
         // console.log("NODE MAPPED: " + node.id);

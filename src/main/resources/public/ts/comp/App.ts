@@ -95,7 +95,7 @@ export class App extends Main {
 
     /* This is where we send an event that lets code hook into the render cycle to process whatever needs
         to be done AFTER the main render is complete, like doing scrolling for example */
-    domUpdateEvent = (): void => {
+    domUpdateEvent = () => {
         // todo-2: based on current scrolling architecture do we still need these pub/sub events?
         PubSub.pub(C.PUBSUB_mainWindowScroll);
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
@@ -133,7 +133,7 @@ export class App extends Main {
 
             let prefsButton = !fullScreenViewer
                 ? new Checkbox("Info", { className: "marginLeft" }, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         S.edit.toggleShowMetaData(state);
                     },
                     getValue: (): boolean => {

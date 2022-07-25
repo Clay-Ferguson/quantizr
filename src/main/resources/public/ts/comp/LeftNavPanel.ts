@@ -81,13 +81,13 @@ export class LeftNavPanel extends Div {
         ]);
     }
 
-    reScroll = (elm: HTMLElement): void => {
+    reScroll = (elm: HTMLElement) => {
         if (elm) {
             elm.scrollTop = LeftNavPanel.scrollPos;
         }
     }
 
-    domAddEvent = (): void => {
+    domAddEvent = () => {
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);
@@ -98,7 +98,7 @@ export class LeftNavPanel extends Div {
         }
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent = () => {
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);

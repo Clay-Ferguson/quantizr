@@ -31,7 +31,7 @@ export class ManageAccountDlg extends DialogBase {
         ];
     }
 
-    closeAccount = (): void => {
+    closeAccount = () => {
         S.user.closeAccount();
         this.close();
     }

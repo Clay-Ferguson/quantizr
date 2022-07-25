@@ -34,7 +34,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    domAddEvent = (): void => {
+    domAddEvent = () => {
         let elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
@@ -80,7 +80,7 @@ export class OpenGraphPanel extends Div {
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
     performance optimization to help the user experience and is not a core part of the logic for
      'correct' functioning */
-    loadNext = (): void => {
+    loadNext = () => {
         let found = false;
         let count = 0;
         if (!this.tabData) return;

@@ -62,7 +62,7 @@ export class Quanta {
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
 
-    refresh = (state: AppState): void => {
+    refresh = (state: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
         }

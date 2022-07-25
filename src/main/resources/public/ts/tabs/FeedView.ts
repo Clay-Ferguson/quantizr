@@ -112,7 +112,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         if (this.data.props.feedFilterRootNode) {
             topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     this.data.props.autoRefresh = checked;
                 },
                 getValue: (): boolean => {
@@ -325,7 +325,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             state.isAnonUser ? null : new Checkbox("Friends", {
                 title: "Include nodes posted by your friends"
             }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterFriends = checked;
                         return s;
@@ -339,7 +339,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             state.isAnonUser ? null : new Checkbox("To Me", {
                 title: "Include nodes shares specifically to you (by name)"
             }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterToMe = checked;
                         return s;
@@ -353,7 +353,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             state.isAnonUser ? null : new Checkbox("From Me", {
                 title: "Include nodes created by you"
             }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterFromMe = checked;
                         return s;
@@ -367,7 +367,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             new Checkbox("Public", {
                 title: "Include nodes shared to 'public' (everyone)"
             }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterToPublic = checked;
                         return s;
@@ -381,7 +381,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             new Checkbox("Local", {
                 title: "Include only nodes from accounts on this server."
             }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterLocalServer = checked;
 
@@ -400,7 +400,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         ]);
     }
 
-    static updateFromFeedDirtyList = (feedData: TabIntf, state: AppState): void => {
+    static updateFromFeedDirtyList = (feedData: TabIntf, state: AppState) => {
         if (feedData?.props?.feedDirtyList) {
             for (let node of feedData.props.feedDirtyList) {
                 // console.log("Force Feed: " + node.content);

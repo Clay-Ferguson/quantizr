@@ -32,7 +32,7 @@ export class SearchAndReplaceDlg extends DialogBase {
                 new TextField({ label: "Replace with", val: this.replaceState }),
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => {
@@ -70,7 +70,7 @@ export class SearchAndReplaceDlg extends DialogBase {
         return valid;
     }
 
-    replace = (): void => {
+    replace = () => {
         if (!this.validate()) {
             return;
         }

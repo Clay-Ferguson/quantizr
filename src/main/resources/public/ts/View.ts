@@ -13,7 +13,7 @@ declare var PROFILE;
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    jumpToId = (id: string, forceRenderParent: boolean = false): void => {
+    jumpToId = (id: string, forceRenderParent: boolean = false) => {
         // console.log("jumpToId: " + id);
         let state = store.getState();
         if (C.DEBUG_SCROLLING) {
@@ -89,11 +89,11 @@ export class View {
         }
     }
 
-    firstPage = (state: AppState): void => {
+    firstPage = (state: AppState) => {
         this.loadPage(false, 0, false, state);
     }
 
-    prevPage = (state: AppState): void => {
+    prevPage = (state: AppState) => {
         let firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
         if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
             let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
@@ -105,7 +105,7 @@ export class View {
         }
     }
 
-    nextPage = (state: AppState): void => {
+    nextPage = (state: AppState) => {
         let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             let targetOffset = lastChildNode.logicalOrdinal + 1;
@@ -113,7 +113,7 @@ export class View {
         }
     }
 
-    lastPage = (state: AppState): void => {
+    lastPage = (state: AppState) => {
         // console.log("Running lastPage Query");
         // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
@@ -121,7 +121,7 @@ export class View {
 
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
-    growPage = (state: AppState): void => {
+    growPage = (state: AppState) => {
         // console.log("growPage");
         let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
@@ -273,7 +273,7 @@ export class View {
         }
     }
 
-    scrollToNode = (state: AppState, node: J.NodeInfo = null): void => {
+    scrollToNode = (state: AppState, node: J.NodeInfo = null) => {
         // S.quanta.setOverlay(true);
 
         let func = () => {

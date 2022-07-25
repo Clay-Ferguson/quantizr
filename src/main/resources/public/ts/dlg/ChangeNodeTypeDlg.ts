@@ -22,7 +22,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
         this.selCallback = selCallback;
 
         this.selTypeValueIntf = {
-            setValue: (val: string): void => {
+            setValue: (val: string) => {
                 this.mergeState<LS>({ selType: val });
             },
 
@@ -46,7 +46,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
         ];
     }
 
-    setNodeType = (): void => {
+    setNodeType = () => {
         this.selCallback(this.getState<LS>().selType);
         this.close();
     }

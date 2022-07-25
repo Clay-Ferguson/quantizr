@@ -19,7 +19,7 @@ import { TrendingViewData } from "./tabs/data/TrendingViewData";
 import { AppTab } from "./comp/AppTab";
 
 export class TabUtil {
-    selectTab = (tabName: string): void => {
+    selectTab = (tabName: string) => {
         /* if tab is already active no need to update state now
 
         SOME codepaths like (openNode) are currently relying on selectTab
@@ -42,7 +42,7 @@ export class TabUtil {
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
-    selectTabStateOnly = (tabName: string, state: AppState): void => {
+    selectTabStateOnly = (tabName: string, state: AppState) => {
         if (tabName === C.TAB_MAIN && !state.node) {
 
             // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
@@ -57,7 +57,7 @@ export class TabUtil {
         }
     }
 
-    createAppTabs = (): void => {
+    createAppTabs = () => {
         dispatch("Action_initTabs", (s: AppState): AppState => {
             s.tabData = [
                 new MainTabCompData(),
@@ -142,7 +142,7 @@ export class TabUtil {
     /* This function manages persisting the scroll position when switching
     from one tab to another, to automatically restore the scroll position that was
     last scroll position on any given tab */
-    tabChanging = (prevTab: string, newTab: string, state: AppState): void => {
+    tabChanging = (prevTab: string, newTab: string, state: AppState) => {
 
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {

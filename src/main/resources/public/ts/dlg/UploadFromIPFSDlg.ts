@@ -55,7 +55,7 @@ export class UploadFromIPFSDlg extends DialogBase {
                 // todo-2: this would be very nice to have!
                 // new Span(null, { className: "marginLeft" }, [
                 //     new Checkbox("PIN a copy on this server", null, {
-                //         setValue: (checked: boolean): void => {
+                //         setValue: (checked: boolean) => {
                 //             UploadFromUrlDlg.storeLocally = checked;
                 //         },
                 //         getValue: (): boolean => {
@@ -81,7 +81,7 @@ export class UploadFromIPFSDlg extends DialogBase {
         this.uploadFromIPFSResponse(res);
     }
 
-    uploadFromIPFSResponse = (res: J.UploadFromUrlResponse): void => {
+    uploadFromIPFSResponse = (res: J.UploadFromUrlResponse) => {
         if (S.util.checkSuccess("Upload from IPFS", res)) {
             this.close();
 

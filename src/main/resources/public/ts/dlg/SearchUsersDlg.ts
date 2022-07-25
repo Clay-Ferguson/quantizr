@@ -50,7 +50,7 @@ export class SearchUsersDlg extends DialogBase {
 
         adminOptions = new RadioButtonGroup([
             this.appState.isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
                     }
@@ -60,7 +60,7 @@ export class SearchUsersDlg extends DialogBase {
                 }
             }) : null,
             new RadioButton("Local Users", true, "optionsGroup", null, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
                     }
@@ -70,7 +70,7 @@ export class SearchUsersDlg extends DialogBase {
                 }
             }),
             new RadioButton("Foreign Users", false, "optionsGroup", null, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
                     }
@@ -87,7 +87,7 @@ export class SearchUsersDlg extends DialogBase {
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.mergeState<LS>({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
@@ -95,7 +95,7 @@ export class SearchUsersDlg extends DialogBase {
                         }
                     }),
                     new Checkbox("Case Sensitive", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.mergeState<LS>({ caseSensitive: checked });
                         },
                         getValue: (): boolean => {

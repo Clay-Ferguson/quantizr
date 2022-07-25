@@ -51,7 +51,7 @@ export class LogView extends AppTab implements LogViewIntf {
     //     // dispatch({
     //     //     type: "Action_InitUserProfile",
     //     //     state,
-    //     //     update: (s: AppState): void => {
+    //     //     update: (s: AppState) => {
     //     //         s.activeTab = C.TAB_MAIN;
     //     //         s.userProfile = null;
     //     //     }

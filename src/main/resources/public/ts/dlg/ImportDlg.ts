@@ -59,7 +59,7 @@ export class ImportDlg extends DialogBase {
         this.close();
     }
 
-    importResponse = (res: J.ImportResponse): void => {
+    importResponse = (res: J.ImportResponse) => {
         if (S.util.checkSuccess("Import", res)) {
             new MessageDlg("Import Successful", "Import", null, null, false, 0, null, this.appState).open();
 

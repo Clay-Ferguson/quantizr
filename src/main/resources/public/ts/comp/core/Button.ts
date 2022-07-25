@@ -19,7 +19,7 @@ export class Button extends Comp {
         this.setEnabled(true);
     }
 
-    setEnabled = (enabled: boolean): void => {
+    setEnabled = (enabled: boolean) => {
         this.mergeState<LS>({ enabled });
     }
 

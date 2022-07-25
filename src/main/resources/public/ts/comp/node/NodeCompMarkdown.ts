@@ -94,7 +94,7 @@ export class NodeCompMarkdown extends Html {
         return val;
     }
 
-    parseAnchorTags = (val: string, content: string): void => {
+    parseAnchorTags = (val: string, content: string) => {
         if (val.indexOf("<") === -1 ||
             val.indexOf(">") === -1) return;
 

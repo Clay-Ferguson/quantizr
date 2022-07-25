@@ -276,7 +276,7 @@ export class Search {
 
     /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
     from the server for a refresh */
-    delayedRefreshFeed = (state: AppState): void => {
+    delayedRefreshFeed = (state: AppState) => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
             let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
@@ -584,7 +584,7 @@ export class Search {
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
-    findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
+    findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null) => {
         state = appState(state);
         const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!focusNode) {

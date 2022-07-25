@@ -15,7 +15,7 @@ export class PieChart extends Div {
         this.setChildren([new Svg(null, { className: this.className })]);
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent = () => {
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
         // let state = this.getState<LS>();
         let svg = d3.select("." + this.className);

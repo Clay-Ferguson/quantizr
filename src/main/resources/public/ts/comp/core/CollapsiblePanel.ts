@@ -91,7 +91,7 @@ export class CollapsiblePanel extends Comp {
         }
     }
 
-    onToggle = (): void => {
+    onToggle = () => {
         let expanded = !this.getState<LS>().expanded;
         this.setExpanded(expanded);
         if (this.stateCallback) {

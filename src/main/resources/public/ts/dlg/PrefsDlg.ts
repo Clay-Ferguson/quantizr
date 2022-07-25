@@ -21,7 +21,7 @@ export class PrefsDlg extends DialogBase {
             new Form(null, [
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.appState.userPreferences.showMetaData = checked;
                         },
                         getValue: (): boolean => {
@@ -58,7 +58,7 @@ export class PrefsDlg extends DialogBase {
         this.close();
     }
 
-    savePreferencesResponse = (res: J.SaveUserPreferencesResponse): void => {
+    savePreferencesResponse = (res: J.SaveUserPreferencesResponse) => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
             S.quanta.refresh(this.appState);
         }

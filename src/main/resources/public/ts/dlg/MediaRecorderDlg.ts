@@ -147,7 +147,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
 
         let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
-            setValue: (val: string): void => {
+            setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, this.appState.userName);
                 this.mergeState<LS>({ audioInput: val });
                 setTimeout(() => {
@@ -162,7 +162,7 @@ export class MediaRecorderDlg extends DialogBase {
         let videoSelect = null;
         if (this.videoMode) {
             videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
-                setValue: (val: string): void => {
+                setValue: (val: string) => {
                     S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, this.appState.userName);
                     this.mergeState<LS>({ videoInput: val });
 
@@ -265,7 +265,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     displayStream = () => {
         if (this.videoPlayer && this.stream) {
-            this.videoPlayer.onMount((elm: HTMLElement): void => {
+            this.videoPlayer.onMount((elm: HTMLElement) => {
                 (elm as HTMLVideoElement).srcObject = this.stream;
             });
         }
@@ -314,12 +314,12 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cleanup = (): void => {
+    cleanup = () => {
         this.blob = null;
         this.recorder = null;
     }
 
-    closeStream = (): void => {
+    closeStream = () => {
         if (this.stream) {
             this.stream.getTracks().forEach(function (track) {
                 track.stop();
@@ -341,7 +341,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cancelImmediate = (): void => {
+    cancelImmediate = () => {
         this.cancelTimer();
         this.stop();
         this.closeStream();
@@ -349,7 +349,7 @@ export class MediaRecorderDlg extends DialogBase {
         this.close();
     }
 
-    save = (): void => {
+    save = () => {
         this.stop();
         this.closeStream();
         this.cancelTimer();

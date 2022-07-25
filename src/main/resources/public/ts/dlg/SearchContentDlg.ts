@@ -55,7 +55,7 @@ export class SearchContentDlg extends DialogBase {
         let requirePriorityCheckbox = null;
         if (this.getState<LS>().sortField === J.NodeProp.PRIORITY_FULL) {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     SearchContentDlg.dlgState.requirePriority = checked;
                     this.mergeState<LS>({ requirePriority: checked });
                 },
@@ -74,7 +74,7 @@ export class SearchContentDlg extends DialogBase {
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
                         },
@@ -83,7 +83,7 @@ export class SearchContentDlg extends DialogBase {
                         }
                     }),
                     new Checkbox("Case Sensitive", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.caseSensitive = checked;
                             this.mergeState<LS>({ caseSensitive: checked });
                         },
@@ -92,7 +92,7 @@ export class SearchContentDlg extends DialogBase {
                         }
                     }),
                     new Checkbox("Recursive", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.recursive = checked;
                             this.mergeState<LS>({ recursive: checked });
                         },
@@ -110,7 +110,7 @@ export class SearchContentDlg extends DialogBase {
                         { key: "contentLength", val: "Text Length" },
                         { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
                     ], "m-2", "searchDlgOrderBy", {
-                        setValue: (val: string): void => {
+                        setValue: (val: string) => {
                             let sortDir = val === "0" ? "" : "DESC";
                             if (val === J.NodeProp.PRIORITY_FULL) {
                                 sortDir = "asc";

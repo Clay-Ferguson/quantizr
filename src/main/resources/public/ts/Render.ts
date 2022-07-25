@@ -106,7 +106,7 @@ export class Render {
     /**
      * See: https://github.com/highlightjs/highlight.js
      */
-    initMarkdown = (): void => {
+    initMarkdown = () => {
         if (this.markedRenderer) return;
         this.markedRenderer = new marked.Renderer();
 
@@ -181,7 +181,7 @@ export class Render {
         });
     }
 
-    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void => {
+    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState) => {
         if (!node) return;
         // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
@@ -249,7 +249,7 @@ export class Render {
         });
     }
 
-    showNodeUrl = (node: J.NodeInfo, state: AppState): void => {
+    showNodeUrl = (node: J.NodeInfo, state: AppState) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }
@@ -413,7 +413,7 @@ export class Render {
         return !typeHandler || typeHandler.allowAction(action, node, appState);
     }
 
-    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true): void => {
+    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -620,7 +620,7 @@ export class Render {
         }
     }
 
-    getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]): void => {
+    getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
         if (!node || !node.children) return;
 
         for (let child of node.children) {
@@ -633,7 +633,7 @@ export class Render {
         }
     }
 
-    updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]): void => {
+    updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]) => {
         if (!node || !node.children) return;
         node.hasChildren = true;
 
@@ -765,7 +765,7 @@ export class Render {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = (node: J.NodeInfo, searchText: string, state: AppState): void => {
+    showGraph = (node: J.NodeInfo, searchText: string, state: AppState) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }

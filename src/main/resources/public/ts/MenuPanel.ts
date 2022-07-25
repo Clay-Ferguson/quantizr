@@ -126,7 +126,7 @@ export class MenuPanel extends Div {
         S.util.saveUserPreferences(state);
     };
 
-    static showKeys = (): void => {
+    static showKeys = () => {
         let f = async () => {
             new ManageEncryptionKeysDlg(appState(null)).open();
         };

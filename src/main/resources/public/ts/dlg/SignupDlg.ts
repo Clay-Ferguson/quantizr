@@ -109,7 +109,7 @@ export class SignupDlg extends DialogBase {
         return valid;
     }
 
-    signup = (): void => {
+    signup = () => {
         if (!this.validate()) {
             return;
         }

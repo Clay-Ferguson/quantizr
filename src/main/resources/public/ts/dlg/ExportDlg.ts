@@ -57,7 +57,7 @@ export class ExportDlg extends DialogBase {
 
     createRadioButton = (name: string, exportType: string) => {
         return new RadioButton(name, false, "exportTypeGroup", null, {
-            setValue: (checked: boolean): void => {
+            setValue: (checked: boolean) => {
                 if (checked) {
                     this.mergeState<LS>({ exportType });
                 }
@@ -80,7 +80,7 @@ export class ExportDlg extends DialogBase {
         this.close();
     }
 
-    exportResponse = (res: J.ExportResponse): void => {
+    exportResponse = (res: J.ExportResponse) => {
         let hostAndPort: string = S.util.getHostAndPort();
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
         the plan is to have the export return the actual md5 of the export for use here */

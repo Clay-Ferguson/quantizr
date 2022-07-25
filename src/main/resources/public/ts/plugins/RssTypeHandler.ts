@@ -177,7 +177,7 @@ export class RssTypeHandler extends TypeBase {
         itemListContainer.addChild(new Checkbox("Headlines Only", {
             className: "float-end"
         }, {
-            setValue: (checked: boolean): void => {
+            setValue: (checked: boolean) => {
                 dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
                     S.edit.setRssHeadlinesOnly(s, checked);
                     return s;

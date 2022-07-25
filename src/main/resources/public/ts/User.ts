@@ -7,7 +7,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class User {
-    closeAccountResponse = (): void => {
+    closeAccountResponse = () => {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -46,7 +46,7 @@ export class User {
             state.userName.toLowerCase() === "dan";
     }
 
-    openSignupPg = (state: AppState): void => {
+    openSignupPg = (state: AppState) => {
         // S.util.showMessage("Signups are temporarily unavailable. Check back in a few hours.", "Note");
         new SignupDlg(state).open();
     }
@@ -139,7 +139,7 @@ export class User {
         }
     }
 
-    logoutResponse = (): void => {
+    logoutResponse = () => {
         S.push.close();
         S.quanta.authToken = null;
         S.quanta.userName = null;

@@ -40,7 +40,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 new TextField({ label: "Upload from URL", val: this.urlState }),
                 new Div(null, { className: "marginTop" }, [
                     new Checkbox("Store a copy on this server", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             UploadFromUrlDlg.storeLocally = checked;
                         },
                         getValue: (): boolean => {
@@ -69,7 +69,7 @@ export class UploadFromUrlDlg extends DialogBase {
         this.uploadFromUrlResponse(res);
     }
 
-    uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {
+    uploadFromUrlResponse = (res: J.UploadFromUrlResponse) => {
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
 

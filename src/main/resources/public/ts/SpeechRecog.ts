@@ -67,7 +67,7 @@ export class SpeechRecog {
         this.speechActive = this.speechActive ? false : true;
     }
 
-    setCallback = (callback: (string) => void): void => {
+    setCallback = (callback: (string) => void) => {
         this.callback = callback;
     }
 }

@@ -57,7 +57,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
                     new Checkbox("Save to IPFS", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.toIpfs = checked;
                         },
                         getValue: (): boolean => {
@@ -114,7 +114,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return children;
     }
 
-    uploadFromUrl = (): void => {
+    uploadFromUrl = () => {
         let state: LS = this.getState<LS>();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
             this.close();
@@ -124,7 +124,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }, this.appState);
     }
 
-    uploadFromIPFS = (): void => {
+    uploadFromIPFS = () => {
         let state = this.getState<LS>();
         S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
             this.close();
@@ -202,7 +202,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return true;
     }
 
-    configureDropZone = (): void => {
+    configureDropZone = () => {
         let state = this.getState<LS>();
 
         /* Limit based on user quota for our user accounts */
@@ -392,7 +392,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return false;
     }
 
-    runButtonEnablement = (): void => {
+    runButtonEnablement = () => {
         let valid = this.filesAreValid();
         this.uploadButton.setEnabled(valid);
     }

@@ -23,23 +23,23 @@ export class Edit {
     pendingContent: string = null;
     pendingContentId: string = null;
 
-    openChangePasswordDlg = (state: AppState): void => {
+    openChangePasswordDlg = (state: AppState) => {
         new ChangePasswordDlg(null, state).open();
     }
 
-    openManageAccountDlg = (state: AppState): void => {
+    openManageAccountDlg = (state: AppState) => {
         new ManageAccountDlg(state).open();
     }
 
-    openManageStorageDlg = (state: AppState): void => {
+    openManageStorageDlg = (state: AppState) => {
         new ManageStorageDlg(state).open();
     }
 
-    editPreferences = (state: AppState): void => {
+    editPreferences = (state: AppState) => {
         new PrefsDlg(state).open();
     }
 
-    openImportDlg = (state: AppState): void => {
+    openImportDlg = (state: AppState) => {
         const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -53,14 +53,14 @@ export class Edit {
         dlg.open();
     }
 
-    openExportDlg = (state: AppState): void => {
+    openExportDlg = (state: AppState) => {
         let node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             new ExportDlg(state, node).open();
         }
     }
 
-    private insertBookResponse = (res: J.InsertBookResponse, state: AppState): void => {
+    private insertBookResponse = (res: J.InsertBookResponse, state: AppState) => {
         S.util.checkSuccess("Insert Book", res);
 
         S.view.refreshTree({
@@ -78,7 +78,7 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
+    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState) => {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
             S.nodeUtil.clearSelNodes(state);
@@ -97,7 +97,7 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction, state: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
@@ -145,7 +145,7 @@ export class Edit {
     }
 
     /* nodeId is optional and represents what to highlight after the paste if anything */
-    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState): void => {
+    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState) => {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
                 s.nodesToMove = null;
@@ -173,7 +173,7 @@ export class Edit {
         }
     }
 
-    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState): void => {
+    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState) => {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
         }
@@ -321,7 +321,7 @@ export class Edit {
         }
     }
 
-    insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
+    insertNodeResponse = (res: J.InsertNodeResponse, state: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.updateNodeMap(res.newNode, state);
             S.nodeUtil.highlightNode(res.newNode, false, state);
@@ -329,7 +329,7 @@ export class Edit {
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, state: AppState): void => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh(state);
@@ -460,7 +460,7 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    setMainPanelCols = (val: number): void => {
+    setMainPanelCols = (val: number) => {
         setTimeout(() => {
             let state = store.getState();
             if (val < 4) val = 4;
@@ -470,7 +470,7 @@ export class Edit {
         }, 100);
     };
 
-    setMetadataOption = (val: boolean): void => {
+    setMetadataOption = (val: boolean) => {
         setTimeout(() => {
             let state = store.getState();
             state.userPreferences.showMetaData = val;
@@ -478,7 +478,7 @@ export class Edit {
         }, 100);
     };
 
-    toggleShowMetaData = (state: AppState): void => {
+    toggleShowMetaData = (state: AppState) => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
         S.util.saveUserPreferences(state);
 
@@ -491,7 +491,7 @@ export class Edit {
         return S.util.saveUserPreferences(state, true);
     }
 
-    toggleShowParents = (state: AppState): void => {
+    toggleShowParents = (state: AppState) => {
         state.userPreferences.showParents = !state.userPreferences.showParents;
         S.util.saveUserPreferences(state, false);
         S.quanta.refresh(state);
@@ -594,7 +594,7 @@ export class Edit {
         return false;
     }
 
-    runEditNodeByClick = (evt: Event, id: string): void => {
+    runEditNodeByClick = (evt: Event, id: string) => {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
@@ -633,7 +633,7 @@ export class Edit {
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
     }
 
-    insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
+    insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {
         if (this.checkEditPending()) return;
 
         state = appState(state);
@@ -670,7 +670,7 @@ export class Edit {
         }
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void => {
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState) => {
         state = appState(state);
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
@@ -879,14 +879,14 @@ export class Edit {
         // });
     }
 
-    undoCutSelNodes = (): void => {
+    undoCutSelNodes = () => {
         dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
             s.nodesToMove = null;
             return s;
         });
     }
 
-    cutSelNodes = (evt: Event, id: string): void => {
+    cutSelNodes = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, null);
 
         dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
@@ -1048,7 +1048,7 @@ export class Edit {
         this.splitNodeResponse(res, state);
     }
 
-    splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
+    splitNodeResponse = (res: J.SplitNodeResponse, state: AppState) => {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,
@@ -1066,7 +1066,7 @@ export class Edit {
         }
     }
 
-    addBookmark = (node: J.NodeInfo, state: AppState): void => {
+    addBookmark = (node: J.NodeInfo, state: AppState) => {
         this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, state);
     }
 

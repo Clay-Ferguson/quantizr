@@ -113,27 +113,27 @@ export class AudioPlayerDlg extends DialogBase {
                 }),
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
-                        new Button("1x", (): void => {
+                        new Button("1x", () => {
                             this.speed(1);
                         }),
-                        new Button("1.25x", (): void => {
+                        new Button("1.25x", () => {
                             this.speed(1.25);
                         }),
-                        new Button("1.5x", (): void => {
+                        new Button("1.5x", () => {
                             this.speed(1.5);
                         }),
-                        new Button("1.75x", (): void => {
+                        new Button("1.75x", () => {
                             this.speed(1.75);
                         }),
-                        new Button("2x", (): void => {
+                        new Button("2x", () => {
                             this.speed(2);
                         })
                     ], "col-9"),
                     new ButtonBar([
-                        new Button("< 30s", (): void => {
+                        new Button("< 30s", () => {
                             this.skip(-30);
                         }),
-                        new Button("30s >", (): void => {
+                        new Button("30s >", () => {
                             this.skip(30);
                         })
                     ], "col-3 float-end")
@@ -186,7 +186,7 @@ export class AudioPlayerDlg extends DialogBase {
         return children;
     }
 
-    updatePlayButton = (): void => {
+    updatePlayButton = () => {
         if (!this.player) return;
 
         // todo-1: this is very bad practice if modifying DOM without react state. fix it
@@ -206,31 +206,31 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    speed = (rate: number): void => {
+    speed = (rate: number) => {
         if (this.player) {
             this.player.playbackRate = rate;
         }
     }
 
-    skip = (delta: number): void => {
+    skip = (delta: number) => {
         if (this.player) {
             this.player.currentTime += delta;
         }
     }
 
-    destroyPlayer = (): void => {
+    destroyPlayer = () => {
         if (this.player) {
             this.player.pause();
         }
         this.cancel();
     }
 
-    postComment = (): void => {
+    postComment = () => {
         let link = this.getLink();
         S.edit.addNode(null, false, "\n\n" + link, null, null, null, null, true, this.appState);
     }
 
-    copyToClipboard = (): void => {
+    copyToClipboard = () => {
         let link = this.getLink();
         S.util.copyToClipboard(link);
         S.util.flashMessage("Copied link clipboard, with timecode.", "Clipboard", true);
@@ -257,7 +257,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    onTimeUpdate = (): void => {
+    onTimeUpdate = () => {
         if (!this.saveTimer) {
             /* save time offset into browser local storage every 3 seconds */
             this.saveTimer = setInterval(this.saveTime, 3000);
@@ -289,7 +289,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    saveTime = (state: AppState): void => {
+    saveTime = (state: AppState) => {
         if (this.player && !this.player.paused) {
             /* this safety check to be sure no hidden audio can still be playing should no longer be needed
             now that I have the close listener even on the dialog, but i'll leave this here anyway. Can't hurt. */
@@ -301,7 +301,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    savePlayerInfo = (url: string, timeOffset: number): void => {
+    savePlayerInfo = (url: string, timeOffset: number) => {
         let urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
     }

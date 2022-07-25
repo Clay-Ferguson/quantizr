@@ -52,7 +52,7 @@ export class ShareToPersonDlg extends DialogBase {
         ];
     }
 
-    shareNodeToPerson = (): void => {
+    shareNodeToPerson = () => {
         if (!this.validate()) {
             return;
         }

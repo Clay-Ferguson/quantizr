@@ -41,7 +41,7 @@ export class EditPropertyDlg extends DialogBase {
         return valid;
     }
 
-    save = (): void => {
+    save = () => {
         if (!this.validate()) {
             return;
         }

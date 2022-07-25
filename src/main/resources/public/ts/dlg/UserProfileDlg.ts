@@ -81,7 +81,7 @@ export class UserProfileDlg extends DialogBase {
 
             if (!this.readOnly) {
                 web3Comps.push(new Checkbox("Web3 File System", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         let state = this.getState<LS>();
                         state.userProfile.mfsEnable = checked;
                         this.mergeState<LS>({ userProfile: state.userProfile });
@@ -279,14 +279,14 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    sendMessage = (): void => {
+    sendMessage = () => {
         this.close();
         setTimeout(() => {
             S.edit.addNode(null, false, null, this.userNodeId, null, null, null, false, this.appState);
         }, 10);
     }
 
-    previousMessages = (): void => {
+    previousMessages = () => {
         this.close();
         setTimeout(() => {
             const state: any = this.getState<LS>();
@@ -310,14 +310,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     super_close = this.close;
-    close = (): void => {
+    close = () => {
         this.super_close();
         if (!this.readOnly) {
             S.user.queryUserProfile(this.userNodeId);
         }
     }
 
-    saveResponse = (res: J.SaveUserPreferencesResponse): void => {
+    saveResponse = (res: J.SaveUserPreferencesResponse) => {
         this.close();
         dispatch("Action_SaveUserPerferences", (s: AppState): AppState => {
             s.displayName = this.displayNameState.getValue();

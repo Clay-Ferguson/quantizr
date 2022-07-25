@@ -32,7 +32,7 @@ export class FullScreenImgViewer extends Main {
         this.setChildren(children);
     }
 
-    domUpdateEvent = (): void => {
+    domUpdateEvent = () => {
         if (C.DEBUG_SCROLLING) {
             console.log("domUpdateEvent scroll top");
         }

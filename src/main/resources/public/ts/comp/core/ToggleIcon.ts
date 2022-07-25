@@ -16,7 +16,7 @@ export class ToggleIcon extends Comp {
         });
     }
 
-    _toggleClass = (): void => {
+    _toggleClass = () => {
         let state = this.getState<LS>();
         this.mergeState<LS>({ toggle: !state.toggle });
     }

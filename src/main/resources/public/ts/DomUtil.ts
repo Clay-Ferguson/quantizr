@@ -24,7 +24,7 @@ export class DomUtil {
     }
 
     /* set focus to element by id */
-    focusId = (id: string): void => {
+    focusId = (id: string) => {
         if (!id) return;
         // console.log("*** focusId = " + id);
         Comp.focusElmId = id;
@@ -51,32 +51,32 @@ export class DomUtil {
         return de.value;
     }
 
-    setInnerHTMLById = (id: string, val: string): void => {
+    setInnerHTMLById = (id: string, val: string) => {
         this.getElm(id, (elm: HTMLElement) => {
             this.setInnerHTML(elm, val);
         });
     }
 
-    setInnerHTML = (elm: HTMLElement, val: string): void => {
+    setInnerHTML = (elm: HTMLElement, val: string) => {
         if (elm) {
             elm.innerHTML = val;
         }
     }
 
-    domElmObjCss = (elm: HTMLElement, prop: string, val: string): void => {
+    domElmObjCss = (elm: HTMLElement, prop: string, val: string) => {
         if (elm) {
             elm.style[prop] = val;
         }
     }
 
     // This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
-    domElmObjRemove = (elm: Element): void => {
+    domElmObjRemove = (elm: Element) => {
         if (elm) {
             elm.parentNode.removeChild(elm);
         }
     }
 
-    domElmRemove = (id: string): void => {
+    domElmRemove = (id: string) => {
         const elm = this.domElm(id);
         if (elm) {
             elm.parentNode.removeChild(elm);
@@ -150,7 +150,7 @@ export class DomUtil {
         return e;
     }
 
-    forEachElmBySel = (sel: string, callback: Function): void => {
+    forEachElmBySel = (sel: string, callback: Function) => {
         const elements = document.querySelectorAll(sel);
         Array.prototype.forEach.call(elements, callback);
     }

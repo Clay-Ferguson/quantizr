@@ -37,7 +37,7 @@ export class TransferNodeDlg extends DialogBase {
                 ]),
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
-                        setValue: (checked: boolean): void => {
+                        setValue: (checked: boolean) => {
                             this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => {

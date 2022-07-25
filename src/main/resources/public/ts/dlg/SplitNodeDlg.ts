@@ -52,7 +52,7 @@ export class SplitNodeDlg extends DialogBase {
 
             new RadioButtonGroup([
                 new RadioButton("Split Inline", false, "splitTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             this.mergeState<LS>({ splitType: "inline" });
                         }
@@ -62,7 +62,7 @@ export class SplitNodeDlg extends DialogBase {
                     }
                 }),
                 new RadioButton("Split into Children", true, "splitTypeGroup", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             this.mergeState<LS>({ splitType: "children" });
                         }
@@ -75,7 +75,7 @@ export class SplitNodeDlg extends DialogBase {
 
             new RadioButtonGroup([
                 new RadioButton("Single Blank Line", true, "splitSpacingGroup", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             this.mergeState<LS>({ splitMode: "double" });
                         }
@@ -85,7 +85,7 @@ export class SplitNodeDlg extends DialogBase {
                     }
                 }),
                 new RadioButton("Double Blank Line", false, "splitSpacingGroup", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             this.mergeState<LS>({ splitMode: "triple" });
                         }
@@ -95,7 +95,7 @@ export class SplitNodeDlg extends DialogBase {
                     }
                 }),
                 new RadioButton("Custom Delimiter", false, "splitSpacingGroup", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         if (checked) {
                             this.mergeState<LS>({ splitMode: "custom" });
                         }
@@ -115,7 +115,7 @@ export class SplitNodeDlg extends DialogBase {
         ];
     }
 
-    splitNodes = (): void => {
+    splitNodes = () => {
         let state = this.getState<LS>();
 
         let delim = "";

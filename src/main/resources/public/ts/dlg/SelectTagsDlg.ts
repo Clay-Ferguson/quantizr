@@ -93,7 +93,7 @@ export class SelectTagsDlg extends DialogBase {
         return [
             new Form(null, [
                 new Checkbox("Suggest Tags", { className: "float-end" }, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState().suggestedTags.length === 0) {
                             setTimeout(this.updateSuggestTags, 250);
@@ -213,7 +213,7 @@ export class SelectTagsDlg extends DialogBase {
         }
         else {
             let checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     let state = this.getState<LS>();
                     if (checked) {
                         state.selectedTags.add(tagObj.tag);

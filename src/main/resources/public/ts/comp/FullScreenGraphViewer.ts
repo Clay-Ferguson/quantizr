@@ -42,7 +42,7 @@ export class FullScreenGraphViewer extends Main {
         this.setChildren([new Div(null, { className: "d3Graph" })]);
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent = () => {
         let state = this.getState<LS>();
         if (!state.data) return;
 
@@ -267,12 +267,12 @@ export class FullScreenGraphViewer extends Main {
             .style("top", (y - 50) + "px");
     }
 
-    domRemoveEvent = (): void => {
+    domRemoveEvent = () => {
         console.log("Graph stopSim");
         this.stopSim();
     }
 
-    domUpdateEvent = (): void => {
+    domUpdateEvent = () => {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollTop=0");
         }

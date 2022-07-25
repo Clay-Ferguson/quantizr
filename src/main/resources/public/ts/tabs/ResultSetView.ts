@@ -91,7 +91,7 @@ export abstract class ResultSetView extends AppTab {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, true, state);
     }
 
-    addPaginationBar = (state: AppState, children: CompIntf[]): void => {
+    addPaginationBar = (state: AppState, children: CompIntf[]) => {
         children.push(
             new Span("Pg. " + (this.data.rsInfo.page + 1), { className: "float-end" }),
             new ButtonBar([

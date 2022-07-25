@@ -18,7 +18,7 @@ export class EmojiPickerDlg extends DialogBase {
         super("Emojis", "app-modal-content-narrow-width", null, state);
 
         this.selectionValueIntf = {
-            setValue: (val: string): void => {
+            setValue: (val: string) => {
                 this.mergeState<LS>({ selectedEmoji: val });
                 this.close();
             },

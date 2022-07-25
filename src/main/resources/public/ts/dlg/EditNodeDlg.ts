@@ -444,7 +444,7 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState<LS>({ node: state.node });
     }
 
-    buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): void => {
+    buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]) => {
         let numPropsShowing: number = 0;
         if (state.node.properties) {
             // This loop creates all the editor input fields for all the properties
@@ -524,7 +524,7 @@ export class EditNodeDlg extends DialogBase {
         let pinCheckbox: Checkbox = null;
         if (ipfsLink) {
             pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     if (checked) {
                         this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
                     }
@@ -584,7 +584,7 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
-            setValue: (checked: boolean): void => {
+            setValue: (checked: boolean) => {
                 this.utl.setEncryption(this, checked);
             },
             getValue: (): boolean => {
@@ -593,7 +593,7 @@ export class EditNodeDlg extends DialogBase {
         }) : null;
 
         let wordWrapCheckbox = new Checkbox("Word Wrap", null, {
-            setValue: (checked: boolean): void => {
+            setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                 S.props.setPropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
                 if (this.contentEditor) {
@@ -613,7 +613,7 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
         return {
-            setValue: (checked: boolean): void => {
+            setValue: (checked: boolean) => {
                 S.props.setPropVal(propName, this.getState<LS>().node, checked ? "1" : null);
             },
             getValue: (): boolean => {
@@ -713,13 +713,13 @@ export class EditNodeDlg extends DialogBase {
     }
 
     super_closeByUser = this.closeByUser;
-    closeByUser = (): void => {
+    closeByUser = () => {
         this.super_closeByUser();
         this.resetAutoSaver();
     }
 
     super_close = this.close;
-    close = (): void => {
+    close = () => {
         this.super_close();
         if (this.mode === DialogMode.EMBED) {
             EditNodeDlg.embedInstance = null;
@@ -740,14 +740,14 @@ export class EditNodeDlg extends DialogBase {
         return !!S.props.controlBasedPropertyList.has(prop.name);
     }
 
-    toggleShowReadOnly = (): void => {
+    toggleShowReadOnly = () => {
         // alert("not yet implemented.");
         // see saveNode for how to iterate all properties, although I wonder why I didn't just use a map/set of
         // properties elements
         // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
     }
 
-    openChangeNodeTypeDlg = (): void => {
+    openChangeNodeTypeDlg = () => {
         new ChangeNodeTypeDlg(this.getState<LS>().node.type, (type: string) => this.utl.setNodeType(this, type), this.appState).open();
     }
 
@@ -783,7 +783,7 @@ export class EditNodeDlg extends DialogBase {
         else {
             if (allowCheckbox) {
                 let checkbox: Checkbox = new Checkbox(label, null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         let state = this.getState<LS>();
                         if (checked) {
                             state.selectedProps.add(propEntry.name);

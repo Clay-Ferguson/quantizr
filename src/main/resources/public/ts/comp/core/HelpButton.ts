@@ -18,7 +18,7 @@ export class HelpButton extends Comp {
         this.attribs.onClick = () => { this.openHelpDialog(); };
     }
 
-    openHelpDialog = (): void => {
+    openHelpDialog = () => {
         let helpText = this.getHelpText();
         if (helpText) {
             // By convention the first line of text is taken as the title for the help

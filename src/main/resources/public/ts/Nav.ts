@@ -19,21 +19,21 @@ export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
     _UID_PARENT_ROWID_PREFIX: string = "parent_";
 
-    login = (state: AppState): void => {
+    login = (state: AppState) => {
         new LoginDlg(null, state).open();
     }
 
-    logout = (state: AppState = null): void => {
+    logout = (state: AppState = null) => {
         state = appState(state);
         S.user.logout(true, state);
     }
 
-    signup = (state: AppState): void => {
+    signup = (state: AppState) => {
         state = appState(state);
         S.user.openSignupPg(state);
     }
 
-    preferences = (state: AppState): void => {
+    preferences = (state: AppState) => {
         new PrefsDlg(state).open();
     }
 
@@ -57,7 +57,7 @@ export class Nav {
         return !this.displayingHome(state);
     }
 
-    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
+    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState) => {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             S.util.showPageMessage("The node above is not shared.");
         } else {
@@ -65,7 +65,7 @@ export class Nav {
         }
     }
 
-    navOpenSelectedNode = (state: AppState): void => {
+    navOpenSelectedNode = (state: AppState) => {
         const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!currentSelNode) return;
         if (C.DEBUG_SCROLLING) {
@@ -239,7 +239,7 @@ export class Nav {
         }
     }
 
-    openNodeById = (evt: Event, id: string, state: AppState): void => {
+    openNodeById = (evt: Event, id: string, state: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -267,7 +267,7 @@ export class Nav {
         }
     }
 
-    setNodeSel = (selected: boolean, id: string, state: AppState): void => {
+    setNodeSel = (selected: boolean, id: string, state: AppState) => {
         if (!id) return;
         state = appState(state);
         if (selected) {
@@ -277,12 +277,12 @@ export class Nav {
         }
     }
 
-    navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
+    navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState) => {
         S.render.renderPageFromData(res, true, null, true, true);
         S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
-    geoLocation = (state: AppState): void => {
+    geoLocation = (state: AppState) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 // todo-2: make this string a configurable property template
@@ -309,7 +309,7 @@ export class Nav {
         }
     }
 
-    showMainMenu = (state: AppState): void => {
+    showMainMenu = (state: AppState) => {
         S.quanta.mainMenu = new MainMenuDlg();
         S.quanta.mainMenu.open();
     }
@@ -344,11 +344,11 @@ export class Nav {
         }
     }
 
-    navPublicHome = (state: AppState): void => {
+    navPublicHome = (state: AppState) => {
         S.util.loadAnonPageHome(null);
     }
 
-    runSearch = (evt: Event): void => {
+    runSearch = (evt: Event) => {
         let id = S.util.allowIdFromEvent(evt, null);
         const state = appState();
         this.clickNodeRow(null, id);
@@ -357,7 +357,7 @@ export class Nav {
         }, 500);
     }
 
-    runTimeline = (evt: Event): void => {
+    runTimeline = (evt: Event) => {
         let id = S.util.allowIdFromEvent(evt, null);
         const state = appState();
         this.clickNodeRow(null, id);
@@ -432,7 +432,7 @@ export class Nav {
         }
     }
 
-    closeFullScreenViewer = (appState: AppState): void => {
+    closeFullScreenViewer = (appState: AppState) => {
         dispatch("Action_CloseFullScreenViewer", (s: AppState): AppState => {
             s.fullScreenViewId = null;
             s.fullScreenGraphId = null;
@@ -441,7 +441,7 @@ export class Nav {
         });
     }
 
-    prevFullScreenImgViewer = (appState: AppState): void => {
+    prevFullScreenImgViewer = (appState: AppState) => {
         const prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
@@ -452,7 +452,7 @@ export class Nav {
         }
     }
 
-    nextFullScreenImgViewer = (appState: AppState): void => {
+    nextFullScreenImgViewer = (appState: AppState) => {
         const nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
@@ -505,7 +505,7 @@ export class Nav {
         return newNode;
     }
 
-    messages = (props: FeedViewProps): void => {
+    messages = (props: FeedViewProps) => {
         let feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (!feedData) {
             return;
@@ -531,7 +531,7 @@ export class Nav {
         }, 10);
     }
 
-    showMyNewMessages = (): void => {
+    showMyNewMessages = () => {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
@@ -545,7 +545,7 @@ export class Nav {
         });
     }
 
-    showPublicFediverse = (): void => {
+    showPublicFediverse = () => {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,

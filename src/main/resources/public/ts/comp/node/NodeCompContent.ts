@@ -75,7 +75,7 @@ export class NodeCompContent extends Div {
         this.setChildren(children);
     }
 
-    maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo): void => {
+    maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo) => {
         let timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
@@ -110,7 +110,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }

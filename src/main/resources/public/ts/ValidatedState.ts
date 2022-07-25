@@ -21,7 +21,7 @@ export class ValidatedState<S> {
         return this.e.state.error;
     }
 
-    setError = (error: string): void => {
+    setError = (error: string) => {
         this.e.mergeState({ error });
     }
 }

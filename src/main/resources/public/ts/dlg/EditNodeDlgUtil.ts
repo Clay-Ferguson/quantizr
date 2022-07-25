@@ -152,7 +152,7 @@ export class EditNodeDlgUtil {
         return null;
     }
 
-    addDateProperty = (dlg: EditNodeDlg): void => {
+    addDateProperty = (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
         if (!state.node.properties) {
             state.node.properties = [];
@@ -191,7 +191,7 @@ export class EditNodeDlgUtil {
         await uploadDlg.open();
     }
 
-    setNodeType = (dlg: EditNodeDlg, newType: string): void => {
+    setNodeType = (dlg: EditNodeDlg, newType: string) => {
         let state = dlg.getState<LS>();
         state.node.type = newType;
         dlg.mergeState<LS>({ node: state.node });
@@ -221,13 +221,13 @@ export class EditNodeDlgUtil {
         }
     }
 
-    deleteSelectedProperties = (dlg: EditNodeDlg): void => {
+    deleteSelectedProperties = (dlg: EditNodeDlg) => {
         let keys: string[] = [];
         dlg.getState<LS>().selectedProps.forEach(prop => keys.push(prop));
         this.deleteProperties(dlg, keys);
     }
 
-    setEncryption = (dlg: EditNodeDlg, encrypt: boolean): void => {
+    setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
         let state = dlg.getState<LS>();
         if (dlg.pendingEncryptionChange) return;
 
@@ -324,7 +324,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): void => {
+    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
         let allowEditAllProps: boolean = dlg.appState.isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let propVal = propEntry.value;
@@ -356,7 +356,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    speechRecognition = (dlg: EditNodeDlg): void => {
+    speechRecognition = (dlg: EditNodeDlg) => {
         S.speech.setCallback((transcript: string) => {
             if (dlg.contentEditor && transcript) {
                 // Capitalize and put period at end. This may be annoying in the long run but for now i "think"
@@ -381,7 +381,7 @@ export class EditNodeDlgUtil {
         }, 250);
     }
 
-    initStates = (dlg: EditNodeDlg): void => {
+    initStates = (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
 
         /* Init main content text on node */
@@ -449,7 +449,7 @@ an upload has been added or removed. */
         }
     }
 
-    insertTime = (dlg: EditNodeDlg): void => {
+    insertTime = (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
             dlg.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
         }
@@ -475,7 +475,7 @@ an upload has been added or removed. */
         }
     }
 
-    cancelEdit = (dlg: EditNodeDlg): void => {
+    cancelEdit = (dlg: EditNodeDlg) => {
         dlg.closeByUser();
         dlg.close();
 

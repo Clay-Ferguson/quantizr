@@ -26,7 +26,7 @@ export class FriendsDlg extends DialogBase {
         super("Friends", "app-modal-content-medium-width", null, state);
 
         this.selectionValueIntf = {
-            setValue: (val: string): void => {
+            setValue: (val: string) => {
                 this.mergeState<LS>({ selectedName: val });
                 if (this.instantSelect) {
                     // this timeout IS required for correct state management, but is also ideal

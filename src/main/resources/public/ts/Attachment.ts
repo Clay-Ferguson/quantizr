@@ -8,7 +8,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Attachment {
-    openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
+    openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState) => {
         state = appState(state);
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
@@ -29,7 +29,7 @@ export class Attachment {
         */
     };
 
-    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
+    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState) => {
         if (!nodeId) {
             let node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
@@ -42,7 +42,7 @@ export class Attachment {
         new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state).open();
     };
 
-    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
+    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState) => {
         if (!nodeId) {
             let node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {

@@ -24,7 +24,7 @@ export class PluginMgr {
 
     private typeHandlers: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
 
-    addTypeHandler = (typeHandler: TypeHandlerIntf): void => {
+    addTypeHandler = (typeHandler: TypeHandlerIntf) => {
         // console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
         if (this.typeHandlers.get(typeHandler.getTypeName())) {
             throw new Error("duplicate type handler: " + typeHandler.getTypeName());
@@ -45,7 +45,7 @@ export class PluginMgr {
     }
 
     // todo-2: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
-    initPlugins = (): void => {
+    initPlugins = () => {
         console.log("initPlugins()");
 
         /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order

@@ -33,7 +33,7 @@ export class TutorialApp extends Comp {
         }, 1000);
     }
 
-    buttonClick = (): void => {
+    buttonClick = () => {
         this.mergeState<LS>({ content: "You clicked a button!" });
     }
 
@@ -52,7 +52,7 @@ export class TutorialApp extends Comp {
                 new Div("SubDiv2"),
                 new Div("SubDiv3"),
                 new Checkbox("Test Checkbox", null, {
-                    setValue: (checked: boolean): void => {
+                    setValue: (checked: boolean) => {
                         TutorialApp.checkboxVal = checked;
                         console.log("checkbox=" + TutorialApp.checkboxVal)
                     },

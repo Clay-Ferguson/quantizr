@@ -30,7 +30,7 @@ export class HistoryPanel extends Div {
         let children = [];
         children.push(new Div(null, null, [
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
-                setValue: (checked: boolean): void => {
+                setValue: (checked: boolean) => {
                     S.quanta.nodeHistoryLocked = checked;
                 },
                 getValue: (): boolean => {
@@ -149,7 +149,7 @@ export class HistoryPanel extends Div {
         this.setChildren(children);
     }
 
-    dragStart = (ev: any, draggingId: string): void => {
+    dragStart = (ev: any, draggingId: string) => {
         if (S.quanta.draggableId !== draggingId) {
             ev.preventDefault();
             return;
@@ -158,7 +158,7 @@ export class HistoryPanel extends Div {
         ev.dataTransfer.setData("text", draggingId);
     }
 
-    dragEnd = (ev): void => {
+    dragEnd = (ev) => {
         ev.target.style.border = "6px solid transparent";
     }
 
@@ -183,7 +183,7 @@ export class HistoryPanel extends Div {
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
-    jumpToId = (evt: any): void => {
+    jumpToId = (evt: any) => {
         let id = S.domUtil.getPropFromDom(evt, "nid");
         S.view.jumpToId(id);
     }
