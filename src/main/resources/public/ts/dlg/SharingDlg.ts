@@ -110,7 +110,7 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and saves into state.
      */
     reload = async () => {
-        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
@@ -121,7 +121,7 @@ export class SharingDlg extends DialogBase {
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
             privilege: "*"
@@ -137,7 +137,7 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    let res: J.CopySharingResponse = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                    let res = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: this.node.id
                     });
                     S.quanta.refresh(this.appState);
@@ -151,7 +151,7 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
             privilege
@@ -160,7 +160,7 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilegeResponse = async () => {
-        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true

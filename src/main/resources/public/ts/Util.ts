@@ -1258,7 +1258,7 @@ export class Util {
     loadBookmarks = async (): Promise<void> => {
         let state: AppState = store.getState();
         if (!state.isAnonUser) {
-            let res: J.GetBookmarksResponse = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
+            let res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("Action_loadBookmarks", (s: AppState): AppState => {
@@ -1518,7 +1518,7 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {

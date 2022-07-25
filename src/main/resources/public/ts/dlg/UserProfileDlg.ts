@@ -199,14 +199,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     deleteFriend = async () => {
-        let res: J.DeleteFriendResponse = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+        let res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
     }
 
     unblockUser = async () => {
-        let res: J.DeleteFriendResponse = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
+        let res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
@@ -224,7 +224,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async (userNodeId: string) => {
-        let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: userNodeId
         });
 
@@ -240,7 +240,7 @@ export class UserProfileDlg extends DialogBase {
 
     save = async () => {
         let state = this.getState<LS>();
-        let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -253,7 +253,7 @@ export class UserProfileDlg extends DialogBase {
 
     publish = async () => {
         let state = this.getState<LS>();
-        let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -266,7 +266,7 @@ export class UserProfileDlg extends DialogBase {
 
     addFriend = async () => {
         const state: any = this.getState<LS>();
-        let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+        let res = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         });
 
@@ -296,7 +296,7 @@ export class UserProfileDlg extends DialogBase {
 
     blockUser = async () => {
         const state: any = this.getState<LS>();
-        let res: J.BlockUserResponse = await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+        let res = await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
 
@@ -343,7 +343,7 @@ export class UserProfileDlg extends DialogBase {
 
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, async () => {
 
-                let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
 
@@ -402,7 +402,7 @@ export class UserProfileDlg extends DialogBase {
 
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, async () => {
 
-                let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
 

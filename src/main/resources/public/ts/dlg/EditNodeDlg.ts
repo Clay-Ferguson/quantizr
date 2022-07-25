@@ -434,7 +434,7 @@ export class EditNodeDlg extends DialogBase {
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
-        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: state.node.id,
             includeAcl: true,
             includeOwners: true

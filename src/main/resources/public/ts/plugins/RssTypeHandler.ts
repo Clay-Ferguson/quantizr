@@ -123,7 +123,7 @@ export class RssTypeHandler extends TypeBase {
             }
 
             (async () => {
-                let res: J.GetMultiRssResponse = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                let res = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                     urls: feedSrc,
                     page
                 }, true);

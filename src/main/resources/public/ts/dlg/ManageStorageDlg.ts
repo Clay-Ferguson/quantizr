@@ -50,7 +50,7 @@ export class ManageStorageDlg extends DialogBase {
     }
 
     async preLoad(): Promise<void> {
-        let res: J.GetUserAccountInfoResponse = await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        let res = await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
 
         let used = "";
         if (res.binQuota <= 0) {

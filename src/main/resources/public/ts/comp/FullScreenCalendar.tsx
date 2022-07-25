@@ -15,7 +15,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 
 export class FullScreenCalendar extends Main {
-
     static lastClickTime: Date;
 
     state: AppState;
@@ -25,7 +24,7 @@ export class FullScreenCalendar extends Main {
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
     }
 
-    _render = (): ReactNode => {
+    compRender = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
         let nodeId = this.state.fullScreenCalendarId;
         let node: J.NodeInfo = S.nodeUtil.findNodeById(this.state, nodeId);
@@ -34,9 +33,9 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return createElement("div", {
+        return this.tag("div", {
             className: "marginAll"
-        },
+        }, [
             createElement(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
@@ -89,7 +88,8 @@ export class FullScreenCalendar extends Main {
                         }
                     }
                 }
-            }, null));
+            }, null)
+        ]);
     }
 
     dateClick = (dateClick: DateClickArg): void => {

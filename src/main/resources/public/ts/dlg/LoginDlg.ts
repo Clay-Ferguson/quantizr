@@ -100,7 +100,7 @@ export class LoginDlg extends DialogBase {
         let pwd = this.pwdState.getValue();
 
         if (usr && pwd) {
-            let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+            let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),

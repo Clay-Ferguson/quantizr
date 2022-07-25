@@ -22,7 +22,7 @@ export class Search {
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): Promise<void> => {
-        let res: J.GetSharedNodesResponse = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
+        let res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
             shareTarget,
@@ -54,7 +54,7 @@ export class Search {
     }
 
     showThreadAddMore = async (nodeId: string, state: AppState) => {
-        let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        let res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             loadOthers: false
         });
@@ -90,7 +90,7 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo, state: AppState) => {
-        let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        let res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true
         });
@@ -148,7 +148,7 @@ export class Search {
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {
-        let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        let res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
             searchText,
@@ -215,7 +215,7 @@ export class Search {
             return;
         }
 
-        let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        let res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node.id,
             searchText: "",
@@ -312,7 +312,7 @@ export class Search {
         // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
 
         // console.log("Getting results page=" + page + " growResults=" + growResults);
-        let res: J.NodeFeedResponse = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+        let res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: feedData.props.feedFilterRootNode?.id,
             toMe: feedData.props.feedFilterToMe,
@@ -407,7 +407,7 @@ export class Search {
             userName = state.userName;
         }
 
-        let res: J.GetFollowersResponse = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
+        let res = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
             targetUserName: userName
         });
@@ -449,7 +449,7 @@ export class Search {
             userName = state.userName;
         }
 
-        let res: J.GetFollowingResponse = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
+        let res = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,
             targetUserName: userName
         });
@@ -562,7 +562,7 @@ export class Search {
     }
 
     searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): Promise<void> => {
-        let res: J.SearchAndReplaceResponse = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
+        let res = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
             search,

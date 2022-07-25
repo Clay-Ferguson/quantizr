@@ -239,7 +239,7 @@ export class Render {
             return;
         }
 
-        let res: J.RenderCalendarResponse = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+        let res = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
         dispatch("Action_ShowCalendar", (s: AppState): AppState => {
@@ -605,7 +605,7 @@ export class Render {
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
-                let res: J.GetNodeMetaInfoResponse = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                let res = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                     ids
                 }, true);
 

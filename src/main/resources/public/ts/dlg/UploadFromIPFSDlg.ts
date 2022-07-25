@@ -72,7 +72,7 @@ export class UploadFromIPFSDlg extends DialogBase {
             return;
         }
 
-        let res: J.UploadFromIPFSResponse = await S.util.ajax<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
+        let res = await S.util.ajax<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
             pinLocally: false, // UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             cid: this.cidState.getValue(),

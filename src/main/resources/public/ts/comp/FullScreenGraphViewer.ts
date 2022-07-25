@@ -30,7 +30,7 @@ export class FullScreenGraphViewer extends Main {
         }
 
         (async () => {
-            let res: J.GraphResponse = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+            let res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
                 searchText: appState.graphSearchText,
                 nodeId: this.nodeId
             });
@@ -230,7 +230,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     updateTooltip = async (d: any, x: number, y: number) => {
-        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
             upLevel: false,
             siblingOffset: 0,

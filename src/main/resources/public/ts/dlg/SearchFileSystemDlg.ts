@@ -72,7 +72,7 @@ export class SearchFileSystemDlg extends DialogBase {
 
         SearchFileSystemDlg.defaultSearchText = this.searchTextState.getValue();
 
-        let res: J.LuceneSearchResponse = await S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
+        let res = await S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
             nodeId: node.id,
             text: SearchFileSystemDlg.defaultSearchText
         });

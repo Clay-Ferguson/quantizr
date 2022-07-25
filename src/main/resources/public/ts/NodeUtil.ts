@@ -289,7 +289,7 @@ export class NodeUtil {
     }
 
     publishNodeToIpfs = async (node: J.NodeInfo) => {
-        let res: J.PublishNodeToIpfsResponse = await S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+        let res = await S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
         });
         S.util.showMessage(res.message, "Server Reply", true);
@@ -301,7 +301,7 @@ export class NodeUtil {
     }
 
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
-        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: "public",
             privilege: "*"
@@ -310,7 +310,7 @@ export class NodeUtil {
     }
 
     removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp): Promise<void> => {
-        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: true,
             includeOwners: true

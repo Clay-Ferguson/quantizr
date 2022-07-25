@@ -64,7 +64,7 @@ export class ChangePasswordDlg extends DialogBase {
         let pwd = this.pwdState.getValue();
 
         if (pwd?.length >= 4) {
-            let res: J.ChangePasswordResponse = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
+            let res = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 newPassword: pwd,
                 passCode: this.passCode
             });

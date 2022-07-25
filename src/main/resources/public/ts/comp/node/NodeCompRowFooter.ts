@@ -34,7 +34,7 @@ export class NodeCompRowFooter extends Div {
                 //             // DO NOT DELETE
                 //             // keep this for future reference, it does work, but we don't currently need it since showThread is more what the user will want.
                 //             // ===============
-                //             // let res: J.GetActPubObjectResponse = await S.util.ajax<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
+                //             // let res = await S.util.ajax<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
                 //             //     url: inReplyTo
                 //             // });
 

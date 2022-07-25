@@ -289,7 +289,7 @@ export class Encryption {
                 pubKeyStr = JSON.stringify(publicKeyDat);
             }
 
-            let res: J.SavePublicKeyResponse = await S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+            let res = await S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                 keyJson: pubKeyStr
             });
             if (showConfirm) {

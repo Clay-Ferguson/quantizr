@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 export interface CompIntf {
     attribs: any;
+    debug: boolean;
 
     getId(prefix?: string): string;
     onMount(func: Function): void;

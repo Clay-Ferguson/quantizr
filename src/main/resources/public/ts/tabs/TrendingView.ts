@@ -39,7 +39,7 @@ export class TrendingView extends AppTab {
     }
 
     refresh = async () => {
-        let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        let res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: null,
             trending: true,
             feed: true,

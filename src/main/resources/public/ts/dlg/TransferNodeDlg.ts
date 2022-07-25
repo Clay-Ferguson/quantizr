@@ -77,7 +77,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        let res: J.TransferNodeResponse = await S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
+        let res = await S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
             recursive: this.getState<LS>().recursive,
             nodeId: node.id,
             fromUser: this.fromUserState.getValue(),

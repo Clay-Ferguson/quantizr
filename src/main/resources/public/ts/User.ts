@@ -81,7 +81,7 @@ export class User {
             S.util.loadAnonPageHome(null);
         } else {
             try {
-                let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
@@ -247,7 +247,7 @@ export class User {
     }
 
     checkMessages = async (): Promise<void> => {
-        let res: J.CheckMessagesResponse = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
+        let res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
             dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
                 s.newMessageCount = res.numNew;
@@ -257,7 +257,7 @@ export class User {
     }
 
     queryUserProfile = async (userId: string): Promise<void> => {
-        let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId
         });
 

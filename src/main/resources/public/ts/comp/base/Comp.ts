@@ -203,19 +203,19 @@ export abstract class Comp implements CompIntf {
         if (!children || children.length === 0) return null;
 
         return children.map((child: any) => {
-            if (typeof child === "string" || child instanceof String) {
+            if (child instanceof Comp) {
+                try {
+                    return child.create();
+                }
+                catch (e) {
+                    console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
+                    return null;
+                }
+            }
+            else {
                 return child;
             }
-
-            if (!child) return null;
-            try {
-                return child.create();
-            }
-            catch (e) {
-                console.error("Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
-                return null;
-            }
-        }).filter(child => !!child);
+        }).filter(c => !!c);
     }
 
     focus(): void {

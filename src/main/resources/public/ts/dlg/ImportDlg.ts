@@ -50,7 +50,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        let res: J.ImportResponse = await S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
+        let res = await S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
             nodeId: hltNode.id,
             sourceFileName: this.fileNameState.getValue()
         });

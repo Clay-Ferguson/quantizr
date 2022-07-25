@@ -255,7 +255,7 @@ export class Edit {
             }
 
             if (nodeInsertTarget) {
-                let res: J.InsertNodeResponse = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                let res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: false,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -267,7 +267,7 @@ export class Edit {
                     this.insertNodeResponse(res, state);
                 }
             } else {
-                let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -292,7 +292,7 @@ export class Edit {
         }
         else {
             if (nodeInsertTarget) {
-                let res: J.InsertNodeResponse = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                let res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: true,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -302,7 +302,7 @@ export class Edit {
                 });
                 this.insertNodeResponse(res, state);
             } else {
-                let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -398,7 +398,7 @@ export class Edit {
         // console.log("refreshNodeFromServer: " + nodeId);
         let state = store.getState();
 
-        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
             siblingOffset: 0,
@@ -515,7 +515,7 @@ export class Edit {
 
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "up"
             });
@@ -533,7 +533,7 @@ export class Edit {
 
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "down"
             });
@@ -549,7 +549,7 @@ export class Edit {
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "top"
             });
@@ -565,7 +565,7 @@ export class Edit {
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "bottom"
             });
@@ -627,7 +627,7 @@ export class Edit {
             return;
         }
 
-        let res: J.InitNodeEditResponse = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
+        let res = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         });
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
@@ -698,7 +698,7 @@ export class Edit {
 
     selectAllNodes = async (state: AppState): Promise<void> => {
         const highlightNode = S.nodeUtil.getHighlightedNode(state);
-        let res: J.SelectAllNodesResponse = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
+        let res = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
         S.nodeUtil.selectAllNodes(res.nodeIds);
@@ -734,7 +734,7 @@ export class Edit {
             "btn-danger", "alert alert-info", state);
         await dlg.open();
         if (dlg.yes) {
-            let res: J.JoinNodesResponse = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+            let res = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
                 nodeIds: selNodesArray
             });
             this.joinNodesResponse(res, state);
@@ -752,7 +752,7 @@ export class Edit {
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
-            let res: J.DeleteNodesResponse = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: null,
                 childrenOnly: false,
                 bulkDelete: true
@@ -800,7 +800,7 @@ export class Edit {
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
-            let res: J.DeleteNodesResponse = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: selNodesArray,
                 childrenOnly: false,
                 bulkDelete: false
@@ -912,7 +912,7 @@ export class Edit {
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
-        let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        let res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
             nodeIds: state.nodesToMove,
             location
@@ -941,7 +941,7 @@ export class Edit {
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
             } else {
-                let res: J.InsertBookResponse = await S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
+                let res = await S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
                     truncated: S.user.isTestUserAccount(state)
@@ -992,7 +992,7 @@ export class Edit {
             return;
         }
 
-        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
@@ -1040,7 +1040,7 @@ export class Edit {
             return;
         }
 
-        let res: J.SplitNodeResponse = await S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
+        let res = await S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             splitType: splitType,
             nodeId: node.id,
             delimiter
@@ -1073,7 +1073,7 @@ export class Edit {
     addLinkBookmark = async (content: any, audioUrl: string, state: AppState): Promise<void> => {
         state = appState(state);
 
-        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
             newNodeName: "",
@@ -1093,7 +1093,7 @@ export class Edit {
 
     // like==false means 'unlike'
     likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
-        let res: J.LikeNodeResponse = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
+        let res = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
         }, true);
@@ -1124,7 +1124,7 @@ export class Edit {
             await S.edit.toggleEditMode(state);
         }
 
-        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId,
             newNodeName: "",
@@ -1145,7 +1145,7 @@ export class Edit {
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = appState(state);
 
-        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
             newNodeName: "",
@@ -1171,7 +1171,7 @@ export class Edit {
     addCalendarEntry = async (initDate: number, state: AppState) => {
         state = appState(state);
 
-        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: state.fullScreenCalendarId,
             newNodeName: "",
@@ -1199,7 +1199,7 @@ export class Edit {
         // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = appState(null);
 
-        let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        let res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
             location

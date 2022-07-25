@@ -262,7 +262,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     openFile = async (item: string, shortName: string, hash: string) => {
         // console.log(S.util.prettyPrint(item));
-        let res: J.GetIPFSContentResponse = await S.util.ajax<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
+        let res = await S.util.ajax<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
             id: item
         });
 
@@ -284,7 +284,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // });
 
         setTimeout(async () => {
-            let res: J.DeleteMFSFileResponse = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
+            let res = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
                 item
             });
 
@@ -305,7 +305,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             // ensure this is never empty string. Server needs to get null instead of empty string.
             if (!folder) folder = null;
 
-            let res: J.GetIPFSFilesResponse = await S.util.ajax<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
+            let res = await S.util.ajax<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
                 folder
             });
 
