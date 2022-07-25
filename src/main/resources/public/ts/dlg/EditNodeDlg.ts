@@ -723,7 +723,7 @@ export class EditNodeDlg extends DialogBase {
         this.super_close();
         if (this.mode === DialogMode.EMBED) {
             EditNodeDlg.embedInstance = null;
-            dispatch("Action_endEditing", (s: AppState): AppState => {
+            dispatch("endEditing", (s: AppState): AppState => {
                 s.editNode = null;
                 s.editNodeOnTab = null;
                 s.editNodeReplyToId = null;

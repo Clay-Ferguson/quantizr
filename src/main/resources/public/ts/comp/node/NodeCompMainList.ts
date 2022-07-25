@@ -16,7 +16,6 @@ export class NodeCompMainList extends Div {
     }
 
     preRender(): void {
-        // todo-0: are we being consistent about when we call useSelector like this across the app?
         let state = useAppState();
 
         let children: Comp[] = [];

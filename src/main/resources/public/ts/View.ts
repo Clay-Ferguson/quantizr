@@ -244,7 +244,7 @@ export class View {
         }
 
         if (newNode) {
-            dispatch("Action_FastRefresh", (s: AppState): AppState => {
+            dispatch("FastRefresh", (s: AppState): AppState => {
                 return s;
             });
         }
@@ -390,7 +390,7 @@ export class View {
                     m.message = dlgDescription + "\n\n" + m.message;
                 }
 
-                dispatch("Action_showServerInfo", (s: AppState): AppState => {
+                dispatch("showServerInfo", (s: AppState): AppState => {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
                     s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
                     s.serverInfoText = m.message;

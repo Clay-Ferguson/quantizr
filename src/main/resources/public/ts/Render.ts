@@ -242,7 +242,7 @@ export class Render {
         let res = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
-        dispatch("Action_ShowCalendar", (s: AppState): AppState => {
+        dispatch("ShowCalendar", (s: AppState): AppState => {
             s.fullScreenCalendarId = nodeId;
             s.calendarData = S.util.buildCalendarData(res.items);
             return s;
@@ -425,7 +425,7 @@ export class Render {
             }
             // console.log("Data:" + S.util.prettyPrint(res));
 
-            dispatch("Action_RenderPage", (s: AppState): AppState => {
+            dispatch("RenderPage", (s: AppState): AppState => {
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {
@@ -549,7 +549,7 @@ export class Render {
                         /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
                         PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
                             setTimeout(() => {
-                                dispatch("Action_settingVisible", (s: AppState): AppState => {
+                                dispatch("settingVisible", (s: AppState): AppState => {
                                     s.rendering = false;
                                     this.allowFadeInId = true;
                                     return s;
@@ -609,7 +609,7 @@ export class Render {
                     ids
                 }, true);
 
-                dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
+                dispatch("updateNodeMetaInfo", (s: AppState): AppState => {
                     if (s.node && s.node.children) {
                         s.node.hasChildren = true;
                         this.updateHasChildren(s.node, res.nodeIntf);
@@ -770,7 +770,7 @@ export class Render {
             node = S.nodeUtil.getHighlightedNode(state);
         }
 
-        dispatch("Action_ShowGraph", (s: AppState): AppState => {
+        dispatch("ShowGraph", (s: AppState): AppState => {
             s.fullScreenGraphId = node.id;
             s.graphSearchText = searchText;
             return s;

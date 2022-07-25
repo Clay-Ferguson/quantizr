@@ -259,7 +259,7 @@ export class Quanta {
 
             window.addEventListener("orientationchange", () => {
                 // we force the page to re-render with an all new state.
-                dispatch("Action_orientationChange", (s: AppState): AppState => {
+                dispatch("orientationChange", (s: AppState): AppState => {
                     return s;
                 });
             });
@@ -321,7 +321,7 @@ export class Quanta {
                     appGuid: Quanta.appGuid
                 }, true);
                 if (res.config) {
-                    dispatch("Action_configUpdates", (s: AppState): AppState => {
+                    dispatch("configUpdates", (s: AppState): AppState => {
                         s.config = res.config;
                         if (s.config.userMessage) {
                             S.util.showMessage(s.config.userMessage, "");

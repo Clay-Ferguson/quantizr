@@ -1,4 +1,4 @@
-import { getAppState, dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Span } from "./comp/core/Span";
@@ -59,7 +59,7 @@ export class NodeUtil {
 
     clearSelNodes = (state: AppState = null) => {
         state = getAppState(state);
-        dispatch("Action_ClearSelections", (s: AppState): AppState => {
+        dispatch("ClearSelections", (s: AppState): AppState => {
             s.selectedNodes.clear();
             return s;
         });

@@ -248,7 +248,7 @@ export class User {
     checkMessages = async () => {
         let res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
-            dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
+            dispatch("SetNewMessageCount", (s: AppState): AppState => {
                 s.newMessageCount = res.numNew;
                 return s;
             });
@@ -262,7 +262,7 @@ export class User {
 
         // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
         if (res?.userProfile) {
-            dispatch("Action_SetUserProfile", (s: AppState): AppState => {
+            dispatch("SetUserProfile", (s: AppState): AppState => {
                 s.userProfile = res.userProfile;
                 return s;
             });

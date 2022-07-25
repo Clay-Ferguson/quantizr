@@ -115,7 +115,7 @@ export class Edit {
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */
                 if (!forceUsePopup && S.quanta.activeTab === C.TAB_FEED) {
-                    dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
+                    dispatch("StartEditingInFeed", (s: AppState): AppState => {
                         s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = S.quanta.activeTab;
                         s.editNode = res.nodeInfo;
@@ -130,7 +130,7 @@ export class Edit {
                     const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state, null, afterEditAction);
                     dlg.open();
                 } else {
-                    dispatch("Action_startEditing", (s: AppState): AppState => {
+                    dispatch("startEditing", (s: AppState): AppState => {
                         s.editNode = res.nodeInfo;
                         s.editNodeOnTab = S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;
@@ -147,7 +147,7 @@ export class Edit {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState) => {
         if (S.util.checkSuccess("Move nodes", res)) {
-            dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+            dispatch("SetNodesToMove", (s: AppState): AppState => {
                 s.nodesToMove = null;
                 return s;
             });
@@ -415,7 +415,7 @@ export class Edit {
             return;
         }
 
-        dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+        dispatch("RefreshNodeFromServer", (s: AppState): AppState => {
             // if the node is our page parent (page root)
             if (res.node.id === s.node.id) {
                 // preserve the children, when updating the root node, because they will not have been obtained
@@ -814,7 +814,7 @@ export class Edit {
                 }
 
                 if (state.node.children.length === 0) {
-                    dispatch("Action_NodeDeleteComplete", (s: AppState): AppState => {
+                    dispatch("NodeDeleteComplete", (s: AppState): AppState => {
                         // remove this node from all data from all the tabs, so they all refresh without
                         // the deleted node without being queries from the server again.
                         selNodesArray.forEach(id => {
@@ -826,7 +826,7 @@ export class Edit {
                     S.view.jumpToId(state.node.id);
                 }
                 else {
-                    dispatch("Action_UpdateChildren", (s: AppState): AppState => {
+                    dispatch("UpdateChildren", (s: AppState): AppState => {
                         selNodesArray.forEach(id => {
                             S.srch.removeNodeById(id, s);
                         });
@@ -874,13 +874,13 @@ export class Edit {
         });
 
         // I'll leave this here commented until I actually TEST deleting calendar items again.
-        // dispatch("Action_UpdateCalendarData", (s: AppState): AppState => {
+        // dispatch("UpdateCalendarData", (s: AppState): AppState => {
         //     return appState;
         // });
     }
 
     undoCutSelNodes = () => {
-        dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+        dispatch("SetNodesToMove", (s: AppState): AppState => {
             s.nodesToMove = null;
             return s;
         });
@@ -889,7 +889,7 @@ export class Edit {
     cutSelNodes = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, null);
 
-        dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+        dispatch("SetNodesToMove", (s: AppState): AppState => {
             S.nav.setNodeSel(true, id, s);
             let selNodesArray = S.nodeUtil.getSelNodeIdsArray(s);
             s.nodesToMove = selNodesArray;
@@ -952,7 +952,7 @@ export class Edit {
     }
 
     // showIpfsTab = () => {
-    //     dispatch("Action_showIpfsTab", (s: AppState): AppState => {
+    //     dispatch("showIpfsTab", (s: AppState): AppState => {
     //         s.showIpfsTab = true;
     //         setTimeout(() => {
     //             S.tabUtil.selectTab(C.TAB_IPFSVIEW);
@@ -1098,7 +1098,7 @@ export class Edit {
             like
         }, true);
 
-        dispatch("Action_likeNode", (s: AppState): AppState => {
+        dispatch("likeNode", (s: AppState): AppState => {
             if (!node.likes) {
                 node.likes = [];
             }
@@ -1208,7 +1208,7 @@ export class Edit {
 
         if (refreshCurrentNode) {
             if (S.util.checkSuccess("Move nodes", res)) {
-                dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+                dispatch("SetNodesToMove", (s: AppState): AppState => {
                     S.util.removeHistorySubItem(sourceNodeId);
                     s.nodesToMove = null;
                     return s;

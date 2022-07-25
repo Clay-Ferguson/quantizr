@@ -29,7 +29,7 @@ export class Search {
             accessOption
         });
         if (res.searchResults?.length > 0) {
-            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            dispatch("RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_SHARES);
@@ -60,7 +60,7 @@ export class Search {
         });
 
         if (res.nodes && res.nodes.length > 0) {
-            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+            dispatch("RenderThreadResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_THREAD);
@@ -80,7 +80,7 @@ export class Search {
             });
         }
         else {
-            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+            dispatch("RenderThreadResults", (s: AppState): AppState => {
                 let data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
                 data.rsInfo.endReached = true;
@@ -96,7 +96,7 @@ export class Search {
         });
 
         if (res.nodes && res.nodes.length > 0) {
-            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+            dispatch("RenderThreadResults", (s: AppState): AppState => {
                 s.highlightSearchNodeId = node.id;
 
                 S.domUtil.focusId(C.TAB_THREAD);
@@ -169,7 +169,7 @@ export class Search {
                 successCallback();
             }
 
-            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            dispatch("RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_SEARCH);
                 S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
@@ -236,7 +236,7 @@ export class Search {
             return;
         }
 
-        dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
+        dispatch("RenderTimelineResults", (s: AppState): AppState => {
             S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
             let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
@@ -293,7 +293,7 @@ export class Search {
             feedData.props.refreshCounter++;
         }
 
-        dispatch("Action_RefreshFeed", (s: AppState): AppState => {
+        dispatch("RefreshFeed", (s: AppState): AppState => {
             feedData.props.feedLoading = true;
             return s;
         });
@@ -326,7 +326,7 @@ export class Search {
             applyAdminBlocks: feedData.props.applyAdminBlocks
         });
 
-        dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
+        dispatch("RenderFeedResults", (s: AppState): AppState => {
             feedData.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
@@ -413,7 +413,7 @@ export class Search {
         });
 
         if (res.searchResults?.length > 0) {
-            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            dispatch("RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
@@ -455,7 +455,7 @@ export class Search {
         });
 
         if (res.searchResults && res.searchResults.length > 0) {
-            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            dispatch("RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
@@ -553,7 +553,7 @@ export class Search {
             S.view.jumpToId(id);
 
             if (this.idToNodeMap.get(id)) {
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                dispatch("RenderSearchResults", (s: AppState): AppState => {
                     s.highlightSearchNodeId = id;
                     return s;
                 });

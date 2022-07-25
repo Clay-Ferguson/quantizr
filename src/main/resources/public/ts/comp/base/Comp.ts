@@ -369,7 +369,7 @@ export abstract class Comp implements CompIntf {
         let stack = "";
         let comp: Comp = this;
         while (comp) {
-            stack = comp.getCompClass() + (stack ? " -> " : "") + stack;
+            stack = comp.getCompClass() + (stack ? " / " : "") + stack;
             comp = comp.parent;
         }
         return stack;

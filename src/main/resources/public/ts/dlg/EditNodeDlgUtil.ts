@@ -289,7 +289,7 @@ export class EditNodeDlgUtil {
             dlg.mergeState<LS>({ node: state.node });
 
             if (dlg.mode === DialogMode.EMBED) {
-                dispatch("Action_uploadDeleted", (s: AppState): AppState => {
+                dispatch("uploadDeleted", (s: AppState): AppState => {
                     s.editNode = state.node;
                     return s;
                 });

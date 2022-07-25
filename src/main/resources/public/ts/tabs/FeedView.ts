@@ -325,7 +325,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 title: "Include nodes posted by your friends"
             }, {
                 setValue: (checked: boolean) => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                    dispatch("SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterFriends = checked;
                         return s;
                     });
@@ -339,7 +339,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 title: "Include nodes shares specifically to you (by name)"
             }, {
                 setValue: (checked: boolean) => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                    dispatch("SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterToMe = checked;
                         return s;
                     });
@@ -353,7 +353,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 title: "Include nodes created by you"
             }, {
                 setValue: (checked: boolean) => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                    dispatch("SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterFromMe = checked;
                         return s;
                     });
@@ -367,7 +367,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 title: "Include nodes shared to 'public' (everyone)"
             }, {
                 setValue: (checked: boolean) => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                    dispatch("SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterToPublic = checked;
                         return s;
                     });
@@ -381,7 +381,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 title: "Include only nodes from accounts on this server."
             }, {
                 setValue: (checked: boolean) => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                    dispatch("SetFeedFilterType", (s: AppState): AppState => {
                         this.data.props.feedFilterLocalServer = checked;
 
                         /* to help keep users probably get what they want, set 'public' also to true as the default
@@ -408,7 +408,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             feedData.props.feedDirtyList = null;
 
             // all the data in feedData will have been updated by forceFeedItem to just force react to render now.
-            dispatch("Action_ForceFeedResults", (s: AppState): AppState => {
+            dispatch("ForceFeedResults", (s: AppState): AppState => {
                 return s;
             });
         }

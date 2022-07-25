@@ -49,7 +49,7 @@ export class Menu extends Div {
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         let activeName = expanded ? this.name : null;
 
-                        dispatch("Action_setActiveMenu", (s: AppState): AppState => {
+                        dispatch("setActiveMenu", (s: AppState): AppState => {
                             s.activeMenu = activeName;
                             return s;
                         });

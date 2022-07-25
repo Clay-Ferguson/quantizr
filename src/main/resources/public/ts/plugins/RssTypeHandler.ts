@@ -77,7 +77,7 @@ export class RssTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
-    rende = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
 
         // console.log("RSSTypeHandler.render");
         let feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
@@ -131,13 +131,13 @@ export class RssTypeHandler extends TypeBase {
                 if (!res?.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
-                    dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+                    dispatch("RSSUpdated", (s: AppState): AppState => {
                         s.rssFeedCache[feedSrcHash] = "failed";
                         return s;
                     });
                 }
                 else {
-                    dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+                    dispatch("RSSUpdated", (s: AppState): AppState => {
                         S.domUtil.focusId(C.TAB_MAIN);
                         S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
                         setTimeout(() => {
@@ -178,7 +178,7 @@ export class RssTypeHandler extends TypeBase {
             className: "float-end"
         }, {
             setValue: (checked: boolean) => {
-                dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
+                dispatch("SetHeadlinesFlag", (s: AppState): AppState => {
                     S.edit.setRssHeadlinesOnly(s, checked);
                     return s;
                 });
@@ -281,7 +281,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     setPage = (feedSrcHash: string, state: AppState, page: number) => {
-        dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+        dispatch("RSSUpdated", (s: AppState): AppState => {
             // deleting will force a requery from the server
             delete s.rssFeedCache[feedSrcHash];
             s.rssFeedPage[feedSrcHash] = page;

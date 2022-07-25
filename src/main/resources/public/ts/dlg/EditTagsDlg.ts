@@ -48,7 +48,7 @@ export class EditTagsDlg extends DialogBase {
     save = () => {
         this.appState.userProfile.userTags = this.tagsState.getValue();
 
-        dispatch("Action_SetUserProfile", (s: AppState): AppState => {
+        dispatch("SetUserProfile", (s: AppState): AppState => {
             s.userProfile = this.appState.userProfile;
             return s;
         });
