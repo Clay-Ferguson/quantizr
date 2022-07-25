@@ -8,7 +8,7 @@ export const initialState = new AppState();
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
  */
-export function rootReducer(state: AppState = initialState, /* action: Action<any> */ action: AppAction) {
+export function rootReducer(state: AppState = initialState, action: AppAction) {
 
     if (!state) {
         console.error("rootReducer called with null state: " + action);

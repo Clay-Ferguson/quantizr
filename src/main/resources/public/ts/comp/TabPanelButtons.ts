@@ -55,7 +55,7 @@ export class TabPanelButtons extends Div {
         return new Li(null, {
             className: "nav-item",
             style: { display: data.isVisible(state) ? "inline" : "none" },
-            onClick: (event) => {
+            onClick: event => {
                 event.stopPropagation();
                 event.preventDefault();
                 S.tabUtil.selectTab(data.id);

@@ -83,7 +83,7 @@ export class App extends Main {
                     // }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
                     new IconButton("fa-angle-double-up", null, {
-                        onClick: e => {
+                        onClick: () => {
                             S.view.scrollAllTop(state);
                         },
                         title: "Scroll to Top"
@@ -121,7 +121,7 @@ export class App extends Main {
         if (state.mobileMode) {
             let menuButton = null;
             menuButton = new IconButton("fa-bars", "Menu", {
-                onClick: e => {
+                onClick: () => {
                     S.nav.showMainMenu(state);
                 },
                 id: "mainMenu"
@@ -142,7 +142,7 @@ export class App extends Main {
                 }, "form-switch form-check-inline") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
-                onClick: e => { S.nav.login(state); }
+                onClick: () => { S.nav.login(state); }
             }, "btn-primary marginRight", "off") : null;
 
             let logo = new Img(this.getId("logo_"), {
@@ -152,16 +152,15 @@ export class App extends Main {
                 title: "Main application Landing Page"
             });
 
-            let messagesSuffix = state.newMessageCount > 0
-                ? " (" + state.newMessageCount + ")" : "";
-
+            // let messagesSuffix = state.newMessageCount > 0
+            //     ? " (" + state.newMessageCount + ")" : "";
             // let appName = new Span(g_brandingAppName + messagesSuffix, {
             //     className: "logo-text",
             //     onClick: e => { S.util.loadAnonPageHome(null); },
             //     title: "Go to Portal Home Node"
             // });
 
-            let title = !state.isAnonUser ? new Button("@" + state.userName, e => S.nav.navHome(state), null, "btn-secondary") : null;
+            let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
             comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
         }
         return comp;

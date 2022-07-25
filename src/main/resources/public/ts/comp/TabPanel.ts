@@ -34,9 +34,7 @@ export class TabPanel extends Div {
         }, this.buildTabs(state));
 
         let scrollUpButton = state.mobileMode ? new IconButton("fa-angle-double-up", null, {
-            onClick: e => {
-                S.view.scrollAllTop(state);
-            },
+            onClick: e => S.view.scrollAllTop(state),
             title: "Scroll to Top"
         }, "btn-primary scrollTopButtonLowerRight", "off") : null;
 
@@ -48,12 +46,8 @@ export class TabPanel extends Div {
     }
 
     buildTabs = (state: AppState): AppTab[] => {
-        let tabs: AppTab[] = [];
-        for (let tab of state.tabData) {
-            if (tab.isVisible(state)) {
-                tabs.push(tab.constructView(tab));
-            }
-        }
-        return tabs;
+        return state.tabData.map(tab => {
+            return tab.isVisible(state) ? tab.constructView(tab) : null
+        }).filter(c => !!c)
     }
 }

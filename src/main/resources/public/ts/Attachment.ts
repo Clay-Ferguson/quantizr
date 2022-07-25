@@ -18,11 +18,10 @@ export class Attachment {
             return;
         }
 
-        const dlg = new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
+        new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
             S.view.jumpToId(node.id);
             // S.quanta.refresh(state);
-        });
-        dlg.open();
+        }).open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and
         nothing else is required. Server side processing is still in place for it
@@ -40,8 +39,7 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
-        dlg.open();
+        new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state).open();
     };
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
@@ -54,15 +52,14 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        const dlg = new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc, state);
-        dlg.open();
+        new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc, state).open();
     };
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (node) {
-            let dlg: ConfirmDlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger", state);
+            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger", state);
             await dlg.open();
             if (dlg.yes) {
                 await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {

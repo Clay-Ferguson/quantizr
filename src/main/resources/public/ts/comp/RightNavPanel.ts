@@ -57,9 +57,7 @@ export class RightNavPanel extends Div {
         // hack for now. I decided showing the header image isn't very attractive when user has a narrow
         // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
         let headerImg = null;
-
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
-
         let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
 
         if (displayName && state.node) {
@@ -76,7 +74,7 @@ export class RightNavPanel extends Div {
 
         let clipboardPasteButton = state.userPreferences.editMode ? new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
-            onClick: e => {
+            onClick: () => {
                 // todo-1: would be nice if this detected an image and saved as attachment.
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
@@ -85,7 +83,7 @@ export class RightNavPanel extends Div {
 
         let addNoteButton = !state.isAnonUser ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
-            onClick: async (e) => {
+            onClick: async () => {
                 let content = null;
                 if (S.util.ctrlKeyCheck()) {
                     content = await (navigator as any).clipboard.readText();
@@ -186,7 +184,6 @@ export class RightNavPanel extends Div {
         if (!state.userProfile) return null;
 
         let src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
-
         if (src) {
             let attr: any = {
                 className: "headerImageRHS",

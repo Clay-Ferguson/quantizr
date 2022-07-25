@@ -17,7 +17,7 @@ export class User {
 
     closeAccount = async (): Promise<void> => {
         let state = store.getState();
-        let dlg: ConfirmDlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
+        let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             null, null, state);
         await dlg.open();
         if (!dlg.yes) {

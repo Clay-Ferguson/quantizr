@@ -54,14 +54,6 @@ export class AppTab<PropType = any> extends Div {
         }
     }
 
-    // Let's keep this code, but it's currently unused
-    // recordCurrentScrollPos = (): void => {
-    //     let elm = this.getRef();
-    //     if (elm) {
-    //         this.data.scrollPos = elm.scrollTop;
-    //     }
-    // }
-
     domPreUpdateEvent = (): void => {
         let elm = this.getRef();
         if (elm) {

@@ -211,7 +211,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                     // their fingers and hope for the best with the ProtocolLabs server.
                                     else {
                                         let state = store.getState();
-                                        let dlg: ConfirmDlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null, state);
+                                        let dlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null, state);
                                         await dlg.open();
                                         if (dlg.yes) {
                                             window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
@@ -245,7 +245,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                             title: "Delete",
                             onClick: async () => {
                                 let state = store.getState();
-                                let dlg: ConfirmDlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
+                                let dlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
                                     "btn-danger", "alert alert-info", state);
                                 await dlg.open();
                                 if (dlg.yes) {

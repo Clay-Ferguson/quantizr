@@ -414,6 +414,7 @@ export class Edit {
         if (!res?.node) {
             return;
         }
+
         dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
             // if the node is our page parent (page root)
             if (res.node.id === s.node.id) {
@@ -423,12 +424,10 @@ export class Edit {
                 s.node = res.node;
             }
             // otherwise a child
-            else if (s.node && s.node.children) {
+            else if (s.node?.children) {
                 // replace the old node with the new node.
-                s.node.children.forEach((node, i) => {
-                    if (node.id === res.node.id) {
-                        s.node.children[i] = res.node;
-                    }
+                s.node.children = s.node.children.map(node => {
+                    return node.id === res.node.id ? res.node : node;
                 });
             }
             S.nodeUtil.updateNodeMap(res.node, s);
@@ -708,7 +707,7 @@ export class Edit {
     clearInbox = async (state: AppState): Promise<void> => {
         S.nodeUtil.clearSelNodes(state);
 
-        let dlg: ConfirmDlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
+        let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
@@ -731,7 +730,7 @@ export class Edit {
         }
 
         let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
+        let dlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
             "btn-danger", "alert alert-info", state);
         await dlg.open();
         if (dlg.yes) {
@@ -749,7 +748,7 @@ export class Edit {
         let state = store.getState();
 
         let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
-        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
+        let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
@@ -797,7 +796,7 @@ export class Edit {
         }
 
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
-        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
+        let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
@@ -932,7 +931,7 @@ export class Edit {
     }
 
     insertBookWarAndPeace = async (state: AppState): Promise<void> => {
-        let dlg: ConfirmDlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
+        let dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
             "Confirm", null, null, state);
         await dlg.open();
         if (dlg.yes) {

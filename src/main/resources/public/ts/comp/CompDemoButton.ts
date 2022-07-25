@@ -11,6 +11,7 @@ interface LS { // Local State
     counter?: number;
 }
 
+// todo-0: I think call classes containing "Demo" can be removed since we now have the "Tutorial" class.
 export class CompDemoButton extends Div {
 
     constructor(public idx: number) {

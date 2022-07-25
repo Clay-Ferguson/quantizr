@@ -219,7 +219,7 @@ export class EditNodeDlgUtil {
     }
 
     deletePropertiesButtonClick = async (dlg: EditNodeDlg): Promise<void> => {
-        let confirmDlg: ConfirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
+        let confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             "btn-danger", "alert alert-danger", dlg.appState);
         await confirmDlg.open();
         if (confirmDlg.yes) {

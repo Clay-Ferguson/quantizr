@@ -16,42 +16,33 @@ export class BreadcrumbsPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
-        this.setChildren([
-            this.createBreadcrumbs(state)
-        ]);
+        this.setChildren([this.createBreadcrumbs(state)]);
     }
 
     createBreadcrumbs = (state: AppState): Comp => {
         let children = [];
 
         if (state.breadcrumbs?.length > 0) {
-            state.breadcrumbs.forEach(bc => {
+            children = state.breadcrumbs.map(bc => {
                 if (bc.id === state.node.id) {
                     // ignore root node or page root node. we don't need it.
+                    return null;
                 }
                 else if (bc.id) {
                     if (!bc.name) {
                         const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(bc.type);
-                        if (typeHandler) {
-                            bc.name = typeHandler.getName();
-                        }
-                        else {
-                            bc.name = "???";
-                        }
+                        bc.name = typeHandler ? typeHandler.getName() : "???";
                     }
 
-                    let name = S.util.removeHtmlTags(bc.name);
-
-                    children.push(new Span(name, {
+                    return new Span(S.util.removeHtmlTags(bc.name), {
                         onClick: () => S.view.jumpToId(bc.id),
                         className: "breadcrumbItem"
-                    }));
+                    });
                 }
                 else {
-                    children.push(new Span("...", { className: "marginRight" }));
+                    return new Span("...", { className: "marginRight" });
                 }
-            });
+            }).filter(c => !!c);
         }
 
         if (children.length > 0 && !state.userPreferences.showParents) {

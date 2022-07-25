@@ -360,7 +360,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         for each file */
         if (!this.importMode && !this.zipQuestionAnswered && this.hasAnyZipFiles()) {
             this.zipQuestionAnswered = true;
-            let dlg: ConfirmDlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
+            let dlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
                 "Explode Zips?", null, null, this.appState);
 
             await dlg.open();
