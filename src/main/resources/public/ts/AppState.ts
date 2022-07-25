@@ -39,10 +39,6 @@ export class AppState {
     inlineEditId: string;
     inlineEditVal: string;
 
-    // for testing in AppDemo
-    counter: number = 0;
-    compDemoIdActive: number = -1;
-
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
     displayName: string = "";

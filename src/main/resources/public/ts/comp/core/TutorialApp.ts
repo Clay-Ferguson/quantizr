@@ -21,16 +21,6 @@ export class TutorialApp extends Comp {
     constructor() {
         super();
         this.mergeState<LS>({ content: "Quanta GUI Framework works!" });
-
-        setTimeout(() => {
-            let ref = this.getRef();
-            if (!ref) {
-                console.log("Unable to get ref.");
-            }
-            else {
-                console.log("ref loaded ok");
-            }
-        }, 1000);
     }
 
     buttonClick = () => {
@@ -41,7 +31,7 @@ export class TutorialApp extends Comp {
         return this.tag("div", null, [
             this.getState<LS>().content,
             new Div(null, null, [
-                new Anchor("https://drudgereport.com", "My Link")
+                new Anchor("https://someserver.com", "My Link")
             ]),
             new Div("Child Div", null, [
                 new Ul("Unordered List", null, [

@@ -286,7 +286,7 @@ export class Quanta {
 
             Log.log("creating App");
             // This is the root react App component that contains the entire application
-            this.app = new App(); // new AppDemo
+            this.app = new App(); 
 
             console.log("DOM app element set.");
             this.app.updateDOM(store, "app");
