@@ -8,7 +8,6 @@ import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
 import { HelpButton } from "../comp/core/HelpButton";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
-import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

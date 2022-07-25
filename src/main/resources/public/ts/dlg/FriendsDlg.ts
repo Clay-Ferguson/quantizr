@@ -46,7 +46,6 @@ export class FriendsDlg extends DialogBase {
         });
 
         (async () => {
-            // todo-0: we can do ALL ajax like this and not specify the type on 'res' but still be typesafe
             let res = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
             this.mergeState<LS>({
                 friends: res.friends,

@@ -18,8 +18,6 @@ export class ManageAccountDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state: any = this.getState<LS>();
-
         return [
             new ButtonBar([
                 !this.appState.isAdminUser ? new Button("Close Account", this.closeAccount) : null,

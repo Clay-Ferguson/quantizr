@@ -30,7 +30,6 @@ interface Tag {
 export class SelectTagsDlg extends DialogBase {
     matchAny = false;
     matchAll = false;
-
     indenting = false;
 
     /* modeOption = search | edit */
@@ -42,16 +41,16 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     makeDefaultSelectedTags = (): Set<string> => {
-        let selectedTags = new Set<string>();
+        let tagSet = new Set<string>();
 
         if (this.curTags) {
             let tags = this.curTags.split(/ /);
             tags.forEach(t => {
-                selectedTags.add(t);
+                tagSet.add(t);
             });
         }
 
-        return selectedTags;
+        return tagSet;
     }
 
     renderDlg(): CompIntf[] {
@@ -145,8 +144,8 @@ export class SelectTagsDlg extends DialogBase {
             if (line?.startsWith("#")) {
                 let tag = null;
                 let description = null;
-
                 let delimIdx = line.indexOf(":");
+
                 if (delimIdx !== -1) {
                     tag = line.substring(0, delimIdx);
                     description = line.substring(delimIdx + 1).trim();
@@ -172,8 +171,8 @@ export class SelectTagsDlg extends DialogBase {
 
     createTagsPickerList = (): Div => {
         let state = this.getState();
-
         let div: Div = null;
+        
         if (state.tags?.length > 0) {
             div = new Div();
 
