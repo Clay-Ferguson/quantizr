@@ -19,7 +19,7 @@ import quanta.response.GetOpenGraphResponse;
 public class JSoupService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 
-	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(500);
+	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
 
 	public static final String BROWSER_USER_AGENT =
 			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
@@ -27,26 +27,29 @@ public class JSoupService extends ServiceBase {
 	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();
 		OpenGraph openGraph = null;
-		synchronized (ogCache) {
-			openGraph = ogCache.get(ogReq.getUrl());
-		}
 
-		if (ok(openGraph)) {
-			res.setOpenGraph(openGraph);
-		} else {
-			try {
-				openGraph = parseOpenGraph(ogReq.getUrl());
-				if (ok(openGraph)) {
-					synchronized (ogCache) {
-						ogCache.put(ogReq.getUrl(), openGraph);
-					}
-				}
+		// if the url is cached (even if null) then return whatever's in the cache
+		synchronized (ogCache) {
+			if (ogCache.containsKey(ogReq.getUrl())) {
+				openGraph = ogCache.get(ogReq.getUrl());
 				res.setOpenGraph(openGraph);
-			} catch (Exception e) {
-				// ignore this error, for now (todo-2)
-				// ExUtil.error(log, "failed parsing OpenGraph", e);
+				return res;
 			}
 		}
+
+		try {
+			openGraph = parseOpenGraph(ogReq.getUrl());
+		} catch (Exception e) {
+			// ignore this error, for now (todo-2)
+			// ExUtil.error(log, "failed parsing OpenGraph", e);
+		}
+		
+		// we allow storing a null if we got back a null. Cache it so we don't try again.
+		synchronized (ogCache) {
+			ogCache.put(ogReq.getUrl(), openGraph);
+		}
+
+		res.setOpenGraph(openGraph);
 		return res;
 	}
 
