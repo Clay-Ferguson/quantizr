@@ -17,7 +17,6 @@ import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
-    _UID_PARENT_ROWID_PREFIX: string = "parent_";
 
     login = (state: AppState) => {
         new LoginDlg(null, state).open();
@@ -61,17 +60,17 @@ export class Nav {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             S.util.showPageMessage("The node above is not shared.");
         } else {
-            S.render.renderPageFromData(res, scrollToTop, id, true, true);
+            S.render.renderPage(res, scrollToTop, id, true, true);
         }
     }
 
     navOpenSelectedNode = (state: AppState) => {
-        const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        if (!currentSelNode) return;
+        const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        if (!selNode) return;
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
         }
-        S.nav.openNodeById(null, currentSelNode.id, state);
+        S.nav.openNodeById(null, selNode.id, state);
     }
 
     navToPrev = () => {
@@ -155,10 +154,10 @@ export class Nav {
      * turn of row selection DOM element of whatever row is currently selected
      */
     getSelectedDomElement = (state: AppState): HTMLElement => {
-        let currentSelNode = S.nodeUtil.getHighlightedNode(state);
-        if (currentSelNode) {
+        let selNode = S.nodeUtil.getHighlightedNode(state);
+        if (selNode) {
             /* get node by node identifier */
-            const node: J.NodeInfo = state.idToNodeMap.get(currentSelNode.id);
+            const node: J.NodeInfo = state.idToNodeMap.get(selNode.id);
 
             if (node) {
                 // console.log("found highlighted node.id=" + node.id);
@@ -183,7 +182,7 @@ export class Nav {
 
             /* First check if this node is already highlighted and if so just return */
             const hltNode = S.nodeUtil.getHighlightedNode();
-            if (hltNode && hltNode.id === id) {
+            if (hltNode?.id === id) {
                 resolve();
                 return;
             }
@@ -278,7 +277,7 @@ export class Nav {
     }
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState) => {
-        S.render.renderPageFromData(res, true, null, true, true);
+        S.render.renderPage(res, true, null, true, true);
         S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
@@ -465,7 +464,6 @@ export class Nav {
 
     // todo-2: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
     getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
-
         let newNode: J.NodeInfo = null;
 
         // First detect if page root node is selected, before doing a child search
@@ -572,9 +570,9 @@ export class Nav {
     }
 
     showTrendingFiltered = (filter: string) => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
-        if (feedData) {
-            feedData.props.filter = filter;
+        let data = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
+        if (data) {
+            data.props.filter = filter;
         }
 
         dispatch("SelectTab", (s: AppState): AppState => {
@@ -583,15 +581,15 @@ export class Nav {
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
-            feedData.props = { ...feedData.props };
+            data.props = { ...data.props };
             return s;
         });
     }
 
     messagesToFromMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -607,9 +605,9 @@ export class Nav {
     }
 
     messagesToMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -625,9 +623,9 @@ export class Nav {
     }
 
     messagesFromMeToUser = (user: string) => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -644,9 +642,9 @@ export class Nav {
     }
 
     messagesFromMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -662,9 +660,9 @@ export class Nav {
     }
 
     messagesFromFriends = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: true,
@@ -680,9 +678,9 @@ export class Nav {
     }
 
     messagesLocal = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -718,9 +716,9 @@ export class Nav {
     }
 
     messagesFediverse = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,

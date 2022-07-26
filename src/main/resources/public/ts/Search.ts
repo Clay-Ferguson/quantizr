@@ -279,33 +279,33 @@ export class Search {
     delayedRefreshFeed = (state: AppState) => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-            if (!feedData.props.feedLoading) {
+            let data: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+            if (!data.props.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
     }
 
     refreshFeed = () => {
-        let feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.page = 0;
-            feedData.props.refreshCounter++;
+        let data: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (data) {
+            data.props.page = 0;
+            data.props.refreshCounter++;
         }
 
         dispatch("RefreshFeed", (s: AppState): AppState => {
-            feedData.props.feedLoading = true;
+            data.props.feedLoading = true;
             return s;
         });
 
-        S.srch.feed(feedData.props.page, feedData.props.searchTextState.getValue(), false, false);
+        S.srch.feed(data.props.page, data.props.searchTextState.getValue(), false, false);
     }
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
-        let feedData: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
-        if (!feedData) {
+        let data: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
+        if (!data) {
             return;
         }
 
@@ -314,24 +314,24 @@ export class Search {
         // console.log("Getting results page=" + page + " growResults=" + growResults);
         let res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId: feedData.props.feedFilterRootNode?.id,
-            toMe: feedData.props.feedFilterToMe,
-            fromMe: feedData.props.feedFilterFromMe,
-            toUser: feedData.props.feedFilterToUser,
-            toPublic: feedData.props.feedFilterToPublic,
-            localOnly: feedData.props.feedFilterLocalServer,
-            fromFriends: feedData.props.feedFilterFriends,
+            nodeId: data.props.feedFilterRootNode?.id,
+            toMe: data.props.feedFilterToMe,
+            fromMe: data.props.feedFilterFromMe,
+            toUser: data.props.feedFilterToUser,
+            toPublic: data.props.feedFilterToPublic,
+            localOnly: data.props.feedFilterLocalServer,
+            fromFriends: data.props.feedFilterFriends,
             nsfw: appState.userPreferences.nsfw,
             searchText,
-            applyAdminBlocks: feedData.props.applyAdminBlocks
+            applyAdminBlocks: data.props.applyAdminBlocks
         });
 
         dispatch("RenderFeedResults", (s: AppState): AppState => {
-            feedData.openGraphComps = [];
+            data.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
             // once user requests their stuff, turn off the new messages count indicator.
-            if (feedData.props.feedFilterToMe) {
+            if (data.props.feedFilterToMe) {
                 s.newMessageCount = 0;
             }
 
@@ -344,33 +344,33 @@ export class Search {
 
             // if scrolling in new results grow the existing array
             if (growResults) {
-                if (feedData?.props?.feedResults && res?.searchResults && feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                if (data?.props?.feedResults && res?.searchResults && data.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     let idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    feedData.props.feedResults.forEach(child => {
+                    data.props.feedResults.forEach(child => {
                         idSet.add(child.id);
                     });
 
                     scrollToTop = false;
-                    feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    data.props.feedResults = data.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
                     // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                 }
                 else {
-                    feedData.props.feedResults = res.searchResults;
+                    data.props.feedResults = res.searchResults;
                     // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                 }
             }
             // else we have a fresh array (reset the array)
             else {
-                feedData.props.feedResults = res.searchResults;
+                data.props.feedResults = res.searchResults;
                 // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
             }
 
-            feedData.props.feedEndReached = res.endReached;
-            feedData.props.feedDirty = false;
-            feedData.props.feedLoading = false;
+            data.props.feedEndReached = res.endReached;
+            data.props.feedDirty = false;
+            data.props.feedLoading = false;
 
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);

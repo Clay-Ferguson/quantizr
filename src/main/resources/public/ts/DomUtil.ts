@@ -7,7 +7,7 @@ export class DomUtil {
         let val = null;
 
         // get the id from this node or any parent node.
-        if (evt && evt.target) {
+        if (evt?.target) {
             let target: any = evt.target;
             while (target) {
                 // console.log("Checking target.id " + target.id + " for nid");
@@ -146,8 +146,7 @@ export class DomUtil {
             return null;
         }
 
-        const e: HTMLElement = document.getElementById(id);
-        return e;
+        return document.getElementById(id);
     }
 
     forEachElmBySel = (sel: string, callback: Function) => {

@@ -9,7 +9,6 @@ import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
-// import { runClassDemoTest } from "./ClassDemoTest";
 
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
@@ -302,17 +301,6 @@ export class Quanta {
             S.util.processUrlParams(null);
             this.setOverlay(false);
             S.util.playAudioIfRequested();
-
-            // For testing error message handling
-            // setTimeout(async () => {
-            //     let x = null;
-            //     try {
-            //         console.log(x.oops);
-            //     }
-            //     catch (ex) {
-            //         S.util.logAndReThrow("Intentional Test Exception: ", ex);
-            //     }
-            // }, 1000);
 
             // This timer delay is just for asthetics and should not be required.
             setTimeout(async () => {

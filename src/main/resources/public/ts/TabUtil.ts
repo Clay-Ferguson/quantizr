@@ -1,6 +1,6 @@
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { CompIntf } from "./comp/base/CompIntf";
+import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
@@ -8,15 +8,14 @@ import { S } from "./Singletons";
 import { FeedViewData } from "./tabs/data/FeedViewData";
 import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
 import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
-import { MainTabCompData } from "./tabs/data/MainTabCompData";
 import { IPFSViewData } from "./tabs/data/IPFSViewData";
+import { MainTabCompData } from "./tabs/data/MainTabCompData";
 import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
 import { ServerInfoViewData } from "./tabs/data/ServerInfoViewData";
 import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
 import { ThreadViewData } from "./tabs/data/ThreadViewData";
 import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
 import { TrendingViewData } from "./tabs/data/TrendingViewData";
-import { AppTab } from "./comp/AppTab";
 
 export class TabUtil {
     selectTab = (tabName: string) => {

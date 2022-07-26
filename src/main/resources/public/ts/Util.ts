@@ -1526,8 +1526,8 @@ export class Util {
                     return;
                 }
                 state = getAppState(state);
-                console.log("renderPageFromData for anonymous");
-                S.render.renderPageFromData(res, false, null, true, true);
+                console.log("renderPage for anonymous");
+                S.render.renderPage(res, false, null, true, true);
             }
         }
         catch (e) {

@@ -79,9 +79,9 @@ export class View {
             });
             if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
-                console.log("refreshTree -> renderPageFromData (scrollTop=" + a.scrollToTop + ")");
+                console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
             }
-            S.render.renderPageFromData(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
+            S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
@@ -174,16 +174,16 @@ export class View {
                 }
 
                 if (C.DEBUG_SCROLLING) {
-                    console.log("loadPage -> renderPageFromData (scrollTop=" + scrollToTop + ")");
+                    console.log("loadPage -> renderPage (scrollTop=" + scrollToTop + ")");
                 }
-                S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
+                S.render.renderPage(res, scrollToTop, null, false, scrollToTop);
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {
                 if (C.DEBUG_SCROLLING) {
-                    console.log("loadPage(3) -> renderPageFromData (scrollTop=true)");
+                    console.log("loadPage(3) -> renderPage (scrollTop=true)");
                 }
-                S.render.renderPageFromData(res, true, null, true, true);
+                S.render.renderPage(res, true, null, true, true);
             }
         }
         catch (e) {

@@ -98,7 +98,7 @@ export class Render {
          <div class="clearfix"/>
          */
         if (val.indexOf("{{imgUrl}}")) {
-            val = val.replace("{{imgUrl}}", S.render.getUrlForNodeAttachment(node, false));
+            val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, false));
         }
         return val;
     }
@@ -413,7 +413,7 @@ export class Render {
         return !typeHandler || typeHandler.allowAction(action, node, appState);
     }
 
-    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
+    renderPage = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -421,7 +421,7 @@ export class Render {
 
         try {
             if (C.DEBUG_SCROLLING) {
-                console.log("renderPageFromData: scrollToTop=" + scrollToTop + " allowScroll=" + allowScroll);
+                console.log("renderPage: scrollToTop=" + scrollToTop + " allowScroll=" + allowScroll);
             }
             // console.log("Data:" + S.util.prettyPrint(res));
 
@@ -678,48 +678,6 @@ export class Render {
             // of no layout is valid, fall back on vertical.
             return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
-    }
-
-    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
-        /* If this node attachment points to external URL return that url */
-        let imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
-        if (imgUrl) {
-            return imgUrl;
-        }
-
-        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
-        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
-
-        if (bin || ipfsLink) {
-            if (ipfsLink) {
-                bin = "ipfs";
-            }
-            let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
-
-            if (downloadLink) {
-                ret += "&download=true";
-            }
-            return ret;
-        }
-
-        return null;
-    }
-
-    getUrlForNodeAttachment = (node: J.NodeInfo, downloadLink: boolean): string => {
-        let ret = null;
-        if (node.dataUrl) {
-            ret = node.dataUrl;
-            // console.log("getUrlForNodeAttachment: id="+node.id+" url="+ret+" from dataUrl");
-        }
-        else {
-            ret = this.getAttachmentUrl("bin", node, downloadLink);
-            // console.log("getUrlForNodeAttachment: id=" + node.id + " url=" + ret + " from bin");
-        }
-        return ret;
-    }
-
-    getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        return this.getAttachmentUrl("stream", node, false);
     }
 
     getAvatarImgUrl = (ownerId: string, avatarVer: string) => {

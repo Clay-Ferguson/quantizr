@@ -11,7 +11,7 @@ export class NodeCompParentNodes extends Div {
 
     constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {
         super(null, {
-            id: S.nav._UID_PARENT_ROWID_PREFIX + state.node.id
+            id: "parent_" + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });

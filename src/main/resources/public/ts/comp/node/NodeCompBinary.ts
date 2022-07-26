@@ -29,7 +29,7 @@ export class NodeCompBinary extends Div {
 
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
         if (!node) return null;
-        let src: string = S.render.getUrlForNodeAttachment(node, false);
+        let src: string = S.attachment.getUrlForNodeAttachment(node, false);
 
         let imgSize = "";
         if (this.isFullScreenEmbed) {
@@ -105,24 +105,24 @@ export class NodeCompBinary extends Div {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.render.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN, state).open();
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN, state).open();
                     }
                 }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
+                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
             ])]);
         }
         else if (S.props.hasAudio(node)) {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Audio", {
                     onClick: () => {
-                        new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(node), 0, state).open();
+                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node), 0, state).open();
                     }
                 }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
+                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
             ])]);
         }
         /*
@@ -135,7 +135,7 @@ export class NodeCompBinary extends Div {
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "View", {
+                viewFileLink = new Anchor(S.attachment.getUrlForNodeAttachment(node, false), "View", {
                     target: "_blank",
                     className: "downloadLink"
                 });
@@ -152,7 +152,7 @@ export class NodeCompBinary extends Div {
                     className: "normalText marginRight"
                 }),
                 new Div(null, { className: "marginTop" }, [
-                    new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { className: "downloadLink" }),
+                    new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { className: "downloadLink" }),
                     viewFileLink
                 ])
             ])]);

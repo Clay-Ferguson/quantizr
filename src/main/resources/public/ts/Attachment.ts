@@ -57,7 +57,6 @@ export class Attachment {
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         node = node || S.nodeUtil.getHighlightedNode(state);
-
         if (node) {
             let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger", state);
             await dlg.open();
@@ -78,4 +77,44 @@ export class Attachment {
             });
         }
     };
+
+    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
+        /* If this node attachment points to external URL return that url */
+        let imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
+        if (imgUrl) {
+            return imgUrl;
+        }
+
+        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
+        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
+
+        if (bin || ipfsLink) {
+            if (ipfsLink) {
+                bin = "ipfs";
+            }
+            let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+
+            if (downloadLink) {
+                ret += "&download=true";
+            }
+            return ret;
+        }
+
+        return null;
+    }
+
+    getUrlForNodeAttachment = (node: J.NodeInfo, downloadLink: boolean): string => {
+        let ret = null;
+        if (node.dataUrl) {
+            ret = node.dataUrl;
+        }
+        else {
+            ret = this.getAttachmentUrl("bin", node, downloadLink);
+        }
+        return ret;
+    }
+
+    getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
+        return this.getAttachmentUrl("stream", node, false);
+    }
 }

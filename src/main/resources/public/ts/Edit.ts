@@ -48,7 +48,6 @@ export class Edit {
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, state, () => {
             S.view.jumpToId(node.id);
-            // S.quanta.refresh(state);
         });
         dlg.open();
     }
@@ -707,7 +706,7 @@ export class Edit {
     clearInbox = async (state: AppState) => {
         S.nodeUtil.clearSelNodes(state);
 
-        let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
+        let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
