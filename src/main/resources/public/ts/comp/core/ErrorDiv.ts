@@ -6,7 +6,6 @@ interface LS { // Local State
     error: string;
 }
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class ErrorDiv extends Comp {
 
     constructor(s: State) {

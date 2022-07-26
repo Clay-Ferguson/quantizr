@@ -2,13 +2,11 @@ import { useAppState } from "../../AppRedux";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Clearfix } from "../core/Clearfix";
 import { NodeCompBinary } from "./NodeCompBinary";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompContent extends Div {
 
     domPreUpdateFunc: Function;

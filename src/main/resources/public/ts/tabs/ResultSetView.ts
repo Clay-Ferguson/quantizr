@@ -12,7 +12,6 @@ import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export abstract class ResultSetView extends AppTab {
 
     allowHeader: boolean = true;

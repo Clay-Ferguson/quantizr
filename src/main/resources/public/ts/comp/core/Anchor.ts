@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Anchor extends Comp {
-    constructor(public url: string, public content: string, attribs: Object = null, children: Comp[] = null, downloadLink: boolean = false) {
+    constructor(public url: string, public content: string, attribs: Object = null, children: Comp[] = null) {
         super({ href: url, ...attribs });
         this.setChildren(children);
     }

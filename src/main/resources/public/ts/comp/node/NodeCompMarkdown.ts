@@ -9,7 +9,6 @@ interface LS {
     pendingDecrypt?: string;
 }
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends Html {
 
     /* This makes the encrypted text visible without editing the node which is important to have

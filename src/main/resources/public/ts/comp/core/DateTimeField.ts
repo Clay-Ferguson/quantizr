@@ -19,8 +19,7 @@ export class DateTimeField extends Span {
 
         this.dateState.v.stateTranslator = (s: any): any => {
             try {
-                let newTimestamp = s.value + " " + this.timeState.getValue() + ":00";
-                let newDate = new Date(newTimestamp);
+                let newDate = new Date(s.value + " " + this.timeState.getValue() + ":00");
                 this.dateTimeState.setValue("" + newDate.getTime());
             }
             catch (e) {
@@ -31,8 +30,7 @@ export class DateTimeField extends Span {
 
         this.timeState.v.stateTranslator = (s: any): any => {
             try {
-                let newTimestamp = this.dateState.getValue() + " " + s.value + ":00";
-                let newDate = new Date(newTimestamp);
+                let newDate = new Date(this.dateState.getValue() + " " + s.value + ":00");
                 this.dateTimeState.setValue("" + newDate.getTime());
             }
             catch (e) {

@@ -15,8 +15,7 @@ export class Button extends Comp {
         this.attribs.onClick = callback;
         this.attribs.className = this.attribs.className || "";
         this.attribs.className += " btn clickable " + moreClasses;
-        this.setText(text);
-        this.setEnabled(true);
+        this.mergeState<LS>({ text, enabled: true });
     }
 
     setEnabled = (enabled: boolean) => {

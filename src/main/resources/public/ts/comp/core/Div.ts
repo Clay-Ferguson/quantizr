@@ -6,7 +6,6 @@ interface LS { // Local State
     content?: string;
 }
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class Div extends Comp {
     constructor(public content: string = "", attribs: Object = {}, public initialChildren: CompIntf[] = null, private rawHtml: boolean = false) {
         super(attribs);

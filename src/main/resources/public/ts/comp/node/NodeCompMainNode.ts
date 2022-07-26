@@ -17,7 +17,6 @@ import { NodeCompRow } from "./NodeCompRow";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainNode extends Div {
 
     constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {

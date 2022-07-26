@@ -17,7 +17,6 @@ import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRow extends Div {
 
     /* we have this flag so we can turn off buttons to troubleshoot performance. */

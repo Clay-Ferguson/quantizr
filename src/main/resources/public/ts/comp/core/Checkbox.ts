@@ -21,11 +21,10 @@ export class Checkbox extends Comp {
         this.attribs.type = "checkbox";
         this.outterClassName = this.attribs.className || "";
         this.attribs.className = "form-check-input clickable";
+        this.layoutClass = this.layoutClass || "form-check-inline";
     }
 
     compRender = (): ReactNode => {
-        this.layoutClass = this.layoutClass || "form-check-inline";
-
         let attribsClone = { ...this.attribs };
         delete attribsClone.ref;
 

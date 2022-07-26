@@ -1,5 +1,4 @@
 import { useAppState } from "../../AppRedux";
-import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { CollapsiblePanel } from "../../comp/core/CollapsiblePanel";
@@ -8,12 +7,10 @@ import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { DialogMode } from "../../enums/DialogMode";
 import { TabIntf } from "../../intf/TabIntf";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompRow } from "./NodeCompRow";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompVerticalRowLayout extends Div {
     static showSpecialNodes = true;
 

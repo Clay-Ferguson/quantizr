@@ -8,7 +8,6 @@ interface LS { // Local State
 }
 
 export class CheckboxInput extends Comp {
-
     constructor(attribs: Object = {}, s?: State, private valueIntf?: ValueIntf) {
         super(attribs, s || new State());
 

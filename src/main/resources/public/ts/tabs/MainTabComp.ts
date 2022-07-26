@@ -13,7 +13,6 @@ import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {
 
     constructor(data: TabIntf) {

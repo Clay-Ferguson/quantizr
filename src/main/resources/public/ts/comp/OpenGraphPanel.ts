@@ -15,7 +15,6 @@ interface LS { // Local State
     loading?: boolean;
 }
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class OpenGraphPanel extends Div {
     loading: boolean;
 

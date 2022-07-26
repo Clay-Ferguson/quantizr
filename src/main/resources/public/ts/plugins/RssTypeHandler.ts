@@ -344,7 +344,7 @@ export class RssTypeHandler extends TypeBase {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
                     audioUrl = enc.url;
-                    let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null, true);
+                    let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
                     let audioButton = new Button("Play Audio", () => {
                         let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
                         dlg.open();

@@ -28,7 +28,7 @@ export class DateField extends Div implements I.ValueIntf {
         this.setChildren([
             new Div(null, {
                 /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
-                to the component, or elase there's a react-rerender flicker. */
+                to the component, or else there's a react-rerender flicker. */
                 style: { fontFamily: "monospace" }
             }, [
                 this.input = new Input({

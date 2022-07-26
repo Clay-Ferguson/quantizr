@@ -9,11 +9,9 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../enums/NodeActionType";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends Div {
 
     constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[], private extraClass: string) {

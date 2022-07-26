@@ -8,7 +8,6 @@ import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { UserProfileDlg } from "../../dlg/UserProfileDlg";
 import { NodeActionType } from "../../enums/NodeActionType";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
@@ -17,7 +16,6 @@ import { Comp } from "../base/Comp";
 // on elements (search for "nid:" in code), to avoid creating new functions
 // every time this component renders (and same for entire app!)
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
