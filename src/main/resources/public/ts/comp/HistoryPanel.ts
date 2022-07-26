@@ -43,7 +43,7 @@ export class HistoryPanel extends Div {
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
 
-            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
+            let typeHandler = S.plugin.getTypeHandler(h.type);
             if (typeHandler) {
                 let iconClass = typeHandler.getIconClass();
                 if (iconClass) {
@@ -93,7 +93,7 @@ export class HistoryPanel extends Div {
                         let dropTarg: Div;
                         let icon: Icon;
 
-                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
+                        let typeHandler = S.plugin.getTypeHandler(h.type);
                         if (typeHandler) {
                             let iconClass = typeHandler.getIconClass();
                             if (iconClass) {

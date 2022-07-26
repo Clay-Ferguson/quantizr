@@ -49,7 +49,7 @@ export class NodeCompButtonBar extends Div {
         let pasteButtons: Span;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        let typeHandler = S.plugin.getTypeHandler(this.node.type);
         let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;

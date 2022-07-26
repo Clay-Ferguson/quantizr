@@ -63,7 +63,7 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        let typeHandler = S.plugin.getTypeHandler(this.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {

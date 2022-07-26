@@ -35,7 +35,7 @@ export class NodeCompContent extends Div {
         }
 
         let children: CompIntf[] = [];
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);
+        let typeHandler = S.plugin.getTypeHandler(this.node.type);
         let embeddedImg = false;
 
         if (state.showProperties) {

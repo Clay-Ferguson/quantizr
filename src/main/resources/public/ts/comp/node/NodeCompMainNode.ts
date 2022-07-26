@@ -101,7 +101,7 @@ export class NodeCompMainNode extends Div {
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
-                let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.boostedNode.type);
+                let typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
                 boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, childrenImgSizes, true, false, true, true, null, state);
             }
 

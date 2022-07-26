@@ -204,7 +204,7 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState<LS>();
         let span: Span = null;
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {
@@ -258,7 +258,7 @@ export class EditNodeDlg extends DialogBase {
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         this.editorHelp = null;
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let typeHandler = S.plugin.getTypeHandler(state.node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
@@ -634,7 +634,7 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState<LS>();
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             typeHandler.ensureDefaultProperties(state.node);
         }

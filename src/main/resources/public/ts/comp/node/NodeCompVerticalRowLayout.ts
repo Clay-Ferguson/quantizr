@@ -45,7 +45,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
                     let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, n.boostedNode);
-                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.boostedNode.type);
+                    let typeHandler = S.plugin.getTypeHandler(n.boostedNode.type);
                     boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, childrenImgSizes, this.allowHeaders, false, true, true, null, state);
                 }
 
@@ -58,7 +58,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
                 else {
                     let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
+                    let typeHandler = S.plugin.getTypeHandler(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
                     if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {

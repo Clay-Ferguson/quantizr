@@ -18,7 +18,7 @@ import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
         let state = dlg.getState<LS>();
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             typeHandler.ensureDefaultProperties(state.node);
             dlg.editorHelp = typeHandler.getEditorHelp();
@@ -403,7 +403,7 @@ export class EditNodeDlgUtil {
 the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
 an upload has been added or removed. */
     initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        let typeHandler = S.plugin.getTypeHandler(node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
