@@ -27,9 +27,7 @@ export class MenuItem extends Div {
 
         let prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
         this.setChildren([
-            new Span(null, {
-                dangerouslySetInnerHTML: { __html: S.render.parseEmojis(prefix + state.content) }
-            }),
+            new Span(S.render.parseEmojis(prefix + state.content), null, null, true),
             this.floatRightComp
         ]);
 

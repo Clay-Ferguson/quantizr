@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
@@ -37,6 +38,10 @@ export abstract class Comp implements CompIntf {
     public domUpdateEvent = null;
     public domRemoveEvent = null;
     public domAddEvent = null;
+
+    // we have the 'target' and 'onclick' here to make our purifier keep those rendered
+    // see also: #onclick-security-note
+    static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
 
     constructor(attribs?: any, private stateMgr?: State) {
         this.attribs = attribs || {};
@@ -233,6 +238,10 @@ export abstract class Comp implements CompIntf {
         });
     }
 
+    public static getDangerousHtml = (content: string) => {
+        return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
+    }
+
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
     Note: Tag can also be a type here, not just a string.
     */
@@ -250,7 +259,7 @@ export abstract class Comp implements CompIntf {
 
         // If this is a raw HTML component just render using 'attribs', which is what react expects.
         if ((props as any).dangerouslySetInnerHTML) {
-            return createElement(type, this.attribs);
+            return createElement(type, props);
         }
 
         childrenArg = childrenArg || this.children;

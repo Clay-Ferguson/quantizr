@@ -1,5 +1,4 @@
 import { useAppState } from "../../AppRedux";
-import { AppState } from "../../AppState";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -55,16 +54,13 @@ export class NodeCompRowHeader extends Div {
                 displayName = this.node.owner;
             }
 
-            let span: Span = null;
-            children.push(span = new Span(displayName, {
+            children.push(new Span(displayName, {
                 className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
                 onClick: (evt: any) => {
                     new UserProfileDlg(this.node.ownerId, state).open();
                 }
-            }));
-
-            span.rawHtml = true;
+            }, null, true));
         }
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(this.node.type);

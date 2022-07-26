@@ -5,6 +5,7 @@ import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
 import { Li } from "./Li";
+import { Span } from "./Span";
 import { Ul } from "./Ul";
 
 interface LS { // Local State
@@ -33,6 +34,7 @@ export class TutorialApp extends Comp {
             new Div(null, null, [
                 new Anchor("https://someserver.com", "My Link")
             ]),
+            new Span("Times[&times;]", null, null, true),
             new Div("Child Div", null, [
                 new Ul("Unordered List", null, [
                     new Li("item 1"),

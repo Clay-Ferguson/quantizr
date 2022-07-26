@@ -23,10 +23,8 @@ export class TextContent extends Comp {
         // todo-2: Not sure I want to keep detecting HTML this way, because we can just use
         // the HTML class explicity when we need to support HTML
         if (state.text && state.text.indexOf("<") !== -1) {
-            // console.log("Dangerously setting html: "+this.jsClassName);
-            let _p: any = { id: this.getId(), key: this.getId() };
-            _p.dangerouslySetInnerHTML = { __html: state.text };
-            return this.tag(this.preformatted ? "pre" : "div", { ...this.attribs, ..._p });
+            this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(state.text);
+            return this.tag(this.preformatted ? "pre" : "div");
         }
         else {
             // console.log("Building (TextContent) react element: " + this.attribs.id);

@@ -2,6 +2,7 @@ import DOMPurify from "dompurify";
 import { Util } from "../../Util";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
+import { Italic } from "./Italic";
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq
@@ -38,9 +39,8 @@ export class Html extends Comp {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
-        let content =
-            DOMPurify.sanitize((this.getState<LS>() as any).content, Util.DOM_PURIFY_CONFIG);
-        this.attribs.dangerouslySetInnerHTML = { __html: content };
+
+        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.getState<LS>().content);
         return this.tag("div");
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to

@@ -6,7 +6,7 @@ export class Pre extends Comp {
 
     constructor(public content: string = "", attribs: Object = {}) {
         super(attribs);
-        this.attribs.dangerouslySetInnerHTML = { __html: this.content };
+        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
     }
 
     compRender = (): ReactNode => {

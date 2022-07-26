@@ -42,7 +42,6 @@ export class HistoryPanel extends Div {
             if (!h.content) return;
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
-            let d: Span = null;
 
             let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
             if (typeHandler) {
@@ -67,7 +66,6 @@ export class HistoryPanel extends Div {
                 onDragEnd: this.dragEnd
             } : {};
 
-            // unicode here is the big blue bullet character
             children.push(parentDropTarg = new Div(null, {
                 id: h.id + "_hist",
                 nid: h.id,
@@ -76,11 +74,10 @@ export class HistoryPanel extends Div {
                 ...dragProps
             }, [
                 parentIcon,
-                d = new Span(h.content)
+                new Span(h.content, null, null, true)
             ]));
 
             this.makeDropTarget(parentDropTarg.attribs, h.id);
-            d.rawHtml = true;
 
             if (h.subItems) {
                 let count = 0;
@@ -93,7 +90,7 @@ export class HistoryPanel extends Div {
                 h.subItems.forEach((h: NodeHistoryItem) => {
                     if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
-                        let dropTarg: Span;
+                        let dropTarg: Div;
                         let icon: Icon;
 
                         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
@@ -127,11 +124,10 @@ export class HistoryPanel extends Div {
                             ...dragProps
                         }, [
                             icon,
-                            d = new Span(h.content)
+                            new Span(h.content, null, null, true)
                         ]));
 
                         this.makeDropTarget(dropTarg.attribs, h.id);
-                        d.rawHtml = true;
                     }
                     else {
                         if (!dotsShown) {

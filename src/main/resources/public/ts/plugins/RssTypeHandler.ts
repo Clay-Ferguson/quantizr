@@ -317,7 +317,7 @@ export class RssTypeHandler extends TypeBase {
             if (entry.parentFeedTitle) {
                 headerDivChildren.push(new Div(null, {
                     className: "rssParentTitle",
-                    dangerouslySetInnerHTML: { __html: entry.parentFeedTitle }
+                    dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle) 
                 }));
             }
 
@@ -325,7 +325,7 @@ export class RssTypeHandler extends TypeBase {
                 anchor = new Anchor(entry.link, null, {
                     className: "rssAnchor",
                     target: "_blank",
-                    dangerouslySetInnerHTML: { __html: entry.title }
+                    dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.title)
                 })
             ]));
         }
