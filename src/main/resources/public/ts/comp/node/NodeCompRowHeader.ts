@@ -55,7 +55,7 @@ export class NodeCompRowHeader extends Div {
             children.push(new Span(displayName, {
                 className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
-                onClick: (evt: any) => {
+                onClick: () => {
                     new UserProfileDlg(this.node.ownerId, state).open();
                 }
             }, null, true));

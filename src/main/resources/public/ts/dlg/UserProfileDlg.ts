@@ -338,7 +338,7 @@ export class UserProfileDlg extends DialogBase {
             src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, avatarVer);
         }
 
-        let onClick = async (evt) => {
+        let onClick = async () => {
             if (this.readOnly) return;
 
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, async () => {
@@ -397,7 +397,7 @@ export class UserProfileDlg extends DialogBase {
             src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, headerImageVer);
         }
 
-        let onClick = (evt) => {
+        let onClick = () => {
             if (this.readOnly) return;
 
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, async () => {

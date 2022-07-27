@@ -516,7 +516,7 @@ export class MenuPanel extends Div {
         return new Icon({
             className: "fa fa-question-circle fa-lg float-end menuIcon",
             title: "Display Help Information",
-            onClick: (event: any) => {
+            onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();
                 // S.view.jumpToId(bookmark.selfId);

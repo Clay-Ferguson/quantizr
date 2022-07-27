@@ -244,7 +244,7 @@ export class RssTypeHandler extends TypeBase {
     makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
-                onClick: (event) => {
+                onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
                     this.setPage(feedSrcHash, state, 1);
@@ -252,7 +252,7 @@ export class RssTypeHandler extends TypeBase {
                 title: "First Page"
             }) : null,
             page > 1 ? new IconButton("fa-angle-left", null, {
-                onClick: (event) => {
+                onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
                     this.pageBump(feedSrcHash, state, -1);
@@ -260,7 +260,7 @@ export class RssTypeHandler extends TypeBase {
                 title: "Previous Page"
             }) : null,
             new IconButton("fa-angle-right", "More", {
-                onClick: (event) => {
+                onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
                     this.pageBump(feedSrcHash, state, 1);

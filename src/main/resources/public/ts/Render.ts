@@ -707,7 +707,7 @@ export class Render {
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 
-            onClick: (evt: any) => {
+            onClick: () => {
                 new UserProfileDlg(node.ownerId, state).open();
             }
         });

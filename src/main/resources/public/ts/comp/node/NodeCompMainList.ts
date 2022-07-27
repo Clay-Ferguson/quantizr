@@ -58,7 +58,7 @@ export class NodeCompMainList extends Div {
 
         if (!endReached) {
             nextButton = new IconButton("fa-angle-right", "More", {
-                onClick: (event) => {
+                onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
                     S.view.nextPage(state);

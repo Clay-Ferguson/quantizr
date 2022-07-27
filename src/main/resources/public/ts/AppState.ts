@@ -72,6 +72,7 @@ export class AppState {
 
     mouseEffect: boolean = false;
 
+    // todo-0: rename to userPrefs
     userPreferences: J.UserPreferences = {
         editMode: false,
         showMetaData: false,

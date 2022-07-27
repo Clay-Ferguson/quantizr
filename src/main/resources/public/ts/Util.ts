@@ -625,7 +625,7 @@ export class Util {
     }
 
     isElmVisible = (elm: HTMLElement) => {
-        return elm && elm.offsetHeight > 0;
+        return elm?.offsetHeight > 0;
     }
 
     /*
@@ -1011,14 +1011,14 @@ export class Util {
     */
 
     getBrowserMemoryInfo = (): string => {
-        let ret = "";
-        const p: any = performance as any;
-        if (p.memory) {
-            ret += "<br>HeapSizeLimit: " + this.formatMemory(p.memory.jsHeapSizeLimit);
-            ret += "<br>TotalHeapSize: " + this.formatMemory(p.memory.totalJSHeapSize);
-            ret += "<br>UsedHeapSize: " + this.formatMemory(p.memory.usedJSHeapSize);
+        // todo-1: research this. According to TypeScript typings there shouldn't even be a 'memory' attribute so this
+        // must be some undocumented feature of Chrome?
+        if ((performance as any).memory) {
+            return "<br>HeapSizeLimit: " + this.formatMemory((performance as any).memory.jsHeapSizeLimit) +
+                "<br>TotalHeapSize: " + this.formatMemory((performance as any).memory.totalJSHeapSize) +
+                "<br>UsedHeapSize: " + this.formatMemory((performance as any).memory.usedJSHeapSize);
         }
-        return ret;
+        return null;
     }
 
     perfStart = (): number => {
@@ -1274,6 +1274,9 @@ export class Util {
 
     If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
     getState and then dispatching the change.
+
+    WARNING: Both places that were calling this are commented out, so I need to remember why, becasue I didn't 
+    add comments when comment thing out saying why.
     */
     refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {
         if (!node || !state.node || !state.node.children) return;
@@ -1286,13 +1289,16 @@ export class Util {
         if (slashIdx === -1) return;
         let parentPath = path.substring(0, slashIdx);
 
-        /* scan all children being displayed and of one of them is the target parent set the hasChildren
+        /* scan all children being displayed and if one of them is the target parent set the hasChildren
         on it so it'll display the "open" button */
         for (let node of state.node.children) {
             if (node.path === parentPath) {
                 node.hasChildren = true;
                 if (doDispatch) {
                     dispatch("NodeChanges", s => {
+                        // todo-0: this is a bug even if everything's working ok. We need the entire for loop
+                        // to be INSIDE this dispatch, and when you do that be careful and check how 'doDispatch'
+                        // flag is supposed to work. This will also be FASTER with only a single dispatch
                         return state;
                     });
                 }

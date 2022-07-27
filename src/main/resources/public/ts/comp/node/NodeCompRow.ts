@@ -87,7 +87,7 @@ export class NodeCompRow extends Div {
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
-                    insertButton = new Button(null, e => {
+                    insertButton = new Button(null, () => {
                         S.edit.insertNode(this.node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     }, {
                         iconclass: "fa fa-plus",

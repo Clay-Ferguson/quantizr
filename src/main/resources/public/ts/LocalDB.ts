@@ -93,7 +93,6 @@ export class LocalDB {
     }
 
     writeObject = async (val: Object) => {
-        // We use a Promise here because we're sesolving inside a callback
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
@@ -109,7 +108,6 @@ export class LocalDB {
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
     readObject = async (name: string): Promise<Object> => {
-        // We use Promise instead of async/await because we need to resolve inside callbacks (not our own design choice)
         return new Promise<Object>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
                 (store: IDBObjectStore) => {

@@ -209,7 +209,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             // only show "More" button if we aren't currently editing. Wouldn't make sense to navigage while editing.
             if (!state.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
                 let moreButton = new IconButton("fa-angle-right", "More", {
-                    onClick: (event) => {
+                    onClick: (event: Event) => {
                         event.stopPropagation();
                         event.preventDefault();
                         S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, false);

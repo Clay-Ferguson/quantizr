@@ -91,7 +91,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
             className: "input-group-addon"
         }, [
             new Anchor(null, null, {
-                onClick: (evt) => {
+                onClick: (evt: Event) => {
                     evt.preventDefault();
                     this.mergeState<LS>({
                         inputType: state.inputType === "password" ? "text" : "password"
