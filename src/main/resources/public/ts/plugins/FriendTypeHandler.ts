@@ -80,7 +80,7 @@ export class FriendTypeHandler extends TypeBase {
         // Note: we pass showMessageButton as true when isTreeView is true only.
         return S.render.renderUser(node.id, user, userBio, imgSrc, actorUrl,
             displayName, null, isTreeView ? "treeFriendImage" : "listFriendImage", isTreeView, () => {
-                new UserProfileDlg(userNodeId, state).open();
+                new UserProfileDlg(userNodeId).open();
             });
     }
 }

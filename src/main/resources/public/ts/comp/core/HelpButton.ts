@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppRedux";
 import { MessageDlg } from "../../dlg/MessageDlg";
 import { Comp } from "../base/Comp";
 import { Italic } from "./Italic";
@@ -29,7 +28,7 @@ export class HelpButton extends Comp {
                 // content = content.replace("\n\n", "[nl]");
                 // content = content.replace("\n", " ");
                 // content = content.replace("[nl]", "\n\n");
-                new MessageDlg(null, title, null, new Markdown(content), false, 0, null, getAppState()).open();
+                new MessageDlg(null, title, null, new Markdown(content), false, 0, null).open();
             }
         }
     }

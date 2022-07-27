@@ -104,7 +104,7 @@ export class NodeCompBinary extends Div {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN, state).open();
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN).open();
                     }
                 }, "btn-primary"),
                 new Span("", {
@@ -116,7 +116,7 @@ export class NodeCompBinary extends Div {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Audio", {
                     onClick: () => {
-                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node), 0, state).open();
+                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node), 0).open();
                     }
                 }, "btn-primary"),
                 new Span("", {

@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -20,7 +19,7 @@ export class TransferNodeDlg extends DialogBase {
     toUserState: ValidatedState<any> = new ValidatedState<any>();
     fromUserState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Transfer Node", "app-modal-content-narrow-width", false);
         this.mergeState<LS>({
             recursive: false

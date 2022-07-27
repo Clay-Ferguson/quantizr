@@ -1,15 +1,14 @@
-import { AppState } from "../AppState";
+import { dispatch } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
-import { ValidatedState } from "../ValidatedState";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { dispatch } from "../AppRedux";
-import { Div } from "../comp/core/Div";
+import { ValidatedState } from "../ValidatedState";
 
 interface LS { // Local State
 }
@@ -17,7 +16,7 @@ interface LS { // Local State
 export class EditTagsDlg extends DialogBase {
     tagsState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Edit Hashtags", "app-modal-content-medium-width", false);
     }
 

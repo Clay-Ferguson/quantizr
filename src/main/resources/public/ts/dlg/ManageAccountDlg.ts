@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -13,7 +12,7 @@ interface LS { // Local State
 
 export class ManageAccountDlg extends DialogBase {
 
-    constructor(state: AppState) {
+    constructor() {
         super("Manage Account", "app-modal-content-narrow-width", false);
     }
 

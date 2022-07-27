@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -40,7 +39,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Search", null, null);
 
         this.onMount((elm: HTMLElement) => {
@@ -143,7 +142,7 @@ export class SearchContentDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async e => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("search", null, this.appState);
+                    let dlg: SelectTagsDlg = new SelectTagsDlg("search", null);
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },

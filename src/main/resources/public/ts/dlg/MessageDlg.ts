@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -12,7 +11,7 @@ import { DialogBase } from "../DialogBase";
 export class MessageDlg extends DialogBase {
 
     constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
-        private flashTimeout: number, classOverride: string, state: AppState) {
+        private flashTimeout: number, classOverride: string) {
         super(title, classOverride, false);
 
         if (this.flashTimeout > 0) {

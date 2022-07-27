@@ -196,7 +196,7 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, null).open();
         }
     }
 

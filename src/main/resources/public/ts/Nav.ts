@@ -279,12 +279,12 @@ export class Nav {
                                 S.util.copyToClipboard(googleUrl);
                                 S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
                             })])
-                    ]), false, 0, null, state
+                    ]), false, 0, null
                 ).open();
             });
         }
         else {
-            new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, null, state).open();
+            new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, null).open();
         }
     }
 
@@ -332,7 +332,7 @@ export class Nav {
         const state = getAppState();
         this.clickNodeRow(null, id);
         setTimeout(() => {
-            new SearchContentDlg(state).open();
+            new SearchContentDlg().open();
         }, 500);
     }
 

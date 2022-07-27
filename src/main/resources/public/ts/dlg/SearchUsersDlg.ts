@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -26,7 +25,7 @@ export class SearchUsersDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Search Users", "app-modal-content-medium-width", null);
 
         this.onMount((elm: HTMLElement) => {

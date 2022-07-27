@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -22,7 +21,7 @@ export class FriendsDlg extends DialogBase {
 
     selectionValueIntf: ValueIntf;
 
-    constructor(private node: J.NodeInfo, state: AppState, private instantSelect: boolean) {
+    constructor(private node: J.NodeInfo, private instantSelect: boolean) {
         super("Friends", "app-modal-content-medium-width", null);
 
         this.selectionValueIntf = {
@@ -80,7 +79,7 @@ export class FriendsDlg extends DialogBase {
     }
 
     shareToPersonDlg = async () => {
-        let dlg = new ShareToPersonDlg(this.node, null, this.appState);
+        let dlg = new ShareToPersonDlg(this.node, null);
         await dlg.open();
 
         if (dlg.userNameState.getValue()) {

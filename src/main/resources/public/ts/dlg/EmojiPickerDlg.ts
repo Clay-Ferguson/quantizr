@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -14,7 +13,7 @@ interface LS { // Local State
 export class EmojiPickerDlg extends DialogBase {
     selectionValueIntf: ValueIntf;
 
-    constructor(state: AppState) {
+    constructor() {
         super("Emojis", "app-modal-content-narrow-width", null);
 
         this.selectionValueIntf = {

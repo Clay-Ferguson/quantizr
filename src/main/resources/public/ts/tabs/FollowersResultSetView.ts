@@ -64,7 +64,7 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
 
         return S.render.renderUser(null, accntUser, null, imgSrc, null,
             displayName, "userFeedItem", "listFriendImage", false, (evt: any) => {
-                new UserProfileDlg(node.ownerId, state).open();
+                new UserProfileDlg(node.ownerId).open();
             });
     }
 }

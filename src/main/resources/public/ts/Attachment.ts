@@ -18,7 +18,7 @@ export class Attachment {
             return;
         }
 
-        new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
+        new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, () => {
             S.view.jumpToId(node.id);
             // S.quanta.refresh(state);
         }).open();
@@ -39,7 +39,7 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state).open();
+        new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc).open();
     };
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState) => {
@@ -52,13 +52,13 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc, state).open();
+        new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc).open();
     };
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         node = node || S.nodeUtil.getHighlightedNode(state);
         if (node) {
-            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger", state);
+            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
                 await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {

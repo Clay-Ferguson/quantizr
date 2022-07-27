@@ -48,7 +48,9 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
-        // todo-0: check to make sure NONE of the dialogs pass in appState, because the base class can always take care of it here
+        // todo-0: need to check to be sure we're not inside a dispatch executor when we execute this (or any other?),
+        // getAppState(), because in a dispatch would imply we should've passed the current state from the dispatch function.
+        // so the dispatch impl will need a {dispatching = true -> finally dispatching=false} pattern.
         this.appState = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.

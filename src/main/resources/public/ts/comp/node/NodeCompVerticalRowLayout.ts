@@ -47,11 +47,11 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && n.id === state.editNode.id) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 else {
                     let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
@@ -96,7 +96,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
             }
             rowIdx++;

@@ -68,17 +68,17 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static transferNode = () => { new TransferNodeDlg(getAppState(null)).open(); };
-    static searchAndReplace = () => { new SearchAndReplaceDlg(getAppState(null)).open(); };
-    static splitNode = () => { new SplitNodeDlg(null, getAppState(null)).open(); }
+    static transferNode = () => { new TransferNodeDlg().open(); };
+    static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
+    static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
     static showPublicWritableShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null, null); }
-    static searchByContent = () => { new SearchContentDlg(getAppState(null)).open(); };
-    static searchByName = () => { new SearchByNameDlg(getAppState(null)).open(); }
-    static searchById = () => { new SearchByIDDlg(getAppState(null)).open(); };
-    static findUsers = () => { new SearchUsersDlg(getAppState(null)).open(); };
+    static searchByContent = () => { new SearchContentDlg().open(); };
+    static searchByName = () => { new SearchByNameDlg().open(); }
+    static searchById = () => { new SearchByIDDlg().open(); };
+    static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time", 0, true);
@@ -93,8 +93,8 @@ export class MenuPanel extends Div {
     static import = () => S.edit.openImportDlg(getAppState(null));
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(getAppState(null));
     static export = () => S.edit.openExportDlg(getAppState(null));
-    static testMicrophone = () => { new MediaRecorderDlg(getAppState(null), false, false).open(); };
-    static testWebCam = () => { new MediaRecorderDlg(getAppState(null), true, false).open(); };
+    static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
+    static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
     static mouseEffects = () => { S.util.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, getAppState(null));
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", getAppState(null));
@@ -127,17 +127,17 @@ export class MenuPanel extends Div {
 
     static showKeys = () => {
         let f = async () => {
-            new ManageEncryptionKeysDlg(getAppState(null)).open();
+            new ManageEncryptionKeysDlg().open();
         };
         f();
     };
 
     static generateKeys = () => { S.util.generateNewCryptoKeys(getAppState(null)); };
     static publishKeys = () => { S.encryption.initKeys(false, true, true); };
-    static importKeys = () => { new ImportCryptoKeyDlg(getAppState(null)).open(); };
-    static profile = () => { new UserProfileDlg(null, getAppState(null)).open(); };
-    static accountSettings = () => { new ManageAccountDlg(getAppState(null)).open(); };
-    static storageSpace = () => { new ManageStorageDlg(getAppState(null)).open(); };
+    static importKeys = () => { new ImportCryptoKeyDlg().open(); };
+    static profile = () => { new UserProfileDlg(null).open(); };
+    static accountSettings = () => { new ManageAccountDlg().open(); };
+    static storageSpace = () => { new ManageStorageDlg().open(); };
     static toggleEditMode = () => S.edit.toggleEditMode(getAppState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(getAppState(null));
     static toggleNsfw = () => S.edit.toggleNsfw(getAppState(null));

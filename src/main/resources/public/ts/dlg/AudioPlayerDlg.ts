@@ -9,8 +9,8 @@ import { Icon } from "../comp/core/Icon";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
-import { S } from "../Singletons";
 import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
 /**
@@ -46,7 +46,7 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number, state: AppState) {
+    constructor(private customTitle, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number) {
         super(customTitle || "Audio Player", null, false);
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];

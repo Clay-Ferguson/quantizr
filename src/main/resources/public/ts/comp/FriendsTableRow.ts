@@ -1,11 +1,10 @@
-import { getAppState } from "../AppRedux";
+import { Div } from "../comp/core/Div";
+import { Img } from "../comp/core/Img";
+import { Span } from "../comp/core/Span";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { Div } from "../comp/core/Div";
-import { Img } from "../comp/core/Img";
 import { ListBoxRow } from "./ListBoxRow";
-import { Span } from "../comp/core/Span";
 
 export class FriendsTableRow extends ListBoxRow {
 
@@ -34,7 +33,7 @@ export class FriendsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: () => {
-                    new UserProfileDlg(this.friend.userNodeId, getAppState(null)).open();
+                    new UserProfileDlg(this.friend.userNodeId).open();
                 }
             });
         }

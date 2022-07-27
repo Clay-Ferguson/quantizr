@@ -297,7 +297,7 @@ export class NodeUtil {
 
     loadNodeFromIpfs = (node: J.NodeInfo): any => {
         let state = getAppState();
-        new LoadNodeFromIpfsDlg(state).open();
+        new LoadNodeFromIpfsDlg().open();
     }
 
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
@@ -354,7 +354,7 @@ export class NodeUtil {
                         onClick: (event: any) => {
                             event.stopPropagation();
                             event.preventDefault();
-                            new UserProfileDlg(ac.principalNodeId, state).open();
+                            new UserProfileDlg(ac.principalNodeId).open();
                         },
                         className: "sharingName clickable",
                         title: "Shared to " + (ac.displayName || ac.principalName || "")

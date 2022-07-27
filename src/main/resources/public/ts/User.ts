@@ -19,14 +19,14 @@ export class User {
     closeAccount = async () => {
         let state = getAppState();
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
-            null, null, state);
+            null, null);
         await dlg.open();
         if (!dlg.yes) {
             return;
         }
 
         dlg = new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Close Account",
-            null, null, state);
+            null, null);
         await dlg.open();
         if (dlg.yes) {
             await this.deleteAllUserLocalDbEntries();
@@ -49,7 +49,7 @@ export class User {
 
     openSignupPg = (state: AppState) => {
         // S.util.showMessage("Signups are temporarily unavailable. Check back in a few hours.", "Note");
-        new SignupDlg(state).open();
+        new SignupDlg().open();
     }
 
     refreshLogin = async (state: AppState) => {

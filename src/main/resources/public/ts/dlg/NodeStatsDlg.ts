@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -14,7 +13,7 @@ import { S } from "../Singletons";
 import { SearchContentDlg } from "./SearchContentDlg";
 
 export class NodeStatsDlg extends DialogBase {
-    constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
+    constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean) {
         super(trending ? "Trending (Top 100s)" : "Node Stats (Top 100s)", null, false);
     }
 
@@ -96,7 +95,7 @@ export class NodeStatsDlg extends DialogBase {
         }
         else {
             SearchContentDlg.defaultSearchText = word;
-            new SearchContentDlg(this.appState).open();
+            new SearchContentDlg().open();
         }
     }
 }

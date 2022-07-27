@@ -143,7 +143,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         // if editing a new post (not a reply)
         if (!editingExistingItem && state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
@@ -189,7 +189,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
                 if (editingExistingItem && node.id === state.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
@@ -201,7 +201,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     // editing a reply inline.
                     if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED, null));
+                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                     }
                 }
             });

@@ -1,5 +1,4 @@
 import { dispatch } from "../AppRedux";
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -76,7 +75,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode, public afterEditAction: Function) {
+    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, mode);
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
@@ -499,7 +498,7 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async e => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue(), this.appState);
+                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue());
                     await dlg.open();
                     this.addTagsToTextField(dlg);
                 },
@@ -750,7 +749,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     openChangeNodeTypeDlg = () => {
-        new ChangeNodeTypeDlg(this.getState<LS>().node.type, (type: string) => this.utl.setNodeType(this, type), this.appState).open();
+        new ChangeNodeTypeDlg(this.getState<LS>().node.type, (type: string) => this.utl.setNodeType(this, type)).open();
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {

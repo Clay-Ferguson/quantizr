@@ -1,12 +1,11 @@
-import { AppState } from "../AppState";
-import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Spinner } from "../comp/core/Spinner";
+import { DialogBase } from "../DialogBase";
 
 export class ProgressDlg extends DialogBase {
 
-    constructor(state: AppState) {
+    constructor() {
         super("Loading...", "app-modal-content-tiny-width", false);
     }
 

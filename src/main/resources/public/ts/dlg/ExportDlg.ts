@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -7,7 +6,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
-import { TextFieldConfig, TextField } from "../comp/core/TextField";
+import { TextField, TextFieldConfig } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { CompValueHolder } from "../CompValueHolder";
 import { DialogBase } from "../DialogBase";
@@ -27,7 +26,7 @@ export class ExportDlg extends DialogBase {
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
     saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
 
-    constructor(state: AppState, private node: NodeInfo) {
+    constructor(private node: NodeInfo) {
         super("Export Node: " + node.id, null, false);
         this.mergeState<LS>({
             exportType: "zip"
@@ -112,7 +111,7 @@ export class ExportDlg extends DialogBase {
                     }) : null,
                     new Anchor(downloadLink, "Download", { target: "_blank" }),
                     res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null
-                ]), false, 0, null, this.appState
+                ]), false, 0, null
             ).open();
 
             S.view.scrollToNode(this.appState);

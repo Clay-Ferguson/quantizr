@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -16,7 +15,7 @@ export class UploadFromUrlDlg extends DialogBase {
     static storeLocally: boolean = false;
     urlState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(private nodeId: string, private url: string, private onUploadFunc: Function, state: AppState) {
+    constructor(private nodeId: string, private url: string, private onUploadFunc: Function) {
         super("Upload File", null, false);
     }
 

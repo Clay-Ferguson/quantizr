@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -33,7 +32,7 @@ export class SelectTagsDlg extends DialogBase {
     indenting = false;
 
     /* modeOption = search | edit */
-    constructor(private modeOption: string, private curTags: string, state: AppState) {
+    constructor(private modeOption: string, private curTags: string) {
         super("Select Hashtags", "app-modal-content-medium-width", false);
 
         let tags = this.parseTags();
@@ -241,7 +240,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     edit = async () => {
-        let dlg = new EditTagsDlg(this.appState);
+        let dlg = new EditTagsDlg();
         await dlg.open();
         let tags = this.parseTags();
         this.mergeState({ tags });

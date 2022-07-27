@@ -56,7 +56,7 @@ export class NodeCompRowHeader extends Div {
                 className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
                 onClick: () => {
-                    new UserProfileDlg(this.node.ownerId, state).open();
+                    new UserProfileDlg(this.node.ownerId).open();
                 }
             }, null, true));
         }

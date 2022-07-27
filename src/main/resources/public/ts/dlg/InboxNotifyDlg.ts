@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -12,7 +11,7 @@ export class InboxNotifyDlg extends DialogBase {
 
     static CLOSE_TIMEOUT: number = 2500;
 
-    constructor(private text: string, private nodeId: string, state: AppState) {
+    constructor(private text: string, private nodeId: string) {
         super("Notification", "app-modal-content-narrow-width", false);
 
         S.util.showSystemNotification("New Message", text);

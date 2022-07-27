@@ -1,5 +1,4 @@
-import { dispatch } from "../AppRedux";
-import { AppState } from "../AppState";
+import { dispatch, getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -31,8 +30,9 @@ export class UserProfileDlg extends DialogBase {
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
-    constructor(private userNodeId: string, state: AppState) {
+    constructor(private userNodeId: string) {
         super("User Profile", "app-modal-content", false);
+        let state = getAppState();
         if (!userNodeId) {
             userNodeId = state.userProfile.userNodeId;
         }
@@ -341,7 +341,7 @@ export class UserProfileDlg extends DialogBase {
         let onClick = async () => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, async () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, async () => {
 
                 let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
@@ -400,7 +400,7 @@ export class UserProfileDlg extends DialogBase {
         let onClick = () => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, async () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, async () => {
 
                 let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId

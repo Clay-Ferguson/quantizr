@@ -1,11 +1,10 @@
-import { AppState } from "../AppState";
-import { DialogBase } from "../DialogBase";
-import { ValueIntf } from "../Interfaces";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Form } from "../comp/core/Form";
 import { NodeTypeListBox } from "../comp/NodeTypeListBox";
+import { DialogBase } from "../DialogBase";
+import { ValueIntf } from "../Interfaces";
 
 interface LS { // Local State
     selType: string;
@@ -17,7 +16,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     selCallback: Function = null;
     inlineButton: Button;
 
-    constructor(curType: string, selCallback: Function, state: AppState) {
+    constructor(curType: string, selCallback: Function) {
         super("Set Node Type", "app-modal-content-narrow-width", false);
         this.selCallback = selCallback;
 

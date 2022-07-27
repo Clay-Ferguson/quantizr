@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -19,7 +18,7 @@ export class ResetPasswordDlg extends DialogBase {
     userState: ValidatedState<any> = new ValidatedState<any>();
     emailState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(user: string, state: AppState) {
+    constructor(user: string) {
         super("Reset Password", "app-modal-content-narrow-width", false);
         this.mergeState<LS>({ user });
     }

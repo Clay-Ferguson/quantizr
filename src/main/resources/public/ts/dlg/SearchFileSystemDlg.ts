@@ -15,7 +15,7 @@ export class SearchFileSystemDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Search File System", null, false);
         this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();

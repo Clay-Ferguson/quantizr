@@ -23,7 +23,7 @@ export class BookmarkTypeHandler extends TypeBase {
         return new Div(null, null, [
             new NodeCompMarkdown(node, state),
             audioUrl ? new Button("Play Audio", () => {
-                new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0, state).open();
+                new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0).open();
             }, null, "btn-primary marginLeft") : null
         ]);
     }

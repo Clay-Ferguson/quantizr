@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
@@ -13,7 +12,7 @@ export class VideoPlayerDlg extends DialogBase {
 
     videoPlayer: VideoPlayer;
 
-    constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, dialogMode: DialogMode, state: AppState) {
+    constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, dialogMode: DialogMode) {
         super(mediaTitle || "Video", null, false, dialogMode);
     }
 

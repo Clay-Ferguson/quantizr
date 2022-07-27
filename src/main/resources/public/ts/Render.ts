@@ -405,7 +405,7 @@ export class Render {
                 }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null, null);
+        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
         dlgHolder.dlg.open();
     }
 
@@ -708,7 +708,7 @@ export class Render {
             // align: "left", // causes text to flow around
 
             onClick: () => {
-                new UserProfileDlg(node.ownerId, state).open();
+                new UserProfileDlg(node.ownerId).open();
             }
         });
     }

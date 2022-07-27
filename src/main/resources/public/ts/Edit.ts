@@ -24,19 +24,19 @@ export class Edit {
     pendingContentId: string = null;
 
     openChangePasswordDlg = (state: AppState) => {
-        new ChangePasswordDlg(null, state).open();
+        new ChangePasswordDlg(null).open();
     }
 
     openManageAccountDlg = (state: AppState) => {
-        new ManageAccountDlg(state).open();
+        new ManageAccountDlg().open();
     }
 
     openManageStorageDlg = (state: AppState) => {
-        new ManageStorageDlg(state).open();
+        new ManageStorageDlg().open();
     }
 
     editPreferences = (state: AppState) => {
-        new PrefsDlg(state).open();
+        new PrefsDlg().open();
     }
 
     openImportDlg = (state: AppState) => {
@@ -46,7 +46,7 @@ export class Edit {
             return;
         }
 
-        const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, state, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, () => {
             S.view.jumpToId(node.id);
         });
         dlg.open();
@@ -55,7 +55,7 @@ export class Edit {
     openExportDlg = (state: AppState) => {
         let node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
-            new ExportDlg(state, node).open();
+            new ExportDlg(node).open();
         }
     }
 
@@ -126,7 +126,7 @@ export class Edit {
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
                 else if (editInPopup) {
-                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state, null, afterEditAction);
+                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, null, afterEditAction);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
@@ -707,7 +707,7 @@ export class Edit {
         S.nodeUtil.clearSelNodes(state);
 
         let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
             await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
@@ -730,7 +730,7 @@ export class Edit {
 
         let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
         let dlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
-            "btn-danger", "alert alert-info", state);
+            "btn-danger", "alert alert-info");
         await dlg.open();
         if (dlg.yes) {
             let res = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
@@ -748,7 +748,7 @@ export class Edit {
 
         let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
         let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
             let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
@@ -796,7 +796,7 @@ export class Edit {
 
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
         let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
             let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
@@ -931,7 +931,7 @@ export class Edit {
 
     insertBookWarAndPeace = async (state: AppState) => {
         let dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
-            "Confirm", null, null, state);
+            "Confirm", null, null);
         await dlg.open();
         if (dlg.yes) {
             /* inserting under whatever node user has focused */
@@ -1255,7 +1255,7 @@ export class Edit {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
-        let dlg: SharingDlg = new SharingDlg(node, state);
+        let dlg: SharingDlg = new SharingDlg(node);
         await dlg.open();
     }
 

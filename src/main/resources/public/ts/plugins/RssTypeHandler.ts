@@ -1,8 +1,8 @@
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Anchor } from "../comp/core/Anchor";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -16,14 +16,14 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
 import { TextContent } from "../comp/core/TextContent";
+import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { NodeActionType } from "../enums/NodeActionType";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
-import { TabIntf } from "../intf/TabIntf";
-import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
@@ -346,7 +346,7 @@ export class RssTypeHandler extends TypeBase {
                     audioUrl = enc.url;
                     let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
                     let audioButton = new Button("Play Audio", () => {
-                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
+                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0);
                         dlg.open();
                     }, { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));

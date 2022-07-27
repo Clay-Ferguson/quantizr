@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -16,7 +15,7 @@ export class EditPropertyDlg extends DialogBase {
 
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(private editNode: J.NodeInfo, state: AppState) {
+    constructor(private editNode: J.NodeInfo) {
         super("New Property", "app-modal-content-narrow-width", false);
     }
 

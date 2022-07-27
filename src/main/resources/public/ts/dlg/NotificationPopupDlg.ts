@@ -1,14 +1,13 @@
-import { AppState } from "../AppState";
-import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../comp/base/CompIntf";
 import { TextContent } from "../comp/core/TextContent";
+import { DialogBase } from "../DialogBase";
 
 /*
  * Notification Dialog that pops up and displays for a short time and then automatically destroys itself
  */
 export class NotificationPopupDlg extends DialogBase {
 
-    constructor(private message: string, title: string, state: AppState) {
+    constructor(private message: string, title: string) {
         super(title, null, false);
     }
 
@@ -19,7 +18,7 @@ export class NotificationPopupDlg extends DialogBase {
     }
 
     show(message: string, title: string, timeout: number = 3000) {
-        let dlg = new NotificationPopupDlg(message, title, this.appState);
+        let dlg = new NotificationPopupDlg(message, title);
         dlg.open();
         setTimeout(() => {
             dlg.close();

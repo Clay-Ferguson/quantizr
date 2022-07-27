@@ -1,15 +1,14 @@
-import { getAppState } from "../AppRedux";
-import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Img } from "../comp/core/Img";
-import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "../comp/core/Span";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Checkbox } from "./core/Checkbox";
+import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
@@ -48,7 +47,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: () => {
-                    new UserProfileDlg(this.aclEntry.principalNodeId, getAppState(null)).open();
+                    new UserProfileDlg(this.aclEntry.principalNodeId).open();
                 }
             });
         }
@@ -69,7 +68,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),
                         onClick: (evt: any) => {
-                            new UserProfileDlg(this.aclEntry.principalNodeId, getAppState(null)).open();
+                            new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
                     }),
                 isPublic

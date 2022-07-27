@@ -162,7 +162,7 @@ export class RightNavPanel extends Div {
                     // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
                         className: "clickable",
-                        onClick: () => { new UserProfileDlg(null, getAppState(null)).open(); }
+                        onClick: () => { new UserProfileDlg(null).open(); }
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
@@ -192,7 +192,7 @@ export class RightNavPanel extends Div {
 
             if (!state.isAnonUser) {
                 attr.onClick = () => {
-                    new UserProfileDlg(null, state).open();
+                    new UserProfileDlg(null).open();
                 };
                 attr.title = "Click to edit your Profile Info";
             }
@@ -225,7 +225,7 @@ export class RightNavPanel extends Div {
 
             if (!state.isAnonUser) {
                 attr.onClick = () => {
-                    new UserProfileDlg(null, state).open();
+                    new UserProfileDlg(null).open();
                 };
                 attr.title = "Click to edit your Profile Info";
             }

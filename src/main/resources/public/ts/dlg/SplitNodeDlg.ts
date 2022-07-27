@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,7 +20,7 @@ export class SplitNodeDlg extends DialogBase {
 
     delimiterState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(private node: J.NodeInfo, state: AppState) {
+    constructor(private node: J.NodeInfo) {
         super("Split Node", null, false);
 
         if (!this.node) {

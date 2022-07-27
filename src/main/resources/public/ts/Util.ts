@@ -393,7 +393,7 @@ export class Util {
             this.waitCounter++;
             if (this.waitCounter >= 3) {
                 if (!this.pgrsDlg) {
-                    const dlg = new ProgressDlg(state);
+                    const dlg = new ProgressDlg();
                     this.pgrsDlg = dlg;
                     this.pgrsDlg.open();
                 }
@@ -643,16 +643,16 @@ export class Util {
     }
 
     flashMessage = (message: string, title: string, preformatted: boolean = false) => {
-        new MessageDlg(message, title, null, null, preformatted, 3000, "app-modal-content-narrow-width", null).open();
+        new MessageDlg(message, title, null, null, preformatted, 3000, "app-modal-content-narrow-width").open();
     }
 
     flashMessageQuick = (message: string, title: string, preformatted: boolean = false) => {
-        new MessageDlg(message, title, null, null, preformatted, 2000, "app-modal-content-narrow-width", null).open();
+        new MessageDlg(message, title, null, null, preformatted, 2000, "app-modal-content-narrow-width").open();
     }
 
     showMessage = (message: string, title: string = null, preformatted: boolean = false): Promise<DialogBase> => {
         if (!message) return;
-        return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();
+        return new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
     addAllToSet = (set: Set<string>, array) => {
@@ -1087,12 +1087,12 @@ export class Util {
 
     generateNewCryptoKeys = async (state: AppState): Promise<any> => {
         let dlg = new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-danger");
         await dlg.open();
         if (!dlg.yes) return;
 
         dlg = new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
-            "btn-danger", "alert alert-danger", state);
+            "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
             S.encryption.initKeys(true);
@@ -1497,7 +1497,7 @@ export class Util {
             let startTimeStr = S.util.getParameterByName("t");
             let startTime = startTimeStr ? parseInt(startTimeStr) : 0;
             setTimeout(() => {
-                new AudioPlayerDlg(null, null, null, audioUrl, startTime, getAppState()).open();
+                new AudioPlayerDlg(null, null, null, audioUrl, startTime).open();
             }, 500);
         }
     }
@@ -1506,7 +1506,7 @@ export class Util {
         let passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
-                new ChangePasswordDlg(passCode, state).open();
+                new ChangePasswordDlg(passCode).open();
             }, 100);
         }
     }

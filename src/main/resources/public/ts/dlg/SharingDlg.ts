@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,7 +20,7 @@ interface LS { // Local State
 export class SharingDlg extends DialogBase {
     dirty: boolean = false;
 
-    constructor(private node: J.NodeInfo, state: AppState) {
+    constructor(private node: J.NodeInfo) {
         super("Node Sharing", "app-modal-content-medium-width", null);
         this.mergeState<LS>({ nodePrivsInfo: null, recursive: false });
     }
@@ -73,7 +72,7 @@ export class SharingDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     new Button("Add Person", async () => {
-                        let friendsDlg: FriendsDlg = new FriendsDlg(this.node, this.appState, true);
+                        let friendsDlg: FriendsDlg = new FriendsDlg(this.node, true);
                         await friendsDlg.open();
                         if (friendsDlg.getState().selectedName) {
                             this.dirty = true;

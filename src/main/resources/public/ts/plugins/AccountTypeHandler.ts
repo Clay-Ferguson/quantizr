@@ -42,7 +42,7 @@ export class AccountTypeHandler extends TypeBase {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
                     // their own account this is not a way to do it.
                     if (!S.props.isMine(node, state)) {
-                        new UserProfileDlg(node.ownerId, state).open();
+                        new UserProfileDlg(node.ownerId).open();
                     }
                 }
             })

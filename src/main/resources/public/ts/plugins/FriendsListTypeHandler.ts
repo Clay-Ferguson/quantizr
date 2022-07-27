@@ -29,7 +29,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends", { className: "marginAll" }),
             new Div("These are the people you follow. Delete from this list to unfollow the person.", { className: "marginLeft" }),
             new Button("Find People", () => {
-                new SearchUsersDlg(state).open();
+                new SearchUsersDlg().open();
             }, { className: "marginAll" })
         ]);
     }

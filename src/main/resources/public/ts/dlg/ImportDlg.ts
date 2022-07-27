@@ -1,5 +1,4 @@
 import { getAppState } from "../AppRedux";
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -13,7 +12,7 @@ import { MessageDlg } from "./MessageDlg";
 export class ImportDlg extends DialogBase {
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Import from XML", null, false);
     }
 
@@ -46,7 +45,7 @@ export class ImportDlg extends DialogBase {
 
         let hltNode = S.nodeUtil.getHighlightedNode(this.appState);
         if (!hltNode) {
-            new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null, this.appState).open();
+            new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null).open();
             return;
         }
 
@@ -61,7 +60,7 @@ export class ImportDlg extends DialogBase {
 
     importResponse = (res: J.ImportResponse) => {
         if (S.util.checkSuccess("Import", res)) {
-            new MessageDlg("Import Successful", "Import", null, null, false, 0, null, this.appState).open();
+            new MessageDlg("Import Successful", "Import", null, null, false, 0, null).open();
 
             S.view.refreshTree({
                 nodeId: null,

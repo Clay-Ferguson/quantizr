@@ -1,5 +1,4 @@
 import { dispatch } from "../AppRedux";
-import { AppState } from "../AppState";
 import { DialogMode } from "../enums/DialogMode";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
@@ -95,7 +94,7 @@ export class EditNodeDlgUtil {
             S.edit.saveNodeResponse(state.node, res, true, dlg.appState);
 
             if (askToSplit) {
-                new SplitNodeDlg(state.node, dlg.appState).open();
+                new SplitNodeDlg(state.node).open();
             }
         }
 
@@ -135,7 +134,7 @@ export class EditNodeDlgUtil {
 
     addProperty = async (dlg: EditNodeDlg) => {
         let state: LS = dlg.getState<LS>();
-        let propDlg = new EditPropertyDlg(state.node, dlg.appState);
+        let propDlg = new EditPropertyDlg(state.node);
         await propDlg.open();
 
         if (propDlg.nameState.getValue()) {
@@ -182,7 +181,7 @@ export class EditNodeDlgUtil {
     upload = async (file: File, dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
 
-        let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, dlg.appState, async () => {
+        let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, async () => {
             await this.refreshBinaryPropsFromServer(dlg, state.node);
             this.initPropStates(dlg, state.node, true);
             dlg.mergeState<LS>({ node: state.node });
@@ -214,7 +213,7 @@ export class EditNodeDlgUtil {
 
     deletePropertiesButtonClick = async (dlg: EditNodeDlg) => {
         let confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
-            "btn-danger", "alert alert-danger", dlg.appState);
+            "btn-danger", "alert alert-danger");
         await confirmDlg.open();
         if (confirmDlg.yes) {
             this.deleteSelectedProperties(dlg);
@@ -457,7 +456,7 @@ an upload has been added or removed. */
 
     insertMention = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
-            let friendDlg: FriendsDlg = new FriendsDlg(null, dlg.appState, true);
+            let friendDlg: FriendsDlg = new FriendsDlg(null, true);
             await friendDlg.open();
             if (friendDlg.getState().selectedName) {
                 dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
@@ -467,7 +466,7 @@ an upload has been added or removed. */
 
     insertEmoji = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
-            let emojiDlg: EmojiPickerDlg = new EmojiPickerDlg(dlg.appState);
+            let emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
             await emojiDlg.open();
             if (emojiDlg.getState().selectedEmoji) {
                 dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);

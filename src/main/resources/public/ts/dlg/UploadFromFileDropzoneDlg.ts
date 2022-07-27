@@ -1,5 +1,4 @@
 import Dropzone from "dropzone";
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -38,7 +37,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
-        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, state: AppState, public afterUploadFunc: Function) {
+        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false);
 
         // if control key is down we trigger a click on the "Clipboard" button for the user.
@@ -76,7 +75,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, false, true);
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
@@ -89,7 +88,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true, true);
+                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
@@ -361,7 +360,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         if (!this.importMode && !this.zipQuestionAnswered && this.hasAnyZipFiles()) {
             this.zipQuestionAnswered = true;
             let dlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
-                "Explode Zips?", null, null, this.appState);
+                "Explode Zips?", null, null);
 
             await dlg.open();
             this.explodeZips = dlg.yes;

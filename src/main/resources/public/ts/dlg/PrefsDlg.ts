@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -12,7 +11,7 @@ import { S } from "../Singletons";
 // NOTE: THIS DIALOG IS CURRENTLY NOT USED BUT WE NEED TO KEEP IT BECAUSE IN THE FUTURE IT LIKELY WILL BE
 export class PrefsDlg extends DialogBase {
 
-    constructor(state: AppState) {
+    constructor() {
         super("Preferences", null, false);
     }
 

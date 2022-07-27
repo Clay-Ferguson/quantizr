@@ -363,7 +363,7 @@ export class View {
             getTags: true,
             getMentions: true
         });
-        new NodeStatsDlg(res, trending, feed, state).open();
+        new NodeStatsDlg(res, trending, feed).open();
     }
 
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {

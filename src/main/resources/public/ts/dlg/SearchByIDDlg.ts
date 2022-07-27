@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -14,7 +13,7 @@ export class SearchByIDDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(state: AppState) {
+    constructor() {
         super("Search for Node ID", "app-modal-content-medium-width", false);
         this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();

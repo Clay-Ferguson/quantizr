@@ -57,7 +57,7 @@ export class ServerPush {
             new MessageDlg("Your session has ended due to inactivity." + message, "Quanta",
                 () => {
                     history.go(0);
-                }, null, false, 0, "app-modal-content-tiny-width", state
+                }, null, false, 0, "app-modal-content-tiny-width"
             ).open();
         });
 

@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -47,7 +46,7 @@ export class MediaRecorderDlg extends DialogBase {
     public uploadRequested: boolean;
     public recorded: boolean;
 
-    constructor(state: AppState, public videoMode: boolean, private allowSave: boolean) {
+    constructor(public videoMode: boolean, private allowSave: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false);
         this.mergeState<LS>({
             status: "",
@@ -306,10 +305,10 @@ export class MediaRecorderDlg extends DialogBase {
             const url = URL.createObjectURL(this.blob);
 
             if (this.videoMode) {
-                new VideoPlayerDlg("recorder", url, null, DialogMode.POPUP, this.appState).open();
+                new VideoPlayerDlg("recorder", url, null, DialogMode.POPUP).open();
             }
             else {
-                new AudioPlayerDlg(null, null, null, url, 0, this.appState).open();
+                new AudioPlayerDlg(null, null, null, url, 0).open();
             }
         }
     }
@@ -330,7 +329,7 @@ export class MediaRecorderDlg extends DialogBase {
     cancel = async () => {
         if (this.recorded) {
             let dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
-                "btn-danger", "alert alert-danger", this.appState);
+                "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
                 this.cancelImmediate();
