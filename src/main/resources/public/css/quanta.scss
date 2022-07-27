@@ -1787,8 +1787,11 @@ i'm backing out for now
     border-radius: $border-radius;
 }
 
-.dialogContentArea {
-    //border: 1px solid red;
+.height-75vh {
+    max-height: 70vh;
+}
+
+.vert-scroll {
     overflow: auto;
 }
 

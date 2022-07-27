@@ -242,14 +242,14 @@ export class EditNodeDlg extends DialogBase {
 
     getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState<LS>();
-        let comps: CompIntf[] = [];
-
         if (S.props.isEncrypted(state.node)) {
-            comps.push(new Icon({
-                className: "fa fa-lock fa-lg iconMarginLeft"
-            }));
+            return [
+                new Icon({
+                    className: "fa fa-lock fa-lg iconMarginLeft"
+                })
+            ];
         }
-        return comps;
+        return null;
     }
 
     renderDlg(): CompIntf[] {
@@ -340,10 +340,10 @@ export class EditNodeDlg extends DialogBase {
 
         let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node, this);
         let isPublic = S.props.isPublic(state.node);
-        
+
         // #unpublish-disabled
         // let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
-        
+
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
@@ -419,7 +419,7 @@ export class EditNodeDlg extends DialogBase {
 
         propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
             this.tagsState.getValue() ? tagsEditRow : null,
-            propsPanel, morePanel, new Clearfix()]);
+            propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
         return children;
     }
 
@@ -634,7 +634,7 @@ export class EditNodeDlg extends DialogBase {
 
     renderButtons(): CompIntf {
         let state = this.getState<LS>();
-        let hasAttachment: boolean = S.props.hasBinary(state.node);
+        // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         let typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {

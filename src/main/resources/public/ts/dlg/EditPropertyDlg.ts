@@ -24,7 +24,11 @@ export class EditPropertyDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextField({ label: "Name", val: this.nameState })
-            ])
+            ]),
+            new ButtonBar([
+                new Button("Save", this.save, null, "btn-primary"),
+                new Button("Cancel", this.close)
+            ], "marginTop")
         ];
     }
 
@@ -53,12 +57,5 @@ export class EditPropertyDlg extends DialogBase {
             return;
         }
         this.close();
-    }
-
-    renderButtons(): CompIntf {
-        return new ButtonBar([
-            new Button("Save", this.save, null, "btn-primary"),
-            new Button("Cancel", this.close)
-        ], "marginTop");
     }
 }

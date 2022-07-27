@@ -8,7 +8,7 @@ interface LS { // Local State
 export class ListBox extends Div {
 
     constructor(public valueIntf: ValueIntf) {
-        super(null, new State());
+        super(null);
         this.setClass("list-group marginBottom");
 
         if (this.valueIntf) {

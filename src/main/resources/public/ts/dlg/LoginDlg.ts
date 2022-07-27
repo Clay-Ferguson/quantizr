@@ -32,7 +32,11 @@ export class LoginDlg extends DialogBase {
                     new Span("Signup", { className: "clickable", onClick: this.signup }),
                     new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword })
                 ])
-            ])
+            ]),
+            new ButtonBar([
+                new Button("Login", this.login, null, "btn-primary"),
+                new Button("Close", this.close, null, "btn-secondary float-end")
+            ], "marginTop")
         ];
     }
 
@@ -123,12 +127,5 @@ export class LoginDlg extends DialogBase {
             this.close();
             new ResetPasswordDlg(usr, this.appState).open();
         }
-    }
-
-    renderButtons(): CompIntf {
-        return new ButtonBar([
-            new Button("Login", this.login, null, "btn-primary"),
-            new Button("Close", this.close, null, "btn-secondary float-end")
-        ], "marginTop");
     }
 }

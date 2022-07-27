@@ -35,9 +35,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     opened: boolean = false;
     loaded: boolean = false;
 
-    /* I added this capability to make the internals of the dialog scroll, but didn't like it ultimately */
-    internalScrolling: boolean = false;
-
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
@@ -71,7 +68,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
     closed. */
-    open = (display: string = null): Promise<DialogBase> => {
+    open = (): Promise<DialogBase> => {
         if (this.mode === DialogMode.EMBED) {
             return;
         }
@@ -106,9 +103,9 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             }
 
             /* If the dialog has a function to load from server, call here first */
-            const queryServerPromise = this.preLoad();
-            if (queryServerPromise) {
-                await queryServerPromise;
+            const preLoadPromise = this.preLoad();
+            if (preLoadPromise) {
+                await preLoadPromise;
             }
 
             if (this.mode === DialogMode.POPUP) {
@@ -198,10 +195,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     abstract renderDlg(): CompIntf[];
 
-    renderButtons(): CompIntf {
-        return null;
-    }
-
     /* Can be overridden to customize content (normally icons) in title bar */
     getExtraTitleBarComps(): CompIntf[] {
         return null;
@@ -216,23 +209,12 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     }
 
     preRender(): void {
-        // Dialog Header with close button (x) right justified on it.
-        const children: CompIntf[] = [];
-        const titleIconComp: CompIntf = this.getTitleIconComp();
-        const titleText: string = this.getTitleText();
-        const extraHeaderComps = this.getExtraTitleBarComps();
-        let useTitle = titleText || this.title;
-
+        let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
-        let titleChildren: CompIntf[] = [titleIconComp,
-            useTitle ? new Span(useTitle) : null
-        ];
 
-        if (extraHeaderComps) {
-            titleChildren = titleChildren.concat(extraHeaderComps);
-        }
-
-        titleChildren = titleChildren.concat(
+        let titleChildren: CompIntf[] = [this.getTitleIconComp(),
+            useTitle ? new Span(useTitle) : null,
+            ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
             new Div(null, { className: "app-modal-title-close-icon float-end" }, [
                 new Icon({
                     className: "fa fa-times fa-lg",
@@ -242,45 +224,15 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                     },
                     title: "Close Dialog"
                 })
-            ]));
+            ])
+        ];
 
-        if (this.title) {
-            children.push(new Div(null, {
+        this.setChildren([
+            this.title ? new Div(null, {
                 className: "app-modal-title"
             },
-                titleChildren
-            ));
-        }
-
-        let contentAttribs: any = null;
-
-        /* This will make the content area of the dialog above the buttons be scrollable, with a max size that is the full
-        page size before scrolling. This scrolling makes the dialog buttons always stay visible and not themselves scroll */
-        if (this.internalScrolling) {
-            const style = {
-                maxHeight: "" + (window.innerHeight - 50) + "px"
-            };
-            contentAttribs = {
-                className: "dialogContentArea",
-                style
-            };
-        }
-
-        let renderComps: CompIntf[] = null;
-        try {
-            renderComps = this.renderDlg();
-        }
-        catch (ex) {
-            S.util.logAndReThrow("renderDlg failed on " + this.getId(), ex);
-        }
-        const contentDiv = new Div(null, contentAttribs, renderComps);
-        children.push(contentDiv);
-
-        let buttons: CompIntf = this.renderButtons();
-        if (buttons) {
-            children.push(buttons);
-        }
-
-        this.setChildren(children);
+                titleChildren) : null,
+            new Div(null, null, this.renderDlg())
+        ]);
     }
 }
