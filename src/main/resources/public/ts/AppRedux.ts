@@ -5,6 +5,8 @@ import { AppAction } from "./Interfaces";
 
 export const initialState = new AppState();
 
+let inDispatch: boolean = false;
+
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
  */
@@ -30,6 +32,9 @@ export function rootReducer(state: AppState = initialState, action: AppAction) {
 export const store = createStore(rootReducer);
 
 export const getAppState = (state?: AppState): AppState => {
+    if (inDispatch) {
+        console.warn("WARNING: calling getAppState while in a dispatch. This is probably a bug.");
+    }
     return state || store.getState();
 };
 
@@ -39,9 +44,17 @@ export const useAppState = (state?: AppState): AppState => {
 
 // NOTE: This dispatch is synchronous (not asynchronous)
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
+
+    // dispatch is synchronous so it's safe to use this inDispatch the way we are here.
+    try {
+        inDispatch = true;
     // console.log(" Dispatch Running: " + actionName);
     store.dispatch({ type: actionName, update });
     // console.log("Dispatch Complete: " + actionName);
+    }
+    finally {
+        inDispatch = false;
+    }
 };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
