@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -64,7 +65,7 @@ export class NodeStatsDlg extends DialogBase {
                 new Button("Ok", () => {
                     this.close();
                 }, null, "btn-primary"),
-                new HelpButton(() => this.appState.config?.help?.nodeStats?.dialog)
+                new HelpButton(() => getAppState().config?.help?.nodeStats?.dialog)
             ], "marginTop")
         ];
     }

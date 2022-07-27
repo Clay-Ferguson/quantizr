@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,10 +22,10 @@ export class PrefsDlg extends DialogBase {
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
                         setValue: (checked: boolean) => {
-                            this.appState.userPrefs.showMetaData = checked;
+                            getAppState().userPrefs.showMetaData = checked;
                         },
                         getValue: (): boolean => {
-                            return this.appState.userPrefs.showMetaData;
+                            return getAppState().userPrefs.showMetaData;
                         }
                     })
                 ]),
@@ -37,17 +38,17 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = async () => {
-        if (!this.appState.isAnonUser) {
+        if (!getAppState().isAnonUser) {
             let res = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: this.appState.homeNodeId,
+                userNodeId: getAppState().homeNodeId,
                 userPreferences: {
-                    editMode: this.appState.userPrefs.editMode,
-                    showMetaData: this.appState.userPrefs.showMetaData,
-                    nsfw: this.appState.userPrefs.nsfw,
-                    showParents: this.appState.userPrefs.showParents,
-                    showReplies: this.appState.userPrefs.showReplies,
-                    rssHeadlinesOnly: this.appState.userPrefs.rssHeadlinesOnly,
-                    mainPanelCols: this.appState.userPrefs.mainPanelCols,
+                    editMode: getAppState().userPrefs.editMode,
+                    showMetaData: getAppState().userPrefs.showMetaData,
+                    nsfw: getAppState().userPrefs.nsfw,
+                    showParents: getAppState().userPrefs.showParents,
+                    showReplies: getAppState().userPrefs.showReplies,
+                    rssHeadlinesOnly: getAppState().userPrefs.rssHeadlinesOnly,
+                    mainPanelCols: getAppState().userPrefs.mainPanelCols,
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }
@@ -59,7 +60,7 @@ export class PrefsDlg extends DialogBase {
 
     savePreferencesResponse = (res: J.SaveUserPreferencesResponse) => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
-            S.quanta.refresh(this.appState);
+            S.quanta.refresh(getAppState());
         }
     }
 }

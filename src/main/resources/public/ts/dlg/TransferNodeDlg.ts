@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -31,7 +32,7 @@ export class TransferNodeDlg extends DialogBase {
             new Form(null, [
                 new HorizontalLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
-                    this.appState.isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
+                    getAppState().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
                     new TextField({ label: "To User", val: this.toUserState })
                 ]),
                 new HorizontalLayout([
@@ -70,7 +71,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(this.appState);
+        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;
@@ -93,7 +94,7 @@ export class TransferNodeDlg extends DialogBase {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            state: this.appState
+            state: getAppState()
         });
         S.util.showMessage(res.message, "Success");
         this.close();

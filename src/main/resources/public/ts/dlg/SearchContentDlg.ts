@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -68,7 +69,7 @@ export class SearchContentDlg extends DialogBase {
             new Form(null, [
                 new Div(null, { className: "row align-items-end" }, [
                     this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-10" }),
-                    !this.appState.isAnonUser ? this.createSearchFieldIconButtons() : null
+                    !getAppState().isAnonUser ? this.createSearchFieldIconButtons() : null
                 ]),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
@@ -131,7 +132,7 @@ export class SearchContentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph),
-                    new HelpButton(() => this.appState.config?.help?.search?.dialog),
+                    new HelpButton(() => getAppState().config?.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -173,7 +174,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.nodeUtil.getHighlightedNode(this.appState);
+        let node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -182,7 +183,7 @@ export class SearchContentDlg extends DialogBase {
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
         this.close();
-        S.render.showGraph(null, SearchContentDlg.defaultSearchText, this.appState);
+        S.render.showGraph(null, SearchContentDlg.defaultSearchText, getAppState());
     }
 
     search = () => {
@@ -191,7 +192,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.nodeUtil.getHighlightedNode(this.appState);
+        let node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -206,7 +207,7 @@ export class SearchContentDlg extends DialogBase {
             requirePriority = false;
         }
 
-        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc,
+        S.srch.search(node, null, SearchContentDlg.defaultSearchText, getAppState(), null, desc,
             this.getState<LS>().fuzzy,
             this.getState<LS>().caseSensitive, 0,
             this.getState<LS>().recursive,

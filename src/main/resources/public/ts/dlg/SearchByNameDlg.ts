@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -59,7 +60,7 @@ export class SearchByNameDlg extends DialogBase {
         SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "Node Name: " + SearchByNameDlg.defaultSearchText;
-        S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, this.appState, null, desc, false,
+        S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, getAppState(), null, desc, false,
             false, 0, true, "mtm", "DESC", false, this.close);
     }
 }

@@ -1,4 +1,4 @@
-import { dispatch } from "../AppRedux";
+import { dispatch, getAppState } from "../AppRedux";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -102,7 +102,7 @@ export class EditNodeDlg extends DialogBase {
             selectedProps: new Set<string>()
         });
 
-        this.allowEditAllProps = this.appState.isAdminUser;
+        this.allowEditAllProps = getAppState().isAdminUser;
         this.utl.initStates(this);
         this.initialProps = S.util.arrayClone(node.properties);
 
@@ -231,7 +231,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit(this);
-                    S.nav.closeFullScreenViewer(this.appState);
+                    S.nav.closeFullScreenViewer(getAppState());
                     S.view.jumpToId(state.node.id);
                 }
             }));
@@ -318,7 +318,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
-            let rows = this.appState.mobileMode ? "8" : "10";
+            let rows = getAppState().mobileMode ? "8" : "10";
             if (customProps && hasContentProp) {
                 rows = "4";
             }
@@ -337,7 +337,7 @@ export class EditNodeDlg extends DialogBase {
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         let binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node, this);
+        let shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), state.node, this);
         let isPublic = S.props.isPublic(state.node);
 
         // #unpublish-disabled
@@ -452,7 +452,7 @@ export class EditNodeDlg extends DialogBase {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("prop=" + S.util.prettyPrint(prop));
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
                     // console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -644,8 +644,8 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        let allowUpload: boolean = typeHandler ? (this.appState.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
-        let allowShare: boolean = typeHandler ? (this.appState.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
+        let allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, getAppState())) : true;
+        let allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, getAppState())) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         let datePropExists = S.props.getProp(J.NodeProp.DATE, state.node);
@@ -678,7 +678,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
-            S.util.fullscreenViewerActive(this.appState)
+            S.util.fullscreenViewerActive(getAppState())
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, state.node.id);
                     this.close();
@@ -755,7 +755,7 @@ export class EditNodeDlg extends DialogBase {
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
         let tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
-        let allowEditAllProps: boolean = this.appState.isAdminUser;
+        let allowEditAllProps: boolean = getAppState().isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let editItems = [];
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
@@ -849,7 +849,7 @@ export class EditNodeDlg extends DialogBase {
             rows
         }, this.contentEditorState, "font-inherit displayCell", true);
 
-        let wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, this.appState.node) !== "1";
+        let wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
         this.contentEditor.onMount((elm: HTMLElement) => {
@@ -857,7 +857,7 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("decrypting: " + value);
                 let cipherText = value.substring(J.Constant.ENC_TAG.length);
                 (async () => {
-                    let cipherKey = S.props.getCryptoKey(node, this.appState);
+                    let cipherKey = S.props.getCryptoKey(node, getAppState());
                     if (cipherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 

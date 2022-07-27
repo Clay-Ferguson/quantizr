@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -60,7 +61,7 @@ export class SearchByIDDlg extends DialogBase {
         SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "For ID: " + SearchByIDDlg.defaultSearchText;
-        S.srch.search(null, "node.id", SearchByIDDlg.defaultSearchText, this.appState, null, desc, false,
+        S.srch.search(null, "node.id", SearchByIDDlg.defaultSearchText, getAppState(), null, desc, false,
             false, 0, true, null, null, false, this.close);
     }
 }

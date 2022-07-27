@@ -61,7 +61,7 @@ export class UserProfileDlg extends DialogBase {
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
 
         let web3Div: Div = null;
-        let web3Enabled = this.appState.allowedFeatures && this.appState.allowedFeatures.indexOf("web3") !== -1;
+        let web3Enabled = getAppState().allowedFeatures && getAppState().allowedFeatures.indexOf("web3") !== -1;
 
         if (web3Enabled) {
             let web3Comps: CompIntf[] = [];
@@ -172,8 +172,8 @@ export class UserProfileDlg extends DialogBase {
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.user.userLogout }),
 
                 new ButtonBar([
-                    this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    (this.appState.isAnonUser || this.readOnly || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
+                    getAppState().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    (getAppState().isAnonUser || this.readOnly || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 
@@ -183,10 +183,10 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
-                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
-                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
-                    !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
-                    !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block", this.blockUser) : null,
+                    !getAppState().isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
+                    !getAppState().isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
+                    !getAppState().isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Follow", this.addFriend) : null,
+                    !getAppState().isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Block", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
@@ -242,7 +242,7 @@ export class UserProfileDlg extends DialogBase {
         let state = this.getState<LS>();
         let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: this.appState.userProfile.userTags,
+            userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: false,
@@ -255,7 +255,7 @@ export class UserProfileDlg extends DialogBase {
         let state = this.getState<LS>();
         let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: this.appState.userProfile.userTags,
+            userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: true,
@@ -282,7 +282,7 @@ export class UserProfileDlg extends DialogBase {
     sendMessage = () => {
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, false, null, this.userNodeId, null, null, null, false, this.appState);
+            S.edit.addNode(null, false, null, this.userNodeId, null, null, null, false, getAppState());
         }, 10);
     }
 
@@ -335,7 +335,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             let avatarVer = state.userProfile.avatarVer;
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, avatarVer);
+            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, avatarVer);
         }
 
         let onClick = async () => {
@@ -394,7 +394,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             let headerImageVer = state.userProfile.headerImageVer;
-            src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, headerImageVer);
+            src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, headerImageVer);
         }
 
         let onClick = () => {

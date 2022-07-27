@@ -43,7 +43,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        let hltNode = S.nodeUtil.getHighlightedNode(this.appState);
+        let hltNode = S.nodeUtil.getHighlightedNode(getAppState());
         if (!hltNode) {
             new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null).open();
             return;
@@ -74,7 +74,7 @@ export class ImportDlg extends DialogBase {
                 forceRenderParent: false,
                 state: getAppState()
             });
-            S.view.scrollToNode(this.appState);
+            S.view.scrollToNode(getAppState());
         }
     }
 }

@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -24,7 +25,7 @@ export class SplitNodeDlg extends DialogBase {
         super("Split Node", null, false);
 
         if (!this.node) {
-            this.node = S.nodeUtil.getHighlightedNode(this.appState);
+            this.node = S.nodeUtil.getHighlightedNode(getAppState());
         }
 
         let splitMode: string;
@@ -128,7 +129,7 @@ export class SplitNodeDlg extends DialogBase {
             delim = this.delimiterState.getValue();
         }
 
-        S.edit.splitNode(this.node, state.splitType, delim, this.appState);
+        S.edit.splitNode(this.node, state.splitType, delim, getAppState());
         this.close();
     }
 }

@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -80,7 +81,7 @@ export class MediaRecorderDlg extends DialogBase {
                 // take the first one here
                 if (!audioInput) {
                     audioInput = device.deviceId;
-                    S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, this.appState.userName);
+                    S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, getAppState().userName);
                 }
 
                 // add to data for dropdown
@@ -91,7 +92,7 @@ export class MediaRecorderDlg extends DialogBase {
                 // take the first one here
                 if (!videoInput) {
                     videoInput = device.deviceId;
-                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, this.appState.userName);
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, getAppState().userName);
                 }
 
                 // add to data for dropdown
@@ -122,7 +123,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (this.videoMode) {
             this.videoPlayer = new VideoPlayer({
                 style: {
-                    width: this.appState.mobileMode ? "50%" : "100%",
+                    width: getAppState().mobileMode ? "50%" : "100%",
                     border: "3px solid gray",
                     display: "block",
                     padding: "0px",
@@ -147,7 +148,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string) => {
-                S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, this.appState.userName);
+                S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, getAppState().userName);
                 this.mergeState<LS>({ audioInput: val });
                 setTimeout(() => {
                     this.resetStream();
@@ -162,7 +163,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (this.videoMode) {
             videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
                 setValue: (val: string) => {
-                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, this.appState.userName);
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, getAppState().userName);
                     this.mergeState<LS>({ videoInput: val });
 
                     setTimeout(() => {

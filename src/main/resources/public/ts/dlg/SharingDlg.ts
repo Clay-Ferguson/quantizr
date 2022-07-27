@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -83,7 +84,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
-                    new HelpButton(() => this.appState.config?.help?.sharing?.dialog)
+                    new HelpButton(() => getAppState().config?.help?.sharing?.dialog)
                 ], "marginTop")
             ])
         ];
@@ -138,11 +139,11 @@ export class SharingDlg extends DialogBase {
                     let res = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: this.node.id
                     });
-                    S.quanta.refresh(this.appState);
+                    S.quanta.refresh(getAppState());
                 }, 100);
             }
             else {
-                S.quanta.refresh(this.appState);
+                S.quanta.refresh(getAppState());
             }
         }
     }

@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -76,7 +77,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 this.onUploadFunc();
             }
             else {
-                S.quanta.refresh(this.appState);
+                S.quanta.refresh(getAppState());
             }
         }
     }

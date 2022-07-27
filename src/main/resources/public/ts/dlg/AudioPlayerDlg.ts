@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
@@ -153,7 +154,7 @@ export class AudioPlayerDlg extends DialogBase {
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
                         new Button("Copy", this.copyToClipboard),
-                        !this.appState.isAnonUser ? new Button("Post", this.postComment) : null,
+                        !getAppState().isAnonUser ? new Button("Post", this.postComment) : null,
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
                     new Div(null, { className: "col-3 float-end" }, [
@@ -227,7 +228,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     postComment = () => {
         let link = this.getLink();
-        S.edit.addNode(null, false, "\n\n" + link, null, null, null, null, true, this.appState);
+        S.edit.addNode(null, false, "\n\n" + link, null, null, null, null, true, getAppState());
     }
 
     copyToClipboard = () => {

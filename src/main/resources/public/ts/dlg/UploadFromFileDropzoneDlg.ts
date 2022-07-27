@@ -1,4 +1,5 @@
 import Dropzone from "dropzone";
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -120,7 +121,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, this.appState);
+        }, getAppState());
     }
 
     uploadFromIPFS = () => {
@@ -130,7 +131,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, this.appState);
+        }, getAppState());
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
@@ -205,7 +206,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState<LS>();
 
         /* Limit based on user quota for our user accounts */
-        let maxFileSize = this.appState.userPrefs.maxUploadFileSize;
+        let maxFileSize = getAppState().userPrefs.maxUploadFileSize;
         // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
@@ -221,7 +222,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let config: Object = {
             action,
             width: "100%",
-            height: this.appState.mobileMode ? "60%" : "100%",
+            height: getAppState().mobileMode ? "60%" : "100%",
             progressBarWidth: "100%",
             url,
             headers: {
@@ -330,7 +331,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.domUtil.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
-            let maxUploadSize = this.appState.userPrefs.maxUploadFileSize;
+            let maxUploadSize = getAppState().userPrefs.maxUploadFileSize;
 
             if (this.autoAddFile) {
                 if (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB) {
@@ -372,7 +373,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxFileSizeMb = this.appState.userPrefs.maxUploadFileSize;
+        let maxFileSizeMb = getAppState().userPrefs.maxUploadFileSize;
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
                 return false;

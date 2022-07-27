@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -19,7 +20,7 @@ export class ManageAccountDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new ButtonBar([
-                !this.appState.isAdminUser ? new Button("Close Account", this.closeAccount) : null,
+                !getAppState().isAdminUser ? new Button("Close Account", this.closeAccount) : null,
                 new Button("Change Password", this.changePassword),
                 new Button("Bulk Delete", () => {
                     S.edit.bulkDelete();
@@ -36,6 +37,6 @@ export class ManageAccountDlg extends DialogBase {
     }
 
     changePassword = () => {
-        S.edit.openChangePasswordDlg(this.appState);
+        S.edit.openChangePasswordDlg(getAppState());
     }
 }

@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -74,13 +75,13 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(this.appState);
+        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
 
-        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), this.appState);
+        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), getAppState());
         this.close();
     }
 }

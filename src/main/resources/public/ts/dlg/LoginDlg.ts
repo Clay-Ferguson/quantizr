@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -70,7 +71,7 @@ export class LoginDlg extends DialogBase {
 
     signup = () => {
         this.close();
-        S.user.userSignup(this.appState);
+        S.user.userSignup(getAppState());
     }
 
     login = async () => {
@@ -112,7 +113,7 @@ export class LoginDlg extends DialogBase {
 
             if (res.success) {
                 S.quanta.authToken = res.authToken;
-                S.user.loginResponse(res, usr, pwd, true, this.appState);
+                S.user.loginResponse(res, usr, pwd, true, getAppState());
                 this.close();
             }
         }

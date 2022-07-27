@@ -1,4 +1,4 @@
-import { dispatch } from "../AppRedux";
+import { dispatch, getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -35,7 +35,7 @@ export class EditTagsDlg extends DialogBase {
 
     reload = async () => {
         let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId: this.appState.userProfile.userNodeId
+            userId: getAppState().userProfile.userNodeId
         });
 
         // console.log("UserProfile Response: " + S.util.prettyPrint(res));
@@ -45,20 +45,20 @@ export class EditTagsDlg extends DialogBase {
     }
 
     save = () => {
-        this.appState.userProfile.userTags = this.tagsState.getValue();
+        getAppState().userProfile.userTags = this.tagsState.getValue();
 
         dispatch("SetUserProfile", s => {
-            s.userProfile = this.appState.userProfile;
+            s.userProfile = getAppState().userProfile;
             return s;
         });
 
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: this.appState.userProfile.userTags,
-            userBio: this.appState.userProfile.userBio,
-            displayName: this.appState.userProfile.displayName,
+            userTags: getAppState().userProfile.userTags,
+            userBio: getAppState().userProfile.userBio,
+            displayName: getAppState().userProfile.displayName,
             publish: false,
-            mfsEnable: this.appState.userProfile.mfsEnable
+            mfsEnable: getAppState().userProfile.mfsEnable
         });
         this.close();
     }

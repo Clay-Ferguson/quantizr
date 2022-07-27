@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -114,7 +115,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     updateSuggestTags = async () => {
-        const node = this.appState.node;
+        const node = getAppState().node;
 
         let res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -136,9 +137,9 @@ export class SelectTagsDlg extends DialogBase {
 
     /* returns an array of objects like {tag, description} */
     parseTags = (): Tag[] => {
-        if (!this.appState.userProfile?.userTags) return null;
+        if (!getAppState().userProfile?.userTags) return null;
         let tags: Tag[] = [];
-        let lines: string[] = this.appState.userProfile.userTags.split(/\r?\n/);
+        let lines: string[] = getAppState().userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             if (line?.startsWith("#")) {
                 let tag = null;

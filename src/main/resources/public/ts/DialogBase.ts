@@ -26,14 +26,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     backdrop: HTMLElement;
 
-    /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
-    we need to just let the render methods grab the latest state like every other component in the render method.
-
-    todo-0: this is bad to have here, because we need to get it LIVE whenever needed, rather than capturing
-    a snapshot during the constructor, so completely remove this
-    */
-    appState: AppState;
-
     /* this is a slight hack so we can ignore 'close()' calls that are bogus, and doesn't apply to the EMBED mode */
     opened: boolean = false;
     loaded: boolean = false;
@@ -48,14 +40,11 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
-        // todo-0: need to check to be sure we're not inside a dispatch executor when we execute this (or any other?),
-        // getAppState(), because in a dispatch would imply we should've passed the current state from the dispatch function.
-        // so the dispatch impl will need a {dispatching = true -> finally dispatching=false} pattern.
-        this.appState = getAppState();
+        let appState = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
-        if (!forceMode && (!this.mode || this.appState.mobileMode)) {
-            this.mode = this.appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
+        if (!forceMode && (!this.mode || appState.mobileMode)) {
+            this.mode = appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
         }
 
         if (this.mode === DialogMode.EMBED) {
@@ -65,7 +54,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             this.attribs.className = "app-modal-content-fullscreen";
         }
         else {
-            this.attribs.className = this.appState.mobileMode
+            this.attribs.className = appState.mobileMode
                 ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
                 : (this.overrideClass ? this.overrideClass : "app-modal-content");
         }
@@ -82,13 +71,14 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
         return new Promise<DialogBase>(async (resolve, reject) => {
+            let appState = getAppState();
             if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.
                 this.backdrop = document.createElement("div");
                 this.backdrop.setAttribute("id", this.getId(DialogBase.BACKDROP_PREFIX));
 
                 // WARNING: Don't use 'className' here, this is pure javascript, and not React!
-                this.backdrop.setAttribute("class", "app-modal " + (this.appState.mobileMode ? "normalScrollbar" : "customScrollbar"));
+                this.backdrop.setAttribute("class", "app-modal " + (appState.mobileMode ? "normalScrollbar" : "customScrollbar"));
                 this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
                 document.body.appendChild(this.backdrop);
 
@@ -120,7 +110,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 if (++DialogBase.refCounter === 1) {
                     /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
                     full-screen dialogs are in use, which is when we need this. */
-                    if (this.appState.mobileMode) {
+                    if (appState.mobileMode) {
                         document.body.style.overflow = "hidden";
                     }
                 }
@@ -169,6 +159,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
+        let appState = getAppState();
 
         if (this.mode === DialogMode.POPUP) {
             if (this.getRef()) {
@@ -178,7 +169,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 S.domUtil.domElmRemove(this.getId(DialogBase.BACKDROP_PREFIX));
 
                 if (--DialogBase.refCounter <= 0) {
-                    if (this.appState.mobileMode) {
+                    if (appState.mobileMode) {
                         document.body.style.overflow = "auto";
                     }
                 }

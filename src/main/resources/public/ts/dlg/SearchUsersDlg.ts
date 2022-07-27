@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -48,7 +49,7 @@ export class SearchUsersDlg extends DialogBase {
         let adminOptions = null;
 
         adminOptions = new RadioButtonGroup([
-            this.appState.isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
+            getAppState().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
@@ -105,7 +106,7 @@ export class SearchUsersDlg extends DialogBase {
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new HelpButton(() => this.appState.config.help?.search?.dialog),
+                    new HelpButton(() => getAppState().config.help?.search?.dialog),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
                     // todo: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
                     // possible and not even all that difficult based on the existing code already written.
@@ -129,7 +130,7 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState<LS>().searchType, desc,
+        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, getAppState(), this.getState<LS>().searchType, desc,
             this.getState<LS>().fuzzy,
             this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, this.close);
     }

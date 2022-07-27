@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -114,7 +115,7 @@ export class ExportDlg extends DialogBase {
                 ]), false, 0, null
             ).open();
 
-            S.view.scrollToNode(this.appState);
+            S.view.scrollToNode(getAppState());
         }
     }
 }

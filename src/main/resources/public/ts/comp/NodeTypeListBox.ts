@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { ValueIntf } from "../Interfaces";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
@@ -23,7 +24,7 @@ export class NodeTypeListBox extends ListBox {
         let typeHandlers = S.plugin.getAllTypeHandlers();
 
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
-            if (this.appState.isAdminUser || typeHandler.getAllowUserSelect()) {
+            if (getAppState().isAdminUser || typeHandler.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(typeHandler, () => {
                     this.updateVal(typeHandler.getTypeName());
                 }, this.valueIntf.getValue() === typeHandler.getTypeName()));

@@ -1,4 +1,4 @@
-import { dispatch } from "../AppRedux";
+import { dispatch, getAppState } from "../AppRedux";
 import { DialogMode } from "../enums/DialogMode";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
@@ -29,7 +29,7 @@ export class EditNodeDlgUtil {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("prop=" + S.util.prettyPrint(prop));
 
-                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, dlg.appState)) {
+                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
                     // console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -52,7 +52,7 @@ export class EditNodeDlgUtil {
         let content: string;
         if (dlg.contentEditor) {
             content = dlg.contentEditor.getValue();
-            let cipherKey = S.props.getCryptoKey(state.node, dlg.appState);
+            let cipherKey = S.props.getCryptoKey(state.node, getAppState());
             if (cipherKey) {
                 content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
                 content = J.Constant.ENC_TAG + content;
@@ -86,12 +86,12 @@ export class EditNodeDlgUtil {
 
         // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
         // page refreshing after the edit.
-        if (res.node.type === J.NodeType.BOOKMARK && dlg.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
+        if (res.node.type === J.NodeType.BOOKMARK && getAppState().node.type !== J.NodeType.BOOKMARK_LIST) {
             // do nothing.
         }
         else {
             S.render.fadeInId = state.node.id;
-            S.edit.saveNodeResponse(state.node, res, true, dlg.appState);
+            S.edit.saveNodeResponse(state.node, res, true, getAppState());
 
             if (askToSplit) {
                 new SplitNodeDlg(state.node).open();
@@ -174,7 +174,7 @@ export class EditNodeDlgUtil {
 
     share = async (dlg: EditNodeDlg) => {
         let state = dlg.getState<LS>();
-        await S.edit.editNodeSharing(dlg.appState, state.node);
+        await S.edit.editNodeSharing(getAppState(), state.node);
         dlg.mergeState<LS>({ node: state.node });
     }
 
@@ -280,7 +280,7 @@ export class EditNodeDlgUtil {
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
         call has fully completed. */
-        let deleted: boolean = await S.attachment.deleteAttachment(state.node, dlg.appState);
+        let deleted: boolean = await S.attachment.deleteAttachment(state.node, getAppState());
 
         if (deleted) {
             S.attachment.removeBinaryProperties(state.node);
@@ -318,13 +318,13 @@ export class EditNodeDlgUtil {
             S.props.transferBinaryProps(res.node, node);
 
             if (res.node) {
-                S.nodeUtil.updateNodeMap(res.node, dlg.appState);
+                S.nodeUtil.updateNodeMap(res.node, getAppState());
             }
         }
     }
 
     initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
-        let allowEditAllProps: boolean = dlg.appState.isAdminUser;
+        let allowEditAllProps: boolean = getAppState().isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let propVal = propEntry.value;
         let propValStr = propVal || "";
@@ -431,7 +431,7 @@ an upload has been added or removed. */
                     return;
                 }
 
-                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, dlg.appState)) {
+                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAppState())) {
                     // ("Hiding property: " + prop.name);
                     return;
                 }
@@ -482,7 +482,7 @@ an upload has been added or removed. */
         dlg.getState<LS>().node.properties = dlg.initialProps;
 
         if (dlg.binaryDirty) {
-            S.quanta.refresh(dlg.appState);
+            S.quanta.refresh(getAppState());
         }
     }
 }
