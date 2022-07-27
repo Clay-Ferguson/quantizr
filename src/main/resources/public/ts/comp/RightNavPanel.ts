@@ -126,7 +126,7 @@ export class RightNavPanel extends Div {
                     !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
                     state.isAnonUser ? new Div("Login / Signup", {
                         className: "signupLinkText",
-                        onClick: e => { S.nav.login(state); }
+                        onClick: S.user.userLogin
                     }) : null,
 
                     new Div(null, { className: "bigMarginBottom" }, [

@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -19,8 +18,8 @@ export class LoginDlg extends DialogBase {
     userState: ValidatedState<any> = new ValidatedState<any>();
     pwdState: ValidatedState<any> = new ValidatedState<any>();
 
-    constructor(paramsTest: Object, state: AppState) {
-        super("Login", "app-modal-content-narrow-width", false, state);
+    constructor() {
+        super("Login", "app-modal-content-narrow-width", false, null);
     }
 
     renderDlg(): CompIntf[] {
@@ -71,7 +70,7 @@ export class LoginDlg extends DialogBase {
 
     signup = () => {
         this.close();
-        S.nav.signup(this.appState);
+        S.user.userSignup(this.appState);
     }
 
     login = async () => {

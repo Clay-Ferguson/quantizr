@@ -142,7 +142,7 @@ export class App extends Main {
                 }, "form-switch form-check-inline") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
-                onClick: () => { S.nav.login(state); }
+                onClick: S.user.userLogin
             }, "btn-primary marginRight", "off") : null;
 
             let logo = new Img(this.getId("logo_"), {

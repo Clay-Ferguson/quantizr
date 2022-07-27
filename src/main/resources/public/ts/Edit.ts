@@ -577,7 +577,7 @@ export class Edit {
         return state.node.children[0];
     }
 
-    getLastChildNode = (state: AppState): any => {
+    getLastChildNode = (state: AppState): J.NodeInfo => {
         if (!state.node || !state.node.children || state.node.children.length === 0) return null;
         return state.node.children[state.node.children.length - 1];
     }

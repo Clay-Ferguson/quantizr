@@ -403,8 +403,8 @@ export class MenuPanel extends Div {
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
             new MenuItem("Account Settings", MenuPanel.accountSettings, !state.isAnonUser), //
             new MenuItem("Storage Space", MenuPanel.storageSpace, !state.isAnonUser), //
-            !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null, //
-            state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null //
+            !state.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !state.isAnonUser) : null, //
+            state.isAnonUser ? new MenuItem("Signup", S.user.userSignup, state.isAnonUser) : null //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //

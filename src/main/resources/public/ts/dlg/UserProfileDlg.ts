@@ -169,7 +169,7 @@ export class UserProfileDlg extends DialogBase {
 
                 web3Div,
 
-                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.nav.logout }),
+                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.user.userLogout }),
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),

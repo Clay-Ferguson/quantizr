@@ -5,10 +5,8 @@ import { ButtonBar } from "./comp/core/ButtonBar";
 import { Heading } from "./comp/core/Heading";
 import { VerticalLayout } from "./comp/core/VerticalLayout";
 import { Constants as C } from "./Constants";
-import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
@@ -17,24 +15,6 @@ import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
-
-    login = (state: AppState) => {
-        new LoginDlg(null, state).open();
-    }
-
-    logout = (state: AppState = null) => {
-        state = getAppState(state);
-        S.user.logout(true, state);
-    }
-
-    signup = (state: AppState) => {
-        state = getAppState(state);
-        S.user.openSignupPg(state);
-    }
-
-    preferences = (state: AppState) => {
-        new PrefsDlg(state).open();
-    }
 
     displayingRepositoryRoot = (state: AppState): boolean => {
         if (!state.node) return false;

@@ -123,7 +123,7 @@ export class View {
     need to load more records automatically, and add to existing page records */
     growPage = (state: AppState) => {
         // console.log("growPage");
-        let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
+        let lastChildNode = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             // todo-0: review this 'targetOffset'. Is this correct now that duplicates are being removed
             // as part of the algorithm. In other words, when we add DOM elements, are we sure the logicalOrdinal 

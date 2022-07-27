@@ -2,6 +2,7 @@ import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -191,6 +192,7 @@ export class User {
             S.util.setStateVarsUsingLoginResponse(res);
 
             // we just processed a dispatch so we need to get the current state now.
+            // todo-0: replace all these with getAppState()
             state = store.getState();
 
             /* set ID to be the page we want to show user right after login */
@@ -240,7 +242,7 @@ export class User {
 
             // location.reload();
             if (!calledFromLoginDlg) {
-                S.nav.login(state);
+                this.userLogin();
             }
         }
     }
@@ -267,5 +269,19 @@ export class User {
                 return s;
             });
         }
+    }
+
+    userLogin = () => {
+        new LoginDlg().open();
+    }
+
+    userLogout = (state: AppState = null) => {
+        state = getAppState(state);
+        S.user.logout(true, state);
+    }
+
+    userSignup = (state: AppState = null) => {
+        state = getAppState(state);
+        S.user.openSignupPg(state);
     }
 }

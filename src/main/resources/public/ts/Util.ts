@@ -1537,7 +1537,7 @@ export class Util {
         }
         catch (e) {
             console.warn("anonPageLoad failed.");
-            S.nav.login(state);
+            S.user.userLogin();
         }
     }
 
