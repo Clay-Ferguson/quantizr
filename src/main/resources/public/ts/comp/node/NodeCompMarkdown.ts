@@ -1,4 +1,4 @@
-import { store } from "../../AppRedux";
+import { getAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Html } from "../../comp/core/Html";
 import * as J from "../../JavaIntf";
@@ -150,7 +150,7 @@ export class NodeCompMarkdown extends Html {
     decrypt = async () => {
         let state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
-        let appState: AppState = store.getState();
+        let appState = getAppState();
         let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 

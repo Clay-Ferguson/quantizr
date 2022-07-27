@@ -1,4 +1,4 @@
-import { getAppState, dispatch, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -303,7 +303,7 @@ export class Search {
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
-        let appState = store.getState();
+        let appState = getAppState();
         let data: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
         if (!data) {
             return;
@@ -400,7 +400,7 @@ export class Search {
     }
 
     showFollowers = async (page: number, userName: string) => {
-        let state: AppState = store.getState();
+        let state = getAppState();
         if (state.isAnonUser) return;
 
         if (!userName) {
@@ -442,7 +442,7 @@ export class Search {
     }
 
     showFollowing = async (page: number, userName: string) => {
-        let state: AppState = store.getState();
+        let state = getAppState();
         if (state.isAnonUser) return;
 
         if (!userName) {

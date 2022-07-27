@@ -146,7 +146,7 @@ export class Quanta {
                         allowScroll: true,
                         setTab: true,
                         forceRenderParent: false,
-                        state: store.getState()
+                        state: getAppState()
                     });
                     S.tabUtil.selectTab(C.TAB_MAIN);
                 }
@@ -209,13 +209,13 @@ export class Quanta {
 
                             // case "ArrowDown":
                             //     if (this.keyDebounce()) return;
-                            //     state = store.getState();
+                            //     state = getAppState()
                             //     S.view.scrollRelativeToNode("down", state);
                             //     break;
 
                             // case "ArrowUp":
                             //     if (this.keyDebounce()) return;
-                            //     state = store.getState();
+                            //     state = getAppState()
                             //     S.view.scrollRelativeToNode("up", state);
                             //     break;
 
@@ -229,7 +229,7 @@ export class Quanta {
 
                             case "ArrowRight":
                                 if (this.keyDebounce()) return;
-                                state = store.getState();
+                                state = getAppState();
                                 // S.nav.navOpenSelectedNode(state);
                                 if (state.fullScreenViewId) {
                                     S.nav.nextFullScreenImgViewer(state);
@@ -294,7 +294,7 @@ export class Quanta {
              * This call checks the server to see if we have a session already, and gets back the login information from
              * the session, and then renders page content, after that.
              */
-            await S.user.refreshLogin(store.getState());
+            await S.user.refreshLogin(getAppState());
             console.log("refreshLogin completed.");
 
             S.util.initProgressMonitor();

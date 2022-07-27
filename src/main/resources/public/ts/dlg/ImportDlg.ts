@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -73,7 +73,7 @@ export class ImportDlg extends DialogBase {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state: store.getState()
+                state: getAppState()
             });
             S.view.scrollToNode(this.appState);
         }

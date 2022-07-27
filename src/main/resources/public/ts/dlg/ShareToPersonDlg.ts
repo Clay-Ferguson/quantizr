@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -27,7 +27,7 @@ export class ShareToPersonDlg extends DialogBase {
             valid = false;
         }
         else {
-            if (this.userNameState.getValue() === store.getState().userName) {
+            if (this.userNameState.getValue() === getAppState().userName) {
                 this.userNameState.setError("You can't share a node to yourself.");
                 valid = false;
             }

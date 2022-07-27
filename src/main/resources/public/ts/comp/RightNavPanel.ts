@@ -1,4 +1,4 @@
-import { getAppState, store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
@@ -30,7 +30,7 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        let state: AppState = store.getState();
+        let state = getAppState();
 
         // mobile mode doesn't render the RHS at all.
         if (state.mobileMode) return;

@@ -1,4 +1,4 @@
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -192,8 +192,7 @@ export class User {
             S.util.setStateVarsUsingLoginResponse(res);
 
             // we just processed a dispatch so we need to get the current state now.
-            // todo-0: replace all these with getAppState()
-            state = store.getState();
+            state = getAppState();
 
             /* set ID to be the page we want to show user right after login */
             let id: string = null;

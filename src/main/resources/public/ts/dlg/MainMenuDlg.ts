@@ -1,13 +1,13 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
+import { CompIntf } from "../comp/base/CompIntf";
 import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
 import { MenuPanel } from "../MenuPanel";
-import { CompIntf } from "../comp/base/CompIntf";
 
 export class MainMenuDlg extends DialogBase {
 
     constructor() {
-        super(null, "app-modal-menu", true, store.getState(), DialogMode.POPUP, true);
+        super(null, "app-modal-menu", true, getAppState(), DialogMode.POPUP, true);
     }
 
     renderDlg(): CompIntf[] {

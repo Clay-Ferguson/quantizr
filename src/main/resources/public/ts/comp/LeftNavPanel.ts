@@ -1,5 +1,4 @@
-import { store, useAppState } from "../AppRedux";
-import { AppState } from "../AppState";
+import { getAppState, useAppState } from "../AppRedux";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
@@ -11,7 +10,6 @@ import { S } from "../Singletons";
 declare var g_brandingAppName;
 
 export class LeftNavPanel extends Div {
-
     private static scrollPos: number = 0;
 
     constructor() {
@@ -21,7 +19,7 @@ export class LeftNavPanel extends Div {
             tabIndex: "1"
         });
 
-        let state: AppState = store.getState();
+        let state = getAppState();
 
         let panelCols = state.userPrefs.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;

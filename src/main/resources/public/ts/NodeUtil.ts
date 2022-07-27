@@ -1,4 +1,4 @@
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Span } from "./comp/core/Span";
@@ -296,7 +296,7 @@ export class NodeUtil {
     }
 
     loadNodeFromIpfs = (node: J.NodeInfo): any => {
-        let state: AppState = store.getState();
+        let state = getAppState();
         new LoadNodeFromIpfsDlg(state).open();
     }
 

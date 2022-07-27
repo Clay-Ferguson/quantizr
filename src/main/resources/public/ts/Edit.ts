@@ -1,5 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -1012,7 +1012,7 @@ export class Edit {
         }
         else {
             setTimeout(() => {
-                let state: AppState = store.getState();
+                let state = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: true,
@@ -1212,7 +1212,7 @@ export class Edit {
                     s.nodesToMove = null;
                     return s;
                 });
-                let state: AppState = store.getState();
+                let state = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: false,

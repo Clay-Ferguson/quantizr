@@ -1,4 +1,4 @@
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
@@ -73,7 +73,7 @@ export class TabUtil {
                 //     name: "IPSM Console",
                 //     id: C.TAB_IPSM,
                 //     isVisible: () => {
-                //         let state: AppState = store.getState();
+                //         let state = getAppState();
                 //         return state.ipsmActive;
                 //     },
                 //     constructView: (data: TabIntf) => new IPSMView(s, data),
@@ -131,7 +131,7 @@ export class TabUtil {
     }
 
     resultSetHasData = (id: string) => {
-        let state: AppState = store.getState();
+        let state = getAppState();
         let data = state.tabData.find(d => d.id === id);
         return data && data.rsInfo && data.rsInfo.results && data.rsInfo.results.length > 0;
     }

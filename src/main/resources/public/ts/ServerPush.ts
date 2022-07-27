@@ -109,7 +109,7 @@ export class ServerPush {
         this.eventSource.addEventListener("newInboxNode", (e: any) => {
             // const obj: J.NotificationMessage = JSON.parse(e.data);
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
-            // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
+            // new InboxNotifyDlg("Your Inbox has updates!").open();
         }, false);
     }
 

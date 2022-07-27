@@ -3,7 +3,7 @@ import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, use
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
-import { store } from "../../AppRedux";
+import { getAppState } from "../../AppRedux";
 import { S } from "../../Singletons";
 import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
@@ -199,7 +199,7 @@ export abstract class Comp implements CompIntf {
     wrapClick = (obj: any) => {
         // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to 
         // give the animation time to run.
-        if (obj?.onClick && store.getState().mouseEffect) {
+        if (obj?.onClick && getAppState().mouseEffect) {
             obj.onClick = S.util.delayFunc(obj.onClick);
         }
     }

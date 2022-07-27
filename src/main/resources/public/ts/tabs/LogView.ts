@@ -1,5 +1,4 @@
-import { store } from "../AppRedux";
-import { AppState } from "../AppState";
+import { getAppState } from "../AppRedux";
 import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
@@ -33,7 +32,7 @@ export class LogView extends AppTab implements LogViewIntf {
     }
 
     preRender(): void {
-        const state: AppState = store.getState();
+        const state = getAppState();
         this.attribs.className = this.getClass(state);
 
         this.setChildren([
@@ -45,16 +44,4 @@ export class LogView extends AppTab implements LogViewIntf {
     // Opens the tab, querying the info from the server to update
     open = (readOnly: boolean, userId: string): any => {
     }
-
-    // close(): void {
-    //     // const state: AppState = store.getState();
-    //     // dispatch({
-    //     //     type: "Action_InitUserProfile",
-    //     //     state,
-    //     //     update: (s: AppState) => {
-    //     //         s.activeTab = C.TAB_MAIN;
-    //     //         s.userProfile = null;
-    //     //     }
-    //     // });
-    // }
 }

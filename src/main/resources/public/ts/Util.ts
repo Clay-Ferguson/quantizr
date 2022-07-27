@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import * as marked from "marked";
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -1252,7 +1252,7 @@ export class Util {
     }
 
     loadBookmarks = async () => {
-        let state: AppState = store.getState();
+        let state = getAppState();
         if (!state.isAnonUser) {
             let res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
             // let count = res.bookmarks ? res.bookmarks.length : 0;
@@ -1497,7 +1497,7 @@ export class Util {
             let startTimeStr = S.util.getParameterByName("t");
             let startTime = startTimeStr ? parseInt(startTimeStr) : 0;
             setTimeout(() => {
-                new AudioPlayerDlg(null, null, null, audioUrl, startTime, store.getState()).open();
+                new AudioPlayerDlg(null, null, null, audioUrl, startTime, getAppState()).open();
             }, 500);
         }
     }
