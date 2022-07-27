@@ -19,7 +19,6 @@ export class ConfirmDlg extends DialogBase {
                 new TextContent(this.text, this.textClass),
                 new ButtonBar([
                     new Button("Yes", () => {
-                        // note: Important to set answer here before closing (closing resolves a promise)
                         this.yes = true;
                         this.close();
                     }, null, this.yesButtonClass || "btn-primary"),

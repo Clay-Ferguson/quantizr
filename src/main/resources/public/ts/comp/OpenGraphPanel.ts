@@ -36,12 +36,12 @@ export class OpenGraphPanel extends Div {
     domAddEvent = () => {
         let elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
-        let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
+        let og = S.quanta.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
                 entries.forEach((entry: any) => {
                     if (entry.isIntersecting) {
-                        let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
+                        let og = S.quanta.openGraphData.get(this.url);
                         if (!og) {
                             if (!this.loading) {
                                 this.loading = true;
@@ -88,7 +88,7 @@ export class OpenGraphPanel extends Div {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {
-                    let og: J.OpenGraph = S.quanta.openGraphData.get(o.url);
+                    let og = S.quanta.openGraphData.get(o.url);
                     if (!og) {
                         if (!o.loading) {
                             o.loading = true;

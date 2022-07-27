@@ -13,7 +13,7 @@ interface LS { // Local State
 
 export class ChangeNodeTypeDlg extends DialogBase {
 
-    selTypeValueIntf: ValueIntf;
+    valIntf: ValueIntf;
     selCallback: Function = null;
     inlineButton: Button;
 
@@ -21,7 +21,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
         super("Set Node Type", "app-modal-content-narrow-width", false, state);
         this.selCallback = selCallback;
 
-        this.selTypeValueIntf = {
+        this.valIntf = {
             setValue: (val: string) => {
                 this.mergeState<LS>({ selType: val });
             },
@@ -37,7 +37,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new NodeTypeListBox(this.selTypeValueIntf, this.appState),
+                new NodeTypeListBox(this.valIntf, this.appState),
                 new ButtonBar([
                     new Button("Set Type", this.setNodeType, null, "btn-primary"),
                     new Button("Cancel", this.close)

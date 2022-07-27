@@ -35,7 +35,6 @@ export class FriendsDlg extends DialogBase {
                         this.close, 500);
                 }
             },
-
             getValue: (): string => {
                 return this.getState<LS>().selectedName;
             }
@@ -87,8 +86,5 @@ export class FriendsDlg extends DialogBase {
         if (dlg.userNameState.getValue()) {
             this.selectionValueIntf.setValue(dlg.userNameState.getValue());
         }
-
-        // this promise currently isn't needed
-        return null;
     }
 }

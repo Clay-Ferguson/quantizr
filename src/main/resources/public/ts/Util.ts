@@ -1296,7 +1296,7 @@ export class Util {
                 node.hasChildren = true;
                 if (doDispatch) {
                     dispatch("NodeChanges", s => {
-                        // todo-0: this is a bug even if everything's working ok. We need the entire for loop
+                        // 1: this is a bug even if everything's working ok. We need the entire for loop
                         // to be INSIDE this dispatch, and when you do that be careful and check how 'doDispatch'
                         // flag is supposed to work. This will also be FASTER with only a single dispatch
                         return state;
