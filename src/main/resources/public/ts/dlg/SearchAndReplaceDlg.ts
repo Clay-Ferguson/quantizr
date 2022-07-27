@@ -21,7 +21,7 @@ export class SearchAndReplaceDlg extends DialogBase {
     replaceState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Search and Replace", "app-modal-content-narrow-width", false, state);
+        super("Search and Replace", "app-modal-content-narrow-width", false);
         this.mergeState<LS>({ recursive: true });
     }
 

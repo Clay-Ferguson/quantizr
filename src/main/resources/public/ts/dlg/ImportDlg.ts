@@ -14,7 +14,7 @@ export class ImportDlg extends DialogBase {
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Import from XML", null, false, state);
+        super("Import from XML", null, false);
     }
 
     renderDlg(): CompIntf[] {

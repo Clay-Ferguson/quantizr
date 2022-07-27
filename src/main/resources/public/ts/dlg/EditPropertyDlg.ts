@@ -17,7 +17,7 @@ export class EditPropertyDlg extends DialogBase {
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private editNode: J.NodeInfo, state: AppState) {
-        super("New Property", "app-modal-content-narrow-width", false, state);
+        super("New Property", "app-modal-content-narrow-width", false);
     }
 
     renderDlg(): CompIntf[] {

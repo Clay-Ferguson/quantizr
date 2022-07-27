@@ -7,7 +7,7 @@ import { Spinner } from "../comp/core/Spinner";
 export class ProgressDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Loading...", "app-modal-content-tiny-width", false, state);
+        super("Loading...", "app-modal-content-tiny-width", false);
     }
 
     renderDlg(): CompIntf[] {

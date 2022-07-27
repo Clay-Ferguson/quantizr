@@ -17,7 +17,7 @@ export class UploadFromUrlDlg extends DialogBase {
     urlState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private nodeId: string, private url: string, private onUploadFunc: Function, state: AppState) {
-        super("Upload File", null, false, state);
+        super("Upload File", null, false);
     }
 
     validate = (): boolean => {

@@ -48,7 +48,7 @@ export class MediaRecorderDlg extends DialogBase {
     public recorded: boolean;
 
     constructor(state: AppState, public videoMode: boolean, private allowSave: boolean) {
-        super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
+        super(videoMode ? "Video Recorder" : "Audio Recorder", null, false);
         this.mergeState<LS>({
             status: "",
             recording: false

@@ -14,7 +14,7 @@ interface LS { // Local State
 export class ManageAccountDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Manage Account", "app-modal-content-narrow-width", false, state);
+        super("Manage Account", "app-modal-content-narrow-width", false);
     }
 
     renderDlg(): CompIntf[] {

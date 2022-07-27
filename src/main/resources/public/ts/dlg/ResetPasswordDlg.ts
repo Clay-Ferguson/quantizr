@@ -20,7 +20,7 @@ export class ResetPasswordDlg extends DialogBase {
     emailState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(user: string, state: AppState) {
-        super("Reset Password", "app-modal-content-narrow-width", false, state);
+        super("Reset Password", "app-modal-content-narrow-width", false);
         this.mergeState<LS>({ user });
     }
 

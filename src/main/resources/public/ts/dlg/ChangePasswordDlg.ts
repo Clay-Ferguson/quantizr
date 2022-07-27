@@ -16,8 +16,9 @@ export class ChangePasswordDlg extends DialogBase {
     passwordField: TextField;
     pwdState: ValidatedState<any> = new ValidatedState<any>();
 
+    // todo-0: new design: dialogs should never NEED to pass any state to constructors
     constructor(private passCode: string, state: AppState) {
-        super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
+        super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false);
         this.onMount((elm: HTMLElement) => {
             this.passwordField?.focus();
         });

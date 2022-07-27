@@ -18,7 +18,7 @@ interface LS { // Local State
 export class ManageStorageDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Storage Space", "app-modal-content-narrow-width", false, state);
+        super("Storage Space", "app-modal-content-narrow-width", false);
     }
 
     getTitleText(): string {

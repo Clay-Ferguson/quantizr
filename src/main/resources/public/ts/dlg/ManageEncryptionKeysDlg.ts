@@ -13,7 +13,7 @@ interface LS { // Local State
 export class ManageEncryptionKeysDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Encryption Keys", null, false, state);
+        super("Encryption Keys", null, false);
     }
 
     renderDlg(): CompIntf[] {

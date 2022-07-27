@@ -28,7 +28,7 @@ export class ExportDlg extends DialogBase {
     saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
 
     constructor(state: AppState, private node: NodeInfo) {
-        super("Export Node: " + node.id, null, false, state);
+        super("Export Node: " + node.id, null, false);
         this.mergeState<LS>({
             exportType: "zip"
             // toIpfs: false <--- set by 'saveToIpfsState'

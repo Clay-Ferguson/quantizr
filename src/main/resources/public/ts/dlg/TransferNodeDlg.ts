@@ -21,7 +21,7 @@ export class TransferNodeDlg extends DialogBase {
     fromUserState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Transfer Node", "app-modal-content-narrow-width", false, state);
+        super("Transfer Node", "app-modal-content-narrow-width", false);
         this.mergeState<LS>({
             recursive: false
         });

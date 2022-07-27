@@ -17,7 +17,7 @@ export class UploadFromIPFSDlg extends DialogBase {
     mimeState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private nodeId: string, private cid: string, private onUploadFunc: Function, state: AppState) {
-        super("Upload File", null, false, state);
+        super("Upload File", null, false);
     }
 
     validate = (): boolean => {

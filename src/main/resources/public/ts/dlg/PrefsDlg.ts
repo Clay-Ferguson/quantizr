@@ -13,7 +13,7 @@ import { S } from "../Singletons";
 export class PrefsDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Preferences", null, false, state);
+        super("Preferences", null, false);
     }
 
     renderDlg(): CompIntf[] {

@@ -77,7 +77,7 @@ export class EditNodeDlg extends DialogBase {
     allowEditAllProps: boolean = false;
 
     constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode, public afterEditAction: Function) {
-        super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
+        super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, mode);
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;

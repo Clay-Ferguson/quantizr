@@ -14,7 +14,7 @@ export class VideoPlayerDlg extends DialogBase {
     videoPlayer: VideoPlayer;
 
     constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, dialogMode: DialogMode, state: AppState) {
-        super(mediaTitle || "Video", null, false, state, dialogMode);
+        super(mediaTitle || "Video", null, false, dialogMode);
     }
 
     renderDlg(): CompIntf[] {

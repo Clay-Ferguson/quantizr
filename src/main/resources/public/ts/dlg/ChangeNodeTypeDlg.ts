@@ -18,7 +18,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     inlineButton: Button;
 
     constructor(curType: string, selCallback: Function, state: AppState) {
-        super("Set Node Type", "app-modal-content-narrow-width", false, state);
+        super("Set Node Type", "app-modal-content-narrow-width", false);
         this.selCallback = selCallback;
 
         this.valIntf = {

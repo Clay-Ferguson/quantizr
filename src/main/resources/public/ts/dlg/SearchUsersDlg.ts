@@ -27,7 +27,7 @@ export class SearchUsersDlg extends DialogBase {
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Search Users", "app-modal-content-medium-width", null, state);
+        super("Search Users", "app-modal-content-medium-width", null);
 
         this.onMount((elm: HTMLElement) => {
             this.searchTextField.focus();

@@ -16,7 +16,7 @@ export class ShareToPersonDlg extends DialogBase {
     userNameState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private node: J.NodeInfo, private sharedNodeFunc: Function, state: AppState) {
-        super("Share Node to Person", "app-modal-content-medium-width", false, state);
+        super("Share Node to Person", "app-modal-content-medium-width", false);
     }
 
     validate = (): boolean => {

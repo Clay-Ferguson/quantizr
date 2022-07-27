@@ -13,7 +13,7 @@ export class MessageDlg extends DialogBase {
 
     constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
         private flashTimeout: number, classOverride: string, state: AppState) {
-        super(title, classOverride, false, state);
+        super(title, classOverride, false);
 
         if (this.flashTimeout > 0) {
             setTimeout(() => {

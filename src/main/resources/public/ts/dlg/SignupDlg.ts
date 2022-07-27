@@ -22,7 +22,7 @@ export class SignupDlg extends DialogBase {
     captchaState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Create Account", "app-modal-content-medium-width", null, state);
+        super("Create Account", "app-modal-content-medium-width", null);
     }
 
     renderDlg(): CompIntf[] {

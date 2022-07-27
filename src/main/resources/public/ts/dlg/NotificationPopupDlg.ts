@@ -9,7 +9,7 @@ import { TextContent } from "../comp/core/TextContent";
 export class NotificationPopupDlg extends DialogBase {
 
     constructor(private message: string, title: string, state: AppState) {
-        super(title, null, false, state);
+        super(title, null, false);
     }
 
     renderDlg(): CompIntf[] {

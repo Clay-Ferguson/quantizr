@@ -13,7 +13,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
     keyState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Import Key Pair", "app-modal-content-medium-width", false, state);
+        super("Import Key Pair", "app-modal-content-medium-width", false);
     }
 
     renderDlg(): CompIntf[] {

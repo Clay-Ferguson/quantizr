@@ -28,6 +28,9 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
 
     /* Warning: Base 'Comp' already has 'state', I think it was wrong to rely on 'appState' everywhere inside dialogs, because
     we need to just let the render methods grab the latest state like every other component in the render method.
+
+    todo-0: this is bad to have here, because we need to get it LIVE whenever needed, rather than capturing
+    a snapshot during the constructor, so completely remove this
     */
     appState: AppState;
 
@@ -39,12 +42,14 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
     experimental overrideClass used for testing was "embedded-dlg"
+
+    todo-0: we can make ALL constructor params have defaults.
     */
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null, public forceMode: boolean = false) {
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
         // todo-0: check to make sure NONE of the dialogs pass in appState, because the base class can always take care of it here
-        this.appState = getAppState(appState);
+        this.appState = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
         if (!forceMode && (!this.mode || this.appState.mobileMode)) {

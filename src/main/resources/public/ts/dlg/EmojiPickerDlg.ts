@@ -15,7 +15,7 @@ export class EmojiPickerDlg extends DialogBase {
     selectionValueIntf: ValueIntf;
 
     constructor(state: AppState) {
-        super("Emojis", "app-modal-content-narrow-width", null, state);
+        super("Emojis", "app-modal-content-narrow-width", null);
 
         this.selectionValueIntf = {
             setValue: (val: string) => {
