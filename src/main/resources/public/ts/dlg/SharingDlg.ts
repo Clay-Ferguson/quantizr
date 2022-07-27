@@ -22,7 +22,7 @@ export class SharingDlg extends DialogBase {
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo) {
-        super("Node Sharing", "app-modal-content-medium-width", null);
+        super("Node Sharing", "app-modal-content-medium-width");
         this.mergeState<LS>({ nodePrivsInfo: null, recursive: false });
     }
 

@@ -41,7 +41,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
-        super("Search", null, null);
+        super("Search");
 
         this.onMount((elm: HTMLElement) => {
             this.searchTextField?.focus();

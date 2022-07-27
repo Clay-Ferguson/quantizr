@@ -13,7 +13,7 @@ export class InboxNotifyDlg extends DialogBase {
     static CLOSE_TIMEOUT: number = 2500;
 
     constructor(private text: string, private nodeId: string) {
-        super("Notification", "app-modal-content-narrow-width", false);
+        super("Notification", "app-modal-content-narrow-width");
 
         S.util.showSystemNotification("New Message", text);
 

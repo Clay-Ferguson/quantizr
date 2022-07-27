@@ -13,7 +13,7 @@ export class ImportDlg extends DialogBase {
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
-        super("Import from XML", null, false);
+        super("Import from XML");
     }
 
     renderDlg(): CompIntf[] {

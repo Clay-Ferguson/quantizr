@@ -31,7 +31,7 @@ export class UserProfileDlg extends DialogBase {
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
     constructor(private userNodeId: string) {
-        super("User Profile", "app-modal-content", false);
+        super("User Profile", "app-modal-content");
         let state = getAppState();
         if (!userNodeId) {
             userNodeId = state.userProfile.userNodeId;

@@ -8,7 +8,7 @@ import { DialogBase } from "../DialogBase";
 export class NotificationPopupDlg extends DialogBase {
 
     constructor(private message: string, title: string) {
-        super(title, null, false);
+        super(title);
     }
 
     renderDlg(): CompIntf[] {

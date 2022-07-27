@@ -34,7 +34,7 @@ export class SelectTagsDlg extends DialogBase {
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string) {
-        super("Select Hashtags", "app-modal-content-medium-width", false);
+        super("Select Hashtags", "app-modal-content-medium-width");
 
         let tags = this.parseTags();
         this.mergeState({ selectedTags: this.makeDefaultSelectedTags(), tags, suggestedTags: [], suggestTags: false });

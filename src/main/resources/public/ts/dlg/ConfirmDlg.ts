@@ -9,7 +9,7 @@ export class ConfirmDlg extends DialogBase {
     yes: boolean = false;
 
     constructor(private text: string, title: string, private yesButtonClass: string, private textClass: string) {
-        super(title, "app-modal-content-narrow-width", false);
+        super(title, "app-modal-content-narrow-width");
     }
 
     renderDlg(): CompIntf[] {

@@ -20,7 +20,7 @@ export class LoginDlg extends DialogBase {
     pwdState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
-        super("Login", "app-modal-content-narrow-width", false, null);
+        super("Login", "app-modal-content-narrow-width");
     }
 
     renderDlg(): CompIntf[] {

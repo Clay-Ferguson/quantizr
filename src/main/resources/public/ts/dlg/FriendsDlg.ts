@@ -22,7 +22,7 @@ export class FriendsDlg extends DialogBase {
     selectionValueIntf: ValueIntf;
 
     constructor(private node: J.NodeInfo, private instantSelect: boolean) {
-        super("Friends", "app-modal-content-medium-width", null);
+        super("Friends", "app-modal-content-medium-width");
 
         this.selectionValueIntf = {
             setValue: (val: string) => {

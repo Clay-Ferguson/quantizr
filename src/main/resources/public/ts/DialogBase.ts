@@ -34,10 +34,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
     experimental overrideClass used for testing was "embedded-dlg"
-
-    todo-0: we can make ALL constructor params have defaults.
     */
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, public mode: DialogMode = null, public forceMode: boolean = false) {
+    constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
         let appState = getAppState();

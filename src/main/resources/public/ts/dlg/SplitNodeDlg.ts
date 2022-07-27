@@ -22,7 +22,7 @@ export class SplitNodeDlg extends DialogBase {
     delimiterState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private node: J.NodeInfo) {
-        super("Split Node", null, false);
+        super("Split Node");
 
         if (!this.node) {
             this.node = S.nodeUtil.getHighlightedNode(getAppState());

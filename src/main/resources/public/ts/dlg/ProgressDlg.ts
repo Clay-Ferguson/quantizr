@@ -6,7 +6,7 @@ import { DialogBase } from "../DialogBase";
 export class ProgressDlg extends DialogBase {
 
     constructor() {
-        super("Loading...", "app-modal-content-tiny-width", false);
+        super("Loading...", "app-modal-content-tiny-width");
     }
 
     renderDlg(): CompIntf[] {

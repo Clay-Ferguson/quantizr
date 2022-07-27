@@ -17,7 +17,7 @@ export class EditTagsDlg extends DialogBase {
     tagsState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
-        super("Edit Hashtags", "app-modal-content-medium-width", false);
+        super("Edit Hashtags", "app-modal-content-medium-width");
     }
 
     renderDlg(): CompIntf[] {

@@ -15,7 +15,7 @@ import { SearchContentDlg } from "./SearchContentDlg";
 
 export class NodeStatsDlg extends DialogBase {
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean) {
-        super(trending ? "Trending (Top 100s)" : "Node Stats (Top 100s)", null, false);
+        super(trending ? "Trending (Top 100s)" : "Node Stats (Top 100s)");
     }
 
     renderDlg = (): CompIntf[] => {
