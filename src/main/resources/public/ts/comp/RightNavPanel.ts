@@ -35,7 +35,7 @@ export class RightNavPanel extends Div {
         // mobile mode doesn't render the RHS at all.
         if (state.mobileMode) return;
 
-        let panelCols = state.userPreferences.mainPanelCols || 6;
+        let panelCols = state.userPrefs.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;
         if (panelCols > 8) panelCols = 8;
         let rightCols = 4;
@@ -72,7 +72,7 @@ export class RightNavPanel extends Div {
         let allowEditMode = state.node && !state.isAnonUser;
         let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
-        let clipboardPasteButton = state.userPreferences.editMode ? new Icon({
+        let clipboardPasteButton = state.userPrefs.editMode ? new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
                 // todo-1: would be nice if this detected an image and saved as attachment.
@@ -123,7 +123,7 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
-                    !state.userPreferences.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
+                    !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
                     state.isAnonUser ? new Div("Login / Signup", {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
@@ -136,7 +136,7 @@ export class RightNavPanel extends Div {
                                 S.edit.toggleEditMode(state);
                             },
                             getValue: (): boolean => {
-                                return state.userPreferences.editMode;
+                                return state.userPrefs.editMode;
                             }
                         }, "form-switch form-check-inline") : null,
 
@@ -145,7 +145,7 @@ export class RightNavPanel extends Div {
                                 S.edit.toggleShowMetaData(state);
                             },
                             getValue: (): boolean => {
-                                return state.userPreferences.showMetaData;
+                                return state.userPrefs.showMetaData;
                             }
                         }, "form-switch form-check-inline") : null
                     ]),

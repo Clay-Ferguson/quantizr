@@ -22,10 +22,10 @@ export class PrefsDlg extends DialogBase {
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
                         setValue: (checked: boolean) => {
-                            this.appState.userPreferences.showMetaData = checked;
+                            this.appState.userPrefs.showMetaData = checked;
                         },
                         getValue: (): boolean => {
-                            return this.appState.userPreferences.showMetaData;
+                            return this.appState.userPrefs.showMetaData;
                         }
                     })
                 ]),
@@ -42,13 +42,13 @@ export class PrefsDlg extends DialogBase {
             let res = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: this.appState.homeNodeId,
                 userPreferences: {
-                    editMode: this.appState.userPreferences.editMode,
-                    showMetaData: this.appState.userPreferences.showMetaData,
-                    nsfw: this.appState.userPreferences.nsfw,
-                    showParents: this.appState.userPreferences.showParents,
-                    showReplies: this.appState.userPreferences.showReplies,
-                    rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
-                    mainPanelCols: this.appState.userPreferences.mainPanelCols,
+                    editMode: this.appState.userPrefs.editMode,
+                    showMetaData: this.appState.userPrefs.showMetaData,
+                    nsfw: this.appState.userPrefs.nsfw,
+                    showParents: this.appState.userPrefs.showParents,
+                    showReplies: this.appState.userPrefs.showReplies,
+                    rssHeadlinesOnly: this.appState.userPrefs.rssHeadlinesOnly,
+                    mainPanelCols: this.appState.userPrefs.mainPanelCols,
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }

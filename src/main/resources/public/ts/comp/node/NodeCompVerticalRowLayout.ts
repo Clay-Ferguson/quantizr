@@ -58,7 +58,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     let typeHandler = S.plugin.getTypeHandler(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
                     }
                     else {
                         lastNode = n;
@@ -102,9 +102,9 @@ export class NodeCompVerticalRowLayout extends Div {
             rowIdx++;
         });
 
-        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPrefs.editMode) {
             let attribs = {};
-            if (state.userPreferences.editMode) {
+            if (state.userPrefs.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
             }
 
@@ -112,7 +112,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root
                 // Note: this is the very last "+" button at the bottom, to insert below last child
-                comps.push(new Div(null, { className: (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row") }, [
+                comps.push(new Div(null, { className: (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row") }, [
                     insertButton = new Button(null, e => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);

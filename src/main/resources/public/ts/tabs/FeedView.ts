@@ -120,7 +120,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             }));
         }
 
-        if (!state.userPreferences.nsfw) {
+        if (!state.userPrefs.nsfw) {
             topChildren.push(new Div("[Show Sensitive Content]", {
                 className: "clickable",
                 onClick: async () => {

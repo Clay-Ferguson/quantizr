@@ -45,7 +45,7 @@ export class BreadcrumbsPanel extends Div {
             }).filter(c => !!c);
         }
 
-        if (children.length > 0 && !state.userPreferences.showParents) {
+        if (children.length > 0 && !state.userPrefs.showParents) {
             children.push(new Icon({
                 className: "fa fa-level-down fa-lg showParentsIcon",
                 title: "Toggle: Show Parent on page",

@@ -29,7 +29,7 @@ export class NodeCompMainNode extends Div {
         let typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!typeHandler || typeHandler.subOrdinal() === -1) && state.userPreferences.editMode && !state.inlineEditId) {
+        if ((!typeHandler || typeHandler.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt) => this.dragStart(evt, state.node.id);
             this.attribs.onDragEnd = this.dragEnd;
@@ -83,7 +83,7 @@ export class NodeCompMainNode extends Div {
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
             const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-            if (state.userPreferences.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())) {
+            if (state.userPrefs.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())) {
                 header = new NodeCompRowHeader(node, true, true, false, false, true, false);
             }
             else {

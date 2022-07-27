@@ -668,7 +668,7 @@ export class Render {
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, node);
 
         /* Note: for edit mode, or on mobile devices, always use vertical layout. */
-        if (state.userPreferences.editMode || state.mobileMode || !layout || layout === "v") {
+        if (state.userPrefs.editMode || state.mobileMode || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {

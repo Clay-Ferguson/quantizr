@@ -32,10 +32,10 @@ export class NodeCompParentNodes extends Div {
 
         this.attribs.className = "parentNodeContentStyle";
 
-        let showCloseParentsIcon = state.userPreferences.showParents && state.node.parents?.length > 0;
+        let showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
 
         this.setChildren([
-            state.userPreferences.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,
+            state.userPrefs.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,
             showCloseParentsIcon ? new Icon({
                 className: "fa fa-level-up fa-lg showParentsIcon float-end",
                 title: "Toggle: Show Parent on page",

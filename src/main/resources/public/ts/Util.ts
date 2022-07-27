@@ -1543,8 +1543,8 @@ export class Util {
     }
 
     setUserPreferences = (state: AppState, flag: boolean) => {
-        if (flag !== state.userPreferences.editMode) {
-            state.userPreferences.editMode = flag;
+        if (flag !== state.userPrefs.editMode) {
+            state.userPrefs.editMode = flag;
             this.saveUserPreferences(state);
         }
     }
@@ -1553,14 +1553,14 @@ export class Util {
         if (!state.isAnonUser) {
             await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
-                userPreferences: state.userPreferences
+                userPreferences: state.userPrefs
             });
         }
 
         if (dispatchNow) {
             dispatch("SetUserPreferences", s => {
-                s.userPreferences = state.userPreferences;
-                if (!s.userPreferences.showParents) {
+                s.userPrefs = state.userPrefs;
+                if (!s.userPrefs.showParents) {
                     s.node.parents = null;
                 }
                 return s;
@@ -1597,7 +1597,7 @@ export class Util {
 
             s.anonUserLandingPageNode = res.anonUserLandingPageNode;
             s.allowFileSystemSearch = res.allowFileSystemSearch;
-            s.userPreferences = res.userPreferences;
+            s.userPrefs = res.userPreferences;
             // s.title = !s.isAnonUser ? res.userName : "";
             s.displayName = !s.isAnonUser ? res.displayName : "";
             return s;

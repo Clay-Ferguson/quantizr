@@ -47,7 +47,7 @@ export class HistoryPanel extends Div {
             if (typeHandler) {
                 let iconClass = typeHandler.getIconClass();
                 if (iconClass) {
-                    let dragProps = state.userPreferences.editMode ? {
+                    let dragProps = state.userPrefs.editMode ? {
                         onMouseOver: () => { S.quanta.draggableId = h.id; },
                         onMouseOut: () => { S.quanta.draggableId = null; }
                     } : {};
@@ -60,7 +60,7 @@ export class HistoryPanel extends Div {
                 }
             }
 
-            let dragProps = state.userPreferences.editMode ? {
+            let dragProps = state.userPrefs.editMode ? {
                 draggable: "true",
                 onDragStart: (evt) => this.dragStart(evt, h.id),
                 onDragEnd: this.dragEnd
@@ -97,7 +97,7 @@ export class HistoryPanel extends Div {
                         if (typeHandler) {
                             let iconClass = typeHandler.getIconClass();
                             if (iconClass) {
-                                let dragProps = state.userPreferences.editMode ? {
+                                let dragProps = state.userPrefs.editMode ? {
                                     onMouseOver: () => { S.quanta.draggableId = h.id; },
                                     onMouseOut: () => { S.quanta.draggableId = null; }
                                 } : {};
@@ -110,7 +110,7 @@ export class HistoryPanel extends Div {
                             }
                         }
 
-                        let dragProps = state.userPreferences.editMode ? {
+                        let dragProps = state.userPrefs.editMode ? {
                             draggable: "true",
                             onDragStart: (evt) => this.dragStart(evt, h.id),
                             onDragEnd: this.dragEnd

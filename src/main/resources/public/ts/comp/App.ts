@@ -137,7 +137,7 @@ export class App extends Main {
                         S.edit.toggleShowMetaData(state);
                     },
                     getValue: (): boolean => {
-                        return state.userPreferences.showMetaData;
+                        return state.userPrefs.showMetaData;
                     }
                 }, "form-switch form-check-inline") : null;
 

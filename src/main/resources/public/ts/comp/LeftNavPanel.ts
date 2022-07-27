@@ -23,7 +23,7 @@ export class LeftNavPanel extends Div {
 
         let state: AppState = store.getState();
 
-        let panelCols = state.userPreferences.mainPanelCols || 6;
+        let panelCols = state.userPrefs.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;
         if (panelCols > 8) panelCols = 8;
 

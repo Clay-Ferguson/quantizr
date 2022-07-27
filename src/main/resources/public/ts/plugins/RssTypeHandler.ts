@@ -184,7 +184,7 @@ export class RssTypeHandler extends TypeBase {
                 });
             },
             getValue: (): boolean => {
-                return state.userPreferences.rssHeadlinesOnly;
+                return state.userPrefs.rssHeadlinesOnly;
             }
         }));
 
@@ -399,7 +399,7 @@ export class RssTypeHandler extends TypeBase {
             });
         }
 
-        if (!state.userPreferences.rssHeadlinesOnly) {
+        if (!state.userPrefs.rssHeadlinesOnly) {
             if (entry.description) {
                 children.push(new Html(entry.description));
             }

@@ -75,7 +75,7 @@ export class View {
                 goToLastPage: false,
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: a.state.userPreferences.showParents ? 1 : 0
+                parentCount: a.state.userPrefs.showParents ? 1 : 0
             });
             if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
@@ -148,7 +148,7 @@ export class View {
                 goToLastPage,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPreferences.showParents ? 1 : 0
+                parentCount: state.userPrefs.showParents ? 1 : 0
             });
 
             if (!res.node) return;

@@ -60,7 +60,7 @@ export class NodeCompTableRowLayout extends Div {
                 let typeHandler = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
-                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
                 }
                 else {
                     lastNode = n;
@@ -109,9 +109,9 @@ export class NodeCompTableRowLayout extends Div {
 
         /* I'll leave this block here, for future reference, but it's dead code. If editMode is on we never do the
         table layout but show each node as if it were vertical layout instead */
-        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
+        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPrefs.editMode) {
             let attribs = {};
-            if (state.userPreferences.editMode) {
+            if (state.userPrefs.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
             }
 

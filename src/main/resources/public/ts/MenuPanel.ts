@@ -121,7 +121,7 @@ export class MenuPanel extends Div {
         });
 
         let state = getAppState(null);
-        state.userPreferences.enableIPSM = true;
+        state.userPrefs.enableIPSM = true;
         S.util.saveUserPreferences(state);
     };
 
@@ -385,11 +385,11 @@ export class MenuPanel extends Div {
         ], null, this.makeHelpIcon(":menu-node-info")));
 
         children.push(new Menu("Settings", [
-            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
-            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
-            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
-            new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => state.userPreferences.showReplies), //
+            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
+            new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
+            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPrefs.nsfw), //
+            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPrefs.showParents), //
+            new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => state.userPrefs.showReplies), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

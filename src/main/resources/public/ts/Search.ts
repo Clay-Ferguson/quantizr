@@ -321,7 +321,7 @@ export class Search {
             toPublic: data.props.feedFilterToPublic,
             localOnly: data.props.feedFilterLocalServer,
             fromFriends: data.props.feedFilterFriends,
-            nsfw: appState.userPreferences.nsfw,
+            nsfw: appState.userPrefs.nsfw,
             searchText,
             applyAdminBlocks: data.props.applyAdminBlocks
         });

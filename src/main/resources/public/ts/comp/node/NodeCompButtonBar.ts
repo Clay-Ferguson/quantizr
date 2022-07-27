@@ -111,7 +111,7 @@ export class NodeCompButtonBar extends Div {
         */
         if (this.node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
-            (!isInlineChildren || state.userPreferences.editMode)) {
+            (!isInlineChildren || state.userPrefs.editMode)) {
             openButton = new Button(null, S.nav.openNodeById, {
                 iconclass: "fa fa-folder-open",
                 nid: this.node.id,
@@ -124,7 +124,7 @@ export class NodeCompButtonBar extends Div {
          * they don't have privileges the server side security will let them know. In the future we can add more
          * intelligence to when to show these buttons or not.
          */
-        if (state.userPreferences.editMode) {
+        if (state.userPrefs.editMode) {
             let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, this.node, state));
             let checkboxForDelete = state.isAdminUser || deleteAllowed;
 

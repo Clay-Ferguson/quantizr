@@ -100,7 +100,7 @@ export class Edit {
         if (S.util.checkSuccess("Editing node", res)) {
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
-            const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(res.nodeInfo, state);
+            const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, state);
             if (editingAllowed) {
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
                 let editInPopup = forceUsePopup || state.mobileMode ||
@@ -407,7 +407,7 @@ export class Edit {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: true,
-            parentCount: state.userPreferences.showParents ? 1 : 0
+            parentCount: state.userPrefs.showParents ? 1 : 0
         });
 
         if (!res?.node) {
@@ -447,12 +447,12 @@ export class Edit {
     }
 
     setRssHeadlinesOnly = async (state: AppState, val: boolean) => {
-        state.userPreferences.rssHeadlinesOnly = val;
+        state.userPrefs.rssHeadlinesOnly = val;
         S.util.saveUserPreferences(state);
     }
 
     toggleEditMode = async (state: AppState) => {
-        state.userPreferences.editMode = !state.userPreferences.editMode;
+        state.userPrefs.editMode = !state.userPrefs.editMode;
         S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
@@ -464,7 +464,7 @@ export class Edit {
             let state = store.getState();
             if (val < 4) val = 4;
             if (val > 8) val = 8;
-            state.userPreferences.mainPanelCols = val;
+            state.userPrefs.mainPanelCols = val;
             S.util.saveUserPreferences(state);
         }, 100);
     };
@@ -472,13 +472,13 @@ export class Edit {
     setMetadataOption = (val: boolean) => {
         setTimeout(() => {
             let state = store.getState();
-            state.userPreferences.showMetaData = val;
+            state.userPrefs.showMetaData = val;
             S.util.saveUserPreferences(state);
         }, 100);
     };
 
     toggleShowMetaData = (state: AppState) => {
-        state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
+        state.userPrefs.showMetaData = !state.userPrefs.showMetaData;
         S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
@@ -486,12 +486,12 @@ export class Edit {
     }
 
     toggleNsfw = async (state: AppState) => {
-        state.userPreferences.nsfw = !state.userPreferences.nsfw;
+        state.userPrefs.nsfw = !state.userPrefs.nsfw;
         return S.util.saveUserPreferences(state, true);
     }
 
     toggleShowParents = (state: AppState) => {
-        state.userPreferences.showParents = !state.userPreferences.showParents;
+        state.userPrefs.showParents = !state.userPrefs.showParents;
         S.util.saveUserPreferences(state, false);
         S.quanta.refresh(state);
     }
@@ -499,7 +499,7 @@ export class Edit {
     // without the await on saveUserPreferences the refresh will be done with WRONG userProfile SO...look for
     // other places we need to have this await and perhaps don't.
     toggleShowReplies = async (state: AppState) => {
-        state.userPreferences.showReplies = !state.userPreferences.showReplies;
+        state.userPrefs.showReplies = !state.userPrefs.showReplies;
         await S.util.saveUserPreferences(state, false);
         S.quanta.refresh(state);
     }
@@ -1119,7 +1119,7 @@ export class Edit {
         state = getAppState(state);
 
         // auto-enable edit mode
-        if (!state.userPreferences.editMode) {
+        if (!state.userPrefs.editMode) {
             await S.edit.toggleEditMode(state);
         }
 
@@ -1161,7 +1161,7 @@ export class Edit {
         });
 
         // auto-enable edit mode
-        if (!state.userPreferences.editMode) {
+        if (!state.userPrefs.editMode) {
             await S.edit.toggleEditMode(state);
         }
         this.createSubNodeResponse(res, forceUsePopup, null, null, state);

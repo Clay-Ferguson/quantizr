@@ -34,7 +34,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
+        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPrefs.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;
@@ -68,7 +68,7 @@ export class NodeCompRow extends Div {
         let insertInlineButton = null;
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
-        if (this.allowHeaders && state.userPreferences.editMode) {
+        if (this.allowHeaders && state.userPrefs.editMode) {
             let insertAllowed = true;
 
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
@@ -116,7 +116,7 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPreferences.editMode ? "node-table-row-compact" : "node-table-row");
+        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row");
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
@@ -128,10 +128,10 @@ export class NodeCompRow extends Div {
         // }
         else {
             if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
-                layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border-inline-children";
+                layoutClass += state.userPrefs.editMode || state.userPrefs.showMetaData ? " row-border-edit" : " row-border-inline-children";
             }
             else {
-                layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
+                layoutClass += state.userPrefs.editMode || state.userPrefs.showMetaData ? " row-border-edit" : " row-border";
             }
         }
 
@@ -157,7 +157,7 @@ export class NodeCompRow extends Div {
 
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
-        if (this.allowHeaders && state.userPreferences.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
+        if (this.allowHeaders && state.userPrefs.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
             header = new NodeCompRowHeader(this.node, true, true, false, false, true, false);
         }
         else {
@@ -171,7 +171,7 @@ export class NodeCompRow extends Div {
         }
 
         // if editMode is on, an this isn't the page root node
-        if (state.userPreferences.editMode && this.node.id !== state.node.id) {
+        if (state.userPrefs.editMode && this.node.id !== state.node.id) {
             S.render.setNodeDropHandler(this.attribs, this.node, true, state);
         }
 

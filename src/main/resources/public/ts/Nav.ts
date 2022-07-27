@@ -96,7 +96,7 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPreferences.showParents ? 1 : 0
+                parentCount: state.userPrefs.showParents ? 1 : 0
             });
             this.upLevelResponse(res, null, true, state);
         }
@@ -134,7 +134,7 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPreferences.showParents ? 1 : 0
+                parentCount: state.userPrefs.showParents ? 1 : 0
             });
 
             if (processingDelete) {
@@ -228,7 +228,7 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPreferences.showParents ? 1 : 0
+                parentCount: state.userPrefs.showParents ? 1 : 0
             });
             this.navPageNodeResponse(res, state);
         }
@@ -333,7 +333,7 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: state.userPreferences.showParents ? 1 : 0
+                    parentCount: state.userPrefs.showParents ? 1 : 0
                 });
                 this.navPageNodeResponse(res, state);
             }

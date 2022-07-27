@@ -206,7 +206,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let state = this.getState<LS>();
 
         /* Limit based on user quota for our user accounts */
-        let maxFileSize = this.appState.userPreferences.maxUploadFileSize;
+        let maxFileSize = this.appState.userPrefs.maxUploadFileSize;
         // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
@@ -331,7 +331,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.domUtil.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
-            let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
+            let maxUploadSize = this.appState.userPrefs.maxUploadFileSize;
 
             if (this.autoAddFile) {
                 if (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB) {
@@ -373,7 +373,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxFileSizeMb = this.appState.userPreferences.maxUploadFileSize;
+        let maxFileSizeMb = this.appState.userPrefs.maxUploadFileSize;
         for (let file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
                 return false;

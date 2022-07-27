@@ -41,7 +41,7 @@ export class MainTabComp extends AppTab {
         //     });
         // }
 
-        let panelCols = state.userPreferences.mainPanelCols || 6;
+        let panelCols = state.userPrefs.mainPanelCols || 6;
 
         let widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
             panelCols > 4 ? new Icon({
@@ -49,7 +49,7 @@ export class MainTabComp extends AppTab {
                 title: "Narrower view",
                 onClick: () => {
                     dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(--s.userPreferences.mainPanelCols);
+                        S.edit.setMainPanelCols(--s.userPrefs.mainPanelCols);
                         return s;
                     });
                 }
@@ -59,7 +59,7 @@ export class MainTabComp extends AppTab {
                 title: "Wider view",
                 onClick: () => {
                     dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(++s.userPreferences.mainPanelCols);
+                        S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
                         return s;
                     });
                 }
@@ -81,7 +81,7 @@ export class MainTabComp extends AppTab {
                 // if we have some parents to display well then let's just do that...
                 state.node.parents?.length > 0 ? new NodeCompParentNodes(state, this.data, null) : null,
 
-                new Div(null, { className: state.userPreferences.editMode ? "my-tab-pane-editmode" : null }, [
+                new Div(null, { className: state.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
                     new NodeCompMainNode(state, this.data, null),
                     new NodeCompMainList(this.data)
                 ])
