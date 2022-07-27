@@ -1,5 +1,4 @@
-import { store } from "../AppRedux";
-import { AppState } from "../AppState";
+import { getAppState } from "../AppRedux";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
@@ -13,7 +12,7 @@ export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetVi
     }
 
     pageChange(delta: number): void {
-        let state: AppState = store.getState();
+        let state = getAppState();
 
         let page = this.data.rsInfo.page;
         if (delta !== null) {

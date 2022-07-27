@@ -1,4 +1,4 @@
-import { store, useAppState } from "../AppRedux";
+import { getAppState, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
@@ -11,13 +11,12 @@ export class TabPanel extends Div {
 
     constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB });
-        const state: AppState = store.getState();
+        let state = getAppState();
 
         if (state.mobileMode) {
             this.attribs.className = "col-12 tabPanelMobile";
         }
         else {
-            let state: AppState = store.getState();
             let panelCols = state.userPrefs.mainPanelCols || 6;
             this.attribs.className = "col-" + panelCols + " tabPanel";
         }

@@ -1,4 +1,4 @@
-import { store, useAppState } from "../AppRedux";
+import { getAppState, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -77,7 +77,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
     }
 
     moreHistory = () => {
-        let state = store.getState();
+        let state = getAppState();
         let results = this.data && this.data.rsInfo.results;
         if (!results || results.length === 0) return;
         S.srch.showThreadAddMore(results[0].id, state);

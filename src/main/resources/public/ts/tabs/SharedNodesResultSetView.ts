@@ -1,5 +1,4 @@
-import { store } from "../AppRedux";
-import { AppState } from "../AppState";
+import { getAppState } from "../AppRedux";
 import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
@@ -14,7 +13,7 @@ export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetV
     }
 
     pageChange(delta: number): void {
-        let state: AppState = store.getState();
+        let state = getAppState();
         let info = this.data.rsInfo as I;
 
         let page = info.page;

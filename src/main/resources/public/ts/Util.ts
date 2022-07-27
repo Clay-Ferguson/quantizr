@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import * as marked from "marked";
-import { getAppState, dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -119,7 +119,7 @@ export class Util {
 
     // #mouseEffects (do not delete tag)
     delayFunc = (func: Function): Function => {
-        let state = store.getState();
+        let state = getAppState();
         if (!func || !state.mouseEffect) {
             return func;
         }
@@ -1281,9 +1281,8 @@ export class Util {
     refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {
         if (!node || !state.node || !state.node.children) return;
         let doDispatch = !state;
-        if (!state) {
-            state = store.getState();
-        }
+        state = getAppState(state);
+        
         let path = node.path;
         let slashIdx: number = path.lastIndexOf("/");
         if (slashIdx === -1) return;
@@ -1332,7 +1331,7 @@ export class Util {
         let clickEffect = (e) => {
             // use a timeout so we can call 'getState()' without a react error.
             setTimeout(() => {
-                let state = store.getState();
+                let state = getAppState();
                 /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
                  and is apparently 0, 0, so we just check the sanity of the coordinates here */
                 if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;

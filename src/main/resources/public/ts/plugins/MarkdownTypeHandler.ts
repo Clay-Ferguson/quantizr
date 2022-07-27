@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
@@ -10,7 +10,7 @@ export class MarkdownTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = store.getState();
+        let state = getAppState();
         return state.config?.help?.editor?.dialog;
     }
 }

@@ -1,4 +1,4 @@
-import { dispatch, getAppState, store, useAppState } from "./AppRedux";
+import { dispatch, getAppState, useAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
@@ -42,13 +42,13 @@ export class MenuPanel extends Div {
     };
 
     static openBookmarksNode = () => {
-        let state = store.getState();
+        let state = getAppState();
         S.util.setUserPreferences(state, true);
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
     static continueEditing = () => {
-        let state = store.getState();
+        let state = getAppState();
         if (state.editNode) {
             S.view.jumpToId(state.editNode.id);
         }

@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
@@ -44,7 +44,7 @@ export class ServerPush {
             if (S.quanta.loggingOut) return;
 
             // this might work ok, but for now, let's just force a page repload
-            let state = store.getState();
+            let state = getAppState();
             // S.nav.login(state);
             // window.location.href = window.location.origin;
 
@@ -83,20 +83,19 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
-            let state = store.getState();
+            let state = getAppState();
             const data: J.FeedPushInfo = JSON.parse(e.data);
             this.feedPushItem(data.nodeInfo, state);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            let state = store.getState();
+            let state = getAppState();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
             // console.log("IPSM: " + data.payload);
             this.ipsmPushItem(data.payload, state);
         }, false);
 
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {
-            let state = store.getState();
             const data: J.PushPageMessage = JSON.parse(e.data);
             // console.log("pagePushMessage: " + data.payload);
             if (data.usePopup) {

@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -16,7 +16,7 @@ export class User {
     }
 
     closeAccount = async () => {
-        let state = store.getState();
+        let state = getAppState();
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             null, null, state);
         await dlg.open();

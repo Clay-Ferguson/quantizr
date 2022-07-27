@@ -1,5 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
-import { getAppState, dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -395,7 +395,7 @@ export class Edit {
 
     refreshNodeFromServer = async (nodeId: string) => {
         // console.log("refreshNodeFromServer: " + nodeId);
-        let state = store.getState();
+        let state = getAppState();
 
         let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
@@ -461,7 +461,7 @@ export class Edit {
 
     setMainPanelCols = (val: number) => {
         setTimeout(() => {
-            let state = store.getState();
+            let state = getAppState();
             if (val < 4) val = 4;
             if (val > 8) val = 8;
             state.userPrefs.mainPanelCols = val;
@@ -471,7 +471,7 @@ export class Edit {
 
     setMetadataOption = (val: boolean) => {
         setTimeout(() => {
-            let state = store.getState();
+            let state = getAppState();
             state.userPrefs.showMetaData = val;
             S.util.saveUserPreferences(state);
         }, 100);
@@ -660,7 +660,7 @@ export class Edit {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
-        const state = store.getState();
+        let state = getAppState();
         if (S.util.ctrlKeyCheck()) {
             this.saveClipboardToChildNode(id);
         }
@@ -744,7 +744,7 @@ export class Edit {
     * Deletes all nodes owned by you but NOT rooted in your own account root.
     */
     bulkDelete = async () => {
-        let state = store.getState();
+        let state = getAppState();
 
         let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
         let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
@@ -765,7 +765,7 @@ export class Edit {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = async (evt: Event = null, id: string = null) => {
-        let state = store.getState();
+        let state = getAppState();
         id = S.util.allowIdFromEvent(evt, id);
 
         // if a nodeId was specified we use it as the selected nodes to delete

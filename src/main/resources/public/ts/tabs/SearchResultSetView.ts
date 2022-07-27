@@ -1,5 +1,4 @@
-import { store } from "../AppRedux";
-import { AppState } from "../AppState";
+import { getAppState } from "../AppRedux";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
@@ -12,7 +11,7 @@ export class SearchResultSetView extends ResultSetView {
     }
 
     pageChange(delta: number): void {
-        let state: AppState = store.getState();
+        let state = getAppState();
 
         let page = this.data.rsInfo.page;
         if (delta !== null) {

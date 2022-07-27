@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
@@ -96,7 +96,7 @@ export class TabUtil {
                 //     id: C.TAB_LOG,
                 //     isVisible: () => {
                 //         // this function needs to get the state itself.
-                //         let state = store.getState();
+                //         let state = getAppState();
                 //         return state.isAdminUser;
                 //     },
                 //     constructView: (data: TabIntf) => new LogView(data),
@@ -109,9 +109,7 @@ export class TabUtil {
     }
 
     getTabDataById = (state: AppState, id: string): TabIntf => {
-        if (!state) {
-            state = store.getState();
-        }
+        state = getAppState(state);
         let data = state.tabData.find(d => d.id === id);
         return data;
     }

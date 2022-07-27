@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
@@ -43,10 +43,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
-        this.appState = appState;
-        if (!appState) {
-            this.appState = store.getState();
-        }
+        this.appState = getAppState(appState);
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
         if (!forceMode && (!this.mode || this.appState.mobileMode)) {

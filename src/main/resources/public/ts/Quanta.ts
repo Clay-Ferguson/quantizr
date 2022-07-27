@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { App } from "./comp/App";
 import { Comp } from "./comp/base/Comp";
@@ -105,7 +105,7 @@ export class Quanta {
             console.log("createTabs");
             S.tabUtil.createAppTabs();
 
-            const state: AppState = store.getState();
+            let state = getAppState();
             state.pendingLocationHash = window.location.hash;
 
             console.log("createPlugins");
@@ -187,7 +187,7 @@ export class Quanta {
                 // capture events going to dialogs / edit fields
                 document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                     // console.log("keydown: " + event.code);
-                    let state: AppState = store.getState();
+                    let state = getAppState();
 
                     if (event.code === "Backquote") {
                         if (S.util.ctrlKeyCheck()) {

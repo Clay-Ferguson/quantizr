@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
@@ -16,7 +16,7 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = store.getState();
+        let state = getAppState();
         return state.config?.help?.type?.friend?.editor;
     }
 

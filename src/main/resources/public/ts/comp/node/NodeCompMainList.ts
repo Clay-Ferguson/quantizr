@@ -1,4 +1,4 @@
-import { store, useAppState } from "../../AppRedux";
+import { getAppState, useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -77,7 +77,7 @@ export class NodeCompMainList extends Div {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
 
-                        let state = store.getState();
+                        let state = getAppState();
 
                         // Make sure this button has existed for 3 seconds at least before allowing it to trigger a growPage, becasue
                         // if it renders as visible without the user scrolling to it that would be bad by triggering a grow

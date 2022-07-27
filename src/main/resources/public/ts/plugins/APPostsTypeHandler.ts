@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { getAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -21,7 +21,7 @@ export class APPostsTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = store.getState();
+        let state = getAppState();
         return state.config?.help?.editor?.dialog;
     }
 }

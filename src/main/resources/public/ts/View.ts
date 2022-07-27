@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
@@ -15,7 +15,7 @@ export class View {
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
         // console.log("jumpToId: " + id);
-        let state = store.getState();
+        let state = getAppState();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -348,7 +348,7 @@ export class View {
 
     scrollToTop = async () => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            let state = store.getState();
+            let state = getAppState();
             this.scrollAllTop(state);
         });
     }
