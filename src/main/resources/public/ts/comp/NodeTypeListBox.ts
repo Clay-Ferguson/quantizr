@@ -20,10 +20,8 @@ export class NodeTypeListBox extends ListBox {
 
     preRender(): void {
         let children = [];
-
         let typeHandlers = S.plugin.getAllTypeHandlers();
 
-        // todo-0: good place to use 'map' not 'forEach'
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (this.appState.isAdminUser || typeHandler.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(typeHandler, () => {
