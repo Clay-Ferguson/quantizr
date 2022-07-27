@@ -16,7 +16,6 @@ import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Label } from "../comp/core/Label";
-import { LayoutRow } from "../comp/core/LayoutRow";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
@@ -337,11 +336,14 @@ export class EditNodeDlg extends DialogBase {
         }
 
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
-        let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
+        let binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
         let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node, this);
         let isPublic = S.props.isPublic(state.node);
-        let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
+        
+        // #unpublish-disabled
+        // let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
+        
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { dispatch, useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
+import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
 interface LS { // Local State
@@ -10,18 +11,14 @@ interface LS { // Local State
     expanded: boolean;
 }
 
-export class Menu extends Div {
-
+export class Menu extends Comp {
     static userClickedMenu: boolean = false;
 
-    constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null, private floatRightComp: CompIntf = null) {
-        super(null, {
-            className: "card menuCard accordion-item"
-        });
+    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
+        super({ className: "card menuCard accordion-item" });
         this.mergeState({ visible: true });
     }
 
-    super_compRender = this.compRender;
     compRender = (): ReactNode => {
         let state = this.getState<LS>();
         let appState = useAppState();
@@ -37,11 +34,10 @@ export class Menu extends Div {
                 className: "card-header menuHeading mb-0 accordion-header",
                 "aria-expanded": appState.activeMenu === this.name ? "true" : "false",
                 "data-bs-toggle": "collapse",
-                // "data-target": "#collapse" + this.getId(),
                 href: this.getId("#collapse"),
                 role: "tab",
                 id: this.getId("heading"),
-                onClick: (elm) => {
+                onClick: () => {
                     setTimeout(() => {
                         /* "aria-expanded" attribute won't have been updated yet when this onClick is called, so we have a delay
                         timer here to wait for it to get updated */
@@ -49,15 +45,15 @@ export class Menu extends Div {
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         let activeName = expanded ? this.name : null;
 
-                        dispatch("setActiveMenu", (s: AppState): AppState => {
+                        dispatch("setActiveMenu", (s) => {
                             s.activeMenu = activeName;
                             return s;
                         });
 
                         Menu.userClickedMenu = true;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
-                        if (this.onClickCallback) {
-                            this.onClickCallback();
+                        if (this.func) {
+                            this.func();
                         }
                         // we need a pub-sub call that can force the ENTIRE menu panel to refresh.
                         this.mergeState({ expanded });
@@ -73,17 +69,13 @@ export class Menu extends Div {
                 "aria-labelledby": this.getId("heading"),
                 "data-bs-parent": "#accordion"
             }, [
-                new Div(null, {
-                    className: "card-body menuCardBody"
-                }, [
-                    new Div(null, {
-                        className: "list-group flex-column"
-                    },
+                new Div(null, { className: "card-body menuCardBody" }, [
+                    new Div(null, { className: "list-group flex-column" },
                         this.menuItems)
                 ])
             ])
         ]);
 
-        return this.super_compRender();
+        return this.tag("div");
     }
 }
