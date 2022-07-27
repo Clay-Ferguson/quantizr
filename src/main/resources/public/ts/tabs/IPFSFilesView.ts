@@ -97,7 +97,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 new Span(null, { className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
                         setValue: (checked: boolean) => {
-                            dispatch("setListCids", (s: AppState): AppState => {
+                            dispatch("setListCids", s => {
                                 this.data.props.listCids = checked;
                                 return s;
                             });
@@ -265,7 +265,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             id: item
         });
 
-        dispatch("showServerInfo", (s: AppState): AppState => {
+        dispatch("showServerInfo", s => {
             S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
             s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
             s.serverInfoText = shortName + "\n" + hash + "\n\n" + res.content;
@@ -277,7 +277,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     deleteItem = (item: string) => {
         // DO NOT DELETE (may decide to do this some day)
-        // dispatch("deleteMFSFile", (s: AppState): AppState => {
+        // dispatch("deleteMFSFile", s => {
         //     this.data.props.loading = true;
         //     return s;
         // });
@@ -293,7 +293,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     openItem = (folder: string) => {
         // DO NOT DELETE (may decide to do this some day)
-        // dispatch("RefreshMFSFiles", (s: AppState): AppState => {
+        // dispatch("RefreshMFSFiles", s => {
         //     this.data.props.loading = true;
         //     return s;
         // });
@@ -308,7 +308,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 folder
             });
 
-            dispatch("loadIPFSFiles", (s: AppState): AppState => {
+            dispatch("loadIPFSFiles", s => {
 
                 // this condition just makes sure we're not pushing the same thing already at the top of the stack.
                 if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {

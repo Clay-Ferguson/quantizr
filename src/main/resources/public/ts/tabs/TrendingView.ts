@@ -46,7 +46,7 @@ export class TrendingView extends AppTab {
             getTags: true,
             getMentions: true
         });
-        dispatch("RenderSearchResults", (s: AppState): AppState => {
+        dispatch("RenderSearchResults", s => {
             let data = s.tabData.find(d => d.id === this.data.id);
             if (!data) return;
             (data.rsInfo as TrendingRSInfo).res = res;

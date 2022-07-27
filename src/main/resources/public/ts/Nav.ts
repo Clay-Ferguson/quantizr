@@ -202,7 +202,7 @@ export class Nav {
             // todo-2: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
             setTimeout(() => {
-                dispatch("FastRefresh", (s: AppState): AppState => {
+                dispatch("FastRefresh", s => {
                     return s;
                 });
 
@@ -432,7 +432,7 @@ export class Nav {
     }
 
     closeFullScreenViewer = (appState: AppState) => {
-        dispatch("CloseFullScreenViewer", (s: AppState): AppState => {
+        dispatch("CloseFullScreenViewer", s => {
             s.fullScreenViewId = null;
             s.fullScreenGraphId = null;
             s.fullScreenCalendarId = null;
@@ -444,7 +444,7 @@ export class Nav {
         const prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
-            dispatch("PrevFullScreenImgViewer", (s: AppState): AppState => {
+            dispatch("PrevFullScreenImgViewer", s => {
                 s.fullScreenViewId = prevNode.id;
                 return s;
             });
@@ -455,7 +455,7 @@ export class Nav {
         const nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
-            dispatch("NextFullScreenImgViewer", (s: AppState): AppState => {
+            dispatch("NextFullScreenImgViewer", s => {
                 s.fullScreenViewId = nextNode.id;
                 return s;
             });
@@ -512,7 +512,7 @@ export class Nav {
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
         feedData.props.refreshCounter++;
 
-        dispatch("SelectTab", (s: AppState): AppState => {
+        dispatch("SelectTab", s => {
             s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
@@ -575,7 +575,7 @@ export class Nav {
             data.props.filter = filter;
         }
 
-        dispatch("SelectTab", (s: AppState): AppState => {
+        dispatch("SelectTab", s => {
             s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING, s);
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;

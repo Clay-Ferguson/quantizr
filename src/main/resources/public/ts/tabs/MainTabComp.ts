@@ -48,7 +48,7 @@ export class MainTabComp extends AppTab {
                 className: "fa fa-step-backward widthSizerIcon",
                 title: "Narrower view",
                 onClick: () => {
-                    dispatch("widthAdjust", (s: AppState): AppState => {
+                    dispatch("widthAdjust", s => {
                         S.edit.setMainPanelCols(--s.userPreferences.mainPanelCols);
                         return s;
                     });
@@ -58,7 +58,7 @@ export class MainTabComp extends AppTab {
                 className: "fa fa-step-forward widthSizerIcon",
                 title: "Wider view",
                 onClick: () => {
-                    dispatch("widthAdjust", (s: AppState): AppState => {
+                    dispatch("widthAdjust", s => {
                         S.edit.setMainPanelCols(++s.userPreferences.mainPanelCols);
                         return s;
                     });

@@ -27,7 +27,7 @@ export class TabUtil {
         */
         // if (state.activeTab==tabName) return;
 
-        dispatch("SelectTab", (s: AppState): AppState => {
+        dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
                 S.nav.navHome(s);
             }
@@ -57,7 +57,7 @@ export class TabUtil {
     }
 
     createAppTabs = () => {
-        dispatch("initTabs", (s: AppState): AppState => {
+        dispatch("initTabs", s => {
             s.tabData = [
                 new MainTabCompData(),
                 new SearchResultSetViewData(),

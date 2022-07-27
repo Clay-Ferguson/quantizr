@@ -124,7 +124,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 }
             }
             else {
-                dispatch("OpenDialog", (s: AppState): AppState => {
+                dispatch("OpenDialog", s => {
                     s.dialogStack.push(this);
                     return s;
                 });
@@ -183,7 +183,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             }
         }
         else {
-            dispatch("CloseDialog", (s: AppState): AppState => {
+            dispatch("CloseDialog", s => {
                 const index = s.dialogStack.indexOf(this);
                 if (index > -1) {
                     s.dialogStack.splice(index, 1);

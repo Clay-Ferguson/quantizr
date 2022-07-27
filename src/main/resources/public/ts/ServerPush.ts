@@ -66,7 +66,7 @@ export class ServerPush {
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
 
             if (nodeInfo) {
-                dispatch("RenderTimelineResults", (s: AppState): AppState => {
+                dispatch("RenderTimelineResults", s => {
                     let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                     if (!data) return;
 
@@ -148,7 +148,7 @@ export class ServerPush {
         let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         if (!feedData) return;
 
-        dispatch("RenderIPSMFeedResults", (s: AppState): AppState => {
+        dispatch("RenderIPSMFeedResults", s => {
             feedData.props.events = feedData.props.events || [];
 
             // add to head of array (rev-chron view)
@@ -183,7 +183,7 @@ export class ServerPush {
             return;
         }
 
-        dispatch("RenderFeedResults", (s: AppState): AppState => {
+        dispatch("RenderFeedResults", s => {
             feedData.props.feedResults = feedData.props.feedResults || [];
 
             let itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);

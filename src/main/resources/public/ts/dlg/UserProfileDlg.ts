@@ -319,7 +319,7 @@ export class UserProfileDlg extends DialogBase {
 
     saveResponse = (res: J.SaveUserPreferencesResponse) => {
         this.close();
-        dispatch("SaveUserPerferences", (s: AppState): AppState => {
+        dispatch("SaveUserPerferences", s => {
             s.displayName = this.displayNameState.getValue();
             return s;
         });

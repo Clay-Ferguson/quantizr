@@ -112,7 +112,7 @@ export class MenuPanel extends Div {
     // DO NOT DELETE
     // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
     static setIpsmActive = () => {
-        dispatch("enableIpsm", (s: AppState): AppState => {
+        dispatch("enableIpsm", s => {
             s.ipsmActive = true;
             setTimeout(() => {
                 S.tabUtil.selectTab(C.TAB_IPSM);

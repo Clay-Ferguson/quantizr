@@ -131,13 +131,13 @@ export class RssTypeHandler extends TypeBase {
                 if (!res?.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
-                    dispatch("RSSUpdated", (s: AppState): AppState => {
+                    dispatch("RSSUpdated", s => {
                         s.rssFeedCache[feedSrcHash] = "failed";
                         return s;
                     });
                 }
                 else {
-                    dispatch("RSSUpdated", (s: AppState): AppState => {
+                    dispatch("RSSUpdated", s => {
                         S.domUtil.focusId(C.TAB_MAIN);
                         S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
                         setTimeout(() => {
@@ -178,7 +178,7 @@ export class RssTypeHandler extends TypeBase {
             className: "float-end"
         }, {
             setValue: (checked: boolean) => {
-                dispatch("SetHeadlinesFlag", (s: AppState): AppState => {
+                dispatch("SetHeadlinesFlag", s => {
                     S.edit.setRssHeadlinesOnly(s, checked);
                     return s;
                 });
@@ -281,7 +281,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     setPage = (feedSrcHash: string, state: AppState, page: number) => {
-        dispatch("RSSUpdated", (s: AppState): AppState => {
+        dispatch("RSSUpdated", s => {
             // deleting will force a requery from the server
             delete s.rssFeedCache[feedSrcHash];
             s.rssFeedPage[feedSrcHash] = page;

@@ -1178,7 +1178,7 @@ export class Util {
     }
 
     switchBrowsingMode = () => {
-        dispatch("SwitchBrowsingMode", (s: AppState): AppState => {
+        dispatch("SwitchBrowsingMode", s => {
             s.mobileMode = !s.mobileMode;
             return s;
         });
@@ -1238,12 +1238,12 @@ export class Util {
         // This outter timer is a very slight hack because when the page re-renders currently it resets pageMessage, so we sneak in
         // here behind that to set this.
         setTimeout(() => {
-            dispatch("ShowPageMessage", (s: AppState): AppState => {
+            dispatch("ShowPageMessage", s => {
                 s.pageMessage = message;
                 return s;
             });
             setTimeout(() => {
-                dispatch("ClearPageMessage", (s: AppState): AppState => {
+                dispatch("ClearPageMessage", s => {
                     s.pageMessage = null;
                     return s;
                 });
@@ -1257,7 +1257,7 @@ export class Util {
             let res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
-            dispatch("loadBookmarks", (s: AppState): AppState => {
+            dispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
 
                 // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
@@ -1292,7 +1292,7 @@ export class Util {
             if (node.path === parentPath) {
                 node.hasChildren = true;
                 if (doDispatch) {
-                    dispatch("NodeChanges", (s: AppState): AppState => {
+                    dispatch("NodeChanges", s => {
                         return state;
                     });
                 }
@@ -1304,7 +1304,7 @@ export class Util {
 
     enableMouseEffect = async () => {
         let mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
-        dispatch("ToggleMouseEffect", (s: AppState): AppState => {
+        dispatch("ToggleMouseEffect", s => {
             s.mouseEffect = mouseEffect === "1";
             return s;
         });
@@ -1312,7 +1312,7 @@ export class Util {
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
-        dispatch("ToggleMouseEffect", (s: AppState): AppState => {
+        dispatch("ToggleMouseEffect", s => {
             s.mouseEffect = !s.mouseEffect;
             S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
             return s;
@@ -1552,7 +1552,7 @@ export class Util {
         }
 
         if (dispatchNow) {
-            dispatch("SetUserPreferences", (s: AppState): AppState => {
+            dispatch("SetUserPreferences", s => {
                 s.userPreferences = state.userPreferences;
                 if (!s.userPreferences.showParents) {
                     s.node.parents = null;
@@ -1570,7 +1570,7 @@ export class Util {
     setStateVarsUsingLoginResponse = (res: J.LoginResponse) => {
         if (!res) return;
 
-        dispatch("LoginResponse", (s: AppState): AppState => {
+        dispatch("LoginResponse", s => {
             if (res.rootNode) {
                 s.homeNodeId = res.rootNode;
                 s.homeNodePath = res.rootNodePath;

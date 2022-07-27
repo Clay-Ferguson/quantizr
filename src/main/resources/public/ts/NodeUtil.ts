@@ -59,7 +59,7 @@ export class NodeUtil {
 
     clearSelNodes = (state: AppState = null) => {
         state = getAppState(state);
-        dispatch("ClearSelections", (s: AppState): AppState => {
+        dispatch("ClearSelections", s => {
             s.selectedNodes.clear();
             return s;
         });
