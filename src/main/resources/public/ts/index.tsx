@@ -9,7 +9,6 @@ import TsxApp from "./TsxApp";
 import "font-awesome/css/font-awesome.min.css";
 import "../css/quanta.scss";
 import { TutorialApp } from "./comp/core/TutorialApp";
-import PayPalButton from "./PayPalButton";
 
 // we have this as the first import for troubleshooting how browsers are 
 // able to handle the 'import' statement.
@@ -35,7 +34,6 @@ else if ((window as any).__page === "tsx-test") {
     ReactDOM.render(
         <React.StrictMode>
             <TsxApp />
-            <PayPalButton />
         </React.StrictMode>,
         document.getElementById("app")
     );

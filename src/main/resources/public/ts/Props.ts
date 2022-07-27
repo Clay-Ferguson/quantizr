@@ -207,22 +207,22 @@ export class Props {
     }
 
     getPropStr = (propertyName: string, node: J.NodeInfo): string => {
-        const prop: J.PropertyInfo = this.getProp(propertyName, node);
+        const prop = this.getProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
     getPropObj = (propertyName: string, node: J.NodeInfo): any => {
-        const prop: J.PropertyInfo = this.getProp(propertyName, node);
+        const prop = this.getProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
     getClientPropStr = (propertyName: string, node: J.NodeInfo): string => {
-        const prop: J.PropertyInfo = this.getClientProp(propertyName, node);
+        const prop = this.getClientProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
     setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {
-        let prop: J.PropertyInfo = this.getProp(propertyName, node);
+        let prop = this.getProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop) {
@@ -243,7 +243,7 @@ export class Props {
 
     setProp = (node: J.NodeInfo, newProp: J.PropertyInfo) => {
         if (!newProp) return;
-        const prop: J.PropertyInfo = this.getProp(newProp.name, node);
+        const prop = this.getProp(newProp.name, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop) {

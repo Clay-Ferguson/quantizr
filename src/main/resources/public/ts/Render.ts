@@ -596,7 +596,7 @@ export class Render {
     safely after every time we get new data from the server, with no significant performance hit.
     */
     getNodeMetaInfo = async (node: J.NodeInfo) => {
-        if (node && node.children) {
+        if (node?.children) {
             // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
             // haven't yet pulled the metadata yet.
             let ids: string[] = [];
@@ -621,7 +621,7 @@ export class Render {
     }
 
     getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
-        if (!node || !node.children) return;
+        if (!node?.children) return;
 
         for (let child of node.children) {
             if (!(child as any).metaInfDone) {

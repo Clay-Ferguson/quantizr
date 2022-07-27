@@ -54,7 +54,7 @@ export class NodeCompMarkdown extends Html {
         let val = "";
 
         if (node.type === J.NodeType.PLAIN_TEXT) {
-            let nowrapProp: J.PropertyInfo = S.props.getProp(J.NodeProp.NOWRAP, node);
+            let nowrapProp = S.props.getProp(J.NodeProp.NOWRAP, node);
             let wordWrap = !(nowrapProp && nowrapProp.value === "1");
 
             if (content) {
