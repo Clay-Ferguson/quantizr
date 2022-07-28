@@ -81,7 +81,8 @@ public class NodeRenderService extends ServiceBase {
 		if (ok(sc) && !sc.isAnonUser()) {
 			showReplies = sc.getUserPreferences().isShowReplies();
 
-			// log.debug("rendering with user prefs: [hashCode=" + sc.getUserPreferences().hashCode() + "] " + XString.prettyPrint(sc.getUserPreferences()));
+			// log.debug("rendering with user prefs: [hashCode=" + sc.getUserPreferences().hashCode() + "] " +
+			// XString.prettyPrint(sc.getUserPreferences()));
 		}
 
 		String targetId = req.getNodeId();
@@ -188,6 +189,7 @@ public class NodeRenderService extends ServiceBase {
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
 		if (ok(node)) {
 			// add pageSize hack to docs and admin part of user guide.
+			// todo-1: is this still needed/wanted?
 			Long pageSize = node.getInt("pageSize");
 			if (ok(pageSize) && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
 				limit = pageSize.intValue();
@@ -269,16 +271,15 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		/*
-		 * todo-2: needed optimization to work well with large numbers of child nodes: If scanToNode is in
+		 * todo-2: need optimization to work well with large numbers of child nodes: If scanToNode is in
 		 * use, we should instead look up the node itself, and then get it's ordinal, and use that as a '>='
 		 * in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
 		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
 		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
-		int queryLimit = ok(scanToNode) ? -1 : offset + limit + 2;
+		int queryLimit = ok(scanToNode) ? -1 : limit + 2;
 
-		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
-		// + scanToNode);
+		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
 
 		String orderBy = node.getStr(NodeProp.ORDER_BY);
 		Sort sort = null;
