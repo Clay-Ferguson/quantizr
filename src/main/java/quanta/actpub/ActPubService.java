@@ -832,7 +832,7 @@ public class ActPubService extends ServiceBase {
     public void processAnnounceAction(HttpServletRequest httpReq, Object payload, String actorUrl, boolean undo,
             byte[] bodyBytes) {
         arun.<Object>run(as -> {
-            apLog.trace("process " + (undo ? "unannounce" : "announe") + " Payload=" + XString.prettyPrint(payload));
+            apLog.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(payload));
 
             // if this is an undo operation we just delete the node and we're done.
             if (undo) {

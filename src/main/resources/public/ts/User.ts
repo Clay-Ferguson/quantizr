@@ -177,8 +177,13 @@ export class User {
                 this.checkMessages();
                 setTimeout(() => {
                     S.util.loadBookmarks();
-                    S.util.resumeEditingOfAbandoned();
                 }, 600);
+
+                // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
+                // the main app layout has already loaded before we even try to resume editing.
+                setTimeout(() => {
+                    S.util.resumeEditingOfAbandoned();
+                }, 1700);
             }
 
             S.util.setStateVarsUsingLoginResponse(res);
