@@ -125,9 +125,6 @@ export class View {
         // console.log("growPage");
         let lastChildNode = S.edit.getLastChildNode(state);
         if (lastChildNode) {
-            // todo-0: review this 'targetOffset'. Is this correct now that duplicates are being removed
-            // as part of the algorithm. In other words, when we add DOM elements, are we sure the logicalOrdinal 
-            // being used here will be correct?
             let targetOffset = lastChildNode.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, true, state);
         }
