@@ -14,7 +14,6 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
 export class LoginDlg extends DialogBase {
-
     userState: ValidatedState<any> = new ValidatedState<any>();
     pwdState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -70,7 +69,7 @@ export class LoginDlg extends DialogBase {
 
     signup = () => {
         this.close();
-        S.user.userSignup(getAppState());
+        S.user.userSignup();
     }
 
     login = async () => {

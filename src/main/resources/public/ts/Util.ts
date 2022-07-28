@@ -170,7 +170,7 @@ export class Util {
         }
         return hash.toString();
     }
-
+    
     hashOfObject = (obj: Object): string => {
         if (!obj) return "null";
         return this.hashOfString(JSON.stringify(obj));
@@ -1513,7 +1513,6 @@ export class Util {
 
     loadAnonPageHome = async () => {
         console.log("loadAnonPageHome()");
-        let state = getAppState();
 
         try {
             if (this.sendAnonUsersToFeed) {

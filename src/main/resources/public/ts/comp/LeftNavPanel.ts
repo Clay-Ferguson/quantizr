@@ -95,6 +95,7 @@ export class LeftNavPanel extends Div {
         }
     }
 
+    // todo-0: Can this kind of logic be built into the base class and not implemented in each component?
     domPreUpdateEvent = () => {
         let elm = this.getRef();
         if (elm) {

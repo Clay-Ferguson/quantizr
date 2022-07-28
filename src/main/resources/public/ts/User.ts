@@ -8,16 +8,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class User {
-    closeAccountResponse = () => {
-        /* Remove warning dialog to ask user about leaving the page */
-        window.onbeforeunload = null;
-
-        /* reloads browser with the query parameters stripped off the path */
-        window.location.href = window.location.origin;
-    }
-
     closeAccount = async () => {
-        let state = getAppState();
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             null, null);
         await dlg.open();
@@ -31,7 +22,12 @@ export class User {
         if (dlg.yes) {
             await this.deleteAllUserLocalDbEntries();
             await S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
-            this.closeAccountResponse();
+
+            /* Remove warning dialog to ask user about leaving the page */
+            window.onbeforeunload = null;
+
+            /* reloads browser with the query parameters stripped off the path */
+            window.location.href = window.location.origin;
         }
     }
 
@@ -41,15 +37,11 @@ export class User {
      * use these names
      */
     isTestUserAccount = (state: AppState): boolean => {
-        return state.userName.toLowerCase() === "adam" || //
-            state.userName.toLowerCase() === "bob" || //
-            state.userName.toLowerCase() === "cory" || //
-            state.userName.toLowerCase() === "dan";
-    }
-
-    openSignupPg = (state: AppState) => {
-        // S.util.showMessage("Signups are temporarily unavailable. Check back in a few hours.", "Note");
-        new SignupDlg().open();
+        let lcUserName = state.userName.toLowerCase();
+        return lcUserName === "adam" || //
+            lcUserName === "bob" || //
+            lcUserName === "cory" || //
+            lcUserName === "dan";
     }
 
     refreshLogin = async (state: AppState) => {
@@ -279,8 +271,7 @@ export class User {
         S.user.logout(true, state);
     }
 
-    userSignup = (state: AppState = null) => {
-        state = getAppState(state);
-        S.user.openSignupPg(state);
+    userSignup = () => {
+        new SignupDlg().open();
     }
 }

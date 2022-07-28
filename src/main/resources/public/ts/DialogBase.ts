@@ -2,7 +2,6 @@ import { createElement } from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { dispatch, getAppState, store } from "./AppRedux";
-import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";

@@ -32,10 +32,16 @@ export function rootReducer(state: AppState = initialState, action: AppAction) {
 export const store = createStore(rootReducer);
 
 export const getAppState = (state?: AppState): AppState => {
-    if (inDispatch) {
-        console.warn("WARNING: calling getAppState while in a dispatch. This is probably a bug.");
-    }
-    return state || store.getState();
+    if (state) return state;
+    
+    // I don't think this was a good idea. We might be using an older state here, but for now I'm going to tolerate
+    // this becasue I think we've always been doing this and it's not necessarily a problem. Needs a bit more consideration.
+    // if (inDispatch) {
+    //     debugger;
+    //     console.warn("WARNING: calling getAppState while in a dispatch. This is probably a bug.");
+    // }
+
+    return store.getState();
 };
 
 export const useAppState = (state?: AppState): AppState => {
@@ -48,9 +54,9 @@ export const dispatch = (actionName: string, update: (state: AppState) => AppSta
     // dispatch is synchronous so it's safe to use this inDispatch the way we are here.
     try {
         inDispatch = true;
-    // console.log(" Dispatch Running: " + actionName);
-    store.dispatch({ type: actionName, update });
-    // console.log("Dispatch Complete: " + actionName);
+        // console.log("Dispatch: " + actionName);
+        store.dispatch({ type: actionName, update });
+        // console.log("Dispatch Complete: " + actionName);
     }
     finally {
         inDispatch = false;

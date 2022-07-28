@@ -133,7 +133,7 @@ export class TabUtil {
     resultSetHasData = (id: string) => {
         let state = getAppState();
         let data = state.tabData.find(d => d.id === id);
-        return data && data.rsInfo && data.rsInfo.results && data.rsInfo.results.length > 0;
+        return data?.rsInfo?.results?.length > 0;
     }
 
     /* This function manages persisting the scroll position when switching
