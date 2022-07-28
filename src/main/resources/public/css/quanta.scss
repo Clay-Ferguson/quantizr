@@ -126,10 +126,6 @@ body {
    padding: $tinyGap;
 }
 
-.fullWidth {
-    width: 100%;
-}
-
 .serverInfoText {
     width: 100%;
     overflow: auto;
@@ -659,14 +655,15 @@ strong em {
 /* I was getting a crazy render flicker where the browser was apparently toggling scrollbar off and on 10 times per second
 it looked like and this wild ass guess at using 95% instead of 100% here as a fix solved the problem. 
 Will come back later and study this more. todo-1 */
-.fullWidth {
-    width: 90%;
+.videoContainer {
+    width: 98%;
 }
 
 .videoPlayerElement {
     display: block;
-    width: 60%;
-    border: 3px solid gray;
+    width: 75%;
+    border: 2px solid gray;
+    border-radius: $border-radius;
     margin: 0 auto;
 }
 
