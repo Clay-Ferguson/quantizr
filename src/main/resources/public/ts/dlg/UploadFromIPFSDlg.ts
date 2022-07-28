@@ -10,7 +10,6 @@ import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
 export class UploadFromIPFSDlg extends DialogBase {
-
     static storeLocally: boolean = false;
     uploadButton: Button;
     cidState: ValidatedState<any> = new ValidatedState<any>();

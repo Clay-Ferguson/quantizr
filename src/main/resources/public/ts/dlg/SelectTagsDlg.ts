@@ -44,9 +44,7 @@ export class SelectTagsDlg extends DialogBase {
 
         if (this.curTags) {
             let tags = this.curTags.split(/ /);
-            tags.forEach(t => {
-                tagSet.add(t);
-            });
+            tags?.forEach(t => tagSet.add(t));
         }
 
         return tagSet;

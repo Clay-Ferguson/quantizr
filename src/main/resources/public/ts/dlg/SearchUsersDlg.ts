@@ -44,9 +44,7 @@ export class SearchUsersDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let adminOptions = null;
-
-        adminOptions = new RadioButtonGroup([
+        let adminOptions = new RadioButtonGroup([
             getAppState().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {

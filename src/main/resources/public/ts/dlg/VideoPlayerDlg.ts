@@ -8,7 +8,6 @@ import { DialogMode } from "../enums/DialogMode";
  * See also: AudioPlayerDlg (which is very similar)
  */
 export class VideoPlayerDlg extends DialogBase {
-
     videoPlayer: VideoPlayer;
 
     constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, dialogMode: DialogMode) {
@@ -17,23 +16,22 @@ export class VideoPlayerDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
-                // space is at a premium for mobile, so let's just not even show the header.
-                new Div(null, { className: "fullWidth" }, [
-                    this.videoPlayer = new VideoPlayer({
-                        id: this.domId + "-comp",
-                        src: this.sourceUrl,
-                        className: "videoPlayerElement",
-                        // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
-                        // "oncanplay": () => { S.podcast.onCanPlay(this); },
-                        controls: "controls",
-                        autoPlay: "autoplay"
-                        // "muted" : "false",
-                        // "volume": "0.9",
-                        // "preload": "auto"
-                    })
-                ])
+            // space is at a premium for mobile, so let's just not even show the header.
+            new Div(null, { className: "videoContainer" }, [
+                this.videoPlayer = new VideoPlayer({
+                    id: this.domId + "-comp",
+                    src: this.sourceUrl,
+                    className: "videoPlayerElement",
+                    // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
+                    // "oncanplay": () => { S.podcast.onCanPlay(this); },
+                    controls: "controls",
+                    autoPlay: "autoplay"
+                    // "muted" : "false",
+                    // "volume": "0.9",
+                    // "preload": "auto"
+                })
             ])
+
         ];
     }
 

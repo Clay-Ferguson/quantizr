@@ -18,15 +18,11 @@ interface LS { // Local State
 }
 
 export class SplitNodeDlg extends DialogBase {
-
     delimiterState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(private node: J.NodeInfo) {
         super("Split Node");
-
-        if (!this.node) {
-            this.node = S.nodeUtil.getHighlightedNode(getAppState());
-        }
+        this.node = this.node || S.nodeUtil.getHighlightedNode(getAppState());
 
         let splitMode: string;
         if (this.node.content.indexOf("\n\n\n") !== -1) {

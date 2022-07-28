@@ -20,14 +20,12 @@ interface LS { // Local State
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
     uploadButton: Button;
-
     fileList: any[] = null;
     zipQuestionAnswered: boolean = false;
     explodeZips: boolean = false;
     dropzone: any = null;
     dropzoneDiv: Div = null;
     sent: boolean = false;
-
     maxFiles: number = 50;
 
     // this varible gets set if anything is detected wrong during the upload
@@ -188,7 +186,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     upload = async (): Promise<boolean> => {
         if (this.filesAreValid()) {
             const files = this.dropzone.getAcceptedFiles();
-
             if (files) {
                 this.numFiles = files.length;
                 this.dropzone.processQueue();
@@ -198,8 +195,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     configureDropZone = () => {
-        let state = this.getState<LS>();
-
         /* Limit based on user quota for our user accounts */
         let maxFileSize = getAppState().userPrefs.maxUploadFileSize;
         // console.log("configureDropZone: maxFileSize="+maxUploadSize);
@@ -212,8 +207,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             action = S.util.getRpcPath() + "upload";
         }
         let url = action;
-
         let dlg = this;
+        
         let config: Object = {
             action,
             width: "100%",

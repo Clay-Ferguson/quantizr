@@ -127,7 +127,7 @@ export class SearchContentDlg extends DialogBase {
     createSearchFieldIconButtons = (): Comp => {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
-                onClick: async e => {
+                onClick: async () => {
                     let dlg: SelectTagsDlg = new SelectTagsDlg("search", null);
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
@@ -184,7 +184,6 @@ export class SearchContentDlg extends DialogBase {
         }
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
-
         let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
 
         let requirePriority = this.getState<LS>().requirePriority;

@@ -16,15 +16,12 @@ interface LS { // Local State
 }
 
 export class TransferNodeDlg extends DialogBase {
-
     toUserState: ValidatedState<any> = new ValidatedState<any>();
     fromUserState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
         super("Transfer Node", "app-modal-content-narrow-width");
-        this.mergeState<LS>({
-            recursive: false
-        });
+        this.mergeState<LS>({ recursive: false });
     }
 
     renderDlg(): CompIntf[] {

@@ -33,9 +33,7 @@ export class UserProfileDlg extends DialogBase {
     constructor(private userNodeId: string) {
         super("User Profile", "app-modal-content");
         let state = getAppState();
-        if (!userNodeId) {
-            userNodeId = state.userProfile.userNodeId;
-        }
+        userNodeId = userNodeId || state.userProfile.userNodeId;
         this.readOnly = !state.userProfile || state.userProfile.userNodeId !== userNodeId;
         this.mergeState<LS>({ userProfile: null });
     }
@@ -51,17 +49,17 @@ export class UserProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const state: LS = this.getState<LS>();
+        let state = this.getState<LS>();
+        let appState = getAppState();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
 
-        let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
-        let profileImg: CompIntf = this.makeProfileImg(!!profileHeaderImg);
+        let profileHeaderImg = this.makeProfileHeaderImg();
+        let profileImg = this.makeProfileImg(!!profileHeaderImg);
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
-
         let web3Div: Div = null;
-        let web3Enabled = getAppState().allowedFeatures && getAppState().allowedFeatures.indexOf("web3") !== -1;
+        let web3Enabled = appState.allowedFeatures && appState.allowedFeatures.indexOf("web3") !== -1;
 
         if (web3Enabled) {
             let web3Comps: CompIntf[] = [];
@@ -181,13 +179,19 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
-                    !getAppState().isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
-                    !getAppState().isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
-                    !getAppState().isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Follow", this.addFriend) : null,
-                    !getAppState().isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName ? new Button("Block", this.blockUser) : null,
-                    state.userProfile.actorUrl ? new Button("User Page", () => {
-                        window.open(state.userProfile.actorUrl, "_blank");
-                    }) : null,
+                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                        ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
+
+                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                        ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
+
+                    !appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                        ? new Button("Follow", this.addFriend) : null,
+
+                    !appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                        ? new Button("Block", this.blockUser) : null,
+
+                    state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
                     new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -398,20 +402,20 @@ export class UserProfileDlg extends DialogBase {
         let onClick = () => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, async () => {
-
-                let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: state.userProfile.userNodeId
-                });
-
-                if (res?.userProfile) {
-                    state.userProfile.headerImageVer = res.userProfile.headerImageVer;
-                    state.userProfile.userNodeId = res.userProfile.userNodeId;
-                    this.mergeState<LS>({
-                        userProfile: state.userProfile
+            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false,
+                async () => {
+                    let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                        userId: state.userProfile.userNodeId
                     });
-                }
-            });
+
+                    if (res?.userProfile) {
+                        state.userProfile.headerImageVer = res.userProfile.headerImageVer;
+                        state.userProfile.userNodeId = res.userProfile.userNodeId;
+                        this.mergeState<LS>({
+                            userProfile: state.userProfile
+                        });
+                    }
+                });
             dlg.open();
         };
 
