@@ -2,7 +2,7 @@ import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -44,7 +44,7 @@ export class UploadFromIPFSDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextField({ label: "Upload from IPFS CID", val: this.cidState }),
                 new TextField({ label: "Mime Type (or Filename Extension)", val: this.mimeState }),
                 new ButtonBar([

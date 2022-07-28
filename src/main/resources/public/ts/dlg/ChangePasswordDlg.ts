@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -24,7 +24,7 @@ export class ChangePasswordDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextContent("Enter your new password below..."),
                 this.passwordField = new TextField({
                     label: "New Password", pwd: true, val: this.pwdState

@@ -3,7 +3,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -18,7 +18,7 @@ export class PrefsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
                         setValue: (checked: boolean) => getAppState().userPrefs.showMetaData = checked,

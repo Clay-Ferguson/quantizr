@@ -3,7 +3,6 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -22,7 +21,7 @@ export class EditTagsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new Div("Enter your custom hashtags, each on a separate line below. Hashtags must start with #."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState),
                 new ButtonBar([

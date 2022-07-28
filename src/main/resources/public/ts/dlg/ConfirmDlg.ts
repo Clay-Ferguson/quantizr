@@ -1,7 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 
@@ -14,7 +14,7 @@ export class ConfirmDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextContent(this.text, this.textClass),
                 new ButtonBar([
                     new Button("Yes", () => {

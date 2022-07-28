@@ -5,7 +5,6 @@ import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { Icon } from "../comp/core/Icon";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -99,7 +98,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let children = [
-            new Form(null, [
+            new Div(null, null, [
                 this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
                 this.audioPlayer = new AudioPlayer({
                     src: this.sourceUrl,

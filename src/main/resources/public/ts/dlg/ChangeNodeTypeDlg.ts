@@ -2,7 +2,7 @@ import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { NodeTypeListBox } from "../comp/NodeTypeListBox";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
@@ -31,7 +31,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new NodeTypeListBox(this.valIntf, getAppState()),
                 new ButtonBar([
                     new Button("Set Type", this.setNodeType, null, "btn-primary"),

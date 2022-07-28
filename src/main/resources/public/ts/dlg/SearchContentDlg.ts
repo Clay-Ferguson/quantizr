@@ -5,7 +5,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
@@ -64,7 +63,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new Div(null, { className: "row align-items-end" }, [
                     this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-10" }),
                     !getAppState().isAnonUser ? this.createSearchFieldIconButtons() : null

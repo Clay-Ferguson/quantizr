@@ -1,6 +1,5 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
@@ -18,7 +17,7 @@ export class VideoPlayerDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 // space is at a premium for mobile, so let's just not even show the header.
                 new Div(null, { className: "fullWidth" }, [
                     this.videoPlayer = new VideoPlayer({

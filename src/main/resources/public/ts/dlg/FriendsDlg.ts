@@ -3,7 +3,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { FriendsTable } from "../comp/FriendsTable";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
@@ -61,7 +60,7 @@ export class FriendsDlg extends DialogBase {
         }
 
         return [
-            new Form(null, [
+            new Div(null, null, [
                 message ? new Div(message)
                     : new FriendsTable(state.friends, this.selectionValueIntf),
                 new ButtonBar([

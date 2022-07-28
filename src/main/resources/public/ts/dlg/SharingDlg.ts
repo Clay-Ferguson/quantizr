@@ -5,7 +5,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { HelpButton } from "../comp/core/HelpButton";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
@@ -31,7 +30,7 @@ export class SharingDlg extends DialogBase {
         let state: LS = this.getState<LS>();
 
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new Div("Note: All usernames mentioned in the content text will also be automatically added to this sharing list when you save the node, " +
                     "so you don't need to add users here if they're mentioned when you save.", { className: "marginBottom" }),
                 new EditPrivsTable((allowAppends: boolean) => {

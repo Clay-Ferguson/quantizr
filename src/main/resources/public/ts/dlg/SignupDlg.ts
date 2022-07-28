@@ -2,7 +2,6 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Img } from "../comp/core/Img";
 import { TextField } from "../comp/core/TextField";
@@ -26,7 +25,7 @@ export class SignupDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextField({ label: "User Name", val: this.userState }),
                 new TextField({ label: "Password", pwd: true, val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),

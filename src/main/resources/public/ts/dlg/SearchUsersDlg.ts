@@ -3,7 +3,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { RadioButton } from "../comp/core/RadioButton";
@@ -76,7 +76,7 @@ export class SearchUsersDlg extends DialogBase {
         ], "marginBottom");
 
         return [
-            new Form(null, [
+            new Div(null, null, [
                 this.searchTextField = new TextField({ label: "User Name", enter: this.search, val: this.searchTextState }),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.

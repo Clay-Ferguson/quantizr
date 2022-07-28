@@ -8,7 +8,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { Header } from "../comp/core/Header";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
@@ -268,7 +267,7 @@ export class EditNodeDlg extends DialogBase {
         let propertyEditFieldContainer: Div = null;
         let children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
-            new Form(null, [
+            new Div(null, null, [
                 new Div(null, {
                 }, [
                     propertyEditFieldContainer = new Div("", {

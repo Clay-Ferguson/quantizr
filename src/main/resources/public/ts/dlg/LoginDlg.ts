@@ -3,7 +3,6 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
@@ -25,7 +24,7 @@ export class LoginDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextField({ label: "User", enter: this.login, val: this.userState }),
                 new TextField({ label: "Password", pwd: true, enter: this.login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [

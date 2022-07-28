@@ -2,7 +2,7 @@ import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Form } from "../comp/core/Form";
+import { Div } from "../comp/core/Div";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -40,7 +40,7 @@ export class ShareToPersonDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new TextContent("Enter the user name of the person to share this node with:"),
                 new TextField({ label: "User to share with", enter: this.shareNodeToPerson, val: this.userNameState }),
                 new ButtonBar([

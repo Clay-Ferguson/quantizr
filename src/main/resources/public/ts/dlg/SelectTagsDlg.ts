@@ -4,7 +4,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Form } from "../comp/core/Form";
 import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -91,7 +90,7 @@ export class SelectTagsDlg extends DialogBase {
         }
 
         return [
-            new Form(null, [
+            new Div(null, null, [
                 new Checkbox("Suggest Tags", { className: "float-end" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
