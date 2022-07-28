@@ -59,11 +59,11 @@ export class NodeCompMarkdown extends Html {
 
             if (content) {
                 if (wordWrap) {
-                    let contentFormatted = S.util.escapeHtml(content);
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\n\r", "<br>");
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\n", "<br>");
-                    contentFormatted = S.util.replaceAll(contentFormatted, "\r", "<br>");
-                    val = "<div class='fixedFont'>" + contentFormatted + "</div>";
+                    let escaped = S.util.escapeHtml(content);
+                    escaped = S.util.replaceAll(escaped, "\n\r", "<br>");
+                    escaped = S.util.replaceAll(escaped, "\n", "<br>");
+                    escaped = S.util.replaceAll(escaped, "\r", "<br>");
+                    val = "<div class='fixedFont'>" + escaped + "</div>";
                 }
                 else {
                     val = "<pre>" + S.util.escapeHtml(content) + "</pre>";

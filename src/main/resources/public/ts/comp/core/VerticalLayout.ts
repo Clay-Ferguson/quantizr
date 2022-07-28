@@ -8,7 +8,6 @@ export class VerticalLayout extends Div {
         this.attribs.className = "vertical " + justify + " layout vertical-layout-row";
 
         if (children) {
-            // Wrap all the children provided in Divs, and make those be the children
             children = children.map(child => {
                 return child ? new Div(null, null, [child]) : null;
             }).filter(c => !!c);

@@ -14,9 +14,7 @@ export class FullScreenControlBar extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
-        let buttons: Comp[] = this.getButtons(state);
-        this.setChildren(buttons);
+        this.setChildren(this.getButtons(useAppState()));
     }
 
     getButtons = (state: AppState): Comp[] => {

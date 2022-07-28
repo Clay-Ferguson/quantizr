@@ -76,7 +76,6 @@ export class NodeCompMainList extends Div {
                     let observer = new IntersectionObserver(entries => {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
-
                         let state = getAppState();
 
                         // Make sure this button has existed for 3 seconds at least before allowing it to trigger a growPage, becasue
@@ -88,12 +87,11 @@ export class NodeCompMainList extends Div {
                                     // if this button comes into visibility within 2 seconds of it being created
                                     // that means it was rendered visible without user scrolling so in this case
                                     // we want to disallow the auto loading
-                                    let curTime: number = new Date().getTime();
+                                    let curTime = new Date().getTime();
                                     if (curTime - buttonCreateTime < 3000) {
                                         observer.disconnect();
                                         return;
                                     }
-
                                     S.view.growPage(state);
                                 }
                             });

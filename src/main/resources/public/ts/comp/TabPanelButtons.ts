@@ -16,17 +16,16 @@ export class TabPanelButtons extends Div {
 
     preRender(): void {
         let state = useAppState();
-        let tabButtons = new Div(null, {
-            className: "tab-buttons-container"
-        }, [
-            new Ul(null, {
-                className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
-                id: "navTabs"
-            }, this.buildTabButtons(state))]
-        );
 
         this.setChildren([
-            tabButtons
+            new Div(null, {
+                className: "tab-buttons-container"
+            }, [
+                new Ul(null, {
+                    className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
+                    id: "navTabs"
+                }, this.buildTabButtons(state))]
+            )
         ]);
     }
 
@@ -55,7 +54,7 @@ export class TabPanelButtons extends Div {
         return new Li(null, {
             className: "nav-item",
             style: { display: data.isVisible(state) ? "inline" : "none" },
-            onClick: event => {
+            onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();
                 S.tabUtil.selectTab(data.id);

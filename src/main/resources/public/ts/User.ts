@@ -61,7 +61,7 @@ export class User {
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
             console.log("loginState known as logged out.");
-            S.util.loadAnonPageHome(null);
+            S.util.loadAnonPageHome();
             return;
         }
 
@@ -79,7 +79,7 @@ export class User {
         console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
-            S.util.loadAnonPageHome(null);
+            S.util.loadAnonPageHome();
         } else {
             try {
                 let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
@@ -105,13 +105,13 @@ export class User {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
 
-                    S.util.loadAnonPageHome(null);
+                    S.util.loadAnonPageHome();
                 }
             }
             catch (e) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
-                S.util.loadAnonPageHome(null);
+                S.util.loadAnonPageHome();
             }
         }
     }

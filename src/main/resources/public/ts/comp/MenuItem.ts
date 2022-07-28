@@ -21,7 +21,6 @@ export class MenuItem extends Div {
 
     compRender = (): ReactNode => {
         let state: LS = this.getState<LS>();
-        let _style = { display: (state.visible ? "" : "none") };
         let enablement = state.enabled ? {} : { disabled: "disabled" };
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
@@ -35,7 +34,7 @@ export class MenuItem extends Div {
             ...this.attribs,
             ...enablement,
             ...{
-                style: _style,
+                style: { display: (state.visible ? "" : "none") },
                 className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent",
                 onClick: this.onClick
             }

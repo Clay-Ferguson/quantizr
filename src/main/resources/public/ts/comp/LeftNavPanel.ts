@@ -58,19 +58,19 @@ export class LeftNavPanel extends Div {
                 new Img(this.getId("logo_"), {
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
-                    onClick: S.util.loadAnonPageHome,
+                    onClick: () => S.util.loadAnonPageHome(),
                     title: "Go to Portal Home Node"
                 }),
                 new Span(g_brandingAppName, {
                     className: "logo-text",
-                    onClick: S.util.loadAnonPageHome,
+                    onClick: () => S.util.loadAnonPageHome(),
                     title: "Go to Portal Home Node"
                 }),
                 // todo-2: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
                 messages ? new Span(messages, {
                     className: "logo-text-small float-end",
-                    onClick: e => { S.nav.showMyNewMessages(); },
+                    onClick: () => S.nav.showMyNewMessages(),
                     title: "Show new messages"
                 }) : null
             ]),

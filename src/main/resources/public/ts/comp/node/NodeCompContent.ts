@@ -8,7 +8,6 @@ import { Clearfix } from "../core/Clearfix";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 export class NodeCompContent extends Div {
-
     domPreUpdateFunc: Function;
 
     constructor(public node: J.NodeInfo,

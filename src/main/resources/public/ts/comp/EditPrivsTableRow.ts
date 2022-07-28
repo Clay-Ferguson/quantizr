@@ -35,7 +35,6 @@ export class EditPrivsTableRow extends ListBoxRow {
     }
 
     preRender(): void {
-        // console.log("aclEntry: " + S.util.prettyPrint(this.aclEntry));
         let src: string = null;
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
@@ -63,19 +62,17 @@ export class EditPrivsTableRow extends ListBoxRow {
             new Div(null, { className: "microMarginAll" }, [
                 this.renderAclPrivileges(this.aclEntry),
                 img,
-                isPublic
-                    ? new Heading(5, "Public")
+                isPublic ? new Heading(5, "Public")
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),
-                        onClick: (evt: any) => {
+                        onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
                     }),
-                isPublic
-                    ? new Checkbox("Allow Replies", { className: "marginLeft" }, {
-                        setValue: (checked: boolean) => this.publicChangedFunc(checked),
-                        getValue: (): boolean => publicWritable
-                    }) : null
+                isPublic ? new Checkbox("Allow Replies", { className: "marginLeft" }, {
+                    setValue: (checked: boolean) => this.publicChangedFunc(checked),
+                    getValue: (): boolean => publicWritable
+                }) : null
             ])
         ]);
     }

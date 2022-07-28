@@ -21,7 +21,6 @@ export class AppTab<PropType = any> extends Div {
         if (state.activeTab === this.getId()) {
             className += " show active";
         }
-        // console.log("ID: " + this.data.id + " className=" + className);
         return className;
     }
 

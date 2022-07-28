@@ -31,7 +31,6 @@ export class NodeCompParentNodes extends Div {
         }
 
         this.attribs.className = "parentNodeContentStyle";
-
         let showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
 
         this.setChildren([

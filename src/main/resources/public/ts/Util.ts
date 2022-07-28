@@ -1511,8 +1511,9 @@ export class Util {
         }
     }
 
-    loadAnonPageHome = async (state: AppState) => {
+    loadAnonPageHome = async () => {
         console.log("loadAnonPageHome()");
+        let state = getAppState();
 
         try {
             if (this.sendAnonUsersToFeed) {
@@ -1530,7 +1531,6 @@ export class Util {
                     }
                     return;
                 }
-                state = getAppState(state);
                 console.log("renderPage for anonymous");
                 S.render.renderPage(res, false, null, true, true);
             }

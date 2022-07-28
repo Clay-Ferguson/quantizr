@@ -13,7 +13,7 @@ export class EditPrivsTable extends ListBox {
     preRender(): void {
         let children = [];
 
-        if (this.nodePrivsInfo && this.nodePrivsInfo.aclEntries) {
+        if (this.nodePrivsInfo?.aclEntries) {
             // first add public, so it's at the top
             this.nodePrivsInfo.aclEntries.forEach(function (aclEntry: J.AccessControlInfo) {
                 if (aclEntry.principalName?.toLowerCase() === "public") {

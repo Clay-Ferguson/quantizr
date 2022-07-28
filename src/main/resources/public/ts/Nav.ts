@@ -299,7 +299,7 @@ export class Nav {
 
         // console.log("navHome()");
         if (state.isAnonUser) {
-            S.util.loadAnonPageHome(null);
+            S.util.loadAnonPageHome();
         } else {
             try {
                 // console.log("renderNode (navHome): " + state.homeNodeId);
@@ -324,7 +324,7 @@ export class Nav {
     }
 
     navPublicHome = (state: AppState) => {
-        S.util.loadAnonPageHome(null);
+        S.util.loadAnonPageHome();
     }
 
     runSearch = (evt: Event) => {

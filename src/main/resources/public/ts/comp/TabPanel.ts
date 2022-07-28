@@ -25,21 +25,17 @@ export class TabPanel extends Div {
     preRender(): void {
         const state = useAppState();
 
-        let tabContent = new Div(null, {
-            className: "row tab-content",
-            role: "main",
-            key: this.attribs.key + "_topdiv"
-        }, this.buildTabs(state));
-
-        let scrollUpButton = state.mobileMode ? new IconButton("fa-angle-double-up", null, {
-            onClick: e => S.view.scrollAllTop(state),
-            title: "Scroll to Top"
-        }, "btn-primary scrollTopButtonLowerRight", "off") : null;
-
         this.setChildren([
             this.customTopComp,
-            tabContent,
-            scrollUpButton
+            new Div(null, {
+                className: "row tab-content",
+                role: "main",
+                key: this.attribs.key + "_topdiv"
+            }, this.buildTabs(state)),
+            state.mobileMode ? new IconButton("fa-angle-double-up", null, {
+                onClick: e => S.view.scrollAllTop(state),
+                title: "Scroll to Top"
+            }, "btn-primary scrollTopButtonLowerRight", "off") : null
         ]);
     }
 

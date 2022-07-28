@@ -94,9 +94,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
             };
         }
 
-        if (!att.style) {
-            att.style = {};
-        }
+        att.style = att.style || {};
         att.style.fontFamily = "monospace";
 
         // Getting a bizarre React error whenver 'onKeyUp' is used.

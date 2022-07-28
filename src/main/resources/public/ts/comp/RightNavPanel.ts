@@ -101,7 +101,6 @@ export class RightNavPanel extends Div {
         }) : null;
 
         if (addNoteButton) {
-            // todo-1: need to document this in "Tips and Tricks"
             S.util.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
                 const data = evt.dataTransfer.items;
                 for (let i = 0; i < data.length; i++) {
@@ -115,10 +114,6 @@ export class RightNavPanel extends Div {
                 }
             });
         }
-
-        // These buttons are great, but not rendering them for now, because we need to declutter the GUI, but these can be
-        // an advanced option required to be turned on by the user.
-        // clipboardPasteButton,
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [

@@ -106,9 +106,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         ]) : null;
 
         this.setChildren([
-            // NOTE: keep label outside of input-group
             label,
-
             new Div(null, {
                 className: "input-group",
                 // **** IMPORTANT ****: Yes we set font on the PARENT and then use 'inherit' to get it

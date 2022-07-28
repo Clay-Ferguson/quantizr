@@ -10,10 +10,7 @@ export class RadioButton extends Comp {
 
     constructor(public label: string, public checked: boolean, groupName: string, attribs: any, private valueIntf: ValueIntf) {
         super(attribs, new State());
-
-        if (!valueIntf) {
-            this.valueIntf = new CompValueHolder<string>(this, "val");
-        }
+        valueIntf = this.valueIntf || new CompValueHolder<string>(this, "val");
 
         this.attribs.name = groupName;
         this.attribs.type = "radio";

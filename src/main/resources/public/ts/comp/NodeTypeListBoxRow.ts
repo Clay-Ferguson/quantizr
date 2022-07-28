@@ -4,7 +4,6 @@ import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./core/Span";
 
-/* NOTE: This class doesn't hold any state and is re-rendered when the state in the parent owning it is rendered. */
 export class NodeTypeListBoxRow extends ListBoxRow {
 
     constructor(public typeHandler: TypeHandlerIntf, onClickFunc: Function, public isSelected: boolean) {
@@ -12,17 +11,11 @@ export class NodeTypeListBoxRow extends ListBoxRow {
     }
 
     preRender(): void {
-        let icon: Icon = null;
         let iconClass = this.typeHandler.getIconClass();
-        if (iconClass) {
-            icon = new Icon({
-                className: iconClass + " typeListIcon"
-            });
-        }
 
         this.setChildren([
             new FlexLayout([
-                icon,
+                iconClass ? new Icon({ className: iconClass + " typeListIcon" }) : null,
                 new Span(this.typeHandler.getName())
             ], this.isSelected ? "selectedListItem" : "unselectedListItem")
         ]);

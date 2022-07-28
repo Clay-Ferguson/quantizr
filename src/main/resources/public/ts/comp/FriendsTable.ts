@@ -10,15 +10,12 @@ export class FriendsTable extends ListBox {
     }
 
     preRender(): void {
-        let children = [];
-
         if (this.friends) {
-            this.friends.forEach((friend: FriendInfo) => {
-                children.push(new FriendsTableRow(friend, () => {
+            this.setChildren(this.friends.map(friend => {
+                return new FriendsTableRow(friend, () => {
                     this.updateVal(friend.userName);
-                }, this.valueIntf.getValue() === friend.userName));
-            });
+                }, this.valueIntf.getValue() === friend.userName);
+            }));
         }
-        this.setChildren(children);
     }
 }

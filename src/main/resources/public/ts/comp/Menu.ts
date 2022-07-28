@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { dispatch, useAppState } from "../AppRedux";
-import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
@@ -27,7 +26,6 @@ export class Menu extends Comp {
             expanded: false
         };
         let show = appState.activeMenu === this.name;
-        // console.log("MENU: " + this.name + " active=" + show + " activeMenu=" + appState.activeMenu);
 
         this.setChildren([
             new Div(this.name, {

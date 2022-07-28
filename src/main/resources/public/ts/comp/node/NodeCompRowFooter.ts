@@ -14,7 +14,6 @@ export class NodeCompRowFooter extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
         let children = [];
 
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link
