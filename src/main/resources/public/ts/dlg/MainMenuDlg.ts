@@ -11,7 +11,6 @@ export class MainMenuDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        // need a variable to hold "Tabs" (it's used two places)
         return [
             new MenuPanel(getAppState())
         ];

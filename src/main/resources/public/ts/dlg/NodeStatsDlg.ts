@@ -57,9 +57,9 @@ export class NodeStatsDlg extends DialogBase {
 
         return [
             this.trending ? null : new TextContent(this.res.stats, null, false),
-            tagPanel.hasChildren() ? tagPanel : null,
-            mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
-            wordPanel.hasChildren() ? wordPanel : null,
+            tagPanel?.hasChildren() ? tagPanel : null,
+            mentionPanel?.hasChildren() ? mentionPanel : null,
+            wordPanel?.hasChildren() ? wordPanel : null,
 
             new ButtonBar([
                 new Button("Ok", () => {

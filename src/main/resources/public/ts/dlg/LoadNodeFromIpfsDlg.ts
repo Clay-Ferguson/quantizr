@@ -48,10 +48,9 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        let path = this.ipfsPathState.getValue();
 
         let res = await S.util.ajax<J.LoadNodeFromIpfsRequest, J.LoadNodeFromIpfsResponse>("loadNodeFromIpfs", {
-            path
+            path: this.ipfsPathState.getValue()
         });
 
         S.util.showMessage(res.message, "Server Reply", true);

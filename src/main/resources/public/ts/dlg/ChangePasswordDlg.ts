@@ -17,9 +17,7 @@ export class ChangePasswordDlg extends DialogBase {
 
     constructor(private passCode: string) {
         super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width");
-        this.onMount((elm: HTMLElement) => {
-            this.passwordField?.focus();
-        });
+        this.onMount((elm: HTMLElement) => this.passwordField?.focus());
     }
 
     renderDlg(): CompIntf[] {

@@ -34,17 +34,18 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = async () => {
-        if (!getAppState().isAnonUser) {
+        let state = getAppState();
+        if (!state.isAnonUser) {
             let res = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: getAppState().homeNodeId,
+                userNodeId: state.homeNodeId,
                 userPreferences: {
-                    editMode: getAppState().userPrefs.editMode,
-                    showMetaData: getAppState().userPrefs.showMetaData,
-                    nsfw: getAppState().userPrefs.nsfw,
-                    showParents: getAppState().userPrefs.showParents,
-                    showReplies: getAppState().userPrefs.showReplies,
-                    rssHeadlinesOnly: getAppState().userPrefs.rssHeadlinesOnly,
-                    mainPanelCols: getAppState().userPrefs.mainPanelCols,
+                    editMode: state.userPrefs.editMode,
+                    showMetaData: state.userPrefs.showMetaData,
+                    nsfw: state.userPrefs.nsfw,
+                    showParents: state.userPrefs.showParents,
+                    showReplies: state.userPrefs.showReplies,
+                    rssHeadlinesOnly: state.userPrefs.rssHeadlinesOnly,
+                    mainPanelCols: state.userPrefs.mainPanelCols,
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }

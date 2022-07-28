@@ -11,9 +11,7 @@ export class ProgressDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, {
-                className: "progressSpinner"
-            }, [new Spinner()])
+            new Div(null, { className: "progressSpinner" }, [new Spinner()])
         ];
     }
 }
