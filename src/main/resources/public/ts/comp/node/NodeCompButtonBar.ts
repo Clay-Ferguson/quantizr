@@ -141,9 +141,7 @@ export class NodeCompButtonBar extends Div {
                             state.selectedNodes.delete(this.node.id);
                         }
                     },
-                    getValue: (): boolean => {
-                        return state.selectedNodes.has(this.node.id);
-                    }
+                    getValue: (): boolean => state.selectedNodes.has(this.node.id)
                 }, "float-start");
             }
 

@@ -29,12 +29,8 @@ export class HistoryPanel extends Div {
         let children = [];
         children.push(new Div(null, null, [
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
-                setValue: (checked: boolean) => {
-                    S.quanta.nodeHistoryLocked = checked;
-                },
-                getValue: (): boolean => {
-                    return S.quanta.nodeHistoryLocked;
-                }
+                setValue: (checked: boolean) => S.quanta.nodeHistoryLocked = checked,
+                getValue: (): boolean => S.quanta.nodeHistoryLocked
             }, "form-switch form-check-inline")
         ]));
 

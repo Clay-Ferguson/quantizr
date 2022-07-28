@@ -22,13 +22,8 @@ export class ChangeNodeTypeDlg extends DialogBase {
         this.selCallback = selCallback;
 
         this.valIntf = {
-            setValue: (val: string) => {
-                this.mergeState<LS>({ selType: val });
-            },
-
-            getValue: (): string => {
-                return this.getState<LS>().selType;
-            }
+            setValue: (val: string) => this.mergeState<LS>({ selType: val }),
+            getValue: (): string => this.getState<LS>().selType
         };
 
         this.mergeState<LS>({ selType: curType || "u" });

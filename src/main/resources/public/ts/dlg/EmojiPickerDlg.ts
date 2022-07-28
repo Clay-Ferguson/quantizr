@@ -21,10 +21,7 @@ export class EmojiPickerDlg extends DialogBase {
                 this.mergeState<LS>({ selectedEmoji: val });
                 this.close();
             },
-
-            getValue: (): string => {
-                return this.getState<LS>().selectedEmoji;
-            }
+            getValue: (): string => this.getState<LS>().selectedEmoji
         };
     }
 

@@ -99,10 +99,7 @@ export class SelectTagsDlg extends DialogBase {
                             setTimeout(this.updateSuggestTags, 250);
                         }
                     },
-                    getValue: (): boolean => {
-                        let state = this.getState();
-                        return state.suggestTags;
-                    }
+                    getValue: (): boolean => this.getState().suggestTags
                 }, "form-switch form-check-inline"),
                 this.createTagsPickerList(),
                 new ButtonBar([
@@ -223,9 +220,7 @@ export class SelectTagsDlg extends DialogBase {
                     }
                     this.mergeState(state);
                 },
-                getValue: (): boolean => {
-                    return this.getState<LS>().selectedTags.has(tagObj.tag);
-                }
+                getValue: (): boolean => this.getState<LS>().selectedTags.has(tagObj.tag)
             });
             div.addChild(new Div(null, { className: this.indenting ? "tagIndent" : "" }, [checkbox]));
         }

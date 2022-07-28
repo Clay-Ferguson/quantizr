@@ -67,9 +67,7 @@ export class SharingDlg extends DialogBase {
                         this.dirty = true;
                         this.mergeState<LS>({ recursive: checked });
                     },
-                    getValue: (): boolean => {
-                        return state.recursive;
-                    }
+                    getValue: (): boolean => state.recursive
                 }),
                 new ButtonBar([
                     new Button("Add Person", async () => {

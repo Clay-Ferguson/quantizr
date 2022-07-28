@@ -101,9 +101,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                 return s;
                             });
                         },
-                        getValue: (): boolean => {
-                            return this.data.props.listCids;
-                        }
+                        getValue: (): boolean => this.data.props.listCids
                     })
                 ])
             ]));

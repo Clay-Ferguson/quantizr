@@ -40,12 +40,8 @@ export class UploadFromUrlDlg extends DialogBase {
                 new TextField({ label: "Upload from URL", val: this.urlState }),
                 new Div(null, { className: "marginTop" }, [
                     new Checkbox("Store a copy on this server", null, {
-                        setValue: (checked: boolean) => {
-                            UploadFromUrlDlg.storeLocally = checked;
-                        },
-                        getValue: (): boolean => {
-                            return UploadFromUrlDlg.storeLocally;
-                        }
+                        setValue: (checked: boolean) => UploadFromUrlDlg.storeLocally = checked,
+                        getValue: (): boolean => UploadFromUrlDlg.storeLocally
                     })
                 ]),
                 new ButtonBar([

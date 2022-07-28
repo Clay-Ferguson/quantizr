@@ -66,9 +66,7 @@ export class ExportDlg extends DialogBase {
                     this.mergeState<LS>({ exportType });
                 }
             },
-            getValue: (): boolean => {
-                return this.getState<LS>().exportType === exportType;
-            }
+            getValue: (): boolean => this.getState<LS>().exportType === exportType
         });
     }
 

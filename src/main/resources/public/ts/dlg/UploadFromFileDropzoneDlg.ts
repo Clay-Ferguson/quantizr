@@ -57,12 +57,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
                     new Checkbox("Save to IPFS", null, {
-                        setValue: (checked: boolean) => {
-                            this.toIpfs = checked;
-                        },
-                        getValue: (): boolean => {
-                            return this.toIpfs;
-                        }
+                        setValue: (checked: boolean) => this.toIpfs = checked,
+                        getValue: (): boolean => this.toIpfs
                     })
                 ]),
                 new Div("Click to Add Files (or Drag and Drop)"),

@@ -55,9 +55,7 @@ export class SearchUsersDlg extends DialogBase {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
                     }
                 },
-                getValue: (): boolean => {
-                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_ALL;
-                }
+                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_ALL
             }) : null,
             new RadioButton("Local Users", true, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
@@ -65,9 +63,7 @@ export class SearchUsersDlg extends DialogBase {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
                     }
                 },
-                getValue: (): boolean => {
-                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL;
-                }
+                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL
             }),
             new RadioButton("Foreign Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
@@ -75,9 +71,7 @@ export class SearchUsersDlg extends DialogBase {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
                     }
                 },
-                getValue: (): boolean => {
-                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN;
-                }
+                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
             })
         ], "marginBottom");
 
@@ -87,20 +81,12 @@ export class SearchUsersDlg extends DialogBase {
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
-                        setValue: (checked: boolean) => {
-                            this.mergeState<LS>({ fuzzy: checked });
-                        },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().fuzzy;
-                        }
+                        setValue: (checked: boolean) => this.mergeState<LS>({ fuzzy: checked }),
+                        getValue: (): boolean => this.getState<LS>().fuzzy
                     }),
                     new Checkbox("Case Sensitive", null, {
-                        setValue: (checked: boolean) => {
-                            this.mergeState<LS>({ caseSensitive: checked });
-                        },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().caseSensitive;
-                        }
+                        setValue: (checked: boolean) => this.mergeState<LS>({ caseSensitive: checked }),
+                        getValue: (): boolean => this.getState<LS>().caseSensitive
                     })
                 ], "displayTable marginBottom"),
                 adminOptions,

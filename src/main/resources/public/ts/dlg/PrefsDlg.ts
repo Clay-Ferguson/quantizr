@@ -21,12 +21,8 @@ export class PrefsDlg extends DialogBase {
             new Form(null, [
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
-                        setValue: (checked: boolean) => {
-                            getAppState().userPrefs.showMetaData = checked;
-                        },
-                        getValue: (): boolean => {
-                            return getAppState().userPrefs.showMetaData;
-                        }
+                        setValue: (checked: boolean) => getAppState().userPrefs.showMetaData = checked,
+                        getValue: (): boolean => getAppState().userPrefs.showMetaData
                     })
                 ]),
                 new ButtonBar([

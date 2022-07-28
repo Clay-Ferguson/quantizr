@@ -7,7 +7,6 @@ import { CheckboxInput } from "./CheckboxInput";
 import { Label } from "./Label";
 
 export class Checkbox extends Comp {
-
     outterClassName: string;
 
     /* To turn this into a slider switch, just add 'form-switch' to layoutClass style */

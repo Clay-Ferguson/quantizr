@@ -183,9 +183,7 @@ export class RssTypeHandler extends TypeBase {
                     return s;
                 });
             },
-            getValue: (): boolean => {
-                return state.userPrefs.rssHeadlinesOnly;
-            }
+            getValue: (): boolean => state.userPrefs.rssHeadlinesOnly
         }));
 
         itemListContainer.addChild(this.makeNavButtonBar(page, feedSrcHash, state));

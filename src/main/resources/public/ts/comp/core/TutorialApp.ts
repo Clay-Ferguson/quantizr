@@ -44,13 +44,8 @@ export class TutorialApp extends Comp {
                 new Div("SubDiv2"),
                 new Div("SubDiv3"),
                 new Checkbox("Test Checkbox", null, {
-                    setValue: (checked: boolean) => {
-                        TutorialApp.checkboxVal = checked;
-                        console.log("checkbox=" + TutorialApp.checkboxVal)
-                    },
-                    getValue: (): boolean => {
-                        return TutorialApp.checkboxVal;
-                    }
+                    setValue: (checked: boolean) => TutorialApp.checkboxVal = checked,
+                    getValue: (): boolean => TutorialApp.checkboxVal
                 })
             ]),
             new Button("My Button", this.buttonClick)

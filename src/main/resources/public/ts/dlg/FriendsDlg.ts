@@ -34,9 +34,7 @@ export class FriendsDlg extends DialogBase {
                         this.close, 500);
                 }
             },
-            getValue: (): string => {
-                return this.getState<LS>().selectedName;
-            }
+            getValue: (): string => this.getState<LS>().selectedName
         };
 
         this.mergeState<LS>({

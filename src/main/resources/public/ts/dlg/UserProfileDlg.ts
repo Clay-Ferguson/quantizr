@@ -86,9 +86,7 @@ export class UserProfileDlg extends DialogBase {
                         state.userProfile.mfsEnable = checked;
                         this.mergeState<LS>({ userProfile: state.userProfile });
                     },
-                    getValue: (): boolean => {
-                        return this.getState<LS>().userProfile.mfsEnable;
-                    }
+                    getValue: (): boolean => this.getState<LS>().userProfile.mfsEnable
                 }));
             }
 

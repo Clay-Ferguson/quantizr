@@ -117,13 +117,10 @@ export class App extends Main {
     }
 
     getTopMobileBar = (state: AppState): CompIntf => {
-        let comp: CompIntf = null;
         if (state.mobileMode) {
             let menuButton = null;
             menuButton = new IconButton("fa-bars", "Menu", {
-                onClick: () => {
-                    S.nav.showMainMenu(state);
-                },
+                onClick: () => S.nav.showMainMenu(state),
                 id: "mainMenu"
                 // only applies to mobile. just don't show title for now.
                 // title: "Show Main Menu"
@@ -133,12 +130,8 @@ export class App extends Main {
 
             let prefsButton = !fullScreenViewer
                 ? new Checkbox("Info", { className: "marginLeft" }, {
-                    setValue: (checked: boolean) => {
-                        S.edit.toggleShowMetaData(state);
-                    },
-                    getValue: (): boolean => {
-                        return state.userPrefs.showMetaData;
-                    }
+                    setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
+                    getValue: (): boolean => state.userPrefs.showMetaData
                 }, "form-switch form-check-inline") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
@@ -161,8 +154,8 @@ export class App extends Main {
             // });
 
             let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
-            comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
         }
-        return comp;
+        return null;
     }
 }

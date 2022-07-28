@@ -111,12 +111,8 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         if (this.data.props.feedFilterRootNode) {
             topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
-                setValue: (checked: boolean) => {
-                    this.data.props.autoRefresh = checked;
-                },
-                getValue: (): boolean => {
-                    return this.data.props.autoRefresh;
-                }
+                setValue: (checked: boolean) => this.data.props.autoRefresh = checked,
+                getValue: (): boolean => this.data.props.autoRefresh
             }));
         }
 
@@ -330,9 +326,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         return s;
                     });
                 },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterFriends;
-                }
+                getValue: (): boolean => this.data.props.feedFilterFriends
             }),
 
             state.isAnonUser ? null : new Checkbox("To Me", {
@@ -344,9 +338,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         return s;
                     });
                 },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterToMe;
-                }
+                getValue: (): boolean => this.data.props.feedFilterToMe
             }),
 
             state.isAnonUser ? null : new Checkbox("From Me", {
@@ -358,9 +350,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         return s;
                     });
                 },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterFromMe;
-                }
+                getValue: (): boolean => this.data.props.feedFilterFromMe
             }),
 
             new Checkbox("Public", {
@@ -372,9 +362,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         return s;
                     });
                 },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterToPublic;
-                }
+                getValue: (): boolean => this.data.props.feedFilterToPublic
             }),
 
             new Checkbox("Local", {
@@ -392,9 +380,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         return s;
                     });
                 },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterLocalServer;
-                }
+                getValue: (): boolean => this.data.props.feedFilterLocalServer
             })
         ]);
     }

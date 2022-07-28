@@ -73,12 +73,8 @@ export class EditPrivsTableRow extends ListBoxRow {
                     }),
                 isPublic
                     ? new Checkbox("Allow Replies", { className: "marginLeft" }, {
-                        setValue: (checked: boolean) => {
-                            this.publicChangedFunc(checked);
-                        },
-                        getValue: (): boolean => {
-                            return publicWritable;
-                        }
+                        setValue: (checked: boolean) => this.publicChangedFunc(checked),
+                        getValue: (): boolean => publicWritable
                     }) : null
             ])
         ]);

@@ -533,9 +533,7 @@ export class EditNodeDlg extends DialogBase {
                         S.props.setPropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
                     }
                 },
-                getValue: (): boolean => {
-                    return S.props.getProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
-                }
+                getValue: (): boolean => S.props.getProp(J.NodeProp.IPFS_REF, state.node) ? false : true
             });
         }
 
@@ -585,12 +583,8 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
-            setValue: (checked: boolean) => {
-                this.utl.setEncryption(this, checked);
-            },
-            getValue: (): boolean => {
-                return S.props.isEncrypted(state.node);
-            }
+            setValue: (checked: boolean) => this.utl.setEncryption(this, checked),
+            getValue: (): boolean => S.props.isEncrypted(state.node)
         }) : null;
 
         let wordWrapCheckbox = new Checkbox("Word Wrap", null, {
@@ -601,9 +595,7 @@ export class EditNodeDlg extends DialogBase {
                     this.contentEditor.setWordWrap(checked);
                 }
             },
-            getValue: (): boolean => {
-                return S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1";
-            }
+            getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1"
         });
 
         let inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Children", null,
@@ -614,12 +606,8 @@ export class EditNodeDlg extends DialogBase {
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
         return {
-            setValue: (checked: boolean) => {
-                S.props.setPropVal(propName, this.getState<LS>().node, checked ? "1" : null);
-            },
-            getValue: (): boolean => {
-                return S.props.getPropStr(propName, this.getState<LS>().node) === "1";
-            }
+            setValue: (checked: boolean) => S.props.setPropVal(propName, this.getState<LS>().node, checked ? "1" : null),
+            getValue: (): boolean => S.props.getPropStr(propName, this.getState<LS>().node) === "1"
         };
     }
 
@@ -794,9 +782,7 @@ export class EditNodeDlg extends DialogBase {
                         }
                         this.mergeState<LS>({ selectedProps: state.selectedProps });
                     },
-                    getValue: (): boolean => {
-                        return this.getState<LS>().selectedProps.has(propEntry.name);
-                    }
+                    getValue: (): boolean => this.getState<LS>().selectedProps.has(propEntry.name)
                 });
                 editItems.push(checkbox);
             }

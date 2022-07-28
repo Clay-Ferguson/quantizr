@@ -59,9 +59,7 @@ export class SearchContentDlg extends DialogBase {
                     SearchContentDlg.dlgState.requirePriority = checked;
                     this.mergeState<LS>({ requirePriority: checked });
                 },
-                getValue: (): boolean => {
-                    return this.getState<LS>().requirePriority;
-                }
+                getValue: (): boolean => this.getState<LS>().requirePriority
             });
         }
 
@@ -78,27 +76,21 @@ export class SearchContentDlg extends DialogBase {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
                         },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().fuzzy;
-                        }
+                        getValue: (): boolean => this.getState<LS>().fuzzy
                     }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.caseSensitive = checked;
                             this.mergeState<LS>({ caseSensitive: checked });
                         },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().caseSensitive;
-                        }
+                        getValue: (): boolean => this.getState<LS>().caseSensitive
                     }),
                     new Checkbox("Recursive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.recursive = checked;
                             this.mergeState<LS>({ recursive: checked });
                         },
-                        getValue: (): boolean => {
-                            return this.getState<LS>().recursive;
-                        }
+                        getValue: (): boolean => this.getState<LS>().recursive
                     })
                     // requirePriorityCheckbox
                 ], "displayTable marginBottom"),
@@ -123,9 +115,7 @@ export class SearchContentDlg extends DialogBase {
                                 sortDir
                             });
                         },
-                        getValue: (): string => {
-                            return this.getState<LS>().sortField;
-                        }
+                        getValue: (): string => this.getState<LS>().sortField
                     }),
                     requirePriorityCheckbox
                 ]),

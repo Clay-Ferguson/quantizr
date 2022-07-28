@@ -154,9 +154,7 @@ export class MediaRecorderDlg extends DialogBase {
                     this.resetStream();
                 }, 250);
             },
-            getValue: (): string => {
-                return this.getState<LS>().audioInput;
-            }
+            getValue: (): string => this.getState<LS>().audioInput
         });
 
         let videoSelect = null;
@@ -170,9 +168,7 @@ export class MediaRecorderDlg extends DialogBase {
                         this.resetStream();
                     }, 250);
                 },
-                getValue: (): string => {
-                    return this.getState<LS>().videoInput;
-                }
+                getValue: (): string => this.getState<LS>().videoInput
             });
         }
 
