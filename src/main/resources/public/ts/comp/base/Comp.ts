@@ -4,6 +4,7 @@ import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
 import { getAppState } from "../../AppRedux";
+import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
@@ -336,6 +337,10 @@ export abstract class Comp implements CompIntf {
                     // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
                     this.domAdd(); // call non-overridable method.
                     if (this.domAddEvent) this.domAddEvent(); // call overridable method.
+
+                    if (this.getScrollPos() !== null) {
+                        this.scrollDomAddEvent();
+                    }
                 }
 
                 // the return value of the useEffect function is what will get called when component unmounts
@@ -345,8 +350,13 @@ export abstract class Comp implements CompIntf {
                 };
             }, []);
 
+            // todo-0: don't even need fat arrows, just use the function var here
             if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
             if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
+
+            if (this.getScrollPos() !== null) {
+                useLayoutEffect(() => this.scrollDomPreUpdateEvent());
+            }
 
             Comp.renderCounter++;
             if (this.debug) {
@@ -416,4 +426,44 @@ export abstract class Comp implements CompIntf {
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // manageent aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
     abstract compRender(): ReactNode;
+
+    scrollDomAddEvent = () => {
+        if (C.DEBUG_SCROLLING) {
+            console.log("scrollDomAddEvent: " + this.getCompClass());
+        }
+        let elm = this.getRef();
+        if (elm) {
+            elm.scrollTop = this.getScrollPos();
+            elm.addEventListener("scroll", () => {
+                if (C.DEBUG_SCROLLING) {
+                    console.log("Scroll Evt [" + this.getCompClass + "]: elm.scrollTop=" + elm.scrollTop);
+                }
+                this.setScrollPos(elm.scrollTop);
+            }, { passive: true });
+        }
+    }
+
+    scrollDomPreUpdateEvent = () => {
+        let elm = this.getRef();
+        if (elm) {
+            if (C.DEBUG_SCROLLING) {
+                console.log("scrollDomPreUpdateEvent [" + this.getCompClass() + "]: elm.scrollTop=" + elm.scrollTop + " elm.scrollHeight=" + elm.scrollHeight);
+            }
+            elm.scrollTop = this.getScrollPos();
+        }
+    }
+
+    /* If a component wants to persist it's scroll position across re-renders, all that's required is to
+     override the getScrollPos and setScrollPos, being sure to use a backing variable that is NOT component-scoped
+     (or it could be static var on the component if there's always only one such component to ever exist, as is 
+     the case for example with the LHS panel (menu) or RHS panels of the main app layout) 
+     
+     Returning null from getScrollPos (the default behavior of this base class) indicates to NOT do any scroll persistence.
+     */
+    getScrollPos = (): number => {
+        return null;
+    }
+
+    setScrollPos = (pos: number): void => {
+    }
 }

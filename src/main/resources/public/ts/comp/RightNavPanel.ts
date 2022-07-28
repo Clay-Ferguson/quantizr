@@ -18,7 +18,7 @@ import { TabPanelButtons } from "./TabPanelButtons";
 declare var g_brandingAppName;
 
 export class RightNavPanel extends Div {
-
+    private static scrollPos: number = 0;
     static historyExpanded: boolean = false;
 
     constructor() {
@@ -27,6 +27,14 @@ export class RightNavPanel extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
+    }
+
+    getScrollPos = (): number => {
+        return RightNavPanel.scrollPos;
+    }
+
+    setScrollPos = (pos: number): void => {
+        RightNavPanel.scrollPos = pos;
     }
 
     preRender(): void {

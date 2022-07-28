@@ -37,6 +37,14 @@ export class LeftNavPanel extends Div {
         this.attribs.className = "col-" + leftCols + " leftNavPanel customScrollbar";
     }
 
+    getScrollPos = (): number => {
+        return LeftNavPanel.scrollPos;
+    }
+
+    setScrollPos = (pos: number): void => {
+        LeftNavPanel.scrollPos = pos;
+    }
+
     preRender(): void {
         let state = useAppState();
         let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
@@ -76,31 +84,6 @@ export class LeftNavPanel extends Div {
             ]),
             new MenuPanel(state)
         ]);
-    }
-
-    reScroll = (elm: HTMLElement) => {
-        if (elm) {
-            elm.scrollTop = LeftNavPanel.scrollPos;
-        }
-    }
-
-    domAddEvent = () => {
-        let elm = this.getRef();
-        if (elm) {
-            this.reScroll(elm);
-
-            elm.addEventListener("scroll", () => {
-                LeftNavPanel.scrollPos = elm.scrollTop;
-            }, { passive: true });
-        }
-    }
-
-    // todo-0: Can this kind of logic be built into the base class and not implemented in each component?
-    domPreUpdateEvent = () => {
-        let elm = this.getRef();
-        if (elm) {
-            this.reScroll(elm);
-        }
     }
 
     // This was originally on the toolbar at top of page but if we bring this back it will be here (probably)

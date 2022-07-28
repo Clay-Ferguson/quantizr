@@ -1,6 +1,5 @@
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
-import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 
 export class AppTab<PropType = any> extends Div {
@@ -24,42 +23,11 @@ export class AppTab<PropType = any> extends Div {
         return className;
     }
 
-    // sets scroll position to the value the 'data' specifies.
-    reScroll = (elm: HTMLElement) => {
-        if (!elm) return;
-        if (C.DEBUG_SCROLLING) {
-            console.log("reScroll [" + this.data.name + "]: elm.scrollTop=" + elm.scrollTop + " elm.scrollHeight=" + elm.scrollHeight);
-        }
-
-        elm.scrollTop = this.data.scrollPos === -1 ? elm.scrollHeight : this.data.scrollPos;
+    getScrollPos = (): number => {
+        return this.data.scrollPos;
     }
 
-    // use NON-Arrow for inheritance compatability
-    domAddEvent = () => {
-        if (C.DEBUG_SCROLLING) {
-            console.log("domAddEvent(a): " + this.data.name);
-        }
-        let elm = this.getRef();
-        if (elm) {
-            this.reScroll(elm);
-
-            elm.addEventListener("scroll", () => {
-                if (C.DEBUG_SCROLLING) {
-                    console.log("Scroll Evt [" + this.data.name + "]: elm.scrollTop=" + elm.scrollTop);
-                }
-
-                this.data.scrollPos = elm.scrollTop;
-            }, { passive: true });
-        }
-    }
-
-    domPreUpdateEvent = () => {
-        let elm = this.getRef();
-        if (elm) {
-            if (C.DEBUG_SCROLLING) {
-                console.log("domPreUpdateEvent calling reScroll")
-            }
-            this.reScroll(elm);
-        }
+    setScrollPos = (pos: number): void => {
+        this.data.scrollPos = pos;
     }
 }
