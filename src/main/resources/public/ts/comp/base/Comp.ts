@@ -350,12 +350,11 @@ export abstract class Comp implements CompIntf {
                 };
             }, []);
 
-            // todo-0: don't even need fat arrows, just use the function var here
-            if (this.domUpdateEvent) useEffect(() => this.domUpdateEvent());
-            if (this.domPreUpdateEvent) useLayoutEffect(() => this.domPreUpdateEvent());
+            if (this.domUpdateEvent) useEffect(this.domUpdateEvent);
+            if (this.domPreUpdateEvent) useLayoutEffect(this.domPreUpdateEvent);
 
             if (this.getScrollPos() !== null) {
-                useLayoutEffect(() => this.scrollDomPreUpdateEvent());
+                useLayoutEffect(this.scrollDomPreUpdateEvent);
             }
 
             Comp.renderCounter++;
