@@ -8,6 +8,7 @@ import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Icon } from "./core/Icon";
@@ -81,6 +82,7 @@ export class RightNavPanel extends Div {
         let clipboardPasteButton = state.userPrefs.editMode ? new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
+                PubSub.pub(C.PUBSUB_navAction);
                 // todo-1: would be nice if this detected an image and saved as attachment.
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
@@ -90,6 +92,7 @@ export class RightNavPanel extends Div {
         let addNoteButton = !state.isAnonUser ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
             onClick: async () => {
+                PubSub.pub(C.PUBSUB_navAction);
                 let content = null;
                 if (S.util.ctrlKeyCheck()) {
                     content = await (navigator as any).clipboard.readText();
@@ -127,7 +130,10 @@ export class RightNavPanel extends Div {
                     !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
                     state.isAnonUser ? new Div("Login / Signup", {
                         className: "signupLinkText",
-                        onClick: S.user.userLogin
+                        onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.user.userLogin();
+                        }
                     }) : null,
 
                     new Div(null, { className: "bigMarginBottom" }, [
@@ -155,7 +161,10 @@ export class RightNavPanel extends Div {
                     // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
                         className: "clickable",
-                        onClick: () => { new UserProfileDlg(null).open(); }
+                        onClick: () => { 
+                            PubSub.pub(C.PUBSUB_navAction);
+                            new UserProfileDlg(null).open(); 
+                        }
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
@@ -185,6 +194,7 @@ export class RightNavPanel extends Div {
 
             if (!state.isAnonUser) {
                 attr.onClick = () => {
+                    PubSub.pub(C.PUBSUB_navAction);
                     new UserProfileDlg(null).open();
                 };
                 attr.title = "Click to edit your Profile Info";
@@ -218,6 +228,7 @@ export class RightNavPanel extends Div {
 
             if (!state.isAnonUser) {
                 attr.onClick = () => {
+                    PubSub.pub(C.PUBSUB_navAction);
                     new UserProfileDlg(null).open();
                 };
                 attr.title = "Click to edit your Profile Info";

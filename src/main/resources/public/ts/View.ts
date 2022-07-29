@@ -254,12 +254,18 @@ export class View {
         let activeTabComp = S.tabUtil.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.getRef().scrollTop = 0;
+            // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
         }
 
-        if (state.mobileMode) {
-            window.scrollTo(0, 0);
-        }
-        else {
+        // todo-1: For some reason in mobile mode we're scrolling lots of times TO the element even when it's the top
+        // element and we want to scroll to ZERO instead, but I can't get that to work and i'm giving up the 
+        // battle for now after 2 hrs trying to locate the issue. Existing functionality is not what I really
+        // want but is still fine.
+        // S.domUtil.getElm(C.ID_TAB, (elm: HTMLElement) => {
+        //     elm.scrollTop = 0;
+        // });        
+
+        if (!state.mobileMode) {
             S.domUtil.getElm(C.ID_LHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
@@ -287,12 +293,12 @@ export class View {
             /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
              a case where the user is editing a node and we KNOW we don't need to scroll after editing,
              so this is where we detect and reset that scenario. */
-            if (node && node.id === S.quanta.noScrollToId) {
+            if (node?.id === S.quanta.noScrollToId) {
                 // console.log("noScrollToId flag");
                 return;
             }
 
-            if (node && state.node.id === node.id) {
+            if (state.node.id === node?.id) {
                 // console.log("is root, scroll to top");
                 this.scrollAllTop(state);
                 return;
@@ -318,7 +324,7 @@ export class View {
                 }
 
                 if (C.DEBUG_SCROLLING) {
-                    console.log("scrollIntoView elm");
+                    console.log("scrollIntoView elm: " + elm.id);
                 }
                 elm.scrollIntoView(true);
             }
