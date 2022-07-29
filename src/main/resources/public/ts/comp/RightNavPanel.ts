@@ -89,7 +89,7 @@ export class RightNavPanel extends Div {
             title: "Save clipboard"
         }) : null;
 
-        let addNoteButton = !state.isAnonUser ? new Icon({
+        let addNoteButton = !state.isAnonUser && !state.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_navAction);
