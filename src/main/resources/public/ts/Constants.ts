@@ -57,6 +57,7 @@ export class Constants {
      * loginState="0" if user logged out intentionally. loginState="1" if last known state of user was 'logged in'
      */
     static readonly LOCALDB_LOGIN_STATE: string = "loginState";
+    static readonly LOCALDB_MOBILE_MODE: string = "mobileMode";
 
     /* These two persist what the user is viewing so when the come back later we can go to same node
      location they were last viewing */

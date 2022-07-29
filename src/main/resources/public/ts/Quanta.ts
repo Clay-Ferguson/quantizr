@@ -84,6 +84,14 @@ export class Quanta {
         try {
             Log.log("initApp()");
 
+            const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "all-users");
+            if (mobileMode) {
+                dispatch("SetMobileMode", s => {
+                    s.mobileMode = mobileMode === "true";
+                    return s;
+                });
+            }
+
             // runClassDemoTest();
 
             // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
@@ -285,7 +293,7 @@ export class Quanta {
 
             Log.log("creating App");
             // This is the root react App component that contains the entire application
-            this.app = new App(); 
+            this.app = new App();
 
             console.log("DOM app element set.");
             this.app.updateDOM(store, "app");

@@ -1180,6 +1180,7 @@ export class Util {
     switchBrowsingMode = () => {
         dispatch("SwitchBrowsingMode", s => {
             s.mobileMode = !s.mobileMode;
+            S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false", "all-users");
             return s;
         });
     }
