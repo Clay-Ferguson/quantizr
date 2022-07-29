@@ -359,10 +359,14 @@ public class ActPubOutbox extends ServiceBase {
                             // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
                             SubNode boostTargetNode = read.getNode(as, boostTarget);
                             if (ok(boostTargetNode)) {
-                                String objUrl = boostTargetNode.getStr(NodeProp.ACT_PUB_OBJ_URL);
-                                if (ok(objUrl)) {
-                                    ret = new APOAnnounce(actor, id, published, objUrl);
+                                String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
+
+                                if (no(boostedId)) {
+                                    boostedId = host + "?id=" + boostTarget;
                                 }
+
+                                ret = new APOAnnounce(actor, id, published, boostedId);
+                                // log.debug("Outbound Announce (from outbox): " + XString.prettyPrint(ret));
                             }
                         } else {
                             // log.debug("not a boost.");

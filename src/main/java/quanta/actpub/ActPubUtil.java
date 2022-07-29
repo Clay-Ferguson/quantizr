@@ -927,6 +927,10 @@ public class ActPubUtil extends ServiceBase {
         // todo-1: we only support "Note" for now.
         String type = apStr(obj, APObj.type); 
         switch (type) {
+            // todo-0: I know we don't support type "Question" or type "Video" yet so I need to at least 
+            // send back a visible message to the user saying that this type of node is not yet supported by Quanta
+            // and so the history cannot be displayed. However we do support at least "Boosts" which will be in here
+            // as an "Announce" type right? ...so we can at least add that with minimal effort right?
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);
                 if (ok(ownerActorUrl)) {

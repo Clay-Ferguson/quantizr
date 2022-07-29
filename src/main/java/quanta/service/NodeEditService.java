@@ -193,13 +193,25 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		update.save(ms, newNode);
+
+		/*
+		 * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
+		 * expecting any final 'saveNode' to ever get called (like when user clicks "Save" in node editor),
+		 * because this node will already be final and the user won't be editing it. It's done and ready to
+		 * publish out to foreign servers
+		 */
+		if (!req.isPendingEdit() && ok(req.getBoostTarget())) {
+			// log.debug("publishing boost: " + newNode.getIdStr());
+			processAfterSave(ms, newNode);
+		}
+
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
 				false, false));
 		res.setSuccess(true);
 		return res;
 	}
 
-		/*
+	/*
 	 * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
 	 * node specified in the request. Should ONLY be called by the controller that accepts a node being
 	 * created by the GUI/user
@@ -249,15 +261,18 @@ public class NodeEditService extends ServiceBase {
 				// inherit UNPUBLISHED prop from parent.
 				// // inherit UNPUBLISHED prop from parent.
 				// if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
-				// 	newNode.set(NodeProp.UNPUBLISHED, true);
+				// newNode.set(NodeProp.UNPUBLISHED, true);
 				// }
 			}
 		}
 
-		// It's not a bug that there's no isFediSend on this request. It happens to be the case that all nodes created thru 
-		// this method are done by interactions that will not ever send an isFediSend=true. These are mainly the '+'-buttons
-		// that are only active when a user is modifying his OWN nodes, and ALL of these shold be unpublished.
-		// newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
+		/*
+		 * It's not a bug that there's no isFediSend on this request. It happens to be the case that all
+		 * nodes created thru this method are done by interactions that will not ever send an
+		 * isFediSend=true. These are mainly the '+'-buttons that are only active when a user is modifying
+		 * his OWN nodes, and ALL of these shold be unpublished. newNode.set(NodeProp.UNPUBLISHED,
+		 * !req.isFediSend() ? Boolean.TRUE : null);
+		 */
 
 		// #unpublish-disabled
 		// newNode.set(NodeProp.UNPUBLISHED, Boolean.TRUE);

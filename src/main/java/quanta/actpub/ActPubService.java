@@ -182,7 +182,7 @@ public class ActPubService extends ServiceBase {
                      * if this node has a boostTarget, we know it's an Announce so we send out the announce
                      * 
                      * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
-                     * that right?)
+                     * that right?) UPDATE: Yes we do like this: on our node: "p" : {"ap:objType" : "Announce",
                      * 
                      * todo-0: Discovered on 7/8/22, this code branch was never executing becasue boostTarget was null
                      * due to getting it off 'parent' instead of 'node', above. Need to verify this branch of code is
@@ -190,25 +190,21 @@ public class ActPubService extends ServiceBase {
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
                         // todo-0: also check how outbox is rendering this boostedUrl. It will also need the fix.
-
-                        // need to convert boostTarget from local node to foreign....i think outbox is doing this.
                         SubNode boostTargetNode = read.getNode(ms, boostTarget);
                         if (ok(boostTargetNode)) {
-                            String boostedUrl = boostTargetNode.getStr(NodeProp.ACT_PUB_OBJ_URL);
+                            String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
 
-                            if (no(boostedUrl)) {
-                                String host = prop.getProtocolHostAndPort();
-                                String nodeIdBase = host + "?id=";
-                                boostedUrl = nodeIdBase + boostTarget;
+                            // What we're doing here is if this is not a foreign node being boosted we return
+                            // a URL pointing to our local node.
+                            if (no(boostedId)) {
+                                boostedId = prop.getProtocolHostAndPort() + "?id=" + boostTarget;
                             }
 
-                            if (ok(boostedUrl)) {
-                                ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-                                message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostedUrl, now,
-                                        privateMessage);
+                            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+                            message = apFactory.newAnnounce(fromUser, fromActor, objUrl, toUserNames, boostedId, now,
+                                    privateMessage);
 
-                                // log.debug("Outbound Announce: " + XString.prettyPrint(message));
-                            }
+                            // log.debug("Outbound Announce: " + XString.prettyPrint(message));
                         }
                     }
                     // else send out as a note.

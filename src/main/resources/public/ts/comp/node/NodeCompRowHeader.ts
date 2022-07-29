@@ -101,7 +101,7 @@ export class NodeCompRowHeader extends Div {
             children.push(new Icon({
                 className: "fa fa-th-list fa-lg marginRight",
                 title: "Show Full Thread History",
-                onClick: () => S.srch.showThread(this.node, state)
+                onClick: () => S.srch.showThread(this.node)
             }));
         }
 
@@ -124,22 +124,20 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        // todo-0: AFTER better testing we can bring back boost feature
-        // Taking this away (7/8/22) after discovering it never was rendering correctly on FOREIGN servers. 
-        // if (!this.isBoost) {
-        //     children.push(new Icon({
-        //         title: "Boost this Node",
-        //         className: "fa fa-retweet fa-lg marginRight",
-        //         onClick: () => {
-        //             if (state.isAnonUser) {
-        //                 S.util.showMessage("Login to create content and reply to nodes.", "Login!");
-        //             }
-        //             else {
-        //                 S.edit.addNode(null, false, null, null, null, null, node.id, false, state)
-        //             }
-        //         }
-        //     }));
-        // }
+        if (!this.isBoost) {
+            children.push(new Icon({
+                title: "Boost this Node",
+                className: "fa fa-retweet fa-lg marginRight",
+                onClick: () => {
+                    if (state.isAnonUser) {
+                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+                    }
+                    else {
+                        S.edit.addNode(null, false, null, null, null, null, this.node.id, false, state)
+                    }
+                }
+            }));
+        }
 
         let youLiked: boolean = false;
         let likeNames = null;

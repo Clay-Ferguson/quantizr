@@ -1123,8 +1123,10 @@ export class Edit {
             await S.edit.toggleEditMode(state);
         }
 
+        // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
+        // so we save the node without any content in this case.
         let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            pendingEdit: true,
+            pendingEdit: !boostTarget,
             nodeId,
             newNodeName: "",
             typeName: J.NodeType.NONE,
@@ -1138,7 +1140,12 @@ export class Edit {
             fediSend
         });
 
-        this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
+        if (!boostTarget) {
+            this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
+        }
+        else {
+            S.util.flashMessage("Your boost was posted.", "Boost");
+        }
     }
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {

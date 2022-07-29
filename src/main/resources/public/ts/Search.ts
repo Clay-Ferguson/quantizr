@@ -89,7 +89,7 @@ export class Search {
         }
     }
 
-    showThread = async (node: J.NodeInfo, state: AppState) => {
+    showThread = async (node: J.NodeInfo) => {
         let res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true
@@ -116,8 +116,8 @@ export class Search {
         }
         else {
             // The most common known reason we can get here due to lack of feature support is when something like 
-            // a "object.type=Video" (a type not yet supprted) is encountered as we attempted to read the thread.
-            let msg = "Thread not available, or not supported";
+            // a "object.type=Video", or "Question" type, (a type not yet supported) is encountered as we attempted to read the thread.
+            let msg = "Thread not available, or contains unsupported post types.";
 
             // make 'msg' a little more specific if we know there's a 'remote link' showing.
             let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
