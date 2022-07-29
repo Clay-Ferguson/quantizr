@@ -1,12 +1,11 @@
 import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Button } from "../comp/core/Button";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
+import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -112,27 +111,29 @@ export class App extends Main {
         else if (state.fullScreenCalendarId) {
             comp = new FullScreenCalendar();
         }
-
         return comp;
     }
 
     getTopMobileBar = (state: AppState): CompIntf => {
         if (state.mobileMode) {
-            let menuButton = null;
-            menuButton = new IconButton("fa-bars", "Menu", {
+            let menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: () => S.nav.showMainMenu(state),
                 id: "mainMenu"
-                // only applies to mobile. just don't show title for now.
-                // title: "Show Main Menu"
             }, "btn-secondary menuButton", "off");
 
-            let fullScreenViewer = S.util.fullscreenViewerActive(state);
+            let navButton = new IconButton("fa-sitemap", "Nav", {
+                onClick: () => new NavPanelDlg().open(),
+                id: "navMenu"
+            }, "btn-secondary menuButton", "off");
 
-            let prefsButton = !fullScreenViewer
-                ? new Checkbox("Info", { className: "marginLeft" }, {
-                    setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
-                    getValue: (): boolean => state.userPrefs.showMetaData
-                }, "form-switch form-check-inline") : null;
+            // let fullScreenViewer = S.util.fullscreenViewerActive(state);
+
+            // Not needed now that we have the NAV button
+            // let prefsButton = !fullScreenViewer
+            //     ? new Checkbox("Info", { className: "marginLeft" }, {
+            //         setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
+            //         getValue: (): boolean => state.userPrefs.showMetaData
+            //     }, "form-switch form-check-inline") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
                 onClick: S.user.userLogin
@@ -153,8 +154,8 @@ export class App extends Main {
             //     title: "Go to Portal Home Node"
             // });
 
-            let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
+            // let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);
         }
         return null;
     }

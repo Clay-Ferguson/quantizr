@@ -40,23 +40,21 @@ export class RightNavPanel extends Div {
     preRender(): void {
         let state = getAppState();
 
-        // mobile mode doesn't render the RHS at all.
-        if (state.mobileMode) return;
+        if (!state.mobileMode) {
+            let panelCols = state.userPrefs.mainPanelCols || 6;
+            if (panelCols < 4) panelCols = 4;
+            if (panelCols > 8) panelCols = 8;
+            let rightCols = 4;
 
-        let panelCols = state.userPrefs.mainPanelCols || 6;
-        if (panelCols < 4) panelCols = 4;
-        if (panelCols > 8) panelCols = 8;
-        let rightCols = 4;
-
-        if (panelCols >= 6) {
-            rightCols--;
+            if (panelCols >= 6) {
+                rightCols--;
+            }
+            if (panelCols >= 8) {
+                rightCols--;
+            }
+            // console.log("right Cols: " + rightCols);
+            this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
         }
-        if (panelCols >= 8) {
-            rightCols--;
-        }
-
-        // console.log("right Cols: " + rightCols);
-        this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
 
         // DO NOT DELETE
         // show header image only if not super narrow.

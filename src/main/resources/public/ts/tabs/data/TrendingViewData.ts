@@ -2,6 +2,7 @@ import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import { PubSub } from "../../PubSub";
 import { S } from "../../Singletons";
 import { TrendingRSInfo } from "../../TrendingRSInfo";
 import { TrendingView } from "../TrendingView";
@@ -21,9 +22,24 @@ export class TrendingViewData implements TabIntf {
     constructView = (data: TabIntf) => new TrendingView(data);
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            new Div("Hashtags", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingHashtags }),
-            new Div("Mentions", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingMentions }),
-            new Div("Words", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingWords })
+            new Div("Hashtags", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.showTrendingHashtags();
+                }
+            }),
+            new Div("Mentions", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.showTrendingMentions();
+                }
+            }),
+            new Div("Words", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.showTrendingWords();
+                }
+            })
         ]);
     };
 }

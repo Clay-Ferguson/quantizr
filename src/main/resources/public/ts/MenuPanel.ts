@@ -19,7 +19,6 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { TabIntf } from "./intf/TabIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -162,10 +161,6 @@ export class MenuPanel extends Div {
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
-
-        if (state.mobileMode) {
-            children.push(new Menu("Tabs", this.getTabMenuItems(state)));
-        }
 
         let bookmarkItems = [];
         if (!state.isAnonUser) {
@@ -565,21 +560,5 @@ export class MenuPanel extends Div {
             }
         }
         return items;
-    }
-
-    getTabMenuItems = (state: AppState): MenuItem[] => {
-        let items: MenuItem[] = [];
-        for (let tab of state.tabData) {
-            if (tab.isVisible(state)) {
-                items.push(this.getTabMenuItem(state, tab));
-            }
-        }
-        return items;
-    }
-
-    getTabMenuItem(state: AppState, data: TabIntf): MenuItem {
-        return new MenuItem(data.name, (event) => {
-            S.tabUtil.selectTab(data.id);
-        }, true, () => state.activeTab === data.id);
     }
 }

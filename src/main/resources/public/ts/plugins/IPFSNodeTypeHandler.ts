@@ -10,6 +10,7 @@ import { TypeBase } from "./base/TypeBase";
 export class IPFSNodeTypeHandler extends TypeBase {
 
     constructor() {
+        // todo-1: use a different icon here, our sitemap icon is being used elsewhere.
         super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap", false);
     }
 

@@ -48,6 +48,7 @@ export class Constants {
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";
+    static readonly PUBSUB_navAction = "PUBSUB_navAction";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";

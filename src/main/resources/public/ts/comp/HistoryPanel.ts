@@ -5,6 +5,7 @@ import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
 import { NodeHistoryItem } from "../NodeHistoryItem";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 
@@ -175,6 +176,7 @@ export class HistoryPanel extends Div {
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
     jumpToId = (evt: any) => {
         let id = S.domUtil.getPropFromDom(evt, "nid");
+        PubSub.pub(C.PUBSUB_navAction);
         S.view.jumpToId(id);
     }
 }

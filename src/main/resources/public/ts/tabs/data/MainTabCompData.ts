@@ -3,6 +3,7 @@ import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { PubSub } from "../../PubSub";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
@@ -20,10 +21,24 @@ export class MainTabCompData implements TabIntf {
 
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            !state.isAnonUser ? new Div("My Account", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }) : null,
-            !state.isAnonUser ? new Div("My Home", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode(":" + state.userName + ":home") }) : null,
-            !state.isAnonUser ? new Div("My Posts", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode("~" + J.NodeType.POSTS) }) : null,
-
+            !state.isAnonUser ? new Div("My Account", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.navHome(state);
+                }
+            }) : null,
+            !state.isAnonUser ? new Div("My Home", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.openContentNode(":" + state.userName + ":home");
+                }
+            }) : null,
+            !state.isAnonUser ? new Div("My Posts", {
+                className: "tabSubOptionsItem", onClick: () => {
+                    PubSub.pub(C.PUBSUB_navAction);
+                    S.nav.openContentNode("~" + J.NodeType.POSTS);
+                }
+            }) : null,
             ...this.customAnonRHSLinks(state)
         ]);
     };
@@ -68,7 +83,12 @@ export class MainTabCompData implements TabIntf {
                         }
                     }
 
-                    items.push(new Div(menuItem.name, { className: "tabSubOptionsItem", onClick: func }));
+                    items.push(new Div(menuItem.name, {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            func();
+                        }
+                    }));
                 }
             }
         }

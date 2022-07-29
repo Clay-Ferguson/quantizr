@@ -4,6 +4,7 @@ import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
@@ -57,6 +58,7 @@ export class TabPanelButtons extends Div {
             onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();
+                PubSub.pub(C.PUBSUB_navAction);
                 S.tabUtil.selectTab(data.id);
             }
         }, [

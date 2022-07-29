@@ -704,6 +704,21 @@ Will come back later and study this more. todo-1 */
     background-color: $modal-content-bg;
 }
 
+.app-modal-nav-panel {
+    border: 2px solid $modal-content-border-color;
+    left: 0;
+    top: 0;
+    padding: 0px;
+    width: 60%;
+    margin-top: 60px;
+    margin-left: $smallGap;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
+    max-width: 500px;
+    min-width: 350px;
+    background-color: $modal-content-bg;
+}
+
 .mainContainer {
     padding: 0px;
 }

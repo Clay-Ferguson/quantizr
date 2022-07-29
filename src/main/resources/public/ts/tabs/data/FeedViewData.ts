@@ -2,6 +2,7 @@ import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import { PubSub } from "../../PubSub";
 import { S } from "../../Singletons";
 import { ValidatedState } from "../../ValidatedState";
 import { FeedView } from "../FeedView";
@@ -45,19 +46,49 @@ export class FeedViewData implements TabIntf {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
                     // we close chat by swithing user back to the Fediverse view.
-                    new Div("Close Chat", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                    new Div("Close Chat", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesFediverse();
+                        }
+                    })
                 ]) : null;
         }
         else {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
-                    new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
-                    new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
-                    new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
-                    new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
+                    new Div("To/From Me", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesToFromMe();
+                        }
+                    }),
+                    new Div("To Me", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesToMe();
+                        }
+                    }),
+                    new Div("From Me", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesFromMe();
+                        }
+                    }),
+                    new Div("From Friends", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesFromFriends();
+                        }
+                    }),
                     // We need to make this a configurable option.
                     // new MenuItem("From Local Users", S.nav.messagesLocal),
-                    new Div("Federated", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                    new Div("Federated", {
+                        className: "tabSubOptionsItem", onClick: () => {
+                            PubSub.pub(C.PUBSUB_navAction);
+                            S.nav.messagesFediverse();
+                        }
+                    })
                 ]) : null;
         }
     };
