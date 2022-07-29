@@ -465,4 +465,20 @@ export abstract class Comp implements CompIntf {
 
     setScrollPos = (pos: number): void => {
     }
+
+    /* Components should call this method instad of setting scrollTop directly on an element */
+    setScrollTop = (pos: number): void => {
+        // if this returns null it means we're not persisting scrolling in this comp and
+        // we skip that logic.
+        if (this.getScrollPos()) {
+            this.setScrollPos(pos);
+        }
+        let elm = this.getRef();
+        if (elm) {
+            if (C.DEBUG_SCROLLING) {
+                console.log("setScrollTop [" + this.getCompClass() + "]: elm.scrollTop=" + pos + " elm.scrollHeight=" + elm.scrollHeight);
+            }
+            elm.scrollTop = pos;
+        }
+    }
 }

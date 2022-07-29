@@ -23,8 +23,10 @@ export class RightNavPanel extends Div {
     static historyExpanded: boolean = false;
 
     constructor() {
+        let state = getAppState();
         super(null, {
             id: C.ID_RHS,
+            className: state.mobileMode ? "mobileRHSPanel" : null,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });

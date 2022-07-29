@@ -36,6 +36,7 @@ export class FullScreenImgViewer extends Main {
             console.log("domUpdateEvent scroll top");
         }
         if (S.view.docElm) {
+            // todo-0: can we call thru comp.setScrollTop ?
             S.view.docElm.scrollTop = 0;
         }
     }

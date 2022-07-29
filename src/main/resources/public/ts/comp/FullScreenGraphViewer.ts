@@ -277,6 +277,7 @@ export class FullScreenGraphViewer extends Main {
             console.log("scrollTop=0");
         }
         if (S.view.docElm) {
+            // todo-0: can we call thru comp.setScrollTop ?
             S.view.docElm.scrollTop = 0;
         }
     }

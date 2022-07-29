@@ -57,7 +57,8 @@ export class App extends Main {
             if (state.mobileMode) {
                 this.setChildren([
                     new Div(null, {
-                        className: "row mainAppRow customScrollBar"
+                        className: "row mainAppRow customScrollBar",
+                        id: "mobileAppMainDiv"
                     }, [
                         new TabPanel(mobileTopBar)
                     ])
@@ -142,7 +143,7 @@ export class App extends Main {
             let logo = new Img(this.getId("logo_"), {
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
-                onClick: () => { window.location.href = window.location.origin; },
+                onClick: () => S.nav.navPublicHome(),
                 title: "Main application Landing Page"
             });
 

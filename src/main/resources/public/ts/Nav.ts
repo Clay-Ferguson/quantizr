@@ -323,7 +323,7 @@ export class Nav {
         }
     }
 
-    navPublicHome = (state: AppState) => {
+    navPublicHome = () => {
         S.util.loadAnonPageHome();
     }
 

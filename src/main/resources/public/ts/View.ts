@@ -253,7 +253,7 @@ export class View {
         }
         let activeTabComp = S.tabUtil.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
-            activeTabComp.getRef().scrollTop = 0;
+            activeTabComp.setScrollTop(0);
             // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
         }
 
@@ -265,7 +265,8 @@ export class View {
         //     elm.scrollTop = 0;
         // });        
 
-        if (!state.mobileMode) {
+        else {
+            // todo-0: need to be calling comp.setScrollTop here, on both these
             S.domUtil.getElm(C.ID_LHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
@@ -302,6 +303,10 @@ export class View {
                 // console.log("is root, scroll to top");
                 this.scrollAllTop(state);
                 return;
+            }
+
+            if (C.DEBUG_SCROLLING) {
+                console.log("ScrollToNode: id=" + node?.id)
             }
 
             let elm: any = null;
@@ -343,6 +348,7 @@ export class View {
         //     }
         // }, 100);
 
+        // todo-0: this scrolling logic has a bad smell. Try to do better.
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToNode");
             func();
@@ -350,6 +356,7 @@ export class View {
     }
 
     scrollToTop = async () => {
+        // todo-0: this scrolling logic has a bad smell. Try to do better.
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             let state = getAppState();
             this.scrollAllTop(state);
