@@ -132,7 +132,8 @@ public class ActPubOutbox extends ServiceBase {
                                 // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
                                 // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                                 // }
-                            } //
+                            } 
+                            // todo-0: need to handle "Boosts" and other types here too.
                             else if (apIsType(object, APType.Note) || //
                                     apIsType(object, APType.ChatMessage)) {
                                 try {
@@ -344,10 +345,9 @@ public class ActPubOutbox extends ServiceBase {
                         APObj ret = null;
 
                         /*
-                         * I was unable to test this branch of the code, because apparently mastodon doesn't call it for the
-                         * scenario I thought it would. I was trying to nav to a user in masto and click their
-                         * "posts and replies" and expecting it to call into here, but it doesn't. Need way to test this
-                         * branch of code. todo-0
+                         * This branch of code is not yet tested (not sure how to get foreign server to run this),
+                         * but similar code is working. There is one other similar block of code elsewhere in the app
+                         * where boosts are published.
                          */
                         if (!StringUtils.isEmpty(boostTarget)) {
                             // log.debug("processing boostTarget: " + boostTarget + " in outbox gen for " + userName);

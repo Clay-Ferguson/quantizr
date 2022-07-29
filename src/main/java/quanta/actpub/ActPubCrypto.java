@@ -35,7 +35,6 @@ import quanta.service.UserManagerService;
 import quanta.util.Val;
 import quanta.util.XString;
 
-
 /**
  * Crypto functions for AP
  */

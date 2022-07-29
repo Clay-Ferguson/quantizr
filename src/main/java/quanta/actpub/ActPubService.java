@@ -183,13 +183,8 @@ public class ActPubService extends ServiceBase {
                      * 
                      * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
                      * that right?) UPDATE: Yes we do like this: on our node: "p" : {"ap:objType" : "Announce",
-                     * 
-                     * todo-0: Discovered on 7/8/22, this code branch was never executing becasue boostTarget was null
-                     * due to getting it off 'parent' instead of 'node', above. Need to verify this branch of code is
-                     * correct now.
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
-                        // todo-0: also check how outbox is rendering this boostedUrl. It will also need the fix.
                         SubNode boostTargetNode = read.getNode(ms, boostTarget);
                         if (ok(boostTargetNode)) {
                             String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
@@ -694,7 +689,7 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, actorUrl, false, bodyBytes);
+                processAnnounceAction(payload, actorUrl, false, bodyBytes);
                 break;
 
             default:
@@ -719,7 +714,7 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Announce:
-                processAnnounceAction(httpReq, payload, actorUrl, true, bodyBytes);
+                processAnnounceAction(payload, actorUrl, true, bodyBytes);
                 break;
 
             default:
@@ -825,7 +820,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processAnnounceAction(HttpServletRequest httpReq, Object payload, String actorUrl, boolean undo,
+    public void processAnnounceAction(Object payload, String actorUrl, boolean undo,
             byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(payload));
@@ -844,7 +839,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            // find or create an actual node that will hold the target thing being boosted
+            // find or create an actual node that will hold the target (i.e. thing being boosted)
             SubNode boostedNode = apUtil.loadObject(as, null, objectIdUrl);
             if (ok(boostedNode)) {
                 // log.debug("BOOSTING: " + XString.prettyPrint(boostedNode));
