@@ -1,3 +1,4 @@
+import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { RightNavPanel } from "../comp/RightNavPanel";
 import { Constants as C } from "../Constants";
@@ -19,7 +20,14 @@ export class NavPanelDlg extends DialogBase {
     super_close = this.close;
     close = () => {
         NavPanelDlg.inst = null;
-        this.super_close();
+
+        // It's helpful in mobile mode (NavPanel in this Popup) for users to be able to see the visual feedback of the
+        // style changing on the panel to the new selection when they click something, so we use this timer for that.
+        if (getAppState().mobileMode) {
+            setTimeout(() => {
+                this.super_close();
+            }, 600);
+        }
     }
 
     domRemoveEvent = () => {
