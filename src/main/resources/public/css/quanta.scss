@@ -16,7 +16,7 @@ $scrollTrack: $gray-900;
 $scrollThumb: $gray-700;
 $scrollBarWidth: 20px;
 
-$mobileHeaderBarHeight: 5em; // todo-0: what units work best here?
+$mobileHeaderBarHeight: 5em;
 
 $baseBgColor: rgb(32, 34, 36);
 $body-bg: darken($baseBgColor, 7%);
@@ -258,7 +258,7 @@ $mobileHeaderHeight: 3.5em;
 }
 
 .visible {
-    display: inline-block; // todo-0: block or inline-block?
+    display: inline-block; 
     visibility: visible !important;
 }
 

@@ -7,7 +7,6 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Icon } from "./core/Icon";
 
-// todo-0: let's make the top panel with this be 'top sticky' just like what we have for mobile mode for it's mobile header.
 export class BreadcrumbsPanel extends Div {
     constructor() {
         super(null, {

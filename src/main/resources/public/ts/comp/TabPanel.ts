@@ -13,7 +13,6 @@ export class TabPanel extends Div {
         super(null, { id: C.ID_TAB });
         let state = getAppState();
 
-        // todo-0: this block can be written simpler
         if (state.mobileMode) {
             this.attribs.className = "col-12 tabPanelMobile";
         }

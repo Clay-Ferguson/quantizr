@@ -81,7 +81,6 @@ export class MainTabComp extends AppTab {
                 // if we have some parents to display well then let's just do that...
                 state.node.parents?.length > 0 ? new NodeCompParentNodes(state, this.data, null) : null,
 
-                // todo-0: how is this related to my-tab-pane ?
                 new Div(null, { className: state.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
                     new NodeCompMainNode(state, this.data, null),
                     new NodeCompMainList(this.data)
