@@ -21,6 +21,7 @@ declare var g_brandingAppName;
 export class RightNavPanel extends Div {
     private static scrollPos: number = 0;
     static historyExpanded: boolean = false;
+    public static inst: RightNavPanel = null;
 
     constructor() {
         let state = getAppState();
@@ -30,6 +31,7 @@ export class RightNavPanel extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
+        RightNavPanel.inst = this;
     }
 
     getScrollPos = (): number => {

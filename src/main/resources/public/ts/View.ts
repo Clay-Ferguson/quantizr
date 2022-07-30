@@ -1,5 +1,7 @@
 import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
+import { LeftNavPanel } from "./comp/LeftNavPanel";
+import { RightNavPanel } from "./comp/RightNavPanel";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import * as J from "./JavaIntf";
@@ -266,14 +268,8 @@ export class View {
         // });        
 
         else {
-            // todo-0: need to be calling comp.setScrollTop here, on both these
-            S.domUtil.getElm(C.ID_LHS, (elm: HTMLElement) => {
-                elm.scrollTop = 0;
-            });
-
-            S.domUtil.getElm(C.ID_RHS, (elm: HTMLElement) => {
-                elm.scrollTop = 0;
-            });
+            LeftNavPanel.inst?.setScrollTop(0);
+            RightNavPanel.inst?.setScrollTop(0);
         }
     }
 
@@ -311,10 +307,8 @@ export class View {
 
             let elm: any = null;
             if (node) {
-                const nodeId: string = S.nav._UID_ROWID_PREFIX + node.id;
                 // console.log("looking up using element id: " + nodeId);
-
-                elm = S.domUtil.domElm(nodeId);
+                elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
             }
 
             if (!elm) {

@@ -6,7 +6,6 @@ import { S } from "../Singletons";
 import { Main } from "./Main";
 
 export class FullScreenImgViewer extends Main {
-
     constructor() {
         super();
     }
@@ -36,7 +35,8 @@ export class FullScreenImgViewer extends Main {
             console.log("domUpdateEvent scroll top");
         }
         if (S.view.docElm) {
-            // todo-0: can we call thru comp.setScrollTop ?
+            // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
+            // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'
             S.view.docElm.scrollTop = 0;
         }
     }

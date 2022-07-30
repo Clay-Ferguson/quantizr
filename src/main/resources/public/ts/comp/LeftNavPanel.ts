@@ -11,6 +11,7 @@ declare var g_brandingAppName;
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
+    public static inst: LeftNavPanel = null;
 
     constructor() {
         super(null, {
@@ -35,6 +36,7 @@ export class LeftNavPanel extends Div {
 
         // console.log("centerCols: " + panelCols + " leftCols: " + leftCols);
         this.attribs.className = "col-" + leftCols + " leftNavPanel customScrollbar";
+        LeftNavPanel.inst = this;
     }
 
     getScrollPos = (): number => {
