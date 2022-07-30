@@ -132,7 +132,9 @@ export class RightNavPanel extends Div {
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
                     !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
-                    state.isAnonUser ? new Div("Login / Signup", {
+                    
+                    // Not showing login on this panel in mobileMode, because it's shown at top of page instead
+                    state.isAnonUser && !state.mobileMode ? new Div("Login / Signup", {
                         className: "signupLinkText",
                         onClick: () => {
                             PubSub.pub(C.PUBSUB_navAction);

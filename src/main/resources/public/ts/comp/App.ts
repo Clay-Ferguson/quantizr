@@ -9,6 +9,7 @@ import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Button } from "./core/Button";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -136,9 +137,9 @@ export class App extends Main {
             //         getValue: (): boolean => state.userPrefs.showMetaData
             //     }, "form-switch form-check-inline") : null;
 
-            let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
-                onClick: S.user.userLogin
-            }, "btn-primary marginRight", "off") : null;
+            let loginButton = state.isAnonUser ? new Button("Login", S.user.userLogin, {
+                className: "menuButton"
+            }) : null;
 
             let logo = new Img(this.getId("logo_"), {
                 className: "marginRight smallLogoButton",
