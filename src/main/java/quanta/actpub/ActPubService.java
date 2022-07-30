@@ -820,8 +820,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processAnnounceAction(Object payload, String actorUrl, boolean undo,
-            byte[] bodyBytes) {
+    public void processAnnounceAction(Object payload, String actorUrl, boolean undo, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(payload));
 
@@ -1544,7 +1543,6 @@ public class ActPubService extends ServiceBase {
             if (ok(server) && server.equals(lastServer)) {
                 continue;
             }
-            lastServer = server;
 
             try {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
@@ -1552,12 +1550,12 @@ public class ActPubService extends ServiceBase {
                     continue;
 
                 /*
-                 * This may hurt performance of the app so let's throttle it way back to a few seconds between
-                 * loops. Also we don't want to put too much unwelcome load on other instances.
-                 * 
-                 * what we can do here is be sure any GIVEN server is only accessed at 4 second intervals!!!
+                 * To limit load on our server we do a sleep here, making sure to do a 4s sleep if we're accessing
+                 * the same server twice in a row or a 1s sleep if it's a different server. Accessing the same server
+                 * too fast without any delays can make them start blocking/throttling us.
                  */
-                Thread.sleep(4000);
+                Thread.sleep(server.equals(lastServer) ? 4000 : 1000);
+                lastServer = server;
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
@@ -1747,7 +1745,7 @@ public class ActPubService extends ServiceBase {
                  * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
                  * accounts. Need to make these parameters configurable by admin.
                  * 
-                 * The reason the oldest 1000 accounts (1000 limit below) are the "best" is because they were the
+                 * The reason the oldest 1200 accounts (1200 limit below) are the "best" is because they were the
                  * most closely seeded (like direct friend of a friend) to the original 50 or so friends I used to
                  * get this server started. That is, I had 50 people I liked originally, and let the system
                  * naturally add all additional users that exist as they were encountered, so that ended up with
@@ -1760,7 +1758,7 @@ public class ActPubService extends ServiceBase {
                  * something but for now just going with first 1000 accounts created works.
                  */
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
-                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1000);
+                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1200);
 
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
