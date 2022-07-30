@@ -13,13 +13,9 @@ export class AppTab<PropType = any> extends Div {
     }
 
     getClass = (state: AppState): string => {
-        let className = "tab-pane fade" +
-            (state.mobileMode ? " my-tab-pane-mobile" : " my-tab-pane customScrollbar") +
-            (state.userPrefs.editMode && this.extraEditModeClass ? (" " + this.extraEditModeClass) /* " my-tab-pane-editmode" */ : "");
-
-        if (state.activeTab === this.getId()) {
-            className += " show active";
-        }
+        let className = "my-tab-pane customScrollbar " + 
+            (state.userPrefs.editMode && this.extraEditModeClass ? (this.extraEditModeClass) /* " my-tab-pane-editmode" */ : "") +
+            (state.activeTab === this.getId() ? " visible" : " invisible");           
         return className;
     }
 

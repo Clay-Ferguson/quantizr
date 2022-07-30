@@ -26,7 +26,6 @@ export class TabUtil {
         to find all those before we can optimize here to ignore setting to same tab.
         */
         // if (state.activeTab==tabName) return;
-
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
                 S.nav.navHome(s);

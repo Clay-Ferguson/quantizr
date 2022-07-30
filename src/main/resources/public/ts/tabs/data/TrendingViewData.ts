@@ -24,19 +24,19 @@ export class TrendingViewData implements TabIntf {
         return new Div(null, { className: "tabSubOptions" }, [
             new Div("Hashtags", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.showTrendingHashtags();
                 }
             }),
             new Div("Mentions", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.showTrendingMentions();
                 }
             }),
             new Div("Words", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.showTrendingWords();
                 }
             })

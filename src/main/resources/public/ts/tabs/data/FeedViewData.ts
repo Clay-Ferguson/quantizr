@@ -48,7 +48,7 @@ export class FeedViewData implements TabIntf {
                     // we close chat by swithing user back to the Fediverse view.
                     new Div("Close Chat", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFediverse();
                         }
                     })
@@ -59,25 +59,25 @@ export class FeedViewData implements TabIntf {
                 ? new Div(null, { className: "tabSubOptions" }, [
                     new Div("To/From Me", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesToFromMe();
                         }
                     }),
                     new Div("To Me", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesToMe();
                         }
                     }),
                     new Div("From Me", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFromMe();
                         }
                     }),
                     new Div("From Friends", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFromFriends();
                         }
                     }),
@@ -85,7 +85,7 @@ export class FeedViewData implements TabIntf {
                     // new MenuItem("From Local Users", S.nav.messagesLocal),
                     new Div("Federated", {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFediverse();
                         }
                     })

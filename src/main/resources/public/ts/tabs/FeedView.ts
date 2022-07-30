@@ -50,9 +50,6 @@ export class FeedView extends AppTab<FeedViewProps> {
             });
         }
 
-        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
-        let hasSearchField = (!state.mobileMode || this.data.props.searchTextState.getValue());
-
         let newItems = null;
         if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
             newItems = new Icon({
@@ -70,17 +67,18 @@ export class FeedView extends AppTab<FeedViewProps> {
                 this.renderHeading(state),
                 new Span(null, { className: "float-end" }, [
                     newItems,
-                    hasSearchField ? new Span(null, { className: "feedSearchField" }, [
+                    new Span(null, { className: "feedSearchField" }, [
                         new TextField({
                             val: this.data.props.searchTextState,
                             placeholder: "Search for...",
                             enter: S.srch.refreshFeed
-                        })]) : null,
+                        })
+                    ]),
                     new IconButton("fa-refresh", "Search", {
                         onClick: () => S.srch.refreshFeed(),
                         title: "Refresh"
                     }),
-                    hasSearchField && this.data.props.searchTextState.getValue() //
+                    this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {

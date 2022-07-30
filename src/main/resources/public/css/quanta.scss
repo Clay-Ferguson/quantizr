@@ -1,4 +1,3 @@
-
 @import "variables.scss";
 
 $brandingBase: '../../../../../branding';
@@ -17,6 +16,8 @@ $scrollTrack: $gray-900;
 $scrollThumb: $gray-700;
 $scrollBarWidth: 20px;
 
+$mobileHeaderBarHeight: 5em; // todo-0: what units work best here?
+
 $baseBgColor: rgb(32, 34, 36);
 $body-bg: darken($baseBgColor, 7%);
 $body-color: white;
@@ -33,7 +34,7 @@ $custom-control-indicator-size: 1.75rem;
 @import "bootswatch.scss";
 
 // Removed custom fonts, because I need emojis to look good
-$fontFamily: 'QuantaCustomFont', 'Roboto','Verdana','Helvetica','Arial','sans-serif';
+$fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 
 //This does work (border around focused edit fields) but we don't need it.
 // .form-control:focus {
@@ -86,7 +87,7 @@ $smallBorderSize: 3px;
     font-family: "QuantaCustomFont";
     src: url('../fonts/Roboto-Light.ttf') format('truetype');
     font-weight: normal;
-    font-style: normal; 
+    font-style: normal;
 }
 
 @import 'scrollbar.scss';
@@ -117,13 +118,16 @@ body {
     margin: $smallGap;
 }
 
-.markdown-content table, th, td {
+.markdown-content table,
+th,
+td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;
 }
 
-.markdown-content th, td {
-   padding: $tinyGap;
+.markdown-content th,
+td {
+    padding: $tinyGap;
 }
 
 .serverInfoText {
@@ -132,8 +136,13 @@ body {
 }
 
 .mobileHeaderBar {
-    margin-top: 10px;
-    margin-left: 10px;
+    padding: 10px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    border-bottom: 3px solid $nodeBorderBottomColor;
+    height: $mobileHeaderBarHeight;
 }
 
 .nodeTags {
@@ -194,7 +203,7 @@ $mobileHeaderHeight: 3.5em;
 }
 
 .calcOutputArea {
-    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
     font-size: 120%;
     margin-left: $smallGap;
     max-height: 600px;
@@ -238,7 +247,7 @@ $mobileHeaderHeight: 3.5em;
 }
 
 .d3PieChart {
-    width: 250px; 
+    width: 250px;
     height: 250px;
 }
 
@@ -246,6 +255,11 @@ $mobileHeaderHeight: 3.5em;
 .invisible {
     display: none;
     visibility: hidden !important;
+}
+
+.visible {
+    display: inline-block; // todo-0: block or inline-block?
+    visibility: visible !important;
 }
 
 // we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
@@ -259,14 +273,14 @@ are sometimes using anchorz inside them like the main landing page button which 
 alterations exist */
 a:visited {
     color: #00bc8c !important;
-    font-weight: bold; 
+    font-weight: bold;
     cursor: pointer;
     //font-size: 110%;
 }
 
 a:active {
     color: #00bc8c !important;
-    font-weight: bold; 
+    font-weight: bold;
     cursor: pointer;
     //font-size: 110%;
 }
@@ -274,7 +288,7 @@ a:active {
 a {
     color: #00bc8c !important;
     font-weight: bold;
-    cursor: pointer; 
+    cursor: pointer;
     //font-size: 110%;
 }
 
@@ -302,7 +316,7 @@ a {
 
 .mainLogoImg {
     /* this margin and display is for making the logo horizontally centered */
-    margin: auto;    
+    margin: auto;
     display: block;
 }
 
@@ -361,14 +375,14 @@ a {
 }
 
 .app-body {
-    font-family: $fontFamily !important;
+    font-family: $fontFamily  !important;
     // font-size: $fontSize;
     width: 100%;
     height: 100%;
 }
 
 .welcome-body {
-    font-family: $fontFamily !important;
+    font-family: $fontFamily  !important;
     font-size: 1.4rem;
     font-weight: 300;
     line-height: 1.5;
@@ -478,11 +492,11 @@ a {
 
 /* This is how the search terms get highlighted by wrapping them like this in 
 the markdown **_term_** */
-strong em { 
-    font-style: normal; 
-    font-weight: bold; 
+strong em {
+    font-style: normal;
+    font-weight: bold;
     background-color: green;
-} 
+}
 
 .width-7rem {
     width: 7rem;
@@ -607,7 +621,7 @@ strong em {
     position: relative;
     top: -5px;
 }
- 
+
 .app-modal {
     //display: none;
     position: fixed;
@@ -729,8 +743,8 @@ Will come back later and study this more. todo-1 */
 }
 
 .rightNavPanel {
-    padding-top: 15px; 
-    padding-left: 0px; 
+    padding-top: 15px;
+    padding-left: 0px;
     height: 100%;
     overflow-y: scroll;
     padding-bottom: 20px;
@@ -762,16 +776,15 @@ Will come back later and study this more. todo-1 */
     margin-left: 10px;
 }
 
+// Tip: It's best practice to have overflow:hidden, on all 
+// parent divs that are the 'same size' or same screen rectangle
+// to prevent any 'double scroll' bars showing up.
 .my-tab-pane {
     width: 100%;
     height: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
     padding-right: 15px;
-}
-
-.my-tab-pane-mobile {
-    width: 100%;
 }
 
 // This padding is what makes room for the '+' buttons on the RHS during editing
@@ -786,18 +799,19 @@ Will come back later and study this more. todo-1 */
 }
 
 .tabPanelMobile {
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 20px !important;
-    background: $body-bg;
+    height: 100%;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: $mobileHeaderBarHeight;
 }
 
 .tab-content {
-    margin-left: 5px; 
-    margin-right: 10px;
+    margin: 0px;
+    padding: 0px;
     height: 100%;
-    padding-left: 0px;
+
+    // important to have 'hidden' to avoid a double scroll bar when this is NOT the thing we're scrolling
+    overflow: hidden;
 }
 
 .ipfsCidText {
@@ -834,7 +848,7 @@ Will come back later and study this more. todo-1 */
 
 .tallTextContent {
     max-height: 650px;
-}   
+}
 
 .centeredTitle {
     width: 500px;
@@ -844,12 +858,12 @@ Will come back later and study this more. todo-1 */
 
 .list-group-menu-item {
     background-color: transparent;
-    padding: 5px 5px 5px 10px; 
+    padding: 5px 5px 5px 10px;
 }
 
 .list-group-transparent {
     background-color: transparent;
-    padding: 5px 5px 5px 10px; 
+    padding: 5px 5px 5px 10px;
 }
 
 .audioPlayer {
@@ -858,7 +872,7 @@ Will come back later and study this more. todo-1 */
     margin-top: 0px;
     margin-left: 0px;
     margin-right: 0px;
-    margin-bottom: 10px;    
+    margin-bottom: 10px;
 }
 
 .downloadLink {
@@ -938,32 +952,32 @@ Will come back later and study this more. todo-1 */
 }
 
 .smallMarginBottom {
-    margin-bottom: $tinyGap; 
+    margin-bottom: $tinyGap;
 }
 
 .bigMarginBottom {
-    margin-bottom: $bigGap; 
+    margin-bottom: $bigGap;
 }
 
 .bigMarginRight {
-    margin-right: $bigGap; 
+    margin-right: $bigGap;
 }
 
 .bigPaddingRight {
-    padding-right: $bigGap; 
+    padding-right: $bigGap;
 }
 
 .bigMarginTop {
-    margin-top: $bigGap; 
+    margin-top: $bigGap;
 }
 
 .bigMarginLeft {
-    margin-left: $bigGap; 
+    margin-left: $bigGap;
 }
 
 .anchorBigMarginBottom {
     display: inline-block;
-    margin-bottom: $smallGap; 
+    margin-bottom: $smallGap;
     cursor: pointer;
     padding: 8px;
     border: 1px solid olivedrab;
@@ -979,7 +993,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .marginBottomIfNotLast {
-    &:not(:last-child) { 
+    &:not(:last-child) {
         margin-bottom: $smallGap;
     }
 }
@@ -1011,7 +1025,7 @@ Will come back later and study this more. todo-1 */
 
 .horizontalLayout {
     // flex will layout things all on the same horizontal row
-   display: flex;
+    display: flex;
 }
 
 /* 
@@ -1029,20 +1043,21 @@ Will come back later and study this more. todo-1 */
 }
 
 .textarea-min-4 {
-    font-family: inherit; 
+    font-family: inherit;
     min-height: 4em;
 }
 
 .font-inherit {
-    font-family: inherit; 
+    font-family: inherit;
     // min-height: 10em;
     // max-height: 60em;
 }
 
-.pre-textarea, .pre-textfield {
-     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
-     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    font-family: inherit; 
+.pre-textarea,
+.pre-textfield {
+    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    font-family: inherit;
 }
 
 .my-ace-editor {
@@ -1139,8 +1154,8 @@ Will come back later and study this more. todo-1 */
 // Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
 .markdown-content kbd,
 .markdown-content pre,
-.markdown-content samp { 
-    width: 100%; 
+.markdown-content samp {
+    width: 100%;
     border: 1px solid olivedrab;
     padding: 8px;
     background-color: $baseBgColor;
@@ -1227,7 +1242,7 @@ Will come back later and study this more. todo-1 */
     //to narrow the main tab content in center of page
     //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
     // max-width: 750px;
-    
+
     //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
     margin-bottom: $smallGap;
     //margin-top: 0px;
@@ -1246,13 +1261,14 @@ Will come back later and study this more. todo-1 */
 
 .mainNodeContentStyle {
     @if $rootNodeBorder {
-        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
-        border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
-    } 
-    @else {
-        border-left: $fatBorderSize solid $nodeBorderBottomColor; 
+        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+        border-left: $highlightBorderSize solid $nodeBorderBottomColor;
     }
-    
+
+    @else {
+        border-left: $fatBorderSize solid $nodeBorderBottomColor;
+    }
+
     padding-top: 8px;
     margin-bottom: 8px;
     margin-top: 8px;
@@ -1261,7 +1277,7 @@ Will come back later and study this more. todo-1 */
 .parentNodeContentStyle {
     // border: 1px solid $gray-700;
     // border-radius: $border-radius;
-    
+
     padding-right: 8px;
     padding-top: 8px;
     margin-bottom: 8px;
@@ -1365,8 +1381,13 @@ Will come back later and study this more. todo-1 */
 }
 
 @keyframes fadeToHidden {
-    from {opacity: 1;}
-    to {opacity: 0;}
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 .compHidden {
@@ -1384,8 +1405,11 @@ Will come back later and study this more. todo-1 */
 'from' value becasue if it's already visibible 'opacity=1' we don't want to cause a screen flicker by setting invisible first for no reason.
 */
 @keyframes fadeToVisible {
+
     // from {opacity: 0;}
-    to {opacity: 1;}
+    to {
+        opacity: 1;
+    }
 }
 
 .compVisible {
@@ -1533,7 +1557,7 @@ Will come back later and study this more. todo-1 */
 
 .row-border-inline-children {
     /* If no border is defined here then borders only show up during edit or metadata display modes */
-    border-bottom: 2px solid $nodeBorderBottomColor; 
+    border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
 /* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
@@ -1632,9 +1656,10 @@ i'm backing out for now
         // border-left: $highlightBorderSize solid $primary;
         border: $highlightBorderSize solid $primary;
         border-radius: 12px;
-    } 
+    }
+
     @else {
-        border-left: $mediumBorderSize solid $primary; 
+        border-left: $mediumBorderSize solid $primary;
     }
 }
 
@@ -1646,11 +1671,12 @@ i'm backing out for now
     @if $rootNodeBorder {
         // border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
         // border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
-        border: $highlightBorderSize solid $nodeBorderBottomColor; 
+        border: $highlightBorderSize solid $nodeBorderBottomColor;
         border-radius: 12px;
     }
+
     @else {
-        border-left: $mediumBorderSize solid $nodeBorderBottomColor; 
+        border-left: $mediumBorderSize solid $nodeBorderBottomColor;
     }
 }
 
@@ -1698,8 +1724,13 @@ i'm backing out for now
 }
 
 @keyframes fadeInRowBkg {
-    from {background-color: $gray-700;}
-    to {background-color: transparent;}
+    from {
+        background-color: $gray-700;
+    }
+
+    to {
+        background-color: transparent;
+    }
 }
 
 .fadeInRowBkgClz {
@@ -1710,7 +1741,7 @@ i'm backing out for now
 .rowFooterIcon {
     margin-top: .5em;
     margin-right: 6px;
-    margin-bottom: 12px;  
+    margin-bottom: 12px;
     vertical-align: middle;
     cursor: pointer;
 }
@@ -1906,7 +1937,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .monospace {
-    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
 }
 
 .dateTimeDisplay {
@@ -2173,7 +2204,7 @@ audio::-webkit-media-controls-play-button {
 .nodeHistoryItem {
     cursor: pointer;
     // anything 'draggable' needs a 2px border
-    border: 2px solid transparent; 
+    border: 2px solid transparent;
 }
 
 .nodeHistorySubItem {
@@ -2192,4 +2223,3 @@ audio::-webkit-media-controls-play-button {
     font-family: 'Courier New', Courier, monospace;
     border-bottom: 1px solid gray;
 }
-

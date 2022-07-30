@@ -9,7 +9,7 @@ import { MainTabComp } from "../MainTabComp";
 
 export class MainTabCompData implements TabIntf {
     name = "Quanta";
-    tooltip = "Quanta global tree-like Database";
+    tooltip = "Quanta Database Content Tree";
     id = C.TAB_MAIN;
     rsInfo = null;
     scrollPos = 0;
@@ -23,19 +23,19 @@ export class MainTabCompData implements TabIntf {
         return new Div(null, { className: "tabSubOptions" }, [
             !state.isAnonUser ? new Div("My Account", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.navHome(state);
                 }
             }) : null,
             !state.isAnonUser ? new Div("My Home", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.openContentNode(":" + state.userName + ":home");
                 }
             }) : null,
             !state.isAnonUser ? new Div("My Posts", {
                 className: "tabSubOptionsItem", onClick: () => {
-                    PubSub.pub(C.PUBSUB_navAction);
+                    PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.openContentNode("~" + J.NodeType.POSTS);
                 }
             }) : null,
@@ -85,7 +85,7 @@ export class MainTabCompData implements TabIntf {
 
                     items.push(new Div(menuItem.name, {
                         className: "tabSubOptionsItem", onClick: () => {
-                            PubSub.pub(C.PUBSUB_navAction);
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
                             func();
                         }
                     }));

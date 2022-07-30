@@ -58,7 +58,7 @@ export class TabPanelButtons extends Div {
             onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                PubSub.pub(C.PUBSUB_navAction);
+                PubSub.pub(C.PUBSUB_closeNavPanel);
                 S.tabUtil.selectTab(data.id);
             }
         }, [

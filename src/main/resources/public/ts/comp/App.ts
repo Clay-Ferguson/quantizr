@@ -55,42 +55,30 @@ export class App extends Main {
             ]);
         }
         else {
-            if (state.mobileMode) {
-                this.setChildren([
-                    new Div(null, {
-                        className: "row mainAppRow customScrollBar",
-                        id: "mobileAppMainDiv"
-                    }, [
-                        new TabPanel(mobileTopBar)
-                    ])
-                ]);
-            }
-            else {
-                this.setChildren([
-                    new Div(null, {
-                        className: "row mainAppRow"
-                    }, [
-                        new LeftNavPanel(),
-                        new TabPanel(),
-                        new RightNavPanel()
-                    ]),
+            this.setChildren([
+                new Div(null, {
+                    className: "row mainAppRow"
+                }, [
+                    state.mobileMode ? null : new LeftNavPanel(),
+                    new TabPanel(mobileTopBar),
+                    state.mobileMode ? null : new RightNavPanel()
+                ]),
 
-                    // I don't like this clutter. Leaving as an example for now.
-                    // new IconButton("fa-angle-double-up", null, {
-                    //     onClick: e => {
-                    //         S.view.scrollAllTop(state);
-                    //     },
-                    //     title: "Scroll to Top"
-                    // }, "btn-secondary scrollTopButtonUpperRight", "off"),
+                // I don't like this clutter. Leaving as an example for now.
+                // new IconButton("fa-angle-double-up", null, {
+                //     onClick: e => {
+                //         S.view.scrollAllTop(state);
+                //     },
+                //     title: "Scroll to Top"
+                // }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
-                    new IconButton("fa-angle-double-up", null, {
-                        onClick: () => {
-                            S.view.scrollAllTop(state);
-                        },
-                        title: "Scroll to Top"
-                    }, "btn-secondary scrollTopButtonLowerRight", "off")
-                ]);
-            }
+                state.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
+                    onClick: () => {
+                        S.view.scrollAllTop(state);
+                    },
+                    title: "Scroll to Top"
+                }, "btn-secondary scrollTopButtonLowerRight", "off")
+            ]);
         }
     }
 

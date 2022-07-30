@@ -1,5 +1,4 @@
 import { dispatch, useAppState } from "../AppRedux";
-import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";

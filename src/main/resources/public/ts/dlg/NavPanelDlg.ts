@@ -17,24 +17,22 @@ export class NavPanelDlg extends DialogBase {
         return [new RightNavPanel()];
     }
 
-    super_close = this.close;
-    close = () => {
-        NavPanelDlg.inst = null;
-
-        // It's helpful in mobile mode (NavPanel in this Popup) for users to be able to see the visual feedback of the
-        // style changing on the panel to the new selection when they click something, so we use this timer for that.
-        if (getAppState().mobileMode) {
-            setTimeout(() => {
-                this.super_close();
-            }, 600);
-        }
-    }
-
     domRemoveEvent = () => {
         NavPanelDlg.inst = null;
     }
 }
 
-PubSub.sub(C.PUBSUB_navAction, () => {
-    NavPanelDlg.inst?.close();
+PubSub.sub(C.PUBSUB_closeNavPanel, (payload: string) => {
+    if (payload === "immediate") {
+        NavPanelDlg.inst?.close();
+        NavPanelDlg.inst = null;
+    }
+    else {
+        // It's helpful in mobile mode (NavPanel in this Popup) for users to be able to see the visual feedback of the
+        // style changing on the panel to the new selection when they click something, so we use this timer for that.
+        setTimeout(() => {
+            NavPanelDlg.inst?.close();
+            NavPanelDlg.inst = null;
+        }, 600);
+    }
 });
