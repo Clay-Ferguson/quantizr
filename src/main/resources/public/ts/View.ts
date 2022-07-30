@@ -342,7 +342,6 @@ export class View {
         //     }
         // }, 100);
 
-        // todo-0: this scrolling logic has a bad smell. Try to do better.
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToNode");
             func();
@@ -350,10 +349,8 @@ export class View {
     }
 
     scrollToTop = async () => {
-        // todo-0: this scrolling logic has a bad smell. Try to do better.
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            let state = getAppState();
-            this.scrollAllTop(state);
+            this.scrollAllTop(getAppState());
         });
     }
 
