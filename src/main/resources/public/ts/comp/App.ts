@@ -115,7 +115,7 @@ export class App extends Main {
             let navButton = new IconButton("fa-sitemap", "Nav", {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
-            }, "btn-primary menuButton float-end", "off");
+            }, "btn-primary menuButton", "off");
 
             // let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
@@ -146,7 +146,7 @@ export class App extends Main {
             // });
 
             // let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, navButton]);
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);
         }
         return null;
     }
