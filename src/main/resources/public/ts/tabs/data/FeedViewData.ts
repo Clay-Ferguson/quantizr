@@ -1,8 +1,8 @@
 import { AppState } from "../../AppState";
+import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
-import { PubSub } from "../../PubSub";
 import { S } from "../../Singletons";
 import { ValidatedState } from "../../ValidatedState";
 import { FeedView } from "../FeedView";
@@ -42,58 +42,23 @@ export class FeedViewData implements TabIntf {
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
     getTabSubOptions = (state: AppState): Div => {
-
-        // todo-0: Everywhere we have the 'tabSubOptionsItem' in the code those links really need 
-        // a custom Component that just takes the text, and the function parameters.
-        let itemClass = state.mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem";
-
         if (this.props?.feedFilterRootNode) {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
                     // we close chat by swithing user back to the Fediverse view.
-                    new Div("Close Chat", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesFediverse();
-                        }
-                    })
+                    new AppNavLink("Close Chat", S.nav.messagesFediverse)
                 ]) : null;
         }
         else {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
-                    new Div("To/From Me", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesToFromMe();
-                        }
-                    }),
-                    new Div("To Me", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesToMe();
-                        }
-                    }),
-                    new Div("From Me", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesFromMe();
-                        }
-                    }),
-                    new Div("From Friends", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesFromFriends();
-                        }
-                    }),
+                    new AppNavLink("To/From Me", S.nav.messagesToFromMe),
+                    new AppNavLink("To Me", S.nav.messagesToMe),
+                    new AppNavLink("From Me", S.nav.messagesFromMe),
+                    new AppNavLink("From Friends", S.nav.messagesFromFriends),
                     // We need to make this a configurable option.
                     // new MenuItem("From Local Users", S.nav.messagesLocal),
-                    new Div("Federated", {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.nav.messagesFediverse();
-                        }
-                    })
+                    new AppNavLink("Federated", S.nav.messagesFediverse)
                 ]) : null;
         }
     };

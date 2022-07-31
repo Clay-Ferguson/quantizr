@@ -1,9 +1,10 @@
 import { AppState } from "../../AppState";
+import { CompIntf } from "../../comp/base/CompIntf";
+import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
-import { PubSub } from "../../PubSub";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
@@ -20,35 +21,18 @@ export class MainTabCompData implements TabIntf {
     constructView = (data: TabIntf) => new MainTabComp(data);
 
     getTabSubOptions = (state: AppState): Div => {
-        let itemClass = state.mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem";
-
         return new Div(null, { className: "tabSubOptions" }, [
-            !state.isAnonUser ? new Div("My Account", {
-                className: itemClass, onClick: () => {
-                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                    S.nav.navHome(state);
-                }
-            }) : null,
-            !state.isAnonUser ? new Div("My Home", {
-                className: itemClass, onClick: () => {
-                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                    S.nav.openContentNode(":" + state.userName + ":home");
-                }
-            }) : null,
-            !state.isAnonUser ? new Div("My Posts", {
-                className: itemClass, onClick: () => {
-                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                    S.nav.openContentNode("~" + J.NodeType.POSTS);
-                }
-            }) : null,
-            ...this.customAnonRHSLinks(itemClass, state)
+            !state.isAnonUser ? new AppNavLink("My Account", () => S.nav.navHome(state)) : null,
+            !state.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + state.userName + ":home")) : null,
+            !state.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
+            ...this.customAnonRHSLinks(state)
         ]);
     };
 
     // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
-    customAnonRHSLinks = (itemClass: string, state: AppState): Div[] => {
-        let items: Div[] = [];
+    customAnonRHSLinks = (state: AppState): CompIntf[] => {
+        let items: CompIntf[] = [];
 
         // if not anon user return empty items
         if (!state.isAnonUser) return items;
@@ -85,12 +69,7 @@ export class MainTabCompData implements TabIntf {
                         }
                     }
 
-                    items.push(new Div(menuItem.name, {
-                        className: itemClass, onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            func();
-                        }
-                    }));
+                    items.push(new AppNavLink(menuItem.name, func));
                 }
             }
         }

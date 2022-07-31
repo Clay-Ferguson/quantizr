@@ -22,11 +22,6 @@ export class Checkbox extends Comp {
     }
 
     compRender = (): ReactNode => {
-        // todo-0: everywhere we're doing this pattern (like 5 places), we can do this cleaner
-        // and it was really the htmlFor that lead me to this bad idea.
-        // let attribsClone = { ...this.attribs };
-        // delete attribsClone.ref;
-
         let cbInput: CheckboxInput = null;
         return this.tag("span", {
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
