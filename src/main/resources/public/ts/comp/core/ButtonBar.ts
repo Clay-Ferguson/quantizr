@@ -10,28 +10,25 @@ export class ButtonBar extends Comp {
      after the ButtonBar (below the ButtonBar) */
     constructor(initialButtons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
         super(null);
-        this.attribs.className = "btn-group btnGroup flex-wrap " + extraClass;
-        this.attribs.role = "group";
         this.setChildren(initialButtons);
     }
 
     compRender = (): ReactNode => {
         if (!this.hasChildren()) return null;
 
+        let props = {
+            className: "btn-group btnGroup flex-wrap " + this.extraClass,
+            role: "group"
+        };
+
         if (this.wrapperClass) {
-            // we have this clone because we want our 'ref' to point to the correct top level element 
-            let attribsClone = { ...this.attribs };
-            delete attribsClone.ref;
-            
             return this.tag("div", {
-                className: this.wrapperClass,
-                key: this.getId("w_"),
-                ref: this.attribs.ref
+                className: this.wrapperClass
             },
-                [new Div(null, attribsClone, this.getChildren())]);
+                [new Div(null, props, this.getChildren())]);
         }
         else {
-            return this.tag("div");
+            return this.tag("div", props);
         }
     }
 }

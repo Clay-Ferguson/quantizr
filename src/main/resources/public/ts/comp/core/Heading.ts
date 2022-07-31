@@ -8,6 +8,6 @@ export class Heading extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tag("h" + this.level, this.attribs, [this.content]);
+        return this.tag("h" + this.level, null, [this.content]);
     }
 }

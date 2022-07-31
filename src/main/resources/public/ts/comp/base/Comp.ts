@@ -251,7 +251,8 @@ export abstract class Comp implements CompIntf {
             console.error("tag called with props as array in " + this.getCompClass());
             return;
         }
-        props = props || this.attribs;
+
+        props = props ? { ...this.attribs, ...props } : this.attribs;
 
         // for debugging, shows classname in every dom element as an attribute.
         if (Comp.renderClassInDom) {
@@ -368,12 +369,14 @@ export abstract class Comp implements CompIntf {
             // of our framework (i.e. this Comp class)
             this.attribs.ref = useRef();
 
-            // if (this.debug) {
-            //     console.log("Calling preRender: " + this.getCompClass());
-            // }
-
             this.preRender();
-            return this.compRender();
+            let ret: ReactNode = this.compRender();
+
+            if (this.debug) {
+                console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
+            }
+
+            return ret;
         }
         catch (e) {
             console.error("Failed to render child (in render method)" + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
@@ -394,7 +397,7 @@ export abstract class Comp implements CompIntf {
     }
 
     // leave NON-Arrow function to support calling thru 'super'
-    domAdd(): void {
+    domAdd = (): void => {
         // console.log("domAddEvent: " + this.jsClassName);
         let elm: HTMLElement = this.getRef();
         if (!elm) {

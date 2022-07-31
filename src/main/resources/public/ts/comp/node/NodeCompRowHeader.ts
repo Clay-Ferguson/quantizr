@@ -303,7 +303,8 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (state.mobileMode) {
-            this.setChildren([...children || [],
+            this.setChildren([
+                ...children || [],
                 new CollapsiblePanel("n/a", "n/a", null, verboseChildren, false, (s: boolean) => {
                     if (s) {
                         state.expandedHeaderIds.add(this.node.id);

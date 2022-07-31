@@ -7,37 +7,32 @@ import { Select } from "./Select";
 
 export class Selection extends Comp {
 
-    constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
+    constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, public moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
         super(attribs, new State());
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
-        this.attribs.className = "form-select " + moreClasses;
     }
 
     compRender = (): ReactNode => {
-        this.attribs.value = this.valueIntf.getValue();
         let children = [];
 
-        let attribsClone = { ...this.attribs };
-        delete attribsClone.ref;
+        let select = new Select({ 
+            value: this.valueIntf.getValue(),
+            className: "form-select " + this.moreClasses 
+        }, this.selectionOptions, this.valueIntf);
 
         if (this.label) {
             children.push(new Label(this.label, {
-                id: this.getId("label_"),
-                key: this.getId("label_"),
-                htmlFor: this.getId(),
+                htmlFor: select.getId(),
                 className: "selectLabel"
             }));
         }
 
-        children.push(new Select(attribsClone, this.selectionOptions, this.valueIntf));
+        children.push(select);
         this.setChildren(children);
 
         return this.tag("div", {
-            id: this.getId("sel_"),
-            key: this.getId("sel_"),
-            className: this.outterClasses || "",
-            ref: this.attribs.ref
+            className: this.outterClasses || ""
         });
     }
 }

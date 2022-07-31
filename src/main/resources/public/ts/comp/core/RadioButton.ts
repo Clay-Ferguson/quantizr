@@ -8,30 +8,25 @@ import { Label } from "./Label";
 
 export class RadioButton extends Comp {
 
-    constructor(public label: string, public checked: boolean, groupName: string, attribs: any, private valueIntf: ValueIntf) {
+    constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf) {
         super(attribs, new State());
         valueIntf = this.valueIntf || new CompValueHolder<string>(this, "val");
-
-        this.attribs.name = groupName;
-        this.attribs.type = "radio";
-        this.attribs.label = label;
-        this.attribs.value = this.getId("val-");
-        this.attribs.className = "form-check-input";
     }
 
     compRender = (): ReactNode => {
-        let attribsClone = { ...this.attribs };
-        delete attribsClone.ref;
-
+        let cbInput: CheckboxInput = null;
         return this.tag("span", {
-            key: this.getId("s_"),
-            className: "form-check",
-            ref: this.attribs.ref
+            className: "form-check"
         }, [
-            new CheckboxInput(attribsClone, null, this.valueIntf),
+            cbInput = new CheckboxInput({
+                name: this.groupName,
+                type: "radio",
+                label: this.label,
+                value: this.getId("val-"),
+                className: "form-check-input clickable"
+            }, null, this.valueIntf),
             new Label(this.label || "", {
-                key: this.getId("l_"),
-                htmlFor: this.getId(),
+                htmlFor: cbInput.getId(),
                 className: "form-check-label radioLabel"
             })
         ]);

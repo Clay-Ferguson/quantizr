@@ -41,23 +41,17 @@ export class CollapsiblePanel extends Comp {
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
             return this.tag(this.elementName, {
-                key: this.getId("panel_"),
-                className: this.extraDivStyleExpanded,
-                ref: this.attribs.ref
+                className: this.extraDivStyleExpanded
             }, [
                 // This div and it's children holds the actual collapsible content.
                 new Div(null, {
-                    className: collapseClass,
-                    id: this.getId(),
-                    key: this.getId("content_")
+                    className: collapseClass
                 }, [
                     // This span is the expande/collapse button itself
                     new Span(this.expandedButtonText === "n/a" ? null : (this.expandedButtonText + "   "), {
                         className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                         // Warning: This can't be camel case!
                         "data-bs-toggle": collapseClass,
-                        id: this.getId("btn_"),
-                        key: this.getId("btn_"),
                         onClick: this.onToggle
                     }),
                     ...this.getChildren()
@@ -66,25 +60,19 @@ export class CollapsiblePanel extends Comp {
         }
         else {
             return this.tag(this.elementName, {
-                key: this.getId("panel_"),
-                className: this.extraDivStyleCollapsed,
-                ref: this.attribs.ref
+                className: this.extraDivStyleCollapsed
             }, [
                 // This span is the expande/collapse button itself
                 new Span(this.collapsedButtonText === "n/a" ? null : (this.collapsedButtonText + "   "), {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                     // Warning: This can't be camel case!
                     "data-bs-toggle": collapseClass,
-                    id: this.getId("btn_"),
-                    key: this.getId("btn_"),
                     onClick: this.onToggle
                 }),
 
                 // This div and it's children holds the actual collapsible content.
                 new Div(null, {
-                    className: collapseClass,
-                    id: this.getId(),
-                    key: this.getId("content_")
+                    className: collapseClass
                 },
                     this.getChildren())
             ]);

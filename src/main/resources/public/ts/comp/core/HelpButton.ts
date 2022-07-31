@@ -38,7 +38,6 @@ export class HelpButton extends Comp {
     compRender = (): ReactNode => {
         return this.tag("button", null, [
             new Italic({
-                key: this.getId("s_"),
                 className: "fa fa-question-circle"
             })]);
     }
