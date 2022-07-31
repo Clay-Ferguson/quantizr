@@ -16,7 +16,7 @@ $scrollTrack: $gray-900;
 $scrollThumb: $gray-700;
 $scrollBarWidth: 20px;
 
-$mobileHeaderBarHeight: 5em;
+$mobileHeaderBarHeight: 5rem;
 
 $baseBgColor: black; // rgb(32, 34, 36);
 $body-bg: black; // darken($baseBgColor, 7%);
@@ -744,6 +744,11 @@ Will come back later and study this more. todo-1 */
     padding: 0px;
 }
 
+.mainContainerMobile {
+    padding: 0px;
+    font-size: 1.2rem;
+}
+
 .rightNavPanel {
     padding-top: 15px;
     padding-left: 0px;
@@ -813,7 +818,7 @@ Will come back later and study this more. todo-1 */
 
 .tabPanelMobile {
     height: 100%;
-    padding-left: 0px;
+    padding-left: 6px;
     padding-right: 0px;
     padding-top: $mobileHeaderBarHeight;
 }

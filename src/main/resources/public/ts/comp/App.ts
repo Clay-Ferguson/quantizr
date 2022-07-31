@@ -45,7 +45,7 @@ export class App extends Main {
 
         let fullScreenViewer = this.getFullScreenViewer(state);
         let mobileTopBar = this.getTopMobileBar(state);
-        this.attribs.className = "container-fluid mainContainer";
+        this.attribs.className = "container-fluid " + (state.mobileMode ? "mainContainerMobile" : "mainContainer");
 
         if (fullScreenViewer) {
             this.setChildren([
