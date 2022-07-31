@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { getAppState } from "../../AppRedux";
 import { Comp } from "../base/Comp";
-import { Icon } from "./Icon";
+import { Tag } from "./Tag";
 
 interface LS { // Local State
     text?: string;
@@ -39,8 +39,9 @@ export class Button extends Comp {
         }
 
         return this.tag("button", null, [
-            this.attribs.iconclass ? new Icon({
-                key: this.getId("s_"),
+            // We use Tag here instead of Icon, because Icon renders larger in size for mobile mode and that
+            // would conflict wiht this button already sizing larger for mobile itself
+            this.attribs.iconclass ? new Tag("i", {
                 className: this.attribs.iconclass,
                 style: {
                     marginRight: text ? "6px" : "0px"

@@ -42,12 +42,17 @@ export class FeedViewData implements TabIntf {
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
     getTabSubOptions = (state: AppState): Div => {
+
+        // todo-0: Everywhere we have the 'tabSubOptionsItem' in the code those links really need 
+        // a custom Component that just takes the text, and the function parameters.
+        let itemClass = state.mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem";
+
         if (this.props?.feedFilterRootNode) {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
                     // we close chat by swithing user back to the Fediverse view.
                     new Div("Close Chat", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFediverse();
                         }
@@ -58,25 +63,25 @@ export class FeedViewData implements TabIntf {
             return !state.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
                     new Div("To/From Me", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesToFromMe();
                         }
                     }),
                     new Div("To Me", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesToMe();
                         }
                     }),
                     new Div("From Me", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFromMe();
                         }
                     }),
                     new Div("From Friends", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFromFriends();
                         }
@@ -84,7 +89,7 @@ export class FeedViewData implements TabIntf {
                     // We need to make this a configurable option.
                     // new MenuItem("From Local Users", S.nav.messagesLocal),
                     new Div("Federated", {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             S.nav.messagesFediverse();
                         }

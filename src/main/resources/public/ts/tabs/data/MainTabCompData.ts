@@ -20,32 +20,34 @@ export class MainTabCompData implements TabIntf {
     constructView = (data: TabIntf) => new MainTabComp(data);
 
     getTabSubOptions = (state: AppState): Div => {
+        let itemClass = state.mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem";
+
         return new Div(null, { className: "tabSubOptions" }, [
             !state.isAnonUser ? new Div("My Account", {
-                className: "tabSubOptionsItem", onClick: () => {
+                className: itemClass, onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.navHome(state);
                 }
             }) : null,
             !state.isAnonUser ? new Div("My Home", {
-                className: "tabSubOptionsItem", onClick: () => {
+                className: itemClass, onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.openContentNode(":" + state.userName + ":home");
                 }
             }) : null,
             !state.isAnonUser ? new Div("My Posts", {
-                className: "tabSubOptionsItem", onClick: () => {
+                className: itemClass, onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.nav.openContentNode("~" + J.NodeType.POSTS);
                 }
             }) : null,
-            ...this.customAnonRHSLinks(state)
+            ...this.customAnonRHSLinks(itemClass, state)
         ]);
     };
 
     // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
-    customAnonRHSLinks = (state: AppState): Div[] => {
+    customAnonRHSLinks = (itemClass: string, state: AppState): Div[] => {
         let items: Div[] = [];
 
         // if not anon user return empty items
@@ -84,7 +86,7 @@ export class MainTabCompData implements TabIntf {
                     }
 
                     items.push(new Div(menuItem.name, {
-                        className: "tabSubOptionsItem", onClick: () => {
+                        className: itemClass, onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             func();
                         }

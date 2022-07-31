@@ -29,7 +29,8 @@ export class Menu extends Comp {
 
         this.setChildren([
             new Div(this.name, {
-                className: "card-header menuHeading mb-0 accordion-header",
+                className: "card-header menuHeading mb-0 accordion-header" +
+                    (appState.mobileMode ? " mobileMenuText" : ""),
                 "aria-expanded": appState.activeMenu === this.name ? "true" : "false",
                 "data-bs-toggle": "collapse",
                 href: this.getId("#collapse"),

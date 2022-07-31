@@ -85,6 +85,10 @@
     border-radius: 0px;
 }
 
+.mobileMenuText {
+    padding: 12px 12px 12px 15px !important;
+}
+
 .mainMenuItemEnabled:hover {
     cursor: pointer;
     background-color: $menuItemHoverBackgroundColor;

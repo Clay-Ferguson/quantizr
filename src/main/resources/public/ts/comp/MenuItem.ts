@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { getAppState } from "../AppRedux";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
@@ -35,7 +36,8 @@ export class MenuItem extends Div {
             ...enablement,
             ...{
                 style: { display: (state.visible ? "" : "none") },
-                className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent",
+                className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent" +
+                    (getAppState().mobileMode ? " mobileMenuText" : ""),
                 onClick: this.onClick
             }
         });
