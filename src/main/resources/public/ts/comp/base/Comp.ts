@@ -14,7 +14,7 @@ import { CompIntf } from "./CompIntf";
  * code can ignore those details.
  */
 export abstract class Comp implements CompIntf {
-    private parent: Comp = null; // only used for debugging (can be deleted without impacting app)
+    private parent: Comp = null; // only used for debug logging (can be deleted without impacting app)
     static renderCounter: number = 0;
     static focusElmId: string = null;
     public debug: boolean = false;

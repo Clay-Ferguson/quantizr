@@ -10,7 +10,7 @@ export class AppState {
     constructor() {
         console.log("Constructing AppState");
     }
-    
+
     config: any;
 
     // up until guiReady the main App component will just render "loading..."
@@ -93,6 +93,7 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
+    expandedHeaderIds: Set<string> = new Set<string>();
 
     highlightSearchNodeId: string;
 

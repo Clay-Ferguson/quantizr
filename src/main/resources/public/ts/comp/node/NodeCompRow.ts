@@ -1,6 +1,5 @@
 import { useAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
-import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -111,7 +110,7 @@ export class NodeCompRow extends Div {
             }
         }
 
-        let buttonBar: Comp = null;
+        let buttonBar: NodeCompButtonBar = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }
@@ -155,7 +154,7 @@ export class NodeCompRow extends Div {
             S.quanta.fadeStartTime = new Date().getTime();
         }
 
-        let header: CompIntf = null;
+        let header: NodeCompRowHeader = null;
         let jumpButton: CompIntf = null;
         if (this.allowHeaders && state.userPrefs.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
             header = new NodeCompRowHeader(this.node, true, true, false, false, true, false);

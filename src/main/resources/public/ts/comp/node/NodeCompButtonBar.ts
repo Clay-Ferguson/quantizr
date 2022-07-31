@@ -222,7 +222,7 @@ export class NodeCompButtonBar extends Div {
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
 
-                        this.node.id !== state.homeNodeId
+                    this.node.id !== state.homeNodeId
                         ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }

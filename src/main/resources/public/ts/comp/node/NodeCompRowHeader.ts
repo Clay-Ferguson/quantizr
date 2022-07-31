@@ -10,7 +10,7 @@ import { UserProfileDlg } from "../../dlg/UserProfileDlg";
 import { NodeActionType } from "../../enums/NodeActionType";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Comp } from "../base/Comp";
+import { CollapsiblePanel } from "../core/CollapsiblePanel";
 
 // todo-1: need to switch to the more efficient way of using nid attribute
 // on elements (search for "nid:" in code), to avoid creating new functions
@@ -21,7 +21,7 @@ export class NodeCompRowHeader extends Div {
     constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
         private isBoost: boolean) {
         super(null, {
-            className: "header-text"
+            className: "row-header"
         });
     }
 
@@ -61,11 +61,13 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
+        let verboseChildren = state.mobileMode ? [] : children;
+
         let typeHandler = S.plugin.getTypeHandler(this.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {
-                children.push(new Icon({
+                verboseChildren.push(new Icon({
                     className: iconClass + " rowTypeIcon",
                     title: "Node Type: " + typeHandler.getName(),
                     onMouseOver: () => { S.quanta.draggableId = this.node.id; },
@@ -79,10 +81,10 @@ export class NodeCompRowHeader extends Div {
         if (state.isAdminUser) {
             // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
             let ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
-            children.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
+            verboseChildren.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
         }
 
-        children.push(new Icon({
+        verboseChildren.push(new Icon({
             className: "fa fa-link fa-lg marginRight",
             title: "Show URLs for this node",
             onClick: () => S.render.showNodeUrl(this.node, state)
@@ -90,7 +92,7 @@ export class NodeCompRowHeader extends Div {
 
         // Allow bookmarking any kind of node other than bookmark nodes.
         if (!state.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
-            children.push(new Icon({
+            verboseChildren.push(new Icon({
                 className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
                 onClick: () => S.edit.addBookmark(this.node, state)
@@ -98,7 +100,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (this.showThreadButton) {
-            children.push(new Icon({
+            verboseChildren.push(new Icon({
                 className: "fa fa-th-list fa-lg marginRight",
                 title: "Show Full Thread History",
                 onClick: () => S.srch.showThread(this.node)
@@ -110,7 +112,7 @@ export class NodeCompRowHeader extends Div {
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         if (!this.isBoost && (!publicReadOnly || actPubId)) {
-            children.push(new Icon({
+            verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
                 onClick: () => {
@@ -125,7 +127,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (!this.isBoost) {
-            children.push(new Icon({
+            verboseChildren.push(new Icon({
                 title: "Boost this Node",
                 className: "fa fa-retweet fa-lg marginRight",
                 onClick: () => {
@@ -154,7 +156,7 @@ export class NodeCompRowHeader extends Div {
             });
         }
 
-        children.push(new Icon({
+        verboseChildren.push(new Icon({
             // title: youLiked ? "You Liked this Node!" : "Like this Node",
             title: likeNames ? likeNames : "Like this Node",
             className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
@@ -169,7 +171,7 @@ export class NodeCompRowHeader extends Div {
         }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
 
         if (priority) {
-            children.push(new Span(priority, {
+            verboseChildren.push(new Span(priority, {
                 className: "priorityTag" + priorityVal
             }));
         }
@@ -296,10 +298,24 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (floatUpperRightDiv.hasChildren()) {
-            children.push(floatUpperRightDiv);
-            children.push(new Clearfix());
+            verboseChildren.push(floatUpperRightDiv);
+            verboseChildren.push(new Clearfix());
         }
 
-        this.setChildren(children);
+        if (state.mobileMode) {
+            this.setChildren([...children || [],
+                new CollapsiblePanel("n/a", "n/a", null, verboseChildren, false, (s: boolean) => {
+                    if (s) {
+                        state.expandedHeaderIds.add(this.node.id);
+                    }
+                    else {
+                        state.expandedHeaderIds.delete(this.node.id);
+                    }
+                }, state.expandedHeaderIds.has(this.node.id), "headerInfoButton", "headerInfoDivExpanded", "headerInfoDivCollapsed float-end")
+            ]);
+        }
+        else {
+            this.setChildren(children);
+        }
     }
 }
