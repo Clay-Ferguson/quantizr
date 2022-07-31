@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { getAppState } from "../../AppRedux";
 import { Comp } from "../base/Comp";
 import { Img } from "./Img";
 import { Italic } from "./Italic";
@@ -13,7 +14,8 @@ export class IconButton extends Comp {
     constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-secondary", private toggle: string = "", private imageUrl: string = null) {
         super(attribs);
         this.attribs.type = "button";
-        this.attribs.className = "btn align-middle clickable " + specialClasses;
+        this.attribs.className = "btn align-middle clickable " + specialClasses +
+            (getAppState().mobileMode ? " mobileIconButton" : "");
         this.mergeState({ visible: true });
     }
 

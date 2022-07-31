@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { getAppState } from "../../AppRedux";
 import { MessageDlg } from "../../dlg/MessageDlg";
 import { Comp } from "../base/Comp";
 import { Italic } from "./Italic";
@@ -13,8 +14,9 @@ export class HelpButton extends Comp {
         }
 
         this.attribs.className += " btn " + moreClasses;
+        this.attribs.className += getAppState().mobileMode ? " mobileButton" : "";
         this.attribs.type = "button";
-        this.attribs.onClick = () => { this.openHelpDialog(); };
+        this.attribs.onClick = () => this.openHelpDialog();
     }
 
     openHelpDialog = () => {

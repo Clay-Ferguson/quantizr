@@ -232,8 +232,8 @@ export class NodeCompButtonBar extends Div {
         let timelineButton: Icon = null;
         let nodeFeedButton: Icon = null;
         let upLevelButton: IconButton;
-        let prevButton: IconButton;
-        let nextButton: IconButton;
+        let prevButton: Button;
+        let nextButton: Button;
 
         if (isPageRootNode) {
             if (state.node && this.node.id === state.node.id) {
@@ -249,13 +249,13 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 if (!S.nav.displayingRepositoryRoot(state)) {
-                    prevButton = new IconButton("fa-chevron-circle-left", null, {
-                        onClick: S.nav.navToPrev,
+                    prevButton = new Button(null, S.nav.navToPrev, {
+                        className: "fa fa-chevron-circle-left",
                         title: "Previous Node"
                     });
 
-                    nextButton = new IconButton("fa-chevron-circle-right", null, {
-                        onClick: S.nav.navToNext,
+                    nextButton = new Button(null, S.nav.navToNext, {
+                        className: "fa fa-chevron-circle-right",
                         title: "Next Node"
                     });
                 }

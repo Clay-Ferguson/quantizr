@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { getAppState } from "../../AppRedux";
 import { Comp } from "../base/Comp";
 import { Icon } from "./Icon";
 
@@ -15,6 +16,7 @@ export class Button extends Comp {
         this.attribs.onClick = callback;
         this.attribs.className = this.attribs.className || "";
         this.attribs.className += " btn clickable " + moreClasses;
+        this.attribs.className += getAppState().mobileMode ? " mobileButton" : "";
         this.mergeState<LS>({ text, enabled: true });
     }
 
