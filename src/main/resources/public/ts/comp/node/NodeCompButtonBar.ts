@@ -156,7 +156,7 @@ export class NodeCompButtonBar extends Div {
             let editInsertAllowed = S.edit.isInsertAllowed(this.node, state);
             let isMine = S.props.isMine(this.node, state);
 
-            if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed) {
+            if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed && !isPageRootNode) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     iconclass: "fa fa-plus",
                     nid: this.node.id,
@@ -236,29 +236,27 @@ export class NodeCompButtonBar extends Div {
         let nextButton: Button;
 
         if (isPageRootNode) {
-            if (state.node && this.node.id === state.node.id) {
-                if (S.nav.parentVisibleToUser(state)) {
-                    upLevelButton = new IconButton("fa-folder", "Up", {
-                        nid: this.node.id,
-                        /* For onclick functions I need a new approach for some (not all) where I can get by
-                        with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
-                        directly off the DOM */
-                        onClick: S.nav.navUpLevelClick,
-                        title: "Go to Parent Node"
-                    }, "btn-primary");
-                }
+            if (S.nav.parentVisibleToUser(state)) {
+                upLevelButton = new IconButton("fa-folder", "Up", {
+                    nid: this.node.id,
+                    /* For onclick functions I need a new approach for some (not all) where I can get by
+                    with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
+                    directly off the DOM */
+                    onClick: S.nav.navUpLevelClick,
+                    title: "Go to Parent Node"
+                }, "btn-primary");
+            }
 
-                if (!S.nav.displayingRepositoryRoot(state)) {
-                    prevButton = new Button(null, S.nav.navToPrev, {
-                        className: "fa fa-chevron-circle-left",
-                        title: "Previous Node"
-                    });
+            if (!S.nav.displayingRepositoryRoot(state)) {
+                prevButton = new Button(null, S.nav.navToPrev, {
+                    className: "fa fa-chevron-circle-left",
+                    title: "Previous Node"
+                });
 
-                    nextButton = new Button(null, S.nav.navToNext, {
-                        className: "fa fa-chevron-circle-right",
-                        title: "Next Node"
-                    });
-                }
+                nextButton = new Button(null, S.nav.navToNext, {
+                    className: "fa fa-chevron-circle-right",
+                    title: "Next Node"
+                });
             }
         }
 

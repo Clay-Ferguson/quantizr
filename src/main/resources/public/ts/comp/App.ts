@@ -24,7 +24,7 @@ declare var g_brandingAppName;
 export class App extends Main {
 
     constructor() {
-        super(null, { role: "main" });
+        super(null, { id: "appPanelId", role: "main" });
     }
 
     preRender(): void {
@@ -57,7 +57,8 @@ export class App extends Main {
         else {
             this.setChildren([
                 new Div(null, {
-                    className: "row mainAppRow"
+                    className: "row mainAppRow",
+                    id: "appMainContainer"
                 }, [
                     state.mobileMode ? null : new LeftNavPanel(),
                     new TabPanel(mobileTopBar),
@@ -109,12 +110,12 @@ export class App extends Main {
             let menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: () => S.nav.showMainMenu(state),
                 id: "mainMenu"
-            }, "btn-secondary menuButton", "off");
+            }, "btn-primary menuButton", "off");
 
             let navButton = new IconButton("fa-sitemap", "Nav", {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
-            }, "btn-secondary menuButton", "off");
+            }, "btn-primary menuButton float-end", "off");
 
             // let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
@@ -127,7 +128,7 @@ export class App extends Main {
 
             let loginButton = state.isAnonUser ? new Button("Login", S.user.userLogin, {
                 className: "menuButton"
-            }) : null;
+            }, "btn-primary") : null;
 
             let logo = new Img(this.getId("logo_"), {
                 className: "marginRight smallLogoButton",
@@ -145,7 +146,7 @@ export class App extends Main {
             // });
 
             // let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, navButton]);
         }
         return null;
     }

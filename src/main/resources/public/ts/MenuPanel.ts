@@ -1,7 +1,7 @@
 import { dispatch, getAppState, useAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
-import { Icon } from "./comp/core/Icon";
+import { Tag } from "./comp/core/Tag";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -26,7 +26,7 @@ import { S } from "./Singletons";
 export class MenuPanel extends Div {
     constructor(state: AppState) {
         super(null, {
-            id: "accordion",
+            id: C.ID_MENU,
             role: "tablist",
             className: (state.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
@@ -202,24 +202,26 @@ export class MenuPanel extends Div {
             ? " (" + state.newMessageCount + " new)" : "";
 
         // These options will appear on the RHS for desktop mode
-        if (state.mobileMode) {
-            children.push(new Menu("Feed" + messagesSuffix, [
-                new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
-                new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
-                new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
-                new MenuItemSeparator(),
-                new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
-                // We need to make this a configurable option.
-                // new MenuItem("From Local Users", S.nav.messagesLocal),
-                new MenuItem("Federated", S.nav.messagesFediverse)
-            ], null, this.makeHelpIcon(":menu-feed")));
+        // No longer needed now that we have RHS as popup (NavDlg)
+        // todo-1: eventually we can delete this code but leaving for now.
+        // if (state.mobileMode) {
+        //     children.push(new Menu("Feed" + messagesSuffix, [
+        //         new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
+        //         new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
+        //         new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
+        //         new MenuItemSeparator(),
+        //         new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
+        //         // We need to make this a configurable option.
+        //         // new MenuItem("From Local Users", S.nav.messagesLocal),
+        //         new MenuItem("Federated", S.nav.messagesFediverse)
+        //     ], null, this.makeHelpIcon(":menu-feed")));
 
-            children.push(new Menu("Trending", [
-                new MenuItem("Hashtags", S.nav.showTrendingHashtags),
-                new MenuItem("Mentions", S.nav.showTrendingMentions),
-                new MenuItem("Words", S.nav.showTrendingWords)
-            ]));
-        }
+        //     children.push(new Menu("Trending", [
+        //         new MenuItem("Hashtags", S.nav.showTrendingHashtags),
+        //         new MenuItem("Mentions", S.nav.showTrendingMentions),
+        //         new MenuItem("Words", S.nav.showTrendingWords)
+        //     ]));
+        // }
 
         children.push(new Menu("People", [
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
@@ -507,8 +509,8 @@ export class MenuPanel extends Div {
         this.setChildren(children);
     }
 
-    makeHelpIcon = (nodeName: string): Icon => {
-        return new Icon({
+    makeHelpIcon = (nodeName: string): Tag => {
+        return new Tag("i", {
             className: "fa fa-question-circle fa-lg float-end menuIcon",
             title: "Display Help Information",
             onClick: (event: Event) => {

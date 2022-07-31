@@ -71,7 +71,8 @@ export class FeedView extends AppTab<FeedViewProps> {
                         new TextField({
                             val: this.data.props.searchTextState,
                             placeholder: "Search for...",
-                            enter: S.srch.refreshFeed
+                            enter: S.srch.refreshFeed,
+                            outterClass: "marginBottom"
                         })
                     ]),
                     new IconButton("fa-refresh", "Search", {
@@ -248,6 +249,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
+    // todo-1: this can be modified and used to show indicator on Feed Sub items about which thing is active.
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
         let subHeading = null;
 

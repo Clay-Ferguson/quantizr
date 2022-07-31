@@ -492,7 +492,7 @@ export class EditNodeDlg extends DialogBase {
     createTagsIconButtons = (): Comp => {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
-                onClick: async e => {
+                onClick: async () => {
                     let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue());
                     await dlg.open();
                     this.addTagsToTextField(dlg);

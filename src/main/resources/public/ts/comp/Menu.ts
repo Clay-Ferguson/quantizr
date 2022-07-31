@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { dispatch, useAppState } from "../AppRedux";
 import { Div } from "../comp/core/Div";
+import { Constants as C } from "../Constants";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
@@ -66,7 +67,7 @@ export class Menu extends Comp {
                 className: "accordion-collapse collapse" + (show ? " show" : ""),
                 role: "tabpanel",
                 "aria-labelledby": this.getId("heading"),
-                "data-bs-parent": "#accordion"
+                "data-bs-parent": "#" + C.ID_MENU
             }, [
                 new Div(null, { className: "card-body menuCardBody" }, [
                     new Div(null, { className: "list-group flex-column" },

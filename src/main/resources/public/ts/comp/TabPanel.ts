@@ -30,7 +30,7 @@ export class TabPanel extends Div {
             new Div(null, {
                 className: "row tab-content",
                 role: "main",
-                key: this.attribs.key + "_topdiv"
+                id: "tabPanelContentId"
             }, this.buildTabs(state)),
             !state.mobileMode ? new IconButton("fa-angle-double-up", null, {
                 onClick: () => S.view.scrollAllTop(state),

@@ -1,4 +1,3 @@
-import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
 import { RightNavPanel } from "../comp/RightNavPanel";
 import { Constants as C } from "../Constants";

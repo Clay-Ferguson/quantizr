@@ -12,6 +12,7 @@ export class Constants {
     static ID_LHS = "leftNavPanelId";
     static ID_TAB = "tabPanelId";
     static ID_RHS = "rightNavPanelId";
+    static ID_MENU = "appMainMenuPanelId";
 
     static TAB_MAIN: string = "mainTab";
     static TAB_SEARCH: string = "resultSetView";

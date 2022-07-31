@@ -18,8 +18,8 @@ $scrollBarWidth: 20px;
 
 $mobileHeaderBarHeight: 5em;
 
-$baseBgColor: rgb(32, 34, 36);
-$body-bg: darken($baseBgColor, 7%);
+$baseBgColor: black; // rgb(32, 34, 36);
+$body-bg: black; // darken($baseBgColor, 7%);
 $body-color: white;
 $font-size-base: 1rem !default;
 // $fontSize: 120%;
@@ -141,7 +141,8 @@ td {
     top: 0px;
     left: 0px;
     width: 100%;
-    border-bottom: 3px solid $nodeBorderBottomColor;
+    background-color: $nodeBorderBottomColor; 
+    border-bottom: 1px solid gray;
     height: $mobileHeaderBarHeight;
 }
 
@@ -347,6 +348,7 @@ a {
     cursor: pointer;
     border-radius: 4px;
     padding: 5px;
+    background-color: black;
 }
 
 .leftNavLogoImg {
