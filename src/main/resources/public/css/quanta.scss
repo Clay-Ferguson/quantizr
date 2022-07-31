@@ -795,7 +795,12 @@ Will come back later and study this more. todo-1 */
     padding-right: 15px;
 }
 
-// This padding is what makes room for the '+' buttons on the RHS during editing
+.my-tab-pane-mobile {
+    @extend .my-tab-pane;
+    padding: 0px !important;
+}
+
+// This padding is what makes room for the '+' buttons to the right of the rows during editing
 .my-tab-pane-editmode {
     padding-right: 50px;
 }
