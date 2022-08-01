@@ -60,11 +60,15 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         topChildren.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
-                this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
-                    onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
-                    title: "Back to Node that was the source of this Feed"
-                }, "marginRight") : null,
-                this.renderHeading(state),
+
+                new Div(null, { className: "marginBottom" }, [
+                    this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
+                        onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
+                        title: "Back to Node"
+                    }, "marginRight") : null,
+                    this.renderHeading(state)
+                ]),
+
                 new Div(null, null, [
                     newItems,
                     new TextField({
@@ -81,9 +85,9 @@ export class FeedView extends AppTab<FeedViewProps> {
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {
-                            title: "Bookmark this Chat Room",
-                            onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
-                        }) : null,
+                        title: "Bookmark this Chat Room",
+                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
+                    }) : null,
 
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
                     // new HelpButton(() => state.config?.help?.fediverse?.feed),

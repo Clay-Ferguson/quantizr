@@ -2,34 +2,32 @@
     margin-left: $smallGap;
 }
 
+.nav-link-base {
+    padding: .5rem .5rem .5rem .8rem;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: $border-radius-large;
+}
+
 .nav-tabs {
     border: none;
-    border-radius: 15px;
-    padding: .2rem .2rem .2rem 10px;
+    border-radius: $border-radius-large;
+    padding: .5rem .5rem .5rem .8rem;
 }
 
 .nav-tabs>.nav-item>.nav-link {
-    border: $mediumBorderSize solid transparent; 
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 15px;
-    padding: .2rem .2rem .2rem 10px;
+    @extend .nav-link-base;
+    border: $mediumBorderSize solid transparent;
 }
 
 .nav-tabs>.nav-item>.nav-link:hover {
-    border: $mediumBorderSize solid transparent; 
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 15px;
-    padding: .2rem .2rem .2rem 10px;
+    @extend .nav-link-base;
+    border: $mediumBorderSize solid transparent;
 }
 
 .nav-tabs>.nav-item>.nav-link.active,
 .nav-tabs>.nav-item>.nav-link.active:hover,
 .nav-tabs>.nav-item>.nav-link.active:focus {
-    border: $mediumBorderSize solid $nodeBorderBottomColor; 
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 15px;
-    padding: .2rem .2rem .2rem 10px;
+    @extend .nav-link-base;
+    border: $mediumBorderSize solid $nodeBorderBottomColor;
 }

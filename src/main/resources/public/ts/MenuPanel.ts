@@ -382,8 +382,10 @@ export class MenuPanel extends Div {
         ], null, this.makeHelpIcon(":menu-node-info")));
 
         children.push(new Menu("Settings", [
-            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
-            new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
+            // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)
+            // new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
+            // new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
+
             new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPrefs.nsfw), //
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPrefs.showParents), //
             new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => state.userPrefs.showReplies), //
