@@ -14,6 +14,9 @@ export class Constants {
     static ID_RHS = "rightNavPanelId";
     static ID_MENU = "appMainMenuPanelId";
 
+    static ADMIN_COMMAND_FEDIVERSE = "{{FederatedFeedButton}}";
+    static ADMIN_COMMAND_TRENDING = "{{TrendingHashtagsButton}}";
+
     static TAB_MAIN: string = "mainTab";
     static TAB_SEARCH: string = "resultSetView";
     static TAB_SHARES: string = "sharedNodesResultSetView";

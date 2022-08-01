@@ -18,8 +18,12 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, private appState: AppState) {
+    constructor(public node: J.NodeInfo, appState: AppState) {
         super(null, { key: "ncmkd_" + node.id });
+
+        // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
+        // so that admin nodes can inject scripted content (like buttons with an onClick on them)
+        this.purifyHtml = node.owner !== "admin";
 
         if (!appState.mobileMode) {
             let widthStyle = node.content && node.content.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
@@ -114,9 +118,7 @@ export class NodeCompMarkdown extends Html {
             if (content.indexOf("* " + href) !== -1) return;
 
             // lazy instantiate
-            if (!this.urls) {
-                this.urls = [];
-            }
+            this.urls = this.urls || [];
             this.urls.push(href);
         });
     }

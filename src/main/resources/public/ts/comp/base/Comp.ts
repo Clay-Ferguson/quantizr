@@ -40,7 +40,7 @@ export abstract class Comp implements CompIntf {
     public domRemoveEvent = null;
     public domAddEvent = null;
 
-    // we have the 'target' and 'onclick' here to make our purifier keep those rendered
+    // we have the 'target' here to make our purifier keep those rendered
     // see also: #onclick-security-note
     static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
 

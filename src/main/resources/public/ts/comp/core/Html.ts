@@ -25,6 +25,8 @@ interface LS { // Local State
 }
 
 export class Html extends Comp {
+    public purifyHtml = true;
+
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.setChildren(initialChildren);
@@ -40,7 +42,8 @@ export class Html extends Comp {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
-        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.getState<LS>().content);
+        this.attribs.dangerouslySetInnerHTML = this.purifyHtml ? Comp.getDangerousHtml(this.getState<LS>().content)
+            : { __html: this.getState<LS>().content };
         return this.tag("div");
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to

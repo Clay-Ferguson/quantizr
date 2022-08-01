@@ -50,6 +50,7 @@ export class Render {
 
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
+        val = this.injectCustomButtons(val);
 
         /* These allow us to enter into the markdown things like this:
         [My Link Test]({{url}}?id=:my-test-name)
@@ -101,6 +102,18 @@ export class Render {
             val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, false));
         }
         return val;
+    }
+
+    injectCustomButtons = (val: string): string => {
+        val = this.injectAdminButton(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse Feed");
+        val = this.injectAdminButton(val, C.ADMIN_COMMAND_TRENDING, "Trending Hashtags");
+        return val;
+    }
+
+    injectAdminButton = (val: string, cmd: string, buttonText: string) => {
+        // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
+        let script = "S.util.adminScriptCommand('" + cmd + "');";
+        return val.replace(cmd, `<button class="btn btn-primary marginRight" onClick="${script}">${buttonText}</button>`);
     }
 
     /**

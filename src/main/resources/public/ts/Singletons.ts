@@ -41,4 +41,5 @@ export interface Singletons {
 }
 
 let S: Singletons = {} as any;
+(window as any).S = S;
 export { S };

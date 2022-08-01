@@ -170,7 +170,7 @@ export class Util {
         }
         return hash.toString();
     }
-    
+
     hashOfObject = (obj: Object): string => {
         if (!obj) return "null";
         return this.hashOfString(JSON.stringify(obj));
@@ -1283,7 +1283,7 @@ export class Util {
         if (!node || !state.node || !state.node.children) return;
         let doDispatch = !state;
         state = getAppState(state);
-        
+
         let path = node.path;
         let slashIdx: number = path.lastIndexOf("/");
         if (slashIdx === -1) return;
@@ -1654,6 +1654,19 @@ export class Util {
             S.edit.pendingContent = editorData.content;
             S.edit.pendingContentId = editorData.nodeId;
             S.edit.runEditNode(null, editorData.nodeId, true, false, false, null, null);
+        }
+    }
+
+    adminScriptCommand = (cmd: string) => {
+        switch (cmd) {
+            case C.ADMIN_COMMAND_FEDIVERSE:
+                S.nav.messagesFediverse();
+                break;
+            case C.ADMIN_COMMAND_TRENDING:
+                S.nav.showTrendingHashtags();
+                break;
+            default:
+                break;
         }
     }
 }
