@@ -65,27 +65,25 @@ export class FeedView extends AppTab<FeedViewProps> {
                     title: "Back to Node that was the source of this Feed"
                 }, "marginRight") : null,
                 this.renderHeading(state),
-                new Span(null, { className: "float-end" }, [
+                new Div(null, null, [
                     newItems,
-                    new Span(null, { className: "feedSearchField" }, [
-                        new TextField({
-                            val: this.data.props.searchTextState,
-                            placeholder: "Search for...",
-                            enter: S.srch.refreshFeed,
-                            outterClass: "marginBottom"
-                        })
-                    ]),
+                    new TextField({
+                        val: this.data.props.searchTextState,
+                        placeholder: "Search for...",
+                        enter: S.srch.refreshFeed,
+                        outterClass: "marginBottom feedSearchField"
+                    }),
                     new IconButton("fa-refresh", "Search", {
-                        onClick: () => S.srch.refreshFeed(),
+                        onClick: S.srch.refreshFeed,
                         title: "Refresh"
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {
-                        title: "Bookmark this Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
-                    }) : null,
+                            title: "Bookmark this Chat Room",
+                            onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
+                        }) : null,
 
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
                     // new HelpButton(() => state.config?.help?.fediverse?.feed),
@@ -93,7 +91,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, false, null, null, null, null, null, true, state), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "attentionButton")
+                    }, "attentionButton float-end")
                 ]),
                 new Clearfix()
             ]),

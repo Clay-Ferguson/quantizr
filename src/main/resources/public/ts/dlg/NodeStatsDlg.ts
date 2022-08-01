@@ -20,11 +20,13 @@ export class NodeStatsDlg extends DialogBase {
 
     renderDlg = (): CompIntf[] => {
         let tagPanel = new Div(null, { className: "wordStatsArea" });
+        let state = getAppState();
+        
         if (this.res.topTags?.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags"));
             this.res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
@@ -36,7 +38,7 @@ export class NodeStatsDlg extends DialogBase {
             mentionPanel.addChild(new Heading(4, "Mentions"));
             this.res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
@@ -48,7 +50,7 @@ export class NodeStatsDlg extends DialogBase {
             wordPanel.addChild(new Heading(4, "Words"));
             this.res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: this.searchWord
                 }));

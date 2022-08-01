@@ -24,7 +24,7 @@ export class FullScreenControlBar extends Div {
             if (S.nav.getAdjacentNode("prev", state)) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: e => { S.nav.prevFullScreenImgViewer(state); },
+                        onClick: () => { S.nav.prevFullScreenImgViewer(state); },
                         title: "View Previous Node (or left arrow key)"
                     }, "btn-primary", "off"));
             }
@@ -32,7 +32,7 @@ export class FullScreenControlBar extends Div {
             if (S.nav.getAdjacentNode("next", state)) {
                 buttons.push(
                     new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: e => { S.nav.nextFullScreenImgViewer(state); },
+                        onClick: () => { S.nav.nextFullScreenImgViewer(state); },
                         title: "View Next Node (or right arrow key)"
                     }, "btn-primary", "off"));
             }
@@ -40,7 +40,7 @@ export class FullScreenControlBar extends Div {
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
-                onClick: e => { S.nav.closeFullScreenViewer(state); },
+                onClick: () => { S.nav.closeFullScreenViewer(state); },
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 

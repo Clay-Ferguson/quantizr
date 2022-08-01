@@ -98,6 +98,8 @@ export class Edit {
 
     public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction, state: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
+            if (state.mobileMode) forceUsePopup = true;
+
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, state);
@@ -113,10 +115,10 @@ export class Edit {
 
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */
-                if (!forceUsePopup && S.quanta.activeTab === C.TAB_FEED) {
+                if (!editInPopup && S.quanta.activeTab === C.TAB_FEED) {
                     dispatch("StartEditingInFeed", s => {
                         s.editNodeReplyToId = replyToId;
-                        s.editNodeOnTab = S.quanta.activeTab;
+                        s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
                         s.editNode = res.nodeInfo;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
@@ -131,7 +133,7 @@ export class Edit {
                 } else {
                     dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
-                        s.editNodeOnTab = S.quanta.activeTab;
+                        s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                         return s;

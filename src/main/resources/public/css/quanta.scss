@@ -220,7 +220,7 @@ $mobileHeaderHeight: 3.5em;
 
 .statsWordMobile {
     @extend .statsWord;
-    padding: 12px;
+    padding: 8px;
 }
 
 .wordStatsArea {
@@ -822,7 +822,7 @@ Will come back later and study this more. todo-1 */
 
 .tabPanelMobile {
     height: 100%;
-    padding-left: 6px;
+    padding-left: 0px;
     padding-right: 0px;
     padding-top: $mobileHeaderBarHeight;
 }

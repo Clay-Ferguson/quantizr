@@ -69,7 +69,7 @@ export class TrendingView extends AppTab {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle" }));
             res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: this.searchWord
                 }));
@@ -81,7 +81,7 @@ export class TrendingView extends AppTab {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle" }));
             res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: this.searchWord
                 }));
@@ -93,7 +93,7 @@ export class TrendingView extends AppTab {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle" }));
             res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
-                    className: "statsWord",
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: this.searchWord
                 }));

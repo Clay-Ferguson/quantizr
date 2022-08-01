@@ -67,7 +67,7 @@ export class App extends Main {
 
                 // I don't like this clutter. Leaving as an example for now.
                 // new IconButton("fa-angle-double-up", null, {
-                //     onClick: e => {
+                //     onClick: () => {
                 //         S.view.scrollAllTop(state);
                 //     },
                 //     title: "Scroll to Top"
@@ -141,7 +141,7 @@ export class App extends Main {
             //     ? " (" + state.newMessageCount + ")" : "";
             // let appName = new Span(g_brandingAppName + messagesSuffix, {
             //     className: "logo-text",
-            //     onClick: e => { S.util.loadAnonPageHome(null); },
+            //     onClick: () => { S.util.loadAnonPageHome(null); },
             //     title: "Go to Portal Home Node"
             // });
 
