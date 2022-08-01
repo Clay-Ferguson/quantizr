@@ -83,10 +83,10 @@
 .menuHeading:hover {
     background-color: $menuItemHoverBackgroundColor;
     border-radius: 0px;
+    border: 1px solid gray;
 }
 
-// todo-0: this works but is "true" with quotes the 'correct' way here?
-.menuHeading[aria-expanded=true] {
+.menuHeading[aria-expanded="true"] {
     background-color: $secondary;
     border-radius: 0px;
     border: 1px solid gray;
