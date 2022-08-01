@@ -117,16 +117,17 @@ export class FeedView extends AppTab<FeedViewProps> {
             }));
         }
 
-        if (!state.userPrefs.nsfw) {
-            topChildren.push(new Div("[Show Sensitive Content]", {
-                className: "clickable",
-                onClick: async () => {
-                    await S.edit.toggleNsfw(state);
-                    S.srch.refreshFeed();
-                }
-            }));
-            topChildren.push(new Clearfix());
-        }
+        // DO NOT DELETE, Leave for future use, but for now this isn't worth the space it takes up and is even to small to easily click.
+        // if (!state.userPrefs.nsfw) {
+        //     topChildren.push(new Div("[Show Sensitive Content]", {
+        //         className: "clickable",
+        //         onClick: async () => {
+        //             await S.edit.toggleNsfw(state);
+        //             S.srch.refreshFeed();
+        //         }
+        //     }));
+        //     topChildren.push(new Clearfix());
+        // }
 
         let children: Comp[] = [];
         children.push(new Div(null, { className: "tinyMarginBottom" }, topChildren));

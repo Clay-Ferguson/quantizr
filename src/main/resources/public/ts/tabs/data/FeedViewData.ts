@@ -50,16 +50,15 @@ export class FeedViewData implements TabIntf {
                 ]) : null;
         }
         else {
-            return !state.isAnonUser
-                ? new Div(null, { className: "tabSubOptions" }, [
-                    new AppNavLink("To/From Me", S.nav.messagesToFromMe),
-                    new AppNavLink("To Me", S.nav.messagesToMe),
-                    new AppNavLink("From Me", S.nav.messagesFromMe),
-                    new AppNavLink("From Friends", S.nav.messagesFromFriends),
-                    // We need to make this a configurable option.
-                    // new MenuItem("From Local Users", S.nav.messagesLocal),
-                    new AppNavLink("Federated", S.nav.messagesFediverse)
-                ]) : null;
+            return new Div(null, { className: "tabSubOptions" }, [
+                state.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
+                state.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
+                state.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
+                state.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
+                // We need to make this a configurable option.
+                // new MenuItem("From Local Users", S.nav.messagesLocal),
+                new AppNavLink("Federated", S.nav.messagesFediverse)
+            ]);
         }
     };
 }
