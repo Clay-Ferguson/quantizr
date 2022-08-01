@@ -132,7 +132,7 @@ export class RightNavPanel extends Div {
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
                     !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
-                    
+
                     // Not showing login on this panel in mobileMode, because it's shown at top of page instead
                     state.isAnonUser && !state.mobileMode ? new Div("Login / Signup", {
                         className: "signupLinkText",
@@ -167,14 +167,14 @@ export class RightNavPanel extends Div {
                     // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
                         className: "clickable",
-                        onClick: () => { 
+                        onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel, "immediate");
-                            new UserProfileDlg(null).open(); 
+                            new UserProfileDlg(null).open();
                         }
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    new TabPanelButtons(true, "rhsMenu")
+                    new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu")
                 ]),
 
                 // note: Anonymouse users don't have nodeHistory
