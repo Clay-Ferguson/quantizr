@@ -83,10 +83,7 @@ export abstract class Comp implements CompIntf {
 
     private setId(id: string) {
         this.attribs.id = id;
-
-        if (!this.attribs.key) {
-            this.attribs.key = id;
-        }
+        this.attribs.key = this.attribs.key || id;
     }
 
     getCompClass = (): string => {
@@ -113,10 +110,7 @@ export abstract class Comp implements CompIntf {
         }
 
         // queue up the 'func' to be called once the domAddEvent gets executed.
-        if (!this.domAddFuncs) {
-            this.domAddFuncs = [];
-        }
-
+        this.domAddFuncs = this.domAddFuncs || [];
         this.domAddFuncs.push(func);
     }
 
@@ -126,25 +120,19 @@ export abstract class Comp implements CompIntf {
 
     insertFirstChild(comp: CompIntf): void {
         if (!comp) return;
-        if (!this.children) {
-            this.children = [];
-        }
+        this.children = this.children || [];
         this.children.unshift(comp);
     }
 
     addChild(comp: CompIntf): void {
         if (!comp) return;
-        if (!this.children) {
-            this.children = [];
-        }
+        this.children = this.children || [];
         this.children.push(comp);
     }
 
     addChildren(comps: Comp[]): void {
         if (!comps || comps.length === 0) return;
-        if (!this.children) {
-            this.children = [];
-        }
+        this.children = this.children || [];
         this.children.push.apply(this.children, comps);
     }
 
@@ -176,9 +164,7 @@ export abstract class Comp implements CompIntf {
 
     /* Attaches a react element directly to the dom at the DOM id specified. */
     updateDOM(store: any = null, id: string = null) {
-        if (!id) {
-            id = this.getId();
-        }
+        id = id || this.getId();
 
         // We call getElm here out of paranoia, but it's not needed. There are no places in our code where
         // we call into here when the element doesn't already exist.
@@ -336,7 +322,7 @@ export abstract class Comp implements CompIntf {
                 if (!this.mounted) {
                     this.mounted = true;
                     // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
-                    this.domAdd(); // call non-overridable method.
+                    this.domAdd(); 
                     if (this.domAddEvent) this.domAddEvent(); // call overridable method.
 
                     if (this.getScrollPos() !== null) {
@@ -396,8 +382,7 @@ export abstract class Comp implements CompIntf {
         return stack;
     }
 
-    // leave NON-Arrow function to support calling thru 'super'
-    domAdd = (): void => {
+    private domAdd = (): void => {
         // console.log("domAddEvent: " + this.jsClassName);
         let elm: HTMLElement = this.getRef();
         if (!elm) {
