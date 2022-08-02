@@ -115,7 +115,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 comps.push(new Div(null, { className: (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row") }, [
                     insertButton = new Button(null, e => {
                         if (lastNode) {
-                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                            S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
                         }
                         else {
                             S.edit.newSubNode(null, state.node.id);
@@ -135,7 +135,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         if (d.kind === "file") {
                             EditNodeDlg.pendingUploadFile = data[i].getAsFile();
                             if (lastNode) {
-                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                                S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
                             }
                             else {
                                 S.edit.newSubNode(null, state.node.id);

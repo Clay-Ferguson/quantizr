@@ -120,7 +120,7 @@ export class NodeCompTableRowLayout extends Div {
 
                 children.push(new Button(null, e => {
                     if (lastNode) {
-                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
                     } else {
                         S.edit.newSubNode(null, state.node.id);
                     }

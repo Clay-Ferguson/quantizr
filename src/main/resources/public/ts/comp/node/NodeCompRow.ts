@@ -87,7 +87,7 @@ export class NodeCompRow extends Div {
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     insertButton = new Button(null, () => {
-                        S.edit.insertNode(this.node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                        S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, state);
                     }, {
                         iconclass: "fa fa-plus",
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
@@ -102,7 +102,7 @@ export class NodeCompRow extends Div {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                         if (d.kind === "file") {
                             EditNodeDlg.pendingUploadFile = data[i].getAsFile();
-                            S.edit.insertNode(this.node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                            S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, state);
                             return;
                         }
                     }

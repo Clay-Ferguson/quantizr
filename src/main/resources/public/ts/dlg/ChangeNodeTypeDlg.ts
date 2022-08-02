@@ -6,7 +6,7 @@ import { Div } from "../comp/core/Div";
 import { NodeTypeListBox } from "../comp/NodeTypeListBox";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
-
+import * as J from "../JavaIntf";
 interface LS { // Local State
     selType: string;
 }
@@ -26,7 +26,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
             getValue: (): string => this.getState<LS>().selType
         };
 
-        this.mergeState<LS>({ selType: curType || "u" });
+        this.mergeState<LS>({ selType: curType || J.NodeType.NONE });
     }
 
     renderDlg(): CompIntf[] {

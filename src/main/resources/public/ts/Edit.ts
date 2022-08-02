@@ -261,7 +261,7 @@ export class Edit {
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                     newNodeName: "",
-                    typeName: typeName || "u",
+                    typeName: typeName || J.NodeType.NONE,
                     initialValue: clipboardText
                 });
                 if (blob) {
@@ -272,7 +272,7 @@ export class Edit {
                     pendingEdit: false,
                     nodeId: parentNode.id,
                     newNodeName: "",
-                    typeName: typeName || "u",
+                    typeName: typeName || J.NodeType.NONE,
                     createAtTop,
                     content: clipboardText,
                     typeLock: false,
@@ -298,7 +298,7 @@ export class Edit {
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                     newNodeName: "",
-                    typeName: typeName || "u",
+                    typeName: typeName || J.NodeType.NONE,
                     initialValue: ""
                 });
                 this.insertNodeResponse(res, state);
@@ -307,7 +307,7 @@ export class Edit {
                     pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
-                    typeName: typeName || "u",
+                    typeName: typeName || J.NodeType.NONE,
                     createAtTop,
                     content: null,
                     typeLock: false,
@@ -997,7 +997,7 @@ export class Edit {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
-            typeName: "u",
+            typeName: J.NodeType.NONE,
             createAtTop: true,
             content: clipText,
             typeLock: false,
