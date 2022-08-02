@@ -58,10 +58,10 @@ help:
         
         ```
         var sum = 2 + 3;
-        qc.log("Hello world!");
-        qc.log("Two plus Three equals "+sum);
+        q.log("Hello world!");
+        q.log("Two plus Three equals "+sum);
         ```
-        The 'qc.log' function is automatically available.
+        The 'q.log' function is automatically available.
 
     friend:    
       editor: |
