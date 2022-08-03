@@ -7,14 +7,17 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class LoadNodeFromIpfsDlg extends DialogBase {
 
-    ipfsPathState: ValidatedState<any> = new ValidatedState<any>();
+    ipfsPathState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor() {
         super("Load from IPFS", "app-modal-content-narrow-width");
+        this.validatedStates = [this.ipfsPathState];
     }
 
     renderDlg(): CompIntf[] {
@@ -29,19 +32,6 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.ipfsPathState.getValue()) {
-            this.ipfsPathState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.ipfsPathState.setError(null);
-        }
-        return valid;
     }
 
     load = async () => {

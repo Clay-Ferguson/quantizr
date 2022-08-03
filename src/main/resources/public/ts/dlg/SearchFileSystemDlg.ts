@@ -9,31 +9,20 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class SearchFileSystemDlg extends DialogBase {
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor() {
         super("Search File System");
         this.onMount((elm: HTMLElement) => this.searchTextField?.focus());
         this.searchTextState.setValue(SearchFileSystemDlg.defaultSearchText);
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchTextState.setError(null);
-        }
-
-        return valid;
+        this.validatedStates = [this.searchTextState];
     }
 
     renderDlg(): CompIntf[] {

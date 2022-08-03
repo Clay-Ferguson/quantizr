@@ -39,10 +39,6 @@ export class SearchUsersDlg extends DialogBase {
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
 
-    validate = (): boolean => {
-        return true;
-    }
-
     renderDlg(): CompIntf[] {
         let adminOptions = new RadioButtonGroup([
             getAppState().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {

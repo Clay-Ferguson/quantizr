@@ -1,3 +1,4 @@
+import { ValidationError } from "webpack";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -7,17 +8,21 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 import { MessageDlg } from "./MessageDlg";
 
 export class ChangePasswordDlg extends DialogBase {
 
     passwordField: TextField;
-    pwdState: ValidatedState<any> = new ValidatedState<any>();
+    pwdState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED },
+        { name: ValidatorRuleName.MINLEN, payload: 4 }
+    ]);
 
     constructor(private passCode: string) {
         super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width");
         this.onMount((elm: HTMLElement) => this.passwordField?.focus());
+        this.validatedStates = [this.pwdState];
     }
 
     renderDlg(): CompIntf[] {
@@ -35,20 +40,6 @@ export class ChangePasswordDlg extends DialogBase {
         ];
     }
 
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.pwdState.getValue()) {
-            this.pwdState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.pwdState.setError(null);
-        }
-
-        return valid;
-    }
-
     /*
      * If the user is doing a "Reset Password" we will have a non-null passCode here, and we simply send this to the server
      * where it will validate the passCode, and if it's valid use it to perform the correct password change on the correct
@@ -59,16 +50,11 @@ export class ChangePasswordDlg extends DialogBase {
             return;
         }
         let pwd = this.pwdState.getValue();
-
-        if (pwd?.length >= 4) {
-            let res = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
-                newPassword: pwd,
-                passCode: this.passCode
-            });
-            this.changePasswordResponse(res);
-        } else {
-            S.util.showMessage("Invalid password(s).", "Warning");
-        }
+        let res = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
+            newPassword: pwd,
+            passCode: this.passCode
+        });
+        this.changePasswordResponse(res);
     }
 
     changePasswordResponse = (res: J.ChangePasswordResponse) => {

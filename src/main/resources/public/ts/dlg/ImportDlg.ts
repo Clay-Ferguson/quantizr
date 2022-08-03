@@ -6,14 +6,17 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 import { MessageDlg } from "./MessageDlg";
 
 export class ImportDlg extends DialogBase {
-    fileNameState: ValidatedState<any> = new ValidatedState<any>();
+    fileNameState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor() {
         super("Import from XML");
+        this.validatedStates = [this.fileNameState];
     }
 
     renderDlg(): CompIntf[] {
@@ -24,18 +27,6 @@ export class ImportDlg extends DialogBase {
                 new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-        if (!this.fileNameState.getValue()) {
-            this.fileNameState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.fileNameState.setError(null);
-        }
-        return valid;
     }
 
     importNodes = async () => {
@@ -54,7 +45,6 @@ export class ImportDlg extends DialogBase {
             sourceFileName: this.fileNameState.getValue()
         });
         this.importResponse(res);
-
         this.close();
     }
 

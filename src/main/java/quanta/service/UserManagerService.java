@@ -1074,7 +1074,6 @@ public class UserManagerService extends ServiceBase {
 	public ResetPasswordResponse resetPassword(ResetPasswordRequest req) {
 		ResetPasswordResponse res = new ResetPasswordResponse();
 		arun.run(ms -> {
-
 			String user = req.getUser();
 			String email = req.getEmail();
 

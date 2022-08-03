@@ -7,7 +7,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 interface LS { // Local State
     user: string;
@@ -15,12 +15,13 @@ interface LS { // Local State
 
 export class ResetPasswordDlg extends DialogBase {
 
-    userState: ValidatedState<any> = new ValidatedState<any>();
-    emailState: ValidatedState<any> = new ValidatedState<any>();
+    userState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    emailState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor(user: string) {
         super("Reset Password", "app-modal-content-narrow-width");
         this.mergeState<LS>({ user });
+        this.validatedStates = [this.userState, this.emailState];
     }
 
     renderDlg(): CompIntf[] {
@@ -35,34 +36,6 @@ export class ResetPasswordDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.userState.getValue()) {
-            this.userState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            if (this.userState.getValue().trim().toLowerCase() === "admin") {
-                valid = false;
-                this.userState.setError("Invalid use name");
-            }
-            else {
-                this.userState.setError(null);
-            }
-        }
-
-        if (!this.emailState.getValue()) {
-            this.emailState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.emailState.setError(null);
-        }
-
-        return valid;
     }
 
     resetPassword = async () => {

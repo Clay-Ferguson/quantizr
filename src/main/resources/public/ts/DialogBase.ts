@@ -9,6 +9,7 @@ import { Span } from "./comp/core/Span";
 import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
 import { S } from "./Singletons";
+import { ValidatedState } from "./ValidatedState";
 
 export abstract class DialogBase extends Div implements DialogBaseImpl {
 
@@ -28,6 +29,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     /* this is a slight hack so we can ignore 'close()' calls that are bogus, and doesn't apply to the EMBED mode */
     opened: boolean = false;
     loaded: boolean = false;
+
+    validatedStates: ValidatedState<any>[] = null;
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
@@ -206,18 +209,18 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         if (useTitle === "[none]") useTitle = null;
 
         let titleChildren: CompIntf[] = [this.getTitleIconComp(),
-            useTitle ? new Span(useTitle) : null,
-            ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
-            new Div(null, { className: "app-modal-title-close-icon float-end" }, [
-                new Icon({
-                    className: "fa fa-times fa-lg",
-                    onClick: () => {
-                        this.closeByUser();
-                        this.close();
-                    },
-                    title: "Close Dialog"
-                })
-            ])
+        useTitle ? new Span(useTitle) : null,
+        ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
+        new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+            new Icon({
+                className: "fa fa-times fa-lg",
+                onClick: () => {
+                    this.closeByUser();
+                    this.close();
+                },
+                title: "Close Dialog"
+            })
+        ])
         ];
 
         this.setChildren([
@@ -227,5 +230,14 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 titleChildren) : null,
             new Div(null, null, this.renderDlg())
         ]);
+    }
+
+    validate = (): boolean => {
+        if (!this.validatedStates) return;
+        let valid = true;
+        this.validatedStates.forEach(vs => {
+            if (!vs.validate()) valid = false;
+        });
+        return valid;
     }
 }

@@ -7,38 +7,23 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class UploadFromIPFSDlg extends DialogBase {
     static storeLocally: boolean = false;
     uploadButton: Button;
-    cidState: ValidatedState<any> = new ValidatedState<any>();
-    mimeState: ValidatedState<any> = new ValidatedState<any>();
+    
+    cidState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
+
+    mimeState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor(private nodeId: string, private cid: string, private onUploadFunc: Function) {
         super("Upload File");
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.cidState.getValue()) {
-            this.cidState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.cidState.setError(null);
-        }
-
-        if (!this.mimeState.getValue()) {
-            this.mimeState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.mimeState.setError(null);
-        }
-
-        return valid;
+        this.validatedStates = [this.cidState, this.mimeState];
     }
 
     renderDlg(): CompIntf[] {

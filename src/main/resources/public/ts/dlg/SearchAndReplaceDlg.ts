@@ -9,7 +9,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 interface LS { // Local State
     recursive: boolean;
@@ -17,12 +17,13 @@ interface LS { // Local State
 
 export class SearchAndReplaceDlg extends DialogBase {
 
-    searchState: ValidatedState<any> = new ValidatedState<any>();
-    replaceState: ValidatedState<any> = new ValidatedState<any>();
+    searchState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    replaceState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Search and Replace", "app-modal-content-narrow-width");
         this.mergeState<LS>({ recursive: true });
+        this.validatedStates = [this.searchState, this.replaceState];
     }
 
     renderDlg(): CompIntf[] {
@@ -42,28 +43,6 @@ export class SearchAndReplaceDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.searchState.getValue()) {
-            this.searchState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchState.setError(null);
-        }
-
-        if (!this.replaceState.getValue()) {
-            this.replaceState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.replaceState.setError(null);
-        }
-
-        return valid;
     }
 
     replace = () => {

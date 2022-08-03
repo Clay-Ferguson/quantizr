@@ -8,31 +8,32 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class ShareToPersonDlg extends DialogBase {
 
-    userNameState: ValidatedState<any> = new ValidatedState<any>();
+    userNameState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor(private node: J.NodeInfo, private sharedNodeFunc: Function) {
         super("Share Node to Person", "app-modal-content-medium-width");
+        this.validatedStates = [this.userNameState];
     }
 
+    super_validate = this.validate;
     validate = (): boolean => {
-        let valid = true;
+        if (!this.super_validate()) return false;
 
-        if (!this.userNameState.getValue()) {
-            this.userNameState.setError("Cannot be empty.");
+        let valid = true;
+        if (this.userNameState.getValue() === getAppState().userName) {
+            this.userNameState.setError("You can't share a node to yourself.");
             valid = false;
         }
         else {
-            if (this.userNameState.getValue() === getAppState().userName) {
-                this.userNameState.setError("You can't share a node to yourself.");
-                valid = false;
-            }
-            else {
-                this.userNameState.setError(null);
-            }
+            // todo-0: does our new architecture account for clearing error messages like this in all cases?
+            // or does the react re-render clean it up by having all new objects?
+            this.userNameState.setError(null);
         }
 
         return valid;

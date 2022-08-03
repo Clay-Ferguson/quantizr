@@ -8,29 +8,19 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class UploadFromUrlDlg extends DialogBase {
 
     static storeLocally: boolean = false;
-    urlState: ValidatedState<any> = new ValidatedState<any>();
+
+    urlState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor(private nodeId: string, private url: string, private onUploadFunc: Function) {
         super("Upload File");
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.urlState.getValue()) {
-            this.urlState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.urlState.setError(null);
-        }
-
-        return valid;
+        this.validatedStates = [this.urlState];
     }
 
     renderDlg(): CompIntf[] {

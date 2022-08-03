@@ -6,32 +6,21 @@ import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class SearchByIDDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor() {
         super("Search for Node ID", "app-modal-content-medium-width");
         this.onMount((elm: HTMLElement) => this.searchTextField?.focus());
         this.searchTextState.setValue(SearchByIDDlg.defaultSearchText);
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchTextState.setError(null);
-        }
-
-        return valid;
+        this.validatedStates = [this.searchTextState];
     }
 
     renderDlg(): CompIntf[] {

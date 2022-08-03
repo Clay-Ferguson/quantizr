@@ -6,17 +6,20 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 /*
  * Property Editor Dialog (Edits Node Properties)
  */
 export class EditPropertyDlg extends DialogBase {
 
-    nameState: ValidatedState<any> = new ValidatedState<any>();
+    nameState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     constructor(private editNode: J.NodeInfo) {
         super("New Property", "app-modal-content-narrow-width");
+        this.validatedStates = [this.nameState];
     }
 
     renderDlg(): CompIntf[] {
@@ -29,19 +32,6 @@ export class EditPropertyDlg extends DialogBase {
                 new Button("Cancel", this.close)
             ], "marginTop")
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.nameState.getValue()) {
-            this.nameState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.nameState.setError(null);
-        }
-        return valid;
     }
 
     save = () => {

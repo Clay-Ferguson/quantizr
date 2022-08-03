@@ -9,16 +9,17 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
 export class LoginDlg extends DialogBase {
-    userState: ValidatedState<any> = new ValidatedState<any>();
-    pwdState: ValidatedState<any> = new ValidatedState<any>();
+    userState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    pwdState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Login", "app-modal-content-narrow-width");
+        this.validatedStates = [this.userState, this.pwdState];
     }
 
     renderDlg(): CompIntf[] {
@@ -36,27 +37,6 @@ export class LoginDlg extends DialogBase {
                 new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.userState.getValue()) {
-            this.userState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.userState.setError(null);
-        }
-
-        if (!this.pwdState.getValue()) {
-            this.pwdState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.pwdState.setError(null);
-        }
-        return valid;
     }
 
     preLoad = async () => {
@@ -100,7 +80,6 @@ export class LoginDlg extends DialogBase {
         }
 
         let pwd = this.pwdState.getValue();
-
         if (usr && pwd) {
             let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,

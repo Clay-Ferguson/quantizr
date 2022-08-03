@@ -9,19 +9,23 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 interface LS { // Local State
     recursive?: boolean;
 }
 
 export class TransferNodeDlg extends DialogBase {
-    toUserState: ValidatedState<any> = new ValidatedState<any>();
+    toUserState: ValidatedState<any> = new ValidatedState<any>("", [
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
+    
     fromUserState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor() {
         super("Transfer Node", "app-modal-content-narrow-width");
         this.mergeState<LS>({ recursive: false });
+        this.validatedStates = [this.toUserState];
     }
 
     renderDlg(): CompIntf[] {
@@ -44,19 +48,6 @@ export class TransferNodeDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
-    }
-
-    validate = (): boolean => {
-        let valid = true;
-
-        if (!this.toUserState.getValue()) {
-            this.toUserState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.toUserState.setError(null);
-        }
-        return valid;
     }
 
     transfer = async () => {
