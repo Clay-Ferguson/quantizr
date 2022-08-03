@@ -30,40 +30,34 @@ export class NodeCompBinary extends Div {
         if (!node) return null;
         let src: string = S.attachment.getUrlForNodeAttachment(node, false);
 
-        let imgSize = "";
+        let size = "";
         if (this.isFullScreenEmbed) {
-            imgSize = state.fullScreenImageSize;
+            size = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            imgSize = "150px";
+            size = "150px";
         }
         else {
-            imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
+            size = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
 
-        if (!imgSize || imgSize === "0") {
+        if (!size || size === "0") {
             style.maxWidth = "";
             style.width = "";
         }
         else {
-            imgSize = imgSize.trim();
+            size = size.trim();
 
             // for backwards compatability if no units are given assume percent
-            if (!imgSize.endsWith("%") && !imgSize.endsWith("px")) {
-                imgSize += "%";
+            if (!size.endsWith("%") && !size.endsWith("px")) {
+                size += "%";
             }
-            style.maxWidth = `calc(${imgSize} - 24px)`;
-            style.width = `calc(${imgSize} - 24px)`;
+            style.maxWidth = `calc(${size} - 24px)`;
+            style.width = `calc(${size} - 24px)`;
         }
 
-        let className = null;
-        if (this.isFullScreenEmbed) {
-            className = "full-screen-img";
-        }
-        else {
-            className = this.isEditorEmbed ? "img-in-editor" : "img-in-row";
-        }
+        let className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
 
         return new Img(node.id, {
             src,

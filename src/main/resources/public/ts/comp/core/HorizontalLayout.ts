@@ -14,9 +14,6 @@ export class HorizontalLayout extends Comp {
         if (this.comps) {
             for (let comp of this.comps) {
                 if (!comp) continue;
-                if (!comp.attribs) {
-                    comp.attribs = {};
-                }
 
                 if (!comp.attribs.className) {
                     comp.attribs.className = "displayCell";
