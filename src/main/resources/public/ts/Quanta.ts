@@ -24,7 +24,9 @@ export class Quanta {
     appInitialized: boolean = false;
     curUrlPath: string = window.location.pathname + window.location.search;
 
+    // This holds the currently highlighted node (the val) for the given page parent node (the key)
     parentIdToFocusNodeMap: Map<string, string> = new Map<string, string>();
+
     curHighlightNodeCompRow: CompIntf = null;
 
     private static lastKeyDownTime: number = 0;

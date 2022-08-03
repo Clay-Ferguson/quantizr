@@ -48,6 +48,7 @@ export class AppState {
     displayName: string = "";
 
     node: J.NodeInfo;
+    highlightNodeId: string = null;
     endReached: boolean;
 
     /* Node Ids to move */

@@ -57,7 +57,7 @@ export class Menu extends Comp {
                         }
                         // we need a pub-sub call that can force the ENTIRE menu panel to refresh.
                         this.mergeState({ expanded });
-                    }, 250);
+                    }, 200);
                 }
             }
                 , [appState.activeMenu === this.name ? this.floatRightComp : null]),

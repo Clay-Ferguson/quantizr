@@ -191,63 +191,59 @@ export class View {
         }
     }
 
-    // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
-    scrollRelativeToNode = (dir: string, state: AppState) => {
-        const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        if (!currentSelNode) return;
+    // NOTE: Method not still being used. Let's keep it for future reference
+    // scrollRelativeToNode = (dir: string, state: AppState) => {
+    //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+    //     if (!currentSelNode) return;
 
-        let newNode: J.NodeInfo = null;
+    //     let newNode: J.NodeInfo = null;
 
-        // First detect if page root node is selected, before doing a child search
-        if (currentSelNode.id === state.node.id) {
-            // if going down that means first child node.
-            if (dir === "down" && state.node.children && state.node.children.length > 0) {
-                S.nodeUtil.highlightNode(state.node.children[0], true, state);
-            }
-            else if (dir === "up") {
-                S.nav.navUpLevel(false);
-            }
-        }
-        else if (state.node.children && state.node.children.length > 0) {
-            let prevChild = null;
-            let nodeFound = false;
+    //     // First detect if page root node is selected, before doing a child search
+    //     if (currentSelNode.id === state.node.id) {
+    //         // if going down that means first child node.
+    //         if (dir === "down" && state.node.children?.length > 0) {
+    //             newNode = state.node.children[0];
+    //         }
+    //         else if (dir === "up") {
+    //             S.nav.navUpLevel(false);
+    //         }
+    //     }
+    //     else if (state.node.children && state.node.children.length > 0) {
+    //         let prevChild = null;
+    //         let nodeFound = false;
 
-            state.node.children.some((child: J.NodeInfo) => {
-                let ret = false;
+    //         state.node.children.some((child: J.NodeInfo) => {
+    //             let ret = false;
 
-                if (nodeFound && dir === "down") {
-                    ret = true;
-                    newNode = child;
-                    S.nodeUtil.highlightNode(child, true, state);
-                }
+    //             if (nodeFound && dir === "down") {
+    //                 ret = true;
+    //                 newNode = child;
+    //                 S.nodeUtil.highlightNode(child, true, state);
+    //             }
 
-                if (child.id === currentSelNode.id) {
-                    if (dir === "up") {
-                        if (prevChild) {
-                            ret = true;
-                            newNode = prevChild;
-                            S.nodeUtil.highlightNode(prevChild, true, state);
-                        }
-                        else {
-                            newNode = state.node;
-                            S.nodeUtil.highlightNode(state.node, true, state);
-                        }
-                    }
-                    nodeFound = true;
-                }
-                prevChild = child;
-
-                // NOTE: returning true stops the iteration.
-                return ret;
-            });
-        }
-
-        if (newNode) {
-            dispatch("FastRefresh", s => {
-                return s;
-            });
-        }
-    }
+    //             if (child.id === currentSelNode.id) {
+    //                 if (dir === "up") {
+    //                     if (prevChild) {
+    //                         ret = true;
+    //                         newNode = prevChild;
+    //                     }
+    //                     else {
+    //                         newNode = state.node;
+    //                     }
+    //                 }
+    //                 nodeFound = true;
+    //             }
+    //             prevChild = child;
+    //             return ret; // NOTE: returning true stops the iteration.
+    //         });
+    //     }
+    //     if (newNode) {
+    //         dispatch("HighlightAndScrollToNode", s => {
+    //             S.nodeUtil.highlightNode(newNode, true, s);
+    //             return s;
+    //         });
+    //     }
+    // }
 
     scrollAllTop = (state: AppState) => {
         if (C.DEBUG_SCROLLING) {
@@ -277,8 +273,6 @@ export class View {
         // S.quanta.setOverlay(true);
 
         let func = () => {
-            // NOTE: LEAVE THIS timer code here until the new pubsub-based scrolling timing is well proven
-            // setTimeout(async () => {
             //    try {
             /* Check to see if we are rendering the top node (page root), and if so
             it is better looking to just scroll to zero index, because that will always

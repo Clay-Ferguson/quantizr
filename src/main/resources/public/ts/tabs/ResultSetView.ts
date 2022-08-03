@@ -96,7 +96,7 @@ export abstract class ResultSetView extends AppTab {
             new ButtonBar([
                 new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
-                    title: "Refresh"
+                    title: "Refresh Search"
                 }),
                 this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
                     onClick: () => this.pageChange(0),

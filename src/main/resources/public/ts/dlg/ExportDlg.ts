@@ -9,7 +9,7 @@ import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField, TextFieldConfig } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
-import { CompValueHolder } from "../CompValueHolder";
+import { Value } from "../Value";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -25,7 +25,7 @@ interface LS { // Local State
 export class ExportDlg extends DialogBase {
 
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
-    saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
+    saveToIpfsState: Value<boolean> = new Value<boolean>(this, "toIpfs");
 
     constructor(private node: NodeInfo) {
         super("Export Node: " + node.id);

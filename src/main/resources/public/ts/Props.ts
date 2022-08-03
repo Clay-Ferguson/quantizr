@@ -81,33 +81,31 @@ export class Props {
      * properties will be null or a list of PropertyInfo objects.
      */
     renderProperties = (properties: J.PropertyInfo[]): PropTable => {
-        if (properties) {
-            const propTable = new PropTable({
-                border: "1",
-                className: "property-table"
-                // "sourceClass" : "[propsTable]"
+        if (!properties) return null;
+
+        const propTable = new PropTable({
+            border: "1",
+            className: "property-table"
+            // "sourceClass" : "[propsTable]"
+        });
+
+        properties.forEach(function (property: J.PropertyInfo) {
+            // console.log("Render Prop: "+property.name);
+            const propNameCell = new PropTableCell(property.name, {
+                className: "prop-table-name-col"
             });
 
-            properties.forEach(function (property: J.PropertyInfo) {
-                // console.log("Render Prop: "+property.name);
-                const propNameCell = new PropTableCell(property.name, {
-                    className: "prop-table-name-col"
-                });
+            const valCellAttrs = {
+                className: "prop-table-val-col"
+            };
+            const propValCell: PropTableCell = new PropTableCell(property.value, valCellAttrs);
 
-                const valCellAttrs = {
-                    className: "prop-table-val-col"
-                };
-                const propValCell: PropTableCell = new PropTableCell(property.value, valCellAttrs);
-
-                const propTableRow = new PropTableRow({
-                    className: "prop-table-row"
-                }, [propNameCell, propValCell]);
-                propTable.addChild(propTableRow);
-            });
-            return propTable;
-        } else {
-            return null;
-        }
+            const propTableRow = new PropTableRow({
+                className: "prop-table-row"
+            }, [propNameCell, propValCell]);
+            propTable.addChild(propTableRow);
+        });
+        return propTable;
     }
 
     getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
@@ -234,9 +232,7 @@ export class Props {
                 name: propertyName,
                 value: val
             };
-            if (!node.properties) {
-                node.properties = [];
-            }
+            node.properties = node.properties || [];
             node.properties.push(prop);
         }
     }
@@ -251,9 +247,7 @@ export class Props {
         }
         /* Else this is a new property we must add (ret remains true here) */
         else {
-            if (!node.properties) {
-                node.properties = [];
-            }
+            node.properties = node.properties || [];
             node.properties.push(newProp);
         }
     }
@@ -306,14 +300,14 @@ export class Props {
     /* This is kind of a hard-coded hack for the one particular type name
     where we are using it, but needs to work for all properties */
     getInputClassForType = (typeName: string): string => {
-        if (typeName === "duration") {
+        if (typeName === J.NodeProp.DURATION) {
             return "durationTypeInput";
         }
         return null;
     }
 
     getParentPath = (node: J.NodeInfo): string => {
-        let slashIdx: number = node.path.lastIndexOf("/");
+        let slashIdx = node.path.lastIndexOf("/");
         if (slashIdx === -1) return null;
         return node.path.substring(0, slashIdx);
     }

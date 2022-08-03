@@ -128,6 +128,11 @@ export class NodeUtil {
         if (!state.isAnonUser) {
             S.util.updateHistory(state.node, node, state);
         }
+
+        // this highlightNodeId is only really used to ensure state change happens, but really everything always
+        // keys off parentIdToFocusNodeMap actually reading the value.
+        state.highlightNodeId = node.id;
+
         S.quanta.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
         if (scroll) {

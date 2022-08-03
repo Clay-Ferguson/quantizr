@@ -177,19 +177,14 @@ export class Nav {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            S.nodeUtil.highlightNode(node, false, state);
+            dispatch("HighlightNode", s => {
+                S.nodeUtil.highlightNode(node, false, s);
+                return s;
+            });
 
-            // todo-2: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
-            // in a good way.
-            setTimeout(() => {
-                dispatch("FastRefresh", s => {
-                    return s;
-                });
-
-                // console.log("nodeClickRow. Focusing Main tab");
-                S.domUtil.focusId(C.TAB_MAIN);
-                resolve();
-            }, 100);
+            // console.log("nodeClickRow. Focusing Main tab");
+            S.domUtil.focusId(C.TAB_MAIN);
+            resolve();
         });
     }
 

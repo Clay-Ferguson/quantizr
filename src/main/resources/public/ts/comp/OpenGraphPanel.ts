@@ -38,37 +38,7 @@ export class OpenGraphPanel extends Div {
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         let og = S.quanta.openGraphData.get(this.url);
         if (!og) {
-            let observer = new IntersectionObserver(entries => {
-                entries.forEach((entry: any) => {
-                    if (entry.isIntersecting) {
-                        let og = S.quanta.openGraphData.get(this.url);
-                        if (!og) {
-                            if (!this.loading) {
-                                this.loading = true;
-                                S.util.loadOpenGraph(this.url, (og: J.OpenGraph) => {
-                                    this.loading = false;
-                                    if (!og) {
-                                        og = {
-                                            title: null,
-                                            description: null,
-                                            image: null,
-                                            url: null
-                                        };
-                                    }
-                                    // observer.disconnect();
-                                    S.quanta.openGraphData.set(this.url, og);
-                                    if (!elm.isConnected) return;
-                                    this.mergeState<LS>({ og });
-                                });
-                            }
-                        }
-                        else {
-                            this.mergeState<LS>({ og });
-                        }
-                        this.loadNext();
-                    }
-                });
-            });
+            let observer = new IntersectionObserver(entries => entries.forEach(entry => this.processOgEntry(entry, elm)));
             observer.observe(elm.parentElement);
         }
         else {
@@ -76,9 +46,37 @@ export class OpenGraphPanel extends Div {
         }
     }
 
+    processOgEntry = (entry: any, elm: HTMLElement) => {
+        if (!entry.isIntersecting) return;
+        let og = S.quanta.openGraphData.get(this.url);
+        if (!og) {
+            if (!this.loading) {
+                this.loading = true;
+                S.util.loadOpenGraph(this.url, (og: J.OpenGraph) => {
+                    this.loading = false;
+                    og = og || {
+                        title: null,
+                        description: null,
+                        image: null,
+                        url: null
+                    };
+                    // observer.disconnect();
+                    S.quanta.openGraphData.set(this.url, og);
+                    if (!elm.isConnected) return;
+                    this.mergeState<LS>({ og });
+                });
+            }
+        }
+        else {
+            this.mergeState<LS>({ og });
+        }
+        this.loadNext();
+    }
+
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
     performance optimization to help the user experience and is not a core part of the logic for
-     'correct' functioning */
+     'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down thru content
+     even including content with lots and lots of openGraph queries happening in the background. */
     loadNext = () => {
         let found = false;
         let count = 0;

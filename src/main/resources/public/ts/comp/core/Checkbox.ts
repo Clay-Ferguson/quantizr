@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CompValueHolder } from "../../CompValueHolder";
+import { Value } from "../../Value";
 import { ValueIntf } from "../../Interfaces";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
@@ -14,7 +14,7 @@ export class Checkbox extends Comp {
         super(attribs, new State());
 
         if (!valueIntf) {
-            this.valueIntf = new CompValueHolder<string>(this, "val");
+            this.valueIntf = new Value<string>(this, "val");
         }
 
         this.outterClassName = this.attribs.className || "";

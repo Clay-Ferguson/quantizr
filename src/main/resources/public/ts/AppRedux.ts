@@ -3,19 +3,11 @@ import { createStore } from "redux";
 import { AppState } from "./AppState";
 import { AppAction } from "./Interfaces";
 
-export const initialState = new AppState();
-
-let inDispatch: boolean = false;
-
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
  */
-export function rootReducer(state: AppState = initialState, action: AppAction) {
-
-    if (!state) {
-        console.error("rootReducer called with null state: " + action);
-        return null;
-    }
+export function rootReducer(state: AppState, action: AppAction) {
+    state = state || new AppState();
 
     // console.log("Action: " + action.type);
     if (action.update) {
@@ -25,23 +17,13 @@ export function rootReducer(state: AppState = initialState, action: AppAction) {
         // because it's own state will be known to be the correct up to date state in those circumstances.
         state = { ...action.update(state) };
     }
-
     return state;
 }
 
 export const store = createStore(rootReducer);
 
 export const getAppState = (state?: AppState): AppState => {
-    if (state) return state;
-    
-    // I don't think this was a good idea. We might be using an older state here, but for now I'm going to tolerate
-    // this becasue I think we've always been doing this and it's not necessarily a problem. Needs a bit more consideration.
-    // if (inDispatch) {
-    //     debugger;
-    //     console.warn("WARNING: calling getAppState while in a dispatch. This is probably a bug.");
-    // }
-
-    return store.getState();
+    return state ? state : store.getState();
 };
 
 export const useAppState = (state?: AppState): AppState => {
@@ -50,17 +32,9 @@ export const useAppState = (state?: AppState): AppState => {
 
 // NOTE: This dispatch is synchronous (not asynchronous)
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
-
-    // dispatch is synchronous so it's safe to use this inDispatch the way we are here.
-    try {
-        inDispatch = true;
-        // console.log("Dispatch: " + actionName);
-        store.dispatch({ type: actionName, update });
-        // console.log("Dispatch Complete: " + actionName);
-    }
-    finally {
-        inDispatch = false;
-    }
+    // console.log("Dispatch: " + actionName);
+    store.dispatch({ type: actionName, update });
+    // console.log("Dispatch Complete: " + actionName);
 };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
@@ -68,10 +42,9 @@ render is complete and AFTER the html DOM is updated/final
 
 This works, but is currently not needed.
 */
-const handleChange = () => {
-    // console.log("AppRedux change.");
-};
-
-store.subscribe(handleChange);
+// const handleChange = () => {
+//     // console.log("AppRedux change.");
+// };
+// store.subscribe(handleChange);
 // const unsubscribe = store.subscribe(handleChange);
 // unsubscribe()

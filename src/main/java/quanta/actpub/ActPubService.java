@@ -80,6 +80,7 @@ public class ActPubService extends ServiceBase {
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
     public static boolean refreshingForeignUsers = false;
+    public static int NUM_CURATED_ACCOUNTS = 1500;
 
     public void sendLikeMessage(MongoSession ms, String userDoingLike, SubNode node) {
         exec.run(() -> {
@@ -1556,7 +1557,7 @@ public class ActPubService extends ServiceBase {
                  * 
                  * upate: I was seeing a performance lag, so I'm setting to 4000ms for each cycle for now regardless.
                  */
-                Thread.sleep(server.equals(lastServer) ? 4000 : 4000);
+                Thread.sleep(server.equals(lastServer) ? 4000 : 1000);
                 lastServer = server;
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
@@ -1760,7 +1761,7 @@ public class ActPubService extends ServiceBase {
                  * something but for now just going with first 1000 accounts created works.
                  */
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
-                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), 1200);
+                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())

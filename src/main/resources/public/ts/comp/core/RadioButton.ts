@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CompValueHolder } from "../../CompValueHolder";
+import { Value } from "../../Value";
 import { ValueIntf } from "../../Interfaces";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
@@ -10,7 +10,7 @@ export class RadioButton extends Comp {
 
     constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf) {
         super(attribs, new State());
-        valueIntf = this.valueIntf || new CompValueHolder<string>(this, "val");
+        valueIntf = this.valueIntf || new Value<string>(this, "val");
     }
 
     compRender = (): ReactNode => {

@@ -22,15 +22,15 @@ export class LeftNavPanel extends Div {
 
         let state = getAppState();
 
-        let panelCols = state.userPrefs.mainPanelCols || 6;
-        if (panelCols < 4) panelCols = 4;
-        if (panelCols > 8) panelCols = 8;
+        let cols = state.userPrefs.mainPanelCols || 6;
+        if (cols < 4) cols = 4;
+        if (cols > 8) cols = 8;
 
         let leftCols = 4;
-        if (panelCols >= 5) {
+        if (cols >= 5) {
             leftCols--;
         }
-        if (panelCols >= 7) {
+        if (cols >= 7) {
             leftCols--;
         }
 

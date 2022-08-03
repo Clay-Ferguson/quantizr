@@ -40,7 +40,7 @@ export class Edit {
     }
 
     openImportDlg = (state: AppState) => {
-        const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -186,10 +186,7 @@ export class Edit {
         let owner: string = node.owner;
 
         // if we don't know who owns this node assume the admin owns it.
-        if (!owner) {
-            owner = "admin";
-        }
-
+        owner = owner || "admin";
         return state.isAdminUser || state.userName === owner;
     }
 
@@ -206,9 +203,7 @@ export class Edit {
         let owner: string = node.owner;
 
         // if we don't know who owns this node assume the admin owns it.
-        if (!owner) {
-            owner = "admin";
-        }
+        owner = owner || "admin";
 
         // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
         // make nodes editable by any other user.
@@ -528,11 +523,11 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = getAppState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         if (node) {
             let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -545,10 +540,10 @@ export class Edit {
     moveNodeToTop = async (id: string = null, state: AppState = null) => {
         state = getAppState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         if (node) {
             let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -561,7 +556,7 @@ export class Edit {
     moveNodeToBottom = async (id: string = null, state: AppState = null) => {
         state = getAppState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -585,7 +580,7 @@ export class Edit {
     }
 
     checkEditPending = (): boolean => {
-        let state: AppState = getAppState(null);
+        let state = getAppState(null);
 
         // state.editNode holds non-null always whenever there is editing underway.
         if (state.editNode) {
@@ -678,7 +673,7 @@ export class Edit {
          * node if there is a selected node.
          */
         if (!id) {
-            const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 parentNode = node;
             }
@@ -746,8 +741,6 @@ export class Edit {
     * Deletes all nodes owned by you but NOT rooted in your own account root.
     */
     bulkDelete = async () => {
-        let state = getAppState();
-
         let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
         let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
             "btn-danger", "alert alert-danger");
@@ -892,8 +885,7 @@ export class Edit {
 
         dispatch("SetNodesToMove", s => {
             S.nav.setNodeSel(true, id, s);
-            let selNodesArray = S.nodeUtil.getSelNodeIdsArray(s);
-            s.nodesToMove = selNodesArray;
+            s.nodesToMove = S.nodeUtil.getSelNodeIdsArray(s);
             s.selectedNodes.clear();
             return s;
         });
@@ -964,7 +956,6 @@ export class Edit {
 
     saveClipboardToChildNode = async (parentId: string) => {
         let clipText: string = await (navigator as any).clipboard.readText();
-
         if (clipText) {
             clipText = clipText.trim();
         }
@@ -1032,9 +1023,7 @@ export class Edit {
     }
 
     splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState) => {
-        if (!node) {
-            node = S.nodeUtil.getHighlightedNode(state);
-        }
+        node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (!node) {
             S.util.showMessage("You didn't select a node to split.", "Warning");
@@ -1100,9 +1089,7 @@ export class Edit {
         }, true);
 
         dispatch("likeNode", s => {
-            if (!node.likes) {
-                node.likes = [];
-            }
+            node.likes = node.likes || [];
 
             if (like && !node.likes.find(u => u === state.userName)) {
                 // add userName to likes
@@ -1256,9 +1243,7 @@ export class Edit {
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
     editNodeSharing = async (state: AppState, node: J.NodeInfo) => {
-        if (!node) {
-            node = S.nodeUtil.getHighlightedNode(state);
-        }
+        node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
