@@ -125,9 +125,8 @@ export class NodeCompTableRowLayout extends Div {
                         S.edit.newSubNode(null, state.node.id);
                     }
                 }, {
-                    iconclass: "fa fa-plus",
                     title: "Insert new node"
-                }, "btn-secondary marginLeft marginTop"));
+                }, "btn-secondary marginLeft marginTop", "fa-plus"));
 
                 let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
                 if (!!state.nodesToMove && userCanPaste) {

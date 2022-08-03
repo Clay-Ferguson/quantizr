@@ -113,10 +113,9 @@ export class NodeCompButtonBar extends Div {
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPrefs.editMode)) {
             openButton = new Button(null, S.nav.openNodeById, {
-                iconclass: "fa fa-folder-open",
                 nid: this.node.id,
                 title: "Open Node"
-            }, "btn-primary");
+            }, "btn-primary", "fa-folder-open");
         }
 
         /*
@@ -158,10 +157,9 @@ export class NodeCompButtonBar extends Div {
 
             if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed && !isPageRootNode) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
-                    iconclass: "fa fa-plus",
                     nid: this.node.id,
                     title: "Create new Node (as child of this node)"
-                });
+                }, null, "fa-plus");
             }
 
             let userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.homeNodeId;
@@ -169,10 +167,9 @@ export class NodeCompButtonBar extends Div {
             if (editingAllowed) {
                 if (editableNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
-                        iconclass: "fa fa-edit",
                         title: "Edit Node",
                         nid: this.node.id
-                    });
+                    }, null, "fa-edit");
                 }
 
                 if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {

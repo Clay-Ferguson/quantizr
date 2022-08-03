@@ -156,10 +156,10 @@ td {
 }
 
 .displayNameTextField {
-    max-width: 40em;
+    max-width: 40rem;
 }
 
-$mobileHeaderHeight: 3.5em;
+$mobileHeaderHeight: 3.5rem;
 
 .helpPanel {
     margin-top: 10px;
@@ -323,12 +323,12 @@ a {
 }
 
 .infoBlock {
-    margin-bottom: 2em;
+    margin-bottom: 2rem;
     //padding-right: 2em;
 }
 
 .welcome-container-with-navbar {
-    margin-top: 4em;
+    margin-top: 4rem;
 }
 
 .welcome-container-no-navbar {
@@ -593,7 +593,7 @@ strong em {
 }
 
 .progressSpinner {
-    width: 5em;
+    width: 5rem;
     margin: 0 auto;
 }
 
@@ -711,7 +711,7 @@ Will come back later and study this more. todo-1 */
     background-color: $modal-content-bg;
     padding: $smallGap;
     width: 85%;
-    max-width: 50em;
+    max-width: 50rem;
 }
 
 /* Modal Content/ Dialog Box */
@@ -792,7 +792,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .rightNavPanelInner {
-    min-width: 15em;
+    min-width: 15rem;
     margin-left: 10px;
 }
 
@@ -1069,7 +1069,7 @@ Will come back later and study this more. todo-1 */
 
 .textarea-min-4 {
     font-family: inherit;
-    min-height: 4em;
+    min-height: 4rem;
 }
 
 .font-inherit {
@@ -1090,7 +1090,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .tagIndent {
-    margin-left: 2em;
+    margin-left: 2rem;
 }
 
 .textfield {
@@ -1130,15 +1130,15 @@ Will come back later and study this more. todo-1 */
 }
 
 .bash-script {
-    margin-left: 1em;
-    margin-top: 1em;
+    margin-left: 1rem;
+    margin-top: 1rem;
 }
 
 .markdown-content {
-    padding-top: .5em;
-    padding-left: 1em;
-    padding-bottom: .5em;
-    padding-right: 1em;
+    padding-top: .5rem;
+    padding-left: 1rem;
+    padding-bottom: .5rem;
+    padding-right: 1rem;
 }
 
 // These borders make the hash-created titles (like '### Title') look really attractive, but it looks ugly 
@@ -1257,7 +1257,7 @@ Will come back later and study this more. todo-1 */
 
 .vert-space {
     display: block;
-    height: 0.5em;
+    height: 0.5rem;
 }
 
 .mainTabPanel {
@@ -1385,7 +1385,7 @@ Will come back later and study this more. todo-1 */
     cursor: pointer;
 
     // warning: don't be tempted again to make this less than 2em!
-    min-height: 2em;
+    min-height: 2rem;
 }
 
 .headerInfoDivExpanded {
@@ -1488,15 +1488,15 @@ Will come back later and study this more. todo-1 */
 }
 
 .content-narrow {
-    max-width: 50em;
+    max-width: 50rem;
 }
 
 .content-medium {
-    max-width: 60em;
+    max-width: 60rem;
 }
 
 .content-wide {
-    max-width: 70em;
+    max-width: 70rem;
 }
 
 .mousePointer {
@@ -1504,7 +1504,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .tags-content {
-    margin-left: 1em;
+    margin-left: 1rem;
     /* we limit page width of text content, because text that goes to wide
 		becomes difficult to read.
 	*/
@@ -1514,7 +1514,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .property-table {
-    margin-left: 1em;
+    margin-left: 1rem;
 }
 
 .prop-table-row {
@@ -1779,7 +1779,7 @@ i'm backing out for now
 }
 
 .rowFooterIcon {
-    margin-top: .5em;
+    margin-top: .5rem;
     margin-right: 6px;
     margin-bottom: 12px;
     vertical-align: middle;
@@ -1819,16 +1819,16 @@ i'm backing out for now
 }
 
 .searchDlgOrderBy {
-    width: 12em;
+    width: 12rem;
 }
 
 .layoutSelection {
-    max-width: 7em;
+    max-width: 7rem;
     margin-right: $smallGap;
 }
 
 .imagesSelection {
-    max-width: 7em;
+    max-width: 7rem;
     margin-right: $smallGap;
 }
 
@@ -1927,7 +1927,7 @@ i'm backing out for now
 }
 
 .durationTypeInput {
-    max-width: 8em;
+    max-width: 8rem;
 }
 
 //We use the default player except we have our own big play and pause buttons.
@@ -2213,7 +2213,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .openGraphDesc {
-    max-width: 45em;
+    max-width: 45rem;
 }
 
 .openGraphTitle {
@@ -2224,7 +2224,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .welcomeText {
-    max-width: 30em;
+    max-width: 30rem;
     display: inline-block;
 }
 
