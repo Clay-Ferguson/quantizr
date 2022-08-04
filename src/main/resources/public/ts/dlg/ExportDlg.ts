@@ -42,12 +42,12 @@ export class ExportDlg extends DialogBase {
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new RadioButtonGroup([
-                this.createRadioButton("ZIP", "zip"),
-                this.createRadioButton("TAR", "tar"),
-                this.createRadioButton("TAR.GZ", "tar.gz"),
-                this.createRadioButton("Markdown", "md"),
-                this.createRadioButton("PDF", "pdf"),
-                this.createRadioButton("HTML", "html")
+                this.radioButton("ZIP", "zip"),
+                this.radioButton("TAR", "tar"),
+                this.radioButton("TAR.GZ", "tar.gz"),
+                this.radioButton("Markdown", "md"),
+                this.radioButton("PDF", "pdf"),
+                this.radioButton("HTML", "html")
             ], "radioButtonsBar marginTop"),
             new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
@@ -59,7 +59,7 @@ export class ExportDlg extends DialogBase {
         ];
     }
 
-    createRadioButton = (name: string, exportType: string) => {
+    radioButton = (name: string, exportType: string) => {
         return new RadioButton(name, false, "exportTypeGroup", null, {
             setValue: (checked: boolean) => {
                 if (checked) {

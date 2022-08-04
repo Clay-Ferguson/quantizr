@@ -28,8 +28,7 @@ export class SearchUsersDlg extends DialogBase {
 
     constructor() {
         super("Search Users", "app-modal-content-medium-width");
-
-        this.onMount((elm: HTMLElement) => this.searchTextField.focus());
+        this.onMount(this.searchTextField?.focus);
 
         this.mergeState<LS>({
             fuzzy: false,

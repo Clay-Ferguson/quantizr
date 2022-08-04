@@ -11,7 +11,7 @@ export class DateField extends Div implements I.ValueIntf {
     }
 
     focus(): void {
-        this.onMount((elm: HTMLElement) => this.input?.focus());
+        this.onMount(this.input?.focus);
     }
 
     setValue(value: string): void {

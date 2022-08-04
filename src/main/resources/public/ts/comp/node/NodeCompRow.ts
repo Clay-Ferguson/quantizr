@@ -73,7 +73,7 @@ export class NodeCompRow extends Div {
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
             can insert or not */
             if (this.level === 1) {
-                const parentTypeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+                const parentTypeHandler = S.plugin.getTypeHandler(state.node.type);
                 if (parentTypeHandler) {
                     insertAllowed = state.isAdminUser || parentTypeHandler.allowAction(NodeActionType.insert, state.node, state);
                 }
@@ -115,7 +115,7 @@ export class NodeCompRow extends Div {
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row");
-        const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
+        // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,

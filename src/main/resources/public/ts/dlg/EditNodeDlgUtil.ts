@@ -24,25 +24,25 @@ export class EditNodeDlgUtil {
         }
 
         let numPropsShowing: number = 0;
-        if (state.node.properties) {
-            // This loop creates all the editor input fields for all the properties
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("prop=" + S.util.prettyPrint(prop));
 
-                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
-                    // console.log("Hiding property: " + prop.name);
-                    return;
+        // This loop creates all the editor input fields for all the properties
+        state.node.properties?.forEach((prop: J.PropertyInfo) => {
+            // console.log("prop=" + S.util.prettyPrint(prop));
+
+            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
+                // console.log("Hiding property: " + prop.name);
+                return;
+            }
+
+            if (dlg.allowEditAllProps || (
+                !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
+
+                if (!dlg.isGuiControlBasedProp(prop)) {
+                    numPropsShowing++;
                 }
+            }
+        });
 
-                if (dlg.allowEditAllProps || (
-                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
-
-                    if (!dlg.isGuiControlBasedProp(prop)) {
-                        numPropsShowing++;
-                    }
-                }
-            });
-        }
         return numPropsShowing;
     }
 
@@ -109,27 +109,25 @@ export class EditNodeDlgUtil {
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (dlg: EditNodeDlg) => {
         const state = dlg.getState<LS>();
-        if (state.node.properties) {
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("Save prop iterator: name=" + prop.name);
-                const propState = dlg.propStates.get(prop.name);
-                if (propState) {
-                    // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
-                    if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
-                        try {
-                            prop.value = parseInt(propState.getValue());
-                        }
-                        catch (e) {
-                            console.error("failed to parse date number: " + propState.getValue());
-                        }
+        state.node.properties?.forEach((prop: J.PropertyInfo) => {
+            // console.log("Save prop iterator: name=" + prop.name);
+            const propState = dlg.propStates.get(prop.name);
+            if (propState) {
+                // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
+                if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
+                    try {
+                        prop.value = parseInt(propState.getValue());
                     }
-                    else {
-                        prop.value = propState.getValue();
-                        // console.log("   val=" + prop.value);
+                    catch (e) {
+                        console.error("failed to parse date number: " + propState.getValue());
                     }
                 }
-            });
-        }
+                else {
+                    prop.value = propState.getValue();
+                    // console.log("   val=" + prop.value);
+                }
+            }
+        });
     }
 
     addProperty = async (dlg: EditNodeDlg) => {
@@ -138,9 +136,7 @@ export class EditNodeDlgUtil {
         await propDlg.open();
 
         if (propDlg.nameState.getValue()) {
-            if (!state.node.properties) {
-                state.node.properties = [];
-            }
+            state.node.properties = state.node.properties || [];
             state.node.properties.push({
                 name: propDlg.nameState.getValue(),
                 value: ""
@@ -153,9 +149,7 @@ export class EditNodeDlgUtil {
 
     addDateProperty = (dlg: EditNodeDlg) => {
         const state = dlg.getState<LS>();
-        if (!state.node.properties) {
-            state.node.properties = [];
-        }
+        state.node.properties = state.node.properties || [];
 
         if (S.props.getProp(J.NodeProp.DATE, state.node)) {
             return;
@@ -293,7 +287,6 @@ export class EditNodeDlgUtil {
                     return s;
                 });
             }
-
             dlg.binaryDirty = true;
         }
     }
@@ -323,7 +316,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
+    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
         const allowEditAllProps: boolean = getAppState().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const propVal = propEntry.value;
@@ -426,7 +419,7 @@ an upload has been added or removed. */
                 // if onlyBinaries and this is NOT a binary prop then skip it.
                 if (onlyBinaries) {
                     if (S.props.allBinaryProps.has(prop.name)) {
-                        this.initPropState(dlg, node, typeHandler, prop, false);
+                        this.initPropState(dlg, node, prop, false);
                     }
                     return;
                 }
@@ -441,7 +434,7 @@ an upload has been added or removed. */
 
                     if (!dlg.isGuiControlBasedProp(prop)) {
                         const allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        this.initPropState(dlg, node, typeHandler, prop, allowSelection);
+                        this.initPropState(dlg, node, prop, allowSelection);
                     }
                 }
             });
@@ -449,28 +442,24 @@ an upload has been added or removed. */
     }
 
     insertTime = (dlg: EditNodeDlg) => {
-        if (dlg.contentEditor) {
-            dlg.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
-        }
+        dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
     }
 
     insertMention = async (dlg: EditNodeDlg) => {
-        if (dlg.contentEditor) {
-            const friendDlg: FriendsDlg = new FriendsDlg(null, true);
-            await friendDlg.open();
-            if (friendDlg.getState().selectedName) {
-                dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
-            }
+        if (!dlg.contentEditor) return;
+        const friendDlg: FriendsDlg = new FriendsDlg(null, true);
+        await friendDlg.open();
+        if (friendDlg.getState().selectedName) {
+            dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
         }
     }
 
     insertEmoji = async (dlg: EditNodeDlg) => {
-        if (dlg.contentEditor) {
-            const emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
-            await emojiDlg.open();
-            if (emojiDlg.getState().selectedEmoji) {
-                dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);
-            }
+        if (!dlg.contentEditor) return;
+        const emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
+        await emojiDlg.open();
+        if (emojiDlg.getState().selectedEmoji) {
+            dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);
         }
     }
 

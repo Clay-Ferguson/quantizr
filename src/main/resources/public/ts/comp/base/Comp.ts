@@ -98,6 +98,7 @@ export abstract class Comp implements CompIntf {
     /* Schedules a function to get run whenever this element comes into existence, or will cause
      the function to run immediately of the component is already mounted */
     onMount(func: (elm: HTMLElement) => void) {
+        if (!func) return;
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
         let elm = this.getRef(false);
@@ -217,7 +218,7 @@ export abstract class Comp implements CompIntf {
         // immediately assign this as the focused element ID
         Comp.focusElmId = this.getId();
 
-        this.onMount((elm: HTMLElement) => {
+        this.onMount(() => {
             // if we're still the focused id, then we do the focus, but due to async nature some other thing
             // could have technically taken over focus and we might do nothing here.
             if (Comp.focusElmId === this.getId()) {

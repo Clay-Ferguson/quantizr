@@ -65,7 +65,7 @@ export class NodeCompMainNode extends Div {
             this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null)]);
         }
         else {
-            const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const focusNode = S.nodeUtil.getHighlightedNode(state);
             const selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
 
@@ -81,7 +81,7 @@ export class NodeCompMainNode extends Div {
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
-            const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+            const typeHandler = S.plugin.getTypeHandler(node.type);
             if (state.userPrefs.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())) {
                 header = new NodeCompRowHeader(node, true, true, false, false, true, false);
             }

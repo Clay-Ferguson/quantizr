@@ -227,7 +227,6 @@ export class NodeCompButtonBar extends Div {
 
         let searchButton: Icon = null;
         let timelineButton: Icon = null;
-        const nodeFeedButton: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;
@@ -275,7 +274,7 @@ export class NodeCompButtonBar extends Div {
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
             new Span(null, { className: "float-end" }, [moveNodeUpButton, //
-                moveNodeDownButton, cutNodeButton, deleteNodeButton, nodeFeedButton, searchButton, timelineButton, pasteButtons])];
+                moveNodeDownButton, cutNodeButton, deleteNodeButton, searchButton, timelineButton, pasteButtons])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);

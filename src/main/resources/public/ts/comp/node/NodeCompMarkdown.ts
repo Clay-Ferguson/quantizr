@@ -128,7 +128,7 @@ export class NodeCompMarkdown extends Html {
 
         if (this.autoDecrypting && state.pendingDecrypt) {
             const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-            const cipherHash: string = S.util.hashOfString(cipherText);
+            const cipherHash = S.util.hashOfString(cipherText);
 
             // if we have already decrypted this data use the result.
             if (S.quanta.decryptCache.get(cipherHash)) {
@@ -159,7 +159,7 @@ export class NodeCompMarkdown extends Html {
         const cipherKey = S.props.getCryptoKey(this.node, appState);
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
-            let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+            let clearText = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
             if (!clearText) {
                 clearText = "[Decrypt Failed]";

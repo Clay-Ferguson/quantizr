@@ -18,7 +18,7 @@ export class NodeCompMainList extends Div {
         const state = useAppState();
 
         const children: Comp[] = [];
-        if (state.node && state.node.children) {
+        if (state.node?.children) {
             this.addPaginationButtons(children, state.endReached, "", state, true);
 
             const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, state.node);
@@ -40,7 +40,7 @@ export class NodeCompMainList extends Div {
         let nextButton: Comp;
         let prevNodeButton: Comp;
         let nextNodeButton: Comp;
-        const firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+        const firstChild = S.edit.getFirstChildNode(state);
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {

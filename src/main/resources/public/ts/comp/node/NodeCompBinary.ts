@@ -122,9 +122,9 @@ export class NodeCompBinary extends Div {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            const fileName: string = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
-            const fileSize: string = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
-            const fileType: string = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
+            const fileName = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
+            const fileSize = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
+            const fileType = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
