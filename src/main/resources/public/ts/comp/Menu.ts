@@ -70,7 +70,7 @@ export class Menu extends Comp {
                 "data-bs-parent": "#" + C.ID_MENU
             }, [
                 new Div(null, { className: "card-body menuCardBody" }, [
-                    new Div(null, { className: "list-group flex-column" },
+                    new Div(null, { className: "list-group flex-column menuPanelItems" },
                         this.menuItems)
                 ])
             ])

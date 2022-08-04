@@ -27,7 +27,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
             new Heading(4, this.displayName, {
                 className: "marginAll"
             }),
-            new Div("These are the people you've blocked. Delete from this list to unblock the person.", { className: "marginLeft marginBottom" })
+            new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "marginLeft marginBottom" })
         ]);
     }
 

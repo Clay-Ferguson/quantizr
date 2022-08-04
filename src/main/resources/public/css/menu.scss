@@ -11,6 +11,11 @@
     font-size: 140%;
 }
 
+.menuPanelItems {
+    border-left: 3px solid $nodeBorderBottomColor;
+    border-radius: 0px !important;
+}
+
 .menuIcon {
     vertical-align: middle;
     cursor: pointer;
@@ -20,7 +25,7 @@
 }
 
 .menuItemSeparator {
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    border-bottom: 3px solid $nodeBorderBottomColor;
 }
 
 .mainMenuItemDisabled {

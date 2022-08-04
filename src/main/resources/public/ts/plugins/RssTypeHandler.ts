@@ -100,7 +100,6 @@ export class RssTypeHandler extends TypeBase {
         }
         else if (state.rssFeedCache[feedSrcHash] === "loading") {
             return new Div(null, null, [
-                new Heading(4, "Loading Feeds..."),
                 new Div(null, {
                     className: "progressSpinner"
                 }, [new Spinner()])

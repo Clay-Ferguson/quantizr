@@ -145,7 +145,6 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Div(null, null, [
-                new Heading(4, "Loading Feed..."),
                 new Div(null, {
                     className: "progressSpinner"
                 }, [new Spinner()])
