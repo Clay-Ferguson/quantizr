@@ -27,9 +27,8 @@ export class State {
       the react function itself is currently executing. One of the "Rules of Hooks"
     */
     setStateEx<ST>(state: ST) {
-        if (!state) {
-            state = {} as ST;
-        }
+        state = state || {} as ST;
+        
         if (typeof state === "function") {
             this.state = state(this.state);
         }

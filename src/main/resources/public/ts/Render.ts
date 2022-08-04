@@ -737,10 +737,8 @@ export class Render {
     }
 
     showGraph = (node: J.NodeInfo, searchText: string, state: AppState) => {
-        if (!node) {
-            node = S.nodeUtil.getHighlightedNode(state);
-        }
-
+        node = node || S.nodeUtil.getHighlightedNode(state);
+        
         dispatch("ShowGraph", s => {
             s.fullScreenGraphId = node.id;
             s.graphSearchText = searchText;

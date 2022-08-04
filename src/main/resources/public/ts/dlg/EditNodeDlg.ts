@@ -205,7 +205,7 @@ export class EditNodeDlg extends DialogBase {
         if (typeHandler) {
             const iconClass = typeHandler.getIconClass();
             if (iconClass) {
-                if (!span) span = new Span();
+                span = span || new Span();
                 span.addChild(new Icon({
                     title: `Node is a '${typeHandler.getName()}' type.`,
                     className: iconClass + " iconMarginRight clickable",
@@ -216,7 +216,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
-            if (!span) span = new Span();
+            span = span || new Span();
             span.addChild(new Icon({
                 title: "Node has a 'Date' property.",
                 className: "fa fa-calendar fa-lg iconMarginRight"
@@ -224,7 +224,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (this.showJumpButton) {
-            if (!span) span = new Span();
+            span = span || new Span();
             span.addChild(new Icon({
                 title: "Jump to Node",
                 className: "fa fa-arrow-right fa-lg jumpButton",

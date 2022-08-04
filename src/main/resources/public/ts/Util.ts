@@ -363,9 +363,8 @@ export class Util {
      */
     getParameterByName = (name?: any, url?: any): string => {
         if (!name) return null;
-        if (!url) {
-            url = window.location.href;
-        }
+        url = url || window.location.href;
+        
         name = name.replace(/[\[\]]/g, "\\$&");
         const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
         const results = regex.exec(url);
@@ -417,10 +416,7 @@ export class Util {
         }
 
         this.rhost = this.getParameterByName("rhost");
-        if (!this.rhost) {
-            this.rhost = window.location.origin;
-        }
-
+        this.rhost = this.rhost || window.location.origin;
         return this.rhost;
     }
 

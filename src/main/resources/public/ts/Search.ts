@@ -206,9 +206,7 @@ export class Search {
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
         it's ok to reset node or not */
-        if (!node) {
-            node = S.nodeUtil.getHighlightedNode(state);
-        }
+        node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Timeline");
@@ -402,10 +400,7 @@ export class Search {
     showFollowers = async (page: number, userName: string) => {
         const state = getAppState();
         if (state.isAnonUser) return;
-
-        if (!userName) {
-            userName = state.userName;
-        }
+        userName = userName || state.userName;
 
         const res = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
@@ -444,10 +439,7 @@ export class Search {
     showFollowing = async (page: number, userName: string) => {
         const state = getAppState();
         if (state.isAnonUser) return;
-
-        if (!userName) {
-            userName = state.userName;
-        }
+        userName = userName || state.userName;
 
         const res = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,

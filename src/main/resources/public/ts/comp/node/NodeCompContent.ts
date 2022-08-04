@@ -42,9 +42,7 @@ export class NodeCompContent extends Div {
             }
         }
         else {
-            if (!typeHandler) {
-                typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
-            }
+            typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
 
             if (this.node.content && ( //
             this.node.content.indexOf("{{imgUrl}}") !== -1 ||

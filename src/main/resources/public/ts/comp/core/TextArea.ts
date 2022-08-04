@@ -27,10 +27,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
             }
         };
 
-        if (!this.textareaAttribs.rows) {
-            this.textareaAttribs.rows = "1";
-        }
-
+        this.textareaAttribs.rows = this.textareaAttribs.rows || "1";
         this.setWordWrap(true);
     }
 

@@ -175,9 +175,7 @@ export class ServerPush {
          process all the accumulated feedDirtyList items. */
         if (state.activeTab === C.TAB_FEED && state.editNode) {
             // console.log("editing, so adding to feedDirty");
-            if (!feedData.props.feedDirtyList) {
-                feedData.props.feedDirtyList = [];
-            }
+            feedData.props.feedDirtyList = feedData.props.feedDirtyList || [];
             feedData.props.feedDirtyList.push(nodeInfo);
             return;
         }

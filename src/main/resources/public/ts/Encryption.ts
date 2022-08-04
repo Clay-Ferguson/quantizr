@@ -417,9 +417,7 @@ export class Encryption {
      * and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
-        if (!publicKey) {
-            publicKey = await this.getPublicKey();
-        }
+        publicKey = publicKey || await this.getPublicKey();
 
         // generate random symmetric key
         const key: CryptoKey = await this.genSymKey();
@@ -459,9 +457,7 @@ export class Encryption {
 
         try {
             // console.log("decrypting [" + skpd.cipherText + "] with cipherKey: " + skpd.cipherKey);
-            if (!privateKey) {
-                privateKey = await this.getPrivateKey();
-            }
+            privateKey = privateKey || await this.getPrivateKey();
 
             if (!privateKey) {
                 console.log("unable to get privateKey");

@@ -13,10 +13,7 @@ export class Checkbox extends Comp {
     constructor(public label: string = null, attribs: Object = null, private valueIntf: ValueIntf, private layoutClass: string = null) {
         super(attribs, new State());
 
-        if (!valueIntf) {
-            this.valueIntf = new Value<string>(this, "val");
-        }
-
+        this.valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.outterClassName = this.attribs.className || "";
         this.layoutClass = this.layoutClass || "form-check-inline";
     }

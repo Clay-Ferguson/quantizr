@@ -75,9 +75,7 @@ export class RightNavPanel extends Div {
             displayName = S.util.insertActPubTags(displayName, state.node);
 
             // If user had nothing left after insertion after ":tags:" replacement in their display name, then display their userName
-            if (!displayName) {
-                displayName = state.node.owner;
-            }
+            displayName = displayName || state.node.owner;
         }
 
         const allowEditMode = state.node && !state.isAnonUser;

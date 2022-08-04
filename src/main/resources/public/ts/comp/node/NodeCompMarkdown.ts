@@ -160,11 +160,7 @@ export class NodeCompMarkdown extends Html {
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
             let clearText = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
-
-            if (!clearText) {
-                clearText = "[Decrypt Failed]";
-            }
-
+            clearText = clearText || "[Decrypt Failed]";
             clearText = this.renderRawMarkdown(this.node, clearText);
 
             this.mergeState<LS>({
