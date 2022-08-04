@@ -47,13 +47,13 @@ export class View {
         }
 
         if (!a.highlightId) {
-            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(a.state);
+            const currentSelNode = S.nodeUtil.getHighlightedNode(a.state);
             a.highlightId = currentSelNode ? currentSelNode.id : a.nodeId;
         }
 
         let offset = 0;
         if (!a.zeroOffset) {
-            const firstChild: J.NodeInfo = S.edit.getFirstChildNode(a.state);
+            const firstChild = S.edit.getFirstChildNode(a.state);
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
@@ -96,7 +96,7 @@ export class View {
     }
 
     prevPage = (state: AppState) => {
-        const firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
+        const firstChildNode = S.edit.getFirstChildNode(state);
         if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
             let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
@@ -108,7 +108,7 @@ export class View {
     }
 
     nextPage = (state: AppState) => {
-        const lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
+        const lastChildNode = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             const targetOffset = lastChildNode.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, false, state);

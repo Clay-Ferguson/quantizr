@@ -40,7 +40,7 @@ export class NodeCompTableRowLayout extends Div {
         const cellWidth = 100 / maxCols;
         const allowInsert = S.edit.isInsertAllowed(this.node, state);
         let curCols = 0;
-        let lastNode: J.NodeInfo = null;
+        let lastNode = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.

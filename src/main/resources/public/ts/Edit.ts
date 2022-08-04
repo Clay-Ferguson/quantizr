@@ -505,11 +505,11 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = getAppState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         if (node) {
             const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -559,7 +559,7 @@ export class Edit {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         if (node) {
             const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -1230,7 +1230,7 @@ export class Edit {
 
     updateHeadings = async (state: AppState) => {
         state = getAppState(state);
-        const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             await S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id

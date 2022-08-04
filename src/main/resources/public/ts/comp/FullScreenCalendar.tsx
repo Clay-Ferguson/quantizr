@@ -26,8 +26,8 @@ export class FullScreenCalendar extends Main {
 
     compRender = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
-        let nodeId = this.state.fullScreenCalendarId;
-        let node: J.NodeInfo = S.nodeUtil.findNodeById(this.state, nodeId);
+        const nodeId = this.state.fullScreenCalendarId;
+        const node = S.nodeUtil.findNodeById(this.state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);
@@ -94,7 +94,7 @@ export class FullScreenCalendar extends Main {
 
     dateClick = (dateClick: DateClickArg): void => {
         FullScreenCalendar.lastClickTime = dateClick.date;
-        let calendarApi = dateClick.view.calendar;
+        const calendarApi = dateClick.view.calendar;
         calendarApi.changeView("timeGridDay");
         calendarApi.gotoDate(dateClick.date);
     }

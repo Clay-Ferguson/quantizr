@@ -148,7 +148,7 @@ export class MenuPanel extends Div {
     preRender(): void {
         const state = useAppState();
 
-        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const hltNode = S.nodeUtil.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);

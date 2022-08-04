@@ -63,7 +63,7 @@ export class ServerPush {
 
         this.eventSource.addEventListener("nodeEdited", (e: any) => {
             const obj: J.FeedPushInfo = JSON.parse(e.data);
-            const nodeInfo: J.NodeInfo = obj.nodeInfo;
+            const nodeInfo = obj.nodeInfo;
 
             if (nodeInfo) {
                 dispatch("RenderTimelineResults", s => {

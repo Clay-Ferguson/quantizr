@@ -25,7 +25,7 @@ export class NodeCompVerticalRowLayout extends Div {
         const collapsedComps: Object[] = [];
         const allowInsert = S.edit.isInsertAllowed(this.node, state);
         let rowCount: number = 0;
-        let lastNode: J.NodeInfo = null;
+        let lastNode = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.

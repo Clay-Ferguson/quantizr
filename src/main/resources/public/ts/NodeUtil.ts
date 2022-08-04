@@ -97,7 +97,7 @@ export class NodeUtil {
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
         // Log.log("highlightRowById: " + id);
-        let node: J.NodeInfo = state.idToNodeMap.get(id);
+        let node = state.idToNodeMap.get(id);
         let ret = true;
 
         /* If node not known, resort to taking the best, previous node we had */
@@ -145,8 +145,7 @@ export class NodeUtil {
         const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // first look in normal tree map for main view.
-        let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
-
+        let node = state.idToNodeMap.get(nodeId);
         if (!node) {
             node = feedData?.props?.feedResults?.find(n => n.id === nodeId);
         }

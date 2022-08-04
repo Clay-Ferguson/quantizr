@@ -586,7 +586,7 @@ export class Search {
     /* If target is non-null we only return shares to that particlar person (or public) */
     findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null) => {
         state = getAppState(state);
-        const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const focusNode = S.nodeUtil.getHighlightedNode(state);
         if (!focusNode) {
             return;
         }

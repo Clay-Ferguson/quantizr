@@ -45,7 +45,7 @@ export class Nav {
     }
 
     navOpenSelectedNode = (state: AppState) => {
-        const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const selNode = S.nodeUtil.getHighlightedNode(state);
         if (!selNode) return;
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
@@ -137,7 +137,7 @@ export class Nav {
         const selNode = S.nodeUtil.getHighlightedNode(state);
         if (selNode) {
             /* get node by node identifier */
-            const node: J.NodeInfo = state.idToNodeMap.get(selNode.id);
+            const node = state.idToNodeMap.get(selNode.id);
 
             if (node) {
                 // console.log("found highlighted node.id=" + node.id);
@@ -167,7 +167,7 @@ export class Nav {
                 return;
             }
 
-            const node: J.NodeInfo = state.idToNodeMap.get(id);
+            const node = state.idToNodeMap.get(id);
             if (!node) {
                 reject();
                 // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
@@ -216,7 +216,7 @@ export class Nav {
     openNodeById = (evt: Event, id: string, state: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = getAppState(state);
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         S.nodeUtil.highlightNode(node, false, state);
 
         if (!node) {
@@ -337,7 +337,7 @@ export class Nav {
         this.clickNodeRow(null, id);
 
         setTimeout(() => {
-            const node: J.NodeInfo = state.idToNodeMap.get(id);
+            const node = state.idToNodeMap.get(id);
             if (!node) {
                 return;
             }
@@ -349,7 +349,7 @@ export class Nav {
         id = S.util.allowIdFromEvent(evt, id);
         const state = getAppState();
 
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node = state.idToNodeMap.get(id);
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
@@ -416,7 +416,7 @@ export class Nav {
     }
 
     prevFullScreenImgViewer = (appState: AppState) => {
-        const prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
+        const prevNode = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
             dispatch("PrevFullScreenImgViewer", s => {
@@ -427,7 +427,7 @@ export class Nav {
     }
 
     nextFullScreenImgViewer = (appState: AppState) => {
-        const nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
+        const nextNode = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
             dispatch("NextFullScreenImgViewer", s => {
@@ -439,7 +439,7 @@ export class Nav {
 
     // todo-2: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
     getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
-        let newNode: J.NodeInfo = null;
+        let newNode = null;
 
         // First detect if page root node is selected, before doing a child search
         if (state.fullScreenViewId === state.node.id) {
@@ -671,7 +671,7 @@ export class Nav {
     }
 
     messagesNodeFeed = (state: AppState) => {
-        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const hltNode = S.nodeUtil.getHighlightedNode(state);
         if (!hltNode) return;
         const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (feedData) {
