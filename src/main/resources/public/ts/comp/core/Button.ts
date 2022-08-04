@@ -8,22 +8,33 @@ interface LS { // Local State
     enabled?: boolean;
 }
 
-// #dynamic-styling-example (do not delete, yet)
-// const scope = "Button";
-
 export class Button extends Comp {
+
+    // *********************** DO NOT DELETE
+    // #dynamic-styling-example
+    // To enable this Classes custom CSS, just uncomment this code, and that's all that's required
+    // to get the proof-of-concept back working. For now we use only SCSS, but this example was 
+    // an experiment, and works great.
+    static cssPrefix = null;
+    // static cssPrefix = Comp.getCssPrefix();
+    // static cssObj = Comp.createCss(Button.cssPrefix, `
+    // .$$testClass {
+    //     border: 2px solid red;
+    // }`);
+    // *********************** DO NOT DELETE
+
     constructor(text: string, callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary",
         private iconClass: string = null) {
-        super(attribs);
+        super(attribs, null, Button.cssPrefix);
         moreClasses = moreClasses || "btn-secondary";
         this.attribs.type = "button";
         this.attribs.onClick = callback;
         this.attribs.className = this.attribs.className || "";
 
-        // #dynamic-styling-example (do not delete, yet)
-        // this.attribs.className += ` btn testClass_${scope} clickable ` + moreClasses;
-
+        // #dynamic-styling-example (do not delete)
+        // this.attribs.className += " btn $$testClass clickable " + moreClasses;
         this.attribs.className += " btn clickable " + moreClasses;
+
         this.attribs.className += getAppState().mobileMode ? " mobileButton" : "";
         this.mergeState<LS>({ text, enabled: true });
     }
@@ -57,9 +68,3 @@ export class Button extends Comp {
             }) : null, text]);
     }
 }
-
-// #dynamic-styling-example (do not delete, yet)
-// CssUtil.create(`
-// .testClass_${scope} {
-//     border: 2px solid red;
-// }`);

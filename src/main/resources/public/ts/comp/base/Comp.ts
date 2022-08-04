@@ -13,6 +13,9 @@ import { CompIntf } from "./CompIntf";
 /**
  * Base class for all components which encapsulates a lot of React functionality so that our implementation 
  * code can ignore those details.
+ * 
+ * For component-local CSS styling see Button.ts. It's simple and involves just passing a 'scope' into this constructor
+ * and then using the prefix '$$' in front of the classnames. That's all there is to it.
  */
 export abstract class Comp implements CompIntf {
     private parent: Comp = null; // only used for debug logging (can be deleted without impacting app)
@@ -45,7 +48,7 @@ export abstract class Comp implements CompIntf {
     // see also: #onclick-security-note
     static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
 
-    constructor(attribs?: any, private stateMgr?: State) {
+    constructor(attribs?: any, private stateMgr?: State, public scope?: string) {
         this.attribs = attribs || {};
 
         // for debugging, shows classname in every dom element as an attribute.
@@ -93,6 +96,10 @@ export abstract class Comp implements CompIntf {
 
     static nextGuid(): number {
         return ++Comp.guid;
+    }
+
+    static getCssPrefix(): string {
+        return `C${++Comp.guid}_`;
     }
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause
@@ -182,7 +189,22 @@ export abstract class Comp implements CompIntf {
 
     create = (): ReactNode => {
         this.wrapClick(this.attribs);
+        this.scopeCss(this.attribs);
         return createElement(this.render, this.attribs);
+    }
+
+    scopeCss = (props: any) => {
+        if (this.scope && props?.className) {
+            props.className = props.className.replace("$$", this.scope);
+        }
+    }
+
+    static createCss(scope: string, cssText: string): Element {
+        if (!scope || !cssText) return;
+        const css = document.createElement("style");
+        css.innerHTML = cssText.replace("$$", scope);
+        document.body.appendChild(css);
+        return css;
     }
 
     wrapClick = (obj: any) => {
@@ -258,6 +280,7 @@ export abstract class Comp implements CompIntf {
             let children: ReactNode[] = this.createChildren(childrenArg);
 
             this.wrapClick(props);
+            this.scopeCss(props);
             if (children?.length > 0) {
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652
@@ -324,7 +347,7 @@ export abstract class Comp implements CompIntf {
                 if (!this.mounted) {
                     this.mounted = true;
                     // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
-                    this.domAdd(); 
+                    this.domAdd();
                     if (this.domAddEvent) this.domAddEvent(); // call overridable method.
 
                     if (this.getScrollPos() !== null) {
