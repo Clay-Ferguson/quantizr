@@ -1557,7 +1557,7 @@ public class ActPubService extends ServiceBase {
                  * 
                  * upate: I was seeing a performance lag, so I'm setting to 4000ms for each cycle for now regardless.
                  */
-                Thread.sleep(server.equals(lastServer) ? 4000 : 1000);
+                Thread.sleep(server.equals(lastServer) ? 4000 : 2000);
                 lastServer = server;
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).

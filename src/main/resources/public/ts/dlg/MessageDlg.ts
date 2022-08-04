@@ -17,7 +17,6 @@ export class MessageDlg extends DialogBase {
         if (this.flashTimeout > 0) {
             setTimeout(() => {
                 if (this.mounted) {
-                    alert("closing flash message");
                     this.close();
                 }
             }, this.flashTimeout);
