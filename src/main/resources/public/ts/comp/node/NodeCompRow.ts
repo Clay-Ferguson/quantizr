@@ -107,7 +107,7 @@ export class NodeCompRow extends Div {
             }
         }
 
-        let buttonBar: NodeCompButtonBar = null;
+        let buttonBar = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }

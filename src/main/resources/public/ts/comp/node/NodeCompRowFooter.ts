@@ -1,5 +1,3 @@
-import { useAppState } from "../../AppRedux";
-import { AppState } from "../../AppState";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
 import * as J from "../../JavaIntf";

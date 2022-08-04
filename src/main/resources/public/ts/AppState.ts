@@ -61,6 +61,9 @@ export class AppState {
 
     // When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time
     // this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.
+
+    // todo-0: Replace these with a "FullScreenConfig interface that has {type=image,graph,calendar, nodeId}"
+    // and if the config object is non-null it means we're displaying a fullscreen something
     fullScreenViewId: string = null;
     fullScreenGraphId: string = null;
     fullScreenCalendarId: string = null;

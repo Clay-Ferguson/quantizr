@@ -1,7 +1,6 @@
 import { useAppState } from "../AppRedux";
 import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
-import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
 
