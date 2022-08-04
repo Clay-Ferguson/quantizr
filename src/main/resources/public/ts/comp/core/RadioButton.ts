@@ -14,7 +14,7 @@ export class RadioButton extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let cbInput: CheckboxInput = null;
+        let cbInput = null;
         return this.tag("span", {
             className: "form-check"
         }, [

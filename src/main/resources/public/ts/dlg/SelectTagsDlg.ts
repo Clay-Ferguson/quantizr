@@ -206,7 +206,7 @@ export class SelectTagsDlg extends DialogBase {
             this.indenting = true;
         }
         else {
-            const checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
+            const checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
                 setValue: (checked: boolean) => {
                     const state = this.getState<LS>();
                     if (checked) {

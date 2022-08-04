@@ -37,14 +37,14 @@ export class NodeCompButtonBar extends Div {
         let encIcon: Icon;
         let sharedIcon: Icon;
         let openButton: Button;
-        let selButton: Checkbox;
+        let selCheckbox: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
-        let cutNodeButton: Icon;
-        let moveNodeUpButton: Icon;
-        let moveNodeDownButton: Icon;
-        let deleteNodeButton: Icon;
-        let pasteButtons: Span;
+        let cutNodeIcon: Icon;
+        let moveNodeUpIcon: Icon;
+        let moveNodeDownIcon: Icon;
+        let deleteNodeIcon: Icon;
+        let pasteSpan: Span;
 
         const isPageRootNode = state.node && this.node.id === state.node.id;
         const typeHandler = S.plugin.getTypeHandler(this.node.type);
@@ -130,7 +130,7 @@ export class NodeCompButtonBar extends Div {
             if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
                 this.node.id !== state.homeNodeId) {
-                selButton = new Checkbox(null, {
+                selCheckbox = new Checkbox(null, {
                     title: "Select Node for multi-node functions."
                 }, {
                     setValue: (checked: boolean) => {
@@ -173,7 +173,7 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
-                    cutNodeButton = new Icon({
+                    cutNodeIcon = new Icon({
                         className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",
                         nid: this.node.id,
@@ -183,7 +183,7 @@ export class NodeCompButtonBar extends Div {
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
                     if (this.node.logicalOrdinal > 0) {
-                        moveNodeUpButton = new Icon({
+                        moveNodeUpIcon = new Icon({
                             className: "fa fa-lg fa-arrow-up buttonBarIcon",
                             title: "Move Node up one position (higher)",
                             nid: this.node.id,
@@ -192,7 +192,7 @@ export class NodeCompButtonBar extends Div {
                     }
 
                     if (!this.node.lastChild && state.node.children && state.node.children.length > 1) {
-                        moveNodeDownButton = new Icon({
+                        moveNodeDownIcon = new Icon({
                             className: "fa fa-lg fa-arrow-down buttonBarIcon",
                             title: "Move Node down one position (lower)",
                             nid: this.node.id,
@@ -205,7 +205,7 @@ export class NodeCompButtonBar extends Div {
             if (deleteAllowed) {
                 // not user's account node!
                 if (this.node.id !== state.homeNodeId) {
-                    deleteNodeButton = new Icon({
+                    deleteNodeIcon = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
                         nid: this.node.id,
@@ -215,7 +215,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (!!state.nodesToMove && userCanPaste) {
-                pasteButtons = new Span(null, { className: "float-end marginLeft" }, [
+                pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
 
@@ -225,8 +225,8 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let searchButton: Icon = null;
-        let timelineButton: Icon = null;
+        let searchIcon: Icon = null;
+        let timelineIcon: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;
@@ -257,14 +257,14 @@ export class NodeCompButtonBar extends Div {
         }
 
         if (isPageRootNode && this.node.hasChildren) {
-            searchButton = new Icon({
+            searchIcon = new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search underneath Node",
                 nid: this.node.id,
                 onClick: S.nav.runSearch
             });
 
-            timelineButton = new Icon({
+            timelineIcon = new Icon({
                 className: "fa fa-clock-o fa-lg buttonBarIcon",
                 title: "View Timeline (by Mod Time)",
                 nid: this.node.id,
@@ -273,8 +273,8 @@ export class NodeCompButtonBar extends Div {
         }
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
-            new Span(null, { className: "float-end" }, [moveNodeUpButton, //
-                moveNodeDownButton, cutNodeButton, deleteNodeButton, searchButton, timelineButton, pasteButtons])];
+            new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
+                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, searchIcon, timelineIcon, pasteSpan])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);
@@ -285,7 +285,7 @@ export class NodeCompButtonBar extends Div {
             buttonBar = null;
         }
 
-        this.setChildren([selButton, encIcon, sharedIcon, buttonBar]);
+        this.setChildren([selCheckbox, encIcon, sharedIcon, buttonBar]);
     }
 
     makeDropTarget = (attribs: any, id: string) => {

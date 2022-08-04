@@ -19,7 +19,7 @@ export class Checkbox extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let cbInput: CheckboxInput = null;
+        let cbInput = null;
         return this.tag("span", {
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
             // NOTE: custom-switch or custom-checkbox will work here with all other things being identical! The custom-switch shows

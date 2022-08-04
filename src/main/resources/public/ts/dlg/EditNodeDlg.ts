@@ -8,7 +8,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
-import { Header } from "../comp/core/Header";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Icon } from "../comp/core/Icon";
@@ -50,7 +49,6 @@ export class EditNodeDlg extends DialogBase {
 
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
-    header: Header;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
@@ -517,7 +515,7 @@ export class EditNodeDlg extends DialogBase {
         const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
         const mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
 
-        let pinCheckbox: Checkbox = null;
+        let pinCheckbox = null;
         if (ipfsLink) {
             pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
                 setValue: (checked: boolean) => {
@@ -577,7 +575,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
-        const encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
+        const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => this.utl.setEncryption(this, checked),
             getValue: (): boolean => S.props.isEncrypted(state.node)
         }) : null;
@@ -639,7 +637,6 @@ export class EditNodeDlg extends DialogBase {
 
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
-
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", null, {
@@ -766,7 +763,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (allowCheckbox) {
-                const checkbox: Checkbox = new Checkbox(label, null, {
+                const checkbox = new Checkbox(label, null, {
                     setValue: (checked: boolean) => {
                         const state = this.getState<LS>();
                         if (checked) {
