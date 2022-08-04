@@ -25,9 +25,7 @@ export class DateField extends Div implements I.ValueIntf {
     preRender(): void {
         this.setChildren([
             new Div(null, {
-                /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
-                to the component, or else there's a react-rerender flicker. */
-                style: { fontFamily: "monospace" }
+                className: "dateField"
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",

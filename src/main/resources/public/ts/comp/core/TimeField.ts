@@ -27,10 +27,7 @@ export class TimeField extends Div implements I.ValueIntf {
     preRender(): void {
         this.setChildren([
             new Div(null, {
-                /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
-                to the component, or elase there's a react-rerender flicker. */
-                style: { fontFamily: "monospace" },
-                className: this.extraClass
+                className: this.extraClass + " timeField"
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",

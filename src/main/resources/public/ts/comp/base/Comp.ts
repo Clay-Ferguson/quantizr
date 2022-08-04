@@ -99,7 +99,7 @@ export abstract class Comp implements CompIntf {
     }
 
     static getCssPrefix(): string {
-        return `C${++Comp.guid}_`;
+        return `C${(++Comp.guid).toString(36)}_`;
     }
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause

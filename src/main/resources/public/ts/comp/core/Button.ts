@@ -61,10 +61,7 @@ export class Button extends Comp {
             // We use Tag here instead of Icon, because Icon renders larger in size for mobile mode and that
             // would conflict with this button already itself sizing larger for mobile
             this.iconClass ? new Tag("i", {
-                className: "fa " + this.iconClass,
-                style: {
-                    marginRight: text ? "6px" : "0px"
-                }
+                className: "fa " + this.iconClass + (text ? " buttonIconWithText" : " buttonIconNoText")
             }) : null, text]);
     }
 }

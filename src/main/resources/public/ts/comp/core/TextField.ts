@@ -106,10 +106,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         this.setChildren([
             label,
             new Div(null, {
-                className: "input-group",
-                // **** IMPORTANT ****: Yes we set font on the PARENT and then use 'inherit' to get it
-                // to the component, or else there's a react-rerender flicker.
-                style: { fontFamily: "monospace" }
+                className: "input-group textField"
             }, [
                 input,
                 passwordEye

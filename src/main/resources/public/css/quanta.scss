@@ -1,7 +1,5 @@
 @import "variables.scss";
 
-$brandingBase: '../../../../../branding';
-
 $profileImgSize: 200px;
 $rootNodeBorder: true;
 $highlightActiveMenuItems: false;
@@ -2263,3 +2261,16 @@ audio::-webkit-media-controls-play-button {
     font-family: 'Courier New', Courier, monospace;
     border-bottom: 1px solid gray;
 }
+
+.dateField {
+    font-family: "monospace";
+}
+
+.timeField {
+    font-family: "monospace";
+}
+
+.textField {
+    font-family: "monospace";
+}
+
