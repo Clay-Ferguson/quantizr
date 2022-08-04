@@ -10,7 +10,7 @@ interface LS { // Local State
 
 export class Button extends Comp {
 
-    // *********************** DO NOT DELETE
+    // *********************** DO NOT DELETE (important css experiment)
     // #dynamic-styling-example
     // To enable this Classes custom CSS, just uncomment this code, and that's all that's required
     // to get the proof-of-concept back working. For now we use only SCSS, but this example was 

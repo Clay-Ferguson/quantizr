@@ -11,7 +11,7 @@ export class Input extends Comp {
     constructor(attribs: Object = {}, s?: State) {
         super(attribs, s || new State());
 
-        this.attribs.onChange = (evt) => {
+        this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
     }

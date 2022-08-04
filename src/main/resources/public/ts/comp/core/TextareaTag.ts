@@ -13,7 +13,7 @@ export class TextareaTag extends Comp {
 
     constructor(attribs: Object = {}, s?: State, private calcRows: boolean = false) {
         super(attribs, s);
-        this.attribs.onChange = (evt) => {
+        this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
     }

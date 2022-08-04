@@ -12,7 +12,7 @@ export class Select extends Comp {
         super(attribs);
         this.mergeState({ value: valueIntf.getValue() });
 
-        this.attribs.onChange = (evt: any) => {
+        this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.valueIntf.setValue(evt.target.value);
             this.mergeState({ value: evt.target.value });
         };
