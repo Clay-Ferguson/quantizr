@@ -2,7 +2,6 @@ import { useAppState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Icon } from "./core/Icon";

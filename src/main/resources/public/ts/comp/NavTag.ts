@@ -3,9 +3,9 @@ import { Comp } from "./base/Comp";
 
 export class NavTag extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, initialChildren: Comp[] = null) {
+    constructor(public content: string = "", attribs: Object = {}, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(initialChildren);
+        this.setChildren(children);
     }
 
     compRender = (): ReactNode => {

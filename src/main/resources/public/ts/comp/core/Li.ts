@@ -3,9 +3,9 @@ import { Comp } from "../base/Comp";
 
 export class Li extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, public initialChildren: Comp[] = null) {
+    constructor(public content: string = "", attribs: Object = {}, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(this.initialChildren);
+        this.setChildren(children);
     }
 
     compRender = (): ReactNode => {

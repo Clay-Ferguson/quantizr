@@ -8,7 +8,6 @@ import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { DialogMode } from "../../enums/DialogMode";
 import { TabIntf } from "../../intf/TabIntf";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";

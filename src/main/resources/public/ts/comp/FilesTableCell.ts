@@ -3,9 +3,9 @@ import { Comp } from "./base/Comp";
 
 export class FilesTableCell extends Comp {
 
-    constructor(public content: string = null, attribs: Object = {}, initialChildren: Comp[] = null) {
+    constructor(public content: string = null, attribs: Object = {}, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(initialChildren);
+        this.setChildren(children);
     }
 
     compRender = (): ReactNode => {

@@ -7,9 +7,9 @@ interface LS { // Local State
 }
 
 export class Div extends Comp {
-    constructor(public content: string = "", attribs: Object = {}, public initialChildren: CompIntf[] = null, private rawHtml: boolean = false) {
+    constructor(public content: string = "", attribs: Object = {}, children: CompIntf[] = null, private rawHtml: boolean = false) {
         super(attribs);
-        this.setChildren(this.initialChildren);
+        this.setChildren(children);
         this.mergeState<LS>({ content });
     }
 

@@ -4,9 +4,9 @@ import { PropTableCell } from "./PropTableCell";
 
 export class FilesTableRow extends Comp {
 
-    constructor(attribs: Object = {}, initialChildren: PropTableCell[] = null) {
+    constructor(attribs: Object = {}, children: PropTableCell[] = null) {
         super(attribs);
-        this.setChildren(initialChildren);
+        this.setChildren(children);
     }
 
     compRender = (): ReactNode => {

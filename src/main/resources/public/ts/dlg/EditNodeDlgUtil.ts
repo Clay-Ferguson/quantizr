@@ -1,6 +1,5 @@
 import { dispatch, getAppState } from "../AppRedux";
 import { DialogMode } from "../enums/DialogMode";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { SymKeyDataPackage } from "../SymKeyDataPackage";

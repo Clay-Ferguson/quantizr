@@ -13,7 +13,7 @@ export class CollapsiblePanel extends Comp {
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
         attribs: Object = {},
-        initialChildren: Comp[] = null,
+        children: Comp[] = null,
         private textLink: boolean = false,
         private stateCallback: Function = null,
         expanded: boolean = false,
@@ -22,7 +22,7 @@ export class CollapsiblePanel extends Comp {
         private extraDivStyleCollapsed: string = "",
         private elementName: string = "div") {
         super(attribs);
-        this.setChildren(initialChildren);
+        this.setChildren(children);
         this.collapsedButtonText = collapsedButtonText || "More ";
         this.expandedButtonText = expandedButtonText || "Less ";
         this.mergeState<LS>({ expanded });
