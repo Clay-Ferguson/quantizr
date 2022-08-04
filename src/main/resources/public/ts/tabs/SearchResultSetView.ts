@@ -11,7 +11,7 @@ export class SearchResultSetView extends ResultSetView {
     }
 
     pageChange(delta: number): void {
-        let state = getAppState();
+        const state = getAppState();
 
         let page = this.data.rsInfo.page;
         if (delta !== null) {

@@ -36,15 +36,15 @@ export class App extends Main {
         }
 
         if (state.dialogStack.length > 0) {
-            let dialog = state.dialogStack[state.dialogStack.length - 1];
+            const dialog = state.dialogStack[state.dialogStack.length - 1];
             if (dialog) {
                 this.setChildren([dialog]);
                 return;
             }
         }
 
-        let fullScreenViewer = this.getFullScreenViewer(state);
-        let mobileTopBar = this.getTopMobileBar(state);
+        const fullScreenViewer = this.getFullScreenViewer(state);
+        const mobileTopBar = this.getTopMobileBar(state);
         this.attribs.className = "container-fluid " + (state.mobileMode ? "mainContainerMobile" : "mainContainer");
 
         if (fullScreenViewer) {
@@ -107,12 +107,12 @@ export class App extends Main {
 
     getTopMobileBar = (state: AppState): CompIntf => {
         if (state.mobileMode) {
-            let menuButton = new IconButton("fa-bars", "Menu", {
+            const menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: () => S.nav.showMainMenu(state),
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 
-            let navButton = new IconButton("fa-sitemap", "Nav", {
+            const navButton = new IconButton("fa-sitemap", "Nav", {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
             }, "btn-primary menuButton", "off");
@@ -126,11 +126,11 @@ export class App extends Main {
             //         getValue: (): boolean => state.userPrefs.showMetaData
             //     }, "form-switch form-check-inline") : null;
 
-            let loginButton = state.isAnonUser ? new Button("Login", S.user.userLogin, {
+            const loginButton = state.isAnonUser ? new Button("Login", S.user.userLogin, {
                 className: "menuButton"
             }, "btn-primary") : null;
 
-            let logo = new Img(this.getId("logo_"), {
+            const logo = new Img(this.getId("logo_"), {
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
                 onClick: () => S.nav.navPublicHome(),

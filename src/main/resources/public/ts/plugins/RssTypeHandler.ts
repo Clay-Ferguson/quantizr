@@ -80,13 +80,13 @@ export class RssTypeHandler extends TypeBase {
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
 
         // console.log("RSSTypeHandler.render");
-        let feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
+        const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
             return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
         }
 
-        let feedSrcHash = S.util.hashOfString(feedSrc);
-        let itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
+        const feedSrcHash = S.util.hashOfString(feedSrc);
+        const itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
 
         /*
         If we find the RSS feed in the cache, use it.
@@ -123,7 +123,7 @@ export class RssTypeHandler extends TypeBase {
             }
 
             (async () => {
-                let res = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                const res = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                     urls: feedSrc,
                     page
                 }, true);
@@ -165,10 +165,10 @@ export class RssTypeHandler extends TypeBase {
     }
 
     renderItem(feed: J.RssFeed, feedSrc: string, itemListContainer: Comp, state: AppState) {
-        let feedOut: Comp[] = [];
+        const feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
-        let feedSrcHash = S.util.hashOfString(feedSrc);
+        const feedSrcHash = S.util.hashOfString(feedSrc);
         let page: number = state.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
@@ -228,10 +228,10 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Div(feed.author));
         }
 
-        let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
+        const feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
         itemListContainer.addChild(feedOutDiv);
 
-        for (let item of feed.entries) {
+        for (const item of feed.entries) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
             itemListContainer.addChild(this.buildFeedItem(feed, item, state));
         }
@@ -289,8 +289,8 @@ export class RssTypeHandler extends TypeBase {
 
     buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, state: AppState): Comp {
         // console.log("ENTRY: " + S.util.prettyPrint(entry));
-        let children: Comp[] = [];
-        let headerDivChildren = [];
+        const children: Comp[] = [];
+        const headerDivChildren = [];
         let imageShown = false;
 
         /* todo-2: Sometimes entry.category can be an Object (not a String) here which will
@@ -342,9 +342,9 @@ export class RssTypeHandler extends TypeBase {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
                     audioUrl = enc.url;
-                    let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
-                    let audioButton = new Button("Play Audio", () => {
-                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0);
+                    const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
+                    const audioButton = new Button("Play Audio", () => {
+                        const dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0);
                         dlg.open();
                     }, { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
@@ -403,9 +403,9 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        let tabData = state.tabData.find(d => d.id === C.TAB_MAIN);
+        const tabData = state.tabData.find(d => d.id === C.TAB_MAIN);
         if (anchor) {
-            let og = new OpenGraphPanel(state, tabData, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            const og = new OpenGraphPanel(state, tabData, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
             if (tabData) {
@@ -413,7 +413,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        let linkIcon = new Icon({
+        const linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
             title: "Copy RSS Item URL into clipboard",
             onClick: () => {
@@ -422,7 +422,7 @@ export class RssTypeHandler extends TypeBase {
             }
         });
 
-        let postIcon = !state.isAnonUser ? new Icon({
+        const postIcon = !state.isAnonUser ? new Icon({
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
@@ -430,7 +430,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }) : null;
 
-        let bookmarkIcon = !state.isAnonUser ? new Icon({
+        const bookmarkIcon = !state.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg rssLinkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
@@ -440,7 +440,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }) : null;
 
-        let footerSpan = new Span(entry.publishDate, { className: "marginRight" });
+        const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
         children.push(new Div(null, null, [
             new Span(null, { className: "float-end" }, [
@@ -475,7 +475,7 @@ export class RssTypeHandler extends TypeBase {
             todo-2: We could use this same logic on each individual FEED ITEM (fediverse), but for now I decided not to
             hide any dupliate images so this is commented out for now.
             */
-            let src: string = (el as any).src;
+            const src: string = (el as any).src;
             // if (urlSet.has(src)) {
             //     el.style.display = "none";
             //     return;

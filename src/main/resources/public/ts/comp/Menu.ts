@@ -20,13 +20,13 @@ export class Menu extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let state = this.getState<LS>();
-        let appState = useAppState();
+        const state = this.getState<LS>();
+        const appState = useAppState();
         this.attribs.style = {
             display: (state.visible && !state.disabled ? "" : "none"),
             expanded: false
         };
-        let show = appState.activeMenu === this.name;
+        const show = appState.activeMenu === this.name;
 
         this.setChildren([
             new Div(this.name, {
@@ -41,9 +41,9 @@ export class Menu extends Comp {
                     setTimeout(() => {
                         /* "aria-expanded" attribute won't have been updated yet when this onClick is called, so we have a delay
                         timer here to wait for it to get updated */
-                        let headingElm = document.getElementById(this.getId("heading"));
-                        let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
-                        let activeName = expanded ? this.name : null;
+                        const headingElm = document.getElementById(this.getId("heading"));
+                        const expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
+                        const activeName = expanded ? this.name : null;
 
                         dispatch("setActiveMenu", (s) => {
                             s.activeMenu = activeName;

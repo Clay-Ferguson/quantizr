@@ -40,7 +40,7 @@ export class SearchUsersDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let adminOptions = new RadioButtonGroup([
+        const adminOptions = new RadioButtonGroup([
             getAppState().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
@@ -107,7 +107,7 @@ export class SearchUsersDlg extends DialogBase {
 
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
-        let desc = "User " + SearchUsersDlg.defaultSearchText;
+        const desc = "User " + SearchUsersDlg.defaultSearchText;
         S.srch.search(null, "", SearchUsersDlg.defaultSearchText, getAppState(), this.getState<LS>().searchType, desc,
             this.getState<LS>().fuzzy,
             this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, this.close);

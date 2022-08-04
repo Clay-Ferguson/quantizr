@@ -66,8 +66,8 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     preRender(): void {
-        let state = this.getState<LS>();
-        let children = [new ErrorDiv(this.valState.e)];
+        const state = this.getState<LS>();
+        const children = [new ErrorDiv(this.valState.e)];
 
         if (this.label) {
             children.push(new Label(this.label, {
@@ -76,7 +76,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
             }));
         }
 
-        let att = { ...this.textareaAttribs };
+        const att = { ...this.textareaAttribs };
 
         // only if 'id' not already provided we set a default id for textarea,
         // sometimes id is provided in order to help with persistence of focus

@@ -32,24 +32,24 @@ export class MainTabCompData implements TabIntf {
     // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
     customAnonRHSLinks = (state: AppState): CompIntf[] => {
-        let items: CompIntf[] = [];
+        const items: CompIntf[] = [];
 
         // if not anon user return empty items
         if (!state.isAnonUser) return items;
 
         if (state.config?.rhsAnonLinks) {
-            for (let menuItem of state.config.rhsAnonLinks) {
+            for (const menuItem of state.config.rhsAnonLinks) {
                 if (menuItem.name === "separator") {
                     // items.push(new MenuItemSeparator());
                 }
                 else {
-                    let link: string = menuItem.link;
+                    const link: string = menuItem.link;
                     let func: Function = null;
 
                     if (link) {
                         // allows ability to select a tab
                         if (link.startsWith("tab:")) {
-                            let tab = link.substring(4);
+                            const tab = link.substring(4);
 
                             /* special case for feed tab */
                             if (tab === C.TAB_FEED) {

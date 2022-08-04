@@ -27,18 +27,18 @@ export class OpenGraphPanel extends Div {
 
         /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
          pull of the open graph data should result in og being an empty object and not null. */
-        let og: J.OpenGraph = S.quanta.openGraphData.get(url);
+        const og: J.OpenGraph = S.quanta.openGraphData.get(url);
         if (og) {
             this.mergeState<LS>({ og });
         }
     }
 
     domAddEvent = () => {
-        let elm: HTMLElement = this.getRef();
+        const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
-        let og = S.quanta.openGraphData.get(this.url);
+        const og = S.quanta.openGraphData.get(this.url);
         if (!og) {
-            let observer = new IntersectionObserver(entries => entries.forEach(entry => this.processOgEntry(entry, elm)));
+            const observer = new IntersectionObserver(entries => entries.forEach(entry => this.processOgEntry(entry, elm)));
             observer.observe(elm.parentElement);
         }
         else {
@@ -48,7 +48,7 @@ export class OpenGraphPanel extends Div {
 
     processOgEntry = (entry: any, elm: HTMLElement) => {
         if (!entry.isIntersecting) return;
-        let og = S.quanta.openGraphData.get(this.url);
+        const og = S.quanta.openGraphData.get(this.url);
         if (!og) {
             if (!this.loading) {
                 this.loading = true;
@@ -86,7 +86,7 @@ export class OpenGraphPanel extends Div {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {
-                    let og = S.quanta.openGraphData.get(o.url);
+                    const og = S.quanta.openGraphData.get(o.url);
                     if (!og) {
                         if (!o.loading) {
                             o.loading = true;
@@ -118,7 +118,7 @@ export class OpenGraphPanel extends Div {
     }
 
     preRender(): void {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         if (state.loading || !state.og) {
             this.setChildren(null);
             return;
@@ -134,7 +134,7 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        let bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.appState.isAnonUser ? new Icon({
+        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.appState.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
             onClick: () => {
                 S.edit.addLinkBookmark(state.og.url, null, null);

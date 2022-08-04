@@ -33,7 +33,7 @@ export class EditTagsDlg extends DialogBase {
     }
 
     reload = async () => {
-        let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: getAppState().userProfile.userNodeId
         });
 

@@ -32,7 +32,7 @@ export class UserProfileDlg extends DialogBase {
     some other user, and this dialog should be readOnly */
     constructor(private userNodeId: string) {
         super("User Profile", "app-modal-content");
-        let state = getAppState();
+        const state = getAppState();
         userNodeId = userNodeId || state.userProfile.userNodeId;
         this.readOnly = !state.userProfile || state.userProfile.userNodeId !== userNodeId;
         this.mergeState<LS>({ userProfile: null });
@@ -49,27 +49,27 @@ export class UserProfileDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state = this.getState<LS>();
-        let appState = getAppState();
+        const state = this.getState<LS>();
+        const appState = getAppState();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
 
-        let profileHeaderImg = this.makeProfileHeaderImg();
-        let profileImg = this.makeProfileImg(!!profileHeaderImg);
-        let localUser = S.util.isLocalUserName(state.userProfile.userName);
+        const profileHeaderImg = this.makeProfileHeaderImg();
+        const profileImg = this.makeProfileImg(!!profileHeaderImg);
+        const localUser = S.util.isLocalUserName(state.userProfile.userName);
         let web3Div: Div = null;
-        let web3Enabled = appState.allowedFeatures && appState.allowedFeatures.indexOf("web3") !== -1;
+        const web3Enabled = appState.allowedFeatures && appState.allowedFeatures.indexOf("web3") !== -1;
 
         if (web3Enabled) {
-            let web3Comps: CompIntf[] = [];
+            const web3Comps: CompIntf[] = [];
 
             if (state.userProfile.didIPNS) {
                 web3Comps.push(new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
                     title: "Decentralized Identity (DID) IPNS Name",
                     className: "marginTop clickable",
                     onClick: () => {
-                        let link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
+                        const link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
                         S.util.copyToClipboard(link);
                         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
                         // window.open(link, "_blank");
@@ -80,7 +80,7 @@ export class UserProfileDlg extends DialogBase {
             if (!this.readOnly) {
                 web3Comps.push(new Checkbox("Web3 File System", null, {
                     setValue: (checked: boolean) => {
-                        let state = this.getState<LS>();
+                        const state = this.getState<LS>();
                         state.userProfile.mfsEnable = checked;
                         this.mergeState<LS>({ userProfile: state.userProfile });
                     },
@@ -91,7 +91,7 @@ export class UserProfileDlg extends DialogBase {
             web3Div = new Div(null, null, web3Comps);
         }
 
-        let children = [
+        const children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
@@ -201,14 +201,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     deleteFriend = async () => {
-        let res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+        const res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
     }
 
     unblockUser = async () => {
-        let res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
+        const res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
@@ -226,7 +226,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async (userNodeId: string) => {
-        let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: userNodeId
         });
 
@@ -241,8 +241,8 @@ export class UserProfileDlg extends DialogBase {
     }
 
     save = async () => {
-        let state = this.getState<LS>();
-        let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        const state = this.getState<LS>();
+        const res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -254,8 +254,8 @@ export class UserProfileDlg extends DialogBase {
     }
 
     publish = async () => {
-        let state = this.getState<LS>();
-        let res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        const state = this.getState<LS>();
+        const res = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -268,7 +268,7 @@ export class UserProfileDlg extends DialogBase {
 
     addFriend = async () => {
         const state: any = this.getState<LS>();
-        let res = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+        const res = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         });
 
@@ -298,7 +298,7 @@ export class UserProfileDlg extends DialogBase {
 
     blockUser = async () => {
         const state: any = this.getState<LS>();
-        let res = await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+        const res = await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
 
@@ -329,23 +329,22 @@ export class UserProfileDlg extends DialogBase {
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {
         let src: string = null;
-        let state: any = this.getState<LS>();
+        const state: any = this.getState<LS>();
 
         // if ActivityPub icon exists, we know that's the one to use.
         if (state.userProfile.apIconUrl) {
             src = state.userProfile.apIconUrl;
         }
         else {
-            let avatarVer = state.userProfile.avatarVer;
+            const avatarVer = state.userProfile.avatarVer;
             src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, avatarVer);
         }
 
-        let onClick = async () => {
+        const onClick = async () => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, async () => {
-
-                let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, async () => {
+                const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
 
@@ -361,7 +360,7 @@ export class UserProfileDlg extends DialogBase {
         };
 
         if (src) {
-            let att: any = {
+            const att: any = {
                 className: "userProfileDlgAvatar",
                 src,
                 onClick
@@ -395,16 +394,16 @@ export class UserProfileDlg extends DialogBase {
             src = state.userProfile.apImageUrl;
         }
         else {
-            let headerImageVer = state.userProfile.headerImageVer;
+            const headerImageVer = state.userProfile.headerImageVer;
             src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, headerImageVer);
         }
 
-        let onClick = () => {
+        const onClick = () => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false,
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false,
                 async () => {
-                    let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                         userId: state.userProfile.userNodeId
                     });
 
@@ -420,7 +419,7 @@ export class UserProfileDlg extends DialogBase {
         };
 
         if (src) {
-            let att: any = {
+            const att: any = {
                 className: "userProfileDlgHeader",
                 src,
                 onClick

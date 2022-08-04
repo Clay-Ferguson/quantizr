@@ -23,14 +23,14 @@ export class FullScreenGraphViewer extends Main {
     constructor(appState: AppState) {
         super();
         this.nodeId = appState.fullScreenGraphId;
-        let node: J.NodeInfo = S.nodeUtil.findNodeById(appState, this.nodeId);
+        const node = S.nodeUtil.findNodeById(appState, this.nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + this.nodeId);
         }
 
         (async () => {
-            let res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+            const res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
                 searchText: appState.graphSearchText,
                 nodeId: this.nodeId
             });
@@ -43,10 +43,10 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent = () => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         if (!state.data) return;
 
-        let customForceDirectedTree = this.forceDirectedTree();
+        const customForceDirectedTree = this.forceDirectedTree();
 
         d3.select(".d3Graph")
             .datum(state.data)
@@ -54,22 +54,22 @@ export class FullScreenGraphViewer extends Main {
     }
 
     forceDirectedTree = () => {
-        let thiz = this;
+        const thiz = this;
 
         return function (selection: any) {
-            let margin = { top: 0, right: 0, bottom: 0, left: 0 };
-            let width = window.innerWidth;
-            let height = window.innerHeight;
+            const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+            const width = window.innerWidth;
+            const height = window.innerHeight;
 
-            let data = selection.datum();
-            let chartWidth = width - margin.left - margin.right;
-            let chartHeight = height - margin.top - margin.bottom;
+            const data = selection.datum();
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
 
-            let root = d3.hierarchy(data);
-            let links = root.links();
-            let nodes = root.descendants();
+            const root = d3.hierarchy(data);
+            const links = root.links();
+            const nodes = root.descendants();
 
-            let simulation = d3.forceSimulation(nodes)
+            const simulation = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(links).id(d => d.id).distance(0).strength(1))
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
@@ -81,7 +81,7 @@ export class FullScreenGraphViewer extends Main {
                 .style("font-size", "14px")
                 .style("pointer-events", "none");
 
-            let drag = function (simulation) {
+            const drag = function (simulation) {
                 return d3.drag()
                     .on("start", function (event: any, d: any) {
                         thiz.isDragging = true;
@@ -111,9 +111,9 @@ export class FullScreenGraphViewer extends Main {
                 .style("cursor", "move")
                 .attr("viewBox", [-window.innerWidth / 2, -window.innerHeight / 2, window.innerWidth, window.innerHeight]);
             svg = svg.merge(svg);
-            let g = svg.append("g");
+            const g = svg.append("g");
 
-            let link = g.append("g")
+            const link = g.append("g")
                 .attr("stroke", "#999")
                 .attr("stroke-width", 1.5)
                 .attr("stroke-opacity", 0.6)
@@ -121,7 +121,7 @@ export class FullScreenGraphViewer extends Main {
                 .data(links)
                 .join("line");
 
-            let node = g.append("g")
+            const node = g.append("g")
                 .attr("stroke-width", 1.5)
                 .style("cursor", "pointer")
                 .selectAll("circle")
@@ -187,7 +187,7 @@ export class FullScreenGraphViewer extends Main {
                     .attr("cy", d => d.y);
             });
 
-            let zoomHandler = d3.zoom()
+            const zoomHandler = d3.zoom()
                 .on("zoom", function (event: any) {
                     const { transform } = event;
                     g.attr("stroke-width", 1 / transform.k);
@@ -230,7 +230,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     updateTooltip = async (d: any, x: number, y: number) => {
-        let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
             upLevel: false,
             siblingOffset: 0,

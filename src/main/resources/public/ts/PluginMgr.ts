@@ -33,7 +33,7 @@ export class PluginMgr {
     }
 
     getTypeHandler = (typeName: string): TypeHandlerIntf => {
-        let handler: TypeHandlerIntf = this.typeHandlers.get(typeName);
+        const handler = this.typeHandlers.get(typeName);
         if (!handler) {
             console.warn("No type handler for: " + typeName);
         }

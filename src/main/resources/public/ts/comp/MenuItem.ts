@@ -21,11 +21,11 @@ export class MenuItem extends Div {
     }
 
     compRender = (): ReactNode => {
-        let state: LS = this.getState<LS>();
-        let enablement = state.enabled ? {} : { disabled: "disabled" };
-        let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
+        const state: LS = this.getState<LS>();
+        const enablement = state.enabled ? {} : { disabled: "disabled" };
+        const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
-        let prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
+        const prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
         this.setChildren([
             new Span(S.render.parseEmojis(prefix + state.content), null, null, true),
             this.floatRightComp
@@ -44,7 +44,7 @@ export class MenuItem extends Div {
     }
 
     onClick(): void {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         if (!state.enabled) return;
 
         if (S.quanta.mainMenu) {

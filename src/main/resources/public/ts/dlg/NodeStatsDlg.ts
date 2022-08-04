@@ -19,8 +19,8 @@ export class NodeStatsDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
-        let tagPanel = new Div(null, { className: "wordStatsArea" });
-        let state = getAppState();
+        const tagPanel = new Div(null, { className: "wordStatsArea" });
+        const state = getAppState();
         
         if (this.res.topTags?.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags"));
@@ -33,7 +33,7 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        let mentionPanel = new Div(null, { className: "wordStatsArea" });
+        const mentionPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topMentions?.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions"));
             this.res.topMentions.forEach((word: string) => {
@@ -45,7 +45,7 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        let wordPanel = new Div(null, { className: "wordStatsArea" });
+        const wordPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topWords?.length > 0) {
             wordPanel.addChild(new Heading(4, "Words"));
             this.res.topWords.forEach((word: string) => {
@@ -75,11 +75,11 @@ export class NodeStatsDlg extends DialogBase {
     searchWord = (evt: Event) => {
         this.close();
 
-        let word = S.domUtil.getPropFromDom(evt, "word");
+        const word = S.domUtil.getPropFromDom(evt, "word");
         if (!word) return;
 
         if (this.feed) {
-            let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+            const feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
             if (feedData) {
                 feedData.props.searchTextState.setValue(word);
             }

@@ -26,8 +26,8 @@ export class SharingDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let isPublic = S.props.isPublic(this.node);
-        let state: LS = this.getState<LS>();
+        const isPublic = S.props.isPublic(this.node);
+        const state: LS = this.getState<LS>();
 
         return [
             new Div(null, null, [
@@ -70,7 +70,7 @@ export class SharingDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     new Button("Add Person", async () => {
-                        let friendsDlg: FriendsDlg = new FriendsDlg(this.node, true);
+                        const friendsDlg: FriendsDlg = new FriendsDlg(this.node, true);
                         await friendsDlg.open();
                         if (friendsDlg.getState().selectedName) {
                             this.dirty = true;
@@ -88,7 +88,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareImmediate = async (userName: string) => {
-        let state: LS = this.getState<LS>();
+        const state: LS = this.getState<LS>();
 
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
@@ -106,7 +106,7 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and saves into state.
      */
     reload = async () => {
-        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
@@ -117,7 +117,7 @@ export class SharingDlg extends DialogBase {
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
             privilege: "*"
@@ -133,7 +133,7 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    let res = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                    const res = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: this.node.id
                     });
                     S.quanta.refresh(getAppState());
@@ -147,7 +147,7 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
             privilege
@@ -156,7 +156,7 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilegeResponse = async () => {
-        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
@@ -168,7 +168,7 @@ export class SharingDlg extends DialogBase {
 
     shareNodeToPublic = async (allowAppends: boolean) => {
         this.dirty = true;
-        let encrypted = S.props.isEncrypted(this.node);
+        const encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;

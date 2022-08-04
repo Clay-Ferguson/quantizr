@@ -30,9 +30,9 @@ export class Props {
         dstNode.properties = dstNode.properties || [];
 
         this.allBinaryProps.forEach(k => {
-            let propVal = this.getPropStr(k, srcNode);
-            if (propVal) {
-                this.setPropVal(k, dstNode, propVal);
+            const val = this.getPropStr(k, srcNode);
+            if (val) {
+                this.setPropVal(k, dstNode, val);
             }
             else {
                 this.deleteProp(dstNode, k);
@@ -307,7 +307,7 @@ export class Props {
     }
 
     getParentPath = (node: J.NodeInfo): string => {
-        let slashIdx = node.path.lastIndexOf("/");
+        const slashIdx = node.path.lastIndexOf("/");
         if (slashIdx === -1) return null;
         return node.path.substring(0, slashIdx);
     }

@@ -46,7 +46,7 @@ export class UploadFromUrlDlg extends DialogBase {
             return;
         }
 
-        let res = await S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
+        const res = await S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
             storeLocally: UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()

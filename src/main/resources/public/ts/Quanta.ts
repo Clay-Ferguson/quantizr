@@ -115,7 +115,7 @@ export class Quanta {
             console.log("createTabs");
             S.tabUtil.createAppTabs();
 
-            let state = getAppState();
+            const state = getAppState();
             state.pendingLocationHash = window.location.hash;
 
             console.log("createPlugins");
@@ -179,7 +179,7 @@ export class Quanta {
 
                 document.body.addEventListener("click", function (e: any) {
                     e = e || window.event;
-                    let target: HTMLElement = e.target;
+                    const target: HTMLElement = e.target;
 
                     // Whenever something is clicked, forget the pending focus data
                     Comp.focusElmId = null;
@@ -315,7 +315,7 @@ export class Quanta {
             // This timer delay is just for asthetics and should not be required.
             setTimeout(async () => {
                 S.push.init();
-                let res = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+                const res = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
                     appGuid: Quanta.appGuid
                 }, true);
                 if (res.config) {

@@ -20,7 +20,7 @@ declare var __page;
 
 // This is how we run the main app (normal flow)
 if ((window as any).__page === "index") {
-    let factory = new Factory();
+    const factory = new Factory();
 
     window.addEventListener("load", (event) => {
         console.log("factory.initApp");
@@ -40,8 +40,8 @@ else if ((window as any).__page === "tsx-test") {
 }
 else if ((window as any).__page === "tutorial") {
     window.addEventListener("load", (event) => {
-        let factory = new Factory();
-        let tutorialRoot = new TutorialApp();
+        const factory = new Factory();
+        const tutorialRoot = new TutorialApp();
         tutorialRoot.updateDOM(store, "app");
     });
 }

@@ -47,8 +47,6 @@ export class Constants {
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 
-    /* ======================================================================== */
-
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";

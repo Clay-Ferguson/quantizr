@@ -97,7 +97,7 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        const children = [
             new Div(null, null, [
                 this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
                 this.audioPlayer = new AudioPlayer({
@@ -226,19 +226,19 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     postComment = () => {
-        let link = this.getLink();
+        const link = this.getLink();
         S.edit.addNode(null, false, "\n\n" + link, null, null, null, null, true, getAppState());
     }
 
     copyToClipboard = () => {
-        let link = this.getLink();
+        const link = this.getLink();
         S.util.copyToClipboard(link);
         S.util.flashMessage("Copied link clipboard, with timecode.", "Clipboard", true);
     }
 
     getLink = (): string => {
-        let port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
-        let link = location.protocol + "//" + location.hostname + port + "?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
+        const port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
+        const link = location.protocol + "//" + location.hostname + port + "?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
         return link;
     }
 
@@ -266,7 +266,7 @@ export class AudioPlayerDlg extends DialogBase {
         this.restoreStartTime();
 
         if (this.adSegments) {
-            for (let seg of this.adSegments) {
+            for (const seg of this.adSegments) {
                 /* endTime of -1 means the rest of the media should be considered ADs */
                 if (this.player.currentTime >= seg.beginTime && //
                     (this.player.currentTime <= seg.endTime || seg.endTime < 0)) {
@@ -302,7 +302,7 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     savePlayerInfo = (url: string, timeOffset: number) => {
-        let urlHash = S.util.hashOfString(url);
+        const urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
     }
 }

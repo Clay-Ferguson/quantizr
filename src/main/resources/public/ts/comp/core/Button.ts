@@ -33,7 +33,7 @@ export class Button extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let text: string = this.getState<LS>().text;
+        const text: string = this.getState<LS>().text;
 
         if (this.getState<LS>().enabled) {
             delete this.attribs.disabled;

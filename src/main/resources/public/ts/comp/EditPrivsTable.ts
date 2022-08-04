@@ -11,7 +11,7 @@ export class EditPrivsTable extends ListBox {
     }
 
     preRender(): void {
-        let children = [];
+        const children = [];
 
         if (this.nodePrivsInfo?.aclEntries) {
             // first add public, so it's at the top

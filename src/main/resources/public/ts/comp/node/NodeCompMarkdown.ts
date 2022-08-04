@@ -26,15 +26,15 @@ export class NodeCompMarkdown extends Html {
         this.purifyHtml = node.owner !== "admin";
 
         if (!appState.mobileMode) {
-            let widthStyle = node.content && node.content.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
+            const widthStyle = node.content && node.content.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
             this.attribs.className = "markdown-content " + widthStyle;
         }
         else {
             this.attribs.className = "markdown-content";
         }
 
-        let content = node.content || "";
-        let att: LS = {
+        const content = node.content || "";
+        const att: LS = {
             content: null
         };
 
@@ -58,8 +58,8 @@ export class NodeCompMarkdown extends Html {
         let val = "";
 
         if (node.type === J.NodeType.PLAIN_TEXT) {
-            let nowrapProp = S.props.getProp(J.NodeProp.NOWRAP, node);
-            let wordWrap = !(nowrapProp && nowrapProp.value === "1");
+            const nowrapProp = S.props.getProp(J.NodeProp.NOWRAP, node);
+            const wordWrap = !(nowrapProp && nowrapProp.value === "1");
 
             if (content) {
                 if (wordWrap) {
@@ -101,7 +101,7 @@ export class NodeCompMarkdown extends Html {
             val.indexOf(">") === -1) return;
 
         this.urls = null;
-        let elm = document.createElement("html");
+        const elm = document.createElement("html");
         elm.innerHTML = val;
         elm.querySelectorAll("a").forEach((e: any) => {
             if (!e.href) return;
@@ -124,11 +124,11 @@ export class NodeCompMarkdown extends Html {
     }
 
     preRender(): void {
-        let state: LS = this.getState<LS>();
+        const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {
-            let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-            let cipherHash: string = S.util.hashOfString(cipherText);
+            const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
+            const cipherHash: string = S.util.hashOfString(cipherText);
 
             // if we have already decrypted this data use the result.
             if (S.quanta.decryptCache.get(cipherHash)) {
@@ -150,13 +150,13 @@ export class NodeCompMarkdown extends Html {
     }
 
     decrypt = async () => {
-        let state: LS = this.getState<LS>();
+        const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
-        let appState = getAppState();
-        let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
+        const appState = getAppState();
+        const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 
-        let cipherKey = S.props.getCryptoKey(this.node, appState);
+        const cipherKey = S.props.getCryptoKey(this.node, appState);
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });

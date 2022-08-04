@@ -20,13 +20,13 @@ export class HelpButton extends Comp {
     }
 
     openHelpDialog = () => {
-        let helpText = this.getHelpText();
+        const helpText = this.getHelpText();
         if (helpText) {
             // By convention the first line of text is taken as the title for the help
-            let idx = helpText.indexOf("\n");
+            const idx = helpText.indexOf("\n");
             if (idx !== -1) {
-                let title = helpText.substring(0, idx);
-                let content = helpText.substring(idx);
+                const title = helpText.substring(0, idx);
+                const content = helpText.substring(idx);
                 // content = content.replace("\n\n", "[nl]");
                 // content = content.replace("\n", " ");
                 // content = content.replace("[nl]", "\n\n");

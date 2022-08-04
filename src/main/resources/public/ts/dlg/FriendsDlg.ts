@@ -41,7 +41,7 @@ export class FriendsDlg extends DialogBase {
         });
 
         (async () => {
-            let res = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
+            const res = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
             this.mergeState<LS>({
                 friends: res.friends,
                 loading: false
@@ -50,7 +50,7 @@ export class FriendsDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state: LS = this.getState();
+        const state: LS = this.getState();
         let message = null;
         if (state.loading) {
             message = "Loading...";
@@ -76,7 +76,7 @@ export class FriendsDlg extends DialogBase {
     }
 
     shareToPersonDlg = async () => {
-        let dlg = new ShareToPersonDlg(this.node, null);
+        const dlg = new ShareToPersonDlg(this.node, null);
         await dlg.open();
 
         if (dlg.userNameState.getValue()) {

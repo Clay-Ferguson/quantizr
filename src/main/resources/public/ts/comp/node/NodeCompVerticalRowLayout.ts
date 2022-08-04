@@ -19,18 +19,18 @@ export class NodeCompVerticalRowLayout extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let childCount: number = this.node.children.length;
-        let comps: Comp[] = [];
-        let collapsedComps: Object[] = [];
-        let allowInsert = S.edit.isInsertAllowed(this.node, state);
+        const state = useAppState();
+        const childCount: number = this.node.children.length;
+        const comps: Comp[] = [];
+        const collapsedComps: Object[] = [];
+        const allowInsert = S.edit.isInsertAllowed(this.node, state);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
-        let isMine = S.props.isMine(state.node, state);
+        const isMine = S.props.isMine(state.node, state);
 
         this.node.children?.forEach((n: J.NodeInfo) => {
             if (!n) return;
@@ -41,8 +41,8 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
-                    let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, n.boostedNode);
-                    let typeHandler = S.plugin.getTypeHandler(n.boostedNode.type);
+                    const childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, n.boostedNode);
+                    const typeHandler = S.plugin.getTypeHandler(n.boostedNode.type);
                     boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, childrenImgSizes, this.allowHeaders, false, true, true, null, state);
                 }
 
@@ -54,8 +54,8 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 else {
-                    let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                    let typeHandler = S.plugin.getTypeHandler(n.type);
+                    const childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                    const typeHandler = S.plugin.getTypeHandler(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
                     if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
@@ -103,7 +103,7 @@ export class NodeCompVerticalRowLayout extends Div {
         });
 
         if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPrefs.editMode) {
-            let attribs = {};
+            const attribs = {};
             if (state.userPrefs.editMode) {
                 S.render.setNodeDropHandler(attribs, lastNode, false, state);
             }
@@ -145,7 +145,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 });
 
                 if (lastNode) {
-                    let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
+                    const userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
                     if (!!state.nodesToMove && userCanPaste) {
                         comps.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton marginLeft"));
                     }

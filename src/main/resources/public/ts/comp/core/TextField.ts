@@ -70,22 +70,22 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     }
 
     preRender(): void {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
 
-        let label = this.cfg.label ? new Label(this.cfg.label, {
+        const label = this.cfg.label ? new Label(this.cfg.label, {
             key: this.getId("label_"),
             className: "txtFieldLabel",
             htmlFor: this.getId("inputId_")
         }) : null;
 
-        let input = this.input = new Input({
+        const input = this.input = new Input({
             placeholder: this.cfg.placeholder || "",
             className: "form-control pre-textfield " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: this.getId("inputId_")
         }, this.cfg.val.v);
 
-        let passwordEye = this.cfg.pwd ? new Span(null, {
+        const passwordEye = this.cfg.pwd ? new Span(null, {
             className: "input-group-addon"
         }, [
             new Anchor(null, null, {

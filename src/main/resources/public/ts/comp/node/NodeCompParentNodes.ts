@@ -18,12 +18,12 @@ export class NodeCompParentNodes extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
          from 'parents' array, but the system architecture is such that if we ever want to display
          more than one parent we can implement that easily */
-        let node = state.node.parents[0];
+        const node = state.node.parents[0];
 
         if (!node) {
             this.setChildren(null);
@@ -31,7 +31,7 @@ export class NodeCompParentNodes extends Div {
         }
 
         this.attribs.className = "parentNodeContentStyle";
-        let showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
+        const showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
 
         this.setChildren([
             state.userPrefs.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,

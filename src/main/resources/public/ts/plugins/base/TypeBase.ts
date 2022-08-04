@@ -65,7 +65,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     hasCustomProp = (prop: string): boolean => {
-        let customProps = this.getCustomProperties();
+        const customProps = this.getCustomProperties();
         if (!customProps) return false;
         return !!customProps.find(p => p === prop);
     }
@@ -84,7 +84,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
-        let prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
+        const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
 
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -103,7 +103,7 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        let comp: NodeCompMarkdown = node.content ? new NodeCompMarkdown(node, state) : null;
+        const comp: NodeCompMarkdown = node.content ? new NodeCompMarkdown(node, state) : null;
 
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
@@ -111,12 +111,12 @@ export class TypeBase implements TypeHandlerIntf {
         */
         // This OpenGraph logic should maybe be just built into the Markdown component itself?
         if (comp?.urls) {
-            let children: CompIntf[] = [comp];
+            const children: CompIntf[] = [comp];
             let count = 0;
             comp.urls.forEach((url: string) => {
                 // allow max of 10 urls.
                 if (count++ < 10) {
-                    let og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url, "openGraphPanel", "openGraphImage", true, true, true);
+                    const og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url, "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {
@@ -127,7 +127,7 @@ export class TypeBase implements TypeHandlerIntf {
             return new Div(null, null, children);
         }
         else {
-            let isRoot = node.id === state.node?.id;
+            const isRoot = node.id === state.node?.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (state.userPrefs.showMetaData || state.userPrefs.editMode)) {
@@ -157,7 +157,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     ensureStringPropExists(node: J.NodeInfo, propName: string) {
-        let prop = S.props.getProp(propName, node);
+        const prop = S.props.getProp(propName, node);
         if (!prop) {
             node.properties = node.properties || [];
             node.properties.push({

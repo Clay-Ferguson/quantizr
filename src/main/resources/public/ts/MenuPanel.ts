@@ -41,13 +41,13 @@ export class MenuPanel extends Div {
     };
 
     static openBookmarksNode = () => {
-        let state = getAppState();
+        const state = getAppState();
         S.util.setUserPreferences(state, true);
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
     static continueEditing = () => {
-        let state = getAppState();
+        const state = getAppState();
         if (state.editNode) {
             S.view.jumpToId(state.editNode.id);
         }
@@ -102,7 +102,7 @@ export class MenuPanel extends Div {
 
     static readJSONfromURL = () => {
         // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
-        let url = window.prompt("ActivityPub Object URL: ");
+        const url = window.prompt("ActivityPub Object URL: ");
         if (url) {
             S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "", getAppState(null));
         }
@@ -119,13 +119,13 @@ export class MenuPanel extends Div {
             return s;
         });
 
-        let state = getAppState(null);
+        const state = getAppState(null);
         state.userPrefs.enableIPSM = true;
         S.util.saveUserPreferences(state);
     };
 
     static showKeys = () => {
-        let f = async () => {
+        const f = async () => {
             new ManageEncryptionKeysDlg().open();
         };
         f();
@@ -162,7 +162,7 @@ export class MenuPanel extends Div {
 
         const children = [];
 
-        let bookmarkItems = [];
+        const bookmarkItems = [];
         if (!state.isAnonUser) {
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
@@ -171,7 +171,7 @@ export class MenuPanel extends Div {
                 });
             }
 
-            let hasBookmarks = bookmarkItems.length > 0;
+            const hasBookmarks = bookmarkItems.length > 0;
             if (bookmarkItems.length > 0) {
                 bookmarkItems.push(new MenuItemSeparator());
             }
@@ -198,7 +198,7 @@ export class MenuPanel extends Div {
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
-        let messagesSuffix = state.newMessageCount > 0
+        const messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
 
         // These options will appear on the RHS for desktop mode
@@ -271,8 +271,8 @@ export class MenuPanel extends Div {
             // ), //
         ], null, this.makeHelpIcon(":menu-edit")));
 
-        let createMenuItems = [];
-        let typeHandlers = S.plugin.getAllTypeHandlers();
+        const createMenuItems = [];
+        const typeHandlers = S.plugin.getAllTypeHandlers();
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
                 createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, state), //
@@ -502,7 +502,7 @@ export class MenuPanel extends Div {
 
                     /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
-                    let sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
+                    const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                     tts.speak(sayThis);
                 })
             ]));
@@ -526,20 +526,20 @@ export class MenuPanel extends Div {
 
     // These are defined externally in config-text.yaml
     helpMenuItems = (state: AppState): Div[] => {
-        let items: Div[] = [];
+        const items: Div[] = [];
         if (state.config?.menu?.help) {
-            for (let menuItem of state.config.menu.help) {
+            for (const menuItem of state.config.menu.help) {
                 if (menuItem.name === "separator") {
                     items.push(new MenuItemSeparator());
                 }
                 else {
-                    let link: string = menuItem.link;
+                    const link: string = menuItem.link;
                     let func: Function = null;
 
                     if (link) {
                         // allows ability to select a tab
                         if (link.startsWith("tab:")) {
-                            let tab = link.substring(4);
+                            const tab = link.substring(4);
 
                             /* special case for feed tab */
                             if (tab === C.TAB_FEED) {

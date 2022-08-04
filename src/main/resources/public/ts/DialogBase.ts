@@ -40,7 +40,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
 
-        let appState = getAppState();
+        const appState = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
         if (!forceMode && (!this.mode || appState.mobileMode)) {
@@ -71,7 +71,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
         return new Promise<DialogBase>(async (resolve, reject) => {
-            let appState = getAppState();
+            const appState = getAppState();
             if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.
                 this.backdrop = document.createElement("div");
@@ -159,7 +159,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
-        let appState = getAppState();
+        const appState = getAppState();
 
         if (this.mode === DialogMode.POPUP) {
             if (this.getRef()) {
@@ -208,7 +208,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
-        let titleChildren: CompIntf[] = [this.getTitleIconComp(),
+        const titleChildren: CompIntf[] = [this.getTitleIconComp(),
         useTitle ? new Span(useTitle) : null,
         ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
         new Div(null, { className: "app-modal-title-close-icon float-end" }, [

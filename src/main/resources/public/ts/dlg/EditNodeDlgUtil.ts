@@ -16,8 +16,8 @@ import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
-        let state = dlg.getState<LS>();
-        let typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const state = dlg.getState<LS>();
+        const typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             typeHandler.ensureDefaultProperties(state.node);
             dlg.editorHelp = typeHandler.getEditorHelp();
@@ -47,12 +47,12 @@ export class EditNodeDlgUtil {
     }
 
     public saveNode = async (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
 
         let content: string;
         if (dlg.contentEditor) {
             content = dlg.contentEditor.getValue();
-            let cipherKey = S.props.getCryptoKey(state.node, getAppState());
+            const cipherKey = S.props.getCryptoKey(state.node, getAppState());
             if (cipherKey) {
                 content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
                 content = J.Constant.ENC_TAG + content;
@@ -65,13 +65,13 @@ export class EditNodeDlgUtil {
         state.node.name = dlg.nameState.getValue();
         state.node.tags = dlg.tagsState.getValue();
 
-        let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
+        const askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
             (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
-        let res = await S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+        const res = await S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: state.node
         });
 
@@ -108,11 +108,11 @@ export class EditNodeDlgUtil {
 
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("Save prop iterator: name=" + prop.name);
-                let propState = dlg.propStates.get(prop.name);
+                const propState = dlg.propStates.get(prop.name);
                 if (propState) {
                     // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
                     if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
@@ -133,8 +133,8 @@ export class EditNodeDlgUtil {
     }
 
     addProperty = async (dlg: EditNodeDlg) => {
-        let state: LS = dlg.getState<LS>();
-        let propDlg = new EditPropertyDlg(state.node);
+        const state: LS = dlg.getState<LS>();
+        const propDlg = new EditPropertyDlg(state.node);
         await propDlg.open();
 
         if (propDlg.nameState.getValue()) {
@@ -152,7 +152,7 @@ export class EditNodeDlgUtil {
     }
 
     addDateProperty = (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
         if (!state.node.properties) {
             state.node.properties = [];
         }
@@ -173,15 +173,15 @@ export class EditNodeDlgUtil {
     }
 
     share = async (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
         await S.edit.editNodeSharing(getAppState(), state.node);
         dlg.mergeState<LS>({ node: state.node });
     }
 
     upload = async (file: File, dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
 
-        let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, async () => {
+        const uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, async () => {
             await this.refreshBinaryPropsFromServer(dlg, state.node);
             this.initPropStates(dlg, state.node, true);
             dlg.mergeState<LS>({ node: state.node });
@@ -191,19 +191,19 @@ export class EditNodeDlgUtil {
     }
 
     setNodeType = (dlg: EditNodeDlg, newType: string) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
         state.node.type = newType;
         dlg.mergeState<LS>({ node: state.node });
     }
 
     deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
-        let res = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
+        const res = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
             nodeId: dlg.getState<LS>().node.id,
             propNames
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
-            let state = dlg.getState<LS>();
+            const state = dlg.getState<LS>();
             propNames.forEach(propName => {
                 S.props.deleteProp(state.node, propName);
             });
@@ -212,7 +212,7 @@ export class EditNodeDlgUtil {
     }
 
     deletePropertiesButtonClick = async (dlg: EditNodeDlg) => {
-        let confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
+        const confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
         await confirmDlg.open();
         if (confirmDlg.yes) {
@@ -221,17 +221,17 @@ export class EditNodeDlgUtil {
     }
 
     deleteSelectedProperties = (dlg: EditNodeDlg) => {
-        let keys: string[] = [];
+        const keys: string[] = [];
         dlg.getState<LS>().selectedProps.forEach(prop => keys.push(prop));
         this.deleteProperties(dlg, keys);
     }
 
     setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
         if (dlg.pendingEncryptionChange) return;
 
         (async () => {
-            let encrypted: boolean = S.props.isEncrypted(state.node);
+            const encrypted: boolean = S.props.isEncrypted(state.node);
 
             if (encrypt && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
@@ -254,9 +254,9 @@ export class EditNodeDlgUtil {
                     else {
                         // if we need to encrypt and the content is not currently encrypted.
                         if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
-                            let content = dlg.contentEditor.getValue();
+                            const content = dlg.contentEditor.getValue();
 
-                            let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                            const skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
                             state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
 
                             /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
@@ -276,11 +276,11 @@ export class EditNodeDlgUtil {
     }
 
     deleteUpload = async (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
         call has fully completed. */
-        let deleted: boolean = await S.attachment.deleteAttachment(state.node, getAppState());
+        const deleted: boolean = await S.attachment.deleteAttachment(state.node, getAppState());
 
         if (deleted) {
             S.attachment.removeBinaryProperties(state.node);
@@ -300,7 +300,7 @@ export class EditNodeDlgUtil {
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
     refreshBinaryPropsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
-        let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
             siblingOffset: 0,
@@ -324,10 +324,10 @@ export class EditNodeDlgUtil {
     }
 
     initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
-        let allowEditAllProps: boolean = getAppState().isAdminUser;
-        let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        let propVal = propEntry.value;
-        let propValStr = propVal || "";
+        const allowEditAllProps: boolean = getAppState().isAdminUser;
+        const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
+        const propVal = propEntry.value;
+        const propValStr = propVal || "";
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
@@ -341,7 +341,7 @@ export class EditNodeDlgUtil {
             propState.setValue(propValStr);
         }
         else {
-            let val = S.props.getPropStr(propEntry.name, node);
+            const val = S.props.getPropStr(propEntry.name, node);
             propState.setValue(val);
 
             /* todo-2: eventually we will have data types, but for now we use a hack
@@ -381,10 +381,10 @@ export class EditNodeDlgUtil {
     }
 
     initStates = (dlg: EditNodeDlg) => {
-        let state = dlg.getState<LS>();
+        const state = dlg.getState<LS>();
 
         /* Init main content text on node */
-        let value = state.node.content || "";
+        const value = state.node.content || "";
         if (!value.startsWith(J.Constant.ENC_TAG)) {
             dlg.contentEditorState.setValue(value);
         }
@@ -402,7 +402,7 @@ export class EditNodeDlgUtil {
 the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
 an upload has been added or removed. */
     initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
-        let typeHandler = S.plugin.getTypeHandler(node.type);
+        const typeHandler = S.plugin.getTypeHandler(node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
@@ -440,7 +440,7 @@ an upload has been added or removed. */
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!dlg.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        const allowSelection = !customProps || !customProps.find(p => p === prop.name);
                         this.initPropState(dlg, node, typeHandler, prop, allowSelection);
                     }
                 }
@@ -456,7 +456,7 @@ an upload has been added or removed. */
 
     insertMention = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
-            let friendDlg: FriendsDlg = new FriendsDlg(null, true);
+            const friendDlg: FriendsDlg = new FriendsDlg(null, true);
             await friendDlg.open();
             if (friendDlg.getState().selectedName) {
                 dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
@@ -466,7 +466,7 @@ an upload has been added or removed. */
 
     insertEmoji = async (dlg: EditNodeDlg) => {
         if (dlg.contentEditor) {
-            let emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
+            const emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
             await emojiDlg.open();
             if (emojiDlg.getState().selectedEmoji) {
                 dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);

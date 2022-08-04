@@ -23,19 +23,19 @@ export abstract class ResultSetView extends AppTab {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let results = this.data && this.data.rsInfo.results;
+        const state = useAppState();
+        const results = this.data && this.data.rsInfo.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
 
-        let childCount = results.length;
+        const childCount = results.length;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
          * client side for various reasons.
          */
         let rowCount = 0;
-        let children: CompIntf[] = [];
+        const children: CompIntf[] = [];
 
         let content = null;
         if (this.showContentHeading && //
@@ -63,12 +63,12 @@ export abstract class ResultSetView extends AppTab {
         this.addPaginationBar(state, children);
 
         let i = 0;
-        let jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+        const jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
 
         results.forEach((node: J.NodeInfo) => {
 
             S.srch.initSearchNode(node);
-            let c = this.renderItem(node, i, rowCount, jumpButton, state);
+            const c = this.renderItem(node, i, rowCount, jumpButton, state);
             if (c) {
                 children.push(c);
             }

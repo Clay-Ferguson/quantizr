@@ -16,7 +16,7 @@ export class TabPanelButtons extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         this.setChildren([
             new Div(null, {
@@ -31,11 +31,11 @@ export class TabPanelButtons extends Div {
     }
 
     buildTabButtons = (state: AppState): Comp[] => {
-        let items: Comp[] = [];
-        for (let tab of state.tabData) {
+        const items: Comp[] = [];
+        for (const tab of state.tabData) {
             items.push(this.getTabButton(state, tab));
 
-            let tabSubOptions = tab.getTabSubOptions(state);
+            const tabSubOptions = tab.getTabSubOptions(state);
             if (tabSubOptions) {
                 items.push(tabSubOptions);
             }
@@ -45,7 +45,7 @@ export class TabPanelButtons extends Div {
 
     getTabButton(state: AppState, data: TabIntf): Li {
         let tabName = data.name;
-        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // slight hack until we have 'name' as a function and not a string.
         if (tabName === "Feed" && feedData?.props?.feedFilterRootNode) {

@@ -25,7 +25,7 @@ export class TextareaTag extends Comp {
     calcRowsFunc(val: string): number {
         let rows = TextareaTag.MIN_ROWS;
         if (val) {
-            let arr = this.splitLines(val);
+            const arr = this.splitLines(val);
             if (arr) {
                 rows = arr.length;
 

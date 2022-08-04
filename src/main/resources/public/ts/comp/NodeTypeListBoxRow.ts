@@ -11,7 +11,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
     }
 
     preRender(): void {
-        let iconClass = this.typeHandler.getIconClass();
+        const iconClass = this.typeHandler.getIconClass();
 
         this.setChildren([
             new FlexLayout([

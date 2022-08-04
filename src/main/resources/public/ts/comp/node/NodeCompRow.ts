@@ -57,7 +57,7 @@ export class NodeCompRow extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         if (this.allowHeaders) {
             this.attribs.nid = this.node.id;
@@ -65,7 +65,7 @@ export class NodeCompRow extends Div {
         }
 
         let insertInlineButton = null;
-        let isPageRootNode = state.node && this.node.id === state.node.id;
+        const isPageRootNode = state.node && this.node.id === state.node.id;
 
         if (this.allowHeaders && state.userPrefs.editMode) {
             let insertAllowed = true;
@@ -73,13 +73,13 @@ export class NodeCompRow extends Div {
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
             can insert or not */
             if (this.level === 1) {
-                let parentTypeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+                const parentTypeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
                 if (parentTypeHandler) {
                     insertAllowed = state.isAdminUser || parentTypeHandler.allowAction(NodeActionType.insert, state.node, state);
                 }
             }
 
-            let isMine = S.props.isMine(state.node, state);
+            const isMine = S.props.isMine(state.node, state);
 
             if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(this.node, state)) {
 
@@ -116,7 +116,7 @@ export class NodeCompRow extends Div {
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row");
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
-        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+        const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
         // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
@@ -133,16 +133,16 @@ export class NodeCompRow extends Div {
             }
         }
 
-        let indentLevel = this.isTableCell ? 0 : this.level;
-        let focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        let selected: boolean = (focusNode && focusNode.id === this.node.id);
+        const indentLevel = this.isTableCell ? 0 : this.level;
+        const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        const selected: boolean = (focusNode && focusNode.id === this.node.id);
 
         if (this.isLinkedNode) {
             this.attribs.className = "boost-row";
         }
         else {
             this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
-            let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
+            const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
             this.attribs.style = style;
         }
 

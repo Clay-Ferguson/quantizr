@@ -13,8 +13,8 @@ export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetV
     }
 
     pageChange(delta: number): void {
-        let state = getAppState();
-        let info = this.data.rsInfo as I;
+        const state = getAppState();
+        const info = this.data.rsInfo as I;
 
         let page = info.page;
         if (delta !== null) {

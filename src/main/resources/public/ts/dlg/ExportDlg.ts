@@ -37,7 +37,7 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let tfc: TextFieldConfig = null;
+        const tfc: TextFieldConfig = null;
 
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
@@ -71,8 +71,8 @@ export class ExportDlg extends DialogBase {
     }
 
     exportNodes = async () => {
-        let state = this.getState<LS>();
-        let res = await S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
+        const state = this.getState<LS>();
+        const res = await S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,
             fileName: this.fileNameState.getValue(),
@@ -83,16 +83,16 @@ export class ExportDlg extends DialogBase {
     }
 
     exportResponse = (res: J.ExportResponse) => {
-        let hostAndPort: string = S.util.getHostAndPort();
+        const hostAndPort: string = S.util.getHostAndPort();
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
         the plan is to have the export return the actual md5 of the export for use here */
 
         // disp=inline (is the other)
-        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+        const downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         // todo-1: Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, becasue we DO want ALL types exports to
         // be able to go to MFS, and it would be pretty easy to do what the PDFs are doing (recarding save to MFS) for all other types of exports.
-        let ipfsMessage = (res.ipfsCid && res.ipfsCid.endsWith(".pdf")) ? " You can also use the `IPFS Explorer` to view the IPFS copy of the file." : "";
+        const ipfsMessage = (res.ipfsCid && res.ipfsCid.endsWith(".pdf")) ? " You can also use the `IPFS Explorer` to view the IPFS copy of the file." : "";
 
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(

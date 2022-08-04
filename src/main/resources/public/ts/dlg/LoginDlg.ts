@@ -40,8 +40,8 @@ export class LoginDlg extends DialogBase {
     }
 
     preLoad = async () => {
-        let user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
-        let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
+        const user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
+        const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 
         this.userState.setValue(user);
         this.pwdState.setValue(pwd);
@@ -67,7 +67,7 @@ export class LoginDlg extends DialogBase {
             S.localDB.userName = usr;
 
             // lookup the password based on known user
-            let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD, usr);
+            const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD, usr);
             if (pwd) {
                 // put password in the password field
                 this.pwdState.setValue(pwd);
@@ -79,9 +79,9 @@ export class LoginDlg extends DialogBase {
             return;
         }
 
-        let pwd = this.pwdState.getValue();
+        const pwd = this.pwdState.getValue();
         if (usr && pwd) {
-            let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+            const res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
@@ -97,8 +97,8 @@ export class LoginDlg extends DialogBase {
     }
 
     resetPassword = async (): Promise<any> => {
-        let usr = this.userState.getValue();
-        let dlg = new ConfirmDlg("Reset your password ?", "Confirm", null, null);
+        const usr = this.userState.getValue();
+        const dlg = new ConfirmDlg("Reset your password ?", "Confirm", null, null);
         await dlg.open();
         if (dlg.yes) {
             this.close();

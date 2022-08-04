@@ -55,7 +55,7 @@
         "valid-typeof": "off",
         "no-useless-return": "off",
         "prefer-promise-reject-errors": "off",
-        "prefer-const": "off",
+        // "prefer-const": "off",
         // "no-trailing-spaces": "off",
         "indent": "off",
         "no-unused-vars": "off",

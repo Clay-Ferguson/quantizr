@@ -16,7 +16,7 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = getAppState();
+        const state = getAppState();
         return state.config?.help?.type?.friend?.editor;
     }
 
@@ -62,16 +62,16 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
-        let user: string = S.props.getPropStr(J.NodeProp.USER, node);
-        let userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
-        let userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
-        let actorUrl = S.props.getClientPropStr(J.NodeProp.ACT_PUB_ACTOR_URL, node);
-        let displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
+        const user: string = S.props.getPropStr(J.NodeProp.USER, node);
+        const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
+        const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
+        const actorUrl = S.props.getClientPropStr(J.NodeProp.ACT_PUB_ACTOR_URL, node);
+        const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
         let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
         if (!imgSrc) {
-            let avatarVer: string = S.props.getClientPropStr("avatarVer", node);
+            const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
             if (avatarVer) {
                 imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
             }

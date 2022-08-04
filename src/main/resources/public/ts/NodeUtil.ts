@@ -142,7 +142,7 @@ export class NodeUtil {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
@@ -152,7 +152,7 @@ export class NodeUtil {
         }
 
         if (!node) {
-            for (let data of state.tabData) {
+            for (const data of state.tabData) {
                 if (data.rsInfo?.results) {
                     node = data.rsInfo.results.find(n => n.id === nodeId);
                     if (node) break;
@@ -269,7 +269,7 @@ export class NodeUtil {
         content = S.util.replaceAll(content, "{{img}}", "");
         content = content.trim();
 
-        let idx = content.indexOf("\n");
+        const idx = content.indexOf("\n");
         if (idx !== -1) {
             content = content.substring(0, idx);
         }
@@ -285,7 +285,7 @@ export class NodeUtil {
     allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
         if (!node || !node.children) return true;
 
-        for (let child of node.children) {
+        for (const child of node.children) {
             if (node.ownerId !== child.ownerId) {
                 return false;
             }
@@ -294,19 +294,19 @@ export class NodeUtil {
     }
 
     publishNodeToIpfs = async (node: J.NodeInfo) => {
-        let res = await S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+        const res = await S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
         });
         S.util.showMessage(res.message, "Server Reply", true);
     }
 
     loadNodeFromIpfs = (node: J.NodeInfo): any => {
-        let state = getAppState();
+        const state = getAppState();
         new LoadNodeFromIpfsDlg().open();
     }
 
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
-        let res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: "public",
             privilege: "*"
@@ -315,14 +315,14 @@ export class NodeUtil {
     }
 
     removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp) => {
-        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: true,
             includeOwners: true
         });
 
         if (editorDlg) {
-            let state = editorDlg.getState();
+            const state = editorDlg.getState();
             state.node.ac = res.aclEntries;
             editorDlg.mergeState({ node: state.node });
         }
@@ -331,7 +331,7 @@ export class NodeUtil {
     getSharingNames = (state: AppState, node: J.NodeInfo, editorDlg: Comp): Comp[] => {
         if (!node?.ac) return null;
 
-        let ret: Comp[] = [];
+        const ret: Comp[] = [];
         if (S.props.isPublic(node)) {
             ret.push(new Span("Public" + this.getPublicPrivilegesDisplay(node),
                 {
@@ -343,7 +343,7 @@ export class NodeUtil {
 
         let showMore = "";
         let numShares = 0;
-        for (let ac of node.ac) {
+        for (const ac of node.ac) {
             if (!ac.principalName) {
                 console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
             }
@@ -400,12 +400,12 @@ export class NodeUtil {
     getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {
         if (!node || !node.ac) return "";
         let val = "";
-        for (let ac of node.ac) {
+        for (const ac of node.ac) {
             if (ac.principalName === "public") {
                 // console.log("AC: " + S.util.prettyPrint(ac));
                 // Note: I'm leaving this loop, but really all this will generate in 'val' is either nothing
                 // at all or "(+Replies)" (for now)
-                for (let p of ac.privileges) {
+                for (const p of ac.privileges) {
                     if (val) {
                         val += ",";
                     }

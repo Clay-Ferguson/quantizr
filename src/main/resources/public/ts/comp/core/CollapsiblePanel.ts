@@ -33,9 +33,9 @@ export class CollapsiblePanel extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let state = this.getState<LS>();
-        let style = this.textLink ? "collapse-panel-link" : "btn btn-secondary ";
-        let collapseClass = state.expanded ? "expand" : "collapse";
+        const state = this.getState<LS>();
+        const style = this.textLink ? "collapse-panel-link" : "btn btn-secondary ";
+        const collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
         which is the area that would be HIDDEN when the component is NOT expanded. */
@@ -80,7 +80,7 @@ export class CollapsiblePanel extends Comp {
     }
 
     onToggle = () => {
-        let expanded = !this.getState<LS>().expanded;
+        const expanded = !this.getState<LS>().expanded;
         this.setExpanded(expanded);
         if (this.stateCallback) {
             this.stateCallback(expanded);

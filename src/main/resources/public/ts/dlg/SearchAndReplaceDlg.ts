@@ -50,7 +50,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;

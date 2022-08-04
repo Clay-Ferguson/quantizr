@@ -79,7 +79,7 @@ export class Render {
             val = S.util.replaceAll(val, "{{img}}", "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
         }
 
-        let imgSize = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
+        const imgSize = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         // actual size prop is saved as "0"
         if (imgSize && imgSize !== "0") {
             val = S.util.replaceAll(val, "{{imgSize}}", imgSize);
@@ -112,7 +112,7 @@ export class Render {
 
     injectAdminButton = (val: string, cmd: string, buttonText: string) => {
         // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
-        let script = "S.util.adminScriptCommand('" + cmd + "');";
+        const script = "S.util.adminScriptCommand('" + cmd + "');";
         return val.replace(cmd, `<button class="btn btn-primary marginRight" onClick="${script}">${buttonText}</button>`);
     }
 
@@ -242,7 +242,7 @@ export class Render {
     /* nodeId is parent node to query for calendar content */
     showCalendar = async (nodeId: string, state: AppState) => {
         if (!nodeId) {
-            let node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 nodeId = node.id;
             }
@@ -252,7 +252,7 @@ export class Render {
             return;
         }
 
-        let res = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+        const res = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
         dispatch("ShowCalendar", s => {
@@ -278,7 +278,7 @@ export class Render {
 
         children.push(new Div("Click a link to put it in your clipboard.", { className: "marginBottom" }));
 
-        let byIdUrl = window.location.origin + "?id=" + node.id;
+        const byIdUrl = window.location.origin + "?id=" + node.id;
         children.push(new Heading(5, "By ID"), //
             new Div(byIdUrl, {
                 className: "anchorBigMarginBottom",
@@ -291,7 +291,7 @@ export class Render {
             }));
 
         if (node.name) {
-            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
+            const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
             children.push(new Heading(5, "By Name"), //
                 new Div(byNameUrl, {
                     className: "anchorBigMarginBottom",
@@ -304,7 +304,7 @@ export class Render {
                 }));
         }
 
-        let rssFeed = window.location.origin + "/rss?id=" + node.id;
+        const rssFeed = window.location.origin + "/rss?id=" + node.id;
         children.push(new Heading(5, "Node RSS Feed"), //
             new Div(rssFeed, {
                 className: "anchorBigMarginBottom",
@@ -316,12 +316,12 @@ export class Render {
                 }
             }));
 
-        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
+        const bin = S.props.getPropStr(J.NodeProp.BIN, node);
         if (bin) {
-            let attachmentComps: Comp[] = [];
+            const attachmentComps: Comp[] = [];
             attachmentComps.push(new Heading(3, "Attachment URLs"));
 
-            let attByIdUrl = window.location.origin + "/f/id/" + node.id;
+            const attByIdUrl = window.location.origin + "/f/id/" + node.id;
             attachmentComps.push(new Heading(5, "View By Id"), //
                 new Div(attByIdUrl, {
                     className: "anchorBigMarginBottom",
@@ -333,7 +333,7 @@ export class Render {
                     }
                 }));
 
-            let downloadttByIdUrl = attByIdUrl + "?download=y";
+            const downloadttByIdUrl = attByIdUrl + "?download=y";
             attachmentComps.push(new Heading(5, "Download By Id"), //
                 new Div(downloadttByIdUrl, {
                     className: "anchorBigMarginBottom",
@@ -346,7 +346,7 @@ export class Render {
                 }));
 
             if (node.name) {
-                let attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
+                const attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
                 attachmentComps.push(new Heading(5, "View By Name"), //
                     new Div(attByNameUrl, {
                         className: "anchorBigMarginBottom",
@@ -358,7 +358,7 @@ export class Render {
                         }
                     }));
 
-                let downloadAttByNameUrl = attByNameUrl + "?download=y";
+                const downloadAttByNameUrl = attByNameUrl + "?download=y";
                 attachmentComps.push(new Heading(5, "Download By Name"), //
                     new Div(downloadAttByNameUrl, {
                         className: "anchorBigMarginBottom",
@@ -376,7 +376,7 @@ export class Render {
             }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
         }
 
-        let ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
+        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
             children.push(new Heading(5, "IPFS LINK"), //
                 new Div("ipfs://" + ipfsLink, {
@@ -390,7 +390,7 @@ export class Render {
                 }));
         }
 
-        let ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
+        const ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
         if (ipfsCid) {
             children.push(new Heading(5, "IPFS CID"), //
                 new Div("ipfs://" + ipfsCid, {
@@ -404,7 +404,7 @@ export class Render {
                 }));
         }
 
-        let ipnsCid = S.props.getPropStr(J.NodeProp.IPNS_CID, node);
+        const ipnsCid = S.props.getPropStr(J.NodeProp.IPNS_CID, node);
         if (ipnsCid) {
             children.push(new Heading(5, "IPNS Name"), //
                 new Div("ipns://" + ipnsCid, {
@@ -449,7 +449,7 @@ export class Render {
                 s.guiReady = true;
                 s.pageMessage = null;
 
-                let data: TabIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
+                const data: TabIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
                 if (data) {
                     data.openGraphComps = [];
                 }
@@ -612,13 +612,13 @@ export class Render {
         if (node?.children) {
             // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
             // haven't yet pulled the metadata yet.
-            let ids: string[] = [];
+            const ids: string[] = [];
 
             this.getIncompleteMetaIds(node, ids);
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
-                let res = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                const res = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                     ids
                 }, true);
 
@@ -636,7 +636,7 @@ export class Render {
     getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
         if (!node?.children) return;
 
-        for (let child of node.children) {
+        for (const child of node.children) {
             if (!(child as any).metaInfDone) {
                 ids.push(child.id);
             }
@@ -650,13 +650,13 @@ export class Render {
         if (!node || !node.children) return;
         node.hasChildren = true;
 
-        for (let child of node.children) {
+        for (const child of node.children) {
 
             // if this is a child we will have just pulled down
             if (!(child as any).metaInfDone) {
 
                 // find the child in what we just pulled down.
-                let inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
+                const inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
 
                 // set the hasChildren to the value we just pulled down.
                 if (inf) {
@@ -672,7 +672,7 @@ export class Render {
 
     renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
-        let allowAvatars = true;
+        const allowAvatars = true;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
@@ -704,7 +704,7 @@ export class Render {
     }
 
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
-        let src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
+        const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
         }
@@ -769,14 +769,14 @@ export class Render {
     renderUser(nodeId: string, user: string, userBio: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
-        let img: Img = imgSrc
+        const img: Img = imgSrc
             ? new Img(null, {
                 className: iconClass,
                 src: imgSrc,
                 onClick
             }) : null;
 
-        let attribs: any = {};
+        const attribs: any = {};
         if (className) attribs.className = className;
 
         return new Div(null, attribs, [

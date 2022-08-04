@@ -14,12 +14,12 @@ export class NodeCompRowFooter extends Div {
     }
 
     preRender(): void {
-        let children = [];
+        const children = [];
 
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link
          to the actual node because all that's internal. */
         if (this.node.owner.indexOf("@") !== -1) {
-            let inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
+            const inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
             if (inReplyTo) {
 
                 // DO NOT DELETE (yet, but eventually)
@@ -58,7 +58,7 @@ export class NodeCompRowFooter extends Div {
                 }
             }
 
-            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
             if (objUrl) {
                 if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
                     children.push(new Anchor(objUrl, "Link", {

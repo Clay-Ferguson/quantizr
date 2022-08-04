@@ -16,7 +16,7 @@ export class ValidatedState<S> {
         if (!this.rules) return true;
         let errors: string[] = null;
         let ret = true;
-        for (let rule of this.rules) {
+        for (const rule of this.rules) {
             if (!this.checkRule(rule)) {
                 errors = errors || [];
                 errors.push(rule.errorMsg);

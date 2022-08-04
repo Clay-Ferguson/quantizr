@@ -3,7 +3,7 @@ import { Comp } from "./base/Comp";
 
 export class FilesTable extends Comp {
 
-    constructor(attribs : Object = {}) {
+    constructor(attribs: Object = {}) {
         super(attribs);
     }
 

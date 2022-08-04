@@ -30,7 +30,7 @@ export class Attachment {
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState) => {
         if (!nodeId) {
-            let node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -43,7 +43,7 @@ export class Attachment {
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState) => {
         if (!nodeId) {
-            let node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -57,7 +57,7 @@ export class Attachment {
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         node = node || S.nodeUtil.getHighlightedNode(state);
         if (node) {
-            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
+            const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
                 await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
@@ -79,7 +79,7 @@ export class Attachment {
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
-        let imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
+        const imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
         if (imgUrl) {
             return imgUrl;
         }

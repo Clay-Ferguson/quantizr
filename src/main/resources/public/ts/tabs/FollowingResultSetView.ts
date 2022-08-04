@@ -17,7 +17,7 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
     }
 
     pageChange(delta: number): void {
-        let info = this.data.rsInfo as FollowingRSInfo;
+        const info = this.data.rsInfo as FollowingRSInfo;
         let page = info.page;
 
         // Yes the check against null IS required. Don't change.
@@ -28,7 +28,7 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
     }
 
     renderHeading(state: AppState): CompIntf {
-        let info = this.data.rsInfo as FollowingRSInfo;
+        const info = this.data.rsInfo as FollowingRSInfo;
         return new Heading(4, "@" + info.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
     }
 }

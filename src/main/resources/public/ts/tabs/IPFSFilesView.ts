@@ -40,10 +40,10 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
         this.attribs.className = this.getClass(state);
 
-        let children = [];
+        const children = [];
 
         if (this.data.props.loading) {
             children.push(new Div(null, null, [
@@ -56,17 +56,17 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         else {
             children.push(new Heading(4, "IPFS Explorer"));
 
-            let mfsFolder = this.data.props.cidField.getValue();
-            let slashCount = S.util.countChars(mfsFolder, "/");
-            let isRoot = !mfsFolder || slashCount === 1;
-            let showParentButton = mfsFolder && slashCount > 1;
+            const mfsFolder = this.data.props.cidField.getValue();
+            const slashCount = S.util.countChars(mfsFolder, "/");
+            const isRoot = !mfsFolder || slashCount === 1;
+            const showParentButton = mfsFolder && slashCount > 1;
 
             children.push(new Div(null, null, [
                 new TextField({
                     label: "MFS Path or CID",
                     val: this.data.props.cidField,
                     enter: () => {
-                        let item = this.data.props.cidField.getValue();
+                        const item = this.data.props.cidField.getValue();
                         if (item) {
                             this.openItem(item);
                         }
@@ -89,7 +89,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 }, "marginAll")
             ]));
 
-            let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+            const mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
             children.push(new Heading(5, "Listing: " + (mfsMode ? "Mutable File System" : "Hierarchy (DAG)")))
 
             children.push(new Div(null, null, [
@@ -126,9 +126,9 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     renderFilesTable = (mfsFiles: J.MFSDirEntry[]): FilesTable => {
         if (mfsFiles) {
-            let mfsFolder = this.data.props.cidField.getValue();
+            const mfsFolder = this.data.props.cidField.getValue();
             // mfsMode means this is a true MFS query on the local server and not a DAG query of CID which can be remote.
-            let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+            const mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
 
             const propTable = new FilesTable({
                 border: "1",
@@ -170,8 +170,8 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             if (foldersOnly && isFile) return;
             if (!foldersOnly && !isFile) return;
 
-            let fullName = mfsMode ? (mfsFolder + "/" + entry.Name) : null;
-            let locationToOpen = mfsMode ? fullName : entry.Hash;
+            const fullName = mfsMode ? (mfsFolder + "/" + entry.Name) : null;
+            const locationToOpen = mfsMode ? fullName : entry.Hash;
             let sizeStr = S.util.formatMemory(entry.Size);
             if (sizeStr === "0 bytes") {
                 sizeStr = "";
@@ -206,8 +206,8 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                     // otherwise instead if a download option (which we CAN do (todo-1), we just let users try it in ipfs.io if they want, to cross
                                     // their fingers and hope for the best with the ProtocolLabs server.
                                     else {
-                                        let state = getAppState();
-                                        let dlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null);
+                                        const state = getAppState();
+                                        const dlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null);
                                         await dlg.open();
                                         if (dlg.yes) {
                                             window.open("https://ipfs.io/ipfs/" + entry.Hash, "_blank");
@@ -240,8 +240,8 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                             className: "fa fa-trash fa-lg clickable marginRight",
                             title: "Delete",
                             onClick: async () => {
-                                let state = getAppState();
-                                let dlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
+                                const state = getAppState();
+                                const dlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
                                     "btn-danger", "alert alert-info");
                                 await dlg.open();
                                 if (dlg.yes) {
@@ -258,7 +258,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     openFile = async (item: string, shortName: string, hash: string) => {
         // console.log(S.util.prettyPrint(item));
-        let res = await S.util.ajax<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
+        const res = await S.util.ajax<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
             id: item
         });
 
@@ -280,7 +280,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // });
 
         setTimeout(async () => {
-            let res = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
+            const res = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
                 item
             });
 
@@ -301,7 +301,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             // ensure this is never empty string. Server needs to get null instead of empty string.
             if (!folder) folder = null;
 
-            let res = await S.util.ajax<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
+            const res = await S.util.ajax<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
                 folder
             });
 
@@ -331,12 +331,12 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     goToParent = () => {
-        let mfsFolder = this.data.props.cidField.getValue();
+        const mfsFolder = this.data.props.cidField.getValue();
         // mfsMode means this is a true MFS query on the local server and not a DAG query of CID which can be remote.
-        let mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
+        const mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
         if (!mfsMode) return;
 
-        let parent = S.util.chopAtLastChar(mfsFolder, "/");
+        const parent = S.util.chopAtLastChar(mfsFolder, "/");
         // console.log("parent = " + parent);
         if (parent) {
             this.openItem(parent);
@@ -345,7 +345,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
 
     refreshFiles = () => {
         setTimeout(async () => {
-            let mfsFolder = this.data.props.cidField.getValue();
+            const mfsFolder = this.data.props.cidField.getValue();
             this.openItem(mfsFolder);
         }, 100);
     }

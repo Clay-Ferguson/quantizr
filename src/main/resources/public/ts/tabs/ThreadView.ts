@@ -19,11 +19,11 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let results = this.data?.rsInfo?.results;
+        const state = useAppState();
+        const results = this.data?.rsInfo?.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
-        let childCount = results.length;
+        const childCount = results.length;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -31,7 +31,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
          */
         let rowCount = 0;
         let i = 0;
-        let children: CompIntf[] = [];
+        const children: CompIntf[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
@@ -45,12 +45,12 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
             this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
         ]));
 
-        let jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
-        let others: J.NodeInfo[] = this.data.props.others;
+        const jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+        const others: J.NodeInfo[] = this.data.props.others;
 
         results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
-            let c = this.renderItem(node, i, rowCount, jumpButton, state);
+            const c = this.renderItem(node, i, rowCount, jumpButton, state);
             if (c) {
                 children.push(c);
             }
@@ -64,7 +64,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
         if (others) {
             others.forEach((node: J.NodeInfo) => {
                 S.srch.initSearchNode(node);
-                let c = this.renderItem(node, i, rowCount, jumpButton, state);
+                const c = this.renderItem(node, i, rowCount, jumpButton, state);
                 if (c) {
                     children.push(c);
                 }
@@ -77,8 +77,8 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
     }
 
     moreHistory = () => {
-        let state = getAppState();
-        let results = this.data && this.data.rsInfo.results;
+        const state = getAppState();
+        const results = this.data && this.data.rsInfo.results;
         if (!results || results.length === 0) return;
         S.srch.showThreadAddMore(results[0].id, state);
     }

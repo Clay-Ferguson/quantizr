@@ -17,7 +17,7 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     }
 
     pageChange(delta: number): void {
-        let info = this.data.rsInfo as FollowersRSInfo;
+        const info = this.data.rsInfo as FollowersRSInfo;
         let page = info.page;
 
         // Yes the check against null IS required. Don't change.
@@ -28,8 +28,8 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     }
 
     renderHeading(state: AppState): CompIntf {
-        let info = this.data.rsInfo as FollowersRSInfo;
-        let text = info.showingFollowersOfUser === state.userName //
+        const info = this.data.rsInfo as FollowersRSInfo;
+        const text = info.showingFollowersOfUser === state.userName //
             ? "Your followers..." //
             : "Followers of @" + info.showingFollowersOfUser + "...";
         return new Heading(4, text, { className: "resultsTitle" });
@@ -49,14 +49,14 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         // let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
-        let displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
-        let accntUser = S.props.getClientPropStr("accntUser", node);
+        const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
+        const accntUser = S.props.getClientPropStr("accntUser", node);
         let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
         if (!imgSrc) {
-            let avatarVer: string = S.props.getClientPropStr("avatarVer", node);
-            let accntId: string = S.props.getClientPropStr("accntId", node);
+            const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
+            const accntId: string = S.props.getClientPropStr("accntId", node);
             if (avatarVer) {
                 imgSrc = S.render.getAvatarImgUrl(accntId, avatarVer);
             }

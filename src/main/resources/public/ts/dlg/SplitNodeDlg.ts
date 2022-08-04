@@ -102,7 +102,7 @@ export class SplitNodeDlg extends DialogBase {
     }
 
     splitNodes = () => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
 
         let delim = "";
         if (state.splitMode === "double") {

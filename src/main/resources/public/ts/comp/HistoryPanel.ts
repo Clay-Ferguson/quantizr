@@ -20,13 +20,13 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         if (S.quanta.nodeHistory.length === 0) {
             this.setChildren(null);
             return;
         }
-        let children = [];
+        const children = [];
         children.push(new Div(null, null, [
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean) => S.quanta.nodeHistoryLocked = checked,
@@ -39,11 +39,11 @@ export class HistoryPanel extends Div {
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
 
-            let typeHandler = S.plugin.getTypeHandler(h.type);
+            const typeHandler = S.plugin.getTypeHandler(h.type);
             if (typeHandler) {
-                let iconClass = typeHandler.getIconClass();
+                const iconClass = typeHandler.getIconClass();
                 if (iconClass) {
-                    let dragProps = state.userPrefs.editMode ? {
+                    const dragProps = state.userPrefs.editMode ? {
                         onMouseOver: () => { S.quanta.draggableId = h.id; },
                         onMouseOut: () => { S.quanta.draggableId = null; }
                     } : {};
@@ -56,7 +56,7 @@ export class HistoryPanel extends Div {
                 }
             }
 
-            let dragProps = state.userPrefs.editMode ? {
+            const dragProps = state.userPrefs.editMode ? {
                 draggable: "true",
                 onDragStart: (evt) => this.dragStart(evt, h.id),
                 onDragEnd: this.dragEnd
@@ -81,7 +81,7 @@ export class HistoryPanel extends Div {
 
                 // we include topLevelId in the ids below so the React 'key' (same as id, by default) isn't
                 // ever able to be duplilcated, because that throws a warning in React.
-                let topLevelId = h.id;
+                const topLevelId = h.id;
 
                 h.subItems.forEach((h: NodeHistoryItem) => {
                     if (!h.content || dotsShown) return;
@@ -89,11 +89,11 @@ export class HistoryPanel extends Div {
                         let dropTarg: Div;
                         let icon: Icon;
 
-                        let typeHandler = S.plugin.getTypeHandler(h.type);
+                        const typeHandler = S.plugin.getTypeHandler(h.type);
                         if (typeHandler) {
-                            let iconClass = typeHandler.getIconClass();
+                            const iconClass = typeHandler.getIconClass();
                             if (iconClass) {
-                                let dragProps = state.userPrefs.editMode ? {
+                                const dragProps = state.userPrefs.editMode ? {
                                     onMouseOver: () => { S.quanta.draggableId = h.id; },
                                     onMouseOut: () => { S.quanta.draggableId = null; }
                                 } : {};
@@ -106,7 +106,7 @@ export class HistoryPanel extends Div {
                             }
                         }
 
-                        let dragProps = state.userPrefs.editMode ? {
+                        const dragProps = state.userPrefs.editMode ? {
                             draggable: "true",
                             onDragStart: (evt) => this.dragStart(evt, h.id),
                             onDragEnd: this.dragEnd
@@ -175,7 +175,7 @@ export class HistoryPanel extends Div {
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
     jumpToId = (evt: any) => {
-        let id = S.domUtil.getPropFromDom(evt, "nid");
+        const id = S.domUtil.getPropFromDom(evt, "nid");
         PubSub.pub(C.PUBSUB_closeNavPanel);
         S.view.jumpToId(id);
     }

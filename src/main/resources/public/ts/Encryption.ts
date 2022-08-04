@@ -289,7 +289,7 @@ export class Encryption {
                 pubKeyStr = JSON.stringify(publicKeyDat);
             }
 
-            let res = await S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+            const res = await S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                 keyJson: pubKeyStr
             });
             if (showConfirm) {
@@ -328,7 +328,7 @@ export class Encryption {
 
             // yes we export to spki for PEM (not a bug)
             const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
-            let pem = this.spkiToPEM(privDatSpki);
+            const pem = this.spkiToPEM(privDatSpki);
             ret += "Public Key (PEM Format):\n" + pem + "\n\n";
         }
 
@@ -440,7 +440,7 @@ export class Encryption {
         // encrypt the data with the symetric key
         const cipherText = await this.symEncryptString(key, data);
 
-        let ret: SymKeyDataPackage = { cipherText, cipherKey };
+        const ret: SymKeyDataPackage = { cipherText, cipherKey };
         return ret;
     }
 
@@ -449,7 +449,7 @@ export class Encryption {
         let ret: string = null;
 
         // get hash of the encrypted data
-        let cipherHash: string = S.util.hashOfString(skpd.cipherText);
+        const cipherHash: string = S.util.hashOfString(skpd.cipherText);
 
         // if we have already decrypted this data return the result.
         if (S.quanta.decryptCache.get(cipherHash)) {
@@ -495,7 +495,7 @@ export class Encryption {
             key, this.convertStringToByteArray(data));
 
         const encData = new Uint8Array(result);
-        let encHex: string = S.util.buf2hex(encData);
+        const encHex: string = S.util.buf2hex(encData);
         return encHex;
     }
 
@@ -520,7 +520,7 @@ export class Encryption {
             const result: ArrayBuffer = await crypto.subtle.decrypt({ name: algo, iv: this.vector }, //
                 key, encArray);
             const resArray = new Uint8Array(result);
-            let resStr: string = this.convertByteArrayToString(resArray);
+            const resStr: string = this.convertByteArrayToString(resArray);
             return resStr;
         }
         catch (ex) {

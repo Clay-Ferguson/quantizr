@@ -11,19 +11,19 @@ export class FullScreenImgViewer extends Main {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let nodeId = state.fullScreenViewId;
-        let node: J.NodeInfo = S.nodeUtil.findNodeById(state, nodeId);
+        const state = useAppState();
+        const nodeId = state.fullScreenViewId;
+        const node = S.nodeUtil.findNodeById(state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        let isAnAccountNode = node?.ownerId && node.id === node.ownerId;
-        let children = [];
+        const isAnAccountNode = node?.ownerId && node.id === node.ownerId;
+        const children = [];
 
         if (node && S.props.hasBinary(node) && !isAnAccountNode) {
-            let binary = new NodeCompBinary(node, false, true, null);
+            const binary = new NodeCompBinary(node, false, true, null);
             children.push(binary);
         }
 

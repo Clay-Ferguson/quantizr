@@ -38,7 +38,7 @@ export class EditPropertyDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        let name = this.nameState.getValue();
+        const name = this.nameState.getValue();
 
         /* verify first that this property doesn't already exist */
         if (S.props.getProp(name, this.editNode)) {

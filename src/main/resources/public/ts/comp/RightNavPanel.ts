@@ -24,7 +24,7 @@ export class RightNavPanel extends Div {
     public static inst: RightNavPanel = null;
 
     constructor() {
-        let state = getAppState();
+        const state = getAppState();
         super(null, {
             id: C.ID_RHS,
             className: state.mobileMode ? "mobileRHSPanel" : null,
@@ -43,7 +43,7 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        let state = getAppState();
+        const state = getAppState();
 
         if (!state.mobileMode) {
             let panelCols = state.userPrefs.mainPanelCols || 6;
@@ -67,8 +67,8 @@ export class RightNavPanel extends Div {
 
         // hack for now. I decided showing the header image isn't very attractive when user has a narrow
         // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
-        let headerImg = null;
-        let avatarImg = this.makeAvatarDiv(state, !!headerImg);
+        const headerImg = null;
+        const avatarImg = this.makeAvatarDiv(state, !!headerImg);
         let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
 
         if (displayName && state.node) {
@@ -80,10 +80,10 @@ export class RightNavPanel extends Div {
             }
         }
 
-        let allowEditMode = state.node && !state.isAnonUser;
-        let fullScreenViewer = S.util.fullscreenViewerActive(state);
+        const allowEditMode = state.node && !state.isAnonUser;
+        const fullScreenViewer = S.util.fullscreenViewerActive(state);
 
-        let clipboardPasteButton = state.userPrefs.editMode ? new Icon({
+        const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel, "immediate");
@@ -93,7 +93,7 @@ export class RightNavPanel extends Div {
             title: "Save clipboard"
         }) : null;
 
-        let addNoteButton = !state.isAnonUser && !state.mobileMode ? new Icon({
+        const addNoteButton = !state.isAnonUser && !state.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel, "immediate");
@@ -102,7 +102,7 @@ export class RightNavPanel extends Div {
                     content = await (navigator as any).clipboard.readText();
 
                     if (!content) {
-                        let blob = await S.util.readClipboardFile();
+                        const blob = await S.util.readClipboardFile();
                         if (blob) {
                             EditNodeDlg.pendingUploadFile = blob;
                         }
@@ -191,9 +191,9 @@ export class RightNavPanel extends Div {
     makeHeaderDiv = (state: AppState): CompIntf => {
         if (!state.userProfile) return null;
 
-        let src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
+        const src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
         if (src) {
-            let attr: any = {
+            const attr: any = {
                 className: "headerImageRHS",
                 src
             };
@@ -227,7 +227,7 @@ export class RightNavPanel extends Div {
         }
 
         if (src) {
-            let attr: any = {
+            const attr: any = {
                 className: offset ? "profileImageRHS" : "profileImageRHSNoOffset",
                 src
             };

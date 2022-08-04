@@ -19,7 +19,7 @@ export class DateTimeField extends Span {
 
         this.dateState.v.stateTranslator = (s: any): any => {
             try {
-                let newDate = new Date(s.value + " " + this.timeState.getValue() + ":00");
+                const newDate = new Date(s.value + " " + this.timeState.getValue() + ":00");
                 this.dateTimeState.setValue("" + newDate.getTime());
             }
             catch (e) {
@@ -30,7 +30,7 @@ export class DateTimeField extends Span {
 
         this.timeState.v.stateTranslator = (s: any): any => {
             try {
-                let newDate = new Date(this.dateState.getValue() + " " + s.value + ":00");
+                const newDate = new Date(this.dateState.getValue() + " " + s.value + ":00");
                 this.dateTimeState.setValue("" + newDate.getTime());
             }
             catch (e) {
@@ -39,7 +39,7 @@ export class DateTimeField extends Span {
             return s;
         };
 
-        let dateTimeStr: string = dateTimeState.getValue();
+        const dateTimeStr: string = dateTimeState.getValue();
         let dateTime: Date;
 
         try {
@@ -56,10 +56,10 @@ export class DateTimeField extends Span {
             dateTime = S.util.addTimezoneOffset(new Date(), -1);
         }
 
-        let isoStr = dateTime.toISOString();
+        const isoStr = dateTime.toISOString();
         // console.log("isoStr: " + isoStr);
 
-        let dateStr = isoStr.substring(0, 10);
+        const dateStr = isoStr.substring(0, 10);
         this.dateState.setValue(dateStr);
 
         let hourStr: string = "" + dateTime.getUTCHours();
@@ -72,7 +72,7 @@ export class DateTimeField extends Span {
             minStr = "0" + minStr;
         }
 
-        let timeStr = hourStr + ":" + minStr;
+        const timeStr = hourStr + ":" + minStr;
         this.timeState.setValue(timeStr);
     }
 

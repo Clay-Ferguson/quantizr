@@ -30,12 +30,12 @@ export class ImportCryptoKeyDlg extends DialogBase {
 
     import = async () => {
         // until better validation, just check for empty
-        let keyText = this.keyState.getValue();
+        const keyText = this.keyState.getValue();
         if (!keyText) {
             S.util.showMessage("Enter key text.", "Warning");
             return;
         }
-        let success = await S.encryption.importKeyPair(keyText);
+        const success = await S.encryption.importKeyPair(keyText);
         if (!success) {
             S.util.showMessage("Invalid key text", "Warning");
             return;

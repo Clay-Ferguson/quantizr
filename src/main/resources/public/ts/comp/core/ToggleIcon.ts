@@ -17,12 +17,12 @@ export class ToggleIcon extends Comp {
     }
 
     _toggleClass = () => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         this.mergeState<LS>({ toggle: !state.toggle });
     }
 
     compRender = (): ReactNode => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
         return this.tag("i");
     }

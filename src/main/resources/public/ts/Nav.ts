@@ -66,7 +66,7 @@ export class Nav {
         if (!state.node) return null;
 
         try {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: false,
                 siblingOffset: siblingOffset,
@@ -104,7 +104,7 @@ export class Nav {
         }
 
         try {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: true,
                 siblingOffset: 0,
@@ -134,7 +134,7 @@ export class Nav {
      * turn of row selection DOM element of whatever row is currently selected
      */
     getSelectedDomElement = (state: AppState): HTMLElement => {
-        let selNode = S.nodeUtil.getHighlightedNode(state);
+        const selNode = S.nodeUtil.getHighlightedNode(state);
         if (selNode) {
             /* get node by node identifier */
             const node: J.NodeInfo = state.idToNodeMap.get(selNode.id);
@@ -193,7 +193,7 @@ export class Nav {
         // console.log("openContentNode(): " + nodePathOrId);
 
         try {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: nodePathOrId,
                 upLevel: false,
                 siblingOffset: 0,
@@ -260,7 +260,7 @@ export class Nav {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 // todo-2: make this string a configurable property template
-                let googleUrl = "https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude;
+                const googleUrl = "https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude;
 
                 new MessageDlg("Your current location...", "GEO Location", null,
                     new VerticalLayout([
@@ -298,7 +298,7 @@ export class Nav {
         } else {
             try {
                 // console.log("renderNode (navHome): " + state.homeNodeId);
-                let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                     nodeId: state.homeNodeId,
                     upLevel: false,
                     siblingOffset: 0,
@@ -323,7 +323,7 @@ export class Nav {
     }
 
     runSearch = (evt: Event) => {
-        let id = S.util.allowIdFromEvent(evt, null);
+        const id = S.util.allowIdFromEvent(evt, null);
         const state = getAppState();
         this.clickNodeRow(null, id);
         setTimeout(() => {
@@ -332,7 +332,7 @@ export class Nav {
     }
 
     runTimeline = (evt: Event) => {
-        let id = S.util.allowIdFromEvent(evt, null);
+        const id = S.util.allowIdFromEvent(evt, null);
         const state = getAppState();
         this.clickNodeRow(null, id);
 
@@ -349,11 +349,11 @@ export class Nav {
         id = S.util.allowIdFromEvent(evt, id);
         const state = getAppState();
 
-        let node: J.NodeInfo = state.idToNodeMap.get(id);
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
-                let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+                const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
                 if (feedData) {
                     feedData.props.searchTextState.setValue("");
                 }
@@ -373,7 +373,7 @@ export class Nav {
         }
         // if node not in local memory, then we have to get it from the server first...
         else {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: id,
                 upLevel: false,
                 siblingOffset: 0,
@@ -388,7 +388,7 @@ export class Nav {
 
             if (!res.node) return;
             S.nodeUtil.updateNodeMap(res.node, state);
-            let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+            const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (feedData) {
                 feedData.props.searchTextState.setValue("");
             }
@@ -479,7 +479,7 @@ export class Nav {
     }
 
     messages = (props: FeedViewProps) => {
-        let feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (!feedData) {
             return;
         }
@@ -545,7 +545,7 @@ export class Nav {
     }
 
     showTrendingFiltered = (filter: string) => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
         if (data) {
             data.props.filter = filter;
         }
@@ -562,7 +562,7 @@ export class Nav {
     }
 
     messagesToFromMe = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -580,7 +580,7 @@ export class Nav {
     }
 
     messagesToMe = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -598,7 +598,7 @@ export class Nav {
     }
 
     messagesFromMeToUser = (user: string) => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -617,7 +617,7 @@ export class Nav {
     }
 
     messagesFromMe = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -635,7 +635,7 @@ export class Nav {
     }
 
     messagesFromFriends = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -653,7 +653,7 @@ export class Nav {
     }
 
     messagesLocal = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }
@@ -673,7 +673,7 @@ export class Nav {
     messagesNodeFeed = (state: AppState) => {
         const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!hltNode) return;
-        let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -691,7 +691,7 @@ export class Nav {
     }
 
     messagesFediverse = () => {
-        let data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.searchTextState.setValue("");
         }

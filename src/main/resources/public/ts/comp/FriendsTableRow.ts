@@ -36,7 +36,7 @@ export class FriendsTableRow extends ListBoxRow {
             });
         }
 
-        let friendDisplay = this.friend.displayName
+        const friendDisplay = this.friend.displayName
             ? this.friend.displayName + " (@" + this.friend.userName + ")"
             : ("@" + this.friend.userName);
 

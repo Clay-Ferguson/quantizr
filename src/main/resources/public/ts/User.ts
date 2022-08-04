@@ -37,7 +37,7 @@ export class User {
      * use these names
      */
     isTestUserAccount = (state: AppState): boolean => {
-        let lcUserName = state.userName.toLowerCase();
+        const lcUserName = state.userName.toLowerCase();
         return lcUserName === "adam" || //
             lcUserName === "bob" || //
             lcUserName === "cory" || //
@@ -74,7 +74,7 @@ export class User {
             S.util.loadAnonPageHome();
         } else {
             try {
-                let res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                const res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
@@ -244,7 +244,7 @@ export class User {
     }
 
     checkMessages = async () => {
-        let res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
+        const res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
             dispatch("SetNewMessageCount", s => {
                 s.newMessageCount = res.numNew;
@@ -254,7 +254,7 @@ export class User {
     }
 
     queryUserProfile = async (userId: string) => {
-        let res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId
         });
 

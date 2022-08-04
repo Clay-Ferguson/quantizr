@@ -53,7 +53,7 @@ export class Edit {
     }
 
     openExportDlg = (state: AppState) => {
-        let node = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             new ExportDlg(node).open();
         }
@@ -105,7 +105,7 @@ export class Edit {
             const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, state);
             if (editingAllowed) {
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
-                let editInPopup = forceUsePopup || state.mobileMode ||
+                const editInPopup = forceUsePopup || state.mobileMode ||
                     // node not found on tree.
                     (!S.nodeUtil.getDisplayingNode(state, res.nodeInfo.id) &&
                         !S.nodeUtil.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
@@ -242,7 +242,7 @@ export class Edit {
 
         if (S.util.ctrlKeyCheck()) {
             let blob = null;
-            let clipboardText = await (navigator as any).clipboard.readText();
+            const clipboardText = await (navigator as any).clipboard.readText();
             if (!clipboardText) {
                 blob = await S.util.readClipboardFile();
                 if (blob) {
@@ -251,7 +251,7 @@ export class Edit {
             }
 
             if (nodeInsertTarget) {
-                let res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                const res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: false,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -263,7 +263,7 @@ export class Edit {
                     this.insertNodeResponse(res, state);
                 }
             } else {
-                let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -288,7 +288,7 @@ export class Edit {
         }
         else {
             if (nodeInsertTarget) {
-                let res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                const res = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: true,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -298,7 +298,7 @@ export class Edit {
                 });
                 this.insertNodeResponse(res, state);
             } else {
-                let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -343,7 +343,7 @@ export class Edit {
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
-                let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+                const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
                 if (feedData?.props?.feedDirtyList) {
                     FeedView.updateFromFeedDirtyList(feedData, state);
                 }
@@ -355,7 +355,7 @@ export class Edit {
             }
 
             // find and update the history item if it exists.
-            let histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
+            const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                 return h.id === node.id;
             });
             if (histItem) {
@@ -392,9 +392,9 @@ export class Edit {
 
     refreshNodeFromServer = async (nodeId: string) => {
         // console.log("refreshNodeFromServer: " + nodeId);
-        let state = getAppState();
+        const state = getAppState();
 
-        let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
             siblingOffset: 0,
@@ -436,7 +436,7 @@ export class Edit {
             return;
         }
 
-        for (let ac of aclEntries) {
+        for (const ac of aclEntries) {
             // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
             await S.edit.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
         }
@@ -458,7 +458,7 @@ export class Edit {
 
     setMainPanelCols = (val: number) => {
         setTimeout(() => {
-            let state = getAppState();
+            const state = getAppState();
             if (val < 4) val = 4;
             if (val > 8) val = 8;
             state.userPrefs.mainPanelCols = val;
@@ -468,7 +468,7 @@ export class Edit {
 
     setMetadataOption = (val: boolean) => {
         setTimeout(() => {
-            let state = getAppState();
+            const state = getAppState();
             state.userPrefs.showMetaData = val;
             S.util.saveUserPreferences(state);
         }, 100);
@@ -511,7 +511,7 @@ export class Edit {
 
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "up"
             });
@@ -529,7 +529,7 @@ export class Edit {
 
         const node = state.idToNodeMap.get(id);
         if (node) {
-            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "down"
             });
@@ -545,7 +545,7 @@ export class Edit {
         }
         const node = state.idToNodeMap.get(id);
         if (node) {
-            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "top"
             });
@@ -561,7 +561,7 @@ export class Edit {
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            let res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "bottom"
             });
@@ -580,7 +580,7 @@ export class Edit {
     }
 
     checkEditPending = (): boolean => {
-        let state = getAppState(null);
+        const state = getAppState(null);
 
         // state.editNode holds non-null always whenever there is editing underway.
         if (state.editNode) {
@@ -612,7 +612,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = getAppState(state);
         if (!id) {
-            let node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 id = node.id;
             }
@@ -623,7 +623,7 @@ export class Edit {
             return;
         }
 
-        let res = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
+        const res = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         });
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
@@ -657,7 +657,7 @@ export class Edit {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
-        let state = getAppState();
+        const state = getAppState();
         if (S.util.ctrlKeyCheck()) {
             this.saveClipboardToChildNode(id);
         }
@@ -694,7 +694,7 @@ export class Edit {
 
     selectAllNodes = async (state: AppState) => {
         const highlightNode = S.nodeUtil.getHighlightedNode(state);
-        let res = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
+        const res = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
         S.nodeUtil.selectAllNodes(res.nodeIds);
@@ -703,7 +703,7 @@ export class Edit {
     clearInbox = async (state: AppState) => {
         S.nodeUtil.clearSelNodes(state);
 
-        let dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
+        const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
@@ -725,12 +725,12 @@ export class Edit {
             return;
         }
 
-        let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        let dlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
+        const confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
+        const dlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
             "btn-danger", "alert alert-info");
         await dlg.open();
         if (dlg.yes) {
-            let res = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+            const res = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
                 nodeIds: selNodesArray
             });
             this.joinNodesResponse(res, state);
@@ -741,12 +741,12 @@ export class Edit {
     * Deletes all nodes owned by you but NOT rooted in your own account root.
     */
     bulkDelete = async () => {
-        let confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
-        let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
+        const confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
+        const dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            const res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: null,
                 childrenOnly: false,
                 bulkDelete: true
@@ -760,7 +760,7 @@ export class Edit {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = async (evt: Event = null, id: string = null) => {
-        let state = getAppState();
+        const state = getAppState();
         id = S.util.allowIdFromEvent(evt, id);
 
         // if a nodeId was specified we use it as the selected nodes to delete
@@ -789,12 +789,12 @@ export class Edit {
             return;
         }
 
-        let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
-        let dlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
+        const confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
+        const dlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            let res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            const res = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: selNodesArray,
                 childrenOnly: false,
                 bulkDelete: false
@@ -905,7 +905,7 @@ export class Edit {
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
-        let res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        const res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
             nodeIds: state.nodesToMove,
             location
@@ -924,7 +924,7 @@ export class Edit {
     }
 
     insertBookWarAndPeace = async (state: AppState) => {
-        let dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
+        const dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
             "Confirm", null, null);
         await dlg.open();
         if (dlg.yes) {
@@ -934,7 +934,7 @@ export class Edit {
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
             } else {
-                let res = await S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
+                const res = await S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
                     truncated: S.user.isTestUserAccount(state)
@@ -984,7 +984,7 @@ export class Edit {
             return;
         }
 
-        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
@@ -1000,12 +1000,12 @@ export class Edit {
         });
 
         if (blob) {
-            let state = getAppState(null);
+            const state = getAppState(null);
             this.createSubNodeResponse(res, false, null, null, state);
         }
         else {
             setTimeout(() => {
-                let state = getAppState();
+                const state = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: true,
@@ -1030,7 +1030,7 @@ export class Edit {
             return;
         }
 
-        let res = await S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
+        const res = await S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             splitType: splitType,
             nodeId: node.id,
             delimiter
@@ -1063,7 +1063,7 @@ export class Edit {
     addLinkBookmark = async (content: any, audioUrl: string, state: AppState) => {
         state = getAppState(state);
 
-        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
             newNodeName: "",
@@ -1083,7 +1083,7 @@ export class Edit {
 
     // like==false means 'unlike'
     likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
-        let res = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
+        const res = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
         }, true);
@@ -1114,7 +1114,7 @@ export class Edit {
 
         // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
         // so we save the node without any content in this case.
-        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: !boostTarget,
             nodeId,
             newNodeName: "",
@@ -1140,7 +1140,7 @@ export class Edit {
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = getAppState(state);
 
-        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
             newNodeName: "",
@@ -1166,7 +1166,7 @@ export class Edit {
     addCalendarEntry = async (initDate: number, state: AppState) => {
         state = getAppState(state);
 
-        let res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: state.fullScreenCalendarId,
             newNodeName: "",
@@ -1194,7 +1194,7 @@ export class Edit {
         // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = getAppState(null);
 
-        let res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        const res = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
             location
@@ -1208,7 +1208,7 @@ export class Edit {
                     s.nodesToMove = null;
                     return s;
                 });
-                let state = getAppState();
+                const state = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: false,
@@ -1249,7 +1249,7 @@ export class Edit {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
-        let dlg: SharingDlg = new SharingDlg(node);
+        const dlg: SharingDlg = new SharingDlg(node);
         await dlg.open();
     }
 

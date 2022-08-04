@@ -66,7 +66,7 @@ export class SignupDlg extends DialogBase {
     }
 
     signupNow = async (reCaptchaToken: string) => {
-        let res = await S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
+        const res = await S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userState.getValue(),
             password: this.passwordState.getValue(),
             email: this.emailState.getValue(),
@@ -87,7 +87,7 @@ export class SignupDlg extends DialogBase {
             window.location.href = window.location.origin;
         }
         else {
-            let errors: any = {};
+            const errors: any = {};
             // S.util.showMessage("Invalid information for Signup", "Signup");
 
             this.userState.setError(res.userError);

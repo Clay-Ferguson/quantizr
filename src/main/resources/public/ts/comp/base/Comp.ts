@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import DOMPurify from "dompurify";
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";

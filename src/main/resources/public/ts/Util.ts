@@ -18,7 +18,7 @@ import { S } from "./Singletons";
 
 declare var __page;
 
-let currencyFormatter = new Intl.NumberFormat("en-US", {
+const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
     // These options are needed to round to whole numbers if that's what you want.
@@ -119,7 +119,7 @@ export class Util {
 
     // #mouseEffects (do not delete tag)
     delayFunc = (func: Function): Function => {
-        let state = getAppState();
+        const state = getAppState();
         if (!func || !state.mouseEffect) {
             return func;
         }
@@ -228,7 +228,7 @@ export class Util {
             return new Uint8Array([]);
         }
 
-        let a = [];
+        const a = [];
         for (let i = 0, len = str.length; i < len; i += 2) {
             a.push(parseInt(str.substring(i, i + 2), 16));
         }
@@ -308,11 +308,11 @@ export class Util {
 
     // add with sign=1, subtract with sign=-1
     addTimezoneOffset = (date: Date, sign: number): Date => {
-        let tzOffsetMinutes = date.getTimezoneOffset();
+        const tzOffsetMinutes = date.getTimezoneOffset();
         // console.log("offset: " + tzOffsetMinutes);
 
         // make the time value in our current local timezone
-        let adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
+        const adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
         return new Date(adjustedTime);
     }
 
@@ -817,7 +817,7 @@ export class Util {
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, childNode.id);
         }
 
-        let content = S.nodeUtil.getShortContent(node);
+        const content = S.nodeUtil.getShortContent(node);
         // console.log("updateHistory: id=" + node.id + " subId=" + childNodeId + " cont=" + content);
         let url, title, state;
         if (node.name) {
@@ -887,7 +887,7 @@ export class Util {
         });
 
         // Lookup this history item so we can update the subIds first.
-        let histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
+        const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
             return h.id === node.id;
         });
 
@@ -907,7 +907,7 @@ export class Util {
                 }
 
                 if (childNode.id !== node.id) {
-                    let childFound = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
+                    const childFound = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                         return h.id === childNode.id;
                     });
 
@@ -932,8 +932,8 @@ export class Util {
     removeHtmlTags = (text: string) => {
         if (!text) return text;
         text = this.replaceAll(text, "```", " ");
-        let doc = new DOMParser().parseFromString(text, "text/html");
-        let ret = doc.body.textContent || "";
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        const ret = doc.body.textContent || "";
         return ret.trim();
     }
 
@@ -1101,7 +1101,7 @@ export class Util {
 
     buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {
         if (!items) return [];
-        let ret = [];
+        const ret = [];
 
         items.forEach((v: J.CalendarItem) => {
             ret.push({
@@ -1132,7 +1132,7 @@ export class Util {
         if (tags) {
             tags.forEach(t => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {
-                    let img = `<img src='${t.icon.url}'">`;
+                    const img = `<img src='${t.icon.url}'">`;
                     val = S.util.replaceAll(val, t.name, img);
                 }
             })
@@ -1193,7 +1193,7 @@ export class Util {
     loadOpenGraph = async (url: string, callback: Function) => {
         // console.log("loadOpenGraph: " + url);
         try {
-            let res: J.GetOpenGraphResponse = await this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+            const res: J.GetOpenGraphResponse = await this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
             }, true);
             callback(res.openGraph);
@@ -1212,7 +1212,7 @@ export class Util {
     // either checking that logging is working, after a live edit of the logger config file or as a text marker
     // for identifying when specific things are happening by injecting into log file some notes or text.
     sendLogText = async () => {
-        let text = window.prompt("Enter text to log on server: ");
+        const text = window.prompt("Enter text to log on server: ");
         if (text) {
             await S.util.ajax<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
             S.util.showMessage("Send log text completed.", "Note");
@@ -1224,7 +1224,7 @@ export class Util {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user
                 message = S.util.removeHtmlTags(message);
 
-                let n = new Notification(title, {
+                const n = new Notification(title, {
                     body: message,
 
                     /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
@@ -1253,9 +1253,9 @@ export class Util {
     }
 
     loadBookmarks = async () => {
-        let state = getAppState();
+        const state = getAppState();
         if (!state.isAnonUser) {
-            let res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
+            const res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
@@ -1281,17 +1281,17 @@ export class Util {
     */
     refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {
         if (!node || !state.node || !state.node.children) return;
-        let doDispatch = !state;
+        const doDispatch = !state;
         state = getAppState(state);
 
-        let path = node.path;
-        let slashIdx: number = path.lastIndexOf("/");
+        const path = node.path;
+        const slashIdx: number = path.lastIndexOf("/");
         if (slashIdx === -1) return;
-        let parentPath = path.substring(0, slashIdx);
+        const parentPath = path.substring(0, slashIdx);
 
         /* scan all children being displayed and if one of them is the target parent set the hasChildren
         on it so it'll display the "open" button */
-        for (let node of state.node.children) {
+        for (const node of state.node.children) {
             if (node.path === parentPath) {
                 node.hasChildren = true;
                 if (doDispatch) {
@@ -1309,7 +1309,7 @@ export class Util {
     }
 
     enableMouseEffect = async () => {
-        let mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
+        const mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
         dispatch("ToggleMouseEffect", s => {
             s.mouseEffect = mouseEffect === "1";
             return s;
@@ -1329,10 +1329,10 @@ export class Util {
     The other part of this is contained in click-effects.scss
     */
     initClickEffect = () => {
-        let clickEffect = (e) => {
+        const clickEffect = (e) => {
             // use a timeout so we can call 'getState()' without a react error.
             setTimeout(() => {
-                let state = getAppState();
+                const state = getAppState();
                 /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
                  and is apparently 0, 0, so we just check the sanity of the coordinates here */
                 if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
@@ -1343,7 +1343,7 @@ export class Util {
     }
 
     runClickAnimation = (x: number, y: number) => {
-        let d = document.createElement("div");
+        const d = document.createElement("div");
         d.className = "clickEffect";
 
         /* todo-2: make this 5 and 12 offset user configurable. I'm using a custom moust pointer that draws a yellow
@@ -1374,22 +1374,22 @@ export class Util {
             arrowOption = "tl";
         }
 
-        let text = window.prompt("Annotation Text:");
+        const text = window.prompt("Annotation Text:");
         if (!text) {
             return;
         }
 
-        let d = document.createElement("div");
+        const d = document.createElement("div");
 
-        let a = document.createElement("div");
+        const a = document.createElement("div");
         a.className = "arrow-up";
         a.style.left = `${this.mouseX + 15}px`;
         a.style.top = `${this.mouseY - 10}px`;
         document.body.appendChild(a);
 
-        let h = document.createElement("h4");
+        const h = document.createElement("h4");
         h.className = "annotationText";
-        let c: any = document.createTextNode(text);
+        const c: any = document.createTextNode(text);
         c.className = "annotationText";
         h.appendChild(c);
         d.appendChild(h);
@@ -1406,10 +1406,10 @@ export class Util {
 
     removeAnnotation = () => {
         if (this.annotations.length > 0) {
-            let a = this.annotations.pop();
+            const a = this.annotations.pop();
             a.parentElement.removeChild(a);
 
-            let e = this.annotations.pop();
+            const e = this.annotations.pop();
             e.parentElement.removeChild(e);
         }
     }
@@ -1453,8 +1453,8 @@ export class Util {
             pos3 = e.clientX;
             pos4 = e.clientY;
 
-            let targX = elmnt.offsetLeft - pos1;
-            let targY = elmnt.offsetTop - pos2;
+            const targX = elmnt.offsetLeft - pos1;
+            const targY = elmnt.offsetTop - pos2;
 
             elmnt.style.left = targX + "px";
             elmnt.style.top = targY + "px";
@@ -1493,10 +1493,10 @@ export class Util {
     }
 
     playAudioIfRequested = () => {
-        let audioUrl = S.util.getParameterByName("audioUrl");
+        const audioUrl = S.util.getParameterByName("audioUrl");
         if (audioUrl) {
-            let startTimeStr = S.util.getParameterByName("t");
-            let startTime = startTimeStr ? parseInt(startTimeStr) : 0;
+            const startTimeStr = S.util.getParameterByName("t");
+            const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
             setTimeout(() => {
                 new AudioPlayerDlg(null, null, null, audioUrl, startTime).open();
             }, 500);
@@ -1504,7 +1504,7 @@ export class Util {
     }
 
     processUrlParams = (state: AppState) => {
-        let passCode = S.util.getParameterByName("passCode");
+        const passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
                 new ChangePasswordDlg(passCode).open();
@@ -1520,7 +1520,7 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {

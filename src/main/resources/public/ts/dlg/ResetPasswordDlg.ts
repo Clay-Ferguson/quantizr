@@ -43,7 +43,7 @@ export class ResetPasswordDlg extends DialogBase {
             return;
         }
 
-        let res = await S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
+        const res = await S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
             user: this.userState.getValue(),
             email: this.emailState.getValue()
         });

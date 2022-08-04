@@ -17,7 +17,7 @@ export class ExportsTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = getAppState();
+        const state = getAppState();
         return state.config?.help?.editor?.dialog;
     }
 

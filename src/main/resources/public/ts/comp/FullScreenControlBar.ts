@@ -18,7 +18,7 @@ export class FullScreenControlBar extends Div {
     }
 
     getButtons = (state: AppState): Comp[] => {
-        let buttons = [];
+        const buttons = [];
 
         if (state.fullScreenViewId && state.activeTab === C.TAB_MAIN) {
             if (S.nav.getAdjacentNode("prev", state)) {

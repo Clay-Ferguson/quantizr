@@ -15,16 +15,16 @@ export class NodeCompMainList extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
-        let children: Comp[] = [];
+        const children: Comp[] = [];
         if (state.node && state.node.children) {
             this.addPaginationButtons(children, state.endReached, "", state, true);
 
-            let orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, state.node);
+            const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, state.node);
 
-            let isMineOrImAdmin = state.isAdminUser || S.props.isMine(state.node, state);
-            let allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
+            const isMineOrImAdmin = state.isAdminUser || S.props.isMine(state.node, state);
+            const allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
             children.push(S.render.renderChildren(state.node, this.tabData, 1, allowNodeMove, state));
 
             this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state, false);
@@ -40,7 +40,7 @@ export class NodeCompMainList extends Div {
         let nextButton: Comp;
         let prevNodeButton: Comp;
         let nextNodeButton: Comp;
-        let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
+        const firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {
@@ -66,17 +66,17 @@ export class NodeCompMainList extends Div {
                 title: "Next Page"
             });
 
-            let buttonCreateTime: number = new Date().getTime();
+            const buttonCreateTime: number = new Date().getTime();
 
             if (C.TREE_INFINITE_SCROLL && !pageTop) {
                 // If nextButton is the one at the bottom of the page we watch it so we can dynamically load in
                 // new content when it scrolls info view. What's happening here is that once
                 // the nextButton scrolls into view, we load in more nodes!
                 nextButton.onMount((elm: HTMLElement) => {
-                    let observer = new IntersectionObserver(entries => {
+                    const observer = new IntersectionObserver(entries => {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
-                        let state = getAppState();
+                        const state = getAppState();
 
                         // Make sure this button has existed for 3 seconds at least before allowing it to trigger a growPage, becasue
                         // if it renders as visible without the user scrolling to it that would be bad by triggering a grow
@@ -87,7 +87,7 @@ export class NodeCompMainList extends Div {
                                     // if this button comes into visibility within 2 seconds of it being created
                                     // that means it was rendered visible without user scrolling so in this case
                                     // we want to disallow the auto loading
-                                    let curTime = new Date().getTime();
+                                    const curTime = new Date().getTime();
                                     if (curTime - buttonCreateTime < 3000) {
                                         observer.disconnect();
                                         return;

@@ -44,7 +44,7 @@ export class ServerPush {
             if (S.quanta.loggingOut) return;
 
             // this might work ok, but for now, let's just force a page repload
-            let state = getAppState();
+            // let state = getAppState();
             // S.nav.login(state);
             // window.location.href = window.location.origin;
 
@@ -67,7 +67,7 @@ export class ServerPush {
 
             if (nodeInfo) {
                 dispatch("RenderTimelineResults", s => {
-                    let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
+                    const data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                     if (!data) return;
 
                     if (data.rsInfo.results) {
@@ -83,13 +83,13 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
-            let state = getAppState();
+            const state = getAppState();
             const data: J.FeedPushInfo = JSON.parse(e.data);
             this.feedPushItem(data.nodeInfo, state);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            let state = getAppState();
+            const state = getAppState();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
             // console.log("IPSM: " + data.payload);
             this.ipsmPushItem(data.payload, state);
@@ -117,8 +117,8 @@ export class ServerPush {
         if (!nodeInfo) return;
         feedData.props.feedResults = feedData.props.feedResults || [];
 
-        let itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
-        let updatesExistingItem = itemFoundIdx !== -1;
+        const itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+        const updatesExistingItem = itemFoundIdx !== -1;
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
             nodeInfo.content = "[Encrypted]";
@@ -144,7 +144,7 @@ export class ServerPush {
     }
 
     ipsmPushItem = (payload: string, state: AppState) => {
-        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
+        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         if (!feedData) return;
 
         dispatch("RenderIPSMFeedResults", s => {
@@ -161,10 +161,10 @@ export class ServerPush {
 
         console.log("feedPushItem: " + nodeInfo.content);
 
-        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (!feedData) return;
 
-        let isMine = S.props.isMine(nodeInfo, state);
+        const isMine = S.props.isMine(nodeInfo, state);
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
             nodeInfo.content = "[Encrypted]";
@@ -185,8 +185,8 @@ export class ServerPush {
         dispatch("RenderFeedResults", s => {
             feedData.props.feedResults = feedData.props.feedResults || [];
 
-            let itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
-            let updatesExistingItem = itemFoundIdx !== -1;
+            const itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+            const updatesExistingItem = itemFoundIdx !== -1;
 
             /* if the reciept of this server push makes us have new knowledge that one of our nodes
                that didn't have children before now has children then update the state to have 'hasChildren'

@@ -17,7 +17,7 @@ export class EditPrivsTableRow extends ListBoxRow {
     }
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
-        let div = new Div(null, { className: "float-end microMarginBottom" });
+        const div = new Div(null, { className: "float-end microMarginBottom" });
 
         aclEntry.privileges.forEach(function (privilege, index) {
             div.addChild(
@@ -51,12 +51,12 @@ export class EditPrivsTableRow extends ListBoxRow {
             });
         }
 
-        let displayName = this.aclEntry.displayName
+        const displayName = this.aclEntry.displayName
             ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
             : ("@" + this.aclEntry.principalName);
 
-        let isPublic = this.aclEntry.principalName === "public";
-        let publicWritable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
+        const isPublic = this.aclEntry.principalName === "public";
+        const publicWritable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
 
         this.setChildren([
             new Div(null, { className: "microMarginAll" }, [

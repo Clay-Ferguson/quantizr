@@ -26,11 +26,11 @@ export class ManageStorageDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state: any = this.getState<LS>();
+        const state: any = this.getState<LS>();
 
         let data = null;
         if (state.binQuota) {
-            let available = state.binQuota - state.binTotal;
+            const available = state.binQuota - state.binTotal;
             data = [
                 { label: "Used: " + S.util.formatMemory(state.binTotal), value: state.binTotal, color: "#377eb8" },
                 { label: "Available: " + S.util.formatMemory(available), value: available, color: "#4daf4a" }];
@@ -49,7 +49,7 @@ export class ManageStorageDlg extends DialogBase {
     }
 
     async preLoad(): Promise<void> {
-        let res = await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        const res = await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
 
         let used = "";
         if (res.binQuota <= 0) {
@@ -64,9 +64,9 @@ export class ManageStorageDlg extends DialogBase {
             }
         }
 
-        let quota = S.util.formatMemory(res.binQuota);
+        const quota = S.util.formatMemory(res.binQuota);
 
-        let info = //
+        const info = //
             "<h5>Used: " + S.util.formatMemory(res.binTotal) + " (" + used + ")</h5>";
 
         this.mergeState<LS>({

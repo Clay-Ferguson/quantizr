@@ -18,7 +18,7 @@ export class TextContent extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
 
         // todo-2: Not sure I want to keep detecting HTML this way, because we can just use
         // the HTML class explicity when we need to support HTML

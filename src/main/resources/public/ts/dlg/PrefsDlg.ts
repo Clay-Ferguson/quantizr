@@ -34,9 +34,9 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = async () => {
-        let state = getAppState();
+        const state = getAppState();
         if (!state.isAnonUser) {
-            let res = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            const res = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
                 userPreferences: {
                     editMode: state.userPrefs.editMode,

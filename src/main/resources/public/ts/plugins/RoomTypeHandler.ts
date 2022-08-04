@@ -22,7 +22,7 @@ export class RoomTypeHandler extends TypeBase {
 
     super_render = this.render;
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
-        let baseComp = this.super_render(node, tabData, rowStyling, isTreeView, state);
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, state);
         return new Div(null, null, [
             baseComp,
             new ButtonBar([

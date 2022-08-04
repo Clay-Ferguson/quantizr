@@ -26,8 +26,8 @@ export class NodeCompRowHeader extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let children = [];
+        const state = useAppState();
+        const children = [];
         let avatarImg: Img = null;
 
         if (this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
@@ -37,8 +37,8 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        let priorityVal = S.props.getPropStr(J.NodeProp.PRIORITY, this.node);
-        let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
+        const priorityVal = S.props.getPropStr(J.NodeProp.PRIORITY, this.node);
+        const priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
@@ -61,11 +61,11 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        let verboseChildren = state.mobileMode ? [] : children;
+        const verboseChildren = state.mobileMode ? [] : children;
 
-        let typeHandler = S.plugin.getTypeHandler(this.node.type);
+        const typeHandler = S.plugin.getTypeHandler(this.node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass();
+            const iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 verboseChildren.push(new Icon({
                     className: iconClass + " rowTypeIcon",
@@ -80,7 +80,7 @@ export class NodeCompRowHeader extends Div {
         the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
         if (state.isAdminUser) {
             // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
-            let ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
+            const ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
             verboseChildren.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
         }
 
@@ -107,8 +107,8 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        let publicReadOnly = S.props.isPublicReadOnly(this.node);
-        let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
+        const publicReadOnly = S.props.isPublicReadOnly(this.node);
+        const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         if (!this.isBoost && (!publicReadOnly || actPubId)) {
@@ -176,12 +176,12 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        let floatUpperRightDiv: Div = new Div(null, {
+        const floatUpperRightDiv: Div = new Div(null, {
             className: "float-end floatRightHeaderDiv"
         });
 
         if (this.node.lastModified) {
-            let reply = S.props.getPropStr(J.NodeProp.REPLY, this.node);
+            const reply = S.props.getPropStr(J.NodeProp.REPLY, this.node);
             if (reply) {
                 floatUpperRightDiv.addChild(new Span("Reply", { className: "reply-indicator", title: "This Post is a reply to it's parent Post" }));
             }
@@ -189,7 +189,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (this.node.name) {
-            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(this.node);
+            const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(this.node);
             floatUpperRightDiv.addChild(new Span(this.node.name, {
                 className: "nodeNameDisp",
                 title: "Node name (Click to copy link to clipboard)",
@@ -202,7 +202,7 @@ export class NodeCompRowHeader extends Div {
 
         // If node is shared to public we just show the globe icon and not the rest of the shares that may be present.
         if (S.props.isPublic(this.node)) {
-            let appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
+            const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
             floatUpperRightDiv.addChild(new Icon({
                 className: "fa fa-globe fa-lg sharingGlobeIcon",
                 title: "Node is Public\n(" + appendNode + ")"
@@ -210,7 +210,7 @@ export class NodeCompRowHeader extends Div {
         }
         // Show all the share names
         else if (S.props.isShared(this.node)) {
-            let shareComps = S.nodeUtil.getSharingNames(state, this.node, null);
+            const shareComps = S.nodeUtil.getSharingNames(state, this.node, null);
             floatUpperRightDiv.addChild(
                 new Span(null, {
                     className: "rowHeaderSharingNames"

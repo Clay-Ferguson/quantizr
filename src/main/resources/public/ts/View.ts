@@ -17,7 +17,7 @@ export class View {
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
         // console.log("jumpToId: " + id);
-        let state = getAppState();
+        const state = getAppState();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -53,7 +53,7 @@ export class View {
 
         let offset = 0;
         if (!a.zeroOffset) {
-            let firstChild: J.NodeInfo = S.edit.getFirstChildNode(a.state);
+            const firstChild: J.NodeInfo = S.edit.getFirstChildNode(a.state);
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
@@ -67,7 +67,7 @@ export class View {
         }
 
         try {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: a.nodeId,
                 upLevel: false,
                 siblingOffset: 0,
@@ -96,7 +96,7 @@ export class View {
     }
 
     prevPage = (state: AppState) => {
-        let firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
+        const firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
         if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
             let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
@@ -108,9 +108,9 @@ export class View {
     }
 
     nextPage = (state: AppState) => {
-        let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
+        const lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
-            let targetOffset = lastChildNode.logicalOrdinal + 1;
+            const targetOffset = lastChildNode.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, false, state);
         }
     }
@@ -125,9 +125,9 @@ export class View {
     need to load more records automatically, and add to existing page records */
     growPage = (state: AppState) => {
         // console.log("growPage");
-        let lastChildNode = S.edit.getLastChildNode(state);
+        const lastChildNode = S.edit.getLastChildNode(state);
         if (lastChildNode) {
-            let targetOffset = lastChildNode.logicalOrdinal + 1;
+            const targetOffset = lastChildNode.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, true, state);
         }
     }
@@ -137,7 +137,7 @@ export class View {
         console.log("loadPage nodeId=" + state.node.id);
 
         try {
-            let res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: false,
                 siblingOffset: 0,
@@ -160,7 +160,7 @@ export class View {
                 max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
                 if (res?.node?.children && state?.node?.children && state.node.children.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
-                    let idSet: Set<string> = new Set<string>();
+                    const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
                     state.node.children.forEach(child => {
@@ -249,7 +249,7 @@ export class View {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
-        let activeTabComp = S.tabUtil.getActiveTabComp(state);
+        const activeTabComp = S.tabUtil.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.setScrollTop(0);
             // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
@@ -272,7 +272,7 @@ export class View {
     scrollToNode = (state: AppState, node: J.NodeInfo = null) => {
         // S.quanta.setOverlay(true);
 
-        let func = () => {
+        const func = () => {
             //    try {
             /* Check to see if we are rendering the top node (page root), and if so
             it is better looking to just scroll to zero index, because that will always
@@ -350,7 +350,7 @@ export class View {
 
     getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(state);
-        let res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        const res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,
             feed,
@@ -364,7 +364,7 @@ export class View {
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
         const node = S.nodeUtil.getHighlightedNode(state);
 
-        let res = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
+        const res = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,
             parameter,
             nodeId: node ? node.id : null

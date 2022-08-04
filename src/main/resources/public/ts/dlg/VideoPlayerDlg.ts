@@ -49,7 +49,7 @@ export class VideoPlayerDlg extends DialogBase {
     }
 
     destroyPlayer = () => {
-        let player = this.videoPlayer ? this.videoPlayer.getVideoElement() : null;
+        const player = this.videoPlayer ? this.videoPlayer.getVideoElement() : null;
         if (player) {
             player.pause();
             player.remove();

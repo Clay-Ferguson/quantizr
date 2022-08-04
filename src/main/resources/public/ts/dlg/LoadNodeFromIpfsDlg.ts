@@ -39,7 +39,7 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
             return;
         }
 
-        let res = await S.util.ajax<J.LoadNodeFromIpfsRequest, J.LoadNodeFromIpfsResponse>("loadNodeFromIpfs", {
+        const res = await S.util.ajax<J.LoadNodeFromIpfsRequest, J.LoadNodeFromIpfsResponse>("loadNodeFromIpfs", {
             path: this.ipfsPathState.getValue()
         });
 

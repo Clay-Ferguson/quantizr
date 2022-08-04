@@ -47,7 +47,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let children = [
+        const children = [
             new Div(null, null, [
                 this.importMode ? null : new HorizontalLayout([
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
@@ -69,7 +69,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
+                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
@@ -82,7 +82,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
                         onClick: async () => {
-                            let dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
+                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
                                 // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
@@ -108,7 +108,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromUrl = () => {
-        let state: LS = this.getState<LS>();
+        const state: LS = this.getState<LS>();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
@@ -118,7 +118,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromIPFS = () => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
@@ -196,7 +196,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     configureDropZone = () => {
         /* Limit based on user quota for our user accounts */
-        let maxFileSize = getAppState().userPrefs.maxUploadFileSize;
+        const maxFileSize = getAppState().userPrefs.maxUploadFileSize;
         // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
@@ -206,10 +206,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         else {
             action = S.util.getRpcPath() + "upload";
         }
-        let url = action;
-        let dlg = this;
+        const url = action;
+        const dlg = this;
         
-        let config: Object = {
+        const config: Object = {
             action,
             width: "100%",
             height: getAppState().mobileMode ? "60%" : "100%",
@@ -321,7 +321,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         S.domUtil.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
-            let maxUploadSize = getAppState().userPrefs.maxUploadFileSize;
+            const maxUploadSize = getAppState().userPrefs.maxUploadFileSize;
 
             if (this.autoAddFile) {
                 if (this.autoAddFile.size > maxUploadSize * Constants.ONE_MB) {
@@ -350,7 +350,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         for each file */
         if (!this.importMode && !this.zipQuestionAnswered && this.hasAnyZipFiles()) {
             this.zipQuestionAnswered = true;
-            let dlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
+            const dlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
                 "Explode Zips?", null, null);
 
             await dlg.open();
@@ -363,8 +363,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return false;
         }
 
-        let maxFileSizeMb = getAppState().userPrefs.maxUploadFileSize;
-        for (let file of this.fileList) {
+        const maxFileSizeMb = getAppState().userPrefs.maxUploadFileSize;
+        for (const file of this.fileList) {
             if (file.size > maxFileSizeMb * Constants.ONE_MB) {
                 return false;
             }
@@ -374,7 +374,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     hasAnyZipFiles = (): boolean => {
         // todo-1: use the some() funcion here instead.
-        for (let file of this.fileList) {
+        for (const file of this.fileList) {
             if (file.name?.toLowerCase().endsWith(".zip")) {
                 return true;
             }
@@ -383,7 +383,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     runButtonEnablement = () => {
-        let valid = this.filesAreValid();
+        const valid = this.filesAreValid();
         this.uploadButton.setEnabled(valid);
     }
 }

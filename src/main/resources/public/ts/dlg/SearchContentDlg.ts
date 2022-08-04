@@ -128,7 +128,7 @@ export class SearchContentDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("search", null);
+                    const dlg: SelectTagsDlg = new SelectTagsDlg("search", null);
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },
@@ -159,7 +159,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -177,14 +177,14 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
-        let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
+        const desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
 
         let requirePriority = this.getState<LS>().requirePriority;
         if (this.getState<LS>().sortField !== J.NodeProp.PRIORITY_FULL) {

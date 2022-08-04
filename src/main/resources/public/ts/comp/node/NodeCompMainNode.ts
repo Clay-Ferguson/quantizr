@@ -26,7 +26,7 @@ export class NodeCompMainNode extends Div {
             // tabIndex: "-1"
         });
 
-        let typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
+        const typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
         if ((!typeHandler || typeHandler.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
@@ -53,8 +53,8 @@ export class NodeCompMainNode extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let node = state.node;
+        const state = useAppState();
+        const node = state.node;
 
         if (!node) {
             this.setChildren(null);
@@ -65,8 +65,8 @@ export class NodeCompMainNode extends Div {
             this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null)]);
         }
         else {
-            let focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-            let selected: boolean = (focusNode && focusNode.id === node.id);
+            const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            const selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
 
             if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
@@ -98,8 +98,8 @@ export class NodeCompMainNode extends Div {
             let boostComp: NodeCompRow = null;
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
-                let typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
+                const childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
+                const typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
                 boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, childrenImgSizes, true, false, true, true, null, state);
             }
 

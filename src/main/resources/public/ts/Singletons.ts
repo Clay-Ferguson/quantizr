@@ -40,6 +40,6 @@ export interface Singletons {
     speech: SpeechRecog;
 }
 
-let S: Singletons = {} as any;
+const S: Singletons = {} as any;
 (window as any).S = S;
 export { S };

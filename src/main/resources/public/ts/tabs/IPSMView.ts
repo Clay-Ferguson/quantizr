@@ -15,10 +15,10 @@ export class IPSMView extends AppTab {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         this.attribs.className = this.getClass(state);
-        let children: Comp[] = [];
+        const children: Comp[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [

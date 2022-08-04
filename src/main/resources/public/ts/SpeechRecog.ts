@@ -16,7 +16,7 @@ export class SpeechRecog {
         }
         else if (webkitSpeechRecognition) {
             // todo-2: fix linter rule to make this cleaner (the first letter upper case is the issue here)
-            let WebkitSpeechRecognition = webkitSpeechRecognition;
+            const WebkitSpeechRecognition = webkitSpeechRecognition;
             this.recognition = new WebkitSpeechRecognition();
         }
 
@@ -47,8 +47,8 @@ export class SpeechRecog {
 
         // This runs when the speech recognition service returns result
         this.recognition.onresult = (event) => {
-            let transcript = event.results[0][0].transcript;
-            let confidence = event.results[0][0].confidence;
+            const transcript = event.results[0][0].transcript;
+            const confidence = event.results[0][0].confidence;
 
             if (this.callback) {
                 this.callback(transcript);

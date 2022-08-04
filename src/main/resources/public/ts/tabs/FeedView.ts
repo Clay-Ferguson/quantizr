@@ -11,7 +11,6 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
-import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
@@ -31,7 +30,7 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
         this.attribs.className = this.getClass(state);
 
         /*
@@ -39,8 +38,8 @@ export class FeedView extends AppTab<FeedViewProps> {
          * client side for various reasons.
          */
         let rowCount = 0;
-        let topChildren: Comp[] = [];
-        let content = this.data.props.feedFilterRootNode ? S.nodeUtil.getShortContent(this.data.props.feedFilterRootNode) : null;
+        const topChildren: Comp[] = [];
+        const content = this.data.props.feedFilterRootNode ? S.nodeUtil.getShortContent(this.data.props.feedFilterRootNode) : null;
         let showBookmarkIcon: boolean = false;
 
         // set showBookmarkIcon visible if we don't already have it bookmarked
@@ -129,9 +128,9 @@ export class FeedView extends AppTab<FeedViewProps> {
         //     topChildren.push(new Clearfix());
         // }
 
-        let children: Comp[] = [];
+        const children: Comp[] = [];
         children.push(new Div(null, { className: "tinyMarginBottom" }, topChildren));
-        let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
+        const childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
         // if we're editing an existing item determine that before starting to render rows.
         let editingExistingItem = false;
@@ -170,7 +169,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             let i = 0;
 
             // holds ids of all boosts (nodes BEING boosted)
-            let boosts: Set<string> = new Set<string>();
+            const boosts: Set<string> = new Set<string>();
 
             // scan all 'feedResults' to build up boosts set of IDs
             this.data.props.feedResults.forEach((node: J.NodeInfo) => {
@@ -206,27 +205,27 @@ export class FeedView extends AppTab<FeedViewProps> {
 
             // only show "More" button if we aren't currently editing. Wouldn't make sense to navigage while editing.
             if (!state.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
-                let moreButton = new IconButton("fa-angle-right", "More", {
+                const moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event: Event) => {
                         event.stopPropagation();
                         event.preventDefault();
                         S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, false);
                     }
                 });
-                let buttonCreateTime: number = new Date().getTime();
+                const buttonCreateTime: number = new Date().getTime();
 
                 if (C.FEED_INFINITE_SCROLL) {
                     if (this.data.props.feedResults?.length < C.MAX_DYNAMIC_ROWS) {
                         // When the 'more' button scrolls into view go ahead and load more records.
                         moreButton.onMount((elm: HTMLElement) => {
-                            let observer = new IntersectionObserver(entries => {
+                            const observer = new IntersectionObserver(entries => {
 
                                 entries.forEach((entry: any) => {
                                     if (entry.isIntersecting) {
                                         // if this button comes into visibility within 2 seconds of it being created
                                         // that means it was rendered visible without user scrolling so in this case
                                         // we want to disallow the auto loading
-                                        let curTime: number = new Date().getTime();
+                                        const curTime: number = new Date().getTime();
                                         if (curTime - buttonCreateTime < 3000) {
                                             observer.disconnect();
                                             return;
@@ -390,7 +389,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     static updateFromFeedDirtyList = (feedData: TabIntf, state: AppState) => {
         if (feedData?.props?.feedDirtyList) {
-            for (let node of feedData.props.feedDirtyList) {
+            for (const node of feedData.props.feedDirtyList) {
                 // console.log("Force Feed: " + node.content);
                 S.push.forceFeedItem(node, feedData, state);
             }

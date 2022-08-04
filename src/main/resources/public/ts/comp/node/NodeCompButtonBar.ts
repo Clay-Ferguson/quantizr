@@ -22,7 +22,7 @@ export class NodeCompButtonBar extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         // make drop target if not a drop-on-self
         if (S.quanta.draggableId !== this.node.id) {
@@ -46,8 +46,8 @@ export class NodeCompButtonBar extends Div {
         let deleteNodeButton: Icon;
         let pasteButtons: Span;
 
-        let isPageRootNode = state.node && this.node.id === state.node.id;
-        let typeHandler = S.plugin.getTypeHandler(this.node.type);
+        const isPageRootNode = state.node && this.node.id === state.node.id;
+        const typeHandler = S.plugin.getTypeHandler(this.node.type);
         let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;
@@ -101,7 +101,7 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
-        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+        const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
         /*
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
@@ -124,8 +124,8 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPrefs.editMode) {
-            let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, this.node, state));
-            let checkboxForDelete = state.isAdminUser || deleteAllowed;
+            const checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, this.node, state));
+            const checkboxForDelete = state.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
@@ -152,8 +152,8 @@ export class NodeCompButtonBar extends Div {
                     insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, this.node, state);
                 }
             }
-            let editInsertAllowed = S.edit.isInsertAllowed(this.node, state);
-            let isMine = S.props.isMine(this.node, state);
+            const editInsertAllowed = S.edit.isInsertAllowed(this.node, state);
+            const isMine = S.props.isMine(this.node, state);
 
             if (C.NEW_ON_TOOLBAR && isMine && insertAllowed && editInsertAllowed && !isPageRootNode) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
@@ -162,7 +162,7 @@ export class NodeCompButtonBar extends Div {
                 }, null, "fa-plus");
             }
 
-            let userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.homeNodeId;
+            const userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.homeNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
@@ -227,7 +227,7 @@ export class NodeCompButtonBar extends Div {
 
         let searchButton: Icon = null;
         let timelineButton: Icon = null;
-        let nodeFeedButton: Icon = null;
+        const nodeFeedButton: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;

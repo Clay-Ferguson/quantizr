@@ -9,7 +9,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-let win: any = window;
+const win: any = window;
 
 export class CalcTypeHandler extends TypeBase {
 
@@ -19,7 +19,7 @@ export class CalcTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        let state = getAppState();
+        const state = getAppState();
         return state.config?.help?.type?.calculator?.editor;
     }
 

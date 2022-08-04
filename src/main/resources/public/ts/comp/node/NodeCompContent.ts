@@ -24,19 +24,19 @@ export class NodeCompContent extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
 
         if (!this.node) {
             this.setChildren(null);
             return;
         }
 
-        let children: CompIntf[] = [];
+        const children: CompIntf[] = [];
         let typeHandler = S.plugin.getTypeHandler(this.node.type);
         let embeddedImg = false;
 
         if (state.showProperties) {
-            let propTable = S.props.renderProperties(this.node.properties);
+            const propTable = S.props.renderProperties(this.node.properties);
             if (propTable) {
                 children.push(propTable);
             }
@@ -61,7 +61,7 @@ export class NodeCompContent extends Div {
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
          showing the normal attachment for this node, because that will the same as the avatar */
-        let isAnAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
+        const isAnAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
 
         if (!embeddedImg && S.props.hasBinary(this.node) && !isAnAccountNode) {
             children.push(new NodeCompBinary(this.node, false, false, this.imgSizeOverride));
@@ -72,11 +72,11 @@ export class NodeCompContent extends Div {
     }
 
     maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo) => {
-        let timestampVal = S.props.getPropStr(propName, node);
+        const timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
-            let dateVal: Date = new Date(parseInt(timestampVal));
-            let diffTime = dateVal.getTime() - (new Date().getTime());
-            let diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
+            const dateVal: Date = new Date(parseInt(timestampVal));
+            const diffTime = dateVal.getTime() - (new Date().getTime());
+            const diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
             let diffStr = "";
             if (diffDays === 0) {
                 diffStr = " (today)";

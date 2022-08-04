@@ -20,7 +20,7 @@ export class IconButton extends Comp {
     }
 
     compRender = (): ReactNode => {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
         return this.tag("button", null, [

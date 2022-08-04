@@ -109,13 +109,12 @@ export class TabUtil {
 
     getTabDataById = (state: AppState, id: string): TabIntf => {
         state = getAppState(state);
-        let data = state.tabData.find(d => d.id === id);
-        return data;
+        return state.tabData.find(d => d.id === id);
     }
 
     getActiveTabComp = (state: AppState): AppTab => {
         if (!state.tabData) return null;
-        let data = state.tabData.find(d => d.id === state.activeTab);
+        const data = state.tabData.find(d => d.id === state.activeTab);
         return data ? data.inst : null;
     }
 
@@ -123,15 +122,15 @@ export class TabUtil {
         if (C.DEBUG_SCROLLING) {
             console.log("Scrolling tab " + tabName + " to offset " + pos);
         }
-        let data = state.tabData.find(d => d.id === tabName);
+        const data = state.tabData.find(d => d.id === tabName);
         if (data) {
             data.scrollPos = pos;
         }
     }
 
     resultSetHasData = (id: string) => {
-        let state = getAppState();
-        let data = state.tabData.find(d => d.id === id);
+        const state = getAppState();
+        const data = state.tabData.find(d => d.id === id);
         return data?.rsInfo?.results?.length > 0;
     }
 

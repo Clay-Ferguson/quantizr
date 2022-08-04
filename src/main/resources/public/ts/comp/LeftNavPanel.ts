@@ -20,7 +20,7 @@ export class LeftNavPanel extends Div {
             tabIndex: "1"
         });
 
-        let state = getAppState();
+        const state = getAppState();
 
         let cols = state.userPrefs.mainPanelCols || 6;
         if (cols < 4) cols = 4;
@@ -48,10 +48,10 @@ export class LeftNavPanel extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        const state = useAppState();
+        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
-        let s = state.newMessageCount > 1 ? "s" : "";
+        const s = state.newMessageCount > 1 ? "s" : "";
         let messages = state.newMessageCount > 0
             ? (state.newMessageCount + " message" + s) : "";
 

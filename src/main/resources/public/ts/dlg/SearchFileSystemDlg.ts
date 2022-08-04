@@ -52,7 +52,7 @@ export class SearchFileSystemDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -60,7 +60,7 @@ export class SearchFileSystemDlg extends DialogBase {
 
         SearchFileSystemDlg.defaultSearchText = this.searchTextState.getValue();
 
-        let res = await S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
+        const res = await S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
             nodeId: node.id,
             text: SearchFileSystemDlg.defaultSearchText
         });

@@ -11,13 +11,13 @@ export class TabPanel extends Div {
 
     constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB });
-        let state = getAppState();
+        const state = getAppState();
 
         if (state.mobileMode) {
             this.attribs.className = "col-12 tabPanelMobile";
         }
         else {
-            let panelCols = state.userPrefs.mainPanelCols || 6;
+            const panelCols = state.userPrefs.mainPanelCols || 6;
             this.attribs.className = "col-" + panelCols + " tabPanel";
         }
     }
@@ -40,7 +40,7 @@ export class TabPanel extends Div {
     }
 
     buildTabs = (state: AppState): AppTab[] => {
-        let tabs = state.tabData.map(tab => {
+        const tabs = state.tabData.map(tab => {
             if (tab.isVisible(state)) {
                 return tab.constructView(tab);
             }

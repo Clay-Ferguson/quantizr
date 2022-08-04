@@ -67,13 +67,13 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     scanDevices = async () => {
-        let audioInputOptions = [];
-        let videoInputOptions = [];
+        const audioInputOptions = [];
+        const videoInputOptions = [];
 
         let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
         let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
 
-        let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
         devices.forEach((device: MediaDeviceInfo) => {
             if (device.kind === "audioinput") {
@@ -116,7 +116,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state: any = this.getState<LS>();
+        const state: any = this.getState<LS>();
 
         // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
         if (this.videoMode) {
@@ -145,7 +145,7 @@ export class MediaRecorderDlg extends DialogBase {
             this.displayStream();
         }
 
-        let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
+        const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, getAppState().userName);
                 this.mergeState<LS>({ audioInput: val });
@@ -200,8 +200,8 @@ export class MediaRecorderDlg extends DialogBase {
             // we force it to recreate the recorder object.
             this.recorder = null;
 
-            let state = this.getState<LS>();
-            let constraints: any = { audio: { deviceId: state.audioInput } };
+            const state = this.getState<LS>();
+            const constraints: any = { audio: { deviceId: state.audioInput } };
             if (this.videoMode) {
                 constraints.video = { deviceId: state.videoInput };
             }
@@ -324,7 +324,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     cancel = async () => {
         if (this.recorded) {
-            let dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
+            const dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
                 "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {

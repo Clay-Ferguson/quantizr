@@ -18,30 +18,30 @@ export class PieChart extends Div {
     domPreUpdateEvent = () => {
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
         // let state = this.getState<LS>();
-        let svg = d3.select("." + this.className);
+        const svg = d3.select("." + this.className);
 
         // width/height must match d3PieChart scss class
-        let height = this.width;
-        let radius = Math.min(this.width, height) / 2;
-        let g = svg.append("g").attr("transform", "translate(" + this.width / 2 + "," + height / 2 + ")");
+        const height = this.width;
+        const radius = Math.min(this.width, height) / 2;
+        const g = svg.append("g").attr("transform", "translate(" + this.width / 2 + "," + height / 2 + ")");
 
-        let colors = [];
-        for (let d of this.data) {
+        const colors = [];
+        for (const d of this.data) {
             colors.push(d.color);
         }
 
-        let color = d3.scaleOrdinal(colors);
+        const color = d3.scaleOrdinal(colors);
 
         // Generate the pie
-        let pie = d3.pie().value((d: any) => { return d.value; });
+        const pie = d3.pie().value((d: any) => { return d.value; });
 
         // Generate the arcs
-        let arc = d3.arc()
+        const arc = d3.arc()
             .innerRadius(0)
             .outerRadius(radius);
 
         // Generate groups
-        let arcs = g.selectAll("." + this.className)
+        const arcs = g.selectAll("." + this.className)
             .data(pie(this.data))
             .enter()
             .append("g")

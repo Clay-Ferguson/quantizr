@@ -128,7 +128,7 @@ export class EditNodeDlg extends DialogBase {
             // save editor state every 3 seconds so user can recover editing if anything goes wrong.
             // This should be CLEARED upon successful saves only, and have this static var set back to null
             EditNodeDlg.autoSaveTimer = setInterval(async () => {
-                let state = EditNodeDlg.currentInst.getState<LS>();
+                const state = EditNodeDlg.currentInst.getState<LS>();
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: state.node.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
@@ -146,7 +146,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
-        let selection: Selection = new Selection(null, "Layout", [
+        const selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "1 col" },
             { key: "c2", val: "2 col" },
             { key: "c3", val: "3 col" },
@@ -198,12 +198,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getTitleIconComp(): CompIntf {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         let span: Span = null;
 
-        let typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass();
+            const iconClass = typeHandler.getIconClass();
             if (iconClass) {
                 if (!span) span = new Span();
                 span.addChild(new Icon({
@@ -239,7 +239,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getExtraTitleBarComps(): CompIntf[] {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         if (S.props.isEncrypted(state.node)) {
             return [
                 new Icon({
@@ -251,11 +251,11 @@ export class EditNodeDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state = this.getState<LS>();
-        let hasAttachment: boolean = S.props.hasBinary(state.node);
+        const state = this.getState<LS>();
+        const hasAttachment: boolean = S.props.hasBinary(state.node);
 
         this.editorHelp = null;
-        let typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(state.node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
@@ -263,9 +263,9 @@ export class EditNodeDlg extends DialogBase {
             this.editorHelp = typeHandler.getEditorHelp();
         }
 
-        let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
+        const allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
         let propertyEditFieldContainer: Div = null;
-        let children = [
+        const children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Div(null, null, [
                 new Div(null, {
@@ -276,7 +276,7 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        let flowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
+        const flowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
 
         if (state.node.hasChildren) {
             flowPanel.addChild(this.createLayoutSelection());
@@ -307,8 +307,8 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
-        let isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, state.node);
+        const propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
+        const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, state.node);
 
         let nodeNameTextField: TextField = null;
         if (!customProps) {
@@ -316,24 +316,24 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (allowContentEdit) {
-            let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
+            const hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
             let rows = getAppState().mobileMode ? "8" : "10";
             if (customProps && hasContentProp) {
                 rows = "4";
             }
 
             if (!customProps || hasContentProp) {
-                let contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
+                const contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
             }
         }
 
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
-        let binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
+        const binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        let shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), state.node, this);
-        let isPublic = S.props.isPublic(state.node);
+        const shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), state.node, this);
+        const isPublic = S.props.isPublic(state.node);
 
         // #unpublish-disabled
         // let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
@@ -370,12 +370,12 @@ export class EditNodeDlg extends DialogBase {
                 }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
-        let tagsEditRow: Div = new Div(null, { className: "marginBottom row align-items-end" }, [
+        const tagsEditRow: Div = new Div(null, { className: "marginBottom row align-items-end" }, [
             new TextField({ label: "Tags", outterClass: "col-10", val: this.tagsState }),
             this.createTagsIconButtons()
         ]);
 
-        let collapsiblePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+        const collapsiblePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             this.tagsState.getValue() ? null : tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
@@ -387,11 +387,11 @@ export class EditNodeDlg extends DialogBase {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "marginRight", "", "", "div") : null;
 
-        let morePanel = new Div(null, { className: "marginBottom" }, [
+        const morePanel = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel
         ]);
 
-        let propsPanel = new Div(null, null, [
+        const propsPanel = new Div(null, null, [
             propsCollapsablePanel
         ]);
 
@@ -404,7 +404,7 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                 if (d.kind === "file") {
                     const file: File = data[i].getAsFile();
-                    let state = this.getState<LS>();
+                    const state = this.getState<LS>();
                     this.utl.upload(file, this);
                     return;
                 }
@@ -418,7 +418,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePublic = async (state: LS, allowAppends: boolean) => {
-        let encrypted = S.props.isEncrypted(state.node);
+        const encrypted = S.props.isEncrypted(state.node);
         if (encrypted) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
@@ -430,7 +430,7 @@ export class EditNodeDlg extends DialogBase {
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
-        let res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: state.node.id,
             includeAcl: true,
             includeOwners: true
@@ -456,8 +456,8 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
+                        const allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        const tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                         propsParent.addChild(tableRow);
                     }
@@ -465,11 +465,11 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        const allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
         if (allowPropAdd) {
             if (numPropsShowing > 0) {
-                let state = this.getState<LS>();
-                let propsButtonBar: ButtonBar = new ButtonBar([
+                const state = this.getState<LS>();
+                const propsButtonBar: ButtonBar = new ButtonBar([
                     new IconButton("fa-plus-circle", null, {
                         onClick: async () => {
                             EditNodeDlg.propsPanelExpanded = true;
@@ -493,7 +493,7 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
-                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue());
+                    const dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue());
                     await dlg.open();
                     this.addTagsToTextField(dlg);
                 },
@@ -514,8 +514,8 @@ export class EditNodeDlg extends DialogBase {
 
     // Generate GUI for handling the display info about any Node Attachments
     makeAttachmentPanel = (state: LS) => {
-        let ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
-        let mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
+        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
+        const mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
 
         let pinCheckbox: Checkbox = null;
         if (ipfsLink) {
@@ -532,10 +532,10 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
+        const imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
             new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
-        let topBinRow = new HorizontalLayout([
+        const topBinRow = new HorizontalLayout([
             new NodeCompBinary(state.node, true, false, null),
 
             new HorizontalLayout([
@@ -577,12 +577,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
-        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
+        const encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => this.utl.setEncryption(this, checked),
             getValue: (): boolean => S.props.isEncrypted(state.node)
         }) : null;
 
-        let wordWrapCheckbox = new Checkbox("Word Wrap", null, {
+        const wordWrapCheckbox = new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                 S.props.setPropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
@@ -593,7 +593,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1"
         });
 
-        let inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Children", null,
+        const inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Children", null,
             this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
 
         return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox];
@@ -615,10 +615,10 @@ export class EditNodeDlg extends DialogBase {
     }
 
     renderButtons(): CompIntf {
-        let state = this.getState<LS>();
+        const state = this.getState<LS>();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
-        let typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             typeHandler.ensureDefaultProperties(state.node);
         }
@@ -627,15 +627,15 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        let allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, getAppState())) : true;
-        let allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, getAppState())) : true;
+        const allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, getAppState())) : true;
+        const allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, getAppState())) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-        let datePropExists = S.props.getProp(J.NodeProp.DATE, state.node);
+        const datePropExists = S.props.getProp(J.NodeProp.DATE, state.node);
 
-        let numPropsShowing = this.utl.countPropsShowing(this);
-        let advancedButtons: boolean = !!this.contentEditor;
-        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        const numPropsShowing = this.utl.countPropsShowing(this);
+        const advancedButtons: boolean = !!this.contentEditor;
+        const allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
@@ -736,12 +736,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
-        let tableRow = new Div(null, { className: "marginBottomIfNotLast" });
+        const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
-        let allowEditAllProps: boolean = getAppState().isAdminUser;
-        let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        let editItems = [];
-        let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
+        const allowEditAllProps: boolean = getAppState().isAdminUser;
+        const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
+        const editItems = [];
+        const label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
@@ -756,7 +756,7 @@ export class EditNodeDlg extends DialogBase {
         // todo-2: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
-            let textarea = new TextArea(label + " (read-only)", {
+            const textarea = new TextArea(label + " (read-only)", {
                 placeholder: "Enter property value...",
                 readOnly: "readOnly",
                 disabled: "disabled"
@@ -766,9 +766,9 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (allowCheckbox) {
-                let checkbox: Checkbox = new Checkbox(label, null, {
+                const checkbox: Checkbox = new Checkbox(label, null, {
                     setValue: (checked: boolean) => {
-                        let state = this.getState<LS>();
+                        const state = this.getState<LS>();
                         if (checked) {
                             state.selectedProps.add(propEntry.name);
                         }
@@ -786,7 +786,7 @@ export class EditNodeDlg extends DialogBase {
             }
 
             let valEditor: CompIntf = null;
-            let multiLine = rows > 1;
+            const multiLine = rows > 1;
 
             if (multiLine) {
                 valEditor = new TextArea(null, {
@@ -817,12 +817,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
-        let value = node.content || "";
-        let editItems = [];
-        let encrypted = value.startsWith(J.Constant.ENC_TAG);
+        const value = node.content || "";
+        const editItems = [];
+        const encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
-        let allowFocus = !this.contentEditor;
+        const allowFocus = !this.contentEditor;
         // console.log("making field editor for val[" + value + "]");
 
         this.contentEditor = new TextArea(null, {
@@ -830,17 +830,17 @@ export class EditNodeDlg extends DialogBase {
             rows
         }, this.contentEditorState, "font-inherit displayCell", true);
 
-        let wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
+        const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
         this.contentEditor.onMount((elm: HTMLElement) => {
             if (encrypted) {
                 // console.log("decrypting: " + value);
-                let cipherText = value.substring(J.Constant.ENC_TAG.length);
+                const cipherText = value.substring(J.Constant.ENC_TAG.length);
                 (async () => {
-                    let cipherKey = S.props.getCryptoKey(node, getAppState());
+                    const cipherKey = S.props.getCryptoKey(node, getAppState());
                     if (cipherKey) {
-                        let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+                        const clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
                         if (!clearText) {
                             this.contentEditorState.setError("Decryption Failed");

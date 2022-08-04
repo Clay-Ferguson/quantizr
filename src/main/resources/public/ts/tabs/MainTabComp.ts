@@ -22,7 +22,7 @@ export class MainTabComp extends AppTab {
     }
 
     preRender(): void {
-        let state = useAppState();
+        const state = useAppState();
         this.attribs.className = this.getClass(state);
 
         if (!state.node) {
@@ -41,9 +41,9 @@ export class MainTabComp extends AppTab {
         //     });
         // }
 
-        let panelCols = state.userPrefs.mainPanelCols || 6;
+        const panelCols = state.userPrefs.mainPanelCols || 6;
 
-        let widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
+        const widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
             panelCols > 4 ? new Icon({
                 className: "fa fa-step-backward widthSizerIcon",
                 title: "Narrower view",

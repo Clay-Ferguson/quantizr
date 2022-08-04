@@ -34,13 +34,13 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        let hltNode = S.nodeUtil.getHighlightedNode(getAppState());
+        const hltNode = S.nodeUtil.getHighlightedNode(getAppState());
         if (!hltNode) {
             new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null).open();
             return;
         }
 
-        let res = await S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
+        const res = await S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
             nodeId: hltNode.id,
             sourceFileName: this.fileNameState.getValue()
         });

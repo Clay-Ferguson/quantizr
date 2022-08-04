@@ -20,8 +20,8 @@ export class NodeTypeListBox extends ListBox {
     }
 
     preRender(): void {
-        let children = [];
-        let typeHandlers = S.plugin.getAllTypeHandlers();
+        const children = [];
+        const typeHandlers = S.plugin.getAllTypeHandlers();
 
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (getAppState().isAdminUser || typeHandler.getAllowUserSelect()) {

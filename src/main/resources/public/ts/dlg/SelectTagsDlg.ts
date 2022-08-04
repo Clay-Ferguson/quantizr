@@ -35,15 +35,15 @@ export class SelectTagsDlg extends DialogBase {
     constructor(private modeOption: string, private curTags: string) {
         super("Select Hashtags", "app-modal-content-medium-width");
 
-        let tags = this.parseTags();
+        const tags = this.parseTags();
         this.mergeState({ selectedTags: this.makeDefaultSelectedTags(), tags, suggestedTags: [], suggestTags: false });
     }
 
     makeDefaultSelectedTags = (): Set<string> => {
-        let tagSet = new Set<string>();
+        const tagSet = new Set<string>();
 
         if (this.curTags) {
-            let tags = this.curTags.split(/ /);
+            const tags = this.curTags.split(/ /);
             tags?.forEach(t => tagSet.add(t));
         }
 
@@ -52,7 +52,7 @@ export class SelectTagsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let buttons: Button[] = [];
-        let state = this.getState();
+        const state = this.getState();
 
         if (state.tags?.length > 0) {
             switch (this.modeOption) {
@@ -111,7 +111,7 @@ export class SelectTagsDlg extends DialogBase {
     updateSuggestTags = async () => {
         const node = getAppState().node;
 
-        let res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        const res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending: false,
             feed: false,
@@ -121,7 +121,7 @@ export class SelectTagsDlg extends DialogBase {
         });
 
         if (res.topTags?.length > 0) {
-            let suggestedTags = [];
+            const suggestedTags = [];
             res.topTags.forEach(tag => {
                 suggestedTags.push({ tag, description: null });
             });
@@ -132,13 +132,13 @@ export class SelectTagsDlg extends DialogBase {
     /* returns an array of objects like {tag, description} */
     parseTags = (): Tag[] => {
         if (!getAppState().userProfile?.userTags) return null;
-        let tags: Tag[] = [];
-        let lines: string[] = getAppState().userProfile.userTags.split(/\r?\n/);
+        const tags: Tag[] = [];
+        const lines: string[] = getAppState().userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             if (line?.startsWith("#")) {
                 let tag = null;
                 let description = null;
-                let delimIdx = line.indexOf(":");
+                const delimIdx = line.indexOf(":");
 
                 if (delimIdx !== -1) {
                     tag = line.substring(0, delimIdx);
@@ -164,7 +164,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     createTagsPickerList = (): Div => {
-        let state = this.getState();
+        const state = this.getState();
         let div: Div = null;
         
         if (state.tags?.length > 0) {
@@ -206,9 +206,9 @@ export class SelectTagsDlg extends DialogBase {
             this.indenting = true;
         }
         else {
-            let checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
+            const checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
                 setValue: (checked: boolean) => {
-                    let state = this.getState<LS>();
+                    const state = this.getState<LS>();
                     if (checked) {
                         state.selectedTags.add(tagObj.tag);
                     }
@@ -233,9 +233,9 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     edit = async () => {
-        let dlg = new EditTagsDlg();
+        const dlg = new EditTagsDlg();
         await dlg.open();
-        let tags = this.parseTags();
+        const tags = this.parseTags();
         this.mergeState({ tags });
     }
 }

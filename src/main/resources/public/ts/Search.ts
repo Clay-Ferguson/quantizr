@@ -22,7 +22,7 @@ export class Search {
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState) => {
-        let res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
+        const res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
             shareTarget,
@@ -32,9 +32,9 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
-                let data = s.tabData.find(d => d.id === C.TAB_SHARES);
+                const data = s.tabData.find(d => d.id === C.TAB_SHARES);
                 if (!data) return;
-                let info = data.rsInfo as SharesRSInfo;
+                const info = data.rsInfo as SharesRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -54,7 +54,7 @@ export class Search {
     }
 
     showThreadAddMore = async (nodeId: string, state: AppState) => {
-        let res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        const res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             loadOthers: false
         });
@@ -63,14 +63,14 @@ export class Search {
             dispatch("RenderThreadResults", s => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
-                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
 
                 s.threadViewNodeId = nodeId;
                 data.openGraphComps = [];
 
                 // remove the last element, which will be a duplicate.
-                let moreResults = res.nodes.slice(0, -1);
+                const moreResults = res.nodes.slice(0, -1);
 
                 // data.props.others = res.others
                 data.rsInfo.results = [...moreResults, ...data.rsInfo.results];
@@ -81,7 +81,7 @@ export class Search {
         }
         else {
             dispatch("RenderThreadResults", s => {
-                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
                 data.rsInfo.endReached = true;
                 return s;
@@ -90,7 +90,7 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
-        let res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        const res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true
         });
@@ -101,7 +101,7 @@ export class Search {
 
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
-                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
 
                 s.threadViewNodeId = node.id;
@@ -120,7 +120,7 @@ export class Search {
             let msg = "Thread not available, or contains unsupported post types.";
 
             // make 'msg' a little more specific if we know there's a 'remote link' showing.
-            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
+            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
             if (objUrl) {
                 if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
                     msg = "Top-level post. No conversation to display. Click `Remote Link` instead.";
@@ -132,7 +132,7 @@ export class Search {
     }
 
     listSubgraphByPriority = async (state: AppState) => {
-        let node = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -148,7 +148,7 @@ export class Search {
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
-        let res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        const res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
             searchText,
@@ -172,7 +172,7 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SEARCH);
                 S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
-                let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
+                const data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                 if (!data) return;
 
                 data.openGraphComps = [];
@@ -215,7 +215,7 @@ export class Search {
             return;
         }
 
-        let res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        const res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node.id,
             searchText: "",
@@ -239,11 +239,11 @@ export class Search {
         dispatch("RenderTimelineResults", s => {
             S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
-            let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
+            const data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
             if (!data) return;
 
             data.openGraphComps = [];
-            let info = data.rsInfo as TimelineRSInfo;
+            const info = data.rsInfo as TimelineRSInfo;
 
             info.results = res.searchResults;
             info.description = timelineDescription;
@@ -279,7 +279,7 @@ export class Search {
     delayedRefreshFeed = (state: AppState) => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            let data: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+            const data: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (!data.props.feedLoading) {
                 this.refreshFeed();
             }
@@ -287,7 +287,7 @@ export class Search {
     }
 
     refreshFeed = () => {
-        let data: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        const data: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (data) {
             data.props.page = 0;
             data.props.refreshCounter++;
@@ -303,8 +303,8 @@ export class Search {
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
-        let appState = getAppState();
-        let data: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
+        const appState = getAppState();
+        const data: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
         if (!data) {
             return;
         }
@@ -312,7 +312,7 @@ export class Search {
         // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
 
         // console.log("Getting results page=" + page + " growResults=" + growResults);
-        let res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+        const res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: data.props.feedFilterRootNode?.id,
             toMe: data.props.feedFilterToMe,
@@ -346,7 +346,7 @@ export class Search {
             if (growResults) {
                 if (data?.props?.feedResults && res?.searchResults && data.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
-                    let idSet: Set<string> = new Set<string>();
+                    const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
                     data.props.feedResults.forEach(child => {
@@ -400,14 +400,14 @@ export class Search {
     }
 
     showFollowers = async (page: number, userName: string) => {
-        let state = getAppState();
+        const state = getAppState();
         if (state.isAnonUser) return;
 
         if (!userName) {
             userName = state.userName;
         }
 
-        let res = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
+        const res = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
             targetUserName: userName
         });
@@ -416,9 +416,9 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
-                let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
+                const data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                 if (!data) return;
-                let info = data.rsInfo as FollowersRSInfo;
+                const info = data.rsInfo as FollowersRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -442,14 +442,14 @@ export class Search {
     }
 
     showFollowing = async (page: number, userName: string) => {
-        let state = getAppState();
+        const state = getAppState();
         if (state.isAnonUser) return;
 
         if (!userName) {
             userName = state.userName;
         }
 
-        let res = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
+        const res = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,
             targetUserName: userName
         });
@@ -458,9 +458,9 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
-                let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
+                const data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                 if (!data) return;
-                let info = data.rsInfo as FollowingRSInfo;
+                const info = data.rsInfo as FollowingRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -541,7 +541,7 @@ export class Search {
             allowFooter ? new Clearfix() : null
         ]);
 
-        let divClass: string = state.highlightSearchNodeId === node.id ? "userFeedItemHighlight" : "userFeedItem";
+        const divClass: string = state.highlightSearchNodeId === node.id ? "userFeedItemHighlight" : "userFeedItem";
 
         return new Div(null, {
             className: isParent ? "userFeedItemParent" : divClass
@@ -562,7 +562,7 @@ export class Search {
     }
 
     searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState) => {
-        let res = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
+        const res = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
             search,

@@ -28,7 +28,7 @@ export class NodeCompBinary extends Div {
 
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
         if (!node) return null;
-        let src: string = S.attachment.getUrlForNodeAttachment(node, false);
+        const src: string = S.attachment.getUrlForNodeAttachment(node, false);
 
         let size = "";
         if (this.isFullScreenEmbed) {
@@ -40,7 +40,7 @@ export class NodeCompBinary extends Div {
         else {
             size = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         }
-        let style: any = {};
+        const style: any = {};
 
         if (!size || size === "0") {
             style.maxWidth = "";
@@ -57,7 +57,7 @@ export class NodeCompBinary extends Div {
             style.width = `calc(${size} - 24px)`;
         }
 
-        let className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
+        const className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
 
         return new Img(node.id, {
             src,
@@ -83,8 +83,8 @@ export class NodeCompBinary extends Div {
     }
 
     preRender(): void {
-        let state = useAppState();
-        let node = this.getState<LS>().node;
+        const state = useAppState();
+        const node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);
             return;
@@ -122,9 +122,9 @@ export class NodeCompBinary extends Div {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let fileName: string = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
-            let fileSize: string = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
-            let fileType: string = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
+            const fileName: string = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
+            const fileSize: string = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
+            const fileType: string = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
