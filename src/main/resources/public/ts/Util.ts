@@ -1355,14 +1355,6 @@ export class Util {
         d.style.top = `${y + 12}px`;
         document.body.appendChild(d);
 
-        // This proved not to be reliable and was able to leave
-        // dangling orphans not in use, but the timer approach below
-        // should be bulletproof.
-        // let func = () => {
-        //     d.parentElement.removeChild(d);
-        // };
-        // d.addEventListener("animationend", func);
-
         setTimeout(() => {
             d.parentElement.removeChild(d);
         }, 400); // this val is in 3 places. put the TS two in a constants file.

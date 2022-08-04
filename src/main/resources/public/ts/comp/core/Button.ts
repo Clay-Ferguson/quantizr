@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { getAppState } from "../../AppRedux";
-import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
 import { Tag } from "./Tag";
 
@@ -9,8 +8,10 @@ interface LS { // Local State
     enabled?: boolean;
 }
 
-export class Button extends Comp {
+// #dynamic-styling-example (do not delete, yet)
+// const scope = "Button";
 
+export class Button extends Comp {
     constructor(text: string, callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary",
         private iconClass: string = null) {
         super(attribs);
@@ -18,9 +19,12 @@ export class Button extends Comp {
         this.attribs.type = "button";
         this.attribs.onClick = callback;
         this.attribs.className = this.attribs.className || "";
+
+        // #dynamic-styling-example (do not delete, yet)
+        // this.attribs.className += ` btn testClass_${scope} clickable ` + moreClasses;
+
         this.attribs.className += " btn clickable " + moreClasses;
         this.attribs.className += getAppState().mobileMode ? " mobileButton" : "";
-        console.log("Button attribs=" + S.util.prettyPrint(this.attribs));
         this.mergeState<LS>({ text, enabled: true });
     }
 
@@ -53,3 +57,9 @@ export class Button extends Comp {
             }) : null, text]);
     }
 }
+
+// #dynamic-styling-example (do not delete, yet)
+// CssUtil.create(`
+// .testClass_${scope} {
+//     border: 2px solid red;
+// }`);
