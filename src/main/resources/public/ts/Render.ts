@@ -199,16 +199,13 @@ export class Render {
         // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
         S.util.setDropHandler(attribs, false, (evt: DragEvent) => {
-            const data = evt.dataTransfer.items;
-
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
-            for (let i = 0; i < data.length; i++) {
-                const d = data[i];
+            for (const item of evt.dataTransfer.items) {
                 // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
-                if (d.kind === "string") {
-                    d.getAsString((s) => {
-                        if (d.type.match("^text/uri-list")) {
+                if (item.kind === "string") {
+                    item.getAsString((s) => {
+                        if (item.type.match("^text/uri-list")) {
                             /* Disallow dropping from our app onto our app */
                             if (s.startsWith(location.protocol + "//" + location.hostname)) {
                                 return;
@@ -222,10 +219,10 @@ export class Render {
                     });
                     return;
                 }
-                else if (d.kind === "string" && d.type.match("^text/html")) {
+                else if (item.kind === "string" && item.type.match("^text/html")) {
                 }
-                else if (d.kind === "file" /* && d.type.match('^image/') */) {
-                    const file: File = data[i].getAsFile();
+                else if (item.kind === "file" /* && d.type.match('^image/') */) {
+                    const file: File = item.getAsFile();
 
                     // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
                     //     S.util.showMessage("That file is too large to upload. Max file size is "+Constants.MAX_UPLOAD_MB+" MB");

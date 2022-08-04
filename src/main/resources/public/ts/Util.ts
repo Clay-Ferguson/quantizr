@@ -215,10 +215,11 @@ export class Util {
 
         // Diferent Algorithm:
         let hexStr = "";
-        for (let i = 0; i < arr.length; i++) {
-            let hex = (arr[i] & 0xff).toString(16);
-            hex = (hex.length === 1) ? "0" + hex : hex;
-            hexStr += hex;
+        if (arr) {
+            for (const a of arr) {
+                const hex = (a & 0xff).toString(16);
+                hexStr += (hex.length === 1) ? "0" + hex : hex;
+            }
         }
         return hexStr;
     }
@@ -286,10 +287,9 @@ export class Util {
         return a.slice(0);
     };
 
-    arrayIndexOfItemByProp = (a: any[], propName: string, propVal: string): number => {
-        const len = a.length;
-        for (let i = 0; i < len; i++) {
-            if (a[i][propName] === propVal) {
+    arrayIndexOfItemByProp = (props: J.PropertyInfo[], propName: string, propVal: string): number => {
+        for (let i = 0; i < props.length; i++) {
+            if (props[i][propName] === propVal) {
                 return i;
             }
         }
@@ -364,7 +364,7 @@ export class Util {
     getParameterByName = (name?: any, url?: any): string => {
         if (!name) return null;
         url = url || window.location.href;
-        
+
         name = name.replace(/[\[\]]/g, "\\$&");
         const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
         const results = regex.exec(url);

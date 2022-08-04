@@ -127,12 +127,9 @@ export class NodeCompVerticalRowLayout extends Div {
 
                 // todo-1: document this in tips and tricks
                 S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
-                    const data = evt.dataTransfer.items;
-                    for (let i = 0; i < data.length; i++) {
-                        const d = data[i];
-                        // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
-                        if (d.kind === "file") {
-                            EditNodeDlg.pendingUploadFile = data[i].getAsFile();
+                    for (const item of evt.dataTransfer.items) {
+                        if (item.kind === "file") {
+                            EditNodeDlg.pendingUploadFile = item.getAsFile();
                             if (lastNode) {
                                 S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
                             }

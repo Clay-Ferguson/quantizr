@@ -290,16 +290,10 @@ export class NodeCompButtonBar extends Div {
 
     makeDropTarget = (attribs: any, id: string) => {
         S.util.setDropHandler(attribs, true, (evt: DragEvent) => {
-            const data = evt.dataTransfer.items;
-
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
-            for (let i = 0; i < data.length; i++) {
-                const d = data[i];
-                // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
-
-                if (d.kind === "string") {
-                    d.getAsString((s) => {
-                        // console.log("String: " + s);
+            for (const item of evt.dataTransfer.items) {
+                if (item.kind === "string") {
+                    item.getAsString((s) => {
                         S.edit.moveNodeByDrop(id, s, "inside", true);
                     });
                     return;

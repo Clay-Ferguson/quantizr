@@ -57,13 +57,9 @@ export class Props {
 
     deleteProp = (node: J.NodeInfo, propertyName: string) => {
         if (node.properties) {
-            for (let i = 0; i < node.properties.length; i++) {
-                if (propertyName === node.properties[i].name) {
-                    // splice is how to delete array elements in js.
-                    node.properties.splice(i, 1);
-                    break;
-                }
-            }
+            node.properties = node.properties.filter(p => {
+                return p.name !== propertyName;
+            });
         }
     }
 

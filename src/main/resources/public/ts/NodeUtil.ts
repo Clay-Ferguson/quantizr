@@ -28,7 +28,7 @@ export class NodeUtil {
     /* return an object with properties for each NodeInfo where the key is the id */
     getSelNodesAsMapById = (state: AppState): Object => {
         const ret: Object = {};
-        const selArray: J.NodeInfo[] = this.getSelNodesArray(state);
+        const selArray = this.getSelNodesArray(state);
         if (!selArray || selArray.length === 0) {
             const node = this.getHighlightedNode(state);
             if (node) {
@@ -37,9 +37,8 @@ export class NodeUtil {
             }
         }
 
-        for (let i = 0; i < selArray.length; i++) {
-            const id = selArray[i].id;
-            ret[id] = selArray[i];
+        for (const sel of selArray) {
+            ret[sel.id] = sel;
         }
         return ret;
     }

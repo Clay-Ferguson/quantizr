@@ -95,12 +95,10 @@ export class NodeCompRow extends Div {
 
                 // todo-1: Need to document this in "Tips and Tricks"
                 S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
-                    const data = evt.dataTransfer.items;
-                    for (let i = 0; i < data.length; i++) {
-                        const d = data[i];
+                    for (const item of evt.dataTransfer.items) {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
-                        if (d.kind === "file") {
-                            EditNodeDlg.pendingUploadFile = data[i].getAsFile();
+                        if (item.kind === "file") {
+                            EditNodeDlg.pendingUploadFile = item.getAsFile();
                             S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, state);
                             return;
                         }
