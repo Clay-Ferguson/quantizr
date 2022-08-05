@@ -12,8 +12,8 @@ import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-import { FeedViewData } from "./tabs/data/FeedViewData";
-import { TrendingViewData } from "./tabs/data/TrendingViewData";
+import { FeedTab } from "./tabs/data/FeedTab";
+import { TrendingTab } from "./tabs/data/TrendingTab";
 import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
@@ -356,8 +356,8 @@ export class Nav {
         const node = state.idToNodeMap.get(id);
         if (node) {
             setTimeout(() => {
-                if (FeedViewData.inst) {
-                    FeedViewData.inst.props.searchTextState.setValue("");
+                if (FeedTab.inst) {
+                    FeedTab.inst.props.searchTextState.setValue("");
                 }
 
                 this.messages({
@@ -391,8 +391,8 @@ export class Nav {
             if (!res.node) return;
             S.nodeUtil.updateNodeMap(res.node, state);
             
-            if (FeedViewData.inst) {
-                FeedViewData.inst.props.searchTextState.setValue("");
+            if (FeedTab.inst) {
+                FeedTab.inst.props.searchTextState.setValue("");
             }
             this.messages({
                 feedFilterFriends: false,
@@ -481,12 +481,12 @@ export class Nav {
     }
 
     messages = (props: any) => {
-        if (!FeedViewData.inst) {
+        if (!FeedTab.inst) {
             return;
         }
 
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
-        FeedViewData.inst.props.refreshCounter++;
+        FeedTab.inst.props.refreshCounter++;
 
         dispatch("SelectTab", s => {
             s.guiReady = true;
@@ -494,7 +494,7 @@ export class Nav {
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
             // merge props parameter into the feed data props.
-            FeedViewData.inst.props = { ...FeedViewData.inst.props, ...props };
+            FeedTab.inst.props = { ...FeedTab.inst.props, ...props };
 
             // console.log("feedData.props=" + S.util.prettyPrint(feedData.props));
             return s;
@@ -546,8 +546,8 @@ export class Nav {
     }
 
     showTrendingFiltered = (filter: string) => {
-        if (TrendingViewData.inst) {
-            TrendingViewData.inst.props.filter = filter;
+        if (TrendingTab.inst) {
+            TrendingTab.inst.props.filter = filter;
         }
 
         dispatch("SelectTab", s => {
@@ -556,14 +556,14 @@ export class Nav {
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
-            TrendingViewData.inst.props = { ...TrendingViewData.inst.props };
+            TrendingTab.inst.props = { ...TrendingTab.inst.props };
             return s;
         });
     }
 
     messagesToFromMe = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -579,8 +579,8 @@ export class Nav {
     }
 
     messagesToMe = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -596,8 +596,8 @@ export class Nav {
     }
 
     messagesFromMeToUser = (user: string) => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -614,8 +614,8 @@ export class Nav {
     }
 
     messagesFromMe = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -631,8 +631,8 @@ export class Nav {
     }
 
     messagesFromFriends = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: true,
@@ -648,8 +648,8 @@ export class Nav {
     }
 
     messagesLocal = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -667,8 +667,8 @@ export class Nav {
     messagesNodeFeed = (state: AppState) => {
         const hltNode = S.nodeUtil.getHighlightedNode(state);
         if (!hltNode) return;
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -684,8 +684,8 @@ export class Nav {
     }
 
     messagesFediverse = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue("");
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,

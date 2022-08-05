@@ -24,7 +24,7 @@ import * as J from "./JavaIntf";
 import { NodeMetaIntf } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-import { MainTabCompData } from "./tabs/data/MainTabCompData";
+import { MainTab } from "./tabs/data/MainTab";
 
 function imageErrorFunc(evt: any) {
     console.log("remove broken img");
@@ -448,8 +448,8 @@ export class Render {
                 s.guiReady = true;
                 s.pageMessage = null;
 
-                if (MainTabCompData.inst) {
-                    MainTabCompData.inst.openGraphComps = [];
+                if (MainTab.inst) {
+                    MainTab.inst.openGraphComps = [];
                 }
 
                 /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering

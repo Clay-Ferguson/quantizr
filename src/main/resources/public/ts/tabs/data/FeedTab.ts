@@ -9,7 +9,7 @@ import { S } from "../../Singletons";
 import { FeedView } from "../FeedView";
 import { FeedViewProps } from "../FeedViewProps";
 
-export class FeedViewData implements TabIntf<FeedViewProps> {
+export class FeedTab implements TabIntf<FeedViewProps> {
     name = "Feed";
     tooltip = "Reverse-chronological list of Fediverse posts";
     id = C.TAB_FEED;
@@ -17,9 +17,9 @@ export class FeedViewData implements TabIntf<FeedViewProps> {
     props = new FeedViewProps();
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: FeedViewData = null;
+    static inst: FeedTab = null;
     constructor() {
-        FeedViewData.inst = this;
+        FeedTab.inst = this;
     }
 
     isVisible = (state: AppState) => true;

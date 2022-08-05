@@ -5,8 +5,8 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-import { FeedViewData } from "./tabs/data/FeedViewData";
-import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
+import { FeedTab } from "./tabs/data/FeedTab";
+import { TimelineTab } from "./tabs/data/TimelineTab";
 
 // reference: https://www.baeldung.com/spring-server-sent-events
 // See also: AppController.java#serverPush
@@ -69,7 +69,7 @@ export class ServerPush {
 
             if (nodeInfo) {
                 dispatch("RenderTimelineResults", s => {
-                    const data = TimelineResultSetViewData.inst;
+                    const data = TimelineTab.inst;
                     if (!data) return;
 
                     if (data.props.results) {
@@ -117,9 +117,9 @@ export class ServerPush {
 
     forceFeedItem = (nodeInfo: J.NodeInfo, state: AppState) => {
         if (!nodeInfo) return;
-        FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults || [];
+        FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
 
-        const itemFoundIdx = FeedViewData.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+        const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
         const updatesExistingItem = itemFoundIdx !== -1;
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
@@ -134,11 +134,11 @@ export class ServerPush {
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
             // console.log("force*** update existing item!");
-            FeedViewData.inst.props.feedResults[itemFoundIdx] = nodeInfo;
+            FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
         }
         else {
             // console.log("force*** push new item");
-            FeedViewData.inst.props.feedResults.unshift(nodeInfo);
+            FeedTab.inst.props.feedResults.unshift(nodeInfo);
             // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
             // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
             // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
@@ -163,7 +163,7 @@ export class ServerPush {
         if (!nodeInfo) return;
 
         console.log("feedPushItem: " + nodeInfo.content);
-        if (!FeedViewData.inst) return;
+        if (!FeedTab.inst) return;
 
         const isMine = S.props.isMine(nodeInfo, state);
 
@@ -176,15 +176,15 @@ export class ServerPush {
          process all the accumulated feedDirtyList items. */
         if (state.activeTab === C.TAB_FEED && state.editNode) {
             // console.log("editing, so adding to feedDirty");
-            FeedViewData.inst.props.feedDirtyList = FeedViewData.inst.props.feedDirtyList || [];
-            FeedViewData.inst.props.feedDirtyList.push(nodeInfo);
+            FeedTab.inst.props.feedDirtyList = FeedTab.inst.props.feedDirtyList || [];
+            FeedTab.inst.props.feedDirtyList.push(nodeInfo);
             return;
         }
 
         dispatch("RenderFeedResults", s => {
-            FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults || [];
+            FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
 
-            const itemFoundIdx = FeedViewData.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+            const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
 
             /* if the reciept of this server push makes us have new knowledge that one of our nodes
@@ -196,12 +196,12 @@ export class ServerPush {
             if (updatesExistingItem) {
                 // console.log("update existing item!");
                 S.render.fadeInId = nodeInfo.id;
-                FeedViewData.inst.props.feedResults[itemFoundIdx] = nodeInfo;
+                FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }
             // else if autoRefresh is on we can add this node to the display, or if autoRefresh is off
             // we still want to display it if we owned it. Otherwise we tried to do a post and it didn't show up
             // and that will seem odd to the user.
-            else if (FeedViewData.inst.props.autoRefresh || nodeInfo.owner === s.userName) {
+            else if (FeedTab.inst.props.autoRefresh || nodeInfo.owner === s.userName) {
                 // console.log("adding in new item.");
 
                 // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now
@@ -211,7 +211,7 @@ export class ServerPush {
 
                 // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                 S.render.fadeInId = nodeInfo.id;
-                FeedViewData.inst.props.feedResults.unshift(nodeInfo);
+                FeedTab.inst.props.feedResults.unshift(nodeInfo);
 
                 if (!isMine) {
                     S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
@@ -231,7 +231,7 @@ export class ServerPush {
 
                 /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                 keep it simple and only set a dirty flag */
-                FeedViewData.inst.props.feedDirty = true;
+                FeedTab.inst.props.feedDirty = true;
             }
             return s;
         });

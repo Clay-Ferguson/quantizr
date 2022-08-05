@@ -7,7 +7,7 @@ import { SharesRSInfo } from "../../SharesRSInfo";
 import { S } from "../../Singletons";
 import { SharedNodesResultSetView } from "../SharedNodesResultSetView";
 
-export class SharedNodesResultSetViewData implements TabIntf<SharesRSInfo> {
+export class SharesTab implements TabIntf<SharesRSInfo> {
     name = "Shared Nodes";
     tooltip = "Shows all the Shared nodes made accessible to other users";
     id = C.TAB_SHARES;
@@ -18,9 +18,9 @@ export class SharedNodesResultSetViewData implements TabIntf<SharesRSInfo> {
     scrollPos: 0;
     openGraphComps: [];
 
-    static inst: SharedNodesResultSetViewData = null;
+    static inst: SharesTab = null;
     constructor() {
-        SharedNodesResultSetViewData.inst = this;
+        SharesTab.inst = this;
     }
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {

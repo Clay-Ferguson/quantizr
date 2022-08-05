@@ -15,13 +15,13 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
-import { FeedViewData } from "./tabs/data/FeedViewData";
-import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
-import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
-import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
-import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
-import { ThreadViewData } from "./tabs/data/ThreadViewData";
-import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
+import { FeedTab } from "./tabs/data/FeedTab";
+import { FollowersTab } from "./tabs/data/FollowersTab";
+import { FollowingTab } from "./tabs/data/FollowingTab";
+import { SearchTab } from "./tabs/data/SearchTab";
+import { SharesTab } from "./tabs/data/SharesTab";
+import { ThreadTab } from "./tabs/data/ThreadTab";
+import { TimelineTab } from "./tabs/data/TimelineTab";
 import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
@@ -41,8 +41,8 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
-                if (!SharedNodesResultSetViewData.inst) return;
-                const info = SharedNodesResultSetViewData.inst.props as SharesRSInfo;
+                if (!SharesTab.inst) return;
+                const info = SharesTab.inst.props as SharesRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -52,7 +52,7 @@ export class Search {
                 info.accessOption = accessOption;
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.tabUtil.selectTabStateOnly(SharedNodesResultSetViewData.inst.id, s);
+                S.tabUtil.selectTabStateOnly(SharesTab.inst.id, s);
                 return s;
             });
         }
@@ -71,7 +71,7 @@ export class Search {
             dispatch("RenderThreadResults", s => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
-                const data = ThreadViewData.inst;
+                const data = ThreadTab.inst;
                 if (!data) return;
 
                 s.threadViewNodeId = nodeId;
@@ -88,8 +88,8 @@ export class Search {
         }
         else {
             dispatch("RenderThreadResults", s => {
-                if (!ThreadViewData.inst) return;
-                ThreadViewData.inst.props.endReached = true;
+                if (!ThreadTab.inst) return;
+                ThreadTab.inst.props.endReached = true;
                 return s;
             });
         }
@@ -108,7 +108,7 @@ export class Search {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
 
-                const data = ThreadViewData.inst;
+                const data = ThreadTab.inst;
                 if (!data) return;
 
                 s.threadViewNodeId = node.id;
@@ -179,7 +179,7 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SEARCH);
                 S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
-                const data = SearchResultSetViewData.inst;
+                const data = SearchTab.inst;
                 if (!data) return;
 
                 data.openGraphComps = [];
@@ -244,10 +244,10 @@ export class Search {
         dispatch("RenderTimelineResults", s => {
             S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
-            if (!TimelineResultSetViewData.inst) return;
+            if (!TimelineTab.inst) return;
 
-            TimelineResultSetViewData.inst.openGraphComps = [];
-            const info = TimelineResultSetViewData.inst.props as TimelineRSInfo;
+            TimelineTab.inst.openGraphComps = [];
+            const info = TimelineTab.inst.props as TimelineRSInfo;
 
             info.results = res.searchResults;
             info.description = timelineDescription;
@@ -258,7 +258,7 @@ export class Search {
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
 
-            S.tabUtil.selectTabStateOnly(TimelineResultSetViewData.inst.id, s);
+            S.tabUtil.selectTabStateOnly(TimelineTab.inst.id, s);
             return s;
         });
     }
@@ -274,30 +274,30 @@ export class Search {
     delayedRefreshFeed = (state: AppState) => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            if (!FeedViewData.inst.props.feedLoading) {
+            if (!FeedTab.inst.props.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
     }
 
     refreshFeed = () => {
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.page = 0;
-            FeedViewData.inst.props.refreshCounter++;
+        if (FeedTab.inst) {
+            FeedTab.inst.props.page = 0;
+            FeedTab.inst.props.refreshCounter++;
         }
 
         dispatch("RefreshFeed", s => {
-            FeedViewData.inst.props.feedLoading = true;
+            FeedTab.inst.props.feedLoading = true;
             return s;
         });
 
-        S.srch.feed(FeedViewData.inst.props.page, FeedViewData.inst.props.searchTextState.getValue(), false, false);
+        S.srch.feed(FeedTab.inst.props.page, FeedTab.inst.props.searchTextState.getValue(), false, false);
     }
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         const appState = getAppState();
-        if (!FeedViewData.inst) {
+        if (!FeedTab.inst) {
             return;
         }
 
@@ -306,24 +306,24 @@ export class Search {
         // console.log("Getting results page=" + page + " growResults=" + growResults);
         const res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId: FeedViewData.inst.props.feedFilterRootNode?.id,
-            toMe: FeedViewData.inst.props.feedFilterToMe,
-            fromMe: FeedViewData.inst.props.feedFilterFromMe,
-            toUser: FeedViewData.inst.props.feedFilterToUser,
-            toPublic: FeedViewData.inst.props.feedFilterToPublic,
-            localOnly: FeedViewData.inst.props.feedFilterLocalServer,
-            fromFriends: FeedViewData.inst.props.feedFilterFriends,
+            nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
+            toMe: FeedTab.inst.props.feedFilterToMe,
+            fromMe: FeedTab.inst.props.feedFilterFromMe,
+            toUser: FeedTab.inst.props.feedFilterToUser,
+            toPublic: FeedTab.inst.props.feedFilterToPublic,
+            localOnly: FeedTab.inst.props.feedFilterLocalServer,
+            fromFriends: FeedTab.inst.props.feedFilterFriends,
             nsfw: appState.userPrefs.nsfw,
             searchText,
-            applyAdminBlocks: FeedViewData.inst.props.applyAdminBlocks
+            applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks
         });
 
         dispatch("RenderFeedResults", s => {
-            FeedViewData.inst.openGraphComps = [];
+            FeedTab.inst.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
             // once user requests their stuff, turn off the new messages count indicator.
-            if (FeedViewData.inst.props.feedFilterToMe) {
+            if (FeedTab.inst.props.feedFilterToMe) {
                 s.newMessageCount = 0;
             }
 
@@ -336,33 +336,33 @@ export class Search {
 
             // if scrolling in new results grow the existing array
             if (growResults) {
-                if (FeedViewData.inst?.props?.feedResults && res?.searchResults && FeedViewData.inst.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                if (FeedTab.inst?.props?.feedResults && res?.searchResults && FeedTab.inst.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    FeedViewData.inst.props.feedResults.forEach((child: any) => {
+                    FeedTab.inst.props.feedResults.forEach((child: any) => {
                         idSet.add(child.id);
                     });
 
                     scrollToTop = false;
-                    FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
                     // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                 }
                 else {
-                    FeedViewData.inst.props.feedResults = res.searchResults;
+                    FeedTab.inst.props.feedResults = res.searchResults;
                     // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                 }
             }
             // else we have a fresh array (reset the array)
             else {
-                FeedViewData.inst.props.feedResults = res.searchResults;
+                FeedTab.inst.props.feedResults = res.searchResults;
                 // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
             }
 
-            FeedViewData.inst.props.feedEndReached = res.endReached;
-            FeedViewData.inst.props.feedDirty = false;
-            FeedViewData.inst.props.feedLoading = false;
+            FeedTab.inst.props.feedEndReached = res.endReached;
+            FeedTab.inst.props.feedDirty = false;
+            FeedTab.inst.props.feedLoading = false;
 
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
@@ -405,7 +405,7 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
-                const data = FollowersResultSetViewData.inst;
+                const data = FollowersTab.inst;
                 if (!data) return;
                 const info = data.props as FollowersRSInfo;
 
@@ -444,7 +444,7 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
-                const data = FollowingResultSetViewData.inst;
+                const data = FollowingTab.inst;
                 if (!data) return;
                 const info = data.props as FollowingRSInfo;
 

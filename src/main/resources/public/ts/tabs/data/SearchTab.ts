@@ -1,36 +1,29 @@
 import { AppState } from "../../AppState";
-import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { ResultSetInfo } from "../../ResultSetInfo";
 import { S } from "../../Singletons";
-import { TrendingRSInfo } from "../../TrendingRSInfo";
-import { TrendingView } from "../TrendingView";
+import { SearchResultSetView } from "../SearchResultSetView";
 
-export class TrendingViewData implements TabIntf<TrendingRSInfo> {
-    name = "Trending";
-    tooltip = "What's popular right now on the Fediverse";
-    id = C.TAB_TRENDING;
-    props = new TrendingRSInfo();
+export class SearchTab implements TabIntf<ResultSetInfo> {
+    name = "Search";
+    tooltip = "Showing the results of your most recent search";
+    id = C.TAB_SEARCH;
+    props = new ResultSetInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: TrendingViewData = null;
+    static inst: SearchTab = null;
     constructor() {
-        TrendingViewData.inst = this;
+        SearchTab.inst = this;
     }
 
-    isVisible = (state: AppState) => true;
-    constructView = (data: TabIntf) => new TrendingView(data);
-    getTabSubOptions = (state: AppState): Div => {
-        return new Div(null, { className: "tabSubOptions" }, [
-            new AppNavLink("Hashtags", S.nav.showTrendingHashtags),
-            new AppNavLink("Mentions", S.nav.showTrendingMentions),
-            new AppNavLink("Words", S.nav.showTrendingWords)
-        ]);
-    };
+    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
+    constructView = (data: TabIntf) => new SearchResultSetView(data)
+    getTabSubOptions = (state: AppState): Div => { return null; };
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
         return this.props.results?.find(n => n.id === nodeId);
@@ -41,6 +34,8 @@ export class TrendingViewData implements TabIntf<TrendingRSInfo> {
     }
 
     replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        if (!this.props.results) return;
+
         this.props.results = this.props.results?.map(n => {
             return n.id === newNode.id ? newNode : n;
         });

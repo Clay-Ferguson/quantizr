@@ -2,27 +2,27 @@ import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
+import { FollowingRSInfo } from "../../FollowingRSInfo";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
-import { ResultSetInfo } from "../../ResultSetInfo";
 import { S } from "../../Singletons";
-import { SearchResultSetView } from "../SearchResultSetView";
+import { FollowingResultSetView } from "../FollowingResultSetView";
 
-export class SearchResultSetViewData implements TabIntf<ResultSetInfo> {
-    name = "Search";
-    tooltip = "Showing the results of your most recent search";
-    id = C.TAB_SEARCH;
-    props = new ResultSetInfo();
+export class FollowingTab implements TabIntf<FollowingRSInfo> {
+    name = "Following";
+    tooltip = "List of people the person is following";
+    id = C.TAB_FOLLOWING;
+    props = new FollowingRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: SearchResultSetViewData = null;
+    static inst: FollowingTab = null;
     constructor() {
-        SearchResultSetViewData.inst = this;
+        FollowingTab.inst = this;
     }
 
-    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
-    constructView = (data: TabIntf) => new SearchResultSetView(data)
+    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
+    constructView = (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
@@ -34,8 +34,6 @@ export class SearchResultSetViewData implements TabIntf<ResultSetInfo> {
     }
 
     replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
-        if (!this.props.results) return;
-
         this.props.results = this.props.results?.map(n => {
             return n.id === newNode.id ? newNode : n;
         });

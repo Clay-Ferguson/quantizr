@@ -6,7 +6,7 @@ import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { FeedViewData } from "../tabs/data/FeedViewData";
+import { FeedTab } from "../tabs/data/FeedTab";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
@@ -48,7 +48,7 @@ export class TabPanelButtons extends Div {
         let tabName = data.name;
 
         // slight hack until we have 'name' as a function and not a string.
-        if (tabName === "Feed" && FeedViewData.inst?.props?.feedFilterRootNode) {
+        if (tabName === "Feed" && FeedTab.inst?.props?.feedFilterRootNode) {
             tabName = "Chat Room";
         }
 

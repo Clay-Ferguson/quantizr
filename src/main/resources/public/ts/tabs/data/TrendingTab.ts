@@ -1,29 +1,36 @@
 import { AppState } from "../../AppState";
+import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
-import { FollowingRSInfo } from "../../FollowingRSInfo";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { FollowingResultSetView } from "../FollowingResultSetView";
+import { TrendingRSInfo } from "../../TrendingRSInfo";
+import { TrendingView } from "../TrendingView";
 
-export class FollowingResultSetViewData implements TabIntf<FollowingRSInfo> {
-    name = "Following";
-    tooltip = "List of people the person is following";
-    id = C.TAB_FOLLOWING;
-    props = new FollowingRSInfo();
+export class TrendingTab implements TabIntf<TrendingRSInfo> {
+    name = "Trending";
+    tooltip = "What's popular right now on the Fediverse";
+    id = C.TAB_TRENDING;
+    props = new TrendingRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: FollowingResultSetViewData = null;
+    static inst: TrendingTab = null;
     constructor() {
-        FollowingResultSetViewData.inst = this;
+        TrendingTab.inst = this;
     }
 
-    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
-    constructView = (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    isVisible = (state: AppState) => true;
+    constructView = (data: TabIntf) => new TrendingView(data);
+    getTabSubOptions = (state: AppState): Div => {
+        return new Div(null, { className: "tabSubOptions" }, [
+            new AppNavLink("Hashtags", S.nav.showTrendingHashtags),
+            new AppNavLink("Mentions", S.nav.showTrendingMentions),
+            new AppNavLink("Words", S.nav.showTrendingWords)
+        ]);
+    };
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
         return this.props.results?.find(n => n.id === nodeId);

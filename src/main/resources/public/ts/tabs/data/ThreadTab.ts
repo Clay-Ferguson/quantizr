@@ -7,7 +7,7 @@ import * as J from "../../JavaIntf";
 import { ThreadRSInfo } from "../../ThreadRSInfo";
 import { ThreadView } from "../ThreadView";
 
-export class ThreadViewData implements TabIntf<ThreadRSInfo> {
+export class ThreadTab implements TabIntf<ThreadRSInfo> {
     name = "Thread";
     tooltip = "View of Posts in top-down chronological order showing the full reply chain"
     id = C.TAB_THREAD;
@@ -15,9 +15,9 @@ export class ThreadViewData implements TabIntf<ThreadRSInfo> {
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: ThreadViewData = null;
+    static inst: ThreadTab = null;
     constructor() {
-        ThreadViewData.inst = this;
+        ThreadTab.inst = this;
     }
 
     isVisible = (state: AppState) => { return !!state.threadViewNodeId; };

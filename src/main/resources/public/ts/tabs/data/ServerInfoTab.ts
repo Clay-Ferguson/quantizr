@@ -6,7 +6,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { ServerInfoView } from "../ServerInfoView";
 
-export class ServerInfoViewData implements TabIntf<any> {
+export class ServerInfoTab implements TabIntf<any> {
     name = "Info View";
     tooltip = "Displaying the information view for the most recently requested info";
     id = C.TAB_SERVERINFO;
@@ -14,9 +14,9 @@ export class ServerInfoViewData implements TabIntf<any> {
     props = {};
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: ServerInfoViewData = null;
+    static inst: ServerInfoTab = null;
     constructor() {
-        ServerInfoViewData.inst = this;
+        ServerInfoTab.inst = this;
     }
 
     isVisible = (state: AppState) => {

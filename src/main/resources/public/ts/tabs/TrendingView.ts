@@ -9,7 +9,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
-import { FeedViewData } from "./data/FeedViewData";
+import { FeedTab } from "./data/FeedTab";
 
 export class TrendingView extends AppTab<TrendingRSInfo> {
 
@@ -117,8 +117,8 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         // expand so users can see what's going on with the search string and know they can clear it.
         // If feed tab exists, expand the filter part
-        if (FeedViewData.inst) {
-            FeedViewData.inst.props.searchTextState.setValue(word);
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue(word);
         }
 
         S.nav.messages({

@@ -8,7 +8,7 @@ import { ValidatedState } from "../../ValidatedState";
 import { IPFSFilesView } from "../IPFSFilesView";
 import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
 
-export class IPFSViewData implements TabIntf<any> {
+export class IPFSTab implements TabIntf<any> {
     name = "IPFS Explorer";
     tooltip = "Explorer for IPFS content and folders";
     id = C.TAB_IPFSVIEW;
@@ -19,9 +19,9 @@ export class IPFSViewData implements TabIntf<any> {
 
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: IPFSViewData = null;
+    static inst: IPFSTab = null;
     constructor() {
-        IPFSViewData.inst = this;
+        IPFSTab.inst = this;
     }
 
     isVisible = (state: AppState) => {

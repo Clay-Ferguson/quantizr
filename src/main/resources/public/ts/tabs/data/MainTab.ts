@@ -1,4 +1,3 @@
-import { getAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { AppNavLink } from "../../comp/core/AppNavLink";
@@ -10,7 +9,7 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
-export class MainTabCompData implements TabIntf<any> {
+export class MainTab implements TabIntf<any> {
     name = "Quanta";
     tooltip = "Quanta Database Content Tree";
     id = C.TAB_MAIN;
@@ -18,9 +17,9 @@ export class MainTabCompData implements TabIntf<any> {
     props = {};
     openGraphComps: OpenGraphPanel[] = [];
 
-    static inst: MainTabCompData = null;
+    static inst: MainTab = null;
     constructor() {
-        MainTabCompData.inst = this;
+        MainTab.inst = this;
     }
 
     isVisible = (state: AppState) => true;

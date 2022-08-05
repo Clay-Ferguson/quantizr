@@ -5,17 +5,17 @@ import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-import { FeedViewData } from "./tabs/data/FeedViewData";
-import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
-import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
-import { IPFSViewData } from "./tabs/data/IPFSViewData";
-import { MainTabCompData } from "./tabs/data/MainTabCompData";
-import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
-import { ServerInfoViewData } from "./tabs/data/ServerInfoViewData";
-import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
-import { ThreadViewData } from "./tabs/data/ThreadViewData";
-import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
-import { TrendingViewData } from "./tabs/data/TrendingViewData";
+import { FeedTab } from "./tabs/data/FeedTab";
+import { FollowersTab } from "./tabs/data/FollowersTab";
+import { FollowingTab } from "./tabs/data/FollowingTab";
+import { IPFSTab } from "./tabs/data/IPFSTab";
+import { MainTab } from "./tabs/data/MainTab";
+import { SearchTab } from "./tabs/data/SearchTab";
+import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
+import { SharesTab } from "./tabs/data/SharesTab";
+import { ThreadTab } from "./tabs/data/ThreadTab";
+import { TimelineTab } from "./tabs/data/TimelineTab";
+import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class TabUtil {
     selectTab = (tabName: string) => {
@@ -58,13 +58,13 @@ export class TabUtil {
     createAppTabs = () => {
         dispatch("initTabs", s => {
             s.tabData = [
-                new MainTabCompData(),
-                new SearchResultSetViewData(),
-                new SharedNodesResultSetViewData(),
-                new TimelineResultSetViewData(),
-                new FollowersResultSetViewData(),
-                new FollowingResultSetViewData(),
-                new FeedViewData(),
+                new MainTab(),
+                new SearchTab(),
+                new SharesTab(),
+                new TimelineTab(),
+                new FollowersTab(),
+                new FollowingTab(),
+                new FeedTab(),
 
                 // DO NOT DELETE
                 // The IPSMView will be repurposed as a server event log viewer
@@ -84,10 +84,10 @@ export class TabUtil {
                 //     }
                 // },
 
-                new TrendingViewData(),
-                new ThreadViewData(),
-                new ServerInfoViewData(),
-                new IPFSViewData()
+                new TrendingTab(),
+                new ThreadTab(),
+                new ServerInfoTab(),
+                new IPFSTab()
 
                 // this is throwing a react error, but we don't need this now anyaay
                 // {

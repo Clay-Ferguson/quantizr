@@ -11,7 +11,7 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { FeedViewData } from "../tabs/data/FeedViewData";
+import { FeedTab } from "../tabs/data/FeedTab";
 import { SearchContentDlg } from "./SearchContentDlg";
 
 export class NodeStatsDlg extends DialogBase {
@@ -80,8 +80,8 @@ export class NodeStatsDlg extends DialogBase {
         if (!word) return;
 
         if (this.feed) {
-            if (FeedViewData.inst) {
-                FeedViewData.inst.props.searchTextState.setValue(word);
+            if (FeedTab.inst) {
+                FeedTab.inst.props.searchTextState.setValue(word);
             }
 
             S.nav.messages({

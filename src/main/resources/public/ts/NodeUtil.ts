@@ -9,7 +9,7 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
-import { FeedViewData } from "./tabs/data/FeedViewData";
+import { FeedTab } from "./tabs/data/FeedTab";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
