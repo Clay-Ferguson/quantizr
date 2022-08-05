@@ -9,17 +9,28 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
-export class MainTabCompData implements TabIntf {
+export class MainTabCompData implements TabIntf<any> {
     name = "Quanta";
     tooltip = "Quanta Database Content Tree";
     id = C.TAB_MAIN;
-    rsInfo = null as any; // todo-0: why is 'as any' needed;
     scrollPos = 0;
     props = {};
     openGraphComps: OpenGraphPanel[] = [];
 
+    static inst: MainTabCompData = null;
+    constructor() {
+        MainTabCompData.inst = this;
+    }
+
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new MainTabComp(data);
+
+    findNode = (nodeId: string): J.NodeInfo => {
+        return null;
+    }
+
+    nodeDeleted = (nodeId: string): void => {
+    }
 
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [

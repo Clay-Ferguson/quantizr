@@ -9,8 +9,9 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
+import { FeedViewData } from "./data/FeedViewData";
 
-export class TrendingView extends AppTab {
+export class TrendingView extends AppTab<TrendingRSInfo> {
 
     static loaded: boolean = false;
     static subscribed: boolean = false;
@@ -46,9 +47,7 @@ export class TrendingView extends AppTab {
             getMentions: true
         });
         dispatch("RenderSearchResults", s => {
-            const data = s.tabData.find(d => d.id === this.data.id);
-            if (!data) return;
-            (data.rsInfo as TrendingRSInfo).res = res;
+            this.data.props.res = res;
             return s;
         });
     }
@@ -56,8 +55,7 @@ export class TrendingView extends AppTab {
     preRender(): void {
         const state = useAppState();
         this.attribs.className = this.getClass(state);
-        const data = state.tabData.find(d => d.id === this.data.id);
-        const res = data ? (data.rsInfo as TrendingRSInfo).res : null;
+        const res = this.data ? this.data.props.res : null;
 
         if (!res) {
             this.setChildren([new Heading(4, "Generating statistics...", { className: "marginTop" })]);
@@ -65,7 +63,7 @@ export class TrendingView extends AppTab {
         }
 
         const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if ((!data.props.filter || data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
+        if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle" }));
             res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
@@ -77,7 +75,7 @@ export class TrendingView extends AppTab {
         }
 
         const mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if ((!data.props.filter || data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
+        if ((!this.data.props.filter || this.data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle" }));
             res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
@@ -89,7 +87,7 @@ export class TrendingView extends AppTab {
         }
 
         const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if ((!data.props.filter || data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
+        if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle" }));
             res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
@@ -119,9 +117,8 @@ export class TrendingView extends AppTab {
 
         // expand so users can see what's going on with the search string and know they can clear it.
         // If feed tab exists, expand the filter part
-        const feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue(word);
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue(word);
         }
 
         S.nav.messages({

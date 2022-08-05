@@ -1,3 +1,4 @@
+import { DayTable } from "@fullcalendar/daygrid";
 import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
@@ -14,6 +15,14 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
+import { FeedViewData } from "./tabs/data/FeedViewData";
+import { FollowersResultSetViewData } from "./tabs/data/FollowersResultSetViewData";
+import { FollowingResultSetViewData } from "./tabs/data/FollowingResultSetViewData";
+import { SearchResultSetViewData } from "./tabs/data/SearchResultSetViewData";
+import { SharedNodesResultSetViewData } from "./tabs/data/SharedNodesResultSetViewData";
+import { ThreadViewData } from "./tabs/data/ThreadViewData";
+import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
+import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
@@ -32,9 +41,8 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
-                const data = s.tabData.find(d => d.id === C.TAB_SHARES);
-                if (!data) return;
-                const info = data.rsInfo as SharesRSInfo;
+                if (!SharedNodesResultSetViewData.inst) return;
+                const info = SharedNodesResultSetViewData.inst.props as SharesRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -44,7 +52,7 @@ export class Search {
                 info.accessOption = accessOption;
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(SharedNodesResultSetViewData.inst.id, s);
                 return s;
             });
         }
@@ -63,7 +71,7 @@ export class Search {
             dispatch("RenderThreadResults", s => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
-                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                const data = ThreadViewData.inst;
                 if (!data) return;
 
                 s.threadViewNodeId = nodeId;
@@ -72,17 +80,16 @@ export class Search {
                 // remove the last element, which will be a duplicate.
                 const moreResults = res.nodes.slice(0, -1);
 
-                data.rsInfo.results = [...moreResults, ...data.rsInfo.results];
-                data.rsInfo.endReached = res.topReached;
+                data.props.results = [...moreResults, ...data.props.results];
+                data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
         }
         else {
             dispatch("RenderThreadResults", s => {
-                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
-                if (!data) return;
-                data.rsInfo.endReached = true;
+                if (!ThreadViewData.inst) return;
+                ThreadViewData.inst.props.endReached = true;
                 return s;
             });
         }
@@ -100,15 +107,16 @@ export class Search {
 
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
-                const data = s.tabData.find(d => d.id === C.TAB_THREAD);
+
+                const data = ThreadViewData.inst;
                 if (!data) return;
 
                 s.threadViewNodeId = node.id;
                 data.openGraphComps = [];
 
-                data.rsInfo.results = res.nodes;
+                data.props.results = res.nodes;
                 data.props.others = res.others;
-                data.rsInfo.endReached = res.topReached;
+                data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
@@ -171,24 +179,24 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SEARCH);
                 S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
-                const data = s.tabData.find(d => d.id === C.TAB_SEARCH);
+                const data = SearchResultSetViewData.inst;
                 if (!data) return;
 
                 data.openGraphComps = [];
 
-                data.rsInfo.results = res.searchResults;
-                data.rsInfo.page = page;
-                data.rsInfo.searchType = searchType;
-                data.rsInfo.description = description;
-                data.rsInfo.node = node;
-                data.rsInfo.searchText = searchText;
-                data.rsInfo.fuzzy = fuzzy;
-                data.rsInfo.caseSensitive = caseSensitive;
-                data.rsInfo.recursive = recursive;
-                data.rsInfo.sortField = sortField;
-                data.rsInfo.sortDir = sortDir;
-                data.rsInfo.prop = prop;
-                data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+                data.props.results = res.searchResults;
+                data.props.page = page;
+                data.props.searchType = searchType;
+                data.props.description = description;
+                data.props.node = node;
+                data.props.searchText = searchText;
+                data.props.fuzzy = fuzzy;
+                data.props.caseSensitive = caseSensitive;
+                data.props.recursive = recursive;
+                data.props.sortField = sortField;
+                data.props.sortDir = sortDir;
+                data.props.prop = prop;
+                data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
                 S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
@@ -236,11 +244,10 @@ export class Search {
         dispatch("RenderTimelineResults", s => {
             S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
-            const data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
-            if (!data) return;
+            if (!TimelineResultSetViewData.inst) return;
 
-            data.openGraphComps = [];
-            const info = data.rsInfo as TimelineRSInfo;
+            TimelineResultSetViewData.inst.openGraphComps = [];
+            const info = TimelineResultSetViewData.inst.props as TimelineRSInfo;
 
             info.results = res.searchResults;
             info.description = timelineDescription;
@@ -251,24 +258,14 @@ export class Search {
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
 
-            S.tabUtil.selectTabStateOnly(data.id, s);
+            S.tabUtil.selectTabStateOnly(TimelineResultSetViewData.inst.id, s);
             return s;
         });
     }
 
     removeNodeById = (id: string, state: AppState) => {
         state.tabData.forEach((td: TabIntf) => {
-
-            // for normal resultsets
-            if (td.rsInfo?.results) {
-                td.rsInfo.results = td.rsInfo.results.filter(n => id !== n.id);
-            }
-
-            // for feed results
-            // todo-0: feedResults is untyped here
-            if (td.props?.feedResults) {
-                td.props.feedResults = td.props.feedResults.filter((n: any) => id !== n.id);
-            }
+            td.nodeDeleted(id);
         });
     }
 
@@ -277,33 +274,30 @@ export class Search {
     delayedRefreshFeed = (state: AppState) => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            const data: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-            if (!data.props.feedLoading) {
+            if (!FeedViewData.inst.props.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
     }
 
     refreshFeed = () => {
-        const data: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.page = 0;
-            data.props.refreshCounter++;
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.page = 0;
+            FeedViewData.inst.props.refreshCounter++;
         }
 
         dispatch("RefreshFeed", s => {
-            data.props.feedLoading = true;
+            FeedViewData.inst.props.feedLoading = true;
             return s;
         });
 
-        S.srch.feed(data.props.page, data.props.searchTextState.getValue(), false, false);
+        S.srch.feed(FeedViewData.inst.props.page, FeedViewData.inst.props.searchTextState.getValue(), false, false);
     }
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         const appState = getAppState();
-        const data: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
-        if (!data) {
+        if (!FeedViewData.inst) {
             return;
         }
 
@@ -312,24 +306,24 @@ export class Search {
         // console.log("Getting results page=" + page + " growResults=" + growResults);
         const res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId: data.props.feedFilterRootNode?.id,
-            toMe: data.props.feedFilterToMe,
-            fromMe: data.props.feedFilterFromMe,
-            toUser: data.props.feedFilterToUser,
-            toPublic: data.props.feedFilterToPublic,
-            localOnly: data.props.feedFilterLocalServer,
-            fromFriends: data.props.feedFilterFriends,
+            nodeId: FeedViewData.inst.props.feedFilterRootNode?.id,
+            toMe: FeedViewData.inst.props.feedFilterToMe,
+            fromMe: FeedViewData.inst.props.feedFilterFromMe,
+            toUser: FeedViewData.inst.props.feedFilterToUser,
+            toPublic: FeedViewData.inst.props.feedFilterToPublic,
+            localOnly: FeedViewData.inst.props.feedFilterLocalServer,
+            fromFriends: FeedViewData.inst.props.feedFilterFriends,
             nsfw: appState.userPrefs.nsfw,
             searchText,
-            applyAdminBlocks: data.props.applyAdminBlocks
+            applyAdminBlocks: FeedViewData.inst.props.applyAdminBlocks
         });
 
         dispatch("RenderFeedResults", s => {
-            data.openGraphComps = [];
+            FeedViewData.inst.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
             // once user requests their stuff, turn off the new messages count indicator.
-            if (data.props.feedFilterToMe) {
+            if (FeedViewData.inst.props.feedFilterToMe) {
                 s.newMessageCount = 0;
             }
 
@@ -342,34 +336,33 @@ export class Search {
 
             // if scrolling in new results grow the existing array
             if (growResults) {
-                if (data?.props?.feedResults && res?.searchResults && data.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                if (FeedViewData.inst?.props?.feedResults && res?.searchResults && FeedViewData.inst.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    // todo-0: feedResults not typed here
-                    data.props.feedResults.forEach((child: any) => {
+                    FeedViewData.inst.props.feedResults.forEach((child: any) => {
                         idSet.add(child.id);
                     });
 
                     scrollToTop = false;
-                    data.props.feedResults = data.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
                     // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                 }
                 else {
-                    data.props.feedResults = res.searchResults;
+                    FeedViewData.inst.props.feedResults = res.searchResults;
                     // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                 }
             }
             // else we have a fresh array (reset the array)
             else {
-                data.props.feedResults = res.searchResults;
+                FeedViewData.inst.props.feedResults = res.searchResults;
                 // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
             }
 
-            data.props.feedEndReached = res.endReached;
-            data.props.feedDirty = false;
-            data.props.feedLoading = false;
+            FeedViewData.inst.props.feedEndReached = res.endReached;
+            FeedViewData.inst.props.feedDirty = false;
+            FeedViewData.inst.props.feedLoading = false;
 
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
@@ -412,9 +405,9 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
-                const data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
+                const data = FollowersResultSetViewData.inst;
                 if (!data) return;
-                const info = data.rsInfo as FollowersRSInfo;
+                const info = data.props as FollowersRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;
@@ -451,9 +444,9 @@ export class Search {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
-                const data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
+                const data = FollowingResultSetViewData.inst;
                 if (!data) return;
-                const info = data.rsInfo as FollowingRSInfo;
+                const info = data.props as FollowingRSInfo;
 
                 info.results = res.searchResults;
                 info.page = page;

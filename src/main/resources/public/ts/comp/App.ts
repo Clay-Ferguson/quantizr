@@ -98,7 +98,7 @@ export class App extends Main {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
             case FullScreenType.GRAPH:
-                // inconsistent to pass state here. try not to. todo-0
+                // inconsistent to pass state here. try not to. todo-1
                 return new FullScreenGraphViewer(state);
             case FullScreenType.CALENDAR:
                 return new FullScreenCalendar();

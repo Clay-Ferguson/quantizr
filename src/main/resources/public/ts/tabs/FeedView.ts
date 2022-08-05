@@ -385,19 +385,4 @@ export class FeedView extends AppTab<FeedViewProps> {
             })
         ]);
     }
-
-    static updateFromFeedDirtyList = (feedData: TabIntf, state: AppState) => {
-        if (feedData?.props?.feedDirtyList) {
-            for (const node of feedData.props.feedDirtyList) {
-                // console.log("Force Feed: " + node.content);
-                S.push.forceFeedItem(node, feedData, state);
-            }
-            feedData.props.feedDirtyList = null;
-
-            // all the data in feedData will have been updated by forceFeedItem to just force react to render now.
-            dispatch("ForceFeedResults", s => {
-                return s;
-            });
-        }
-    }
 }

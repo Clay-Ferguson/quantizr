@@ -630,10 +630,8 @@ export class Util {
      * every response method instead, if we want that response to print a message to the user when fail happens.
      *
      * requires: res.success res.message
-     * 
-     * todo-0: make 'res' typed
      */
-    checkSuccess = (opFriendlyName: string, res: any): boolean => {
+    checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
         if ((!res || !res.success) && res.message) {
             this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
         }
@@ -1131,7 +1129,7 @@ export class Util {
 
     // External Emojis!
     insertActPubTags = (val: string, node: J.NodeInfo) => {
-        // todo-0: need some typesafety here. what if 'forEach' doesn't even exist?
+        // todo-1: need some typesafety here. what if 'forEach' doesn't even exist?
         let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
         if (tags && tags.forEach) {
             tags.forEach((t: any) => {

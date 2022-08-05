@@ -2,8 +2,8 @@ import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 
-export class AppTab<PropType = any> extends Div {
-    constructor(public data: TabIntf<PropType>, private extraEditModeClass: string = null) {
+export class AppTab<T = any> extends Div {
+    constructor(public data: TabIntf<T>, private extraEditModeClass: string = null) {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.

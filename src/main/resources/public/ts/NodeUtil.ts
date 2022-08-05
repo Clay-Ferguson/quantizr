@@ -9,6 +9,7 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
+import { FeedViewData } from "./tabs/data/FeedViewData";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
@@ -141,21 +142,16 @@ export class NodeUtil {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-
         // first look in normal tree map for main view.
         let node = state.idToNodeMap.get(nodeId);
         if (!node) {
-            // todo-0: it looks like props.feedResults isn't typesafe here?
-            node = feedData?.props?.feedResults?.find((n: any) => n.id === nodeId);
+            node = FeedViewData.inst?.props?.feedResults?.find((n: any) => n.id === nodeId);
         }
 
         if (!node) {
             for (const data of state.tabData) {
-                if (data.rsInfo?.results) {
-                    node = data.rsInfo.results.find(n => n.id === nodeId);
-                    if (node) break;
-                }
+                node = data.findNode(nodeId);
+                if (node) break;
             }
         }
         return node;

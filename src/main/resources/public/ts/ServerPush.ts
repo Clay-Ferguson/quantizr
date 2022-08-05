@@ -5,6 +5,8 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { FeedViewData } from "./tabs/data/FeedViewData";
+import { TimelineResultSetViewData } from "./tabs/data/TimelineResultSetViewData";
 
 // reference: https://www.baeldung.com/spring-server-sent-events
 // See also: AppController.java#serverPush
@@ -67,15 +69,15 @@ export class ServerPush {
 
             if (nodeInfo) {
                 dispatch("RenderTimelineResults", s => {
-                    const data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
+                    const data = TimelineResultSetViewData.inst;
                     if (!data) return;
 
-                    if (data.rsInfo.results) {
+                    if (data.props.results) {
                         // remove this nodeInfo if it's already in the results.
-                        data.rsInfo.results = data.rsInfo.results.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
+                        data.props.results = data.props.results.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
 
                         // now add to the top of the list.
-                        data.rsInfo.results.unshift(nodeInfo);
+                        data.props.results.unshift(nodeInfo);
                     }
                     return s;
                 });
@@ -113,12 +115,11 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo, feedData: TabIntf, state: AppState) => {
+    forceFeedItem = (nodeInfo: J.NodeInfo, state: AppState) => {
         if (!nodeInfo) return;
-        feedData.props.feedResults = feedData.props.feedResults || [];
+        FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults || [];
 
-        // todo-0: make typesafe
-        const itemFoundIdx = feedData.props.feedResults.findIndex((item: any) => item.id === nodeInfo.id);
+        const itemFoundIdx = FeedViewData.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
         const updatesExistingItem = itemFoundIdx !== -1;
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
@@ -133,11 +134,11 @@ export class ServerPush {
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
             // console.log("force*** update existing item!");
-            feedData.props.feedResults[itemFoundIdx] = nodeInfo;
+            FeedViewData.inst.props.feedResults[itemFoundIdx] = nodeInfo;
         }
         else {
             // console.log("force*** push new item");
-            feedData.props.feedResults.unshift(nodeInfo);
+            FeedViewData.inst.props.feedResults.unshift(nodeInfo);
             // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
             // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
             // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
@@ -145,25 +146,24 @@ export class ServerPush {
     }
 
     ipsmPushItem = (payload: string, state: AppState) => {
-        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
-        if (!feedData) return;
+        // IPSM currently disabled
+        // const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
+        // if (!feedData) return;
 
-        dispatch("RenderIPSMFeedResults", s => {
-            feedData.props.events = feedData.props.events || [];
+        // dispatch("RenderIPSMFeedResults", s => {
+        //     feedData.props.events = feedData.props.events || [];
 
-            // add to head of array (rev-chron view)
-            feedData.props.events.unshift(payload);
-            return s;
-        });
+        //     // add to head of array (rev-chron view)
+        //     feedData.props.events.unshift(payload);
+        //     return s;
+        // });
     }
 
     feedPushItem = (nodeInfo: J.NodeInfo, state: AppState) => {
         if (!nodeInfo) return;
 
         console.log("feedPushItem: " + nodeInfo.content);
-
-        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-        if (!feedData) return;
+        if (!FeedViewData.inst) return;
 
         const isMine = S.props.isMine(nodeInfo, state);
 
@@ -176,16 +176,15 @@ export class ServerPush {
          process all the accumulated feedDirtyList items. */
         if (state.activeTab === C.TAB_FEED && state.editNode) {
             // console.log("editing, so adding to feedDirty");
-            feedData.props.feedDirtyList = feedData.props.feedDirtyList || [];
-            feedData.props.feedDirtyList.push(nodeInfo);
+            FeedViewData.inst.props.feedDirtyList = FeedViewData.inst.props.feedDirtyList || [];
+            FeedViewData.inst.props.feedDirtyList.push(nodeInfo);
             return;
         }
 
         dispatch("RenderFeedResults", s => {
-            feedData.props.feedResults = feedData.props.feedResults || [];
+            FeedViewData.inst.props.feedResults = FeedViewData.inst.props.feedResults || [];
 
-            // todo-0: make typesafe
-            const itemFoundIdx = feedData.props.feedResults.findIndex((item: any) => item.id === nodeInfo.id);
+            const itemFoundIdx = FeedViewData.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
 
             /* if the reciept of this server push makes us have new knowledge that one of our nodes
@@ -197,12 +196,12 @@ export class ServerPush {
             if (updatesExistingItem) {
                 // console.log("update existing item!");
                 S.render.fadeInId = nodeInfo.id;
-                feedData.props.feedResults[itemFoundIdx] = nodeInfo;
+                FeedViewData.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }
             // else if autoRefresh is on we can add this node to the display, or if autoRefresh is off
             // we still want to display it if we owned it. Otherwise we tried to do a post and it didn't show up
             // and that will seem odd to the user.
-            else if (feedData.props.autoRefresh || nodeInfo.owner === s.userName) {
+            else if (FeedViewData.inst.props.autoRefresh || nodeInfo.owner === s.userName) {
                 // console.log("adding in new item.");
 
                 // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now
@@ -212,7 +211,7 @@ export class ServerPush {
 
                 // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                 S.render.fadeInId = nodeInfo.id;
-                feedData.props.feedResults.unshift(nodeInfo);
+                FeedViewData.inst.props.feedResults.unshift(nodeInfo);
 
                 if (!isMine) {
                     S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
@@ -232,7 +231,7 @@ export class ServerPush {
 
                 /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                 keep it simple and only set a dirty flag */
-                feedData.props.feedDirty = true;
+                FeedViewData.inst.props.feedDirty = true;
             }
             return s;
         });

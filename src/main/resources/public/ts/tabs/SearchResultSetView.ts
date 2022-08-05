@@ -1,9 +1,10 @@
 import { getAppState } from "../AppRedux";
 import { TabIntf } from "../intf/TabIntf";
+import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class SearchResultSetView extends ResultSetView {
+export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -13,23 +14,23 @@ export class SearchResultSetView extends ResultSetView {
     pageChange(delta: number): void {
         const state = getAppState();
 
-        let page = this.data.rsInfo.page;
+        let page = this.data.props.page;
         if (delta !== null) {
-            page = delta === 0 ? 0 : this.data.rsInfo.page + delta;
+            page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.search(this.data.rsInfo.node,
-            this.data.rsInfo.prop,
-            this.data.rsInfo.searchText,
+        S.srch.search(this.data.props.node,
+            this.data.props.prop,
+            this.data.props.searchText,
             state,
-            this.data.rsInfo.searchType,
-            this.data.rsInfo.description,
-            this.data.rsInfo.fuzzy,
-            this.data.rsInfo.caseSensitive,
+            this.data.props.searchType,
+            this.data.props.description,
+            this.data.props.fuzzy,
+            this.data.props.caseSensitive,
             page,
-            this.data.rsInfo.recursive,
-            this.data.rsInfo.sortField,
-            this.data.rsInfo.sortDir,
+            this.data.props.recursive,
+            this.data.props.sortField,
+            this.data.props.sortDir,
             false,
             null);
     }

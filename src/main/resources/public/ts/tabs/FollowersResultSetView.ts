@@ -8,7 +8,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSetView {
+export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -17,21 +17,19 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     }
 
     pageChange(delta: number): void {
-        const info = this.data.rsInfo as FollowersRSInfo;
-        let page = info.page;
+        let page = this.data.props.page;
 
         // Yes the check against null IS required. Don't change.
         if (delta !== null) {
-            page = delta === 0 ? 0 : info.page + delta;
+            page = delta === 0 ? 0 : this.data.props.page + delta;
         }
-        S.srch.showFollowers(page, info.showingFollowersOfUser);
+        S.srch.showFollowers(page, this.data.props.showingFollowersOfUser);
     }
 
     renderHeading(state: AppState): CompIntf {
-        const info = this.data.rsInfo as FollowersRSInfo;
-        const text = info.showingFollowersOfUser === state.userName //
+        const text = this.data.props.showingFollowersOfUser === state.userName //
             ? "Your followers..." //
-            : "Followers of @" + info.showingFollowersOfUser + "...";
+            : "Followers of @" + this.data.props.showingFollowersOfUser + "...";
         return new Heading(4, text, { className: "resultsTitle" });
     }
 

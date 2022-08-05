@@ -115,7 +115,7 @@ export class MenuPanel extends Div {
         dispatch("enableIpsm", s => {
             s.ipsmActive = true;
             setTimeout(() => {
-                S.tabUtil.selectTab(C.TAB_IPSM);
+                // S.tabUtil.selectTab(C.TAB_IPSM);
             }, 250);
             return s;
         });

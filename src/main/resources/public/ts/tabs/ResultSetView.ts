@@ -10,12 +10,10 @@ import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 
-// todo-0: this AppTab needs to be parameterized like the FeedView is and have something like FeedViewProps that holds the rsInfo 
-// instead of having rsInfo in the root of this object OR in AppTab itself especially. 
-// Is it just this that we need: ApTab<ResultSetInfo> ???
-export abstract class ResultSetView extends AppTab {
+export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
     allowHeader: boolean = true;
     allowFooter: boolean = true;
@@ -27,7 +25,7 @@ export abstract class ResultSetView extends AppTab {
 
     preRender(): void {
         const state = useAppState();
-        const results = this.data && this.data.rsInfo.results;
+        const results = this.data && this.data.props.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
 
@@ -42,23 +40,23 @@ export abstract class ResultSetView extends AppTab {
 
         let content = null;
         if (this.showContentHeading && //
-            this.data.rsInfo.prop !== "node.id" && //
-            this.data.rsInfo.prop !== "node.name") {
-            content = this.data.rsInfo.node ? S.nodeUtil.getShortContent(this.data.rsInfo.node) : null;
+            this.data.props.prop !== "node.id" && //
+            this.data.props.prop !== "node.name") {
+            content = this.data.props.node ? S.nodeUtil.getShortContent(this.data.props.node) : null;
         }
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 // include back button if we have a central node this panel is about.
-                this.data.rsInfo.node && this.showContentHeading
+                this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
-                        onClick: () => S.view.jumpToId(this.data.rsInfo.node.id),
+                        onClick: () => S.view.jumpToId(this.data.props.node.id),
                         title: "Back to Node that was Searched"
                     }, "marginRight") : null,
                 this.renderHeading(state)
             ]),
             content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
-            this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
+            this.data.props.description ? new Div(this.data.props.description) : null
         ]));
 
         // this shows the page number. not needed. used for debugging.
@@ -66,7 +64,7 @@ export abstract class ResultSetView extends AppTab {
         this.addPaginationBar(state, children);
 
         let i = 0;
-        const jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+        const jumpButton = state.isAdminUser || !this.data.props.searchType;
 
         results.forEach((node: J.NodeInfo) => {
 
@@ -95,21 +93,21 @@ export abstract class ResultSetView extends AppTab {
 
     addPaginationBar = (state: AppState, children: CompIntf[]) => {
         children.push(
-            new Span("Pg. " + (this.data.rsInfo.page + 1), { className: "float-end" }),
+            new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }),
             new ButtonBar([
                 new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
                     title: "Refresh Search"
                 }),
-                this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
+                this.data.props.page > 1 ? new IconButton("fa-angle-double-left", null, {
                     onClick: () => this.pageChange(0),
                     title: "First Page"
                 }) : null,
-                this.data.rsInfo.page > 0 ? new IconButton("fa-angle-left", null, {
+                this.data.props.page > 0 ? new IconButton("fa-angle-left", null, {
                     onClick: () => this.pageChange(-1),
                     title: "Previous Page"
                 }) : null,
-                !this.data.rsInfo.endReached ? new IconButton("fa-angle-right", "More", {
+                !this.data.props.endReached ? new IconButton("fa-angle-right", "More", {
                     onClick: () => this.pageChange(1),
                     title: "Next Page"
                 }) : null

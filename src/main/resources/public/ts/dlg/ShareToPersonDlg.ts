@@ -31,7 +31,7 @@ export class ShareToPersonDlg extends DialogBase {
             valid = false;
         }
         else {
-            // todo-0: does our new architecture account for clearing error messages like this in all cases?
+            // todo-0: does our new validation architecture account for clearing error messages like this in all cases?
             // or does the react re-render clean it up by having all new objects?
             this.userNameState.setError(null);
         }

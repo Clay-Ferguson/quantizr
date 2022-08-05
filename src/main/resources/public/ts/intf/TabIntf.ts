@@ -2,9 +2,9 @@ import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
-import { ResultSetInfo } from "../ResultSetInfo";
+import * as J from "../JavaIntf";
 
-export interface TabIntf<PropsType = any> {
+export interface TabIntf<T = any> {
     // display name shown on the tab
     name: string;
 
@@ -24,9 +24,11 @@ export interface TabIntf<PropsType = any> {
     // controls whether to show tab button or not.
     isVisible(state: AppState): boolean;
 
-    // todo-0: this ResultSetInfo just needs to come in here as the PropsTypoe
-    rsInfo: ResultSetInfo;
-    props: PropsType;
+    // tabs are required to be able to search their known nodes and find any that are found, or null if not found
+    findNode(nodeId: string): J.NodeInfo;
+    nodeDeleted(nodeId: string): void;
+
+    props: T;
 
     openGraphComps: OpenGraphPanel[];
 }

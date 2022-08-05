@@ -4,7 +4,7 @@ import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetView {
+export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -14,18 +14,17 @@ export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetV
 
     pageChange(delta: number): void {
         const state = getAppState();
-        const info = this.data.rsInfo as I;
 
-        let page = info.page;
+        let page = this.data.props.page;
         if (delta !== null) {
-            page = delta === 0 ? 0 : info.page + delta;
+            page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.findSharedNodes(info.node,
+        S.srch.findSharedNodes(this.data.props.node,
             page,
-            info.shareNodesType,
-            info.shareTarget,
-            info.accessOption,
+            this.data.props.shareNodesType,
+            this.data.props.shareTarget,
+            this.data.props.accessOption,
             state);
     }
 }

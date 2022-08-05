@@ -15,10 +15,9 @@ export interface FeedViewProps {
     feedFilterRootNode?: J.NodeInfo;
     feedDirty?: boolean;
     feedLoading?: boolean;
-    // todo-0: it's inconsistent to have this data here, and the Search/Timeline NOT in props, but one level up (in data)
     feedResults?: J.NodeInfo[];
     feedEndReached?: boolean;
-    feedDirtyList?: boolean;
+    feedDirtyList?: J.NodeInfo[];
     filterExpanded?: boolean;
     applyAdminBlocks?: boolean;
 }

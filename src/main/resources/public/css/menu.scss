@@ -82,19 +82,19 @@
     background-color: transparent;
     padding: 5px 5px 5px 15px; 
     border-radius: 0px;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
 }
 
 .menuHeading:hover {
     background-color: $menuItemHoverBackgroundColor;
     border-radius: 0px;
-    border: 1px solid gray;
+    border: 2px solid gray;
 }
 
 .menuHeading[aria-expanded="true"] {
     background-color: $secondary;
     border-radius: 0px;
-    border: 1px solid gray;
+    border: 2px solid gray;
 }
 
 .mobileMenuText {

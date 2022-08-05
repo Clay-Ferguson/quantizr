@@ -7,17 +7,20 @@ import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
 import { TrendingRSInfo } from "../../TrendingRSInfo";
 import { TrendingView } from "../TrendingView";
+import * as J from "../../JavaIntf";
 
-export class TrendingViewData implements TabIntf {
+export class TrendingViewData implements TabIntf<TrendingRSInfo> {
     name = "Trending";
     tooltip = "What's popular right now on the Fediverse";
     id = C.TAB_TRENDING;
-    rsInfo = new TrendingRSInfo();
+    props = new TrendingRSInfo();
     scrollPos = 0;
-
-    // supports props.filter = hashtags, users, words
-    props = {};
     openGraphComps: OpenGraphPanel[] = [];
+
+    static inst: TrendingViewData = null;
+    constructor() {
+        TrendingViewData.inst = this;
+    }
 
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new TrendingView(data);
@@ -28,4 +31,12 @@ export class TrendingViewData implements TabIntf {
             new AppNavLink("Words", S.nav.showTrendingWords)
         ]);
     };
+
+    findNode = (nodeId: string): J.NodeInfo => {
+        return this.props.results.find(n => n.id === nodeId);
+    }
+
+    nodeDeleted = (nodeId: string): void => {
+        this.props.results = this.props.results.filter(n => nodeId !== n.id);
+    }
 }

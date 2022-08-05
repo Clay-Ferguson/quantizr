@@ -107,11 +107,6 @@ export class TabUtil {
         });
     }
 
-    getTabDataById = (state: AppState, id: string): TabIntf => {
-        state = getAppState(state);
-        return state.tabData.find(d => d.id === id);
-    }
-
     getActiveTabComp = (state: AppState): AppTab => {
         if (!state.tabData) return null;
         const data = state.tabData.find(d => d.id === state.activeTab);
@@ -128,10 +123,11 @@ export class TabUtil {
         }
     }
 
+    // WARNING: This won't apply to (or work) for feed view which has different prop than 'results'
     resultSetHasData = (id: string) => {
         const state = getAppState();
         const data = state.tabData.find(d => d.id === id);
-        return data?.rsInfo?.results?.length > 0;
+        return data?.props?.results?.length > 0;
     }
 
     /* This function manages persisting the scroll position when switching

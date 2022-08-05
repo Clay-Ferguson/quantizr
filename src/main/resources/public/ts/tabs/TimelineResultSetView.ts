@@ -4,7 +4,7 @@ import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
 import { ResultSetView } from "./ResultSetView";
 
-export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetView {
+export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -14,13 +14,13 @@ export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetVi
     pageChange(delta: number): void {
         const state = getAppState();
 
-        let page = this.data.rsInfo.page;
+        let page = this.data.props.page;
         if (delta !== null) {
-            page = delta === 0 ? 0 : this.data.rsInfo.page + delta;
+            page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.timeline(this.data.rsInfo.node, this.data.rsInfo.prop, state, this.data.rsInfo.timeRangeType,
-            this.data.rsInfo.description,
-            page, this.data.rsInfo.recursive);
+        S.srch.timeline(this.data.props.node, this.data.props.prop, state, this.data.props.timeRangeType,
+            this.data.props.description,
+            page, this.data.props.recursive);
     }
 }

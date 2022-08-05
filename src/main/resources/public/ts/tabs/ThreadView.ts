@@ -20,7 +20,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
     preRender(): void {
         const state = useAppState();
-        const results = this.data?.rsInfo?.results;
+        const results = this.data?.props?.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
         const childCount = results.length;
@@ -36,16 +36,16 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 new Heading(4, this.data.name + " / Hierarchy", { className: "resultsTitle" }),
-                new Div(this.data.rsInfo.endReached ? "Chain of replies going back to original post" //
+                new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
                 : "Chain of replies going back towards original post", { className: "float-end" }),
                 new Clearfix(),
-                !this.data.rsInfo.endReached ? new Button("Load More...", () => { this.moreHistory() }, { className: "float-end" }) : null,
+                !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() }, { className: "float-end" }) : null,
                 new Clearfix()
             ]),
-            this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
+            this.data.props.description ? new Div(this.data.props.description) : null
         ]));
 
-        const jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+        const jumpButton = state.isAdminUser || !this.data.props.searchType;
         const others: J.NodeInfo[] = this.data.props.others;
 
         results.forEach((node: J.NodeInfo) => {
@@ -78,7 +78,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
     moreHistory = () => {
         const state = getAppState();
-        const results = this.data && this.data.rsInfo.results;
+        const results = this.data && this.data.props.results;
         if (!results || results.length === 0) return;
         S.srch.showThreadAddMore(results[0].id, state);
     }

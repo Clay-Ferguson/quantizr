@@ -12,6 +12,8 @@ import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { FeedViewData } from "./tabs/data/FeedViewData";
+import { TrendingViewData } from "./tabs/data/TrendingViewData";
 import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
@@ -354,9 +356,8 @@ export class Nav {
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
-                const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-                if (feedData) {
-                    feedData.props.searchTextState.setValue("");
+                if (FeedViewData.inst) {
+                    FeedViewData.inst.props.searchTextState.setValue("");
                 }
 
                 this.messages({
@@ -389,9 +390,9 @@ export class Nav {
 
             if (!res.node) return;
             S.nodeUtil.updateNodeMap(res.node, state);
-            const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-            if (feedData) {
-                feedData.props.searchTextState.setValue("");
+            
+            if (FeedViewData.inst) {
+                FeedViewData.inst.props.searchTextState.setValue("");
             }
             this.messages({
                 feedFilterFriends: false,
@@ -480,13 +481,12 @@ export class Nav {
     }
 
     messages = (props: FeedViewProps) => {
-        const feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (!feedData) {
+        if (!FeedViewData.inst) {
             return;
         }
 
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
-        feedData.props.refreshCounter++;
+        FeedViewData.inst.props.refreshCounter++;
 
         dispatch("SelectTab", s => {
             s.guiReady = true;
@@ -494,7 +494,7 @@ export class Nav {
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
             // merge props parameter into the feed data props.
-            feedData.props = { ...feedData.props, ...props };
+            FeedViewData.inst.props = { ...FeedViewData.inst.props, ...props };
 
             // console.log("feedData.props=" + S.util.prettyPrint(feedData.props));
             return s;
@@ -546,9 +546,8 @@ export class Nav {
     }
 
     showTrendingFiltered = (filter: string) => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
-        if (data) {
-            data.props.filter = filter;
+        if (TrendingViewData.inst) {
+            TrendingViewData.inst.props.filter = filter;
         }
 
         dispatch("SelectTab", s => {
@@ -557,15 +556,14 @@ export class Nav {
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
-            data.props = { ...data.props };
+            TrendingViewData.inst.props = { ...TrendingViewData.inst.props };
             return s;
         });
     }
 
     messagesToFromMe = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -581,9 +579,8 @@ export class Nav {
     }
 
     messagesToMe = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -599,9 +596,8 @@ export class Nav {
     }
 
     messagesFromMeToUser = (user: string) => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -618,9 +614,8 @@ export class Nav {
     }
 
     messagesFromMe = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -636,9 +631,8 @@ export class Nav {
     }
 
     messagesFromFriends = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: true,
@@ -654,9 +648,8 @@ export class Nav {
     }
 
     messagesLocal = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -674,9 +667,8 @@ export class Nav {
     messagesNodeFeed = (state: AppState) => {
         const hltNode = S.nodeUtil.getHighlightedNode(state);
         if (!hltNode) return;
-        const feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,
@@ -692,9 +684,8 @@ export class Nav {
     }
 
     messagesFediverse = () => {
-        const data = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (data) {
-            data.props.searchTextState.setValue("");
+        if (FeedViewData.inst) {
+            FeedViewData.inst.props.searchTextState.setValue("");
         }
         this.messages({
             feedFilterFriends: false,

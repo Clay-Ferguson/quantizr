@@ -8,14 +8,16 @@ import { S } from "../../Singletons";
 import { ValidatedState } from "../../ValidatedState";
 import { FeedView } from "../FeedView";
 import { FeedViewProps } from "../FeedViewProps";
+import * as J from "../../JavaIntf";
 
-export class FeedViewData implements TabIntf {
+export class FeedViewData implements TabIntf<FeedViewProps> {
     name = "Feed";
     tooltip = "Reverse-chronological list of Fediverse posts";
     id = C.TAB_FEED;
-    rsInfo: any = null;
     scrollPos = 0;
-    props = {
+
+    // todo-0: need to makeout interface a 'class' and just construct it here.
+    props: FeedViewProps = {
         page: 0,
         refreshCounter: 0,
         autoRefresh: true,
@@ -23,25 +25,38 @@ export class FeedViewData implements TabIntf {
         feedFilterFriends: false,
         feedFilterToMe: false,
         feedFilterFromMe: false,
-        feedFilterToUser: null as any, // todo-0: why is 'as any' needed
+        feedFilterToUser: null, 
         feedFilterToPublic: true,
         feedFilterLocalServer: false,
         applyAdminBlocks: true,
 
         /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
          for any non-node specific feed query this stays null. */
-        feedFilterRootNode: null as any, // todo-0: why is 'as any' needed
-
+        feedFilterRootNode: null, 
         feedDirty: false,
         feedLoading: false,
-        feedResults: null as any, // todo-0: why is 'as any' needed
+        feedResults: null,
         feedEndReached: false
     };
 
     openGraphComps: OpenGraphPanel[] = [];
 
+    static inst: FeedViewData = null;
+    constructor() {
+        FeedViewData.inst = this;
+    }
+
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
+
+    findNode = (nodeId: string): J.NodeInfo => {
+        return this.props.feedResults.find(n => n.id === nodeId);
+    }
+
+    nodeDeleted = (nodeId: string): void => {
+        this.props.feedResults = this.props.feedResults.filter(n => nodeId !== n.id);
+    }
+
     getTabSubOptions = (state: AppState): Div => {
         if (this.props?.feedFilterRootNode) {
             return !state.isAnonUser

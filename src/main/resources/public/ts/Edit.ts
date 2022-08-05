@@ -12,6 +12,7 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
+import { FeedViewData } from "./tabs/data/FeedViewData";
 import { FeedView } from "./tabs/FeedView";
 
 export class Edit {
@@ -322,9 +323,17 @@ export class Edit {
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
-                const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-                if (feedData?.props?.feedDirtyList) {
-                    FeedView.updateFromFeedDirtyList(feedData, state);
+                if (FeedViewData.inst?.props?.feedDirtyList) {
+                    for (const node of FeedViewData.inst.props.feedDirtyList) {
+                        // console.log("Force Feed: " + node.content);
+                        S.push.forceFeedItem(node, state);
+                    }
+                    FeedViewData.inst.props.feedDirtyList = null;
+
+                    // all the data in feedData will have been updated by forceFeedItem to just force react to render now.
+                    dispatch("ForceFeedResults", s => {
+                        return s;
+                    });
                 }
             }
 

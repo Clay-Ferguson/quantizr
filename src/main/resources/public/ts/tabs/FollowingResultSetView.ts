@@ -6,7 +6,7 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSetView {
+export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -17,18 +17,16 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
     }
 
     pageChange(delta: number): void {
-        const info = this.data.rsInfo as FollowingRSInfo;
-        let page = info.page;
+        let page = this.data.props.page;
 
         // Yes the check against null IS required. Don't change.
         if (delta !== null) {
-            page = delta === 0 ? 0 : info.page + delta;
+            page = delta === 0 ? 0 : this.data.props.page + delta;
         }
-        S.srch.showFollowing(page, info.showingFollowingOfUser);
+        S.srch.showFollowing(page, this.data.props.showingFollowingOfUser);
     }
 
     renderHeading(state: AppState): CompIntf {
-        const info = this.data.rsInfo as FollowingRSInfo;
-        return new Heading(4, "@" + info.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
+        return new Heading(4, "@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
     }
 }

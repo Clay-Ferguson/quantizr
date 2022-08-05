@@ -23,6 +23,7 @@ import { NodeActionType } from "../enums/NodeActionType";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { MainTabCompData } from "../tabs/data/MainTabCompData";
 import { TypeBase } from "./base/TypeBase";
 
 export class RssTypeHandler extends TypeBase {
@@ -402,13 +403,12 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        const tabData = state.tabData.find(d => d.id === C.TAB_MAIN);
         if (anchor) {
-            const og = new OpenGraphPanel(state, tabData, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            const og = new OpenGraphPanel(state, MainTabCompData.inst, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
-            if (tabData) {
-                tabData.openGraphComps.push(og);
+            if (MainTabCompData.inst) {
+                MainTabCompData.inst.openGraphComps.push(og);
             }
         }
 

@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
+import { FeedViewData } from "../tabs/data/FeedViewData";
 
 declare var g_brandingAppName: string;
 
@@ -49,7 +50,6 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         const state = useAppState();
-        const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         const s = state.newMessageCount > 1 ? "s" : "";
         let messages = state.newMessageCount > 0
@@ -59,7 +59,7 @@ export class LeftNavPanel extends Div {
         // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
         // if feedFilterRoodNode is non-null which means user is in a node chat. I should consider having
         // a "Chat" tab that's separate from the "Feed" tab. Maybe the ChatView should be subclass of FeedView?
-        if (feedData?.props?.feedFilterRootNode) {
+        if (FeedViewData.inst?.props?.feedFilterRootNode) {
             messages = null;
         }
 
