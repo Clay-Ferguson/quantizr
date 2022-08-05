@@ -121,7 +121,7 @@ export class SelectTagsDlg extends DialogBase {
         });
 
         if (res.topTags?.length > 0) {
-            const suggestedTags = [];
+            const suggestedTags: Tag[] = [];
             res.topTags.forEach(tag => {
                 suggestedTags.push({ tag, description: null });
             });
@@ -164,7 +164,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     createTagsPickerList = (): Div => {
-        const state = this.getState();
+        const state = this.getState<LS>();
         let div: Div = null;
         
         if (state.tags?.length > 0) {

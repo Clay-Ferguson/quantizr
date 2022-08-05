@@ -137,7 +137,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return;
         }
 
-        (navigator as any).clipboard.read().then(async (data) => {
+        (navigator as any).clipboard.read().then(async (data: any) => {
             let done: boolean = false;
             for (const clipboardItem of data) {
                 // this was supposed to be only images, but i'm getting all types as blob. whoops.
@@ -239,7 +239,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             // WARNING: Don't try to put arrow functions in here, these functions are called by Dropzone itself and the
             // 'this' that is in scope during each call must be left as is.
             init: function () {
-                this.on("addedfile", function (file) {
+                this.on("addedfile", function (file: any) {
                     dlg.uploadFailed = false;
                     dlg.errorShown = false;
                     if (file.size > maxFileSize * Constants.ONE_MB) {
@@ -250,7 +250,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.runButtonEnablement();
                 });
 
-                this.on("maxfilesexceeded", function (arg) {
+                this.on("maxfilesexceeded", function (arg: any) {
                     S.util.showMessage("Only " + dlg.maxFiles + " file can be uploaded to a node.", "Warning");
                 });
 
@@ -259,7 +259,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.runButtonEnablement();
                 });
 
-                this.on("sending", function (file: File, xhr, formData) {
+                this.on("sending", function (file: File, xhr: any, formData: any) {
                     dlg.sent = true;
                     // console.log("sending file: " + file.name);
 
@@ -280,7 +280,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.zipQuestionAnswered = false;
                 });
 
-                this.on("error", function (param1, param2, param3) {
+                this.on("error", function (param1: any, param2: any, param3: any) {
                     if (dlg.sent) {
                         dlg.uploadFailed = true;
                         S.util.showMessage("Upload failed.", "Warning");
@@ -288,7 +288,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 // not needed (this does work however)
-                this.on("uploadprogress", function (file, progress) {
+                this.on("uploadprogress", function (file: any, progress: any) {
                     // console.log("File progress", progress);
                 });
 
@@ -304,7 +304,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                 });
 
-                this.on("queuecomplete", function (arg) {
+                this.on("queuecomplete", function (arg: any) {
                     if (dlg.sent) {
                         if (dlg.fileList.length > 1 && !dlg.uploadFailed) {
                             S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");

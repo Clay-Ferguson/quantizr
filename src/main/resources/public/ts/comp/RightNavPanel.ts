@@ -16,7 +16,7 @@ import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
-declare var g_brandingAppName;
+declare var g_brandingAppName: string;
 
 export class RightNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -67,7 +67,7 @@ export class RightNavPanel extends Div {
 
         // hack for now. I decided showing the header image isn't very attractive when user has a narrow
         // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
-        const headerImg = null;
+        const headerImg: Div = null;
         const avatarImg = this.makeAvatarDiv(state, !!headerImg);
         let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
 

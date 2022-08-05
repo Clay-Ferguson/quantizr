@@ -19,13 +19,13 @@ export class PubSub {
     static pub = (name: string, ...args: any[]) => {
         if (PubSub.registry[name]) {
             PubSub.lastFires[name] = args;
-            PubSub.registry[name].forEach(function (fn) {
+            PubSub.registry[name].forEach(function (fn: Function) {
                 fn.apply(null, args);
             });
         }
 
         if (PubSub.registryOnce[name]) {
-            PubSub.registryOnce[name].forEach(function (fn) {
+            PubSub.registryOnce[name].forEach(function (fn: Function) {
                 fn.apply(null, args);
             });
             delete PubSub.registryOnce[name];

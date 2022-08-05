@@ -9,8 +9,8 @@ import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
 // This is magically defined in webpack.common.js;
-declare var BUILDTIME;
-declare var PROFILE;
+declare var BUILDTIME: string;
+declare var PROFILE: string;
 
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);

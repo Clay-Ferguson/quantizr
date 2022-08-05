@@ -39,10 +39,10 @@ export abstract class Comp implements CompIntf {
 
     // default all these to null so that unless derived class sets the value we never need
     // to create some of the useEffect calls
-    public domPreUpdateEvent = null;
-    public domUpdateEvent = null;
-    public domRemoveEvent = null;
-    public domAddEvent = null;
+    public domPreUpdateEvent: React.EffectCallback = null;
+    public domUpdateEvent: React.EffectCallback = null;
+    public domRemoveEvent: React.EffectCallback = null;
+    public domAddEvent: React.EffectCallback = null;
 
     // we have the 'target' here to make our purifier keep those rendered
     // see also: #onclick-security-note

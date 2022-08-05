@@ -24,6 +24,7 @@ export interface TabIntf<PropsType = any> {
     // controls whether to show tab button or not.
     isVisible(state: AppState): boolean;
 
+    // todo-0: this ResultSetInfo just needs to come in here as the PropsTypoe
     rsInfo: ResultSetInfo;
     props: PropsType;
 

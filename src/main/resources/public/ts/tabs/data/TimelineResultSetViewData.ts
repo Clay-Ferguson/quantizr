@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
@@ -13,7 +14,7 @@ export class TimelineResultSetViewData implements TabIntf {
     rsInfo = new TimelineRSInfo();
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_TIMELINE);
     constructView = (data: TabIntf) => new TimelineResultSetView<TimelineRSInfo>(data);

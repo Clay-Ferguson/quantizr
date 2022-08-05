@@ -2,6 +2,7 @@ import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
@@ -12,10 +13,10 @@ export class MainTabCompData implements TabIntf {
     name = "Quanta";
     tooltip = "Quanta Database Content Tree";
     id = C.TAB_MAIN;
-    rsInfo = null;
+    rsInfo = null as any; // todo-0: why is 'as any' needed;
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new MainTabComp(data);

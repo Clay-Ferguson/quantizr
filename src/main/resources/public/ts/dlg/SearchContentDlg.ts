@@ -140,7 +140,9 @@ export class SearchContentDlg extends DialogBase {
     /* todo-1: put typesafety here on dlgState */
     addTagsToSearchField = (dlg: any) => {
         let val = ""; // this.searchTextState.getValue();
-        dlg.getState().selectedTags.forEach(tag => {
+
+        // todo-0: check type safety on 'selectedTags'
+        dlg.getState().selectedTags.forEach((tag: string) => {
             // if (val.indexOf(tag) !== -1) return;
             if (val) val += " ";
             if (dlg.matchAny) {

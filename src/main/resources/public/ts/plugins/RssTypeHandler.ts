@@ -336,7 +336,7 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, null, headerDivChildren));
 
         // process audio enclosures
-        let audioUrl = null;
+        let audioUrl: string = null;
         if (entry.enclosures) {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
@@ -458,7 +458,7 @@ export class RssTypeHandler extends TypeBase {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 
-        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
+        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i: any) => {
 
             // this logic doesn't apply to openGraphImages, so we detect those and bail out
             if (el.className.indexOf("openGraphImage") !== -1) {

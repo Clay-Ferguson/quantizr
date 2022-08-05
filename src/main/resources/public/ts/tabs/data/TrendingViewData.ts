@@ -1,6 +1,7 @@
 import { AppState } from "../../AppState";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
@@ -16,7 +17,7 @@ export class TrendingViewData implements TabIntf {
 
     // supports props.filter = hashtags, users, words
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new TrendingView(data);

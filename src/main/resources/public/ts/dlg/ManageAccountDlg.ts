@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
+import { ChangePasswordDlg } from "./ChangePasswordDlg";
 
 interface LS { // Local State
     info: string;
@@ -37,6 +38,6 @@ export class ManageAccountDlg extends DialogBase {
     }
 
     changePassword = () => {
-        S.edit.openChangePasswordDlg(getAppState());
+        new ChangePasswordDlg(null).open();
     }
 }

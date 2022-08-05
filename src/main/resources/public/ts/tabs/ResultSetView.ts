@@ -12,6 +12,9 @@ import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 
+// todo-0: this AppTab needs to be parameterized like the FeedView is and have something like FeedViewProps that holds the rsInfo 
+// instead of having rsInfo in the root of this object OR in AppTab itself especially. 
+// Is it just this that we need: ApTab<ResultSetInfo> ???
 export abstract class ResultSetView extends AppTab {
 
     allowHeader: boolean = true;

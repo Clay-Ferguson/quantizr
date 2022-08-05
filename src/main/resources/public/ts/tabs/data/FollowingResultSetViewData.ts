@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { FollowingRSInfo } from "../../FollowingRSInfo";
 import { TabIntf } from "../../intf/TabIntf";
@@ -13,7 +14,7 @@ export class FollowingResultSetViewData implements TabIntf {
     rsInfo = new FollowingRSInfo();
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
     constructView = (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(data);

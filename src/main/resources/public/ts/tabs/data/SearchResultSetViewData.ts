@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { ResultSetInfo } from "../../ResultSetInfo";
@@ -13,7 +14,7 @@ export class SearchResultSetViewData implements TabIntf {
     rsInfo = new ResultSetInfo();
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
     constructView = (data: TabIntf) => new SearchResultSetView(data)

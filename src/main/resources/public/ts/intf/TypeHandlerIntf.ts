@@ -16,7 +16,7 @@ export interface TypeHandlerIntf {
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getDomPreUpdateFunction(parent: CompIntf): void;
     getCustomProperties(): string[];
-    ensureDefaultProperties(node: J.NodeInfo);
+    ensureDefaultProperties(node: J.NodeInfo): void;
     getAllowPropertyAdd(): boolean;
     getAllowContentEdit(): boolean;
     getEditLabelForProp(propName: string): string;

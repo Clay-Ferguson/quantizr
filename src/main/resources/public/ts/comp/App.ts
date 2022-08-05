@@ -20,7 +20,7 @@ import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
 
-declare var g_brandingAppName;
+declare var g_brandingAppName: string;
 
 export class App extends Main {
 

@@ -62,7 +62,7 @@ export class Nav {
         S.nav.navToSibling(1);
     }
 
-    navToSibling = async (siblingOffset: number, state?: AppState) => {
+    navToSibling = async (siblingOffset: number, state?: AppState): Promise<string> => {
         state = getAppState(state);
         if (!state.node) return null;
 
@@ -94,7 +94,7 @@ export class Nav {
         this.navUpLevel(false);
     }
 
-    navUpLevel = async (processingDelete: boolean) => {
+    navUpLevel = async (processingDelete: boolean): Promise<void> => {
         const state = getAppState();
         if (!state.node) return null;
 
@@ -446,7 +446,7 @@ export class Nav {
             return null;
         }
         else if (state.node.children && state.node.children.length > 0) {
-            let prevChild = null;
+            let prevChild: J.NodeInfo = null;
             let nodeFound = false;
 
             state.node.children.some((child: J.NodeInfo) => {

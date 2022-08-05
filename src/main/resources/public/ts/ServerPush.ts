@@ -117,7 +117,8 @@ export class ServerPush {
         if (!nodeInfo) return;
         feedData.props.feedResults = feedData.props.feedResults || [];
 
-        const itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+        // todo-0: make typesafe
+        const itemFoundIdx = feedData.props.feedResults.findIndex((item: any) => item.id === nodeInfo.id);
         const updatesExistingItem = itemFoundIdx !== -1;
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
@@ -183,7 +184,8 @@ export class ServerPush {
         dispatch("RenderFeedResults", s => {
             feedData.props.feedResults = feedData.props.feedResults || [];
 
-            const itemFoundIdx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+            // todo-0: make typesafe
+            const itemFoundIdx = feedData.props.feedResults.findIndex((item: any) => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
 
             /* if the reciept of this server push makes us have new knowledge that one of our nodes

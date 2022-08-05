@@ -35,7 +35,7 @@ export class NodeCompRow extends Div {
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
         if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPrefs.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
-            this.attribs.onDragStart = (evt) => this.dragStart(evt, node.id);
+            this.attribs.onDragStart = (evt: any) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;
         }
     }
@@ -52,7 +52,7 @@ export class NodeCompRow extends Div {
         ev.dataTransfer.setData("text", draggingId);
     }
 
-    dragEnd = (ev) => {
+    dragEnd = (ev: any) => {
         ev.target.style.borderLeft = "6px solid transparent";
     }
 

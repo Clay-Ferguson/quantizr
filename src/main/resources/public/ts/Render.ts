@@ -34,7 +34,7 @@ function imageErrorFunc(evt: any) {
 
 export class Render {
     private debug: boolean = false;
-    private markedRenderer = null;
+    private markedRenderer: any = null;
 
     CHAR_CHECKMARK = "&#10004;";
 
@@ -139,7 +139,7 @@ export class Render {
 
         // From Stack Overflow
         // https://github.com/markedjs/marked/issues/882
-        this.markedRenderer.link = function (href, title, text) {
+        this.markedRenderer.link = function (href: string, title: string, text: string) {
             // console.log(`marked.link [${href}][${title}][${text}]`);
             if (href.indexOf("mailto:") === 0) {
                 // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that. Eventually we could
@@ -472,7 +472,7 @@ export class Render {
                         S.nodeUtil.updateNodeMap(res.node, s);
                     }
 
-                    let targetNode = null;
+                    let targetNode: J.NodeInfo = null;
                     if (targetNodeId) {
                         // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
                         // so we have to call getNodeByName() to get the 'id' that goes with that node name.

@@ -66,11 +66,11 @@ export class FullScreenGraphViewer extends Main {
             const chartHeight = height - margin.top - margin.bottom;
 
             const root = d3.hierarchy(data);
-            const links = root.links();
-            const nodes = root.descendants();
+            const links: any = root.links();
+            const nodes: any = root.descendants();
 
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(0).strength(1))
+                .force("link", d3.forceLink(links).id((d: any) => d.id).distance(0).strength(1))
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
@@ -81,7 +81,7 @@ export class FullScreenGraphViewer extends Main {
                 .style("font-size", "14px")
                 .style("pointer-events", "none");
 
-            const drag = function (simulation) {
+            const drag = function (simulation: any) {
                 return d3.drag()
                     .on("start", function (event: any, d: any) {
                         thiz.isDragging = true;
@@ -128,7 +128,7 @@ export class FullScreenGraphViewer extends Main {
                 .data(nodes)
                 .join("circle")
 
-                .attr("fill", d => {
+                .attr("fill", (d: any) => {
                     let color = "transparent";
                     if (d.data.id === thiz.nodeId) {
                         color = "red";
@@ -138,15 +138,15 @@ export class FullScreenGraphViewer extends Main {
                     }
                     return color;
                 })
-                .attr("stroke", d => {
+                .attr("stroke", (d: any) => {
                     return thiz.getColorForLevel(d.data.level);
                 })
-                .attr("r", d => {
+                .attr("r", (d: any) => {
                     if (d.data.id === thiz.nodeId) return 5;
                     return 3.5;
                 })
 
-                .on("mouseover", (event: any, d) => {
+                .on("mouseover", (event: any, d: any) => {
                     if (d.data.id.startsWith("/")) {
                         thiz.updateTooltip(d, event.pageX, event.pageY);
                     }
@@ -160,7 +160,7 @@ export class FullScreenGraphViewer extends Main {
                         .style("opacity", 0);
                 })
 
-                .on("click", function (event: any, d) {
+                .on("click", function (event: any, d: any) {
                     d3.select(this)
                         .style("fill", "green");
 
@@ -177,14 +177,14 @@ export class FullScreenGraphViewer extends Main {
 
             simulation.on("tick", () => {
                 link
-                    .attr("x1", d => d.source.x)
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
+                    .attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y);
 
                 node
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
+                    .attr("cx", (d: any) => d.x)
+                    .attr("cy", (d: any) => d.y);
             });
 
             const zoomHandler = d3.zoom()
@@ -256,7 +256,7 @@ export class FullScreenGraphViewer extends Main {
     showTooltip = (d: any, x: number, y: number) => {
         this.tooltip.transition()
             .duration(300)
-            .style("opacity", (d) => !this.isDragging ? 0.97 : 0);
+            .style("opacity", (d: any) => !this.isDragging ? 0.97 : 0);
 
         // DO NOT DELETE (example for how to use HTML)
         // this.tooltip.html(() => {

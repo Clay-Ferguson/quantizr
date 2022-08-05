@@ -10,7 +10,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
-declare var g_brandingAppName;
+declare var g_brandingAppName: string;
 
 export class SignupDlg extends DialogBase {
 
@@ -75,7 +75,7 @@ export class SignupDlg extends DialogBase {
         this.signupResponse(res);
     }
 
-    signupResponse = async (res: J.SignupResponse) => {
+    signupResponse = async (res: J.SignupResponse): Promise<void> => {
         if (res.success) {
             /* close the signup dialog */
             this.close();

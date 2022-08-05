@@ -19,7 +19,6 @@ export interface CompIntf {
     setChildren(comps: CompIntf[]): void;
     getChildren(): CompIntf[];
     getRef(warn: boolean): HTMLElement;
-    domAddEvent(): void;
     render(): any;
     getCompClass(): string;
     create(): ReactNode;

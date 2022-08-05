@@ -72,7 +72,6 @@ export class Search {
                 // remove the last element, which will be a duplicate.
                 const moreResults = res.nodes.slice(0, -1);
 
-                // data.props.others = res.others
                 data.rsInfo.results = [...moreResults, ...data.rsInfo.results];
                 data.rsInfo.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
@@ -266,8 +265,9 @@ export class Search {
             }
 
             // for feed results
+            // todo-0: feedResults is untyped here
             if (td.props?.feedResults) {
-                td.props.feedResults = td.props.feedResults.filter(n => id !== n.id);
+                td.props.feedResults = td.props.feedResults.filter((n: any) => id !== n.id);
             }
         });
     }
@@ -347,7 +347,8 @@ export class Search {
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    data.props.feedResults.forEach(child => {
+                    // todo-0: feedResults not typed here
+                    data.props.feedResults.forEach((child: any) => {
                         idSet.add(child.id);
                     });
 

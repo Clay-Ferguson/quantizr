@@ -17,7 +17,7 @@ import { VideoPlayerDlg } from "./VideoPlayerDlg";
 // https://developers.google.com/web/fundamentals/media/recording-audio
 // Need to persist in LOCAL browser storage which input selections (audio/video) are the current choice at all times.
 
-declare var MediaRecorder;
+declare var MediaRecorder: any;
 
 interface LS { // Local State
     status?: string;
@@ -30,7 +30,7 @@ interface LS { // Local State
 
 export class MediaRecorderDlg extends DialogBase {
     stream: any;
-    chunks = [];
+    chunks: any[] = [];
     recorder: any;
 
     // this timer is also used as a way to detect if we are currently recording. This will be null always if not currently recording.
@@ -67,8 +67,8 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     scanDevices = async () => {
-        const audioInputOptions = [];
-        const videoInputOptions = [];
+        const audioInputOptions: any[] = [];
+        const videoInputOptions: any[] = [];
 
         let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
         let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
@@ -236,7 +236,7 @@ export class MediaRecorderDlg extends DialogBase {
             // this.recorder = new MediaRecorder(this.stream, options);
             this.recorder = new MediaRecorder(this.stream);
 
-            this.recorder.addEventListener("dataavailable", event => {
+            this.recorder.addEventListener("dataavailable", (event: any) => {
                 this.chunks.push(event.data);
             });
 
@@ -316,7 +316,7 @@ export class MediaRecorderDlg extends DialogBase {
 
     closeStream = () => {
         if (this.stream) {
-            this.stream.getTracks().forEach(function (track) {
+            this.stream.getTracks().forEach(function (track: any) {
                 track.stop();
             });
         }

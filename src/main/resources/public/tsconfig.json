@@ -8,7 +8,8 @@
         "module": "esnext",
         "moduleResolution": "node",
         "jsx": "react",
-        "noImplicitAny": false,
+        // todo-0: need to be able to turn noImplicitAny on
+        "noImplicitAny": true,
         "strictNullChecks": false,
 
         "noImplicitUseStrict": false,

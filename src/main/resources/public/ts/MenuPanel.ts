@@ -1,5 +1,6 @@
 import { dispatch, getAppState, useAppState } from "./AppRedux";
 import { AppState } from "./AppState";
+import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Tag } from "./comp/core/Tag";
 import { Menu } from "./comp/Menu";
@@ -271,7 +272,7 @@ export class MenuPanel extends Div {
             // ), //
         ], null, this.makeHelpIcon(":menu-edit")));
 
-        const createMenuItems = [];
+        const createMenuItems: CompIntf[] = [];
         const typeHandlers = S.plugin.getAllTypeHandlers();
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
@@ -392,7 +393,7 @@ export class MenuPanel extends Div {
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.
-            // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
+            // new MenuItem("Preferences", () => {new PrefsDlg().open();}, !state.isAnonUser), // "fa-gear"
 
             new MenuItemSeparator(), //
 

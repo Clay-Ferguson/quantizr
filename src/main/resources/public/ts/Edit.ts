@@ -2,13 +2,9 @@ import { EventInput } from "@fullcalendar/react";
 import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
-import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
-import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
-import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { FullScreenType } from "./Interfaces";
@@ -24,23 +20,7 @@ export class Edit {
     pendingContent: string = null;
     pendingContentId: string = null;
 
-    openChangePasswordDlg = (state: AppState) => {
-        new ChangePasswordDlg(null).open();
-    }
-
-    openManageAccountDlg = (state: AppState) => {
-        new ManageAccountDlg().open();
-    }
-
-    openManageStorageDlg = (state: AppState) => {
-        new ManageStorageDlg().open();
-    }
-
-    editPreferences = (state: AppState) => {
-        new PrefsDlg().open();
-    }
-
-    openImportDlg = (state: AppState) => {
+    openImportDlg = (state: AppState): any => {
         const node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -53,14 +33,14 @@ export class Edit {
         dlg.open();
     }
 
-    openExportDlg = (state: AppState) => {
+    openExportDlg = (state: AppState): any => {
         const node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             new ExportDlg(node).open();
         }
     }
 
-    private insertBookResponse = (res: J.InsertBookResponse, state: AppState) => {
+    private insertBookResponse = (res: J.InsertBookResponse, state: AppState): any => {
         S.util.checkSuccess("Insert Book", res);
 
         S.view.refreshTree({
@@ -78,7 +58,7 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState) => {
+    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): any => {
         state = getAppState(state);
         if (S.util.checkSuccess("Join node", res)) {
             S.nodeUtil.clearSelNodes(state);
@@ -97,7 +77,7 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction, state: AppState) => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
             if (state.mobileMode) forceUsePopup = true;
 
@@ -201,10 +181,8 @@ export class Edit {
             return true;
         }
 
-        let owner: string = node.owner;
-
         // if we don't know who owns this node assume the admin owns it.
-        owner = owner || "admin";
+        const owner = node.owner || "admin";
 
         // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
         // make nodes editable by any other user.
@@ -667,7 +645,7 @@ export class Edit {
         }
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState) => {
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): any => {
         state = getAppState(state);
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected

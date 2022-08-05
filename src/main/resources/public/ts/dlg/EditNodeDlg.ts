@@ -498,7 +498,8 @@ export class EditNodeDlg extends DialogBase {
     /* todo-1: put typesafety here on dlgState */
     addTagsToTextField = (dlg: any) => {
         let val = "";
-        dlg.getState().selectedTags.forEach(tag => {
+        // todo-0: need typesafety on selectedTags
+        dlg.getState().selectedTags.forEach((tag: string) => {
             if (val) val += " ";
             val += tag;
         });

@@ -16,7 +16,7 @@ ImportTest.check();
 console.log("index.tsx finished imports");
 
 // set in index.html (and other HTML files)
-declare var __page;
+declare var __page: any;
 
 // This is how we run the main app (normal flow)
 if ((window as any).__page === "index") {

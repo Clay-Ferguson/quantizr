@@ -15,8 +15,8 @@ export interface FullScreenConfig {
 
 export interface ValueIntf {
     getValue(): any;
-    setValue(val: any);
-    getValidationError?();
+    setValue(val: any): void;
+    getValidationError?(): string;
 }
 
 export interface AppAction extends Action<any> {

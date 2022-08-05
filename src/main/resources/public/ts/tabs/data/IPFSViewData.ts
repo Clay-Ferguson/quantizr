@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { ValidatedState } from "../../ValidatedState";
@@ -10,13 +11,13 @@ export class IPFSViewData implements TabIntf {
     name = "IPFS Explorer";
     tooltip = "Explorer for IPFS content and folders";
     id = C.TAB_IPFSVIEW;
-    rsInfo = null;
+    rsInfo = null as any;
     scrollPos = 0;
     props = {
         cidField: new ValidatedState<any>()
     };
 
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => {
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]

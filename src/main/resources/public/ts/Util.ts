@@ -16,7 +16,7 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
-declare var __page;
+declare var __page: any;
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -324,7 +324,7 @@ export class Util {
         return date.getTimezoneOffset() < this.stdTimezoneOffset(date);
     }
 
-    indexOfObject = (arr: any[], obj) => {
+    indexOfObject = (arr: any[], obj: any) => {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] === obj) {
                 return i;
@@ -608,7 +608,7 @@ export class Util {
         throw exception;
     }
 
-    ajaxReady = (requestName): boolean => {
+    ajaxReady = (requestName: string): boolean => {
         if (this._ajaxCounter > 0) {
             console.log("Ignoring requests: " + requestName + ". Ajax currently in progress.");
             return false;
@@ -630,8 +630,10 @@ export class Util {
      * every response method instead, if we want that response to print a message to the user when fail happens.
      *
      * requires: res.success res.message
+     * 
+     * todo-0: make 'res' typed
      */
-    checkSuccess = (opFriendlyName, res): boolean => {
+    checkSuccess = (opFriendlyName: string, res: any): boolean => {
         if ((!res || !res.success) && res.message) {
             this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
         }
@@ -651,14 +653,14 @@ export class Util {
         return new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
-    addAllToSet = (set: Set<string>, array) => {
+    addAllToSet = (set: Set<string>, array: any[]) => {
         if (!array) return;
         array.forEach(v => {
             set.add(v);
         });
     }
 
-    nullOrUndef = (obj): boolean => {
+    nullOrUndef = (obj: any): boolean => {
         return obj === null || obj === undefined;
     }
 
@@ -780,7 +782,7 @@ export class Util {
         elm.dispatchEvent(event);
     }
 
-    formatDate = (date): string => {
+    formatDate = (date: Date): string => {
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? "pm" : "am";
@@ -794,7 +796,7 @@ export class Util {
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + year + " " + strTime;
     }
 
-    formatDateShort = (date): string => {
+    formatDateShort = (date: Date): string => {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
 
@@ -868,7 +870,7 @@ export class Util {
 
     updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState) => {
         if (S.quanta.nodeHistoryLocked) return;
-        let subItems = null;
+        let subItems: NodeHistoryItem[] = null;
 
         this.removeHistorySubItem(node.id);
 
@@ -910,7 +912,12 @@ export class Util {
                     // if this child at at a top level now, don't let it be appended as a child second level item.
                     if (!childFound) {
                         // new NodeHistoryItem
-                        subItems.unshift({ id: childNode.id, type: childNode.type, content: S.nodeUtil.getShortContent(childNode), subIds: null });
+                        subItems.unshift({ 
+                            id: childNode.id, 
+                            type: childNode.type, 
+                            content: S.nodeUtil.getShortContent(childNode), 
+                            subItems: null 
+                        });
                     }
                 }
             }
@@ -1038,12 +1045,12 @@ export class Util {
         // console.log("setDropHandler: nodeId=" + attribs.id);
         const nonDragBorder = "";
 
-        attribs.onDragEnter = function (event) {
+        attribs.onDragEnter = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
         };
 
-        attribs.onDragOver = function (event) {
+        attribs.onDragOver = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
             // console.log("onDragOver: id=" + event.target.id);
@@ -1056,7 +1063,7 @@ export class Util {
             }
         };
 
-        attribs.onDragLeave = function (event) {
+        attribs.onDragLeave = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
             if (fullOutline) {
@@ -1067,7 +1074,7 @@ export class Util {
             }
         };
 
-        attribs.onDrop = function (event) {
+        attribs.onDrop = function (event: any) {
             // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
@@ -1097,7 +1104,7 @@ export class Util {
 
     buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {
         if (!items) return [];
-        const ret = [];
+        const ret: EventInput[] = [];
 
         items.forEach((v: J.CalendarItem) => {
             ret.push({
@@ -1124,9 +1131,10 @@ export class Util {
 
     // External Emojis!
     insertActPubTags = (val: string, node: J.NodeInfo) => {
+        // todo-0: need some typesafety here. what if 'forEach' doesn't even exist?
         let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
-        if (tags) {
-            tags.forEach(t => {
+        if (tags && tags.forEach) {
+            tags.forEach((t: any) => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {
                     const img = `<img src='${t.icon.url}'">`;
                     val = S.util.replaceAll(val, t.name, img);
@@ -1140,7 +1148,7 @@ export class Util {
             // split val into words (space delimited)
             tags = val.split(/ /);
             val = "";
-            tags.forEach(t => {
+            tags.forEach((t: any) => {
                 // skip any `:tag:` words.
                 if (t.startsWith(":") && t.endsWith(":")) return;
 
@@ -1325,7 +1333,7 @@ export class Util {
     The other part of this is contained in click-effects.scss
     */
     initClickEffect = () => {
-        const clickEffect = (e) => {
+        const clickEffect = (e: MouseEvent) => {
             // use a timeout so we can call 'getState()' without a react error.
             setTimeout(() => {
                 const state = getAppState();
@@ -1403,7 +1411,7 @@ export class Util {
     }
 
     // from here: https://www.w3schools.com/howto/howto_js_draggable.asp
-    dragElement(elmnt, arrow) {
+    dragElement(elmnt: any, arrow: any) {
         let pos1 = 0;
         let pos2 = 0;
         let pos3 = 0;
@@ -1420,7 +1428,7 @@ export class Util {
         // }
         elmnt.onmousedown = dragMouseDown;
 
-        function dragMouseDown(e) {
+        function dragMouseDown(e: any) {
             e = e || window.event;
             e.preventDefault();
 
@@ -1432,7 +1440,7 @@ export class Util {
             elmnt.style.cursor = "move";
         }
 
-        function elementDrag(e) {
+        function elementDrag(e: any) {
             e = e || window.event;
             e.preventDefault();
 
@@ -1617,7 +1625,7 @@ export class Util {
 
     readClipboardFile = (): Promise<any> => {
         return new Promise<any>(async (resolve, reject) => {
-            (navigator as any).clipboard.read().then(async (data) => {
+            (navigator as any).clipboard.read().then(async (data: any) => {
                 let done: boolean = false;
                 let blob = null;
                 for (const item of data) {

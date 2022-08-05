@@ -129,7 +129,7 @@ export class EditNodeDlgUtil {
         });
     }
 
-    addProperty = async (dlg: EditNodeDlg) => {
+    addProperty = async (dlg: EditNodeDlg): Promise<void> => {
         const state: LS = dlg.getState<LS>();
         const propDlg = new EditPropertyDlg(state.node);
         await propDlg.open();

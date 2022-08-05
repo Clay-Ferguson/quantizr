@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import { ValueIntf } from "../Interfaces";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { S } from "../Singletons";
+import { Comp } from "./base/Comp";
 import { ListBox } from "./ListBox";
 import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
@@ -20,7 +21,7 @@ export class NodeTypeListBox extends ListBox {
     }
 
     preRender(): void {
-        const children = [];
+        const children: Comp[] = [];
         const typeHandlers = S.plugin.getAllTypeHandlers();
 
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {

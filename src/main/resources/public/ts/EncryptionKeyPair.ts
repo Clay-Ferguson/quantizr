@@ -1,4 +1,4 @@
 export class EncryptionKeyPair {
-    constructor(public publicKey, public privateKey) {
+    constructor(public publicKey: any, public privateKey: any) {
     }
 }

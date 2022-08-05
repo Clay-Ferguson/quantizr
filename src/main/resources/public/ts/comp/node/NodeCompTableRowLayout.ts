@@ -40,7 +40,7 @@ export class NodeCompTableRowLayout extends Div {
         const cellWidth = 100 / maxCols;
         const allowInsert = S.edit.isInsertAllowed(this.node, state);
         let curCols = 0;
-        let lastNode = null;
+        let lastNode: J.NodeInfo = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
@@ -118,7 +118,7 @@ export class NodeCompTableRowLayout extends Div {
             if (this.level <= 1) {
                 // todo-1: this button should have same enablement as "new" button, on the page root
 
-                children.push(new Button(null, e => {
+                children.push(new Button(null, () => {
                     if (lastNode) {
                         S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
                     } else {

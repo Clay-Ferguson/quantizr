@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { ThreadRSInfo } from "../../ThreadRSInfo";
@@ -12,7 +13,7 @@ export class ThreadViewData implements TabIntf {
     rsInfo = new ThreadRSInfo();
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => { return !!state.threadViewNodeId; };
 

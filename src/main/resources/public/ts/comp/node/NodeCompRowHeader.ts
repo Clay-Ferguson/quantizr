@@ -10,6 +10,7 @@ import { UserProfileDlg } from "../../dlg/UserProfileDlg";
 import { NodeActionType } from "../../enums/NodeActionType";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Comp } from "../base/Comp";
 import { CollapsiblePanel } from "../core/CollapsiblePanel";
 
 // todo-1: need to switch to the more efficient way of using nid attribute
@@ -59,7 +60,7 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        const verboseChildren = state.mobileMode ? [] : children;
+        const verboseChildren: Comp[] = state.mobileMode ? [] : children;
 
         const typeHandler = S.plugin.getTypeHandler(this.node.type);
         if (typeHandler) {
@@ -140,7 +141,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         let youLiked: boolean = false;
-        let likeNames = null;
+        let likeNames: string = null;
         if (this.node.likes) {
             youLiked = !!this.node.likes.find(u => u === state.userName);
             likeNames = "Liked by:";

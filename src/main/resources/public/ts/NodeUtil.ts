@@ -146,7 +146,8 @@ export class NodeUtil {
         // first look in normal tree map for main view.
         let node = state.idToNodeMap.get(nodeId);
         if (!node) {
-            node = feedData?.props?.feedResults?.find(n => n.id === nodeId);
+            // todo-0: it looks like props.feedResults isn't typesafe here?
+            node = feedData?.props?.feedResults?.find((n: any) => n.id === nodeId);
         }
 
         if (!node) {

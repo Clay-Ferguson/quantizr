@@ -4,6 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { CompIntf } from "./base/CompIntf";
 import { Icon } from "./core/Icon";
 
 export class BreadcrumbsPanel extends Div {
@@ -19,7 +20,7 @@ export class BreadcrumbsPanel extends Div {
     }
 
     createBreadcrumbs = (state: AppState): Comp => {
-        let children = [];
+        let children: CompIntf[] = [];
 
         if (state.breadcrumbs?.length > 0) {
             children = state.breadcrumbs.map(bc => {

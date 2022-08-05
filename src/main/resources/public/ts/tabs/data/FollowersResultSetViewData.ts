@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { FollowersRSInfo } from "../../FollowersRSInfo";
 import { TabIntf } from "../../intf/TabIntf";
@@ -13,7 +14,7 @@ export class FollowersResultSetViewData implements TabIntf {
     rsInfo = new FollowersRSInfo();
     scrollPos = 0;
     props = {};
-    openGraphComps = [];
+    openGraphComps: OpenGraphPanel[] = [];
 
     isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
     constructView = (data: TabIntf) => new FollowersResultSetView<FollowersRSInfo>(data);

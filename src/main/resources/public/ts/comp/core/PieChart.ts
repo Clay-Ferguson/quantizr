@@ -36,7 +36,7 @@ export class PieChart extends Div {
         const pie = d3.pie().value((d: any) => { return d.value; });
 
         // Generate the arcs
-        const arc = d3.arc()
+        const arc: any = d3.arc()
             .innerRadius(0)
             .outerRadius(radius);
 
@@ -49,19 +49,19 @@ export class PieChart extends Div {
 
         // Draw arc paths
         arcs.append("path")
-            .attr("fill", (d, i) => {
+            .attr("fill", (d: any, i: any) => {
                 return color(i);
             })
             .attr("d", arc);
 
         arcs.append("text")
-            .attr("transform", (d) => {
+            .attr("transform", (d: any) => {
                 d.innerRadius = 0;
                 d.outerRadius = this.width;
                 return "translate(" + arc.centroid(d) + ")";
             })
             .attr("text-anchor", "middle")
-            .text((d, i) => {
+            .text((d: any, i: any) => {
                 return this.data[i].label;
             });
     }

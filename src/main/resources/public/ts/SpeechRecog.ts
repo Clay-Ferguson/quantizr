@@ -1,10 +1,10 @@
 import { S } from "./Singletons";
 
-declare var webkitSpeechRecognition;
-declare var SpeechRecognition;
+declare var webkitSpeechRecognition: any;
+declare var SpeechRecognition: any;
 
 export class SpeechRecog {
-    recognition = null;
+    recognition: any = null;
     speechActive: boolean = false;
     private callback: (text: string) => void;
 
@@ -46,7 +46,7 @@ export class SpeechRecog {
         };
 
         // This runs when the speech recognition service returns result
-        this.recognition.onresult = (event) => {
+        this.recognition.onresult = (event: any) => {
             const transcript = event.results[0][0].transcript;
             const confidence = event.results[0][0].confidence;
 
@@ -67,7 +67,7 @@ export class SpeechRecog {
         this.speechActive = this.speechActive ? false : true;
     }
 
-    setCallback = (callback: (string) => void) => {
+    setCallback = (callback: (val: string) => void) => {
         this.callback = callback;
     }
 }

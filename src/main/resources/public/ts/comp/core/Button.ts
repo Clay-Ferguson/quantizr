@@ -15,7 +15,7 @@ export class Button extends Comp {
     // To enable this Classes custom CSS, just uncomment this code, and that's all that's required
     // to get the proof-of-concept back working. For now we use only SCSS, but this example was 
     // an experiment, and works great.
-    static cssPrefix = null;
+    static cssPrefix: string = null;
     // static cssPrefix = Comp.getCssPrefix();
     // static cssObj = Comp.createCss(Button.cssPrefix, `
     // .$$testClass {

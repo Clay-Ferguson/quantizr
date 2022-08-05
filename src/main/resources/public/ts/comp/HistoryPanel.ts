@@ -58,7 +58,7 @@ export class HistoryPanel extends Div {
 
             const dragProps = state.userPrefs.editMode ? {
                 draggable: "true",
-                onDragStart: (evt) => this.dragStart(evt, h.id),
+                onDragStart: (evt: any) => this.dragStart(evt, h.id),
                 onDragEnd: this.dragEnd
             } : {};
 
@@ -108,7 +108,7 @@ export class HistoryPanel extends Div {
 
                         const dragProps = state.userPrefs.editMode ? {
                             draggable: "true",
-                            onDragStart: (evt) => this.dragStart(evt, h.id),
+                            onDragStart: (evt: any) => this.dragStart(evt, h.id),
                             onDragEnd: this.dragEnd
                         } : {};
 
@@ -149,7 +149,7 @@ export class HistoryPanel extends Div {
         ev.dataTransfer.setData("text", draggingId);
     }
 
-    dragEnd = (ev) => {
+    dragEnd = (ev: any) => {
         ev.target.style.border = "6px solid transparent";
     }
 
