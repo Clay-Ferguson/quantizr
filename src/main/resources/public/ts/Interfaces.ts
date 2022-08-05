@@ -5,6 +5,7 @@ import * as J from "./JavaIntf";
 /* These are Client-side only models, and are not seen on the server side ever */
 
 export enum FullScreenType {
+    // eslint-disable-next-line no-unused-vars
     NONE, IMAGE, GRAPH, CALENDAR
 }
 

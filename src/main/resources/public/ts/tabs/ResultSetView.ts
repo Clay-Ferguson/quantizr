@@ -29,8 +29,6 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         this.attribs.className = this.getClass(state);
         if (!results) return;
 
-        const childCount = results.length;
-
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
          * client side for various reasons.

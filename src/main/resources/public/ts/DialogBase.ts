@@ -30,7 +30,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     opened: boolean = false;
     loaded: boolean = false;
 
-    validatedStates: ValidatedState<any>[] = null;
+    validatedStates: ValidatedState[] = null;
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed

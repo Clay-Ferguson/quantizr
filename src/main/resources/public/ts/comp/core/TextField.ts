@@ -18,7 +18,7 @@ export interface TextFieldConfig {
     enter?: () => void;
     inputClass?: string;
     labelLeft?: boolean;
-    val?: ValidatedState<any>;
+    val?: ValidatedState;
     outterClass?: string;
     placeholder?: string;
 }

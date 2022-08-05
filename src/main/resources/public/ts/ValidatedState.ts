@@ -2,7 +2,7 @@ import { State } from "./State";
 import { S } from "./Singletons";
 
 /* todo-2: Finish making this type safe, and don't use 'any' inside here */
-export class ValidatedState<S> {
+export class ValidatedState {
     v: State = new State();
     e: State = new State();
 
@@ -98,6 +98,7 @@ export class ValidatedState<S> {
 }
 
 export enum ValidatorRuleName {
+    // eslint-disable-next-line no-unused-vars
     REQUIRED, MAXLEN, MINLEN, USERNAME
 }
 

@@ -88,8 +88,6 @@ export class SharingDlg extends DialogBase {
     }
 
     shareImmediate = async (userName: string) => {
-        const state: LS = this.getState<LS>();
-
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
@@ -117,7 +115,7 @@ export class SharingDlg extends DialogBase {
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
             privilege: "*"
@@ -133,7 +131,7 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    const res = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                    await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: this.node.id
                     });
                     S.quanta.refresh(getAppState());
@@ -147,7 +145,7 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
             privilege

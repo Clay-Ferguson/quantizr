@@ -14,7 +14,7 @@ export class IPFSTab implements TabIntf<any> {
     id = C.TAB_IPFSVIEW;
     scrollPos = 0;
     props = {
-        cidField: new ValidatedState<any>()
+        cidField: new ValidatedState()
     };
 
     openGraphComps: OpenGraphPanel[] = [];

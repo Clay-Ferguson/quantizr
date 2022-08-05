@@ -6,7 +6,7 @@ export interface IPFSFilesViewProps {
 
     listCids?: boolean;
     mfsFolderCid?: string;
-    cidField?: ValidatedState<any>;
+    cidField?: ValidatedState;
 
     // MFS FilesView support
     mfsFiles?: J.MFSDirEntry[]; // files retrieved from MFS

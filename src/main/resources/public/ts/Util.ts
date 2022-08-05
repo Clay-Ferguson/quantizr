@@ -1040,9 +1040,6 @@ export class Util {
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, fullOutline: boolean, func: (elm: any) => void) => {
-        // console.log("setDropHandler: nodeId=" + attribs.id);
-        const nonDragBorder = "";
-
         attribs.onDragEnter = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
@@ -1226,6 +1223,7 @@ export class Util {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user
                 message = S.util.removeHtmlTags(message);
 
+                // eslint-disable-next-line no-unused-vars
                 const n = new Notification(title, {
                     body: message,
 

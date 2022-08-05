@@ -14,20 +14,20 @@ declare var g_brandingAppName: string;
 
 export class SignupDlg extends DialogBase {
 
-    userState: ValidatedState<any> = new ValidatedState<any>("", [
+    userState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MAXLEN, payload: 25 },
         { name: ValidatorRuleName.USERNAME }
     ]);
 
-    passwordState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    passwordState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
 
-    emailState: ValidatedState<any> = new ValidatedState<any>("", [
+    emailState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MAXLEN, payload: 50 }
     ]);
 
-    captchaState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    captchaState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Create Account", "app-modal-content-medium-width");
@@ -87,7 +87,6 @@ export class SignupDlg extends DialogBase {
             window.location.href = window.location.origin;
         }
         else {
-            const errors: any = {};
             // S.util.showMessage("Invalid information for Signup", "Signup");
 
             this.userState.setError(res.userError);

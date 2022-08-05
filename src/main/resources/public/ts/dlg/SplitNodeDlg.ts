@@ -18,7 +18,7 @@ interface LS { // Local State
 }
 
 export class SplitNodeDlg extends DialogBase {
-    delimiterState: ValidatedState<any> = new ValidatedState<any>();
+    delimiterState: ValidatedState = new ValidatedState();
 
     constructor(private node: J.NodeInfo) {
         super("Split Node");

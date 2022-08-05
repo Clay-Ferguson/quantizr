@@ -50,12 +50,12 @@ export class EditNodeDlg extends DialogBase {
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
-    contentEditorState: ValidatedState<any> = new ValidatedState<any>();
-    nameState: ValidatedState<any> = new ValidatedState<any>();
-    tagsState: ValidatedState<any> = new ValidatedState<any>();
+    contentEditorState: ValidatedState = new ValidatedState();
+    nameState: ValidatedState = new ValidatedState();
+    tagsState: ValidatedState = new ValidatedState();
 
     // holds a map of states by property names.
-    propStates: Map<string, ValidatedState<any>> = new Map<string, ValidatedState<any>>();
+    propStates: Map<string, ValidatedState> = new Map<string, ValidatedState>();
 
     // todo-1: these should be in our local state really
     static morePanelExpanded: boolean = false;
@@ -736,9 +736,9 @@ export class EditNodeDlg extends DialogBase {
         const label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
-        let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
+        let propState: ValidatedState = this.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new ValidatedState<any>(propEntry.value);
+            propState = new ValidatedState(propEntry.value);
             this.propStates.set(propEntry.name, propState);
         }
 

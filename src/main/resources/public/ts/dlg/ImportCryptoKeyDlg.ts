@@ -9,7 +9,7 @@ import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
 export class ImportCryptoKeyDlg extends DialogBase {
-    keyState: ValidatedState<any> = new ValidatedState<any>();
+    keyState: ValidatedState = new ValidatedState();
 
     constructor() {
         super("Import Key Pair", "app-modal-content-medium-width");

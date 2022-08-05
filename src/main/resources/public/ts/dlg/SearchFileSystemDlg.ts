@@ -14,7 +14,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 export class SearchFileSystemDlg extends DialogBase {
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>("", [
+    searchTextState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

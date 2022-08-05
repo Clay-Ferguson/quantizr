@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import DOMPurify from "dompurify";
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
@@ -108,7 +107,7 @@ export abstract class Comp implements CompIntf {
         if (!func) return;
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
-        let elm = this.getRef(false);
+        const elm = this.getRef(false);
         if (elm) {
             func(elm);
             return;
@@ -182,7 +181,7 @@ export abstract class Comp implements CompIntf {
             ReactDOM.unmountComponentAtNode(elm);
 
             /* wrap with the Redux Provider to make it all reactive */
-            let provider = createElement(Provider, { store }, this.create());
+            const provider = createElement(Provider, { store }, this.create());
             ReactDOM.render(provider, elm);
         });
     }
@@ -277,7 +276,7 @@ export abstract class Comp implements CompIntf {
         childrenArg = childrenArg || this.children;
 
         try {
-            let children: ReactNode[] = this.createChildren(childrenArg);
+            const children = this.createChildren(childrenArg);
 
             this.wrapClick(props);
             this.scopeCss(props);
@@ -381,7 +380,7 @@ export abstract class Comp implements CompIntf {
             this.attribs.ref = useRef();
 
             this.preRender();
-            let ret: ReactNode = this.compRender();
+            const ret = this.compRender();
 
             if (this.debug) {
                 console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
@@ -409,7 +408,7 @@ export abstract class Comp implements CompIntf {
 
     private domAdd = (): void => {
         // console.log("domAddEvent: " + this.jsClassName);
-        let elm: HTMLElement = this.getRef();
+        const elm = this.getRef();
         if (!elm) {
             return;
         }
@@ -443,7 +442,7 @@ export abstract class Comp implements CompIntf {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollDomAddEvent: " + this.getCompClass());
         }
-        let elm = this.getRef();
+        const elm = this.getRef();
         if (elm) {
             elm.scrollTop = this.getScrollPos();
             elm.addEventListener("scroll", () => {
@@ -456,7 +455,7 @@ export abstract class Comp implements CompIntf {
     }
 
     scrollDomPreUpdateEvent = () => {
-        let elm = this.getRef();
+        const elm = this.getRef();
         if (elm) {
             if (C.DEBUG_SCROLLING) {
                 console.log("scrollDomPreUpdateEvent [" + this.getCompClass() + "]: elm.scrollTop=" + elm.scrollTop + " elm.scrollHeight=" + elm.scrollHeight);
@@ -486,7 +485,7 @@ export abstract class Comp implements CompIntf {
         if (this.getScrollPos()) {
             this.setScrollPos(pos);
         }
-        let elm = this.getRef();
+        const elm = this.getRef();
         if (elm) {
             if (C.DEBUG_SCROLLING) {
                 console.log("setScrollTop [" + this.getCompClass() + "]: elm.scrollTop=" + pos + " elm.scrollHeight=" + elm.scrollHeight);

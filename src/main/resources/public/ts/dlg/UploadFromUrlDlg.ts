@@ -14,7 +14,7 @@ export class UploadFromUrlDlg extends DialogBase {
 
     static storeLocally: boolean = false;
 
-    urlState: ValidatedState<any> = new ValidatedState<any>("", [
+    urlState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

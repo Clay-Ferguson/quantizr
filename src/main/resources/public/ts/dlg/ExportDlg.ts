@@ -7,14 +7,14 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
-import { TextField, TextFieldConfig } from "../comp/core/TextField";
+import { TextField } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
-import { Value } from "../Value";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
+import { Value } from "../Value";
 import { MessageDlg } from "./MessageDlg";
 
 interface LS { // Local State
@@ -24,7 +24,7 @@ interface LS { // Local State
 
 export class ExportDlg extends DialogBase {
 
-    fileNameState: ValidatedState<any> = new ValidatedState<any>();
+    fileNameState: ValidatedState = new ValidatedState();
     saveToIpfsState: Value<boolean> = new Value<boolean>(this, "toIpfs");
 
     constructor(private node: NodeInfo) {
@@ -37,8 +37,6 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const tfc: TextFieldConfig = null;
-
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new RadioButtonGroup([

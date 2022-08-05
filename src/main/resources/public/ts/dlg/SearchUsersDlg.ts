@@ -24,7 +24,7 @@ export class SearchUsersDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState = new ValidatedState();
 
     constructor() {
         super("Search Users", "app-modal-content-medium-width");

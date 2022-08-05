@@ -6,12 +6,6 @@ import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { ChangePasswordDlg } from "./ChangePasswordDlg";
 
-interface LS { // Local State
-    info: string;
-    binQuota: number;
-    binTotal: number;
-}
-
 export class ManageAccountDlg extends DialogBase {
 
     constructor() {

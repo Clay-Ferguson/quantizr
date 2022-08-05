@@ -1,8 +1,4 @@
 export enum NodeActionType {
-    addChild,
-    editNode,
-    insert,
-    upload,
-    delete,
-    share
+    /* eslint-disable no-unused-vars */
+    addChild, editNode, insert, upload, delete, share
 };

@@ -15,8 +15,8 @@ interface LS { // Local State
 
 export class ResetPasswordDlg extends DialogBase {
 
-    userState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
-    emailState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    userState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
+    emailState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor(user: string) {
         super("Reset Password", "app-modal-content-narrow-width");

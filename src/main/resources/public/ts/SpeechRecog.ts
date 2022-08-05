@@ -48,7 +48,7 @@ export class SpeechRecog {
         // This runs when the speech recognition service returns result
         this.recognition.onresult = (event: any) => {
             const transcript = event.results[0][0].transcript;
-            const confidence = event.results[0][0].confidence;
+            // const confidence = event.results[0][0].confidence;
 
             if (this.callback) {
                 this.callback(transcript);

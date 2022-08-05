@@ -27,7 +27,6 @@ import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
 function imageErrorFunc(evt: any) {
-    console.log("remove broken img");
     evt.target.hidden = true;
     evt.target.onerror = null;
     return true;
@@ -670,7 +669,6 @@ export class Render {
 
     renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
-        const allowAvatars = true;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
@@ -714,7 +712,7 @@ export class Render {
             className: "avatarImage",
             // I haven't yet proven that this onError wasn't contributing to a page flicker bug but am suspicious
             // and since this is not that important, i'm removing until I have an abundane of time to retest.
-            // onError: imageErrorFunc, 
+            onError: imageErrorFunc, 
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 

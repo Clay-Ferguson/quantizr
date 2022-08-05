@@ -199,9 +199,8 @@ export class MenuPanel extends Div {
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
-        const messagesSuffix = state.newMessageCount > 0
-            ? " (" + state.newMessageCount + " new)" : "";
-
+        // const messagesSuffix = state.newMessageCount > 0
+        //     ? " (" + state.newMessageCount + " new)" : "";
         // These options will appear on the RHS for desktop mode
         // No longer needed now that we have RHS as popup (NavDlg)
         // todo-1: eventually we can delete this code but leaving for now.
@@ -441,7 +440,6 @@ export class MenuPanel extends Div {
           These menu items can save a node subgraph to IPFS files (MFS) and then restore those nodes back
           from that tree branch. But the feature is not currently needed or enabled.
           */
-        // eslint-disable-next-line no-constant-condition
         if (state.isAdminUser) {
             // DO NOT DELETE: Work in Progress....
             // children.push(new Menu("IPFS", [

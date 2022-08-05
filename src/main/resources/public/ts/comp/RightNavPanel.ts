@@ -16,6 +16,7 @@ import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
+// eslint-disable-next-line no-unused-vars
 declare var g_brandingAppName: string;
 
 export class RightNavPanel extends Div {
@@ -81,15 +82,15 @@ export class RightNavPanel extends Div {
         const allowEditMode = state.node && !state.isAnonUser;
         const fullScreenViewer = S.util.fullscreenViewerActive(state);
 
-        const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
-            className: "fa fa-clipboard fa-lg marginRight clickable",
-            onClick: () => {
-                PubSub.pub(C.PUBSUB_closeNavPanel, "immediate");
-                // todo-1: would be nice if this detected an image and saved as attachment.
-                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-            },
-            title: "Save clipboard"
-        }) : null;
+        // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
+        //     className: "fa fa-clipboard fa-lg marginRight clickable",
+        //     onClick: () => {
+        //         PubSub.pub(C.PUBSUB_closeNavPanel, "immediate");
+        //         // todo-1: would be nice if this detected an image and saved as attachment.
+        //         S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+        //     },
+        //     title: "Save clipboard"
+        // }) : null;
 
         const addNoteButton = !state.isAnonUser && !state.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",

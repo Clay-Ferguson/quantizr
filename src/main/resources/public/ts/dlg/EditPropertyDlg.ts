@@ -13,7 +13,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
  */
 export class EditPropertyDlg extends DialogBase {
 
-    nameState: ValidatedState<any> = new ValidatedState<any>("", [
+    nameState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

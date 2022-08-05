@@ -1,10 +1,6 @@
-import { ValueIntf } from "../Interfaces";
 import { Div } from "../comp/core/Div";
-import { State } from "../State";
+import { ValueIntf } from "../Interfaces";
 
-interface LS { // Local State
-    value: string
-}
 export class ListBox extends Div {
 
     constructor(public valueIntf: ValueIntf) {

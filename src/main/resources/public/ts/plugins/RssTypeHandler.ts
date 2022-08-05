@@ -474,7 +474,7 @@ export class RssTypeHandler extends TypeBase {
             todo-2: We could use this same logic on each individual FEED ITEM (fediverse), but for now I decided not to
             hide any dupliate images so this is commented out for now.
             */
-            const src: string = (el as any).src;
+            // const src: string = (el as any).src;
             // if (urlSet.has(src)) {
             //     el.style.display = "none";
             //     return;

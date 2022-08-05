@@ -7,7 +7,6 @@ import { Div } from "../comp/core/Div";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
@@ -17,8 +16,8 @@ interface LS { // Local State
 
 export class SearchAndReplaceDlg extends DialogBase {
 
-    searchState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
-    replaceState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    searchState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
+    replaceState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Search and Replace", "app-modal-content-narrow-width");

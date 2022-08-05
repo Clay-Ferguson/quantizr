@@ -2,9 +2,6 @@ import * as d3 from "d3";
 import { Div } from "./Div";
 import { Svg } from "./Svg";
 
-interface LS { // Local State
-}
-
 export class PieChart extends Div {
 
     constructor(private width: number, private className: string, private data: any[]) {

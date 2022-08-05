@@ -13,11 +13,11 @@ export class UploadFromIPFSDlg extends DialogBase {
     static storeLocally: boolean = false;
     uploadButton: Button;
     
-    cidState: ValidatedState<any> = new ValidatedState<any>("", [
+    cidState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    mimeState: ValidatedState<any> = new ValidatedState<any>("", [
+    mimeState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

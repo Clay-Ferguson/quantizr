@@ -2,7 +2,6 @@ import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
-import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";

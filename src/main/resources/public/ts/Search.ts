@@ -1,4 +1,3 @@
-import { DayTable } from "@fullcalendar/daygrid";
 import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
@@ -22,7 +21,6 @@ import { SearchTab } from "./tabs/data/SearchTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
-import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {

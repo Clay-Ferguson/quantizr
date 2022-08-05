@@ -11,7 +11,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class LoadNodeFromIpfsDlg extends DialogBase {
 
-    ipfsPathState: ValidatedState<any> = new ValidatedState<any>("", [
+    ipfsPathState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

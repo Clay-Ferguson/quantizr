@@ -3,7 +3,6 @@ import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";

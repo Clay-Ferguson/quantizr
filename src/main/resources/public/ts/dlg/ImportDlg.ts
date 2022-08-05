@@ -10,7 +10,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 import { MessageDlg } from "./MessageDlg";
 
 export class ImportDlg extends DialogBase {
-    fileNameState: ValidatedState<any> = new ValidatedState<any>("", [
+    fileNameState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

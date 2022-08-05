@@ -40,7 +40,7 @@ export class AudioPlayerDlg extends DialogBase {
     urlHash: string;
 
     timeLeftTextField: TextField;
-    timeLeftState: ValidatedState<any> = new ValidatedState<any>();
+    timeLeftState: ValidatedState = new ValidatedState();
 
     intervalTimer: any;
     playButton: Icon;

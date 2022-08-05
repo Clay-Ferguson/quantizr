@@ -6,7 +6,7 @@ import { Input } from "./Input";
 export class DateField extends Div implements I.ValueIntf {
     input: Input;
 
-    constructor(private valState: ValidatedState<any>) {
+    constructor(private valState: ValidatedState) {
         super(null);
     }
 

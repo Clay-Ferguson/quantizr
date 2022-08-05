@@ -323,9 +323,9 @@ export class EditNodeDlgUtil {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        let propState: ValidatedState<any> = dlg.propStates.get(propEntry.name);
+        let propState: ValidatedState = dlg.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new ValidatedState<any>();
+            propState = new ValidatedState();
             dlg.propStates.set(propEntry.name, propState);
         }
 

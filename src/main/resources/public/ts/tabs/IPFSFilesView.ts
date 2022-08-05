@@ -1,4 +1,4 @@
-import { dispatch, getAppState, useAppState } from "../AppRedux";
+import { dispatch, useAppState } from "../AppRedux";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -206,7 +206,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                     // otherwise instead if a download option (which we CAN do (todo-1), we just let users try it in ipfs.io if they want, to cross
                                     // their fingers and hope for the best with the ProtocolLabs server.
                                     else {
-                                        const state = getAppState();
                                         const dlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null);
                                         await dlg.open();
                                         if (dlg.yes) {
@@ -240,7 +239,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                             className: "fa fa-trash fa-lg clickable marginRight",
                             title: "Delete",
                             onClick: async () => {
-                                const state = getAppState();
                                 const dlg = new ConfirmDlg("Delete File: " + entry.Name + "?", "Confirm Delete",
                                     "btn-danger", "alert alert-info");
                                 await dlg.open();
@@ -280,7 +278,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // });
 
         setTimeout(async () => {
-            const res = await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
+            await S.util.ajax<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
                 item
             });
 

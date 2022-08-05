@@ -16,11 +16,11 @@ interface LS { // Local State
 }
 
 export class TransferNodeDlg extends DialogBase {
-    toUserState: ValidatedState<any> = new ValidatedState<any>("", [
+    toUserState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
     
-    fromUserState: ValidatedState<any> = new ValidatedState<any>();
+    fromUserState: ValidatedState = new ValidatedState();
 
     constructor() {
         super("Transfer Node", "app-modal-content-narrow-width");

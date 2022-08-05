@@ -11,7 +11,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
 
-export class ThreadView<I extends ThreadRSInfo> extends AppTab {
+export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -23,7 +23,6 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
         const results = this.data?.props?.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
-        const childCount = results.length;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the

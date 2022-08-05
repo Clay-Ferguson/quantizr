@@ -1,4 +1,3 @@
-import { ValidationError } from "webpack";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -14,7 +13,7 @@ import { MessageDlg } from "./MessageDlg";
 export class ChangePasswordDlg extends DialogBase {
 
     passwordField: TextField;
-    pwdState: ValidatedState<any> = new ValidatedState<any>("", [
+    pwdState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MINLEN, payload: 4 }
     ]);

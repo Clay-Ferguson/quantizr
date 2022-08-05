@@ -5,7 +5,7 @@ export class FeedViewProps {
     page = 0;
     refreshCounter = 0;
     autoRefresh = true;
-    searchTextState = new ValidatedState<any>();
+    searchTextState = new ValidatedState();
     feedFilterFriends = false;
     feedFilterToMe = false;
     feedFilterFromMe = false;

@@ -9,11 +9,8 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
-interface LS { // Local State
-}
-
 export class EditTagsDlg extends DialogBase {
-    tagsState: ValidatedState<any> = new ValidatedState<any>();
+    tagsState: ValidatedState = new ValidatedState();
 
     constructor() {
         super("Edit Hashtags", "app-modal-content-medium-width");

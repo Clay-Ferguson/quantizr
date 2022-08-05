@@ -180,7 +180,7 @@ export class Quanta {
 
                 document.body.addEventListener("click", function (e: any) {
                     e = e || window.event;
-                    const target: HTMLElement = e.target;
+                    // const target: HTMLElement = e.target;
 
                     // Whenever something is clicked, forget the pending focus data
                     Comp.focusElmId = null;

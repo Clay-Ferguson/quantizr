@@ -1,8 +1,5 @@
-import DOMPurify from "dompurify";
-import { Util } from "../../Util";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
-import { Italic } from "./Italic";
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq

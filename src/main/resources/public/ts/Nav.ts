@@ -9,12 +9,10 @@ import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { FullScreenType } from "./Interfaces";
-import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
-import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
@@ -327,7 +325,6 @@ export class Nav {
 
     runSearch = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        const state = getAppState();
         this.clickNodeRow(null, id);
         setTimeout(() => {
             new SearchContentDlg().open();

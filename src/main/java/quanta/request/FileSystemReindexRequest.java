@@ -1,6 +1,5 @@
 package quanta.request;
 
-
 import quanta.request.base.RequestBase;
 
 public class FileSystemReindexRequest extends RequestBase {

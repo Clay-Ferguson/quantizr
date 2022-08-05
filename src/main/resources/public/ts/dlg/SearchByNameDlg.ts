@@ -12,7 +12,7 @@ export class SearchByNameDlg extends DialogBase {
     static defaultSearchText: string = "";
 
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>("", [
+    searchTextState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

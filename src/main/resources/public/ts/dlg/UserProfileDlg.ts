@@ -25,8 +25,8 @@ interface LS { // Local State
 
 export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
-    bioState: ValidatedState<any> = new ValidatedState<any>();
-    displayNameState: ValidatedState<any> = new ValidatedState<any>();
+    bioState: ValidatedState = new ValidatedState();
+    displayNameState: ValidatedState = new ValidatedState();
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
@@ -201,14 +201,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     deleteFriend = async () => {
-        const res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+        await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
     }
 
     unblockUser = async () => {
-        const res = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
+        await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);

@@ -1061,7 +1061,7 @@ export class Edit {
 
     // like==false means 'unlike'
     likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
-        const res = await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
+        await S.util.ajax<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
         }, true);

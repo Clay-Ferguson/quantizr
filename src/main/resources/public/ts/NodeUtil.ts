@@ -5,11 +5,9 @@ import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
-import { FeedTab } from "./tabs/data/FeedTab";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
@@ -294,12 +292,11 @@ export class NodeUtil {
     }
 
     loadNodeFromIpfs = (node: J.NodeInfo): any => {
-        const state = getAppState();
         new LoadNodeFromIpfsDlg().open();
     }
 
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
-        const res = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: "public",
             privilege: "*"

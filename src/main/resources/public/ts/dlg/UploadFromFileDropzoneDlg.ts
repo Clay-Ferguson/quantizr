@@ -14,9 +14,6 @@ import { S } from "../Singletons";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
 
-interface LS { // Local State
-}
-
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
     uploadButton: Button;
@@ -108,7 +105,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromUrl = () => {
-        const state: LS = this.getState<LS>();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
@@ -118,7 +114,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromIPFS = () => {
-        const state = this.getState<LS>();
         S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {

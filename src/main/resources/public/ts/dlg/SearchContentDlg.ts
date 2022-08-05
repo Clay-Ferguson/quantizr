@@ -37,7 +37,7 @@ export class SearchContentDlg extends DialogBase {
     };
 
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState = new ValidatedState();
 
     constructor() {
         super("Search");

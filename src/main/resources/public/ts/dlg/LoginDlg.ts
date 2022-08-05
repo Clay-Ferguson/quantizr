@@ -14,8 +14,8 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
 
 export class LoginDlg extends DialogBase {
-    userState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
-    pwdState: ValidatedState<any> = new ValidatedState<any>("", [{ name: ValidatorRuleName.REQUIRED }]);
+    userState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
+    pwdState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Login", "app-modal-content-narrow-width");

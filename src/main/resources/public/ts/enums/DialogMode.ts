@@ -1,5 +1,4 @@
 export enum DialogMode {
-    POPUP,
-    EMBED,
-    FULLSCREEN
+    // eslint-disable-next-line no-unused-vars
+    POPUP, EMBED, FULLSCREEN
 };

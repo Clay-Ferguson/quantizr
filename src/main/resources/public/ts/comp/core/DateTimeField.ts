@@ -5,11 +5,11 @@ import { Span } from "./Span";
 import { TimeField } from "./TimeField";
 
 export class DateTimeField extends Span {
-    dateState: ValidatedState<any> = new ValidatedState<any>();
-    timeState: ValidatedState<any> = new ValidatedState<any>();
+    dateState: ValidatedState = new ValidatedState();
+    timeState: ValidatedState = new ValidatedState();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: ValidatedState<any>) {
+    constructor(private dateTimeState: ValidatedState) {
         super(null);
         this.attribs = {
             ...this.attribs, ...{

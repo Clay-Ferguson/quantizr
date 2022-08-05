@@ -12,7 +12,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
 export class ShareToPersonDlg extends DialogBase {
 
-    userNameState: ValidatedState<any> = new ValidatedState<any>("", [
+    userNameState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
