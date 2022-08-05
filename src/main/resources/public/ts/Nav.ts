@@ -8,6 +8,7 @@ import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -408,9 +409,7 @@ export class Nav {
 
     closeFullScreenViewer = (appState: AppState) => {
         dispatch("CloseFullScreenViewer", s => {
-            s.fullScreenViewId = null;
-            s.fullScreenGraphId = null;
-            s.fullScreenCalendarId = null;
+            s.fullScreenConfig = { type: FullScreenType.NONE };
             return s;
         });
     }
@@ -420,7 +419,7 @@ export class Nav {
 
         if (prevNode) {
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenViewId = prevNode.id;
+                s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: prevNode.id };
                 return s;
             });
         }
@@ -431,7 +430,7 @@ export class Nav {
 
         if (nextNode) {
             dispatch("NextFullScreenImgViewer", s => {
-                s.fullScreenViewId = nextNode.id;
+                s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: nextNode.id };
                 return s;
             });
         }
@@ -442,7 +441,8 @@ export class Nav {
         let newNode = null;
 
         // First detect if page root node is selected, before doing a child search
-        if (state.fullScreenViewId === state.node.id) {
+        if (state.fullScreenConfig.type === FullScreenType.IMAGE && //
+            state.fullScreenConfig.nodeId === state.node.id) {
             return null;
         }
         else if (state.node.children && state.node.children.length > 0) {
@@ -460,7 +460,8 @@ export class Nav {
                         newNode = child;
                     }
 
-                    if (child.id === state.fullScreenViewId) {
+                    if (state.fullScreenConfig.type === FullScreenType.IMAGE &&
+                        state.fullScreenConfig.nodeId === child.id) {
                         if (dir === "prev") {
                             if (prevChild) {
                                 ret = true;

@@ -1608,7 +1608,7 @@ export class Util {
     }
 
     fullscreenViewerActive = (state: AppState): boolean => {
-        return !!(state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId);
+        return state.fullScreenConfig.type !== I.FullScreenType.NONE;
     }
 
     ctrlKeyCheck = (): boolean => {

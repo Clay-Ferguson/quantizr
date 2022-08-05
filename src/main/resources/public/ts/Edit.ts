@@ -11,6 +11,7 @@ import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
+import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
@@ -384,8 +385,8 @@ export class Edit {
                 this.refreshNodeFromServer(node.id);
             }
 
-            if (state.fullScreenCalendarId) {
-                S.render.showCalendar(state.fullScreenCalendarId, state);
+            if (state.fullScreenConfig.type === FullScreenType.CALENDAR) {
+                S.render.showCalendar(state.fullScreenConfig.nodeId, state);
             }
         }
     }
@@ -1168,7 +1169,7 @@ export class Edit {
 
         const res = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
-            nodeId: state.fullScreenCalendarId,
+            nodeId: state.fullScreenConfig.nodeId,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,

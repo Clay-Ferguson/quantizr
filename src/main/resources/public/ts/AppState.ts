@@ -2,6 +2,7 @@ import { EventInput } from "@fullcalendar/react";
 import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
+import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 
@@ -64,9 +65,7 @@ export class AppState {
 
     // todo-0: Replace these with a "FullScreenConfig interface that has {type=image,graph,calendar, nodeId}"
     // and if the config object is non-null it means we're displaying a fullscreen something
-    fullScreenViewId: string = null;
-    fullScreenGraphId: string = null;
-    fullScreenCalendarId: string = null;
+    fullScreenConfig: FullScreenConfig = { type: FullScreenType.NONE };
 
     graphSearchText: string = null;
 

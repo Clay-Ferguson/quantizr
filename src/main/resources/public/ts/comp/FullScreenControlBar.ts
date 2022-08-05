@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
+import { FullScreenType } from "../Interfaces";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 
@@ -20,7 +21,7 @@ export class FullScreenControlBar extends Div {
     getButtons = (state: AppState): Comp[] => {
         const buttons = [];
 
-        if (state.fullScreenViewId && state.activeTab === C.TAB_MAIN) {
+        if (state.fullScreenConfig.type === FullScreenType.IMAGE && state.activeTab === C.TAB_MAIN) {
             if (S.nav.getAdjacentNode("prev", state)) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {

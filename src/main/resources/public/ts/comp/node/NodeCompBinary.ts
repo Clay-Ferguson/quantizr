@@ -10,6 +10,7 @@ import { Constants as C } from "../../Constants";
 import { AudioPlayerDlg } from "../../dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { DialogMode } from "../../enums/DialogMode";
+import { FullScreenType } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { HorizontalLayout } from "../core/HorizontalLayout";
@@ -74,10 +75,10 @@ export class NodeCompBinary extends Div {
         if (this.isEditorEmbed) return;
 
         dispatch("ClickImage", s => {
-            if (s.fullScreenViewId && this.isFullScreenEmbed) {
+            if (s.fullScreenConfig.type === FullScreenType.IMAGE && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }
-            s.fullScreenViewId = id;
+            s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: id };
             return s;
         });
     }

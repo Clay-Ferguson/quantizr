@@ -4,6 +4,15 @@ import * as J from "./JavaIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
 
+export enum FullScreenType {
+    NONE, IMAGE, GRAPH, CALENDAR
+}
+
+export interface FullScreenConfig {
+    type: FullScreenType;
+    nodeId?: string;
+}
+
 export interface ValueIntf {
     getValue(): any;
     setValue(val: any);

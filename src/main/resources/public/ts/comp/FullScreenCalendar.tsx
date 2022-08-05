@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode, createElement } from "react";
@@ -26,7 +25,7 @@ export class FullScreenCalendar extends Main {
 
     compRender = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
-        const nodeId = this.state.fullScreenCalendarId;
+        const nodeId = this.state.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNodeById(this.state, nodeId);
 
         if (!node) {
@@ -66,9 +65,7 @@ export class FullScreenCalendar extends Main {
                     addEventButton: {
                         text: "add",
                         click: () => {
-                            if (!FullScreenCalendar.lastClickTime) {
-                                FullScreenCalendar.lastClickTime = new Date();
-                            }
+                            FullScreenCalendar.lastClickTime = FullScreenCalendar.lastClickTime || new Date();
                             S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
                         }
                     },

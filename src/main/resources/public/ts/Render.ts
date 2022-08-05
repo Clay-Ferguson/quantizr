@@ -17,6 +17,7 @@ import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
+import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
@@ -253,7 +254,7 @@ export class Render {
             nodeId
         });
         dispatch("ShowCalendar", s => {
-            s.fullScreenCalendarId = nodeId;
+            s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
             s.calendarData = S.util.buildCalendarData(res.items);
             return s;
         });
@@ -735,9 +736,9 @@ export class Render {
 
     showGraph = (node: J.NodeInfo, searchText: string, state: AppState) => {
         node = node || S.nodeUtil.getHighlightedNode(state);
-        
+
         dispatch("ShowGraph", s => {
-            s.fullScreenGraphId = node.id;
+            s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
             return s;
         });

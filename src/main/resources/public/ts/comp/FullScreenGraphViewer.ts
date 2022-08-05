@@ -22,7 +22,7 @@ export class FullScreenGraphViewer extends Main {
 
     constructor(appState: AppState) {
         super();
-        this.nodeId = appState.fullScreenGraphId;
+        this.nodeId = appState.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNodeById(appState, this.nodeId);
 
         if (!node) {

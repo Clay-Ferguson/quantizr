@@ -6,6 +6,7 @@ import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
+import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -49,7 +50,7 @@ export class App extends Main {
 
         if (fullScreenViewer) {
             this.setChildren([
-                !state.fullScreenCalendarId ? new FullScreenControlBar() : null,
+                state.fullScreenConfig.type !== FullScreenType.CALENDAR ? new FullScreenControlBar() : null,
                 new Clearfix(),
                 fullScreenViewer
             ]);
@@ -92,17 +93,18 @@ export class App extends Main {
     };
 
     getFullScreenViewer = (state: AppState): CompIntf => {
-        let comp: CompIntf = null;
-        if (state.fullScreenViewId) {
-            comp = new FullScreenImgViewer();
+
+        switch (state.fullScreenConfig.type) {
+            case FullScreenType.IMAGE:
+                return new FullScreenImgViewer();
+            case FullScreenType.GRAPH:
+                // inconsistent to pass state here. try not to. todo-0
+                return new FullScreenGraphViewer(state);
+            case FullScreenType.CALENDAR:
+                return new FullScreenCalendar();
+            default:
+                return null;
         }
-        else if (state.fullScreenGraphId) {
-            comp = new FullScreenGraphViewer(state);
-        }
-        else if (state.fullScreenCalendarId) {
-            comp = new FullScreenCalendar();
-        }
-        return comp;
     }
 
     getTopMobileBar = (state: AppState): CompIntf => {

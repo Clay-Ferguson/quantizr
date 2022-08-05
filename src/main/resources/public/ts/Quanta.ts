@@ -5,6 +5,7 @@ import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
+import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
@@ -232,7 +233,7 @@ export class Quanta {
                             case "ArrowLeft":
                                 if (this.keyDebounce()) return;
                                 // S.nav.navUpLevel();
-                                if (state.fullScreenViewId) {
+                                if (state.fullScreenConfig.type===FullScreenType.IMAGE) {
                                     S.nav.prevFullScreenImgViewer(state);
                                 }
                                 break;
@@ -241,7 +242,7 @@ export class Quanta {
                                 if (this.keyDebounce()) return;
                                 state = getAppState();
                                 // S.nav.navOpenSelectedNode(state);
-                                if (state.fullScreenViewId) {
+                                if (state.fullScreenConfig.type===FullScreenType.IMAGE) {
                                     S.nav.nextFullScreenImgViewer(state);
                                 }
                                 break;

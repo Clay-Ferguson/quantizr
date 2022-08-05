@@ -11,7 +11,7 @@ export class FullScreenImgViewer extends Main {
 
     preRender(): void {
         const state = useAppState();
-        const nodeId = state.fullScreenViewId;
+        const nodeId = state.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNodeById(state, nodeId);
 
         if (!node) {
