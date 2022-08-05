@@ -59,7 +59,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     }
 
     focus(): void {
-        this.onMount(this.input?.focus);
+        this.onMount(() => this.input?.focus());
     }
 
     preRender(): void {

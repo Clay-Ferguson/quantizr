@@ -20,7 +20,7 @@ export class SearchFileSystemDlg extends DialogBase {
 
     constructor() {
         super("Search File System");
-        this.onMount(this.searchTextField?.focus);
+        this.onMount(() => this.searchTextField?.focus());
         this.searchTextState.setValue(SearchFileSystemDlg.defaultSearchText);
         this.validatedStates = [this.searchTextState];
     }

@@ -7,8 +7,6 @@ import { S } from "../../Singletons";
 import { TimelineRSInfo } from "../../TimelineRSInfo";
 import { TimelineResultSetView } from "../TimelineResultSetView";
 import * as J from "../../JavaIntf";
-
-// todo-0: put all classes that implement TabIntf in same subfolder
 export class TimelineResultSetViewData implements TabIntf<TimelineRSInfo> {
     name = "Timeline";
     tooltip = "Reverse-chronological list of the entire subgraph of all nodes under one node"

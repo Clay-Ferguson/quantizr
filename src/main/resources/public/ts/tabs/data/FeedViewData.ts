@@ -15,30 +15,7 @@ export class FeedViewData implements TabIntf<FeedViewProps> {
     tooltip = "Reverse-chronological list of Fediverse posts";
     id = C.TAB_FEED;
     scrollPos = 0;
-
-    // todo-0: need to makeout interface a 'class' and just construct it here.
-    props: FeedViewProps = {
-        page: 0,
-        refreshCounter: 0,
-        autoRefresh: true,
-        searchTextState: new ValidatedState<any>(),
-        feedFilterFriends: false,
-        feedFilterToMe: false,
-        feedFilterFromMe: false,
-        feedFilterToUser: null, 
-        feedFilterToPublic: true,
-        feedFilterLocalServer: false,
-        applyAdminBlocks: true,
-
-        /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
-         for any non-node specific feed query this stays null. */
-        feedFilterRootNode: null, 
-        feedDirty: false,
-        feedLoading: false,
-        feedResults: null,
-        feedEndReached: false
-    };
-
+    props = new FeedViewProps();
     openGraphComps: OpenGraphPanel[] = [];
 
     static inst: FeedViewData = null;

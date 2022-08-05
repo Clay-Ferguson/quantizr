@@ -49,7 +49,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
     // Overriding base class so we can focus the correct part of this composite component.
     focus(): void {
-        this.onMount(this.input?.focus);
+        this.onMount(() => this.input?.focus());
     }
 
     insertTextAtCursor(text: string) {

@@ -23,16 +23,13 @@ export class ShareToPersonDlg extends DialogBase {
 
     super_validate = this.validate;
     validate = (): boolean => {
-        if (!this.super_validate()) return false;
+        let valid = this.super_validate();
 
-        let valid = true;
         if (this.userNameState.getValue() === getAppState().userName) {
             this.userNameState.setError("You can't share a node to yourself.");
             valid = false;
         }
         else {
-            // todo-0: does our new validation architecture account for clearing error messages like this in all cases?
-            // or does the react re-render clean it up by having all new objects?
             this.userNameState.setError(null);
         }
 

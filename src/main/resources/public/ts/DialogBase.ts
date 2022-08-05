@@ -208,19 +208,20 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
-        const titleChildren: CompIntf[] = [this.getTitleIconComp(),
-        useTitle ? new Span(useTitle) : null,
-        ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
-        new Div(null, { className: "app-modal-title-close-icon float-end" }, [
-            new Icon({
-                className: "fa fa-times fa-lg",
-                onClick: () => {
-                    this.closeByUser();
-                    this.close();
-                },
-                title: "Close Dialog"
-            })
-        ])
+        const titleChildren: CompIntf[] = [
+            this.getTitleIconComp(),
+            useTitle ? new Span(useTitle) : null,
+            ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
+            new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+                new Icon({
+                    className: "fa fa-times fa-lg",
+                    onClick: () => {
+                        this.closeByUser();
+                        this.close();
+                    },
+                    title: "Close Dialog"
+                })
+            ])
         ];
 
         this.setChildren([

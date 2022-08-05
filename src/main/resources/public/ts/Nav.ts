@@ -352,8 +352,8 @@ export class Nav {
         id = S.util.allowIdFromEvent(evt, id);
         const state = getAppState();
 
-        const node = state.idToNodeMap.get(id);
         // Try to get node from local memory...
+        const node = state.idToNodeMap.get(id);
         if (node) {
             setTimeout(() => {
                 if (FeedViewData.inst) {
@@ -480,7 +480,7 @@ export class Nav {
         return newNode;
     }
 
-    messages = (props: FeedViewProps) => {
+    messages = (props: any) => {
         if (!FeedViewData.inst) {
             return;
         }

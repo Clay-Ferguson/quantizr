@@ -26,6 +26,9 @@ export class ValidatedState<S> {
         if (!ret) {
             this.setError(errors.join(","));
         }
+        else {
+            this.setError(null);
+        }
         return ret;
     }
 
