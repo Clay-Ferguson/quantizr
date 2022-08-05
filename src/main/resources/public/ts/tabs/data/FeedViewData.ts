@@ -4,11 +4,10 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { ValidatedState } from "../../ValidatedState";
 import { FeedView } from "../FeedView";
 import { FeedViewProps } from "../FeedViewProps";
-import * as J from "../../JavaIntf";
 
 export class FeedViewData implements TabIntf<FeedViewProps> {
     name = "Feed";
@@ -26,12 +25,18 @@ export class FeedViewData implements TabIntf<FeedViewProps> {
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
-    findNode = (nodeId: string): J.NodeInfo => {
-        return this.props.feedResults.find(n => n.id === nodeId);
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        return this.props.feedResults?.find(n => n.id === nodeId);
     }
 
-    nodeDeleted = (nodeId: string): void => {
-        this.props.feedResults = this.props.feedResults.filter(n => nodeId !== n.id);
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+        this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        this.props.feedResults = this.props.feedResults?.map(n => {
+            return n.id === newNode.id ? newNode : n;
+        });
     }
 
     getTabSubOptions = (state: AppState): Div => {

@@ -3,10 +3,10 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import * as J from "../../JavaIntf";
 import { ValidatedState } from "../../ValidatedState";
 import { IPFSFilesView } from "../IPFSFilesView";
 import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
-import * as J from "../../JavaIntf";
 
 export class IPFSViewData implements TabIntf<any> {
     name = "IPFS Explorer";
@@ -33,10 +33,13 @@ export class IPFSViewData implements TabIntf<any> {
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (nodeId: string): void => {
+    nodeDeleted = (state: AppState, nodeId: string): void => {
     }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    }   
 }

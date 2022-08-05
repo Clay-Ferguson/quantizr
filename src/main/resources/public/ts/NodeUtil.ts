@@ -144,13 +144,11 @@ export class NodeUtil {
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
         // first look in normal tree map for main view.
         let node = state.idToNodeMap.get(nodeId);
-        if (!node) {
-            node = FeedViewData.inst?.props?.feedResults?.find((n: any) => n.id === nodeId);
-        }
 
+        // if not found look everywher else.
         if (!node) {
             for (const data of state.tabData) {
-                node = data.findNode(nodeId);
+                node = data.findNode(state, nodeId);
                 if (node) break;
             }
         }

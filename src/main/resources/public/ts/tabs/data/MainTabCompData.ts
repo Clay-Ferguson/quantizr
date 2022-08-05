@@ -1,3 +1,4 @@
+import { getAppState } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { AppNavLink } from "../../comp/core/AppNavLink";
@@ -25,11 +26,23 @@ export class MainTabCompData implements TabIntf<any> {
     isVisible = (state: AppState) => true;
     constructView = (data: TabIntf) => new MainTabComp(data);
 
-    findNode = (nodeId: string): J.NodeInfo => {
-        return null;
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        if (!state.node) return null;
+        if (state.node.id === nodeId) return state.node;
+        return state.node.children?.find(n => n.id === nodeId);
     }
 
-    nodeDeleted = (nodeId: string): void => {
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+        if (!state.node) return;
+        state.node.children = state.node.children?.filter(n => nodeId !== n.id);
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        if (!state.node || !state.node.children) return;
+
+        state.node.children = state.node.children.map(n => {
+            return n.id === newNode.id ? newNode : n;
+        });
     }
 
     getTabSubOptions = (state: AppState): Div => {

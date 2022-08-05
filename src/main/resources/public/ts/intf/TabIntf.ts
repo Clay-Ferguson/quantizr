@@ -25,8 +25,9 @@ export interface TabIntf<T = any> {
     isVisible(state: AppState): boolean;
 
     // tabs are required to be able to search their known nodes and find any that are found, or null if not found
-    findNode(nodeId: string): J.NodeInfo;
-    nodeDeleted(nodeId: string): void;
+    findNode(state: AppState, nodeId: string): J.NodeInfo;
+    nodeDeleted(state: AppState, nodeId: string): void;
+    replaceNode(state: AppState, newNode: J.NodeInfo): void;
 
     props: T;
 

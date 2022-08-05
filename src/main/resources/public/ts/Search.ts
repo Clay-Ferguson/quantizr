@@ -265,7 +265,7 @@ export class Search {
 
     removeNodeById = (id: string, state: AppState) => {
         state.tabData.forEach((td: TabIntf) => {
-            td.nodeDeleted(id);
+            td.nodeDeleted(state, id);
         });
     }
 

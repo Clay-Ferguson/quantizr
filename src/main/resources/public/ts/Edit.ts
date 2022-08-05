@@ -13,7 +13,6 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 import { FeedViewData } from "./tabs/data/FeedViewData";
-import { FeedView } from "./tabs/FeedView";
 
 export class Edit {
 
@@ -337,13 +336,8 @@ export class Edit {
                 }
             }
 
-            // If we're on some tab other than MAIN (tree) we don't need to update anything.
-            if (state.activeTab !== C.TAB_MAIN) {
-                return;
-            }
-
             // find and update the history item if it exists.
-            const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
+            const histItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                 return h.id === node.id;
             });
             if (histItem) {
@@ -353,7 +347,6 @@ export class Edit {
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
             // and so before refreshing the screen we check for that edge case.
             // console.log("saveNodeResponse: " + S.util.prettyPrint(node));
-
             let parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
@@ -363,13 +356,11 @@ export class Edit {
                 parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
             }
 
+            await this.refreshNodeFromServer(node.id);
+
             // if 'node.id' is not being displayed on the page we need to jump to it from scratch
-            if (!S.nodeUtil.getDisplayingNode(state, node.id)) {
+            if (state.activeTab === C.TAB_MAIN && !S.nodeUtil.getDisplayingNode(state, node.id)) {
                 S.view.jumpToId(node.id);
-            }
-            // otherwise we just pull down the new node data and replace it into our 'state.node.children' (or page root) and we're done.
-            else {
-                this.refreshNodeFromServer(node.id);
             }
 
             if (state.fullScreenConfig.type === FullScreenType.CALENDAR) {
@@ -378,7 +369,7 @@ export class Edit {
         }
     }
 
-    refreshNodeFromServer = async (nodeId: string) => {
+    refreshNodeFromServer = async (nodeId: string): Promise<void> => {
         // console.log("refreshNodeFromServer: " + nodeId);
         const state = getAppState();
 
@@ -407,13 +398,12 @@ export class Edit {
                 res.node.children = s.node.children;
                 s.node = res.node;
             }
-            // otherwise a child
-            else if (s.node?.children) {
-                // replace the old node with the new node.
-                s.node.children = s.node.children.map(node => {
-                    return node.id === res.node.id ? res.node : node;
-                });
-            }
+
+            // make all tabs update their copy of the node of they have it
+            state.tabData.forEach((td: TabIntf) => {
+                td.replaceNode(s, res.node);
+            });
+
             S.nodeUtil.updateNodeMap(res.node, s);
             return s;
         });

@@ -2,10 +2,10 @@ import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import * as J from "../../JavaIntf";
 import { SharesRSInfo } from "../../SharesRSInfo";
 import { S } from "../../Singletons";
 import { SharedNodesResultSetView } from "../SharedNodesResultSetView";
-import * as J from "../../JavaIntf";
 
 export class SharedNodesResultSetViewData implements TabIntf<SharesRSInfo> {
     name = "Shared Nodes";
@@ -23,11 +23,17 @@ export class SharedNodesResultSetViewData implements TabIntf<SharesRSInfo> {
         SharedNodesResultSetViewData.inst = this;
     }
 
-    findNode = (nodeId: string): J.NodeInfo => {
-        return this.props.results.find(n => n.id === nodeId);
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        return this.props.results?.find(n => n.id === nodeId);
     }
 
-    nodeDeleted = (nodeId: string): void => {
-        this.props.results = this.props.results.filter(n => nodeId !== n.id);
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+        this.props.results = this.props.results?.filter(n => nodeId !== n.id);
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        this.props.results = this.props.results?.map(n => {
+            return n.id === newNode.id ? newNode : n;
+        });
     }
 }

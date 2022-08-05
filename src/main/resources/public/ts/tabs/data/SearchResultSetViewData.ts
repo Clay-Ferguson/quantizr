@@ -3,10 +3,10 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
+import * as J from "../../JavaIntf";
 import { ResultSetInfo } from "../../ResultSetInfo";
 import { S } from "../../Singletons";
 import { SearchResultSetView } from "../SearchResultSetView";
-import * as J from "../../JavaIntf";
 
 export class SearchResultSetViewData implements TabIntf<ResultSetInfo> {
     name = "Search";
@@ -25,11 +25,19 @@ export class SearchResultSetViewData implements TabIntf<ResultSetInfo> {
     constructView = (data: TabIntf) => new SearchResultSetView(data)
     getTabSubOptions = (state: AppState): Div => { return null; };
 
-    findNode = (nodeId: string): J.NodeInfo => {
-        return this.props.results.find(n => n.id === nodeId);
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        return this.props.results?.find(n => n.id === nodeId);
     }
 
-    nodeDeleted = (nodeId: string): void => {
-        this.props.results = this.props.results.filter(n => nodeId !== n.id);
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+        this.props.results = this.props.results?.filter(n => nodeId !== n.id);
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        if (!this.props.results) return;
+
+        this.props.results = this.props.results?.map(n => {
+            return n.id === newNode.id ? newNode : n;
+        });
     }
 }

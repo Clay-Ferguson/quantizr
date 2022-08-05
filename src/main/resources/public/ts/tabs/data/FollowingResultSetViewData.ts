@@ -4,9 +4,9 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { FollowingRSInfo } from "../../FollowingRSInfo";
 import { TabIntf } from "../../intf/TabIntf";
+import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { FollowingResultSetView } from "../FollowingResultSetView";
-import * as J from "../../JavaIntf";
 
 export class FollowingResultSetViewData implements TabIntf<FollowingRSInfo> {
     name = "Following";
@@ -25,11 +25,17 @@ export class FollowingResultSetViewData implements TabIntf<FollowingRSInfo> {
     constructView = (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 
-    findNode = (nodeId: string): J.NodeInfo => {
-        return this.props.results.find(n => n.id === nodeId);
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        return this.props.results?.find(n => n.id === nodeId);
     }
 
-    nodeDeleted = (nodeId: string): void => {
-        this.props.results = this.props.results.filter(n => nodeId !== n.id);
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+        this.props.results = this.props.results?.filter(n => nodeId !== n.id);
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+        this.props.results = this.props.results?.map(n => {
+            return n.id === newNode.id ? newNode : n;
+        });
     }
 }

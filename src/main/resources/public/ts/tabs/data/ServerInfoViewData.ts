@@ -3,8 +3,8 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
-import { ServerInfoView } from "../ServerInfoView";
 import * as J from "../../JavaIntf";
+import { ServerInfoView } from "../ServerInfoView";
 
 export class ServerInfoViewData implements TabIntf<any> {
     name = "Info View";
@@ -26,10 +26,13 @@ export class ServerInfoViewData implements TabIntf<any> {
     constructView = (data: TabIntf) => new ServerInfoView(data);
     getTabSubOptions = (state: AppState): Div => { return null; };
 
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (nodeId: string): void => {
+    nodeDeleted = (state: AppState, nodeId: string): void => {
+    }
+
+    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
     }
 }
