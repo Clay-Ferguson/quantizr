@@ -66,12 +66,14 @@ public class ActPubFollowing extends ServiceBase {
 
                 // if not found in cache, get it the harder way.
                 if (no(actorUrlOfUserBeingFollowed)) {
-                    actorUrlOfUserBeingFollowed = apub.getUserProperty(ms, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
+                    actorUrlOfUserBeingFollowed =
+                            apub.getUserProperty(ms, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
 
                     // if we got the actor url put it in the cache now.
                     if (ok(actorUrlOfUserBeingFollowed)) {
                         // are there othere places we can take advantage and load this cache, by chance? #todo-optimization
-                        // (yes I looked, there's about 20ish other places we can take advantage of having both these and just cram into cache)
+                        // (yes I looked, there's about 20ish other places we can take advantage of having both these and
+                        // just cram into cache)
                         apCache.actorUrlsByUserName.put(apUserName, actorUrlOfUserBeingFollowed);
                     }
                 }
@@ -263,7 +265,7 @@ public class ActPubFollowing extends ServiceBase {
      */
     @PerfMon(category = "apFollowing")
     public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
-        List<String> following = getFollowing(userName, minId);
+        List<String> following = getFollowing(userName, true, true, minId);
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
@@ -330,39 +332,43 @@ public class ActPubFollowing extends ServiceBase {
      * Returns following for LOCAL users only 'userName'. This doesn't use ActPub or query any remote
      * servers
      * 
-     * Returns a list of all the 'actor urls' for all the users that 'userName' is following
+     * Returns a list of all the 'actor urls' for all the users that 'userName' is following.
+     * 
+     * todo-0: do paging. Implement minId.
      */
-    public List<String> getFollowing(String userName, String minId) {
+    public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId) {
         final List<String> following = new LinkedList<>();
-        log.debug("getFollowing of user: " + userName + " minId=" + minId);
+        // log.debug("getFollowing of user: " + userName);
 
         arun.run(ms -> {
             Iterable<SubNode> iter = findFollowingOfUser(ms, userName);
 
             for (SubNode n : iter) {
-                // log.debug("    Found Friend Node: " + n.getIdStr());
+                // log.debug(" Found Friend Node: " + n.getIdStr());
                 // if this Friend node is a foreign one it will have the actor url property
-                // fyi: we had ACT_PUB_ACTOR_URL here before, which was a bug.
-                String remoteActorUrl = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);
+                String remoteActorId = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
                 // this will be non-null if it's a remote account.
-                if (ok(remoteActorUrl)) {
-                    following.add(remoteActorUrl);
+                if (ok(remoteActorId)) {
+                    if (foreignUsers) {
+                        following.add(remoteActorId);
+                    }
                 }
                 // otherwise, it's a local user, and we know how to build the Actor URL of our own users.
                 else {
-                    // the name on the account that owns the Friend node in his Friends List, is the "Follower"
-                    String followingUserName = n.getStr(NodeProp.USER);
+                    if (localUsers) {
+                        // the name on the account that owns the Friend node in his Friends List, is the "Follower"
+                        String followingUserName = n.getStr(NodeProp.USER);
 
-                    // sanity check that name doesn't contain '@' making it a foreign user.
-                    if (!followingUserName.contains("@")) {
-                        following.add(apUtil.makeActorUrlForUserName(followingUserName));
+                        // sanity check that name doesn't contain '@' making it a foreign user.
+                        if (!followingUserName.contains("@")) {
+                            following.add(apUtil.makeActorUrlForUserName(followingUserName));
+                        }
                     }
                 }
             }
             return null;
         });
-
         return following;
     }
 

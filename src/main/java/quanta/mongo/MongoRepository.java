@@ -68,7 +68,6 @@ public class MongoRepository extends ServiceBase {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
-		// todo-0: review hos this is guaranteed to be happening first on ALL ServiceBase classes
 		ServiceBase.init(event.getApplicationContext());
 		log.debug("ContextRefreshedEvent");
 		if (initialized)

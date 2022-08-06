@@ -80,6 +80,7 @@ public class ActPubService extends ServiceBase {
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
     public static boolean refreshingForeignUsers = false;
+    public static boolean scanningForeignUsers = false;
     public static int NUM_CURATED_ACCOUNTS = 1500;
 
     public void sendLikeMessage(MongoSession ms, String userDoingLike, SubNode node) {
@@ -1552,10 +1553,11 @@ public class ActPubService extends ServiceBase {
 
                 /*
                  * To limit load on our server we do a sleep here, making sure to do a 4s sleep if we're accessing
-                 * the same server twice in a row or a 1s sleep if it's a different server. Accessing the same server
-                 * too fast without any delays can make them start blocking/throttling us.
+                 * the same server twice in a row or a 1s sleep if it's a different server. Accessing the same
+                 * server too fast without any delays can make them start blocking/throttling us.
                  * 
-                 * upate: I was seeing a performance lag, so I'm setting to 4000ms for each cycle for now regardless.
+                 * upate: I was seeing a performance lag, so I'm setting to 4000ms for each cycle for now
+                 * regardless.
                  */
                 Thread.sleep(server.equals(lastServer) ? 4000 : 2000);
                 lastServer = server;
@@ -1723,7 +1725,64 @@ public class ActPubService extends ServiceBase {
         return count;
     }
 
+    public void identifyFollowedAccounts() {
+        if (!prop.isActPubEnabled() || scanningForeignUsers)
+            return;
+
+        arun.run(ms -> {
+            if (scanningForeignUsers)
+                return null;
+
+            try {
+                scanningForeignUsers = true;
+
+                Iterable<SubNode> accountNodes =
+                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+
+                for (SubNode node : accountNodes) {
+                    if (!prop.isDaemonsEnabled())
+                        break;
+
+                    String userName = node.getStr(NodeProp.USER);
+
+                    // if a foreign account we skip it.
+                    if (no(userName) || userName.contains("@"))
+                        continue;
+
+                    // we query for only the foreign users this local user is following
+                    List<String> following = apFollowing.getFollowing(userName, true, false, null);
+
+                    // todo-0: this info should be saved so we can dump it out in a "server info" printout for admin
+                    log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
+                    synchronized (apCache.followedUsers) {
+                        apCache.followedUsers.addAll(following);
+                    }
+                }
+
+                StringBuilder sb = new StringBuilder();
+                synchronized (apCache.followedUsers) {
+                    apCache.followedUsers.forEach(user -> {
+                        sb.append(user + "\n");
+                    });
+                }
+                // need a 'server info' query that can dump these out for the admin user to see in browser.
+                log.debug("FOLLOWED USERS: " + sb.toString());
+
+            } finally {
+                scanningForeignUsers = false;
+            }
+            return null;
+        });
+    }
+
+    /*
+     * NEW LOGIC (Work in Progress), we will be crawling ONLY the accounts that are not currently being
+     * followed by any Quanta users, becuase accounts that are followed will be getting the data pushed
+     * to the inbox and will not need to be "pulled" by this crawler.
+     */
     public void refreshForeignUsers() {
+        identifyFollowedAccounts();
+
         if (!prop.isActPubEnabled() || refreshingForeignUsers)
             return;
 
@@ -1763,6 +1822,7 @@ public class ActPubService extends ServiceBase {
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
+                int pushSkipCounter = 0;
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
                         break;
@@ -1772,12 +1832,29 @@ public class ActPubService extends ServiceBase {
                         continue;
 
                     String userName = node.getStr(NodeProp.USER);
+
+                    // if not a forgien account ignore
                     if (no(userName) || !userName.contains("@"))
                         continue;
+
+                    // if account is being followed by someone, ignore. No need to pull when we're expecting
+                    // to get pushes.
+                    String remoteActorId = node.getStr(NodeProp.ACT_PUB_ACTOR_ID);
+                    synchronized (apCache.followedUsers) {
+                        if (ok(remoteActorId) && apCache.followedUsers.contains(remoteActorId)) {
+                            // todo-0: eventually remove this logging
+                            log.debug("SKIP CRAWL: " + remoteActorId);
+                            pushSkipCounter++;
+                            continue;
+                        }
+                    }
 
                     refreshForeignUsersQueuedCount++;
                     queueUserForRefresh(userName, true);
                 }
+
+                log.debug("refreshForeignUsers skipped " + String.valueOf(pushSkipCounter)
+                        + " becasue they're followed by someone.");
 
                 /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
                 synchronized (NodeSearchService.trendingFeedInfoLock) {

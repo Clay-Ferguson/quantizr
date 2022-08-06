@@ -59,6 +59,8 @@ public class ActPubCache extends ServiceBase {
     /* Maps the string representation of a key to the PrivateKey object */
     public final ConcurrentHashMap<String, PrivateKey> privateKeys = new ConcurrentHashMap<>();
 
+    public final HashSet<String> followedUsers = new HashSet<>();
+
     /*
      * Update cache, when nodes chagne. Yes, this is a bit of a tight-coupling to be calling this from
      * the MongoEventListener, when we could be using more of a pub-sub mode.

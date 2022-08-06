@@ -1383,7 +1383,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			 */
 			map = (HashMap<String, Object>) map.clone();
 
-			// todo-0: is userMessage still in use?
 			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
 			ThreadLocals.getSC().setUserMessage(null);
 		}

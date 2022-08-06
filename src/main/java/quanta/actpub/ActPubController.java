@@ -36,7 +36,7 @@ public class ActPubController extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired
-    private ActPubLog apLog;
+	private ActPubLog apLog;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -96,8 +96,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON
-	})
+			APConst.CTYPE_LD_JSON})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
 		apLog.trace("getActor: " + userName);
@@ -123,7 +122,10 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest req) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apLog.trace("shared INBOX incoming payload: " + XString.prettyPrint(payload));
+
+			// todo-0: temporarily logging all (change back to apLog.trace)
+			log.debug("INBOX (shared): " + XString.prettyPrint(payload));
+
 			ActPubService.inboxCount++;
 			apub.processInboxPost(req, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -149,7 +151,10 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apLog.trace("User INBOX incoming: " + XString.prettyPrint(payload));
+			
+			// todo-0: temporarily logging all (change back to apLog.trace)
+			log.debug("INBOX[" + userName + "]: " + XString.prettyPrint(payload));
+
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -188,8 +193,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON
-	})
+			APConst.CTYPE_LD_JSON})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
@@ -226,8 +230,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON
-	})
+			APConst.CTYPE_LD_JSON})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
@@ -255,8 +258,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_LD_JSON
-	})
+			APConst.CTYPE_LD_JSON})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
