@@ -1,5 +1,5 @@
 import { AppState } from "../AppState";
-import { NodeActionType } from "../enums/NodeActionType";
+import { NodeActionType } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 

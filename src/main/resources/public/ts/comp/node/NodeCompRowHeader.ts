@@ -7,7 +7,7 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { UserProfileDlg } from "../../dlg/UserProfileDlg";
-import { NodeActionType } from "../../enums/NodeActionType";
+import { NodeActionType } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";

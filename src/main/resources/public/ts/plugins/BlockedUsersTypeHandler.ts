@@ -2,8 +2,8 @@ import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { NodeActionType } from "../enums/NodeActionType";
 import { TabIntf } from "../intf/TabIntf";
+import { NodeActionType } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 

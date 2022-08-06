@@ -5,8 +5,8 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
-import { NodeActionType } from "../enums/NodeActionType";
 import { TabIntf } from "../intf/TabIntf";
+import { NodeActionType } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 

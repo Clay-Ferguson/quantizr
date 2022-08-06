@@ -16,10 +16,9 @@ import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { NodeActionType } from "./enums/NodeActionType";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
+import { NodeActionType, TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { NodeMetaIntf } from "./JavaIntf";
 import { PubSub } from "./PubSub";

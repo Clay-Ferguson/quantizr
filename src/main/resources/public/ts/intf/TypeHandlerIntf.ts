@@ -1,5 +1,4 @@
 import { AppState } from "../AppState";
-import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -29,3 +28,8 @@ export interface TypeHandlerIntf {
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;
 }
+
+export enum NodeActionType {
+    /* eslint-disable no-unused-vars */
+    addChild, editNode, insert, upload, delete, share
+};

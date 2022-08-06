@@ -8,7 +8,7 @@ import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
-import { NodeActionType } from "../../enums/NodeActionType";
+import { NodeActionType } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 

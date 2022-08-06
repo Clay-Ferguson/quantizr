@@ -1,11 +1,11 @@
 import { AppState } from "../AppState";
-import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
+import { NodeActionType } from "../intf/TypeHandlerIntf";
 
 export class BookmarkListTypeHandler extends TypeBase {
     constructor() {
