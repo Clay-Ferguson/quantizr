@@ -13,7 +13,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import { Value } from "../Value";
 import { MessageDlg } from "./MessageDlg";
 
@@ -24,7 +24,7 @@ interface LS { // Local State
 
 export class ExportDlg extends DialogBase {
 
-    fileNameState: ValidatedState = new ValidatedState();
+    fileNameState: Validator = new Validator();
     saveToIpfsState: Value<boolean> = new Value<boolean>(this, "toIpfs");
 
     constructor(private node: NodeInfo) {

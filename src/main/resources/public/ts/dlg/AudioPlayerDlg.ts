@@ -11,7 +11,7 @@ import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 
 /**
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing
@@ -40,7 +40,7 @@ export class AudioPlayerDlg extends DialogBase {
     urlHash: string;
 
     timeLeftTextField: TextField;
-    timeLeftState: ValidatedState = new ValidatedState();
+    timeLeftState: Validator = new Validator();
 
     intervalTimer: any;
     playButton: Icon;

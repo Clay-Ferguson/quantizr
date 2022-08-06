@@ -6,10 +6,10 @@ import { TextArea } from "../comp/core/TextArea";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 
 export class ImportCryptoKeyDlg extends DialogBase {
-    keyState: ValidatedState = new ValidatedState();
+    keyState: Validator = new Validator();
 
     constructor() {
         super("Import Key Pair", "app-modal-content-medium-width");

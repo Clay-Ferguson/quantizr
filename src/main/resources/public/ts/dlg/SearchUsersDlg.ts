@@ -12,7 +12,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 
 interface LS { // Local State
     fuzzy?: boolean;
@@ -24,7 +24,7 @@ export class SearchUsersDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState = new ValidatedState();
+    searchTextState: Validator = new Validator();
 
     constructor() {
         super("Search Users", "app-modal-content-medium-width");

@@ -7,10 +7,10 @@ import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 
 export class EditTagsDlg extends DialogBase {
-    tagsState: ValidatedState = new ValidatedState();
+    tagsState: Validator = new Validator();
 
     constructor() {
         super("Edit Hashtags", "app-modal-content-medium-width");

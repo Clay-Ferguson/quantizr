@@ -1,6 +1,6 @@
 import * as I from "../../Interfaces";
 import { S } from "../../Singletons";
-import { ValidatedState } from "../../ValidatedState";
+import { Validator } from "../../Validator";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
 import { Span } from "./Span";
@@ -14,7 +14,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
-    constructor(private label: string, attribs: any, private valState: ValidatedState, moreClasses: string = "", public calcRows: boolean = false) {
+    constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "", public calcRows: boolean = false) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 

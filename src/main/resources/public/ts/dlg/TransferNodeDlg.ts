@@ -9,18 +9,18 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
+import { Validator, ValidatorRuleName } from "../Validator";
 
 interface LS { // Local State
     recursive?: boolean;
 }
 
 export class TransferNodeDlg extends DialogBase {
-    toUserState: ValidatedState = new ValidatedState("", [
+    toUserState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    fromUserState: ValidatedState = new ValidatedState();
+    fromUserState: Validator = new Validator();
 
     constructor() {
         super("Transfer Node", "app-modal-content-narrow-width");

@@ -7,7 +7,7 @@ import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { S } from "./Singletons";
-import { ValidatedState } from "./ValidatedState";
+import { Validator } from "./Validator";
 
 export abstract class DialogBase extends Div {
 
@@ -28,7 +28,7 @@ export abstract class DialogBase extends Div {
     opened: boolean = false;
     loaded: boolean = false;
 
-    validatedStates: ValidatedState[] = null;
+    validatedStates: Validator[] = null;
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed

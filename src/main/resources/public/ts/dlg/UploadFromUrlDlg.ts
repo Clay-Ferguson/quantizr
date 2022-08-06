@@ -8,13 +8,13 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
+import { Validator, ValidatorRuleName } from "../Validator";
 
 export class UploadFromUrlDlg extends DialogBase {
 
     static storeLocally: boolean = false;
 
-    urlState: ValidatedState = new ValidatedState("", [
+    urlState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

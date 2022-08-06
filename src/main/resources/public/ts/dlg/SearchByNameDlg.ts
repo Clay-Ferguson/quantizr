@@ -6,13 +6,13 @@ import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
-import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
+import { Validator, ValidatorRuleName } from "../Validator";
 
 export class SearchByNameDlg extends DialogBase {
     static defaultSearchText: string = "";
 
     searchTextField: TextField;
-    searchTextState: ValidatedState = new ValidatedState("", [
+    searchTextState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 

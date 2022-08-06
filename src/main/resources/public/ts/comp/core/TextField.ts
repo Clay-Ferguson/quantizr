@@ -1,5 +1,5 @@
 import * as I from "../../Interfaces";
-import { ValidatedState } from "../../ValidatedState";
+import { Validator } from "../../Validator";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { ErrorDiv } from "./ErrorDiv";
@@ -18,7 +18,7 @@ export interface TextFieldConfig {
     enter?: () => void;
     inputClass?: string;
     labelLeft?: boolean;
-    val?: ValidatedState;
+    val?: Validator;
     outterClass?: string;
     placeholder?: string;
 }

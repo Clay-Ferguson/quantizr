@@ -2,7 +2,7 @@ import { State } from "./State";
 import { S } from "./Singletons";
 
 /* todo-2: Finish making this type safe, and don't use 'any' inside here */
-export class ValidatedState {
+export class Validator {
     v: State = new State();
     e: State = new State();
 

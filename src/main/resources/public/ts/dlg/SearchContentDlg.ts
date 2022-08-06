@@ -13,7 +13,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import { SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
@@ -37,7 +37,7 @@ export class SearchContentDlg extends DialogBase {
     };
 
     searchTextField: TextField;
-    searchTextState: ValidatedState = new ValidatedState();
+    searchTextState: Validator = new Validator();
 
     constructor() {
         super("Search");

@@ -7,13 +7,13 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
+import { Validator, ValidatorRuleName } from "../Validator";
 import { MessageDlg } from "./MessageDlg";
 
 export class ChangePasswordDlg extends DialogBase {
 
     passwordField: TextField;
-    pwdState: ValidatedState = new ValidatedState("", [
+    pwdState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MINLEN, payload: 4 }
     ]);

@@ -8,26 +8,26 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
+import { Validator, ValidatorRuleName } from "../Validator";
 
 declare const g_brandingAppName: string;
 
 export class SignupDlg extends DialogBase {
 
-    userState: ValidatedState = new ValidatedState("", [
+    userState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MAXLEN, payload: 25 },
         { name: ValidatorRuleName.USERNAME }
     ]);
 
-    passwordState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
+    passwordState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
 
-    emailState: ValidatedState = new ValidatedState("", [
+    emailState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED },
         { name: ValidatorRuleName.MAXLEN, payload: 50 }
     ]);
 
-    captchaState: ValidatedState = new ValidatedState("", [{ name: ValidatorRuleName.REQUIRED }]);
+    captchaState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
 
     constructor() {
         super("Create Account", "app-modal-content-medium-width");

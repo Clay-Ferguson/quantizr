@@ -1,15 +1,15 @@
 import { S } from "../../Singletons";
-import { ValidatedState } from "../../ValidatedState";
+import { Validator } from "../../Validator";
 import { DateField } from "./DateField";
 import { Span } from "./Span";
 import { TimeField } from "./TimeField";
 
 export class DateTimeField extends Span {
-    dateState: ValidatedState = new ValidatedState();
-    timeState: ValidatedState = new ValidatedState();
+    dateState: Validator = new Validator();
+    timeState: Validator = new Validator();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: ValidatedState) {
+    constructor(private dateTimeState: Validator) {
         super(null);
         this.attribs = {
             ...this.attribs, ...{

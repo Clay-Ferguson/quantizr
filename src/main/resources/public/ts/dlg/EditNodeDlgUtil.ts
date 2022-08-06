@@ -3,7 +3,7 @@ import { DialogMode } from "../DialogBase";
 import { SymKeyDataPackage } from "../Encryption";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg } from "./EditNodeDlg";
 import { LS } from "./EditNodeDlgState";
@@ -323,9 +323,9 @@ export class EditNodeDlgUtil {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        let propState: ValidatedState = dlg.propStates.get(propEntry.name);
+        let propState: Validator = dlg.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new ValidatedState();
+            propState = new Validator();
             dlg.propStates.set(propEntry.name, propState);
         }
 

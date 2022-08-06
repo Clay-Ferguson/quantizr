@@ -1,11 +1,11 @@
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import * as J from "../JavaIntf";
 
 export class FeedViewProps {
     page = 0;
     refreshCounter = 0;
     autoRefresh = true;
-    searchTextState = new ValidatedState();
+    searchTextState = new Validator();
     feedFilterFriends = false;
     feedFilterToMe = false;
     feedFilterFromMe = false;

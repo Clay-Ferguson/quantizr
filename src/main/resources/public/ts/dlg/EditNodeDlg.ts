@@ -27,7 +27,7 @@ import { NodeActionType, TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
@@ -48,12 +48,12 @@ export class EditNodeDlg extends DialogBase {
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
-    contentEditorState: ValidatedState = new ValidatedState();
-    nameState: ValidatedState = new ValidatedState();
-    tagsState: ValidatedState = new ValidatedState();
+    contentEditorState: Validator = new Validator();
+    nameState: Validator = new Validator();
+    tagsState: Validator = new Validator();
 
     // holds a map of states by property names.
-    propStates: Map<string, ValidatedState> = new Map<string, ValidatedState>();
+    propStates: Map<string, Validator> = new Map<string, Validator>();
 
     // todo-1: these should be in our local state really
     static morePanelExpanded: boolean = false;
@@ -734,9 +734,9 @@ export class EditNodeDlg extends DialogBase {
         const label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
-        let propState: ValidatedState = this.propStates.get(propEntry.name);
+        let propState: Validator = this.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new ValidatedState(propEntry.value);
+            propState = new Validator(propEntry.value);
             this.propStates.set(propEntry.name, propState);
         }
 

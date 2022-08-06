@@ -16,7 +16,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
+import { Validator } from "../Validator";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 interface LS { // Local State
@@ -25,8 +25,8 @@ interface LS { // Local State
 
 export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
-    bioState: ValidatedState = new ValidatedState();
-    displayNameState: ValidatedState = new ValidatedState();
+    bioState: Validator = new Validator();
+    displayNameState: Validator = new Validator();
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */

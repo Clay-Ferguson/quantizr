@@ -4,7 +4,7 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
-import { ValidatedState } from "../../ValidatedState";
+import { Validator } from "../../Validator";
 import { IPFSFilesView } from "../IPFSFilesView";
 import { IPFSFilesViewProps } from "../IPFSFilesViewProps";
 
@@ -14,7 +14,7 @@ export class IPFSTab implements TabIntf<any> {
     id = C.TAB_IPFSVIEW;
     scrollPos = 0;
     props = {
-        cidField: new ValidatedState()
+        cidField: new Validator()
     };
 
     openGraphComps: OpenGraphPanel[] = [];
