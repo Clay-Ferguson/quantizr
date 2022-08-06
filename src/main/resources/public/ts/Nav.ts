@@ -408,6 +408,7 @@ export class Nav {
     closeFullScreenViewer = (appState: AppState) => {
         dispatch("CloseFullScreenViewer", s => {
             s.fullScreenConfig = { type: FullScreenType.NONE };
+            s.graphData = null;
             return s;
         });
     }

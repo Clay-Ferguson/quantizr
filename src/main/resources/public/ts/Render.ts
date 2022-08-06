@@ -731,12 +731,18 @@ export class Render {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = (node: J.NodeInfo, searchText: string, state: AppState) => {
+    showGraph = async (node: J.NodeInfo, searchText: string, state: AppState) => {
         node = node || S.nodeUtil.getHighlightedNode(state);
+
+        const res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+            searchText,
+            nodeId: node.id
+        });
 
         dispatch("ShowGraph", s => {
             s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
+            s.graphData = res.rootNode;
             return s;
         });
     }

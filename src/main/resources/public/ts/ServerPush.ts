@@ -50,7 +50,7 @@ export class ServerPush {
             // window.location.href = window.location.origin;
 
             let message = "";
-            const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
+            const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA, "all");
             if (editorData?.nodeId && editorData?.content) {
                 message = "<p><p>Click to resume editing.";
             }

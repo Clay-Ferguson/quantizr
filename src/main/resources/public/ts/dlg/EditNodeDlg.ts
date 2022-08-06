@@ -128,9 +128,13 @@ export class EditNodeDlg extends DialogBase {
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: state.node.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
-                });
+                }, "all");
             }, 3000);
         }
+    }
+
+    domRemoveEvent = () => {
+        this.resetAutoSaver();
     }
 
     resetAutoSaver = async () => {
@@ -138,7 +142,7 @@ export class EditNodeDlg extends DialogBase {
             clearInterval(EditNodeDlg.autoSaveTimer);
             EditNodeDlg.autoSaveTimer = null;
         }
-        await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
+        S.localDB.setVal(C.STORE_EDITOR_DATA, null, "all");
     }
 
     createLayoutSelection = (): Selection => {

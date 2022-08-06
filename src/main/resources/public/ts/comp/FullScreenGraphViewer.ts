@@ -1,60 +1,37 @@
 import * as d3 from "d3";
-import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
+import { getAppState } from "../AppRedux";
+import { Div } from "../comp/core/Div";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Div } from "../comp/core/Div";
 import { Main } from "./Main";
 
 // https://observablehq.com/@d3/force-directed-tree
 // https://www.npmjs.com/package/d3
 // https://d3js.org/
 
-interface LS { // Local State
-    data: J.GraphNode;
-}
-
 export class FullScreenGraphViewer extends Main {
-    nodeId: string;
     simulation: any;
     tooltip: any;
     isDragging: boolean;
-
-    constructor(appState: AppState) {
-        super();
-        this.nodeId = appState.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNodeById(appState, this.nodeId);
-
-        if (!node) {
-            console.log("Can't find nodeId " + this.nodeId);
-        }
-
-        (async () => {
-            const res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
-                searchText: appState.graphSearchText,
-                nodeId: this.nodeId
-            });
-            this.mergeState<LS>({ data: res.rootNode });
-        })();
-    }
 
     preRender(): void {
         this.setChildren([new Div(null, { className: "d3Graph" })]);
     }
 
     domPreUpdateEvent = () => {
-        const state = this.getState<LS>();
-        if (!state.data) return;
-
+        const appState = getAppState();
+        if (!appState.graphData) return;
         const customForceDirectedTree = this.forceDirectedTree();
 
         d3.select(".d3Graph")
-            .datum(state.data)
+            .datum(appState.graphData)
             .call(customForceDirectedTree);
     }
 
     forceDirectedTree = () => {
         const thiz = this;
+        const appState = getAppState();
+        const nodeId = appState.fullScreenConfig.nodeId;
 
         return function (selection: any) {
             const margin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -130,7 +107,7 @@ export class FullScreenGraphViewer extends Main {
 
                 .attr("fill", (d: any) => {
                     let color = "transparent";
-                    if (d.data.id === thiz.nodeId) {
+                    if (d.data.id === nodeId) {
                         color = "red";
                     }
                     else if (d.data.highlight) {
@@ -142,7 +119,7 @@ export class FullScreenGraphViewer extends Main {
                     return thiz.getColorForLevel(d.data.level);
                 })
                 .attr("r", (d: any) => {
-                    if (d.data.id === thiz.nodeId) return 5;
+                    if (d.data.id === nodeId) return 5;
                     return 3.5;
                 })
 
@@ -172,7 +149,6 @@ export class FullScreenGraphViewer extends Main {
                         window.open(S.util.getHostAndPort() + "?id=" + d.data.id, "_blank");
                     }
                 })
-
                 .call(drag(simulation));
 
             simulation.on("tick", () => {
@@ -273,9 +249,6 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domUpdateEvent = () => {
-        if (C.DEBUG_SCROLLING) {
-            console.log("scrollTop=0");
-        }
         if (S.view.docElm) {
             // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
             // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'

@@ -85,19 +85,16 @@ export class App extends Main {
     /* This is where we send an event that lets code hook into the render cycle to process whatever needs
         to be done AFTER the main render is complete, like doing scrolling for example */
     domUpdateEvent = () => {
-        // todo-2: based on current scrolling architecture do we still need these pub/sub events?
         PubSub.pub(C.PUBSUB_mainWindowScroll);
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
 
     getFullScreenViewer = (state: AppState): CompIntf => {
-
         switch (state.fullScreenConfig.type) {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
             case FullScreenType.GRAPH:
-                // inconsistent to pass state here. try not to. todo-1
-                return new FullScreenGraphViewer(state);
+                return new FullScreenGraphViewer();
             case FullScreenType.CALENDAR:
                 return new FullScreenCalendar();
             default:

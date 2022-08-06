@@ -141,4 +141,6 @@ export class AppState {
 
     ipsmActive: boolean = false;
     activeMenu: string = null;
+
+    graphData: J.GraphNode;
 }
