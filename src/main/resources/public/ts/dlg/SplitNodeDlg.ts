@@ -95,8 +95,8 @@ export class SplitNodeDlg extends DialogBase {
             (this.getState<LS>().splitMode === "custom") ? new TextField({ label: "Delimiter", val: this.delimiterState }) : null,
 
             new ButtonBar([
-                new Button("Split Node", this.splitNodes, null, "btn-primary"),
-                new Button("Save without Splitting", this.close)
+                new Button("Split", this.splitNodes, null, "btn-primary"),
+                new Button("Save", this.close)
             ], "marginTop")
         ];
     }
