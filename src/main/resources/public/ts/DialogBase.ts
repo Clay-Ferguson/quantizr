@@ -6,11 +6,10 @@ import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
-import { DialogBaseImpl } from "./DialogBaseImpl";
 import { S } from "./Singletons";
 import { ValidatedState } from "./ValidatedState";
 
-export abstract class DialogBase extends Div implements DialogBaseImpl {
+export abstract class DialogBase extends Div {
 
     // ref counter that allows multiple dialogs to be opened on top of each other and only
     // when the final one closes out do we go back to enabling scrolling on body again.
@@ -38,7 +37,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
-
         const appState = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
