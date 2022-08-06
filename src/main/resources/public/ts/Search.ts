@@ -120,7 +120,7 @@ export class Search {
             });
         }
         else {
-            // The most common known reason we can get here due to lack of feature support is when something like 
+            // The most common known reason we can get here due to lack of feature support is when something like
             // a "object.type=Video", or "Question" type, (a type not yet supported) is encountered as we attempted to read the thread.
             let msg = "Thread not available, or contains unsupported post types.";
 

@@ -17,7 +17,8 @@ import { VideoPlayerDlg } from "./VideoPlayerDlg";
 // https://developers.google.com/web/fundamentals/media/recording-audio
 // Need to persist in LOCAL browser storage which input selections (audio/video) are the current choice at all times.
 
-declare var MediaRecorder: any;
+// todo-0: there should be a cleaner way to get this MediaRecorder
+declare const MediaRecorder: any;
 
 interface LS { // Local State
     status?: string;

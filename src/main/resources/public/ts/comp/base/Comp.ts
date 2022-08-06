@@ -10,9 +10,9 @@ import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
 
 /**
- * Base class for all components which encapsulates a lot of React functionality so that our implementation 
+ * Base class for all components which encapsulates a lot of React functionality so that our implementation
  * code can ignore those details.
- * 
+ *
  * For component-local CSS styling see Button.ts. It's simple and involves just passing a 'scope' into this constructor
  * and then using the prefix '$$' in front of the classnames. That's all there is to it.
  */
@@ -207,7 +207,7 @@ export abstract class Comp implements CompIntf {
     }
 
     wrapClick = (obj: any) => {
-        // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to 
+        // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to
         // give the animation time to run.
         if (obj?.onClick && getAppState().mouseEffect) {
             obj.onClick = S.util.delayFunc(obj.onClick);
@@ -252,7 +252,7 @@ export abstract class Comp implements CompIntf {
         return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 
-    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph 
+    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph
     Note: Tag can also be a type here, not just a string.
     */
     tag = (type: any, props?: object, childrenArg?: any[]): ReactNode => {
@@ -373,9 +373,9 @@ export abstract class Comp implements CompIntf {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            // React intermittently has a problem where it say use forwardRef. Even after 
+            // React intermittently has a problem where it say use forwardRef. Even after
             // a ton of testing that all went fine sometimes React will just start complaining with the error that
-            // we should be using forwardRef, which I haven't yet found a way to do that's compatable with the rest 
+            // we should be using forwardRef, which I haven't yet found a way to do that's compatable with the rest
             // of our framework (i.e. this Comp class)
             this.attribs.ref = useRef();
 
@@ -466,9 +466,9 @@ export abstract class Comp implements CompIntf {
 
     /* If a component wants to persist it's scroll position across re-renders, all that's required is to
      override the getScrollPos and setScrollPos, being sure to use a backing variable that is NOT component-scoped
-     (or it could be static var on the component if there's always only one such component to ever exist, as is 
-     the case for example with the LHS panel (menu) or RHS panels of the main app layout) 
-     
+     (or it could be static var on the component if there's always only one such component to ever exist, as is
+     the case for example with the LHS panel (menu) or RHS panels of the main app layout)
+
      Returning null from getScrollPos (the default behavior of this base class) indicates to NOT do any scroll persistence.
      */
     getScrollPos = (): number => {

@@ -387,7 +387,7 @@ export class Nav {
 
             if (!res.node) return;
             S.nodeUtil.updateNodeMap(res.node, state);
-            
+
             if (FeedTab.inst) {
                 FeedTab.inst.props.searchTextState.setValue("");
             }

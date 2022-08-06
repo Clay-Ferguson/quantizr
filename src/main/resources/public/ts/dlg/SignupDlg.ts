@@ -10,7 +10,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 
-declare var g_brandingAppName: string;
+declare const g_brandingAppName: string;
 
 export class SignupDlg extends DialogBase {
 

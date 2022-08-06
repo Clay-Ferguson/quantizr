@@ -19,7 +19,7 @@ export class TransferNodeDlg extends DialogBase {
     toUserState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
-    
+
     fromUserState: ValidatedState = new ValidatedState();
 
     constructor() {

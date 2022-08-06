@@ -7,7 +7,7 @@ import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 
-declare var g_brandingAppName: string;
+declare const g_brandingAppName: string;
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;

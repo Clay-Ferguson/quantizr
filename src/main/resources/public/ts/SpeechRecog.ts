@@ -1,7 +1,7 @@
 import { S } from "./Singletons";
 
-declare var webkitSpeechRecognition: any;
-declare var SpeechRecognition: any;
+declare let webkitSpeechRecognition: any;
+declare let SpeechRecognition: any;
 
 export class SpeechRecog {
     recognition: any = null;

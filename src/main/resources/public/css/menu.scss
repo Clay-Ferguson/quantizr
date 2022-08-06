@@ -12,7 +12,7 @@
 }
 
 .menuPanelItems {
-    border-left: $highlightBorderSize solid $nodeBorderBottomColor;
+    border-left: $highlightBorderSize solid $primary;
     border-radius: 0px !important;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .menuItemSeparator {
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    border-bottom: 1px solid $nodeBorderBottomColor;
 }
 
 .mainMenuItemDisabled {
@@ -86,7 +86,7 @@
 }
 
 .menuHeading:hover {
-    background-color: $menuItemHoverBackgroundColor;
+    background-color: $primary; // $menuItemHoverBackgroundColor;
     border-radius: 0px;
     border: 2px solid gray;
 }

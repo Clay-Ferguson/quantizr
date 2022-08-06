@@ -166,7 +166,7 @@ export class SelectTagsDlg extends DialogBase {
     createTagsPickerList = (): Div => {
         const state = this.getState<LS>();
         let div: Div = null;
-        
+
         if (state.tags?.length > 0) {
             div = new Div();
 

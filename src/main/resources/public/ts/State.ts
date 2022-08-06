@@ -28,7 +28,7 @@ export class State {
     */
     setStateEx<ST>(state: ST) {
         state = state || {} as ST;
-        
+
         if (typeof state === "function") {
             this.state = state(this.state);
         }

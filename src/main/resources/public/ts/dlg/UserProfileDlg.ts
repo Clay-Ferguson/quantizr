@@ -179,16 +179,16 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
-                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
-                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
-                    !appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                    !appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Follow", this.addFriend) : null,
 
-                    !appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName 
+                    !appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Block", this.blockUser) : null,
 
                     state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,

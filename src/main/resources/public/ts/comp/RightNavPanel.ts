@@ -16,9 +16,6 @@ import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
-// eslint-disable-next-line no-unused-vars
-declare var g_brandingAppName: string;
-
 export class RightNavPanel extends Div {
     private static scrollPos: number = 0;
     static historyExpanded: boolean = false;

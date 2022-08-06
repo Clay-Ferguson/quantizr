@@ -3,7 +3,7 @@ export class Constants {
 
     // max rows to allow to scroll in via infinite scroll capability before we reset back to 25 rows.
     // todo-1: Infinite scrolling needs more testing. When we exceed this MAX_DYNAMIC_ROWS, and the more button pulls in
-    // the next set of results. 
+    // the next set of results.
     static MAX_DYNAMIC_ROWS = 800;
 
     static TREE_INFINITE_SCROLL = true;

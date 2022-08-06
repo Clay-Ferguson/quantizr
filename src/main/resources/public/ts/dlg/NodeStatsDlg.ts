@@ -21,7 +21,7 @@ export class NodeStatsDlg extends DialogBase {
     renderDlg = (): CompIntf[] => {
         const tagPanel = new Div(null, { className: "wordStatsArea" });
         const state = getAppState();
-        
+
         if (this.res.topTags?.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags"));
             this.res.topTags.forEach((word: string) => {

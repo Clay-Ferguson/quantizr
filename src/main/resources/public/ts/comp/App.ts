@@ -20,9 +20,6 @@ import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
 
-// eslint-disable-next-line no-unused-vars
-declare var g_brandingAppName: string;
-
 export class App extends Main {
 
     constructor() {

@@ -8,9 +8,9 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
-// This is magically defined in webpack.common.js;
-declare var BUILDTIME: string;
-declare var PROFILE: string;
+// These are magically defined in webpack.common.js;
+declare const BUILDTIME: string;
+declare const PROFILE: string;
 
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
@@ -256,12 +256,12 @@ export class View {
         }
 
         // todo-1: For some reason in mobile mode we're scrolling lots of times TO the element even when it's the top
-        // element and we want to scroll to ZERO instead, but I can't get that to work and i'm giving up the 
+        // element and we want to scroll to ZERO instead, but I can't get that to work and i'm giving up the
         // battle for now after 2 hrs trying to locate the issue. Existing functionality is not what I really
         // want but is still fine.
         // S.domUtil.getElm(C.ID_TAB, (elm: HTMLElement) => {
         //     elm.scrollTop = 0;
-        // });        
+        // });
 
         else {
             LeftNavPanel.inst?.setScrollTop(0);

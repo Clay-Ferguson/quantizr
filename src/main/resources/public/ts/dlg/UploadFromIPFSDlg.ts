@@ -12,7 +12,7 @@ import { ValidatedState, ValidatorRuleName } from "../ValidatedState";
 export class UploadFromIPFSDlg extends DialogBase {
     static storeLocally: boolean = false;
     uploadButton: Button;
-    
+
     cidState: ValidatedState = new ValidatedState("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);

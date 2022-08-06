@@ -712,7 +712,7 @@ export class Render {
             className: "avatarImage",
             // I haven't yet proven that this onError wasn't contributing to a page flicker bug but am suspicious
             // and since this is not that important, i'm removing until I have an abundane of time to retest.
-            onError: imageErrorFunc, 
+            onError: imageErrorFunc,
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 

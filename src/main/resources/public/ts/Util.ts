@@ -16,7 +16,7 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
-declare var __page: any;
+declare const __page: any;
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -910,11 +910,11 @@ export class Util {
                     // if this child at at a top level now, don't let it be appended as a child second level item.
                     if (!childFound) {
                         // new NodeHistoryItem
-                        subItems.unshift({ 
-                            id: childNode.id, 
-                            type: childNode.type, 
-                            content: S.nodeUtil.getShortContent(childNode), 
-                            subItems: null 
+                        subItems.unshift({
+                            id: childNode.id,
+                            type: childNode.type,
+                            content: S.nodeUtil.getShortContent(childNode),
+                            subItems: null
                         });
                     }
                 }
@@ -1276,7 +1276,7 @@ export class Util {
     If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
     getState and then dispatching the change.
 
-    WARNING: Both places that were calling this are commented out, so I need to remember why, becasue I didn't 
+    WARNING: Both places that were calling this are commented out, so I need to remember why, becasue I didn't
     add comments when comment thing out saying why.
     */
     refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {

@@ -203,7 +203,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
         const url = action;
         const dlg = this;
-        
+
         const config: Object = {
             action,
             width: "100%",

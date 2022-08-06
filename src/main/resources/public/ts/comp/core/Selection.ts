@@ -16,9 +16,9 @@ export class Selection extends Comp {
     compRender = (): ReactNode => {
         const children = [];
 
-        const select = new Select({ 
+        const select = new Select({
             value: this.valueIntf.getValue(),
-            className: "form-select " + this.moreClasses 
+            className: "form-select " + this.moreClasses
         }, this.selectionOptions, this.valueIntf);
 
         if (this.label) {

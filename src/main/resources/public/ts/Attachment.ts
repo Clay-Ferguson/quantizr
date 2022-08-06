@@ -11,7 +11,7 @@ export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState) => {
         state = getAppState(state);
         node = node || S.nodeUtil.getHighlightedNode(state);
-        
+
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;

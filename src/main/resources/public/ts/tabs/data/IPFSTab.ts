@@ -41,5 +41,5 @@ export class IPFSTab implements TabIntf<any> {
     }
 
     replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
-    }   
+    }
 }

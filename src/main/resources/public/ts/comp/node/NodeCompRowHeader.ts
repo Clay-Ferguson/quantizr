@@ -50,7 +50,7 @@ export class NodeCompRowHeader extends Div {
 
             // If user had nothin but ":tags:" in their display name, then display there userName
             displayName = displayName || this.node.owner;
-            
+
             children.push(new Span(displayName, {
                 className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
