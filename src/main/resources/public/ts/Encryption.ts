@@ -1,4 +1,3 @@
-import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -559,4 +558,9 @@ export interface SymKeyDataPackage {
     cipherText: string;
     cipherKey: string;
     symKey?: CryptoKey;
+}
+
+export class EncryptionKeyPair {
+    constructor(public publicKey: any, public privateKey: any) {
+    }
 }
