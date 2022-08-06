@@ -34,7 +34,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         this.attribs = {
             ...this.attribs, ...{
                 name: this.getId(),
-                className: "textField " + (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
+                className: (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
             }
         };
 
