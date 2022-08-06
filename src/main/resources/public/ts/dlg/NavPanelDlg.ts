@@ -1,8 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { RightNavPanel } from "../comp/RightNavPanel";
 import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
+import { DialogBase, DialogMode } from "../DialogBase";
 import { PubSub } from "../PubSub";
 
 export class NavPanelDlg extends DialogBase {

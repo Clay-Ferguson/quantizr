@@ -1,8 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
+import { DialogBase, DialogMode } from "../DialogBase";
 
 /**
  * See also: AudioPlayerDlg (which is very similar)

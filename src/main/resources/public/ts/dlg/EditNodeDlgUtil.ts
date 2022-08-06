@@ -1,8 +1,8 @@
 import { dispatch, getAppState } from "../AppRedux";
-import { DialogMode } from "../enums/DialogMode";
+import { DialogMode } from "../DialogBase";
+import { SymKeyDataPackage } from "../Encryption";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { SymKeyDataPackage } from "../SymKeyDataPackage";
 import { ValidatedState } from "../ValidatedState";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg } from "./EditNodeDlg";

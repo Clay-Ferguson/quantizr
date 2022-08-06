@@ -1,7 +1,6 @@
 import { getAppState } from "../AppRedux";
 import { CompIntf } from "../comp/base/CompIntf";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
+import { DialogBase, DialogMode } from "../DialogBase";
 import { MenuPanel } from "../MenuPanel";
 
 export class MainMenuDlg extends DialogBase {

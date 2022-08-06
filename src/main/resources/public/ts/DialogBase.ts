@@ -7,7 +7,6 @@ import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { DialogBaseImpl } from "./DialogBaseImpl";
-import { DialogMode } from "./enums/DialogMode";
 import { S } from "./Singletons";
 import { ValidatedState } from "./ValidatedState";
 
@@ -242,3 +241,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         return valid;
     }
 }
+
+export enum DialogMode {
+    // eslint-disable-next-line no-unused-vars
+    POPUP, EMBED, FULLSCREEN
+};
