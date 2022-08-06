@@ -28,6 +28,7 @@ public class IPFSCat extends ServiceBase {
      * NOTE: The hash is allowed to have a subpath here.
      */
     public String getString(String hash) {
+        checkIpfs();
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
@@ -42,6 +43,7 @@ public class IPFSCat extends ServiceBase {
     }
 
     public InputStream getInputStream(String hash) {
+        checkIpfs();
         String url = API_CAT + "?arg=" + hash;
         InputStream is = null;
         try {

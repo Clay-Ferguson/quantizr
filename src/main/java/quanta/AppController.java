@@ -558,7 +558,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getIPFSFiles", method = RequestMethod.POST)
 	public @ResponseBody Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
-
+		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getIPFSFiles", req, session, ms -> {
 			Val<String> folder = new Val<>();
@@ -585,6 +585,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
+		checkIpfs();
 		return callProc.run("deleteMFSFile", req, session, ms -> {
 			ipfsFiles.deleteMFSFile(ms, req);
 			GetIPFSFilesResponse res = new GetIPFSFilesResponse();
@@ -595,6 +596,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getIPFSContent", method = RequestMethod.POST)
 	public @ResponseBody Object getIPFSContent(@RequestBody GetIPFSContentRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
+		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getIPFSContent", req, session, ms -> {
 			String content = ipfsFiles.getIPFSContent(ms, req);
@@ -698,6 +700,9 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
 	public @ResponseBody Object export(@RequestBody ExportRequest req, HttpSession session) {
+		if (req.isToIpfs()) {
+			checkIpfs();
+		}
 		SessionContext.checkReqToken();
 		return callProc.run("export", req, session, ms -> {
 			ExportResponse res = new ExportResponse();
@@ -785,6 +790,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
+		checkIpfs();
 		SessionContext.checkReqToken();
 		return callProc.run("publishNodeToIpfs", req, session, ms -> {
 			return ipfs.publishNodeToIpfs(ms, req);
@@ -793,6 +799,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
+		checkIpfs();
 		SessionContext.checkReqToken();
 		return callProc.run("loadNodeFromIpfs", req, session, ms -> {
 			return ipfs.loadNodeFromIpfs(ms, req);
@@ -1359,6 +1366,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		GetConfigResponse res = new GetConfigResponse();
 		HashMap<String, Object> map = prop.getConfig();
+		map.put("ipfsEnabled", prop.ipfsEnabled());
 
 		// Identifier generated once on Browser, can uniquely identify one single session to associate with
 		// the given webpage/tab
@@ -1375,6 +1383,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			 */
 			map = (HashMap<String, Object>) map.clone();
 
+			// todo-0: is userMessage still in use?
 			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
 			ThreadLocals.getSC().setUserMessage(null);
 		}

@@ -38,52 +38,62 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public IPFSDir getDir(String path) {
+        checkIpfs();
         String url = API_FILES + "/ls?arg=" + path + "&long=true";
         return (IPFSDir) ipfs.postForJsonReply(url, IPFSDir.class);
     }
 
     /* Deletes the file or if a folder deletes it recursively */
     public boolean deletePath(String path) {
+        checkIpfs();
         String url = API_FILES + "/rm?arg=" + path + "&force=true";
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
 
     public boolean flushFiles(String path) {
+        checkIpfs();
         String url = API_FILES + "/flush?arg=" + path;
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
 
     public void addFile(MongoSession ms, String fileName, String mimeType, String content) {
+        checkIpfs();
         addFile(ms, fileName, mimeType, content.getBytes(StandardCharsets.UTF_8));
     }
 
     public void addFile(MongoSession ms, String fileName, String mimeType, byte[] bytes) {
+        checkIpfs();
         addEntry(ms, fileName, mimeType, new ByteArrayInputStream(bytes));
     }
 
     public void addEntry(MongoSession ms, String fileName, String mimeType, InputStream stream) {
+        checkIpfs();
         ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
     }
 
     public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
             Val<Integer> streamSize) {
+                checkIpfs();
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
         return ipfs.writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
                 null, streamSize);
     }
 
     public IPFSDirStat pathStat(String path) {
+        checkIpfs();
         String url = API_FILES + "/stat?arg=" + path;
         return (IPFSDirStat) ipfs.postForJsonReply(url, IPFSDirStat.class);
     }
 
     public String readFile(String path) {
+        checkIpfs();
         String url = API_FILES + "/read?arg=" + path;
         return (String) ipfs.postForJsonReply(url, String.class);
     }
 
     /* This has a side effect of deleting empty directories */
     public void traverseDir(String path, HashSet<String> allFilePaths, boolean deleteEmptyDirs) {
+        checkIpfs();
         log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (ok(dir)) {
@@ -121,6 +131,7 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public void deleteMFSFile(MongoSession ms, DeleteMFSFileRequest req) {
+        checkIpfs();
         if (!ThreadLocals.getSC().allowWeb3()) {
             return;
         }
@@ -137,6 +148,7 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public String getIPFSContent(MongoSession ms, GetIPFSContentRequest req) {
+        checkIpfs();
         if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
@@ -145,6 +157,7 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
+        checkIpfs();
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
         if (!ThreadLocals.getSC().allowWeb3()) {

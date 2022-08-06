@@ -36,6 +36,7 @@ public class IPFSDag extends ServiceBase {
     }
 
     public String getString(String hash) {
+        checkIpfs();
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
@@ -50,6 +51,7 @@ public class IPFSDag extends ServiceBase {
     }
 
     public DagNode getNode(String cid) {
+        checkIpfs();
         DagNode ret = null;
         try {
             String url = API_DAG + "/get?arg=" + cid;
@@ -61,6 +63,7 @@ public class IPFSDag extends ServiceBase {
     }
 
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
+        checkIpfs();
         LinkedList<MFSDirEntry> files = new LinkedList<>();
 
         if (!ThreadLocals.getSC().allowWeb3()) {
@@ -92,10 +95,12 @@ public class IPFSDag extends ServiceBase {
     }
 
     public MerkleLink putString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize) {
+        checkIpfs();
         return ipfs.writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize);
     }
 
     public MerkleLink putStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize) {
+        checkIpfs();
         return ipfs.writeFromStream(ms, API_DAG + "/put", stream, null, streamSize);
     }
 }

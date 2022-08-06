@@ -28,6 +28,7 @@ public class IPFSKey extends ServiceBase {
 
     // todo-2: convert to actual type, not map.
     public Map<String, Object> gen(MongoSession ms, String keyName) {
+        checkIpfs();
         Map<String, Object> ret = null;
         try {
             String url = API_NAME + "/gen?arg=" + keyName;

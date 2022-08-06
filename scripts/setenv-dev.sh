@@ -39,10 +39,9 @@ export dc_ipfs_yaml=dc-dev-ipfs.yaml
 export ipfs_data=/home/clay/.ipfs
 export ipfs_staging=/home/clay/.ipfs/staging
 
-# set to 'true' to activate IPFS. Note: This is the ONLY thing required to activate IPFS too. 
-# When you run with this variable defined all the configs and docker files all get run
-# in a way which configures and starts up IPFS.
-export use_ipfs=
+# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
+# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
+export ipfsEnabled=
 
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev

@@ -50,7 +50,7 @@ dockerUp
 dockerCheck quanta-distro
 dockerCheck mongo-distro
 
-if [[ -z ${use_ipfs} ]];  
+if [[ -z ${ipfsEnabled} ]];  
     then  
         echo "ipfs not in use"
     else

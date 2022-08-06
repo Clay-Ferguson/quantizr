@@ -24,14 +24,18 @@ public class IPFSConfig extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, Object> res = null;
 
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
-        sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
+        if (prop.ipfsEnabled()) {
+            res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
+            sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
 
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
-        sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
+            res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
+            sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
 
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));
-        sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
+            res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));
+            sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
+        } else {
+            sb.append("\nIPFS Repository Status: ipfsEnabled=false\n\n");
+        }
 
         // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic,
         // LinkedHashMap.class));

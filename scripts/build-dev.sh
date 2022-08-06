@@ -42,7 +42,7 @@ cd ${PRJROOT}
 dockerDown ${dc_app_yaml} quanta-dev
 dockerDown ${dc_mongo_yaml} mongo-dev
 
-if [[ -z ${use_ipfs} ]];  
+if [[ -z ${ipfsEnabled} ]];  
     then  
         echo "ipfs not in use"
     else
@@ -74,7 +74,7 @@ dockerUp
 dockerCheck quanta-dev
 dockerCheck mongo-dev
 
-if [[ -z ${use_ipfs} ]];  
+if [[ -z ${ipfsEnabled} ]];  
     then  
         echo "ipfs not in use"
     else

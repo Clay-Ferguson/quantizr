@@ -71,7 +71,7 @@ public class IPFSPubSub extends ServiceBase {
         // log.debug("Checking swarmPeers");
         // swarmPeers();
 
-        if (IPSM_ENABLE) {
+        if (prop.ipfsEnabled() && IPSM_ENABLE) {
             exec.run(null, () -> {
                 setOptions();
                 ipfsSwarm.connect();
@@ -83,6 +83,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void setOptions() {
+        if (!prop.ipfsEnabled()) return;
         // Only used this for some testing (shouldn't be required?)
         // if these are the defaults ?
         LinkedHashMap<String, Object> res = null;
@@ -110,6 +111,7 @@ public class IPFSPubSub extends ServiceBase {
     // }}
 
     public void openChannel(String topic) {
+        checkIpfs();
         if (IPSM_ENABLE) {
             exec.run(null, () -> {
                 log.debug("openChannel: " + topic);
@@ -126,6 +128,7 @@ public class IPFSPubSub extends ServiceBase {
 
     // PubSub publish
     public Map<String, Object> pub(String topic, String message) {
+        checkIpfs();
         Map<String, Object> ret = null;
         try {
             String url = API_PUBSUB + "/pub?arg=" + topic + "&arg=" + message;
@@ -144,6 +147,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void sub(String topic) {
+        checkIpfs();
         String url = API_PUBSUB + "/sub?arg=" + topic;
         try {
             HttpURLConnection conn = configureConnection(new URL(url), "POST");
@@ -155,6 +159,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     HttpURLConnection configureConnection(URL target, String method) throws IOException {
+        checkIpfs();
         HttpURLConnection conn = (HttpURLConnection) target.openConnection();
         conn.setRequestMethod(method);
         // conn.setRequestProperty("Content-Type", "application/json");
@@ -164,6 +169,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private void getObjectStream(InputStream in) throws IOException {
+        checkIpfs();
         byte LINE_FEED = (byte) 10;
         ByteArrayOutputStream resp = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
@@ -191,6 +197,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void processInboundEvent(Map<String, Object> msg) {
+        checkIpfs();
         String from = (String) msg.get("from");
         if (no(from))
             return;

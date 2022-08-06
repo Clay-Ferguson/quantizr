@@ -34,6 +34,7 @@ public class IPFSObj extends ServiceBase {
      * returns MerkleNode of the hash, as requested using the 'encoding=' url argument specified.
      */
     public MerkleNode getMerkleNode(String hash, String encoding) {
+        checkIpfs();
         MerkleNode ret = null;
         try {
             String url = API_OBJECT + "/get?arg=" + hash + "&" + ipfs.ENCODING_PARAM_NAME + "=" + encoding;
@@ -59,6 +60,7 @@ public class IPFSObj extends ServiceBase {
     }
 
     public MerkleNode objectOperation(String endpoint) {
+        checkIpfs();
         MerkleNode ret = null;
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -79,6 +81,7 @@ public class IPFSObj extends ServiceBase {
      * Returns string of the hash get, as requested using the 'encoding=' url argument specified.
      */
     public String getAsString(String hash, String encoding) {
+        checkIpfs();
         String ret = null;
         try {
             String url = API_OBJECT + "/get?arg=" + hash + "&" + ipfs.ENCODING_PARAM_NAME + "=" + encoding;
@@ -98,6 +101,7 @@ public class IPFSObj extends ServiceBase {
     }
 
     public MerkleNode newObject() {
+        checkIpfs();
         return objectOperation(API_OBJECT + "/new");
     }
 
@@ -105,6 +109,7 @@ public class IPFSObj extends ServiceBase {
      * Adds an existing CID into the directory strcture at rootCid, and returns the new rootCid
      */
     public MerkleNode addFileToDagRoot(String rootCid, String filePath, String fileCid) {
+        checkIpfs();
         if (StringUtils.isEmpty(filePath)) {
             filePath = fileCid;
         }
@@ -113,6 +118,7 @@ public class IPFSObj extends ServiceBase {
     }
 
     public IPFSObjectStat objectStat(String cid, boolean humanReadable) {
+        checkIpfs();
         String url = API_OBJECT + "/stat?arg=" + cid;
         if (humanReadable) {
             url += "&human=true";

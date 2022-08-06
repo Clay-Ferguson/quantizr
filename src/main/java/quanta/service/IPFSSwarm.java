@@ -31,6 +31,7 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public Map<String, Object> connect(String peer) {
+        if (!prop.ipfsEnabled()) return null;
         Map<String, Object> ret = null;
         try {
             log.debug("Swarm connect: " + peer);
@@ -51,6 +52,7 @@ public class IPFSSwarm extends ServiceBase {
 
     // PubSub List peers
     public Map<String, Object> listPeers() {
+        checkIpfs();
         Map<String, Object> ret = null;
         try {
             String url = API_SWARM + "/peers";
@@ -69,6 +71,7 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public void connect() {
+        if (!prop.ipfsEnabled()) return;
         arun.run(ms -> {
             List<String> adrsList = getConnectAddresses(ms);
             if (ok(adrsList)) {
@@ -83,6 +86,7 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public List<String> getConnectAddresses(MongoSession ms) {
+        checkIpfs();
         List<String> ret = null;
         SubNode node = read.getNode(ms, ":ipfsSwarmAddresses");
         if (ok(node)) {

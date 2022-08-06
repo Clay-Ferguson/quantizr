@@ -96,6 +96,8 @@ public class IPFSService extends ServiceBase {
     }
 
     public LinkedHashMap<String, Object> getInstanceId() {
+        if (!prop.ipfsEnabled())
+            return null;
         synchronized (instanceIdLock) {
             if (no(instanceId)) {
                 instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
@@ -106,6 +108,7 @@ public class IPFSService extends ServiceBase {
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
+        checkIpfs();
         String cid = null;
         String mime = node.getStr(NodeProp.BIN_MIME);
         String fileName = node.getStr(NodeProp.BIN_FILENAME);
@@ -130,6 +133,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType, boolean wrapInFolder) {
+        checkIpfs();
         InputStream stream = IOUtils.toInputStream(text);
         try {
             return addFromStream(ms, stream, fileName, mimeType, null, wrapInFolder);
@@ -139,11 +143,12 @@ public class IPFSService extends ServiceBase {
     }
 
     /*
-     * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call
-     * it DOES pin the file
+     * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call it
+     * DOES pin the file
      */
     public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
             Val<Integer> streamSize, boolean wrapInFolder) {
+        checkIpfs();
         String endpoint = prop.getIPFSApiBase() + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
@@ -176,6 +181,7 @@ public class IPFSService extends ServiceBase {
      */
     public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
             Val<Integer> streamSize) {
+        checkIpfs();
         // log.debug("Write stream to endpoint: " + endpoint);
         MerkleLink ret = null;
         try {
@@ -205,7 +211,8 @@ public class IPFSService extends ServiceBase {
                 try {
                     ret = XString.jsonMapper.readValue(body, MerkleLink.class);
                 } catch (Exception e) {
-                    // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate that
+                    // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate
+                    // that
                     // until we design better around it, and return a null.
                     // log.debug("Unable to parse response string: " + body);
                 }
@@ -225,6 +232,7 @@ public class IPFSService extends ServiceBase {
 
     // Creates a single file entry for a multipart file upload HTTP post
     public HttpEntity<InputStreamResource> makeFileEntity(InputStream is, String fileName) {
+        checkIpfs();
         if (StringUtils.isEmpty(fileName)) {
             fileName = "file";
         }
@@ -248,6 +256,7 @@ public class IPFSService extends ServiceBase {
      */
     public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
+                checkIpfs();
         SubNode exportParent =
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
@@ -283,6 +292,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public void streamResponse(HttpServletResponse response, MongoSession ms, String hash, String mimeType) {
+        checkIpfs();
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
 
@@ -310,6 +320,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public InputStream getStream(MongoSession ms, String hash) {
+        checkIpfs();
         if (ok(failedCIDs.get(hash))) {
             // log.debug("Abort CID already failed: " + hash);
             throw new RuntimeException("failed CIDs: " + hash);
@@ -339,6 +350,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {
+        checkIpfs();
         ThreadLocals.requireAdmin();
         PublishNodeToIpfsResponse res = new PublishNodeToIpfsResponse();
         SyncToMFSService svc = (SyncToMFSService) context.getBean(SyncToMFSService.class);
@@ -347,6 +359,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession ms, LoadNodeFromIpfsRequest req) {
+        checkIpfs();
         ThreadLocals.requireAdmin();
         LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
         SyncFromMFSService svc = (SyncFromMFSService) context.getBean(SyncFromMFSService.class);
@@ -355,6 +368,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public Object postForJsonReply(String url, Class<?> clazz) {
+        checkIpfs();
         Object ret = null;
         try {
             // log.debug("post: " + url);

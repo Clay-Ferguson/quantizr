@@ -113,12 +113,14 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
+		if (!prop.ipfsEnabled()) return "IPFS Disabled.";
 		String ret = ipfsRepo.gc();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
 
 	public String validateDb() {
+		if (!prop.ipfsEnabled()) return "IPFS Disabled.";
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
 		ret += ipfsRepo.verify();

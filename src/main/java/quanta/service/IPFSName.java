@@ -29,6 +29,7 @@ public class IPFSName extends ServiceBase {
 
     // todo-2: convert to actual type, not map.
     public Map<String, Object> publish(MongoSession ms, String key, String cid) {
+        checkIpfs();
         Map<String, Object> ret = null;
         try {
             if (no(key))
@@ -58,6 +59,7 @@ public class IPFSName extends ServiceBase {
 
     // todo-2: convert return val to a type (not map)
     public Map<String, Object> resolve(MongoSession ms, String name) {
+        checkIpfs();
         Map<String, Object> ret = null;
         try {
             String url = API_NAME + "/resolve?arg=" + name;

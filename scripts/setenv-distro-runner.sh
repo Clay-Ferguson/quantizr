@@ -14,8 +14,9 @@ export dc_mongo_yaml=dc-distro-mongo.yaml
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-# set to 'true' to activate IPFS
-export use_ipfs=
+# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
+# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
+export ipfsEnabled=
 
 export QUANTA_VER=1.0.29
 

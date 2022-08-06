@@ -189,6 +189,10 @@ public class AppProp {
 		return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
 	}
 
+	public boolean ipfsEnabled() {
+		return APConst.TRUE.equals(env.getProperty("ipfsEnabled"));
+	}
+
 	public String getIPFSApiHostAndPort() {
 		return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.apiPort");
 	}

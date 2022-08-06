@@ -26,12 +26,14 @@ public class IPFSRepo extends ServiceBase {
      * postForJsonReply to always return 'success' in this scenario (200 with no body)
      */
     public String verify() {
+        if (!prop.ipfsEnabled()) return "IPFS Disabled.";
         String url = API_REPO + "/verify";
         LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
         return "\nIPFS Repository Verify:\n" + XString.prettyPrint(res) + "\n";
     }
 
     public String gc() {
+        if (!prop.ipfsEnabled()) return "IPFS Disabled.";
         String url = API_REPO + "/gc";
         // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
         // LinkedHashMap.class));

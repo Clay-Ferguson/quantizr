@@ -259,4 +259,10 @@ public class ServiceBase {
 		log.debug("getBean: " + requiredType.getSimpleName());
 		return ctx.getBean(requiredType);
 	}
+
+	public void checkIpfs() {
+		if (!prop.ipfsEnabled()) {
+			throw new RuntimeException("IPFS Not Enabled");
+		}
+	}
 }

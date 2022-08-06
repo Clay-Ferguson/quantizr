@@ -12,6 +12,8 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
+    // todo-0: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
+    // only in the place where we load this config value, extract that into the typed property
     config: any;
 
     // up until guiReady the main App component will just render "loading..."

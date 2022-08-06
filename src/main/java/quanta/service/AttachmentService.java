@@ -106,6 +106,9 @@ public class AttachmentService extends ServiceBase {
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession ms, String binSuffix, String nodeId, MultipartFile[] uploadFiles,
 			boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
+		if (toIpfs) {
+			checkIpfs();
+		}
 		if (no(nodeId)) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}

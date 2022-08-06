@@ -233,7 +233,7 @@ export class Quanta {
                             case "ArrowLeft":
                                 if (this.keyDebounce()) return;
                                 // S.nav.navUpLevel();
-                                if (state.fullScreenConfig.type===FullScreenType.IMAGE) {
+                                if (state.fullScreenConfig.type === FullScreenType.IMAGE) {
                                     S.nav.prevFullScreenImgViewer(state);
                                 }
                                 break;
@@ -242,7 +242,7 @@ export class Quanta {
                                 if (this.keyDebounce()) return;
                                 state = getAppState();
                                 // S.nav.navOpenSelectedNode(state);
-                                if (state.fullScreenConfig.type===FullScreenType.IMAGE) {
+                                if (state.fullScreenConfig.type === FullScreenType.IMAGE) {
                                     S.nav.nextFullScreenImgViewer(state);
                                 }
                                 break;
@@ -322,6 +322,7 @@ export class Quanta {
                 if (res.config) {
                     dispatch("configUpdates", s => {
                         s.config = res.config;
+                        console.log("CONFIG: " + S.util.prettyPrint(s.config));
                         if (s.config.userMessage) {
                             S.util.showMessage(s.config.userMessage, "");
                         }

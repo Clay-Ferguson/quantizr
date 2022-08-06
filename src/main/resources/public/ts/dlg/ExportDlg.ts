@@ -37,6 +37,7 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+        const appState = getAppState();
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new RadioButtonGroup([
@@ -47,9 +48,9 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("PDF", "pdf"),
                 this.radioButton("HTML", "html")
             ], "radioButtonsBar marginTop"),
-            new Div(null, null, [
+            appState.config.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
-            ]),
+            ]) : null,
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", this.close, null, "btn-secondary float-end")

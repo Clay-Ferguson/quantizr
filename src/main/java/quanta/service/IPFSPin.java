@@ -30,6 +30,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public String verify() {
+        if (!prop.ipfsEnabled()) return "IPFS not enabled.";
         String url = API_PIN + "/verify";
         // LinkedHashMap<String, Object> res =
         // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
@@ -40,18 +41,21 @@ public class IPFSPin extends ServiceBase {
     }
 
     public boolean remove(String cid) {
+        checkIpfs();
         // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
 
     public boolean add(String cid) {
+        checkIpfs();
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
         return ok(ipfs.postForJsonReply(url, Object.class));
     }
 
     public LinkedHashMap<String, Object> getPins() {
+        if (!prop.ipfsEnabled()) return null;
         LinkedHashMap<String, Object> pins = null;
         HashMap<String, Object> res = null;
         try {
@@ -69,6 +73,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
+        if (!prop.ipfsEnabled()) return;
         exec.run(() -> {
             // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
             /*

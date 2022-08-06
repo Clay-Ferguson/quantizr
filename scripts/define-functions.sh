@@ -60,7 +60,7 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-dc-not-updating-with-new-instructions
     echo "dockerUp"
 
-    if [[ -z ${use_ipfs} ]];  
+    if [[ -z ${ipfsEnabled} ]];  
         then  
             echo "ipfs not in use"
         else

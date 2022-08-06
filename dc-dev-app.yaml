@@ -32,7 +32,7 @@ services:
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest"
-            # **** Tip ****: remember to put this line in setenv-dev.sh if enablingIPFSTest: `export use_ipfs=true`
+            # **** Tip ****: remember to put this line in setenv-dev.sh if running IPFS tests: `export ipfsEnabled="true"`
             runTests:
             
             mongoAdminPassword: "${adminPassword}"
@@ -61,6 +61,7 @@ services:
             metaHost: "${quanta_domain}" 
             allowFileSystemSearch: "false"
             actPubEnabled: "false" 
+            ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"

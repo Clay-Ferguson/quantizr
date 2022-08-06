@@ -21,8 +21,9 @@ export dc_mongo_yaml=dc-distro-mongo.yaml
 
 export mvn_profile=prod
 
-# set to 'true' to activate IPFS
-export use_ipfs=
+# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
+# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
+export ipfsEnabled=
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
 export DEPLOY_TARGET=/home/clay/ferguson/quanta-distro
