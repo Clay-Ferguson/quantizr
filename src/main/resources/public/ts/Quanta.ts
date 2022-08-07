@@ -322,7 +322,7 @@ export class Quanta {
                 if (res.config) {
                     dispatch("configUpdates", s => {
                         s.config = res.config;
-                        console.log("CONFIG: " + S.util.prettyPrint(s.config));
+                        // console.log("CONFIG: " + S.util.prettyPrint(s.config));
                         if (s.config.userMessage) {
                             S.util.showMessage(s.config.userMessage, "");
                         }

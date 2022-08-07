@@ -76,7 +76,7 @@ export class NodeCompMainNode extends Div {
             }
 
             this.attribs.nid = node.id;
-            this.attribs.onClick = S.nav.clickNodeRow;
+            this.attribs.onClick = S.nav.clickTreeNode;
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;

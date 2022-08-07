@@ -389,7 +389,7 @@ export abstract class Comp implements CompIntf {
             return ret;
         }
         catch (e) {
-            console.error("Failed to render child (in render method)" + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
+            console.error("Failed to render child (in render method) " + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
                 "\nELEMENTS Stack: " + this.getElementStack());
             return null;
         }

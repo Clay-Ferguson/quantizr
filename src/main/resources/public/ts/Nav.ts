@@ -91,7 +91,7 @@ export class Nav {
     navUpLevelClick = async (evt: Event = null, id: string = null) => {
         // for state management, especially for scrolling, we need to run the node click on the node
         // before upLeveling from it.
-        await this.clickNodeRow(evt, id);
+        await this.clickTreeNode(evt, id);
         this.navUpLevel(false);
     }
 
@@ -150,10 +150,8 @@ export class Nav {
     }
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
-    on an attribute of the element
-    todo-0: rename to clickTreeNode
-    */
-    clickNodeRow = async (evt: Event, id: string, state?: AppState) => {
+    on an attribute of the element */
+    clickTreeNode = async (evt: Event, id: string, state?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
@@ -321,7 +319,7 @@ export class Nav {
 
     runSearch = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        this.clickNodeRow(null, id);
+        this.clickTreeNode(null, id);
         setTimeout(() => {
             new SearchContentDlg().open();
         }, 500);
@@ -330,7 +328,7 @@ export class Nav {
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const state = getAppState();
-        this.clickNodeRow(null, id);
+        this.clickTreeNode(null, id);
 
         setTimeout(() => {
             const node = MainTab.inst?.findNode(state, id);

@@ -14,7 +14,8 @@ export class AppState {
 
     // todo-1: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
     // only in the place where we load this config value, extract that into the typed property
-    config: any;
+    // Initialize to empty object so we don't get NPE
+    config: any = {};
 
     // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
