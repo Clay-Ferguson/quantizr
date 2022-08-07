@@ -745,10 +745,13 @@ public class NodeEditService extends ServiceBase {
 		String friendUserName = node.getStr(NodeProp.USER);
 		if (ok(friendUserName)) {
 			// if a foreign user, update thru ActivityPub.
-			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {
+			if (userDoingAction.equals(PrincipalName.ADMIN.s())) {
+				throw new RuntimeException("Don't follow from admin account.");
+			}
+
+			if (friendUserName.contains("@")) {
 				apLog.trace("calling setFollowing=true, to post follow to foreign server.");
-				String followerUser = ThreadLocals.getSC().getUserName();
-				apFollowing.setFollowing(followerUser, friendUserName, true);
+				apFollowing.setFollowing(userDoingAction, friendUserName, true);
 			}
 
 			/*

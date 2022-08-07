@@ -68,6 +68,7 @@ services:
             # Using '|' there instead would preserve the newlines after read in
             # The '-' after either of those removes any trailing newline
             testUserAccounts: >- 
+                FollowBot:${adminPassword}:${devEmail},
                 adam:${testPassword}:${devEmail},
                 bob:${testPassword}:${devEmail},
                 cory:${testPassword}:${devEmail},

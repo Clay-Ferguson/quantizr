@@ -64,6 +64,9 @@ import quanta.util.XString;
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
+    // temporary code
+    private static int followBotCounterStart = 0;
+
     @Autowired
     private ActPubLog apLog;
 
@@ -1776,9 +1779,9 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
-     * NEW LOGIC (Work in Progress), we will be crawling ONLY the accounts that are not currently being
-     * followed by any Quanta users, becuase accounts that are followed will be getting the data pushed
-     * to the inbox and will not need to be "pulled" by this crawler.
+     * todo-0: NEW LOGIC (Work in Progress), we will be crawling ONLY the accounts that are not
+     * currently being followed by any Quanta users, becuase accounts that are followed will be getting
+     * the data pushed to the inbox and will not need to be "pulled" by this crawler.
      */
     public void refreshForeignUsers() {
         identifyFollowedAccounts();
@@ -1822,6 +1825,7 @@ public class ActPubService extends ServiceBase {
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
+                int followBotCounter = followBotCounterStart++;
                 int pushSkipCounter = 0;
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
@@ -1845,12 +1849,41 @@ public class ActPubService extends ServiceBase {
                             // todo-0: eventually remove this logging
                             log.debug("SKIP CRAWL: " + remoteActorId);
                             pushSkipCounter++;
+
+                            // todo-0: final step before we can do this skip/continue, is we need to check, for a timestamp
+                            // on the 'node' we have here which will be something like LAST_INBOUND_TIME, and will be
+                            // set and updated to hold the time every time that user 'userName' account has ever sent
+                            // us something inbound into our server (either to a specific user inbox or shared inbox),
+                            // indicating to us it's ok to depend on them sending info rather than crawling the inbox
+                            // right here. For now, we just skip, and hope for the best, until I see how much feed
+                            // content we'll end up expecing out FollowBot to do it's job.
                             continue;
                         }
                     }
 
                     refreshForeignUsersQueuedCount++;
                     queueUserForRefresh(userName, true);
+
+                    /*
+                     * todo-0: this code (for adding a friend to the FollowBot account) will eventually be removed, and
+                     * then this entire mechanism of crawling can be replaced with a query of FOLLOW_BOT accounts,
+                     * instead of the current approach of having a curated set of users determined by the first
+                     * NUM_CURATED_ACCOUNTS that were ever crawled which is the current approach.
+                     * 
+                     * todo-0: We're doing the "% 50 == 0" to pull in only a handful on each run so that servers don't
+                     * consider quanta to be a DOS attack. Sending follow request to 1 of every few should be ok
+                     * and not suspicious. Once our FollowBot account has around 1500 users it's following we can
+                     * remove this temporary code, and the "official" way quanta admins will "curate" a public Fediverse
+                     * feed will be to use the FollowBot account to follow with.
+                     * 
+                     * todo-0: We'll also need a 'single click' button to allow the admin user to follow onto the 
+                     * FollowerBot from the UserProfile of any user, so we can be logged in as admin and still be able
+                     * to add to FollowerBot follows with one click.
+                     */
+                    if (++followBotCounter % 50 == 0) {
+                        log.debug("FOLLOW_BOT following: " + userName);
+                        user.addFriend(ms, true, PrincipalName.FOLLOW_BOT.s(), userName);
+                    }
                 }
 
                 log.debug("refreshForeignUsers skipped " + String.valueOf(pushSkipCounter)

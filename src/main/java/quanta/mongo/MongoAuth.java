@@ -290,6 +290,12 @@ public class MongoAuth extends ServiceBase {
 			ms = ThreadLocals.getMongoSession();
 		}
 
+		if (no(ms)) {
+			// when we get here it normally means we should've called "arun.exec" to manage
+			// the thread instead of justs passing in an 'ms' or null
+			throw new RuntimeException("ThreadLocals doesn't have session.");
+		}
+
 		if (no(node)) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}

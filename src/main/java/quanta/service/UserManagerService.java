@@ -611,7 +611,8 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
 
-			// log.debug("saveUserPreferences: [hashCode=" + userPrefs.hashCode() + "] " + XString.prettyPrint(userPrefs));
+			// log.debug("saveUserPreferences: [hashCode=" + userPrefs.hashCode() + "] " +
+			// XString.prettyPrint(userPrefs));
 			res.setSuccess(true);
 			return null;
 		});
@@ -801,74 +802,90 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
-	/*
-	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
-	 * if the user wasn't already a friend
-	 */
 	public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
 		// apLog.trace("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
-		String userName = ThreadLocals.getSC().getUserName();
-
-		String _newUserName = req.getUserName().trim();
-		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
-		String newUserName = _newUserName;
-
-		if (newUserName.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
-			res.setMessage("You can't be friends with the admin.");
-			res.setSuccess(false);
-			return res;
-		}
-
-		// This is concurrency safe because by the time we get to this async exec, we're done processing in
-		// this request thread.
-		exec.run(() -> {
-			MongoSession mst = ThreadLocals.getMongoSession();
-
-			// get the Friend List of the follower
-			SubNode followerFriendList =
-					read.getUserNodeByType(mst, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-
-			/*
-			 * lookup to see if this followerFriendList node already has userToFollow already under it
-			 */
-			SubNode friendNode = read.findNodeByUserAndType(mst, followerFriendList, newUserName, NodeType.FRIEND.s());
-
-			// if friendNode was non-null here it means we were already following the user.
-			if (no(friendNode)) {
-				apLog.trace("loadForeignUser: " + newUserName);
-				apub.loadForeignUser(userName, newUserName);
-
-				SubNode userNode = arun.run(s -> {
-					return read.getUserNodeByUserName(s, newUserName);
-				});
-
-				if (no(userNode))
-					return;
-
-				// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
-				// the DB enforcing this.
-				deleteFriend(mst, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
-
-				apLog.trace("Creating friendNode for " + newUserName);
-				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
-
-				if (ok(friendNode)) {
-					friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
-					edit.updateSavedFriendNode(userName, friendNode);
-
-					// todo-2: eventually we can have a design that pushes these results back to the browser async
-					// instead of optimistically saying 'Added friend'
-					// res.setMessage("Added Friend: " + newUserName);
-				} else {
-
-					// res.setMessage("Unable to add Friend: " + newUserName);
-				}
-			}
-		});
-		res.setMessage("Added Friend: " + newUserName);
+		String ret = addFriend(ms, false, ThreadLocals.getSC().getUserName(), req.getUserName().trim());
+		res.setMessage(ret);
 		res.setSuccess(true);
 		return res;
+	}
+
+	/*
+	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
+	 * if the user wasn't already a friend
+	 * 
+	 * NOTE: userDoingTheFollow should be short name like "clay" (not full fediverse name)
+	 */
+	public String addFriend(MongoSession ms, boolean asAdmin, String userDoingTheFollow, String userBeingFollowed) {
+		String _userToFollow = userBeingFollowed;
+		_userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
+
+		// duplicate variable because of lambdas below
+		String userToFollow = _userToFollow;
+
+		if (userToFollow.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
+			return "You can't be friends with the admin.";
+		}
+
+		if (asAdmin) {
+			arun.run(as -> {
+				addFriendInternal(as, userDoingTheFollow, userToFollow);
+				return null;
+			});
+		} else {
+			// run as logged in user (request thread identifies auth)
+			exec.run(() -> {
+				addFriendInternal(ThreadLocals.getMongoSession(), userDoingTheFollow, userToFollow);
+			});
+		}
+		return "Added Friend: " + userToFollow;
+	}
+
+	private void addFriendInternal(MongoSession ms, String userDoingTheFollow, String userToFollow) {
+		SubNode followerFriendList =
+				read.getUserNodeByType(ms, userDoingTheFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+
+		if (no(followerFriendList)) {
+			log.debug("Can't access Friend list for: " + userDoingTheFollow);
+			return;
+		}
+
+		/*
+		 * lookup to see if this followerFriendList node already has userToFollow already under it
+		 */
+		SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, userToFollow, NodeType.FRIEND.s());
+
+		// if friendNode is non-null here it means we were already following the user.
+		if (ok(friendNode))
+			return;
+
+		apub.loadForeignUser(userDoingTheFollow, userToFollow);
+
+		// the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we must use arun.
+		SubNode userNode = arun.run(s -> {
+			return read.getUserNodeByUserName(s, userToFollow);
+		});
+
+		if (no(userNode))
+			return;
+
+		// follower bot never blocks people, so we can avoid calling that if follower bot.
+		if (!userDoingTheFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
+			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
+			// the DB enforcing this.
+			deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
+		}
+
+		apLog.trace("Creating friendNode for " + userToFollow);
+		friendNode = edit.createFriendNode(ms, followerFriendList, userToFollow);
+
+		if (ok(friendNode)) {
+			friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
+
+			// updates AND sends the friend request out to the foreign server.
+			edit.updateSavedFriendNode(userDoingTheFollow, friendNode);
+		}
 	}
 
 	public GetUserProfileResponse getUserProfile(GetUserProfileRequest req) {

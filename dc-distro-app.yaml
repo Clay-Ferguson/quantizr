@@ -35,6 +35,7 @@ services:
 
             # NOTE: '>-' removes all newline characters and makes one long string
             testUserAccounts: >- 
+                FollowBot:${adminPassword}:${devEmail},
                 adam:${testPassword}:${devEmail},
                 bob:${testPassword}:${devEmail},
                 cory:${testPassword}:${devEmail},

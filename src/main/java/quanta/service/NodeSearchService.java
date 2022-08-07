@@ -402,6 +402,8 @@ public class NodeSearchService extends ServiceBase {
 		}
 
 		for (SubNode node : iter) {
+			nodeCount++;
+			
 			if (no(node.getContent()))
 				continue;
 
@@ -487,7 +489,6 @@ public class NodeSearchService extends ServiceBase {
 				totalWords++;
 			}
 			extractTagsAndMentions(node, knownTokens, tagMap, mentionMap);
-			nodeCount++;
 		}
 
 		List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
