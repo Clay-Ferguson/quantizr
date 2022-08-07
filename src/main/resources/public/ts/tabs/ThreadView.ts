@@ -36,7 +36,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
             new Div(null, { className: "marginBottom marginTop" }, [
                 new Heading(4, this.data.name + " / Hierarchy", { className: "resultsTitle" }),
                 new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
-                : "Chain of replies going back towards original post", { className: "float-end" }),
+                    : "Chain of replies going back towards original post", { className: "float-end" }),
                 new Clearfix(),
                 !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() }, { className: "float-end" }) : null,
                 new Clearfix()
@@ -45,10 +45,11 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         ]));
 
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
+
+        // NOTE: The current findNode() impl for this tab doesn't take into account the 'data.props.others' yet. probably should.
         const others: J.NodeInfo[] = this.data.props.others;
 
         results.forEach((node: J.NodeInfo) => {
-            S.srch.initSearchNode(node);
             const c = this.renderItem(node, i, rowCount, jumpButton, state);
             if (c) {
                 children.push(c);
@@ -62,7 +63,6 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
         if (others) {
             others.forEach((node: J.NodeInfo) => {
-                S.srch.initSearchNode(node);
                 const c = this.renderItem(node, i, rowCount, jumpButton, state);
                 if (c) {
                     children.push(c);

@@ -26,9 +26,22 @@ export class MainTab implements TabIntf<any> {
     constructView = (data: TabIntf) => new MainTabComp(data);
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        if (!state.node) return null;
-        if (state.node.id === nodeId) return state.node;
-        return state.node.children?.find(n => n.id === nodeId);
+        return this.findNodeRecursive(state.node, nodeId);
+    }
+
+    // finds a node matching node with 'id' on this node or any of it's chilren
+    findNodeRecursive = (node: J.NodeInfo, id: string): J.NodeInfo => {
+        if (!node) return null;
+        if (node.id === id) return node;
+        if (node.parent?.id === id) return node.parent;
+        if (node.boostedNode?.id === id) return node.boostedNode;
+
+        if (node.children) {
+            for (const n of node.children) {
+                const found = this.findNodeRecursive(n, id);
+                if (found) return found;
+            }
+        }
     }
 
     nodeDeleted = (state: AppState, nodeId: string): void => {

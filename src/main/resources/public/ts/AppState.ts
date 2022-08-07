@@ -12,7 +12,7 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
-    // todo-0: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
+    // todo-1: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
     // only in the place where we load this config value, extract that into the typed property
     config: any;
 
@@ -97,9 +97,6 @@ export class AppState {
     expandedHeaderIds: Set<string> = new Set<string>();
 
     highlightSearchNodeId: string;
-
-    /* maps node.id values to NodeInfo.java objects */
-    idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     isAdminUser: boolean;
     isAnonUser: boolean = true;

@@ -465,11 +465,6 @@ export class Render {
                         }
                     }
 
-                    s.idToNodeMap = new Map<string, J.NodeInfo>();
-                    if (res) {
-                        S.nodeUtil.updateNodeMap(res.node, s);
-                    }
-
                     let targetNode: J.NodeInfo = null;
                     if (targetNodeId) {
                         // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)

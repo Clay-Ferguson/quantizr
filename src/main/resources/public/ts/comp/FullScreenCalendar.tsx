@@ -26,7 +26,7 @@ export class FullScreenCalendar extends Main {
     compRender = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
         const nodeId = this.state.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNodeById(this.state, nodeId);
+        const node = S.nodeUtil.findNode(this.state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);

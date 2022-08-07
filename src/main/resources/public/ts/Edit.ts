@@ -13,6 +13,7 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
+import { MainTab } from "./tabs/data/MainTab";
 
 export class Edit {
 
@@ -298,7 +299,6 @@ export class Edit {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.nodeUtil.updateNodeMap(res.newNode, state);
             S.nodeUtil.highlightNode(res.newNode, false, state);
             this.runEditNode(null, res.newNode.id, false, false, false, null, null, state);
         }
@@ -310,7 +310,6 @@ export class Edit {
                 S.quanta.refresh(state);
             }
             else {
-                S.nodeUtil.updateNodeMap(res.newNode, state);
                 this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, state);
             }
         }
@@ -404,7 +403,6 @@ export class Edit {
                 td.replaceNode(s, res.node);
             });
 
-            S.nodeUtil.updateNodeMap(res.node, s);
             return s;
         });
     }
@@ -487,14 +485,11 @@ export class Edit {
             id = selNode.id;
         }
 
-        const node = state.idToNodeMap.get(id);
-        if (node) {
-            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                nodeId: node.id,
-                targetName: "up"
-            });
-            this.setNodePositionResponse(res, id, state);
-        }
+        const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            nodeId: id,
+            targetName: "up"
+        });
+        this.setNodePositionResponse(res, id, state);
     }
 
     moveNodeDown = async (evt: Event, id: string, state: AppState) => {
@@ -505,14 +500,11 @@ export class Edit {
             id = selNode.id;
         }
 
-        const node = state.idToNodeMap.get(id);
-        if (node) {
-            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                nodeId: node.id,
-                targetName: "down"
-            });
-            this.setNodePositionResponse(res, id, state);
-        }
+        const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            nodeId: id,
+            targetName: "down"
+        });
+        this.setNodePositionResponse(res, id, state);
     }
 
     moveNodeToTop = async (id: string = null, state: AppState = null) => {
@@ -521,14 +513,11 @@ export class Edit {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node = state.idToNodeMap.get(id);
-        if (node) {
-            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                nodeId: node.id,
-                targetName: "top"
-            });
-            this.setNodePositionResponse(res, id, state);
-        }
+        const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            nodeId: id,
+            targetName: "top"
+        });
+        this.setNodePositionResponse(res, id, state);
     }
 
     moveNodeToBottom = async (id: string = null, state: AppState = null) => {
@@ -537,14 +526,11 @@ export class Edit {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node = state.idToNodeMap.get(id);
-        if (node) {
-            const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-                nodeId: node.id,
-                targetName: "bottom"
-            });
-            this.setNodePositionResponse(res, id, state);
-        }
+        const res = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            nodeId: id,
+            targetName: "bottom"
+        });
+        this.setNodePositionResponse(res, id, state);
     }
 
     getFirstChildNode = (state: AppState): any => {
@@ -621,7 +607,7 @@ export class Edit {
         if (!id) {
             node = S.nodeUtil.getHighlightedNode(state);
         } else {
-            node = state.idToNodeMap.get(id);
+            node = MainTab.inst?.findNode(state, id);
         }
 
         if (node) {
@@ -660,7 +646,7 @@ export class Edit {
                 parentNode = state.node;
             }
         } else {
-            parentNode = state.idToNodeMap.get(id);
+            parentNode = MainTab.inst?.findNode(state, id);
             if (!parentNode) {
                 // console.log("Unknown nodeId in createSubNode: " + id);
                 return;

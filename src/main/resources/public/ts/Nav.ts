@@ -12,6 +12,7 @@ import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
+import { MainTab } from "./tabs/data/MainTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class Nav {
@@ -137,24 +138,21 @@ export class Nav {
     getSelectedDomElement = (state: AppState): HTMLElement => {
         const selNode = S.nodeUtil.getHighlightedNode(state);
         if (selNode) {
-            /* get node by node identifier */
-            const node = state.idToNodeMap.get(selNode.id);
+            // console.log("found highlighted node.id=" + node.id);
 
-            if (node) {
-                // console.log("found highlighted node.id=" + node.id);
+            /* now make CSS id from node */
+            const nodeId: string = this._UID_ROWID_PREFIX + selNode.id;
+            // console.log("looking up using element id: "+nodeId);
 
-                /* now make CSS id from node */
-                const nodeId: string = this._UID_ROWID_PREFIX + node.id;
-                // console.log("looking up using element id: "+nodeId);
-
-                return S.domUtil.domElm(nodeId);
-            }
+            return S.domUtil.domElm(nodeId);
         }
         return null;
     }
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
-    on an attribute of the element */
+    on an attribute of the element
+    todo-0: rename to clickTreeNode
+    */
     clickNodeRow = async (evt: Event, id: string, state?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
@@ -168,21 +166,19 @@ export class Nav {
                 return;
             }
 
-            const node = state.idToNodeMap.get(id);
-            if (!node) {
-                reject();
-                // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
-                throw new Error("node not found in idToNodeMap: " + id);
-            }
-
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            dispatch("HighlightNode", s => {
-                S.nodeUtil.highlightNode(node, false, s);
-                return s;
-            });
-
+            const node = MainTab.inst?.findNode(state, id);
+            if (node) {
+                dispatch("HighlightNode", s => {
+                    S.nodeUtil.highlightNode(node, false, s);
+                    return s;
+                });
+            }
+            else {
+                console.error("Node not found: " + id);
+            }
             // console.log("nodeClickRow. Focusing Main tab");
             S.domUtil.focusId(C.TAB_MAIN);
             resolve();
@@ -217,8 +213,7 @@ export class Nav {
     openNodeById = (evt: Event, id: string, state: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = getAppState(state);
-        const node = state.idToNodeMap.get(id);
-        S.nodeUtil.highlightNode(node, false, state);
+        const node = MainTab.inst?.findNode(state, id);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -226,6 +221,7 @@ export class Nav {
             if (C.DEBUG_SCROLLING) {
                 console.log("openNodeById");
             }
+            S.nodeUtil.highlightNode(node, false, state);
             // NOTE: Passing true for "scrollToTop" is new on 11/6/21
             S.view.refreshTree({
                 nodeId: node.id,
@@ -337,7 +333,7 @@ export class Nav {
         this.clickNodeRow(null, id);
 
         setTimeout(() => {
-            const node = state.idToNodeMap.get(id);
+            const node = MainTab.inst?.findNode(state, id);
             if (!node) {
                 return;
             }
@@ -350,7 +346,7 @@ export class Nav {
         const state = getAppState();
 
         // Try to get node from local memory...
-        const node = state.idToNodeMap.get(id);
+        const node = MainTab.inst?.findNode(state, id);
         if (node) {
             setTimeout(() => {
                 if (FeedTab.inst) {
@@ -386,7 +382,6 @@ export class Nav {
             });
 
             if (!res.node) return;
-            S.nodeUtil.updateNodeMap(res.node, state);
 
             if (FeedTab.inst) {
                 FeedTab.inst.props.searchTextState.setValue("");

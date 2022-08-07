@@ -8,6 +8,7 @@ import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
+import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
@@ -46,7 +47,7 @@ export class NodeUtil {
     getSelNodesArray = (state: AppState): J.NodeInfo[] => {
         const selArray: J.NodeInfo[] = [];
         state.selectedNodes.forEach(id => {
-            const node = state.idToNodeMap.get(id);
+            const node = MainTab.inst?.findNode(state, id);
             if (node) {
                 selArray.push(node);
             }
@@ -87,7 +88,7 @@ export class NodeUtil {
         if (!state.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(state.node.id);
         if (id) {
-            return state.idToNodeMap.get(id);
+            return MainTab.inst?.findNode(state, id);
         }
         return null;
     }
@@ -95,7 +96,7 @@ export class NodeUtil {
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
         // Log.log("highlightRowById: " + id);
-        let node = state.idToNodeMap.get(id);
+        let node = MainTab.inst?.findNode(state, id);
         let ret = true;
 
         /* If node not known, resort to taking the best, previous node we had */
@@ -139,18 +140,12 @@ export class NodeUtil {
     }
 
     /* Find node by looking everywhere we possibly can on local storage for it */
-    findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        // first look in normal tree map for main view.
-        let node = state.idToNodeMap.get(nodeId);
-
-        // if not found look everywher else.
-        if (!node) {
-            for (const data of state.tabData) {
-                node = data.findNode(state, nodeId);
-                if (node) break;
-            }
+    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        for (const data of state.tabData) {
+            const node = data.findNode(state, nodeId);
+            if (node) return node;
         }
-        return node;
+        return null;
     }
 
     clearLastNodeIds = () => {
@@ -161,8 +156,9 @@ export class NodeUtil {
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
     getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;
+        // todo-1: this was lazy coding. I really just need the FIRST one of the set, and no need to iterate all.
         state.selectedNodes.forEach(id => {
-            ret = state.idToNodeMap.get(id);
+            ret = MainTab.inst?.findNode(state, id);
         });
         return ret;
     }
@@ -183,24 +179,6 @@ export class NodeUtil {
             }, this);
         }
         return ret;
-    }
-
-    updateNodeMap = (node: J.NodeInfo, state: AppState) => {
-        if (!node) return;
-
-        // console.log("NODE MAPPED: " + node.id);
-        state.idToNodeMap.set(node.id, node);
-
-        // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
-        if (node.parent) {
-            state.idToNodeMap.set(node.parent.id, node.parent);
-        }
-
-        if (node.children) {
-            node.children.forEach(function (n) {
-                this.updateNodeMap(n, state);
-            }, this);
-        }
     }
 
     /* Returns the node if it's currently displaying on the page. For now we don't have ability */

@@ -1870,7 +1870,7 @@ public class ActPubService extends ServiceBase {
                      * instead of the current approach of having a curated set of users determined by the first
                      * NUM_CURATED_ACCOUNTS that were ever crawled which is the current approach.
                      * 
-                     * todo-0: We're doing the "% 50 == 0" to pull in only a handful on each run so that servers don't
+                     * todo-0: We're doing the "% X == 0" to pull in only a handful on each run so that servers don't
                      * consider quanta to be a DOS attack. Sending follow request to 1 of every few should be ok
                      * and not suspicious. Once our FollowBot account has around 1500 users it's following we can
                      * remove this temporary code, and the "official" way quanta admins will "curate" a public Fediverse
@@ -1880,9 +1880,10 @@ public class ActPubService extends ServiceBase {
                      * FollowerBot from the UserProfile of any user, so we can be logged in as admin and still be able
                      * to add to FollowerBot follows with one click.
                      */
-                    if (++followBotCounter % 50 == 0) {
+                    if (++followBotCounter % 40 == 0) {
                         log.debug("FOLLOW_BOT following: " + userName);
                         user.addFriend(ms, true, PrincipalName.FOLLOW_BOT.s(), userName);
+                        Util.sleep(2000);
                     }
                 }
 

@@ -26,8 +26,6 @@ import { TimelineRSInfo } from "./TimelineRSInfo";
 export class Search {
     _UID_ROWID_PREFIX: string = "srch_row_";
 
-    idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
-
     findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState) => {
         const res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
@@ -379,16 +377,6 @@ export class Search {
         });
     }
 
-    initSearchNode = (node: J.NodeInfo) => {
-        if (!node) return;
-        this.idToNodeMap.set(node.id, node);
-
-        // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
-        if (node.parent) {
-            this.idToNodeMap.set(node.parent.id, node.parent);
-        }
-    }
-
     showFollowers = async (page: number, userName: string) => {
         const state = getAppState();
         if (state.isAnonUser) return;
@@ -535,13 +523,10 @@ export class Search {
     clickSearchNode = (id: string, state: AppState) => {
         setTimeout(() => {
             S.view.jumpToId(id);
-
-            if (this.idToNodeMap.get(id)) {
-                dispatch("RenderSearchResults", s => {
-                    s.highlightSearchNodeId = id;
-                    return s;
-                });
-            }
+            dispatch("RenderSearchResults", s => {
+                s.highlightSearchNodeId = id;
+                return s;
+            });
         }, 10);
     }
 
