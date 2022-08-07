@@ -122,10 +122,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest req) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-
-			// todo-0: temporarily logging all (change back to apLog.trace)
-			log.debug("INBOX (shared): " + XString.prettyPrint(payload));
-
+			apLog.trace("INBOX (shared): " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apub.processInboxPost(req, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);

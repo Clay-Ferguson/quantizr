@@ -231,11 +231,16 @@ export abstract class DialogBase extends Div {
     }
 
     validate = (): boolean => {
-        if (!this.validatedStates) return;
+        if (!this.validatedStates) return true;
+
         let valid = true;
         this.validatedStates.forEach(vs => {
             if (!vs.validate()) valid = false;
         });
+
+        if (!valid) {
+            console.log("validate()=false in " + this.getCompClass());
+        }
         return valid;
     }
 }
