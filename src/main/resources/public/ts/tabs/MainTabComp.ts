@@ -1,11 +1,9 @@
-import { dispatch, useAppState } from "../AppRedux";
+import { useAppState } from "../AppRedux";
 import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
-import { Icon } from "../comp/core/Icon";
-import { Span } from "../comp/core/Span";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
@@ -40,30 +38,7 @@ export class MainTabComp extends AppTab {
         //     });
         // }
 
-        const panelCols = state.userPrefs.mainPanelCols || 6;
-
-        const widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
-            panelCols > 4 ? new Icon({
-                className: "fa fa-step-backward widthSizerIcon",
-                title: "Narrower view",
-                onClick: () => {
-                    dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(--s.userPrefs.mainPanelCols);
-                        return s;
-                    });
-                }
-            }) : null,
-            panelCols < 8 ? new Icon({
-                className: "fa fa-step-forward widthSizerIcon",
-                title: "Wider view",
-                onClick: () => {
-                    dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
-                        return s;
-                    });
-                }
-            }) : null
-        ]) : null;
+        const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         this.setChildren([
             widthSizerPanel,

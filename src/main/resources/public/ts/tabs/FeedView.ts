@@ -241,7 +241,10 @@ export class FeedView extends AppTab<FeedViewProps> {
                 children.push(new ButtonBar([moreButton], "text-center marginTop marginBottom"));
             }
         }
-        this.setChildren([new Div(null, { className: "feedView" }, children)]);
+
+        this.setChildren([
+            S.render.makeWidthSizerPanel(),
+            new Div(null, { className: "feedView" }, children)]);
     }
 
     /* overridable (don't use arrow function) */
