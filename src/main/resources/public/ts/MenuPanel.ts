@@ -183,7 +183,7 @@ export class MenuPanel extends Div {
             }
         }
 
-        if (state.config?.menu?.help) {
+        if (state.config.menu?.help) {
             children.push(new Menu("Help", this.helpMenuItems(state)));
         }
 
@@ -526,7 +526,7 @@ export class MenuPanel extends Div {
     // These are defined externally in config-text.yaml
     helpMenuItems = (state: AppState): Div[] => {
         const items: Div[] = [];
-        if (state.config?.menu?.help) {
+        if (state.config.menu?.help) {
             for (const menuItem of state.config.menu.help) {
                 if (menuItem.name === "separator") {
                     items.push(new MenuItemSeparator());

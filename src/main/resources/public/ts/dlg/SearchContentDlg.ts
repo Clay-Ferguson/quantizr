@@ -117,7 +117,7 @@ export class SearchContentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph),
-                    new HelpButton(() => getAppState().config?.help?.search?.dialog),
+                    new HelpButton(() => getAppState().config.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])

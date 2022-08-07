@@ -24,6 +24,6 @@ export class PostsTypeHandler extends TypeBase {
 
     getEditorHelp(): string {
         const state = getAppState();
-        return state.config?.help?.editor?.dialog;
+        return state.config.help?.editor?.dialog;
     }
 }

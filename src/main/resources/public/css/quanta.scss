@@ -625,7 +625,6 @@ strong em {
 .app-modal-title-close-icon {
     cursor: pointer;
     position: relative;
-    top: -5px;
 }
 
 .app-modal {
@@ -655,7 +654,7 @@ strong em {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
     margin: $smallGap auto;
-    padding: 16px;
+    padding: 8px 16px 16px 16px;
     width: 75%;
     max-width: 800px;
     border-radius: $border-radius;
@@ -1321,6 +1320,7 @@ Will come back later and study this more. todo-1 */
 
 .txtFieldLabel {
     margin-right: .25rem;
+    margin-top: 1rem;
 }
 
 .dialogTitle {

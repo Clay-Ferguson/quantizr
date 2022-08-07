@@ -74,7 +74,7 @@ export class MainTab implements TabIntf<any> {
         // if not anon user return empty items
         if (!state.isAnonUser) return items;
 
-        if (state.config?.rhsAnonLinks) {
+        if (state.config.rhsAnonLinks) {
             for (const menuItem of state.config.rhsAnonLinks) {
                 if (menuItem.name === "separator") {
                     // items.push(new MenuItemSeparator());

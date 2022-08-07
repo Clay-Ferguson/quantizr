@@ -17,7 +17,7 @@ export class FriendTypeHandler extends TypeBase {
 
     getEditorHelp(): string {
         const state = getAppState();
-        return state.config?.help?.type?.friend?.editor;
+        return state.config.help?.type?.friend?.editor;
     }
 
     getAllowRowHeader(): boolean {

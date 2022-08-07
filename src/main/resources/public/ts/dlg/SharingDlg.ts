@@ -81,7 +81,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
-                    new HelpButton(() => getAppState().config?.help?.sharing?.dialog)
+                    new HelpButton(() => getAppState().config.help?.sharing?.dialog)
                 ], "marginTop")
             ])
         ];

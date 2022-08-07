@@ -20,7 +20,7 @@ export class CalcTypeHandler extends TypeBase {
 
     getEditorHelp(): string {
         const state = getAppState();
-        return state.config?.help?.type?.calculator?.editor;
+        return state.config.help?.type?.calculator?.editor;
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

@@ -52,7 +52,16 @@ export abstract class Comp implements CompIntf {
 
         // for debugging, shows classname in every dom element as an attribute.
         if (Comp.renderClassInDom) {
-            this.attribs = { c: this.constructor.name, ...this.attribs };
+            // if 'c' property not defined from a higher level up define it here as class name
+            if (!this.attribs.c) {
+                this.attribs = { c: this.constructor.name, ...this.attribs };
+            }
+        }
+        else {
+            // components can specify 'c' (to name a generic Div for example), and if not needed we remove it here.
+            if (this.attribs.c) {
+                delete this.attribs.c;
+            }
         }
 
         /* If an ID was specifically provided, then use it, or else generate one. We prefix with 'c' only because

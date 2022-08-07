@@ -67,7 +67,7 @@ export class NodeStatsDlg extends DialogBase {
                 new Button("Ok", () => {
                     this.close();
                 }, null, "btn-primary"),
-                new HelpButton(() => getAppState().config?.help?.nodeStats?.dialog)
+                new HelpButton(() => getAppState().config.help?.nodeStats?.dialog)
             ], "marginTop")
         ];
     }

@@ -24,7 +24,7 @@ export class LoginDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new Div(null, null, [
+            new Div(null, { c: "LoginContainerDiv" }, [
                 new TextField({ label: "User", enter: this.login, val: this.userState }),
                 new TextField({ label: "Password", pwd: true, enter: this.login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
