@@ -76,9 +76,9 @@ export class FeedView extends AppTab<FeedViewProps> {
                         enter: S.srch.refreshFeed,
                         outterClass: "marginBottom feedSearchField"
                     }),
-                    new IconButton("fa-refresh", "Search", {
+                    new IconButton("fa-refresh", "Refresh", {
                         onClick: S.srch.refreshFeed,
-                        title: "Refresh"
+                        title: "Refresh or Search"
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
