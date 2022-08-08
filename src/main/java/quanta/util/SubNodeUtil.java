@@ -317,7 +317,7 @@ public class SubNodeUtil extends ServiceBase {
 			// get the new idx, it might have changed.
 			newLineIdx = description.indexOf("\n");
 
-			String ogTitle = description.substring(0, newLineIdx).trim();
+			String ogTitle = newLineIdx > 2 ? description.substring(0, newLineIdx).trim() : "";
 			ogTitle = render.stripRenderTags(ogTitle);
 			ret.setTitle(ogTitle);
 
