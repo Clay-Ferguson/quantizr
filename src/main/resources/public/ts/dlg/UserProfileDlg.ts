@@ -134,7 +134,7 @@ export class UserProfileDlg extends DialogBase {
                                 className: "followCount"
                             }) : null,
 
-                            state.userProfile.followingCount > 0 ? new Span(state.userProfile.followingCount + " following", {
+                            state.userProfile.followingCount > 0 ? new Span("following "+state.userProfile.followingCount, {
                                 onClick: () => {
                                     if (state.userProfile.followingCount) {
                                         this.close();
