@@ -41,11 +41,15 @@ public class Convert extends ServiceBase {
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
+	 * 
+	 * todo-0: allow a boostedNode to be passed in optionally, and if so we use it rather than query for
+	 * it, AND make it a ValContainer so we know if ValContainer itself is non-null the check was done,
+	 * so don't query again.
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
 			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
-			boolean loadLikes, boolean attachBoosted) {
+			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
@@ -212,18 +216,28 @@ public class Convert extends ServiceBase {
 					boolean multiLevel = true;
 
 					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++,
-							multiLevel, lastChild, childrenCheck, false, loadLikes, false));
+							multiLevel, lastChild, childrenCheck, false, loadLikes, false, null));
 				}
 			}
 		}
 
 		if (attachBoosted) {
-			String boostTargetId = node.getStr(NodeProp.BOOST);
-			if (ok(boostTargetId)) {
-				SubNode boostedNode = read.getNode(ms, boostTargetId);
-				if (ok(boostedNode)) {
-					nodeInfo.setBoostedNode(convertToNodeInfo(sc, ms, boostedNode, false, false, 0, false, false, false, false, false, false));
+			SubNode boostedNode = null;
+
+			if (ok(boostedNodeVal)) {
+				// if boosted node was passed in use it
+				boostedNode = boostedNodeVal.getVal();
+			} else {
+				// otherwise check to see if we have a boosted node from scratch.
+				String boostTargetId = node.getStr(NodeProp.BOOST);
+				if (ok(boostTargetId)) {
+					boostedNode = read.getNode(ms, boostTargetId);
 				}
+			}
+
+			if (ok(boostedNode)) {
+				nodeInfo.setBoostedNode(convertToNodeInfo(sc, ms, boostedNode, false, false, 0, false, false, false, false,
+						false, false, null));
 			}
 		}
 

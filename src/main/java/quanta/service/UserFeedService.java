@@ -31,6 +31,7 @@ import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
 import quanta.util.ThreadLocals;
+import quanta.util.Val;
 
 @Component
 public class UserFeedService extends ServiceBase {
@@ -384,9 +385,34 @@ public class UserFeedService extends ServiceBase {
 				continue;
 			}
 
+			Val<SubNode> boostedNodeVal = null;
+			if (!allowNonEnglish || !allowBadWords) {
+				String boostTargetId = node.getStr(NodeProp.BOOST);
+				if (ok(boostTargetId)) {
+					SubNode boostedNode = read.getNode(ms, boostTargetId);
+
+					// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
+					// even if boostedNode is null here, indicating it's not found.
+					boostedNodeVal = new Val<>(boostedNode);
+
+					if (ok(boostedNode)) {
+						if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent(), 0.50f)) {
+							// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
+							skipped++;
+							continue;
+						}
+
+						if (!allowBadWords && english.hasBadWords(boostedNode.getContent())) {
+							skipped++;
+							continue;
+						}
+					}
+				}
+			}
+
 			try {
 				NodeInfo info =
-						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true);
+						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false, true, true, boostedNodeVal);
 				searchResults.add(info);
 
 				if (searchResults.size() >= MAX_FEED_ITEMS) {

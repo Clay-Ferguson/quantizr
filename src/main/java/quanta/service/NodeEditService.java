@@ -206,7 +206,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
-				false, false));
+				false, false, null));
 		res.setSuccess(true);
 		return res;
 	}
@@ -279,7 +279,7 @@ public class NodeEditService extends ServiceBase {
 
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
-				false, false));
+				false, false, null));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -561,7 +561,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false, true, true);
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, 
+				false, true, true, null);
 		res.setNode(newNodeInfo);
 
 		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check
