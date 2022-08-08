@@ -220,8 +220,12 @@ public class AuditFilter extends GenericFilterBean {
 	}
 
 	private String getSessionAttributeInfo(HttpServletRequest sreq) {
+		HttpSession session = ((HttpServletRequest) sreq).getSession(false);
+		if (no(session)) {
+			return "[no session]\n";
+		}
+
 		StringBuilder sb = new StringBuilder();
-		HttpSession session = ((HttpServletRequest) sreq).getSession(true);
 		Object sessionAattrs = session.getAttributeNames();
 		if (ok(sessionAattrs) && sessionAattrs instanceof Enumeration<?>) {
 			Enumeration<?> attrs = (Enumeration<?>) sessionAattrs;

@@ -1,5 +1,6 @@
 package quanta.filter;
 
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -38,9 +39,7 @@ public class GlobalFilter extends GenericFilterBean {
 			HttpServletRequest sreq = null;
 			if (request instanceof HttpServletRequest) {
 				sreq = (HttpServletRequest) request;
-
-				HttpSession session = sreq.getSession(true);
-				SessionContext.init(context, session);
+				boolean createSession = true;
 
 				// Special checks for Cache-Controls
 				if (sreq.getRequestURI().contains("/images/") || //
@@ -50,13 +49,21 @@ public class GlobalFilter extends GenericFilterBean {
 						// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
 						// v param.
 						sreq.getRequestURI().contains("?v=")) {
+					createSession = false;
 					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 				}
 
 				// Special check for CORS
 				if (sreq.getRequestURI().contains("/.well-known/") || //
 						sreq.getRequestURI().contains("/ap/")) {
+					createSession = false;
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
+				}
+
+				// NOTE: this is new logic! We used to create session always here.
+				HttpSession session = sreq.getSession(createSession);
+				if (ok(session)) {
+					SessionContext.init(context, session);
 				}
 			}
 			// log.debug("GlobalFilter->doFilter");
