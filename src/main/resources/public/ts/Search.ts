@@ -496,7 +496,9 @@ export class Search {
 
             boostComp = new Div(null, { className: "boost-row" }, [
                 allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true) : null,
-                boostContent
+                boostContent,
+                allowFooter ? new NodeCompRowFooter(node.boostedNode, isFeed, showThreadButton) : null,
+                allowFooter ? new Clearfix() : null
             ])
         }
 
