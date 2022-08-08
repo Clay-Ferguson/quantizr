@@ -79,6 +79,7 @@ import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -805,8 +806,38 @@ public class UserManagerService extends ServiceBase {
 	public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
 		// apLog.trace("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
-		String ret = addFriend(ms, false, ThreadLocals.getSC().getUserName(), req.getUserName().trim());
-		res.setMessage(ret);
+		String userDoingAction = ThreadLocals.getSC().getUserName();
+
+		final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
+
+		// If just following one user do it synchronously and send back the response
+		if (users.size() == 1) {
+			String ret = addFriend(ms, false, userDoingAction, users.get(0));
+			res.setMessage(ret);
+		}
+		// else if following multiple users run in an async exector thread
+		else if (users.size() > 1) {
+			
+			// For now we only allow FollowBot to do this.
+			if (!userDoingAction.equals(PrincipalName.FOLLOW_BOT.s())) {
+				throw new RuntimeException("Account not authorized for multi-follows.");
+			}
+
+			res.setMessage("Following users is in progress.");
+			exec.run(() -> {
+				Val<Integer> counter = new Val<>(0);
+				users.forEach(u -> {
+					counter.setVal(counter.getVal() + 1);
+					log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
+					addFriend(ms, false, userDoingAction, u);
+
+					// sleep so the foreign server doesn't start throttling us if these users are
+					// very many onthe same server.
+					Util.sleep(4000);
+				});
+				log.debug("BATCH FOLLOW complete.");
+			});
+		}
 		res.setSuccess(true);
 		return res;
 	}
@@ -860,9 +891,12 @@ public class UserManagerService extends ServiceBase {
 		if (ok(friendNode))
 			return;
 
-		apub.loadForeignUser(userDoingTheFollow, userToFollow);
+		if (userToFollow.contains("@")) {
+			apub.loadForeignUser(userDoingTheFollow, userToFollow);
+		}
 
-		// the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we must use arun.
+		// the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
+		// must use arun.
 		SubNode userNode = arun.run(s -> {
 			return read.getUserNodeByUserName(s, userToFollow);
 		});
@@ -885,6 +919,11 @@ public class UserManagerService extends ServiceBase {
 
 			// updates AND sends the friend request out to the foreign server.
 			edit.updateSavedFriendNode(userDoingTheFollow, friendNode);
+
+			// Update our cache, becasue we now have a new followed user.
+			synchronized (apCache.followedUsers) {
+				apCache.followedUsers.add(userToFollow);
+			}
 		}
 	}
 

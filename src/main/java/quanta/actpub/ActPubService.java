@@ -64,9 +64,6 @@ import quanta.util.XString;
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
-    // temporary code
-    private static int followBotCounterStart = 0;
-
     @Autowired
     private ActPubLog apLog;
 
@@ -1729,7 +1726,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void identifyFollowedAccounts() {
-        if (!prop.isActPubEnabled() || scanningForeignUsers)
+        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
             return;
 
         arun.run(ms -> {
@@ -1786,7 +1783,7 @@ public class ActPubService extends ServiceBase {
     public void refreshForeignUsers() {
         identifyFollowedAccounts();
 
-        if (!prop.isActPubEnabled() || refreshingForeignUsers)
+        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers)
             return;
 
         arun.run(ms -> {
@@ -1825,8 +1822,10 @@ public class ActPubService extends ServiceBase {
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
-                int followBotCounter = followBotCounterStart++;
                 int pushSkipCounter = 0;
+                StringBuilder usersToFollow = new StringBuilder();
+
+                // process each account in the system
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
                         break;
@@ -1841,8 +1840,6 @@ public class ActPubService extends ServiceBase {
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
-                    // if account is being followed by someone, ignore. No need to pull when we're expecting
-                    // to get pushes.
                     String remoteActorId = node.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                     synchronized (apCache.followedUsers) {
                         if (ok(remoteActorId) && apCache.followedUsers.contains(remoteActorId)) {
@@ -1850,45 +1847,20 @@ public class ActPubService extends ServiceBase {
                             log.debug("SKIP CRAWL: " + remoteActorId);
                             pushSkipCounter++;
 
-                            // todo-0: final step before we can do this skip/continue, is we need to check, for a timestamp
-                            // on the 'node' we have here which will be something like LAST_INBOUND_TIME, and will be
-                            // set and updated to hold the time every time that user 'userName' account has ever sent
-                            // us something inbound into our server (either to a specific user inbox or shared inbox),
-                            // indicating to us it's ok to depend on them sending info rather than crawling the inbox
-                            // right here. For now, we just skip, and hope for the best, until I see how much feed
-                            // content we'll end up expecing out FollowBot to do it's job.
+                            // if account is being followed by someone, ignore. No need to pull when we're expecting
+                            // to get pushes.
                             continue;
                         }
                     }
 
                     refreshForeignUsersQueuedCount++;
                     queueUserForRefresh(userName, true);
-
-                    /*
-                     * todo-0: this code (for adding a friend to the FollowBot account) will eventually be removed, and
-                     * then this entire mechanism of crawling can be replaced with a query of FOLLOW_BOT accounts,
-                     * instead of the current approach of having a curated set of users determined by the first
-                     * NUM_CURATED_ACCOUNTS that were ever crawled which is the current approach.
-                     * 
-                     * todo-0: We're doing the "% X == 0" to pull in only a handful on each run so that servers don't
-                     * consider quanta to be a DOS attack. Sending follow request to 1 of every few should be ok
-                     * and not suspicious. Once our FollowBot account has around 1500 users it's following we can
-                     * remove this temporary code, and the "official" way quanta admins will "curate" a public Fediverse
-                     * feed will be to use the FollowBot account to follow with.
-                     * 
-                     * todo-0: We'll also need a 'single click' button to allow the admin user to follow onto the 
-                     * FollowerBot from the UserProfile of any user, so we can be logged in as admin and still be able
-                     * to add to FollowerBot follows with one click.
-                     */
-                    if (++followBotCounter % 40 == 0) {
-                        log.debug("FOLLOW_BOT following: " + userName);
-                        user.addFriend(ms, true, PrincipalName.FOLLOW_BOT.s(), userName);
-                        Util.sleep(2000);
-                    }
+                    usersToFollow.append(userName + "\n");
                 }
 
                 log.debug("refreshForeignUsers skipped " + String.valueOf(pushSkipCounter)
-                        + " becasue they're followed by someone.");
+                        + " because they're followed by someone.");
+                log.debug("usersToFollow: " + usersToFollow.toString());
 
                 /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
                 synchronized (NodeSearchService.trendingFeedInfoLock) {

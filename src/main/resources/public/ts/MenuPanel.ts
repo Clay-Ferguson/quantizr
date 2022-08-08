@@ -12,6 +12,7 @@ import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
+import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
@@ -79,6 +80,7 @@ export class MenuPanel extends Div {
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
+    static multiFollow = () => { new MultiFollowDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time", 0, true);
@@ -228,7 +230,12 @@ export class MenuPanel extends Div {
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),
             new MenuItemSeparator(),
-            new MenuItem("Find People", MenuPanel.findUsers, !state.isAnonUser) //
+            new MenuItem("Find People", MenuPanel.findUsers, !state.isAnonUser), //
+
+            /* It would be possible to allow this multiFollow capability for all users, but I don't want to make it that easy
+             to create a heavy server load for now. Users can add one at a time for now, and only the FollowBot user has
+             this superpower. */
+            new MenuItem("Multi-Follow", MenuPanel.multiFollow, state.userName === J.PrincipalName.FOLLOW_BOT) //
         ], null, this.makeHelpIcon(":menu-people")));
 
         children.push(new Menu("Edit", [
