@@ -1755,7 +1755,7 @@ public class ActPubService extends ServiceBase {
                     // we query for only the foreign users this local user is following
                     List<String> following = apFollowing.getFollowing(userName, true, false, null);
 
-                    // todo-0: this info should be saved so we can dump it out in a "server info" printout for admin
+                    // todo-1: this info should be saved so we can dump it out in a "server info" printout for admin
                     log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
                     synchronized (apCache.followedUsers) {
                         apCache.followedUsers.addAll(following);
