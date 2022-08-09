@@ -1725,6 +1725,7 @@ public class ActPubService extends ServiceBase {
         return count;
     }
 
+    /* This code is no longer being used, but I want to leave for future reference and possible use. */
     public void identifyFollowedAccounts() {
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
             return;
@@ -1776,11 +1777,21 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
-     * todo-0: NEW LOGIC (Work in Progress), we will be crawling ONLY the accounts that are not
-     * currently being followed by any Quanta users, becuase accounts that are followed will be getting
-     * the data pushed to the inbox and will not need to be "pulled" by this crawler.
+     * This code was needed for curating content into our database before we had the FollowBot for this
+     * purpose. This code grabs some users from the DB (not necessarily followed by any user) and
+     * queries their actual outboxes. However now that we have FollowBot, we can depend on other forgign
+     * servers posting to us all the content we need to populate our curated fediverse feed.
+     * 
+     * I'm leaving this code here, and the hooks to call it, rather than deleting it, in case we have a
+     * need for this kind of processing in the future.
      */
     public void refreshForeignUsers() {
+
+        // YAY!!! We no longer need this method.
+        if (true) {
+            log.debug("Ignoring obsolete refreshForeignUsers call.");
+            return;
+        }
         identifyFollowedAccounts();
 
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers)
@@ -1802,23 +1813,6 @@ public class ActPubService extends ServiceBase {
                 HashSet<ObjectId> blockedUserIds = new HashSet<>();
                 userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
-                /*
-                 * todo-1: For now we only auto-refresh the top 1000 accounts. We're doing this becasue we have too
-                 * many and the current scale and purpose of the Quanta server can really be capped at 1000 good
-                 * accounts. Need to make these parameters configurable by admin.
-                 * 
-                 * The reason the oldest 1200 accounts (1200 limit below) are the "best" is because they were the
-                 * most closely seeded (like direct friend of a friend) to the original 50 or so friends I used to
-                 * get this server started. That is, I had 50 people I liked originally, and let the system
-                 * naturally add all additional users that exist as they were encountered, so that ended up with
-                 * about 6000. It turns out once you get past that first 1000 or so, the "quality" of the people
-                 * goes down significantly, and contains lots of foreign language stuff, unwanted sexual content,
-                 * bots, etc, so I noticed if I only update the "original" 1000 accounts this creates a fairly
-                 * "high quality" feed that I enjoy seeing, in the "Federated" tab.
-                 * 
-                 * There could be other algorighms used to select the accounts to auto-crawl, like ranking them or
-                 * something but for now just going with first 1000 accounts created works.
-                 */
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
