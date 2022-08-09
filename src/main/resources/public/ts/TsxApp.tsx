@@ -1,8 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import "../css/tsx-test.scss";
 
 // Example use:
 // http://localhost:8182/demo/tsx-test
+
+// This was an experiment with `react-md-editor`, but I decided not to use it for now:
+// https://www.npmjs.com/package/@uiw/react-md-editor
+//
+// import MDEditor from "@uiw/react-md-editor"
+// css:
+// .w-md-editor-text-pre > code,
+// .w-md-editor-text-input {
+//   font-size: 23px !important;
+//   line-height: 24px !important;
+// }
+// const [value, setValue] = useState("**Hello world!!!**");
+//             <div className="container">
+//                 <MDEditor
+//                     value={value}
+//                     onChange={setValue}
+//                     preview="edit"
+//                 />
+//                 {/* <MDEditor.Markdown source={value} style={{ whiteSpace: "pre-wrap" }} /> */}
+//             </div>
 
 function TsxApp() {
     return (
