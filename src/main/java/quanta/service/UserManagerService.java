@@ -767,7 +767,10 @@ public class UserManagerService extends ServiceBase {
 				res.setMessage("Unable to block user: " + req.getUserName());
 			}
 
-			edit.updateSavedFriendNode(userName, userNode);
+			// this was a bug to call this here, because we need to do NOTHING related to foreign servers
+			// when we're blocking a user. Leaving this code here commented, but to be removed soon. (todo-0)
+			// edit.updateSavedFriendNode(userName, userNode);
+
 			res.setSuccess(true);
 		} else {
 			/*
@@ -807,6 +810,11 @@ public class UserManagerService extends ServiceBase {
 		// apLog.trace("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		String userDoingAction = ThreadLocals.getSC().getUserName();
+
+		// if a foreign user, update thru ActivityPub.
+		if (userDoingAction.equals(PrincipalName.ADMIN.s())) {
+			throw new RuntimeException("Don't follow from admin account.");
+		}
 
 		final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
 

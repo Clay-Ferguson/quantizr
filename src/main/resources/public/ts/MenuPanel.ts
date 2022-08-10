@@ -235,7 +235,7 @@ export class MenuPanel extends Div {
             /* It would be possible to allow this multiFollow capability for all users, but I don't want to make it that easy
              to create a heavy server load for now. Users can add one at a time for now, and only the FollowBot user has
              this superpower. */
-            new MenuItem("Multi-Follow", MenuPanel.multiFollow, state.userName === J.PrincipalName.FOLLOW_BOT) //
+             state.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null //
         ], null, this.makeHelpIcon(":menu-people")));
 
         children.push(new Menu("Edit", [

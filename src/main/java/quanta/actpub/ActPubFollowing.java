@@ -47,7 +47,7 @@ public class ActPubFollowing extends ServiceBase {
     private ActPubLog apLog;
 
     /**
-     * Outbound message to foreign servers to follow/unfollow users
+     * Send outbound message to foreign servers to follow/unfollow users
      * 
      * apUserName is full user name like alice@quantizr.com
      */
