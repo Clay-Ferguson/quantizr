@@ -1263,7 +1263,7 @@ export class Util {
 
                 // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
                 if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
-                    s.activeMenu = C.BOOKMARKS_MENU_TEXT;
+                    s.activeMenu.add(C.BOOKMARKS_MENU_TEXT);
                 }
                 return s;
             });

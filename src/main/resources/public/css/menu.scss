@@ -81,19 +81,17 @@
     cursor: pointer;
     background-color: transparent;
     padding: 5px 5px 5px 15px; 
-    border-radius: 0px;
     border: 2px solid transparent;
 }
 
 .menuHeading:hover {
     background-color: $primary; // $menuItemHoverBackgroundColor;
-    border-radius: 0px;
     border: 2px solid gray;
 }
 
-.menuHeading[aria-expanded="true"] {
+.menuHeadingExpanded {
+    @extend .menuHeading;
     background-color: $secondary;
-    border-radius: 0px;
     border: 2px solid gray;
 }
 

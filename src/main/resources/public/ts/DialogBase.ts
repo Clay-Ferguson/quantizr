@@ -211,7 +211,7 @@ export abstract class DialogBase extends Div {
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
             new Div(null, { className: "app-modal-title-close-icon float-end" }, [
                 new Icon({
-                    className: "fa fa-times fa-lg",
+                    className: "fa fa-times",
                     onClick: () => {
                         this.closeByUser();
                         this.close();

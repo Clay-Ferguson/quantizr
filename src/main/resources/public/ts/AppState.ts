@@ -140,7 +140,7 @@ export class AppState {
     serverInfoTitle: string = null;
 
     ipsmActive: boolean = false;
-    activeMenu: string = null;
+    activeMenu: Set<string> = new Set<string>();
 
     graphData: J.GraphNode;
 }
