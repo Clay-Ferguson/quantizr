@@ -1,4 +1,5 @@
 import { dispatch, getAppState } from "../AppRedux";
+import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -27,6 +28,7 @@ export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
     bioState: Validator = new Validator();
     displayNameState: Validator = new Validator();
+    textScrollPos = new ScrollPos();
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
@@ -134,7 +136,7 @@ export class UserProfileDlg extends DialogBase {
                                 className: "followCount"
                             }) : null,
 
-                            state.userProfile.followingCount > 0 ? new Span("following "+state.userProfile.followingCount, {
+                            state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
                                 onClick: () => {
                                     if (state.userProfile.followingCount) {
                                         this.close();
@@ -160,8 +162,7 @@ export class UserProfileDlg extends DialogBase {
                     ? new Html(S.util.markdown(state.userProfile.userBio) || "", { className: "bioPanel" })
                     : new TextArea("About Me", {
                         rows: 5
-                    },
-                        this.bioState),
+                    }, this.bioState, null, false, this.textScrollPos),
 
                 web3Div,
 

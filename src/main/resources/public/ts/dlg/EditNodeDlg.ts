@@ -1,5 +1,5 @@
 import { dispatch, getAppState } from "../AppRedux";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -69,6 +69,7 @@ export class EditNodeDlg extends DialogBase {
     initialProps: J.PropertyInfo[];
 
     allowEditAllProps: boolean = false;
+    contentScrollPos = new ScrollPos();
 
     constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, mode);
@@ -822,7 +823,7 @@ export class EditNodeDlg extends DialogBase {
         this.contentEditor = new TextArea(null, {
             id: C.ID_PREFIX_EDIT + this.getState<LS>().node.id,
             rows
-        }, this.contentEditorState, "font-inherit displayCell", true);
+        }, this.contentEditorState, "font-inherit displayCell", true, this.contentScrollPos);
 
         const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
         this.contentEditor.setWordWrap(wrap);

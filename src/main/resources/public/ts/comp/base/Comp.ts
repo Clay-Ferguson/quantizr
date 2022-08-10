@@ -503,3 +503,15 @@ export abstract class Comp implements CompIntf {
         }
     }
 }
+
+export class ScrollPos {
+    scrollPos: number = 0;
+
+    getVal = (): number => {
+        return this.scrollPos;
+    }
+
+    setVal = (p: number): void => {
+        this.scrollPos = p;
+    }
+}

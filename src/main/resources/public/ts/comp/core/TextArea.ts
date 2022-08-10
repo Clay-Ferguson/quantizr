@@ -1,6 +1,7 @@
 import * as I from "../../Interfaces";
 import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
+import { ScrollPos } from "../base/Comp";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
 import { Span } from "./Span";
@@ -14,7 +15,8 @@ export class TextArea extends Span implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
-    constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "", public calcRows: boolean = false) {
+    constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "",
+        public calcRows: boolean = false, private scrollPos: ScrollPos = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
@@ -110,7 +112,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         //     textarea.style.height = calcHeight(textarea.value) + "px";
         // });
 
-        children.push(this.input = new TextareaTag(att, this.valState.v, this.calcRows));
+        children.push(this.input = new TextareaTag(att, this.valState.v, this.calcRows, this.scrollPos));
         this.setChildren(children);
     }
 }

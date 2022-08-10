@@ -1,3 +1,4 @@
+import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -10,6 +11,7 @@ import { Validator } from "../Validator";
 
 export class ImportCryptoKeyDlg extends DialogBase {
     keyState: Validator = new Validator();
+    textScrollPos = new ScrollPos();
 
     constructor() {
         super("Import Key Pair", "app-modal-content-medium-width");
@@ -19,7 +21,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextContent("Enter JWK Key Text"),
-                new TextArea("Keys", { rows: 15 }, this.keyState),
+                new TextArea("Keys", { rows: 15 }, this.keyState, null, false, this.textScrollPos),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { State } from "../../State";
-import { Comp } from "../base/Comp";
+import { Comp, ScrollPos } from "../base/Comp";
 
 interface LS { // Local State
     value: string;
@@ -11,7 +11,7 @@ export class TextareaTag extends Comp {
     static MIN_ROWS = 3;
     static MAX_ROWS = 15;
 
-    constructor(attribs: Object = {}, s?: State, private calcRows: boolean = false) {
+    constructor(attribs: Object = {}, s?: State, private calcRows: boolean = false, private scrollPos: ScrollPos = null) {
         super(attribs, s);
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
@@ -52,6 +52,14 @@ export class TextareaTag extends Comp {
         }
 
         return rows;
+    }
+
+    getScrollPos = (): number => {
+        return this.scrollPos ? this.scrollPos.getVal() : null;
+    }
+
+    setScrollPos = (pos: number): void => {
+        this.scrollPos?.setVal(pos);
     }
 
     compRender = (): ReactNode => {

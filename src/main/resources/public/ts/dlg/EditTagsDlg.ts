@@ -1,4 +1,5 @@
 import { dispatch, getAppState } from "../AppRedux";
+import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -11,6 +12,7 @@ import { Validator } from "../Validator";
 
 export class EditTagsDlg extends DialogBase {
     tagsState: Validator = new Validator();
+    textScrollPos = new ScrollPos();
 
     constructor() {
         super("Edit Hashtags", "app-modal-content-medium-width");
@@ -20,7 +22,7 @@ export class EditTagsDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new Div("Enter your custom hashtags, each on a separate line below. Hashtags must start with #."),
-                new TextArea("Hashtags", { rows: 15 }, this.tagsState),
+                new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
