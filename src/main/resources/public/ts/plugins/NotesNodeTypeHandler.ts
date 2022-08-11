@@ -15,7 +15,7 @@ export class NotesNodeTypeHandler extends TypeBase {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
         return new Div(null, null, [
             new Heading(4, "Notes", { className: "marginAll" })
         ]);

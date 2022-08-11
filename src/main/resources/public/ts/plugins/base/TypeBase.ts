@@ -82,7 +82,7 @@ export class TypeBase implements TypeHandlerIntf {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -114,7 +114,8 @@ export class TypeBase implements TypeHandlerIntf {
             comp.urls.forEach((url: string) => {
                 // allow max of 10 urls.
                 if (count++ < 10) {
-                    const og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url, "openGraphPanel", "openGraphImage", true, true, true);
+                    const og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url,
+                    isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {

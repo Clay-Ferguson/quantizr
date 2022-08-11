@@ -18,7 +18,7 @@ export class BookmarkTypeHandler extends TypeBase {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Div(null, null, [
             new NodeCompMarkdown(node, state),

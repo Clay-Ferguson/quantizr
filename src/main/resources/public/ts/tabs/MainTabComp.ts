@@ -52,7 +52,7 @@ export class MainTabComp extends AppTab {
                 state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-end" }) : null,
                 state.pageMessage ? new Clearfix() : null,
 
-                // if we have some parents to display well then let's just do that...
+                // if we have some parents to display...
                 state.node.parents?.length > 0 ? new NodeCompParentNodes(state, this.data, null) : null,
 
                 new Div(null, { className: state.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [

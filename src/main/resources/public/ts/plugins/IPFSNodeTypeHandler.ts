@@ -18,7 +18,7 @@ export class IPFSNodeTypeHandler extends TypeBase {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
         const cid = S.props.getPropStr(J.NodeProp.IPFS_CID, node) || "";
         return new Div(null, null, [new Heading(6, "CID: " + cid, { className: "ipfs-text" })]);
     }

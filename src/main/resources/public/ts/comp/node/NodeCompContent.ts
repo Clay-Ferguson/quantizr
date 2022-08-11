@@ -14,10 +14,11 @@ export class NodeCompContent extends Div {
         public tabData: TabIntf<any>,
         public rowStyling: boolean,
         public showHeader: boolean,
-        public idPrefix?: string,
-        public isFeed?: boolean,
-        public imgSizeOverride?: string,
-        public isTreeView?: boolean) {
+        public idPrefix: string,
+        public isFeed: boolean,
+        public imgSizeOverride: string,
+        public isTreeView: boolean,
+        public isLinkedNode: boolean) {
         super(null, {
             id: (idPrefix ? idPrefix : "n") + node?.id
         });
@@ -54,7 +55,7 @@ export class NodeCompContent extends Div {
             }
 
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
-            children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, state));
+            children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not

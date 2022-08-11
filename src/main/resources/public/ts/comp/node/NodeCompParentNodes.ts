@@ -40,7 +40,10 @@ export class NodeCompParentNodes extends Div {
                 title: "Toggle: Show Parent on page",
                 onClick: () => S.edit.toggleShowParents(state)
             }) : null,
-            new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true)
+
+            // todo-1: hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,
+            // so not worried about that here, for now.
+            new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false)
         ]);
     }
 }

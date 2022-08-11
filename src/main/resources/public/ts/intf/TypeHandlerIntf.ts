@@ -8,7 +8,7 @@ import { TabIntf } from "./TabIntf";
 export interface TypeHandlerIntf {
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp;
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp;
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo, appState: AppState): boolean;
     getAllowRowHeader(): boolean;

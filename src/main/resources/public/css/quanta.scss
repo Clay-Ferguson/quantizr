@@ -2147,6 +2147,11 @@ audio::-webkit-media-controls-play-button {
     background-color: #17202A;
 }
 
+.openGraphPanelBoost {
+    @extend .openGraphPanel;
+    background-color: black;
+}
+
 .openGraphPanelRss {
     overflow-x: hidden;
 }

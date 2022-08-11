@@ -23,7 +23,7 @@ export class FriendsListTypeHandler extends TypeBase {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => state.config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", { className: "marginAll" }),

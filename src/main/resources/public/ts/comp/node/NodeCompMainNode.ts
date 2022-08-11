@@ -107,7 +107,7 @@ export class NodeCompMainNode extends Div {
                 !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, null) : null,
                 new Clearfix(),
                 jumpButton,
-                new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true),
+                new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false),
                 boostComp,
                 new NodeCompRowFooter(node, false, true),
                 new Clearfix()

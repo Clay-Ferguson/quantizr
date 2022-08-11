@@ -470,7 +470,7 @@ export class Search {
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
-        const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false);
+        const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false, false);
 
         let clazz = isFeed ? "feed-node-table-row" : "results-node-table-row";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
@@ -491,7 +491,7 @@ export class Search {
 
         let boostComp: Div = null;
         if (node.boostedNode) {
-            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, null, false);
+            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, null, false, true);
             // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
             boostComp = new Div(null, { className: "boost-row" }, [
