@@ -26,7 +26,7 @@ import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
-function imageErrorFunc(evt: any) {
+export function imageErrorFunc(evt: any) {
     evt.target.hidden = true;
     evt.target.onerror = null;
     return true;

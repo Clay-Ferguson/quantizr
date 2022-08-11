@@ -51,17 +51,31 @@ export class NodeCompRowFooter extends Div {
                 if (inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
                     children.push(new Anchor(inReplyTo, "Parent", {
                         className: "footerLink",
-                        target: "_blank"
+                        target: "_blank",
+                        title: "Go to post's parent on it's home Fediverse instance"
                     }));
                 }
             }
 
-            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+
+            // some servers might have sent an ID and not the URL to our server, and so we detect this case
+            // and assume if there's an "https://" link specified we can build out link to that.
+            if (!objUrl) {
+                const idUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
+                if (idUrl?.startsWith("https://")) {
+                    objUrl = idUrl;
+                }
+            }
+
             if (objUrl) {
+                // check to see if it's a link to our server, and don't show 'foreign link' link if so.
+                // todo-1: we should make a util.ts method for this.
                 if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
                     children.push(new Anchor(objUrl, "Link", {
                         className: "footerLink",
-                        target: "_blank"
+                        target: "_blank",
+                        title: "Go to post on it's home Fediverse instance"
                     }));
                 }
             }

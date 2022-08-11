@@ -461,6 +461,7 @@ export class RssTypeHandler extends TypeBase {
         S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i: any) => {
 
             // this logic doesn't apply to openGraphImages, so we detect those and bail out
+            // Warning: this applies to openGraphImage, openGrapImageRss, and openGraphImageVert
             if (el.className.indexOf("openGraphImage") !== -1) {
                 return;
             }

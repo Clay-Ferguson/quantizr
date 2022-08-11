@@ -1,13 +1,14 @@
 import { AppState } from "../AppState";
-import { Anchor } from "../comp/core/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
-import { HorizontalLayout } from "./core/HorizontalLayout";
 import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { TabIntf } from "../intf/TabIntf";
+import * as J from "../JavaIntf";
+import { imageErrorFunc } from "../Render";
+import { S } from "../Singletons";
+import { HorizontalLayout } from "./core/HorizontalLayout";
 import { Html } from "./core/Html";
 
 interface LS { // Local State
@@ -147,30 +148,38 @@ export class OpenGraphPanel extends Div {
 
         let imgAndDesc: CompIntf = null;
         if (state.og.image && this.includeImage) {
+            // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
+            // apparently that interfered with rendering. Wasn't able to repro on localhost because of using http I think, so
+            // this code is probably harmless even if I'm making a mistake blaming the scrolling glitch on this.
+            state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
+
             // if mobile portrait mode render image above (not beside) description
             if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
                     new Img(null, {
                         className: "openGraphImageVert",
-                        src: state.og.image
+                        src: state.og.image,
+                        onError: imageErrorFunc
                     }),
                     new Div(state.og.description)
                 ]);
             }
             else {
-                if (state?.og?.image) {
-                    // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
-                    // apparently that interfered wit rendering. Wasn't able to repro on localhost because of using http I think, so
-                    // this code is probably harmless even if I'm making a mistake blaming the scrolling glitch on this.
-                    state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
-                }
+                let imgParent: Div;
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new HorizontalLayout([
-                    new Div(null, { className: "openGraphLhs" }, [
+                    imgParent = new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
-                            // warning: this class is referenced other places in the code, you must chagne both if you chagne one.
                             className: this.imageClass,
-                            src: state.og.image
+                            src: state.og.image,
+
+                            // NOTE: this onError needs to remove the PARENT div of the image so that it won't leave
+                            // an ugly gap on the page, and will instead look like the content never had an image there.
+                            onError: () => {
+                                // WARNING: we must delay the evaluation of 'imgParent' until the ACUTUAL onError,
+                                // so keep INSIDE function braces.
+                                imgParent.onMount(elm => { elm.style.display = "none"; });
+                            }
                         })
                     ]),
                     new Div(null, { className: "openGraphRhs" }, [

@@ -1469,7 +1469,7 @@ Will come back later and study this more. todo-1 */
 .systemNodeContent {
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
-    background-color: $baseBgColor;
+    background-color: #17202A;
     margin: $tinyGap;
     padding: $tinyGap;
 }
@@ -2160,12 +2160,14 @@ audio::-webkit-media-controls-play-button {
     margin-top: 8px;
 }
 
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphImageRss {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     width: 100%;
 }
 
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphImageVert {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
@@ -2174,6 +2176,7 @@ audio::-webkit-media-controls-play-button {
     margin-bottom: 10px;
 }
 
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphNoImage {
     margin-top: 8px;
     margin-right: 8px;
