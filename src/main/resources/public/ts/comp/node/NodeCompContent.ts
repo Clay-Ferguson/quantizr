@@ -18,9 +18,11 @@ export class NodeCompContent extends Div {
         public isFeed: boolean,
         public imgSizeOverride: string,
         public isTreeView: boolean,
-        public isLinkedNode: boolean) {
+        public isLinkedNode: boolean,
+        public wrapperClass: string) {
         super(null, {
-            id: (idPrefix ? idPrefix : "n") + node?.id
+            id: (idPrefix ? idPrefix : "n") + node?.id,
+            className: wrapperClass
         });
     }
 

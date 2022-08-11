@@ -43,7 +43,7 @@ export class NodeCompParentNodes extends Div {
 
             // todo-1: hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,
             // so not worried about that here, for now.
-            new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false)
+            new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false, null)
         ]);
     }
 }

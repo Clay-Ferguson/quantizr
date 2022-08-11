@@ -176,7 +176,7 @@ export class NodeCompRow extends Div {
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,
-            new NodeCompContent(this.node, this.tabData, true, true, null, null, this.imgSizeOverride, true, this.isLinkedNode),
+            new NodeCompContent(this.node, this.tabData, true, true, null, null, this.imgSizeOverride, true, this.isLinkedNode, null),
             this.internalComp,
             this.allowHeaders ? new NodeCompRowFooter(this.node, false, this.allowShowThread) : null,
             this.allowHeaders ? new Clearfix() : null
