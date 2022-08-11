@@ -8,7 +8,8 @@
         "module": "esnext",
         "moduleResolution": "node",
         "jsx": "react",
-        // todo-0: need to be able to turn noImplicitAny on
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
         "strictNullChecks": false,
 
@@ -18,8 +19,7 @@
         "suppressImplicitAnyIndexErrors": true,
 
         "noEmitOnError": true,
-        "allowJs": true,
-        "allowSyntheticDefaultImports": true,
+        "allowJs": true
         // "traceResolution": true (for tracing module loading, for diagnostics)
     },
     "include": [

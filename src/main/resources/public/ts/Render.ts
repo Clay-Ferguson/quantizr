@@ -1,6 +1,6 @@
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
-import marked from "marked";
+import { marked } from "marked";
 import { toArray } from "react-emoji-render";
 import { dispatch, getAppState } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -122,6 +122,9 @@ export class Render {
      */
     initMarkdown = () => {
         if (this.markedRenderer) return;
+        if (!marked) {
+            throw new Error("failed to import 'marked' in Render.ts");
+        }
         this.markedRenderer = new marked.Renderer();
 
         // This code is discovered to have been dead, for a long time. Look into it.
