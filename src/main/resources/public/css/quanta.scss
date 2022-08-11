@@ -620,11 +620,13 @@ strong em {
 .app-modal-title {
     margin-bottom: 1rem;
     font-size: 160%;
+    margin-left: 4px;
 }
 
 .app-modal-title-close-icon {
     cursor: pointer;
     position: relative;
+    margin-right: $smallGap;
 }
 
 .app-modal {
@@ -1679,6 +1681,7 @@ i'm backing out for now
     border-radius: $border-radius;
     margin-left: 40px;
     padding-top: 8px;
+    background-color: #17202A;
 }
 
 .active-row:hover {
@@ -2141,7 +2144,7 @@ audio::-webkit-media-controls-play-button {
     margin-right: $smallGap;
     border-radius: $border-radius;
     overflow-x: hidden;
-    background-color: $baseBgColor;
+    background-color: #17202A;
 }
 
 .openGraphPanelRss {
