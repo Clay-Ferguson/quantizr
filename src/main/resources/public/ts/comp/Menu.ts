@@ -3,12 +3,15 @@ import { dispatch, useAppState } from "../AppRedux";
 import { Div } from "../comp/core/Div";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
+import { S } from "../Singletons";
 
 export class Menu extends Comp {
     static userClickedMenu: boolean = false;
 
     constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
-        super({ id: "appMainMenu", className: "menuCard" });
+        // todo-0: we should probably do an ID like this for 'nodes' too like "${tabMame}${nodeId}" so each element of every page
+        // has a reproducable id/key to help react rendering effeciency!!!
+        super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
     compRender = (): ReactNode => {
