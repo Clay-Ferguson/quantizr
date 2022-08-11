@@ -2146,6 +2146,7 @@ audio::-webkit-media-controls-play-button {
 .openGraphPanelBoost {
     @extend .openGraphPanel;
     background-color: black;
+    margin-right: 0px;
 }
 
 .openGraphPanelRss {
