@@ -1,3 +1,7 @@
+$scrollTrack: $gray-900;
+$scrollThumb: $gray-700;
+$scrollBarWidth: 20px;
+
 .customScrollbar {
     // trying to get Firefox scrollbars to look better but it doesn't work.
     scrollbar-width: auto;
