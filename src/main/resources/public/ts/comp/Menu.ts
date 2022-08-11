@@ -9,8 +9,6 @@ export class Menu extends Comp {
     static userClickedMenu: boolean = false;
 
     constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
-        // todo-0: we should probably do an ID like this for 'nodes' too like "${tabMame}${nodeId}" so each element of every page
-        // has a reproducable id/key to help react rendering effeciency!!!
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 

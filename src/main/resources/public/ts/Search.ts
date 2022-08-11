@@ -24,8 +24,6 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
-    _UID_ROWID_PREFIX: string = "srch_row_";
-
     findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState) => {
         const res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
@@ -469,7 +467,6 @@ export class Search {
             parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
         }
 
-        const cssId = this._UID_ROWID_PREFIX + node.id;
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false, false, null);
 
         let clazz = isFeed ? "feed-node-table-row" : "results-node-table-row";
@@ -502,11 +499,14 @@ export class Search {
             ])
         }
 
-        const div = new Div(null, {
-            className: clazz,
-            id: cssId,
+        // this divClass goes on the parent if we have a parentItem, or else on the 'itemDiv' itself if we don't
+        const divClass: string = state.highlightSearchNodeId === node.id ? " userFeedItemHighlight" : " userFeedItem";
+
+        const itemDiv = new Div(null, {
+            className: clazz + (parentItem ? "" : divClass),
+            // todo-1: this 'tabData.id' can be a bit long and eat some memory but not that much.
+            id: tabData.id + "_" + node.id,
             nid: node.id
-            // tabIndex: "-1"
         }, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false) : null,
             content,
@@ -515,11 +515,18 @@ export class Search {
             allowFooter ? new Clearfix() : null
         ]);
 
-        const divClass: string = state.highlightSearchNodeId === node.id ? "userFeedItemHighlight" : "userFeedItem";
-
-        return new Div(null, {
-            className: isParent ? "userFeedItemParent" : divClass
-        }, [parentItem, div]);
+        // if we have a parentItem wrap it and 'itemDiv' in a container Div
+        if (parentItem) {
+            return new Div(null, {
+                className: isParent ? "userFeedItemParent" : divClass,
+                // the "_p_" differentiates the parent from the 'div' which is just "_" delimeter (see above)
+                id: tabData.id + "_p_" + node.id
+            }, [parentItem, itemDiv]);
+        }
+        // othwersize 'div' itself is what we need to return, without an unnecessary div wrapping it.
+        else {
+            return itemDiv;
+        }
     }
 
     clickSearchNode = (id: string, state: AppState) => {
