@@ -621,8 +621,6 @@ strong em {
 
 .app-modal-title-close-icon {
     cursor: pointer;
-    position: relative;
-    margin-right: $smallGap;
 }
 
 .app-modal {
@@ -997,8 +995,9 @@ Will come back later and study this more. todo-1 */
 .anchorBigMarginBottom {
     display: inline-block;
     margin-bottom: $smallGap;
+    margin-left: 20px;
     cursor: pointer;
-    padding: 8px;
+    padding: 3px;
     border: 1px solid olivedrab;
     border-radius: $border-radius;
 }

@@ -277,8 +277,6 @@ export class Render {
         /* we need this holder object because we don't have the dialog until it's created */
         const dlgHolder: any = {};
 
-        children.push(new Div("Click a link to put it in your clipboard.", { className: "marginBottom" }));
-
         const byIdUrl = window.location.origin + "?id=" + node.id;
         children.push(new Heading(5, "By ID"), //
             new Div(byIdUrl, {
