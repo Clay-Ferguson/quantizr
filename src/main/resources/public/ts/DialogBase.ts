@@ -210,8 +210,8 @@ export abstract class DialogBase extends Div {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            // only show the close 'X' icon for popup dialogs
-            this.mode === DialogMode.POPUP ? new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+            // only show the close 'X' icon for non-embed dialogs
+            this.mode !== DialogMode.EMBED ? new Div(null, { className: "app-modal-title-close-icon float-end" }, [
                 new Icon({
                     className: "fa fa-times",
                     onClick: () => {
