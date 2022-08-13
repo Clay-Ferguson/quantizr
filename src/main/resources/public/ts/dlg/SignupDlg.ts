@@ -14,34 +14,40 @@ declare const g_brandingAppName: string;
 
 export class SignupDlg extends DialogBase {
 
-    userState: Validator = new Validator("", [
+    userNameState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED },
-        { name: ValidatorRuleName.MAXLEN, payload: 25 },
+        { name: ValidatorRuleName.MINLEN, payload: 3 },
+        { name: ValidatorRuleName.MAXLEN, payload: 100 },
         { name: ValidatorRuleName.USERNAME }
     ]);
 
-    passwordState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
+    passwordState: Validator = new Validator("", [
+        { name: ValidatorRuleName.MINLEN, payload: 5 },
+        { name: ValidatorRuleName.MAXLEN, payload: 40 },
+        { name: ValidatorRuleName.REQUIRED }
+    ]);
 
     emailState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED },
-        { name: ValidatorRuleName.MAXLEN, payload: 50 }
+        { name: ValidatorRuleName.MINLEN, payload: 5 },
+        { name: ValidatorRuleName.MAXLEN, payload: 100 }
     ]);
 
     captchaState: Validator = new Validator("", [{ name: ValidatorRuleName.REQUIRED }]);
 
-    constructor() {
+    constructor(private adminCreatingUser: boolean = false) {
         super("Create Account", "app-modal-content-medium-width");
-        this.validatedStates = [this.userState, this.passwordState, this.emailState, this.captchaState];
+        this.validatedStates = [this.userNameState, this.passwordState, this.emailState, this.captchaState];
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextField({ label: "User Name", val: this.userState }),
+                new TextField({ label: "User Name", val: this.userNameState }),
                 new TextField({ label: "Password", pwd: true, val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),
 
-                new HorizontalLayout([
+                this.adminCreatingUser ? null : new HorizontalLayout([
                     new Img(null, {
                         src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
@@ -59,6 +65,13 @@ export class SignupDlg extends DialogBase {
     }
 
     signup = () => {
+        if (this.adminCreatingUser) {
+            // this string is just to make the validator succeed, and used as an extra confirmation on the server
+            // that the intent of the admin is the creation of a new user. This is not a security risk, but is safe
+            // in terms of security, because the server side also confirms independently that this is the admin doing this.
+            this.captchaState.setValue("adminCreatingUser");
+        }
+
         if (!this.validate()) {
             return;
         }
@@ -67,7 +80,7 @@ export class SignupDlg extends DialogBase {
 
     signupNow = async (reCaptchaToken: string) => {
         const res = await S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
-            userName: this.userState.getValue(),
+            userName: this.userNameState.getValue(),
             password: this.passwordState.getValue(),
             email: this.emailState.getValue(),
             captcha: this.captchaState.getValue()
@@ -80,16 +93,20 @@ export class SignupDlg extends DialogBase {
             /* close the signup dialog */
             this.close();
 
-            await S.util.showMessage(
-                "Check your email for verification link.", "Welcome to " + g_brandingAppName + "!"
-            );
+            if (this.adminCreatingUser) {
+                await S.util.showMessage("User '" + this.userNameState.getValue() + "' created successfully.", "New User");
+            }
+            else {
+                await S.util.showMessage(
+                    "Check your email for verification link.", "Welcome to " + g_brandingAppName + "!"
+                );
 
-            window.location.href = window.location.origin;
+                window.location.href = window.location.origin;
+            }
         }
         else {
             // S.util.showMessage("Invalid information for Signup", "Signup");
-
-            this.userState.setError(res.userError);
+            this.userNameState.setError(res.userError);
             this.passwordState.setError(res.passwordError);
             this.emailState.setError(res.emailError);
             this.captchaState.setError(res.captchaError);

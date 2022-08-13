@@ -41,7 +41,7 @@ public class Validator extends ServiceBase {
 
 	public String checkEmail(String email) {
 		int len = email.length();
-		if (len < 7 || len > 100)
+		if (len < 5 || len > 100)
 			return "Invalid email address";
 		return null;
 	}

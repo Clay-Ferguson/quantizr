@@ -18,6 +18,7 @@ import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
+import { SignupDlg } from "./dlg/SignupDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
@@ -81,6 +82,7 @@ export class MenuPanel extends Div {
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static multiFollow = () => { new MultiFollowDlg().open(); };
+    static createUser = () => { new SignupDlg(true).open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time", 0, true);
@@ -235,7 +237,8 @@ export class MenuPanel extends Div {
             /* It would be possible to allow this multiFollow capability for all users, but I don't want to make it that easy
              to create a heavy server load for now. Users can add one at a time for now, and only the FollowBot user has
              this superpower. */
-            state.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null //
+            state.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null, //
+            state.isAdminUser ? new MenuItem("Create User", MenuPanel.createUser) : null //
         ], null, this.makeHelpIcon(":menu-people")));
 
         children.push(new Menu("Edit", [

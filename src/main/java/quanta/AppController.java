@@ -453,7 +453,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("signup", req, session, ms -> {
-			return user.signup(req, false);
+			// This automated flag will bypass the captcha check, and email confirmation, and just immediately create the user.
+			boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
+			return user.signup(req, automated);
 		});
 	}
 

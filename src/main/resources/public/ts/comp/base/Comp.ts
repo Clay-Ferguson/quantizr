@@ -84,7 +84,8 @@ export abstract class Comp implements CompIntf {
         // }
 
         if (!ret && warn) {
-            console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted);
+            console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted +
+                "\nELEMENTS Stack: " + this.getElementStack());
         }
         return ret;
     }

@@ -422,7 +422,6 @@ public class UserManagerService extends ServiceBase {
 			log.debug("Signup: userName=" + userName + " email=" + email);
 			res.setSuccess(true);
 
-			/* throw exceptions of the username or password are not valid */
 			String userError = validator.checkUserName(userName);
 			if (ok(userError)) {
 				res.setUserError(userError);
@@ -471,7 +470,6 @@ public class UserManagerService extends ServiceBase {
 			return null;
 		});
 
-		res.setMessage("success");
 		return res;
 	}
 

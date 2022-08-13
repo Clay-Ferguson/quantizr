@@ -24,7 +24,7 @@ export class Validator {
             }
         }
         if (!ret) {
-            this.setError(errors.join(","));
+            this.setError(errors.join(", "));
         }
         else {
             this.setError(null);

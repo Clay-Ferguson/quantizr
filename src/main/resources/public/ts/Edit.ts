@@ -1097,7 +1097,7 @@ export class Edit {
             this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
         }
         else {
-            S.util.flashMessage("Your boost was posted.", "Boost");
+            S.util.showPageMessage("Node boosted!");
         }
     }
 
