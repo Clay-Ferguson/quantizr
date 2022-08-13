@@ -24,7 +24,7 @@ export class SharesTab implements TabIntf<SharesRSInfo> {
     }
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        return this.props.results?.find(n => n.id === nodeId);
+        return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
     nodeDeleted = (state: AppState, nodeId: string): void => {

@@ -26,7 +26,7 @@ export class SearchTab implements TabIntf<ResultSetInfo> {
     getTabSubOptions = (state: AppState): Div => { return null; };
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        return this.props.results?.find(n => n.id === nodeId);
+        return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
     nodeDeleted = (state: AppState, nodeId: string): void => {

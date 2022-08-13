@@ -26,7 +26,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        return this.props.feedResults?.find(n => n.id === nodeId);
+        return S.util.searchNodeArray(this.props.feedResults, nodeId);
     }
 
     nodeDeleted = (state: AppState, nodeId: string): void => {

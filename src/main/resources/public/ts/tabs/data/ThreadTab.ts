@@ -4,6 +4,7 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { S } from "../../Singletons";
 import { ThreadRSInfo } from "../../ThreadRSInfo";
 import { ThreadView } from "../ThreadView";
 
@@ -26,7 +27,7 @@ export class ThreadTab implements TabIntf<ThreadRSInfo> {
     getTabSubOptions = (state: AppState): Div => { return null; };
 
     findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        return this.props.results?.find(n => n.id === nodeId);
+        return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
     nodeDeleted = (state: AppState, nodeId: string): void => {

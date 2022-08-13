@@ -157,6 +157,14 @@ export class Util {
         }
     }
 
+    searchNodeArray(nodes: J.NodeInfo[], nodeId: string) {
+        for (const n of nodes) {
+            if (n.id === nodeId) return n;
+            if (n.boostedNode?.id === nodeId) return n.boostedNode;
+        }
+        return null;
+    }
+
     hashOfString = (s: string): string => {
         let hash = 0;
         let i = 0;
