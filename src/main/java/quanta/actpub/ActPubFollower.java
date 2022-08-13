@@ -241,7 +241,7 @@ public class ActPubFollower extends ServiceBase {
         Query q = new Query();
         Criteria crit =
                 /*
-                 * Technically we should be querying only unser Users Root, but I will assume the admin hasn't
+                 * Technically we should be querying only user Users Root, but I will assume the admin hasn't
                  * created any user nodes outside that location so that we can simplify this query and possibly make
                  * it run faster, by exclulding the subgraph check and just querying the entire DB based only on
                  * USER and FRIEND type

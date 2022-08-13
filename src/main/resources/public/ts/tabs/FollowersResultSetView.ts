@@ -49,6 +49,13 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
         // let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
         const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
         const accntUser = S.props.getClientPropStr("accntUser", node);
+
+        // We can end up here with a null accntUser, if this user has been deleted, but the
+        // server can't fix this itself because it has to expect the user is simply not yet created
+        // so we cope with this by ignoring any who don't have an accntUser name here.
+        if (!accntUser) {
+            return null;
+        }
         let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
