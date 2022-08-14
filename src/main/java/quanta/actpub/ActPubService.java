@@ -1935,11 +1935,18 @@ public class ActPubService extends ServiceBase {
                 if (ok(postsNode)) {
                     long delCount = delete.deleteOldActPubPosts(postsNode, ms);
                     totalDelCount += delCount;
-                    log.debug("User: " + userName + ". Deletes: " + delCount);
+                    log.debug("User:" + userName + ". Deleted:" + delCount + ". TotalDeletes:" + totalDelCount);
 
                     // this will take a long time to complete, but let's sleep 500ms between runs so the server
                     // performance isn't hosed.
                     Util.sleep(500);
+                }
+
+                // only clean up 100K at a time, per run of this function. Admin can run this multiple times, if
+                // desired
+                if (totalDelCount >= 100000) {
+                    log.debug("AP Delete Max Reached: 100000. End of cleanup.");
+                    break;
                 }
             }
             String message = "AP Maintence Complete. Deleted " + String.valueOf(totalDelCount) + " old posts.";
