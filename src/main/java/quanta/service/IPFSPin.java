@@ -30,7 +30,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public String verify() {
-        if (!prop.ipfsEnabled()) return "IPFS not enabled.";
+        if (!prop.ipfsEnabled()) return "\nIPFS not enabled.";
         String url = API_PIN + "/verify";
         // LinkedHashMap<String, Object> res =
         // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));

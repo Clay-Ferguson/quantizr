@@ -96,7 +96,10 @@ public class SystemService extends ServiceBase {
 			final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
 			attach.gridMaintenanceScan(statsMap);
-			ret = ipfsGarbageCollect(statsMap);
+
+			if (prop.ipfsEnabled()) {
+				ret = ipfsGarbageCollect(statsMap);
+			}
 
 			arun.run(ms -> {
 				user.writeUserStats(ms, statsMap);
@@ -113,18 +116,21 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		if (!prop.ipfsEnabled()) return "IPFS Disabled.";
+		if (!prop.ipfsEnabled())
+			return "IPFS Disabled.";
 		String ret = ipfsRepo.gc();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
 
 	public String validateDb() {
-		if (!prop.ipfsEnabled()) return "IPFS Disabled.";
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
-		ret += ipfsRepo.verify();
-		ret += ipfsPin.verify();
+
+		if (prop.ipfsEnabled()) {
+			ret += ipfsRepo.verify();
+			ret += ipfsPin.verify();
+		}
 		return ret;
 	}
 
@@ -206,8 +212,10 @@ public class SystemService extends ServiceBase {
 			HttpSession httpSess = ThreadLocals.getHttpSession();
 			log.debug("Send admin note to: " + sc.getUserName() + " sessId: " + httpSess.getId());
 			// need custom messages support pushed by admin
-			push.sendServerPushInfo(sc, new PushPageMessage("Server " + prop.getMetaHost()
-					+ "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.", true));
+			push.sendServerPushInfo(sc,
+					new PushPageMessage("Server " + prop.getMetaHost()
+							+ "  will restart for maintenance soon.<p><p>When you get an error, just refresh your browser.",
+							true));
 			sessionCount++;
 		}
 
