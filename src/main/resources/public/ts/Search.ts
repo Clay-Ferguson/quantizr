@@ -469,7 +469,7 @@ export class Search {
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false, false, null);
 
-        let clazz = isFeed ? "feed-node-table-row" : "results-node-table-row";
+        let clazz = isFeed ? "feed-node" : "results-node";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
