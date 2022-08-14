@@ -13,15 +13,14 @@ export class FullScreenImgViewer extends Main {
         const state = useAppState();
         const nodeId = state.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(state, nodeId);
-
         if (!node) {
-            console.log("Can't find nodeId " + nodeId);
+            console.error("Can't find nodeId " + nodeId);
         }
 
         const isAnAccountNode = node?.ownerId && node.id === node.ownerId;
         const children = [];
 
-        if (node && S.props.hasBinary(node) && !isAnAccountNode) {
+        if (S.props.hasBinary(node) && !isAnAccountNode) {
             const binary = new NodeCompBinary(node, false, true, null);
             children.push(binary);
         }

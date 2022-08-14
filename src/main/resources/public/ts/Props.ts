@@ -168,6 +168,7 @@ export class Props {
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
+        if (!node) return false;
         return !!this.getPropStr(J.NodeProp.BIN, node) ||
             !!this.getPropStr(J.NodeProp.BIN_URL, node) ||
             !!this.getPropStr(J.NodeProp.IPFS_LINK, node);
