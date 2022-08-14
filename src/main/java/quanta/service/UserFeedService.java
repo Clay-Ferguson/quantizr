@@ -218,10 +218,10 @@ public class UserFeedService extends ServiceBase {
 		 * users may be following a user that will effectively be blocked
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
+		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 		boolean allowNonEnglish = true;
 
 		if (!bidirectional) {
-			HashSet<ObjectId> blockedUserIds = new HashSet<>();
 			/*
 			 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
 			 * removed from it.
@@ -396,6 +396,13 @@ public class UserFeedService extends ServiceBase {
 					boostedNodeVal = new Val<>(boostedNode);
 
 					if (ok(boostedNode)) {
+						// if the owner of the boosted node is a blocked user and we're querying public nodes and with
+						// applyAdminBlocks in effect then skip this post.
+						if (req.getToPublic() && req.isApplyAdminBlocks() && blockedUserIds.contains(boostedNode.getOwner())) {
+							skipped++;
+							continue;
+						}
+
 						if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent(), 0.50f)) {
 							// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
 							skipped++;
