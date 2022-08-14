@@ -159,6 +159,7 @@ export class Util {
     }
 
     searchNodeArray(nodes: J.NodeInfo[], nodeId: string) {
+        if (!nodes) return null;
         for (const n of nodes) {
             if (n.id === nodeId) return n;
             if (n.boostedNode?.id === nodeId) return n.boostedNode;
