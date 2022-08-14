@@ -33,8 +33,9 @@ export const useAppState = (state?: AppState): AppState => {
 // NOTE: This dispatch is synchronous (not asynchronous)
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
     // console.log("Dispatch: " + actionName);
+    const startTime = new Date().getTime();
     store.dispatch({ type: actionName, update });
-    // console.log("Dispatch Complete: " + actionName);
+    console.log("act: " + actionName + " " + (new Date().getTime() - startTime) + "ms");
 };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any

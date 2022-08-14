@@ -453,6 +453,7 @@ export class Util {
                     S.quanta.setOverlay(true);
                 }
 
+                const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {
                     method: "POST",
@@ -468,6 +469,7 @@ export class Util {
                 })
                     .then((res: any) => {
                         if (res.status !== 200) {
+                            console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                             reject({ response: res });
                         }
                         else {
@@ -478,10 +480,12 @@ export class Util {
                         /* if we did a reject above in the first 'then' we will get here with json undefined
                         so we ignore that */
                         if (json) {
+                            console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
                             resolve(JSON.parse(json));
                         }
                     })
                     .catch((error) => {
+                        console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                         reject(error);
                     });
             });
@@ -1265,7 +1269,7 @@ export class Util {
     loadBookmarks = async () => {
         const state = getAppState();
         if (!state.isAnonUser) {
-            const res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
+            const res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
