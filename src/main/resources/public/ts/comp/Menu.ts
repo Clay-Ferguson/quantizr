@@ -1,36 +1,30 @@
 import { ReactNode } from "react";
-import { dispatch, useAppState } from "../AppRedux";
+import { useAppState } from "../AppRedux";
 import { Div } from "../comp/core/Div";
+import { Constants as C } from "../Constants";
+import { MenuPanelState } from "../Interfaces";
+import { PubSub } from "../PubSub";
+import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
-import { S } from "../Singletons";
 
 export class Menu extends Comp {
     static userClickedMenu: boolean = false;
 
-    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
+    constructor(public menuPanelState: MenuPanelState, public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
     compRender = (): ReactNode => {
         const appState = useAppState();
-        const expanded = appState.activeMenu.has(this.name);
+        const expanded =this.menuPanelState.expanded.has(this.name);
 
         this.setChildren([
             new Div(this.name, {
                 className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (appState.mobileMode ? " mobileMenuText" : ""),
                 id: this.getId("heading"),
                 onClick: () => {
-                    dispatch("setActiveMenu", (s) => {
-                        if (s.activeMenu.has(this.name)) {
-                            s.activeMenu.delete(this.name);
-                        }
-                        else {
-                            s.activeMenu.add(this.name);
-                        }
-                        return s;
-                    });
-
+                    PubSub.pub(C.PUBSUB_menuClicked, this.name);
                     Menu.userClickedMenu = true;
                     if (this.func) {
                         this.func();

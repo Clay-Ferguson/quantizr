@@ -14,6 +14,7 @@ import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
+import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
 declare const __page: any;
@@ -1269,10 +1270,13 @@ export class Util {
             dispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
 
-                // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
-                if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
-                    s.activeMenu.add(C.BOOKMARKS_MENU_TEXT);
-                }
+                // use a timer to let this dispatch completely finish setting bookmarks before we sent the click to expand.
+                setTimeout(() => {
+                    // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
+                    if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
+                        PubSub.pub(C.PUBSUB_menuClicked, C.BOOKMARKS_MENU_TEXT);
+                    }
+                }, 250);
                 return s;
             });
         }

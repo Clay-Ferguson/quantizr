@@ -47,10 +47,12 @@ export class Constants {
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 
+    // make an enum for these (todo-1)
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";
     static readonly PUBSUB_closeNavPanel = "PUBSUB_closeNavPanel";
+    static readonly PUBSUB_menuClicked = "PUBSUB_menuClicked";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";

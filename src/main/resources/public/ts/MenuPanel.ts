@@ -22,17 +22,24 @@ import { SignupDlg } from "./dlg/SignupDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
+import { MenuPanelState } from "./Interfaces";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
 export class MenuPanel extends Div {
+    static activeMenu: Set<string> = new Set<string>();
+    static inst: MenuPanel;
+
     constructor(state: AppState) {
         super(null, {
             id: C.ID_MENU,
             role: "tablist",
             className: (state.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
+        MenuPanel.inst = this;
+        this.mergeState<MenuPanelState>({ lastAction: null, lastClicked: null, expanded: MenuPanel.activeMenu });
     }
 
     // leaving for reference how to open this.
@@ -151,26 +158,27 @@ export class MenuPanel extends Div {
     static mobileToggle = () => S.util.switchBrowsingMode();
 
     preRender(): void {
-        const state = useAppState();
+        const appState = useAppState();
+        const state = this.getState();
 
-        const hltNode = S.nodeUtil.getHighlightedNode(state);
-        const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
+        const hltNode = S.nodeUtil.getHighlightedNode(appState);
+        const selNodeIsMine = !!hltNode && (hltNode.owner === appState.userName || appState.userName === "admin");
 
-        const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
-        const exportFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
+        const importFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
+        const exportFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
 
         const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, hltNode);
-        const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
-        const isPageRootNode = state.node && hltNode && state.node.id === hltNode.id;
-        const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
-        const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
+        const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(appState.node, appState);
+        const isPageRootNode = appState.node && hltNode && appState.node.id === hltNode.id;
+        const canMoveUp = !isPageRootNode && !appState.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
+        const canMoveDown = !isPageRootNode && !appState.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
 
         const bookmarkItems = [];
-        if (!state.isAnonUser) {
-            if (state.bookmarks) {
-                state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
+        if (!appState.isAnonUser) {
+            if (appState.bookmarks) {
+                appState.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null));
                     return true;
                 });
@@ -180,26 +188,26 @@ export class MenuPanel extends Div {
             if (bookmarkItems.length > 0) {
                 bookmarkItems.push(new MenuItemSeparator());
             }
-            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
+            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !appState.isAnonUser));
 
             if (hasBookmarks) {
-                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
+                children.push(new Menu(state, C.BOOKMARKS_MENU_TEXT, bookmarkItems, null, this.makeHelpIcon(":menu-bookmarks")));
             }
         }
 
-        if (state.config.menu?.help) {
-            children.push(new Menu("Help", this.helpMenuItems(state)));
+        if (appState.config.menu?.help) {
+            children.push(new Menu(state, "Help", this.helpMenuItems(appState)));
         }
 
-        if (!state.isAnonUser) {
-            children.push(new Menu("Quanta", [
-                new MenuItem("My Account", S.nav.navHome, !state.isAnonUser),
-                new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
-                new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
+        if (!appState.isAnonUser) {
+            children.push(new Menu(state, "Quanta", [
+                new MenuItem("My Account", S.nav.navHome, !appState.isAnonUser),
+                new MenuItem("My Home", MenuPanel.openHomeNode, !appState.isAnonUser),
+                new MenuItem("My Posts", MenuPanel.openPostsNode, !appState.isAnonUser),
                 new MenuItemSeparator(),
-                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
-                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
-                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !appState.isAnonUser),
+                new MenuItem("Notes", MenuPanel.openNotesNode, !appState.isAnonUser),
+                new MenuItem("Exports", MenuPanel.openExportsNode, !appState.isAnonUser)
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
@@ -209,7 +217,7 @@ export class MenuPanel extends Div {
         // No longer needed now that we have RHS as popup (NavDlg)
         // todo-1: eventually we can delete this code but leaving for now.
         // if (state.mobileMode) {
-        //     children.push(new Menu("Feed" + messagesSuffix, [
+        //     children.push(new Menu(localState, "Feed" + messagesSuffix, [
         //         new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
         //         new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
         //         new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
@@ -220,33 +228,33 @@ export class MenuPanel extends Div {
         //         new MenuItem("Federated", S.nav.messagesFediverse)
         //     ], null, this.makeHelpIcon(":menu-feed")));
 
-        //     children.push(new Menu("Trending", [
+        //     children.push(new Menu(localState, "Trending", [
         //         new MenuItem("Hashtags", S.nav.showTrendingHashtags),
         //         new MenuItem("Mentions", S.nav.showTrendingMentions),
         //         new MenuItem("Words", S.nav.showTrendingWords)
         //     ]));
         // }
 
-        children.push(new Menu("People", [
-            new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
-            new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
-            new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),
+        children.push(new Menu(state, "People", [
+            new MenuItem("Friends", MenuPanel.openFriendsNode, !appState.isAnonUser),
+            new MenuItem("Followers", MenuPanel.showFollowers, !appState.isAnonUser),
+            new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !appState.isAnonUser),
             new MenuItemSeparator(),
-            new MenuItem("Find People", MenuPanel.findUsers, !state.isAnonUser), //
+            new MenuItem("Find People", MenuPanel.findUsers, !appState.isAnonUser), //
 
             /* It would be possible to allow this multiFollow capability for all users, but I don't want to make it that easy
              to create a heavy server load for now. Users can add one at a time for now, and only the FollowBot user has
              this superpower. */
-            state.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null, //
-            state.isAdminUser ? new MenuItem("Create User", MenuPanel.createUser) : null //
+            appState.userName === J.PrincipalName.FOLLOW_BOT ? new MenuItem("Multi-Follow", MenuPanel.multiFollow) : null, //
+            appState.isAdminUser ? new MenuItem("Create User", MenuPanel.createUser) : null //
         ], null, this.makeHelpIcon(":menu-people")));
 
-        children.push(new Menu("Edit", [
-            state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
-            new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, !state.isAnonUser && state.selectedNodes.size > 0), //
+        children.push(new Menu(state, "Edit", [
+            appState.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !appState.isAnonUser) : null, //
+            new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, !appState.isAnonUser && appState.selectedNodes.size > 0), //
 
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
-            new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //
+            new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !appState.isAnonUser && !!appState.nodesToMove), //
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
@@ -254,15 +262,15 @@ export class MenuPanel extends Div {
             // we need some sort of "acceptance" feature for the recipient to take control, because for now they way this
             // works is you can take your own node and create the appearance that someone else authored it simply by
             // transferring the node to them, so we need some better process of acceptance.
-            state.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !state.isAnonUser && selNodeIsMine) : null, //
+            appState.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
 
-            new MenuItem("Update Headings", S.edit.updateHeadings, !state.isAnonUser && selNodeIsMine), //
-            new MenuItem("Search and Replace", MenuPanel.searchAndReplace, !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Update Headings", S.edit.updateHeadings, !appState.isAnonUser && selNodeIsMine), //
+            new MenuItem("Search and Replace", MenuPanel.searchAndReplace, !appState.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Split Node", MenuPanel.splitNode, !state.isAnonUser && selNodeIsMine), //
-            new MenuItem("Join Nodes", MenuPanel.joinNodes, !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Split Node", MenuPanel.splitNode, !appState.isAnonUser && selNodeIsMine), //
+            new MenuItem("Join Nodes", MenuPanel.joinNodes, !appState.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 
@@ -270,7 +278,7 @@ export class MenuPanel extends Div {
             new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, canMoveDown), //
 
             new MenuItemSeparator(), //
-            new MenuItem("Delete", S.edit.deleteSelNodes, !state.isAnonUser && selNodeIsMine) //
+            new MenuItem("Delete", S.edit.deleteSelNodes, !appState.isAnonUser && selNodeIsMine) //
 
             // todo-2: disabled during mongo conversion
             // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
@@ -284,19 +292,19 @@ export class MenuPanel extends Div {
         const createMenuItems: CompIntf[] = [];
         const typeHandlers = S.plugin.getAllTypeHandlers();
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
-            if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, state), //
-                    !state.isAnonUser && !!hltNode));
+            if (appState.isAdminUser || typeHandler.getAllowUserSelect()) {
+                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, appState), //
+                    !appState.isAnonUser && !!hltNode));
             }
             return true;
         });
 
-        children.push(new Menu("Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
+        children.push(new Menu(state, "Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));
 
-        children.push(new Menu("Search", [
-            new MenuItem("By Content", MenuPanel.searchByContent, !state.isAnonUser && !!hltNode), //
-            new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser), //
-            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser), //
+        children.push(new Menu(state, "Search", [
+            new MenuItem("By Content", MenuPanel.searchByContent, !appState.isAnonUser && !!hltNode), //
+            new MenuItem("By Node Name", MenuPanel.searchByName, !appState.isAnonUser), //
+            new MenuItem("By Node ID", MenuPanel.searchById, !appState.isAnonUser), //
 
             // moved into editor dialog
             // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
@@ -305,43 +313,43 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Shared Nodes", MenuPanel.showAllShares, //
-                !state.isAnonUser && !!hltNode),
+                !appState.isAnonUser && !!hltNode),
 
             new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, //
-                !state.isAnonUser && !!hltNode),
+                !appState.isAnonUser && !!hltNode),
 
             new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, //
-                !state.isAnonUser && !!hltNode),
+                !appState.isAnonUser && !!hltNode),
 
             new MenuItemSeparator(), //
 
             new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, //
-                !state.isAnonUser && !!hltNode)
+                !appState.isAnonUser && !!hltNode)
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
         ], null, this.makeHelpIcon(":menu-search")));
 
-        children.push(new Menu("Timeline", [
+        children.push(new Menu(state, "Timeline", [
             // todo-1: need to see if this is easy to turn on for non-logged in users.
-            new MenuItem("Live Rev-Chron (Chat Room)", () => S.nav.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
+            new MenuItem("Live Rev-Chron (Chat Room)", () => S.nav.messagesNodeFeed(appState), !appState.isAnonUser && hltNode?.id != null),
             new MenuItemSeparator(), //
-            new MenuItem("Created", MenuPanel.timelineByCreated, !state.isAnonUser && !!hltNode), //
-            new MenuItem("Modified", MenuPanel.timelineByModified, !state.isAnonUser && !!hltNode), //
+            new MenuItem("Created", MenuPanel.timelineByCreated, !appState.isAnonUser && !!hltNode), //
+            new MenuItem("Modified", MenuPanel.timelineByModified, !appState.isAnonUser && !!hltNode), //
             new MenuItemSeparator(), //
-            new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, !state.isAnonUser && !!hltNode), //
-            new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, !state.isAnonUser && !!hltNode) //
+            new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, !appState.isAnonUser && !!hltNode), //
+            new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, !appState.isAnonUser && !!hltNode) //
         ], null, this.makeHelpIcon(":menu-timeline")));
 
-        children.push(new Menu("Calendar", [
-            new MenuItem("Display", MenuPanel.showCalendar, !state.isAnonUser && !!hltNode),
+        children.push(new Menu(state, "Calendar", [
+            new MenuItem("Display", MenuPanel.showCalendar, !appState.isAnonUser && !!hltNode),
             new MenuItemSeparator(), //
-            new MenuItem("Future", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
-            new MenuItem("Past", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
-            new MenuItem("All", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
+            new MenuItem("Future", MenuPanel.calendarFutureDates, !appState.isAnonUser && !!hltNode), //
+            new MenuItem("Past", MenuPanel.calendarPastDates, !appState.isAnonUser && !!hltNode), //
+            new MenuItem("All", MenuPanel.calendarAllDates, !appState.isAnonUser && !!hltNode) //
         ]));
 
-        children.push(new Menu("Tools", [
+        children.push(new Menu(state, "Tools", [
             // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
@@ -351,15 +359,15 @@ export class MenuPanel extends Div {
             new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
             new MenuItemSeparator(), //
 
-            new MenuItem("Test Microphone", MenuPanel.testMicrophone, !state.isAnonUser), //
-            new MenuItem("Test Web Cam", MenuPanel.testWebCam, !state.isAnonUser), //
+            new MenuItem("Test Microphone", MenuPanel.testMicrophone, !appState.isAnonUser), //
+            new MenuItem("Test Web Cam", MenuPanel.testWebCam, !appState.isAnonUser), //
 
             new MenuItemSeparator(), //
             /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
              that I have to impose an intentional performance lag to let the animation show up, so in order to have the
              absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
              the code in place for future reference. */
-            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect),
+            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => appState.mouseEffect),
 
             new MenuItem("My GEO Location", S.nav.geoLocation) //
 
@@ -370,17 +378,17 @@ export class MenuPanel extends Div {
             // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
         ], null, this.makeHelpIcon(":menu-tools")));
 
-        children.push(new Menu("Node Info", [
+        children.push(new Menu(state, "Node Info", [
             // I decided with this on the toolbar we don't need it repliated here.
             // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
             new MenuItem("Show URLs", MenuPanel.showUrls, !!hltNode), //
-            new MenuItem("Show Raw Data", MenuPanel.showRawData, !state.isAnonUser && selNodeIsMine), //
-            state.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
+            new MenuItem("Show Raw Data", MenuPanel.showRawData, !appState.isAnonUser && selNodeIsMine), //
+            appState.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
             new MenuItemSeparator(), //
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
-            new MenuItem("Node Stats", MenuPanel.nodeStats, !state.isAnonUser && selNodeIsMine) //
+            new MenuItem("Node Stats", MenuPanel.nodeStats, !appState.isAnonUser && selNodeIsMine) //
 
             // This menu item works, but will have little value to users, because the only difference between this and 'Node Stats', is that
             // the 'trending' stats is defined as the 'Node Stats' for the most recent 500 results in the query. I had a need for this early on
@@ -391,14 +399,14 @@ export class MenuPanel extends Div {
             //     !state.isAnonUser /* state.isAdminUser */) //
         ], null, this.makeHelpIcon(":menu-node-info")));
 
-        children.push(new Menu("Settings", [
+        children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)
             // new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
             // new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
 
-            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPrefs.nsfw), //
-            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPrefs.showParents), //
-            new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => state.userPrefs.showReplies), //
+            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => appState.userPrefs.nsfw), //
+            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => appState.userPrefs.showParents), //
+            new MenuItem("Show Replies", MenuPanel.toggleReplies, true, () => appState.userPrefs.showReplies), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.
@@ -407,28 +415,28 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(state.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
+            new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
 
-            new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
-            new MenuItem("Account Settings", MenuPanel.accountSettings, !state.isAnonUser), //
-            new MenuItem("Storage Space", MenuPanel.storageSpace, !state.isAnonUser), //
-            !state.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !state.isAnonUser) : null, //
-            state.isAnonUser ? new MenuItem("Signup", S.user.userSignup, state.isAnonUser) : null //
+            new MenuItem("Profile", MenuPanel.profile, !appState.isAnonUser), //
+            new MenuItem("Account Settings", MenuPanel.accountSettings, !appState.isAnonUser), //
+            new MenuItem("Storage Space", MenuPanel.storageSpace, !appState.isAnonUser), //
+            !appState.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !appState.isAnonUser) : null, //
+            appState.isAnonUser ? new MenuItem("Signup", S.user.userSignup, appState.isAnonUser) : null //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
         ]));
 
-        children.push(new Menu("Encrypt", [
-            new MenuItem("Show Keys", MenuPanel.showKeys, !state.isAnonUser), //
-            new MenuItem("Generate Keys", MenuPanel.generateKeys, !state.isAnonUser), //
-            new MenuItem("Publish Keys", MenuPanel.publishKeys, !state.isAnonUser), //
-            new MenuItem("Import Keys", MenuPanel.importKeys, !state.isAnonUser) //
+        children.push(new Menu(state, "Encrypt", [
+            new MenuItem("Show Keys", MenuPanel.showKeys, !appState.isAnonUser), //
+            new MenuItem("Generate Keys", MenuPanel.generateKeys, !appState.isAnonUser), //
+            new MenuItem("Publish Keys", MenuPanel.publishKeys, !appState.isAnonUser), //
+            new MenuItem("Import Keys", MenuPanel.importKeys, !appState.isAnonUser) //
         ], null, this.makeHelpIcon(":menu-encrypt")));
 
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
-        //     children.push(new Menu("Admin Tools", [
+        //     children.push(new Menu(localState, "Admin Tools", [
         //         //todo-2: disabled during mongo conversion
         //         //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
         //         //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
@@ -450,9 +458,9 @@ export class MenuPanel extends Div {
           These menu items can save a node subgraph to IPFS files (MFS) and then restore those nodes back
           from that tree branch. But the feature is not currently needed or enabled.
           */
-        if (state.isAdminUser) {
+        if (appState.isAdminUser) {
             // DO NOT DELETE: Work in Progress....
-            // children.push(new Menu("IPFS", [
+            // children.push(new Menu(localState, "IPFS", [
             //     new MenuItem("Sync: To IPFS", () => S.nodeUtil.publishNodeToIpfs(hltNode), //
             //         state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
             //     new MenuItem("Sync: From IPFS", () => S.nodeUtil.loadNodeFromIpfs(hltNode), //
@@ -460,39 +468,39 @@ export class MenuPanel extends Div {
             // ]));
         }
 
-        if (state.isAdminUser) {
-            children.push(new Menu("Admin - Utils", [
+        if (appState.isAdminUser) {
+            children.push(new Menu(state, "Admin - Utils", [
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
-                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null, state)), //
-                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null, state)), //
-                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, state)), //
-                new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, state)), //
+                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null, appState)), //
+                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null, appState)), //
+                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, appState)), //
+                new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, appState)), //
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
-                new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null, state)), //
-                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state))
+                new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null, appState)), //
+                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(appState))
             ]));
 
-            children.push(new Menu("Admin - DB", [
-                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, state)), //
-                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, state)), //
-                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null, state)), //
-                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null, state)), //
-                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null, state)),
-                new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null, state)) //
+            children.push(new Menu(state, "Admin - DB", [
+                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
+                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //
+                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null, appState)), //
+                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null, appState)), //
+                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null, appState)),
+                new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null, appState)) //
             ]));
 
-            children.push(new Menu("Admin - ActivityPub", [
+            children.push(new Menu(state, "Admin - ActivityPub", [
                 new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                 new MenuItem("Get JSON from URL", MenuPanel.readJSONfromURL), //
-                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null, state)), //
-                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null, state)), //
-                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null, state)), //
-                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null, state))
+                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null, appState)), //
+                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null, appState)), //
+                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null, appState)), //
+                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null, appState))
             ]));
 
-            children.push(new Menu("Admin - Test", [
-                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null, state)), //
+            children.push(new Menu(state, "Admin - Test", [
+                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null, appState)), //
                 new MenuItem("Send Email", () => S.util.sendTestEmail()),
                 new MenuItem("Server Log Text", () => S.util.sendLogText()),
                 new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
@@ -575,3 +583,19 @@ export class MenuPanel extends Div {
         return items;
     }
 }
+
+PubSub.sub(C.PUBSUB_menuClicked, (name: string) => {
+    MenuPanel.inst?.onMount(() => {
+        const state: MenuPanelState = MenuPanel.inst.getState();
+        if (state.expanded.has(name)) {
+            state.expanded.delete(name);
+            state.lastAction = "collapse";
+        }
+        else {
+            state.expanded.add(name);
+            state.lastAction = "expand";
+        }
+        state.lastClicked = name;
+        MenuPanel.inst.mergeState(state);
+    });
+});
