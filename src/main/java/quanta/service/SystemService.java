@@ -167,6 +167,12 @@ public class SystemService extends ServiceBase {
 				}
 			}
 
+			if (ms.isAdmin()) {
+				ret += "\n\n";
+				ret += "English: " + (english.isEnglish(node.getContent(), 0.50f) ? "Yes" : "No") + "\n";
+				ret += "Profanity: " + (english.hasBadWords(node.getContent()) ? "Yes" : "No") + "\n";
+			}
+
 			return ret;
 		} else {
 			return "node not found!";
