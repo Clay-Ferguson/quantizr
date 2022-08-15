@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import com.mongodb.bulk.BulkWriteResult;
-import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -17,6 +15,8 @@ import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -24,6 +24,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
+import quanta.util.Val;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
@@ -79,19 +80,14 @@ public class MongoDelete extends ServiceBase {
 		update.saveSession(ms);
 	}
 
-	/**
-	 * Deletes old activity pub posts, just to save space on our server. Admin option only.
-	 */
-	public long deleteOldActPubPosts(SubNode parent, MongoSession ms) {
+	public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
 		Query q = new Query();
 
 		// date 365 days ago. Posts over a year old will be removed
-		LocalDate ldt = LocalDate.now().minusDays(365);
+		LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria crit = // Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
-				Criteria.where(SubNode.PARENT).is(parent.getId())
-				.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).ne(null) //
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null) //
 				.and(SubNode.MODIFY_TIME).lt(date);
 
 		q.addCriteria(crit);
@@ -223,70 +219,83 @@ public class MongoDelete extends ServiceBase {
 			ms = auth.getAdminSession();
 		}
 
-		int orphanCount = 0;
+		Val<Integer> orphanCount = new Val<>(0);
 		int loops = 0;
 
 		/*
-		 * Run this up to 3 per call. Note that for large orphaned subgraphs we only end up pruning off the
-		 * 10 deepest levels at a time, so running this multiple times will be required, but this is ideal.
-		 * We could raise this 10 to a larger number larger than any possible tree depth, but there's no
-		 * need. Running this several times has the same effect
+		 * Run this loop up to 3 per call. Note that for large orphaned subgraphs we only end up pruning off the
+		 * N deepest levels at a time, so running this multiple times will be required, but this is ideal.
+		 * We could raise this N to a larger number larger than any possible tree depth, but there's no
+		 * need. Running this several times has the same effect.
 		 */
-		while (++loops < 3) {
-			int nodesProcessed = 0;
-			int deleteCount = 0;
+		while (++loops <= 3) {
+			log.debug("Delete Orphans. Loop: " + loops);
+			Val<Integer> nodesProcessed = new Val<>(0);
+			Val<Integer> deleteCount = new Val<>(0);
+			Val<Integer> batchSize = new Val<>(0);
 
 			// bulk operations is scoped only to one iteration, just so it itself can't be too large
-			BulkOperations bops = null;
+			Val<BulkOperations> bops = new Val<>(null);
 
+			Query allQuery = new Query().addCriteria(new Criteria(SubNode.PARENT).ne(null));
 			/*
 			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
 			 * the node is an orphan and can be deleted.
 			 */
-			Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-
-			for (SubNode node : nodes) {
-				// print progress every 2000th node
-				if (++nodesProcessed % 2000 == 0) {
-					log.debug("Nodes Processed: " + nodesProcessed);
+			ops.stream(allQuery, SubNode.class).forEachRemaining(node -> {
+				// print progress every 1000th node
+				nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+				if (nodesProcessed.getVal() % 1000 == 0) {
+					log.debug("Nodes Processed: " + nodesProcessed.getVal());
 				}
 
 				// ignore the root node and any of it's children.
 				if ("/r".equalsIgnoreCase(node.getPath()) || //
 						"/r".equalsIgnoreCase(node.getParentPath())) {
-					continue;
+					return;
 				}
 
 				/*
 				 * if there's a parent specified (always should be except for root), but we can't find the parent
 				 * then this node is an orphan to be deleted
 				 */
-				if (ok(node.getParent()) && no(ops.findById(node.getParent(), SubNode.class))) {
+				if (no(ops.findById(node.getParent(), SubNode.class))) {
 					log.debug("DEL ORPHAN id=" + node.getIdStr() + " path=" + node.getPath() + " Content=" + node.getContent());
-					orphanCount++;
-					deleteCount++;
+					orphanCount.setVal(orphanCount.getVal() + 1);
+					deleteCount.setVal(deleteCount.getVal() + 1);
 
-					if (no(bops)) {
-						bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+					// lazily create the bulk ops
+					if (no(bops.getVal())) {
+						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 					}
 
 					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-					bops.remove(query);
-				}
-			}
+					bops.getVal().remove(query);
 
-			if (ok(bops)) {
-				BulkWriteResult results = bops.execute();
-				log.debug("Orphans Deleted: " + results.getDeletedCount());
+					batchSize.setVal(batchSize.getVal() + 1);
+					if (batchSize.getVal() >= 200) {
+						batchSize.setVal(0);;
+						BulkWriteResult results = bops.getVal().execute();
+						log.debug("Orphans Deleted Batch: " + results.getDeletedCount());
+
+						// haven't confirmed if forcing a new bops is required for each batch or not (todo-0)
+						bops.setVal(null);
+					}
+				}
+			});
+
+			if (ok(bops.getVal())) {
+				BulkWriteResult results = bops.getVal().execute();
+				log.debug("Orphans Deleted (batch remainder): " + results.getDeletedCount());
 			}
 
 			// if no deletes were done, break out of while loop and return.
-			if (deleteCount == 0) {
+			if (deleteCount.getVal() == 0) {
 				break;
 			}
 		}
 
-		log.debug("TOTAL ORPHANS DELETED=" + orphanCount);
+		log.debug("TOTAL ORPHANS DELETED=" + orphanCount.getVal());
 		// nodeCount = read.getNodeCount(null);
 		// log.debug("final Node Count: " + nodeCount);
 	}

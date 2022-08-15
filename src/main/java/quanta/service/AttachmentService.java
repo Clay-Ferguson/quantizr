@@ -1143,6 +1143,7 @@ public class AttachmentService extends ServiceBase {
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		arun.run(ms -> {
 			int delCount = 0;
+			// todo-1: do we need to replace this with a 'stream' of some kind to keep from getting out of memory errors?
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
