@@ -277,8 +277,6 @@ public class MongoDelete extends ServiceBase {
 						batchSize.setVal(0);;
 						BulkWriteResult results = bops.getVal().execute();
 						log.debug("Orphans Deleted Batch: " + results.getDeletedCount());
-
-						// haven't confirmed if forcing a new bops is required for each batch or not (todo-0)
 						bops.setVal(null);
 					}
 				}

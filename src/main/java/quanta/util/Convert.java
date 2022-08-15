@@ -41,10 +41,6 @@ public class Convert extends ServiceBase {
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
-	 * 
-	 * todo-0: allow a boostedNode to be passed in optionally, and if so we use it rather than query for
-	 * it, AND make it a ValContainer so we know if ValContainer itself is non-null the check was done,
-	 * so don't query again.
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,

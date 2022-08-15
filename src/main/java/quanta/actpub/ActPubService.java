@@ -1837,7 +1837,6 @@ public class ActPubService extends ServiceBase {
                     String remoteActorId = node.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                     synchronized (apCache.followedUsers) {
                         if (ok(remoteActorId) && apCache.followedUsers.contains(remoteActorId)) {
-                            // todo-0: eventually remove this logging
                             log.debug("SKIP CRAWL: " + remoteActorId);
                             pushSkipCounter++;
 

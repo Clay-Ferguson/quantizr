@@ -373,11 +373,6 @@ public class MongoUtil extends ServiceBase {
 		return path.startsWith("/") && path.substring(1).indexOf("/") == -1;
 	}
 
-	public Iterable<SubNode> findAll(MongoSession ms) {
-		auth.requireAdmin(ms);
-		update.saveSession(ms);
-		return ops.findAll(SubNode.class);
-	}
 
 	public String getHashOfPassword(String password) {
 		if (no(password))
@@ -509,25 +504,28 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void fixSharing(MongoSession ms) {
 		log.debug("Processing fixSharing");
-		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-		int counter = 0;
+		
+		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
 
-		for (SubNode node : nodes) {
-			// essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
-			if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
-				acl.makePublicAppendable(ms, node);
-			}
+		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		// int counter = 0;
 
-			if (ThreadLocals.getDirtyNodeCount() > 200) {
-				update.saveSession(ms);
-			}
+		// for (SubNode node : nodes) {
+		// 	// essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
+		// 	if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
+		// 		acl.makePublicAppendable(ms, node);
+		// 	}
 
-			if (++counter % 2000 == 0) {
-				log.debug("fixShare: " + String.valueOf(counter));
-			}
-		}
+		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// 		update.saveSession(ms);
+		// 	}
 
-		log.debug("fixSharing completed.");
+		// 	if (++counter % 2000 == 0) {
+		// 		log.debug("fixShare: " + String.valueOf(counter));
+		// 	}
+		// }
+
+		// log.debug("fixSharing completed.");
 	}
 
 	/*
@@ -537,91 +535,93 @@ public class MongoUtil extends ServiceBase {
 	 * parent to verify the path IS indeed the correct parent.
 	 */
 	public void setParentNodes(MongoSession ms) {
-		log.debug("Processing setParentNodes");
-		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-		int counter = 0;
+		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
+		// log.debug("Processing setParentNodes");
+		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		// int counter = 0;
 
-		for (SubNode node : nodes) {
+		// for (SubNode node : nodes) {
 
-			// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
-			// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
-			if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ok(node.getParent())) {
-				node.setParent(null);
-				continue;
-			}
+		// 	// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
+		// 	// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
+		// 	if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ok(node.getParent())) {
+		// 		node.setParent(null);
+		// 		continue;
+		// 	}
 
-			// this is what the MongoListener does....
-			mongoUtil.validateParent(node, null);
+		// 	// this is what the MongoListener does....
+		// 	mongoUtil.validateParent(node, null);
 
-			if (ThreadLocals.getDirtyNodeCount() > 200) {
-				update.saveSession(ms);
-			}
+		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// 		update.saveSession(ms);
+		// 	}
 
-			if (++counter % 1000 == 0) {
-				log.debug("SPN: " + String.valueOf(counter));
-			}
-		}
+		// 	if (++counter % 1000 == 0) {
+		// 		log.debug("SPN: " + String.valueOf(counter));
+		// 	}
+		// }
 
-		log.debug("setParentNodes completed.");
+		// log.debug("setParentNodes completed.");
 	}
 
 	// Alters all paths parts that are over 10 characters long, on all nodes
 	public void shortenPathParts(MongoSession ms) {
-		int lenLimit = 10;
-		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-		HashMap<String, Integer> set = new HashMap<>();
-		int idx = 0;
+		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
+		// int lenLimit = 10;
+		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		// HashMap<String, Integer> set = new HashMap<>();
+		// int idx = 0;
 
-		for (SubNode node : nodes) {
-			StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
+		// for (SubNode node : nodes) {
+		// 	StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
 
-			while (t.hasMoreTokens()) {
-				String part = t.nextToken().trim();
-				if (part.length() < lenLimit)
-					continue;
+		// 	while (t.hasMoreTokens()) {
+		// 		String part = t.nextToken().trim();
+		// 		if (part.length() < lenLimit)
+		// 			continue;
 
-				if (no(set.get(part))) {
-					Integer x = idx++;
-					set.put(part, x);
-				}
-			}
-		}
+		// 		if (no(set.get(part))) {
+		// 			Integer x = idx++;
+		// 			set.put(part, x);
+		// 		}
+		// 	}
+		// }
 
-		nodes = ops.findAll(SubNode.class);
-		int maxPathLen = 0;
+		// nodes = ops.findAll(SubNode.class);
+		// int maxPathLen = 0;
 
-		for (SubNode node : nodes) {
-			StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
-			StringBuilder fullPath = new StringBuilder();
+		// for (SubNode node : nodes) {
+		// 	StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
+		// 	StringBuilder fullPath = new StringBuilder();
 
-			while (t.hasMoreTokens()) {
-				String part = t.nextToken().trim();
+		// 	while (t.hasMoreTokens()) {
+		// 		String part = t.nextToken().trim();
 
-				// if delimiter, or short parths, just take them as is
-				if (part.length() < lenLimit) {
-					fullPath.append(part);
-				}
-				// if path part find it's unique integer, and insert
-				else {
-					Integer partIdx = set.get(part);
+		// 		// if delimiter, or short parths, just take them as is
+		// 		if (part.length() < lenLimit) {
+		// 			fullPath.append(part);
+		// 		}
+		// 		// if path part find it's unique integer, and insert
+		// 		else {
+		// 			Integer partIdx = set.get(part);
 
-					// if the database changed underneath it we just take that as another new path part
-					if (no(partIdx)) {
-						partIdx = idx++;
-						set.put(part, partIdx);
-					}
-					fullPath.append(String.valueOf(partIdx));
-				}
-			}
+		// 			// if the database changed underneath it we just take that as another new path part
+		// 			if (no(partIdx)) {
+		// 				partIdx = idx++;
+		// 				set.put(part, partIdx);
+		// 			}
+		// 			fullPath.append(String.valueOf(partIdx));
+		// 		}
+		// 	}
 
-			// log.debug("fullPath: " + fullPath);
-			if (fullPath.length() > maxPathLen) {
-				maxPathLen = fullPath.length();
-			}
-			node.setPath(fullPath.toString());
-			ops.save(node);
-		}
-		log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
+		// 	// log.debug("fullPath: " + fullPath);
+		// 	if (fullPath.length() > maxPathLen) {
+		// 		maxPathLen = fullPath.length();
+		// 	}
+		// 	node.setPath(fullPath.toString());
+		// 	ops.save(node);
+		// }
+		// log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
 	}
 
 	public void createAllIndexes(MongoSession ms) {
