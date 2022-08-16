@@ -16,8 +16,8 @@ import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
 
 @Component
-public class JSoupService extends ServiceBase {
-	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
+public class OpenGraphService extends ServiceBase {
+	private static final Logger log = LoggerFactory.getLogger(OpenGraphService.class);
 
 	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
 

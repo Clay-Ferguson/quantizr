@@ -46,7 +46,7 @@ import quanta.service.IPFSService;
 import quanta.service.IPFSSwarm;
 import quanta.service.ImportBookService;
 import quanta.service.ImportService;
-import quanta.service.JSoupService;
+import quanta.service.OpenGraphService;
 import quanta.service.LuceneService;
 import quanta.service.NodeEditService;
 import quanta.service.NodeMoveService;
@@ -141,7 +141,7 @@ public class ServiceBase {
 	public static FileIndexer fileIndexer;
 	public static SystemService system;
 	public static RSSFeedService rssFeed;
-	public static JSoupService jsoup;
+	public static OpenGraphService openGraph;
 	public static ActPubFactory apFactory;
 	public static FileUtils fileUtil;
 	public static MimeUtil mimeUtil;
@@ -227,7 +227,7 @@ public class ServiceBase {
 			fileIndexer = getBean(ctx, FileIndexer.class);
 			system = getBean(ctx, SystemService.class);
 			rssFeed = getBean(ctx, RSSFeedService.class);
-			jsoup = getBean(ctx, JSoupService.class);
+			openGraph = getBean(ctx, OpenGraphService.class);
 			apFactory = getBean(ctx, ActPubFactory.class);
 			fileUtil = getBean(ctx, FileUtils.class);
 			mimeUtil = getBean(ctx, MimeUtil.class);

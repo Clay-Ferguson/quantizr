@@ -633,7 +633,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
 	public @ResponseBody Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return jsoup.getOpenGraph(req);
+		return openGraph.getOpenGraph(req);
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
