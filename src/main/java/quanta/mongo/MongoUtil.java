@@ -632,7 +632,7 @@ public class MongoUtil extends ServiceBase {
 		// read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
 
 		log.debug("Creating FediverseName unique index.");
-		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
+		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
 
 		createUniqueIndex(ms, SubNode.class, SubNode.PATH);
 

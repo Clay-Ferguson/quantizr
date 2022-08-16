@@ -24,7 +24,7 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 
 		removeAll();
 
-		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
+		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
 
 		String name = "jameson2@server.com";
 		FediverseName fName = new FediverseName();
@@ -58,7 +58,7 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 
 	private void removeAll() {
 		Query q = new Query();
-		q.addCriteria(Criteria.where(FediverseName.FIELD_NAME).ne(null));
+		q.addCriteria(Criteria.where(FediverseName.NAME).ne(null));
 
 		DeleteResult res = ops.remove(q, FediverseName.class);
 		log.debug("Objects deleted: " + res.getDeletedCount());

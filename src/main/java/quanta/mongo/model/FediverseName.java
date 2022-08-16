@@ -20,22 +20,22 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "fediNames")
 @TypeAlias("fn")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.ID, SubNode.NAME, SubNode.CREATE_TIME})
+@JsonPropertyOrder({FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME})
 public class FediverseName {
 	private static final Logger log = LoggerFactory.getLogger(FediverseName.class);
 	
-	public static final String FIELD_ID = "_id";
+	public static final String ID = "_id";
 
 	@Id
-	@Field(FIELD_ID)
+	@Field(ID)
 	private ObjectId id;
 
-	public static final String FIELD_NAME = "name";
-	@Field(FIELD_NAME)
+	public static final String NAME = "name";
+	@Field(NAME)
 	private String name;
 
-	public static final String FIELD_CREATE_TIME = "ctm";
-	@Field(FIELD_CREATE_TIME)
+	public static final String CREATE_TIME = "ctm";
+	@Field(CREATE_TIME)
 	private Date createTime;
 
 	@PersistenceConstructor
@@ -52,32 +52,32 @@ public class FediverseName {
 		return id;
 	}
 
-	@JsonProperty(FIELD_ID)
+	@JsonProperty(ID)
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
 
-	@JsonGetter(FIELD_ID)
+	@JsonGetter(ID)
 	public String jsonId() {
 		return ok(id) ? id.toHexString() : null;
 	}
 
-	@JsonProperty(FIELD_CREATE_TIME)
+	@JsonProperty(CREATE_TIME)
 	public Date getCreateTime() {
 		return createTime;
 	}
 
-	@JsonProperty(FIELD_CREATE_TIME)
+	@JsonProperty(CREATE_TIME)
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
 
-	@JsonProperty(FIELD_NAME)
+	@JsonProperty(NAME)
 	public String getName() {
 		return name;
 	}
 
-	@JsonProperty(FIELD_NAME)
+	@JsonProperty(NAME)
 	public void setName(String name) {
 		this.name = name;
 	}
