@@ -123,7 +123,7 @@ public class ThreadLocals {
 	}
 
 	/*
-	 * todo-0: We need a way to detect when some code has accidentally called this from a deamon thread
+	 * todo-1: We need a way to detect when some code has accidentally called this from a deamon thread
 	 * where there won't be any session context, rather than letting it result in a NPE that we have to
 	 * trace back to this cause.
 	 */

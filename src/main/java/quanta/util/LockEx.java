@@ -111,7 +111,7 @@ public class LockEx extends ReentrantLock {
 			StringBuilder sb = new StringBuilder();
 			sb.append("********** DISREGARD DEADLOCK WARNING **********\n");
 			sb.append("Thread FINALLY DID obtain lock: " + thread.getName() + "\n");
-			sb.append(getStackTrace(thread));
+			sb.append(ExUtil.getStackTrace(thread));
 			sb.append("\n");
 			log.trace(sb.toString());
 		}
@@ -129,7 +129,7 @@ public class LockEx extends ReentrantLock {
 			log.trace("globalLockCounter=" + getHoldCount());
 
 		} catch (Exception e) {
-			log.trace("unlock failed: " + getStackTrace(null));
+			log.trace("unlock failed: " + ExUtil.getStackTrace(null));
 			throw new RuntimeEx("LockEx.unlock failed.");
 		}
 	}
@@ -140,28 +140,11 @@ public class LockEx extends ReentrantLock {
 
 		Thread thread = Thread.currentThread();
 		sb.append("Thread attempting to get the lock: " + thread.getName() + "\n");
-		sb.append(getStackTrace(thread));
+		sb.append(ExUtil.getStackTrace(thread));
 		sb.append("\n");
 		Thread holdingThread = getOwner();
 		sb.append("Thread that has the lock: " + holdingThread.getName());
-		sb.append(getStackTrace(holdingThread));
+		sb.append(ExUtil.getStackTrace(holdingThread));
 		log.trace(sb.toString());
-	}
-
-	// Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
-	// argument here
-	public static final String getStackTrace(Thread thread) {
-		if (no(thread)) {
-			thread = Thread.currentThread();
-		}
-		StringBuilder sb = new StringBuilder();
-		StackTraceElement[] trace = thread.getStackTrace();
-		for (int i = 0; i < trace.length; i++) {
-			StackTraceElement e = trace[i];
-			sb.append("    ");
-			sb.append(e.toString());
-			sb.append("\n");
-		}
-		return (sb.toString());
 	}
 }

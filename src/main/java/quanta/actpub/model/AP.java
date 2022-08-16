@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
+import quanta.util.ExUtil;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -72,12 +73,12 @@ public class AP {
             } else if (val.getVal() instanceof String) {
                 return (String) val.getVal();
             } else if (val.getVal() instanceof ArrayList) {
-                log.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
+                ExUtil.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
                         + XString.prettyPrint(obj));
                 return null;
             } else {
                 if (warnIfMissing) {
-                    log.warn("unhandled type on apStr() return val: "
+                    ExUtil.warn("unhandled type on apStr() return val: "
                             + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object")
                             + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
                 }
@@ -86,8 +87,8 @@ public class AP {
         }
 
         if (warnIfMissing) {
-            log.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null") + "\nUnable to get property "
-                    + prop + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null")
+                    + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         }
         return null;
     }
@@ -105,8 +106,8 @@ public class AP {
             }
         }
 
-        log.warn("unhandled type on apBool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apBool(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+                + prop + " from obj " + XString.prettyPrint(obj));
         return false;
     }
 
@@ -125,8 +126,8 @@ public class AP {
             }
         }
 
-        log.warn("unhandled type on apInt(): " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apInt(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+                + prop + " from obj " + XString.prettyPrint(obj));
         return 0;
     }
 
@@ -141,8 +142,8 @@ public class AP {
             }
         }
 
-        log.warn("unhandled type on apDate(): " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apDate(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+                + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
@@ -164,8 +165,8 @@ public class AP {
             }
         }
 
-        log.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+                + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
@@ -176,8 +177,8 @@ public class AP {
         else if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         }
-        log.warn("getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null"));
-        log.debug("Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        ExUtil.warn("getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
+                + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 

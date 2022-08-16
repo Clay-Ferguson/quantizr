@@ -776,7 +776,7 @@ public class ActPubService extends ServiceBase {
         arun.<Object>run(as -> {
             apLog.trace("process " + (unlike ? "unlike" : "like"));
 
-            String objectIdUrl = apStr(payload, APObj.object);
+            String objectIdUrl = apStr(payload, APObj.object); // &&&
 
             if (no(objectIdUrl)) {
                 log.debug("Unable to get object from payload: " + XString.prettyPrint(payload));

@@ -1,5 +1,6 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,31 @@ public class ExUtil {
 	public static RuntimeEx wrapEx(String msg) {
 		RuntimeEx ex = new RuntimeEx(msg);
 		return ex;
+	}
+
+	// Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
+	// argument here
+	public static final String getStackTrace(Thread thread) {
+		if (no(thread)) {
+			thread = Thread.currentThread();
+		}
+		StringBuilder sb = new StringBuilder();
+		StackTraceElement[] trace = thread.getStackTrace();
+		for (int i = 0; i < trace.length; i++) {
+			StackTraceElement e = trace[i];
+			sb.append("    ");
+			sb.append(e.toString());
+			sb.append("\n");
+		}
+		return (sb.toString());
+	}
+
+	public static void warn(String msg) {
+		log.warn(msg + "\n" + getStackTrace(null));
+	}
+
+	public static void error(String msg) {
+		log.error(msg + "\n" + getStackTrace(null));
 	}
 
 	public static void debug(Logger logger, String msg, Throwable e) {
