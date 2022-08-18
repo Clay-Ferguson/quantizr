@@ -110,7 +110,7 @@ export class NodeCompRowHeader extends Div {
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        if (!this.isBoost && (!publicReadOnly || actPubId)) {
+        if (!publicReadOnly || actPubId) {
             verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
@@ -125,20 +125,18 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        if (!this.isBoost) {
-            verboseChildren.push(new Icon({
-                title: "Boost this Node",
-                className: "fa fa-retweet fa-lg marginRight",
-                onClick: () => {
-                    if (state.isAnonUser) {
-                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
-                    }
-                    else {
-                        S.edit.addNode(null, false, null, null, null, null, this.node.id, false, state)
-                    }
+        verboseChildren.push(new Icon({
+            title: "Boost this Node",
+            className: "fa fa-retweet fa-lg marginRight",
+            onClick: () => {
+                if (state.isAnonUser) {
+                    S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                 }
-            }));
-        }
+                else {
+                    S.edit.addNode(null, false, null, null, null, null, this.node.id, false, state)
+                }
+            }
+        }));
 
         let youLiked: boolean = false;
         let likeNames: string = null;
