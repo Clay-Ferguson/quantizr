@@ -112,14 +112,9 @@ public class EnglishDictionary extends ServiceBase {
 
 		/*
 		 * Counts all the 'words' in the text that consist purely of alphabet strings (letters) and returns
-		 * true only of known English words outnumber unknown words, making the assumption that despite that
-		 * some popular English slang won't be in the dictionary (i.e. Frens==Friends), we can still detect
-		 * if text is not in English language at all using this statistical technique.
-		 * 
-		 * NOTE: Do not include '@' or '#' in the delimiters, because by leaving those out we have the
-		 * effect of ignoring usernames and also hashtags which we don't want to check for English or not.
+		 * true only of known English reach a threshold percentage.
 		 */
-		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*", false);
+		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.?!><", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 
@@ -129,12 +124,24 @@ public class EnglishDictionary extends ServiceBase {
 			}
 
 			// only consider words that are all alpha characters
-			if (!StringUtils.isAlpha(token) || token.length() < 5) {
+			if (!StringUtils.isAlpha(token) || token.length() < 3) {
 				// log.debug(" ignoring: " + token);
 				continue;
 			}
 
 			token = token.toLowerCase();
+
+			switch (token) {
+				case "span":
+				case "div":
+				case "html":
+				case "img":
+					continue;
+				default:
+					break;
+			}
+
+			// log.debug("tok: " + token);
 			if (dictWords.contains(token)) {
 				englishCount++;
 				// log.debug(" isEnglish: " + token);

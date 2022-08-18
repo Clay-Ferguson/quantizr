@@ -1081,7 +1081,7 @@ public class ActPubService extends ServiceBase {
 
         if (ENGLISH_LANGUAGE_CHECK) {
             if (lang.equals("0")) {
-                if (!english.isEnglish(contentHtml, 0.30f)) {
+                if (!english.isEnglish(contentHtml, 0.50f)) {
                     log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
                     return null;
                 } else {
