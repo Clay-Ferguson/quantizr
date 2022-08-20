@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppRedux";
+import { getAppState } from "../../AppContext";
 import { Constants as C } from "../../Constants";
 import { PubSub } from "../../PubSub";
 import { Comp } from "../base/Comp";

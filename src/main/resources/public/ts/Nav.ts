@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Button } from "./comp/core/Button";
 import { ButtonBar } from "./comp/core/ButtonBar";

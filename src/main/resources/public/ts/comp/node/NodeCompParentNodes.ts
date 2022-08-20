@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppRedux";
+import { useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";

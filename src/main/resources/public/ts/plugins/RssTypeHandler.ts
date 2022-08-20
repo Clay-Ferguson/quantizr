@@ -1,4 +1,4 @@
-import { dispatch } from "../AppRedux";
+import { dispatch } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";

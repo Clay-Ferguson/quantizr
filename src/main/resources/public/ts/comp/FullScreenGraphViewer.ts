@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

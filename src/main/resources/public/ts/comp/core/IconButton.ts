@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppRedux";
+import { getAppState } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Img } from "./Img";
 import { Italic } from "./Italic";

@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -55,7 +55,7 @@ export class ImportDlg extends DialogBase {
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
-                renderParentIfLeaf: false, 
+                renderParentIfLeaf: false,
                 highlightId: null,
                 forceIPFSRefresh: false,
                 scrollToTop: true,

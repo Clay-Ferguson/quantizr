@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";

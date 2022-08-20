@@ -1,5 +1,3 @@
-import { Action } from "redux";
-import { AppState } from "./AppState";
 import * as J from "./JavaIntf";
 
 /* These are Client-side only models, and are not seen on the server side ever */
@@ -18,11 +16,6 @@ export interface ValueIntf {
     getValue(): any;
     setValue(val: any): void;
     getValidationError?(): string;
-}
-
-export interface AppAction extends Action<any> {
-    type: string;
-    update: (AppState: any) => AppState;
 }
 
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the iteration, and true continues iterating */

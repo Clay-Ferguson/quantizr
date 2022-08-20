@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";

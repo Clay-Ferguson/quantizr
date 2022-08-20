@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";

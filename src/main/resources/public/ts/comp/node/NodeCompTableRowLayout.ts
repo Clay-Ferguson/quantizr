@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppRedux";
+import { useAppState } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Div } from "../../comp/core/Div";

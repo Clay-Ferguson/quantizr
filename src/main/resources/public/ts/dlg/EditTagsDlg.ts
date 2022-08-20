@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppRedux";
+import { dispatch, getAppState } from "../AppContext";
 import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";

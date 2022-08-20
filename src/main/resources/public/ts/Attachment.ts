@@ -1,4 +1,4 @@
-import { getAppState } from "./AppRedux";
+import { getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";

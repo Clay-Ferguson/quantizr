@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 

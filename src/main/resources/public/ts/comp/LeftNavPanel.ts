@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppRedux";
+import { getAppState, useAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";

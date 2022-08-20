@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { dispatch, useCurState } from "../../AppContext";
+import { dispatch, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Comp } from "../base/Comp";
 import { Anchor } from "./Anchor";
@@ -27,7 +27,7 @@ export class TutorialApp extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const appState: AppState = useCurState();
+        const appState: AppState = useAppState();
 
         return this.tag("div", null, [
             this.getState<LS>().content,
@@ -55,7 +55,6 @@ export class TutorialApp extends Comp {
                     (state: AppState) => {
                         state.userName = "clay";
                         return state;
-
                     });
             })
         ]);

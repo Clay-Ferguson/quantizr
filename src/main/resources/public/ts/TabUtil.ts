@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";

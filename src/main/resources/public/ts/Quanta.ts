@@ -1,6 +1,5 @@
-import { dispatch, getAppState, store } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
-import { App } from "./comp/App";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
@@ -293,13 +292,6 @@ export class Quanta {
             // window.onbeforeunload = () => {
             //     return "Leave [appName] ?";
             // };
-
-            Log.log("creating App");
-            // This is the root react App component that contains the entire application
-            this.app = new App();
-
-            console.log("DOM app element set.");
-            this.app.updateDOM(store, "app");
 
             /*
              * This call checks the server to see if we have a session already, and gets back the login information from

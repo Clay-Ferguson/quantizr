@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppRedux";
+import { dispatch, getAppState } from "../AppContext";
 import { DialogMode } from "../DialogBase";
 import { SymKeyDataPackage } from "../Encryption";
 import * as J from "../JavaIntf";

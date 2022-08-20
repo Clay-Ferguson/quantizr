@@ -11,6 +11,7 @@ NOTE: This Factory is allowed to import anything it wants and the way we allow C
 being a problem is by having the rule that no other modules are allowed to import this Factory module,
 but only the interface of it.
 */
+import { getDispatcher } from "./AppContext";
 import { Attachment } from "./Attachment";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
@@ -71,8 +72,13 @@ export class Factory {
     initApp() {
         try {
             console.log("calling initApp()");
-            // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
-            // called (line above) initializing all of them and wiring them all up.
+
+            // we require that the AppContainer has ran and rendered already becasue we're doing state management
+            // using the root component.
+            if (!getDispatcher()) {
+                throw new Error("dispatcher not ready in initApp");
+            }
+
             S.quanta.initApp();
         }
         catch (e) {

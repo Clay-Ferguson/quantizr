@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppRedux";
+import { getAppState } from "../../AppContext";
 import { MessageDlg } from "../../dlg/MessageDlg";
 import { Comp } from "../base/Comp";
 import { Italic } from "./Italic";

@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { LeftNavPanel } from "./comp/LeftNavPanel";
 import { RightNavPanel } from "./comp/RightNavPanel";

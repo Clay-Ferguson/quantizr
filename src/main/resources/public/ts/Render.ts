@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
@@ -438,8 +438,6 @@ export class Render {
             // console.log("Data:" + S.util.prettyPrint(res));
 
             dispatch("RenderPage", s => {
-                // console.log("update state in Action_RenderPage");
-
                 if (!s.activeTab || clickTab) {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN, s);
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
@@ -583,6 +581,7 @@ export class Render {
                         S.domUtil.focusId(C.TAB_MAIN);
                     }
                 }
+
                 return s;
             });
         }

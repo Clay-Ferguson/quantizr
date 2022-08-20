@@ -1,5 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
-import { dispatch, getAppState } from "./AppRedux";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";

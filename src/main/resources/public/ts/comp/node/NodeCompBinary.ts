@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../../AppRedux";
+import { dispatch, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
@@ -74,7 +74,7 @@ export class NodeCompBinary extends Div {
         id = S.util.allowIdFromEvent(evt, id);
         if (this.isEditorEmbed) return;
 
-        dispatch("ClickImage", s => {
+        dispatch("ClickImage", (s: AppState) => {
             if (s.fullScreenConfig.type === FullScreenType.IMAGE && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }

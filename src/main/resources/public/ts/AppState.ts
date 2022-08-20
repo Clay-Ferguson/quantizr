@@ -6,7 +6,6 @@ import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 
-/* root react Redux state for entire app */
 export class AppState {
     constructor() {
         console.log("Constructing AppState");

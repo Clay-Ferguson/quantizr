@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../AppRedux";
+import { dispatch, useAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";

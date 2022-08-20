@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { DialogBase, DialogMode } from "../DialogBase";
 import { MenuPanel } from "../MenuPanel";

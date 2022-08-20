@@ -1,4 +1,4 @@
-import { getAppState } from "../../AppRedux";
+import { getAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Html } from "../../comp/core/Html";
 import * as J from "../../JavaIntf";

@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppRedux";
+import { useAppState } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";

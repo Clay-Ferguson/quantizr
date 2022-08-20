@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { ValueIntf } from "../Interfaces";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";

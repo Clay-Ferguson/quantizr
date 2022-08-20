@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";

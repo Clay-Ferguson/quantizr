@@ -1,14 +1,13 @@
-import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode, createElement } from "react";
-import { dispatch } from "../AppRedux";
+import { dispatch, getAppState, useAppState } from "../AppContext";
 
 /* ========= WARNING =========
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
 */
-import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, formatDate } from "@fullcalendar/react";
+import FullCalendar, { DateSelectArg, EventClickArg, EventContentArg } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
@@ -16,17 +15,15 @@ import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 export class FullScreenCalendar extends Main {
     static lastClickTime: Date;
 
-    state: AppState;
-
     constructor() {
         super();
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
     }
 
     compRender = (): ReactNode => {
-        this.state = useSelector((state: AppState) => state);
-        const nodeId = this.state.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNode(this.state, nodeId);
+        const state = useAppState();
+        const nodeId = state.fullScreenConfig.nodeId;
+        const node = S.nodeUtil.findNode(state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);
@@ -53,8 +50,8 @@ export class FullScreenCalendar extends Main {
                 selectable: false,
                 selectMirror: true,
                 dayMaxEvents: true,
-                weekends: this.state.calendarShowWeekends,
-                initialEvents: this.state.calendarData,
+                weekends: state.calendarShowWeekends,
+                initialEvents: state.calendarData,
                 dateClick: this.dateClick,
                 // select: this.handleDateSelect,
                 eventContent: renderEventContent,
@@ -66,20 +63,20 @@ export class FullScreenCalendar extends Main {
                         text: "add",
                         click: () => {
                             FullScreenCalendar.lastClickTime = FullScreenCalendar.lastClickTime || new Date();
-                            S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), this.state);
+                            S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), state);
                         }
                     },
                     closeCalendarButton: {
                         text: "Close",
                         click: () => {
-                            S.nav.closeFullScreenViewer(this.state);
+                            S.nav.closeFullScreenViewer(state);
                         }
                     },
                     weekendsEventButton: {
                         text: "weekend",
                         click: () => {
                             dispatch("Action_CalendarToggleWeekends", (s: AppState): AppState => {
-                                s.calendarShowWeekends = !this.state.calendarShowWeekends;
+                                s.calendarShowWeekends = !state.calendarShowWeekends;
                                 return s;
                             });
                         }
@@ -100,7 +97,9 @@ export class FullScreenCalendar extends Main {
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
-        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, this.state);
+        console.log("eventClick.");
+        const state = getAppState();
+        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, state);
     }
 
     domUpdateEvent = (): void => {

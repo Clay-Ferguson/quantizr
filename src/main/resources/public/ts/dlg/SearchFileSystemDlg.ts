@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";

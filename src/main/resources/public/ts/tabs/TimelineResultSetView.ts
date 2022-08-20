@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";

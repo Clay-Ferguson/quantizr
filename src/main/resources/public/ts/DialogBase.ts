@@ -1,19 +1,15 @@
-import { createElement } from "react";
-import * as ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-import { dispatch, getAppState, store } from "./AppRedux";
+import { ReactNode } from "react";
+import { dispatch, getAppState } from "./AppContext";
+import { AppState } from "./AppState";
+import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
-import { S } from "./Singletons";
 import { Validator } from "./Validator";
+import { S } from "./Singletons";
 
-export abstract class DialogBase extends Div {
-
-    // ref counter that allows multiple dialogs to be opened on top of each other and only
-    // when the final one closes out do we go back to enabling scrolling on body again.
-    static refCounter = 0;
+export abstract class DialogBase extends Comp {
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
 
@@ -29,6 +25,7 @@ export abstract class DialogBase extends Div {
     loaded: boolean = false;
 
     validatedStates: Validator[] = null;
+    zIndex: number = DialogBase.backdropZIndex;
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
@@ -43,18 +40,6 @@ export abstract class DialogBase extends Div {
         if (!forceMode && (!this.mode || appState.mobileMode)) {
             this.mode = appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
         }
-
-        if (this.mode === DialogMode.EMBED) {
-            this.attribs.className = this.overrideClass;
-        }
-        else if (this.mode === DialogMode.FULLSCREEN) {
-            this.attribs.className = "app-modal-content-fullscreen";
-        }
-        else {
-            this.attribs.className = appState.mobileMode
-                ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
-                : (this.overrideClass ? this.overrideClass : "app-modal-content");
-        }
     }
 
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
@@ -68,30 +53,8 @@ export abstract class DialogBase extends Div {
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
         return new Promise<DialogBase>(async (resolve, reject) => {
-            const appState = getAppState();
             if (this.mode === DialogMode.POPUP) {
-                // Create dialog container and attach to document.body.
-                this.backdrop = document.createElement("div");
-                this.backdrop.setAttribute("id", this.getId(DialogBase.BACKDROP_PREFIX));
-
-                // WARNING: Don't use 'className' here, this is pure javascript, and not React!
-                this.backdrop.setAttribute("class", "app-modal " + (appState.mobileMode ? "normalScrollbar" : "customScrollbar"));
-                this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
-                document.body.appendChild(this.backdrop);
-
-                // clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
-                // is too easy to do while your editing and can cause loss of work/editing.
-                if (this.closeByOutsideClick) {
-                    this.backdrop.addEventListener("click", (evt: any) => {
-                        // get our dialog itself.
-                        const contentElm: any = S.domUtil.domElm(this.getId());
-
-                        // check if the click was outside the dialog.
-                        if (!!contentElm && !contentElm.contains(evt.target)) {
-                            this.close();
-                        }
-                    });
-                }
+                this.zIndex = ++DialogBase.backdropZIndex;
             }
 
             /* If the dialog has a function to load from server, call here first */
@@ -100,24 +63,16 @@ export abstract class DialogBase extends Div {
                 await preLoadPromise;
             }
 
-            if (this.mode === DialogMode.POPUP) {
-                // this renders the dlgComp onto the screen (on the backdrop elm)
-                this.domRender();
+            dispatch("OpenDialog", (s: AppState) => {
+                // adding to dialogStack will cause it to be rendered by main App component.
+                s.dialogStack.push(this);
 
-                if (++DialogBase.refCounter === 1) {
-                    /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
-                    full-screen dialogs are in use, which is when we need this. */
-                    if (appState.mobileMode) {
-                        document.body.style.overflow = "hidden";
-                    }
+                // opening first dialog in mobile mode
+                if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 1) {
+                    document.body.style.overflow = "hidden";
                 }
-            }
-            else {
-                dispatch("OpenDialog", s => {
-                    s.dialogStack.push(this);
-                    return s;
-                });
-            }
+                return s;
+            });
 
             this.resolve = resolve;
         });
@@ -128,12 +83,6 @@ export abstract class DialogBase extends Div {
     from the server before displaying */
     async preLoad(): Promise<any> {
         return null;
-    }
-
-    domRender(): void {
-        // console.log("Rendering with provider");
-        const provider = createElement(Provider, { store }, this.create());
-        ReactDOM.render(provider, this.backdrop);
     }
 
     public abort = () => {
@@ -156,31 +105,19 @@ export abstract class DialogBase extends Div {
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
-        const appState = getAppState();
 
-        if (this.mode === DialogMode.POPUP) {
-            if (this.getRef()) {
-                this.preUnmount();
-                ReactDOM.unmountComponentAtNode(this.backdrop);
-                S.domUtil.domElmRemove(this.getId());
-                S.domUtil.domElmRemove(this.getId(DialogBase.BACKDROP_PREFIX));
-
-                if (--DialogBase.refCounter <= 0) {
-                    if (appState.mobileMode) {
-                        document.body.style.overflow = "auto";
-                    }
-                }
+        dispatch("CloseDialog", (s: AppState) => {
+            const index = s.dialogStack.indexOf(this);
+            if (index > -1) {
+                s.dialogStack.splice(index, 1);
             }
-        }
-        else {
-            dispatch("CloseDialog", s => {
-                const index = s.dialogStack.indexOf(this);
-                if (index > -1) {
-                    s.dialogStack.splice(index, 1);
-                }
-                return s;
-            });
-        }
+
+            // if just closed last dialog (no more dialogs open)
+            if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 0) {
+                document.body.style.overflow = "auto";
+            }
+            return s;
+        });
     }
 
     preUnmount(): any {
@@ -201,7 +138,8 @@ export abstract class DialogBase extends Div {
         return null;
     }
 
-    preRender(): void {
+    compRender = (): ReactNode => {
+        const appState = getAppState();
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
@@ -230,6 +168,45 @@ export abstract class DialogBase extends Div {
                 titleChildren) : null,
             new Div(null, null, this.renderDlg())
         ]);
+
+        if (this.mode === DialogMode.EMBED) {
+            this.attribs.className = this.overrideClass;
+            return this.tag("div");
+        }
+        else if (this.mode === DialogMode.FULLSCREEN) {
+            this.attribs.className = "app-modal-content-fullscreen";
+            return this.tag("div");
+        }
+        else {
+            const clazzName = appState.mobileMode
+                ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
+                : (this.overrideClass ? this.overrideClass : "app-modal-content");
+
+            // if fullscreen we render without backdrop
+            if (this.mode !== DialogMode.POPUP) {
+                this.attribs.className = clazzName;
+                return this.tag("div");
+            }
+            // else wrap dialog in backdrop
+            else {
+                return this.tag("div", {
+                    id: this.getId(DialogBase.BACKDROP_PREFIX),
+                    className: "app-modal " + (appState.mobileMode ? "normalScrollbar" : "customScrollbar"),
+                    style: { zIndex: this.zIndex },
+                    onClick: (evt: Event) => {
+                        if (this.closeByOutsideClick) {
+                            const dlgElm: any = S.domUtil.domElm(this.getId());
+                            // check if the click was outside the dialog.
+                            if (!!dlgElm && !dlgElm.contains(evt.target)) {
+                                this.close();
+                            }
+                        }
+                    }
+                }, [
+                    new Div(null, { id: this.getId(), className: clazzName }, this.getChildren())
+                ]);
+            }
+        }
     }
 
     validate = (): boolean => {

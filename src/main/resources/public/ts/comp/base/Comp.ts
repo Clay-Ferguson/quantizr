@@ -1,10 +1,7 @@
 import DOMPurify from "dompurify";
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
-import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
-import { Provider } from "react-redux";
-import { AppContext, getCurState, initDispatch } from "../../AppContext";
-import { getAppState } from "../../AppRedux";
+import { getAppState } from "../../AppContext";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -26,7 +23,6 @@ export abstract class Comp implements CompIntf {
     public rendered: boolean = false;
     private static guid: number = 0;
     private static renderClassInDom: boolean = false;
-    private isDispatchRoot: boolean = false;
 
     attribs: any;
 
@@ -182,42 +178,6 @@ export abstract class Comp implements CompIntf {
         return renderToString(elm);
     }
 
-    /* Attaches a react element directly to the dom at the DOM id specified. */
-    updateDOM(store: any = null, id: string = null) {
-        id = id || this.getId();
-
-        // We call getElm here out of paranoia, but it's not needed. There are no places in our code where
-        // we call into here when the element doesn't already exist.
-        S.domUtil.getElm(id, (elm: HTMLElement) => {
-            // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
-            ReactDOM.unmountComponentAtNode(elm);
-
-            /* wrap with the Redux Provider to make it all reactive */
-            const provider = createElement(Provider, { store }, this.create());
-            ReactDOM.render(provider, elm);
-        });
-    }
-
-    /* This will become the new updateDOM replacement once we remove redux.
-
-       Attaches a react element directly to the dom at the DOM id specified.
-       Caller can pass in appState if available or null if this the app is just starting, and no state is yet created.
-    */
-    updateDOM2 = (id: string) => {
-        id = id || this.getId();
-
-        // We call getElm here out of paranoia, but it's not needed. There are no places in our code where
-        // we call into here when the element doesn't already exist.
-        S.domUtil.getElm(id, (elm: HTMLElement) => {
-            // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
-            ReactDOM.unmountComponentAtNode(elm);
-
-            this.isDispatchRoot = true;
-            const provider = createElement(AppContext.Provider, { value: getCurState() }, this.create());
-            ReactDOM.render(provider, elm);
-        });
-    }
-
     create = (): ReactNode => {
         this.wrapClick(this.attribs);
         this.scopeCss(this.attribs);
@@ -368,10 +328,6 @@ export abstract class Comp implements CompIntf {
         this.rendered = true;
 
         try {
-            if (this.isDispatchRoot) {
-                initDispatch();
-            }
-
             if (this.stateMgr) {
                 this.stateMgr.useState();
             }
@@ -419,7 +375,7 @@ export abstract class Comp implements CompIntf {
             const ret = this.compRender();
 
             if (this.debug) {
-                console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
+                // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
             return ret;

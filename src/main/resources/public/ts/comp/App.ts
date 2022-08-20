@@ -1,10 +1,11 @@
-import { useAppState } from "../AppRedux";
+import { useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
+import { DialogMode } from "../DialogBase";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
@@ -30,13 +31,17 @@ export class App extends Main {
         const state = useAppState();
 
         if (!state.guiReady) {
+            console.log("gui not ready in App.preRender");
             this.setChildren(null);
             return;
         }
 
-        if (state.dialogStack.length > 0) {
+        /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
+        if (state.mobileMode && state.dialogStack.length > 0) {
+            // eventually ONLY mobile will do this 'top-only' display, and desktop mode will have all dialog
+            // divs simultaneously onscreen in background of top one.
             const dialog = state.dialogStack[state.dialogStack.length - 1];
-            if (dialog) {
+            if (dialog && dialog.mode !== DialogMode.POPUP) {
                 this.setChildren([dialog]);
                 return;
             }
@@ -79,6 +84,10 @@ export class App extends Main {
                     title: "Scroll to Top"
                 }, "btn-secondary scrollTopButtonLowerRight", "off")
             ]);
+        }
+
+        if (state.dialogStack?.length > 0) {
+            this.addChildren(state.dialogStack);
         }
     }
 

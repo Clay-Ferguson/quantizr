@@ -10,7 +10,6 @@ export interface CompIntf {
     getState(): any;
     mergeState(moreState: any): void;
     setClass(clazz: string): void;
-    updateDOM(store: any, id: string): void;
     getAttribs() : Object;
     compRender(): ReactNode;
     addChild(comp: CompIntf): void;

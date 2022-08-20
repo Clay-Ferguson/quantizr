@@ -1,4 +1,4 @@
-import { getAppState } from "../AppRedux";
+import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
