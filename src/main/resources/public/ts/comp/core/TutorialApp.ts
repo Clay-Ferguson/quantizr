@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { dispatch, useCurState } from "../../AppContext";
+import { AppState } from "../../AppState";
 import { Comp } from "../base/Comp";
 import { Anchor } from "./Anchor";
 import { Button } from "./Button";
@@ -24,13 +26,12 @@ export class TutorialApp extends Comp {
         this.mergeState<LS>({ content: "Quanta GUI Framework works!" });
     }
 
-    buttonClick = () => {
-        this.mergeState<LS>({ content: "You clicked a button!" });
-    }
-
     compRender = (): ReactNode => {
+        const appState: AppState = useCurState();
+
         return this.tag("div", null, [
             this.getState<LS>().content,
+            appState?.userName ? new Div("userName: " + appState.userName) : null,
             new Div(null, null, [
                 new Anchor("https://someserver.com", "My Link")
             ]),
@@ -48,7 +49,15 @@ export class TutorialApp extends Comp {
                     getValue: (): boolean => TutorialApp.checkboxVal
                 })
             ]),
-            new Button("My Button", this.buttonClick)
+            new Button("My Button", () => {
+                this.mergeState<LS>({ content: "You clicked a button!" });
+                dispatch("ButtonClick",
+                    (state: AppState) => {
+                        state.userName = "clay";
+                        return state;
+
+                    });
+            })
         ]);
     }
 }

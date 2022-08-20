@@ -41,8 +41,10 @@ else if ((window as any).__page === "tsx-test") {
 else if ((window as any).__page === "tutorial") {
     window.addEventListener("load", (event) => {
         const factory = new Factory();
-        const tutorialRoot = new TutorialApp();
-        tutorialRoot.updateDOM(store, "app");
+        if (factory) {
+            const tutorialRoot = new TutorialApp();
+            tutorialRoot.updateDOM2("app");
+        }
     });
 }
 
