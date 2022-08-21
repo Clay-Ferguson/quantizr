@@ -17,7 +17,10 @@ export const AppContext = createContext(state);
 
 /* Our architecture is to always have the payload as a function, and do that pattern everywhere */
 export function reducer(s: AppState, action: any) {
-    return state = { ...action.payload(s) };
+    // s.stateId++;
+    // console.log("****** stateId: " + s.stateId);
+    state = { ...action.payload(s) };
+    return state;
 }
 
 /* Use this to get state when NOT inside a react function */
@@ -27,22 +30,44 @@ export function getAppState(s: AppState = null): AppState {
 
 /* Must be called from a react function */
 export function useAppState(): AppState {
-    return state = useContext(AppContext);
+    state = useContext(AppContext);
+    // console.log("****** useState stateId: " + state.stateId);
+    return state;
 }
 
 /* Must be called from the context of a running root level react function */
 export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
+    // console.log("****** initDispatch stateId: " + state.stateId);
 }
 
 export function dispatch(type: string, func: (s: AppState) => AppState) {
-    // console.log("Dispatch: " + type);
+    // console.log("asyncDispatch: " + type);
     if (!dispatcher) {
         throw new Error("Called dispatch before first render. type: " + type);
     }
-    const startTime = new Date().getTime();
+    // const startTime = new Date().getTime();
     dispatcher({ type, payload: func });
-    console.log("act: " + type + " " + (new Date().getTime() - startTime) + "ms");
+    // console.log("act: " + type + " " + (new Date().getTime() - startTime) + "ms");
+}
+
+export function promiseDispatch(type: string, func: (s: AppState) => AppState): Promise<AppState> {
+    return new Promise<AppState>(async (resolve, reject) => {
+        // console.log("dispatch: " + type);
+        if (!dispatcher) {
+            throw new Error("Called dispatch before first render. type: " + type);
+        }
+        // const startTime = new Date().getTime();
+        dispatcher({
+            type, payload: function (s: AppState): AppState {
+                // console.log("Calling func " + type + " stateId: " + s.stateId);
+                const state = func(s);
+                // console.log("act: " + type + " " + (new Date().getTime() - startTime) + "ms");
+                resolve(state);
+                return state;
+            }
+        });
+    });
 }
 
 export function getDispatcher() {

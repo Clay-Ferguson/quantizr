@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Button } from "./comp/core/Button";
 import { ButtonBar } from "./comp/core/ButtonBar";
@@ -471,7 +471,7 @@ export class Nav {
         return newNode;
     }
 
-    messages = (props: any) => {
+    messages = async (props: any) => {
         if (!FeedTab.inst) {
             return;
         }
@@ -479,7 +479,7 @@ export class Nav {
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
         FeedTab.inst.props.refreshCounter++;
 
-        dispatch("SelectTab", s => {
+        await promiseDispatch("SelectTab", s => {
             s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;

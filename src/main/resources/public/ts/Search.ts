@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -274,13 +274,13 @@ export class Search {
         }, 500);
     }
 
-    refreshFeed = () => {
+    refreshFeed = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.page = 0;
             FeedTab.inst.props.refreshCounter++;
         }
 
-        dispatch("RefreshFeed", s => {
+        await promiseDispatch("RefreshFeed", s => {
             FeedTab.inst.props.feedLoading = true;
             return s;
         });

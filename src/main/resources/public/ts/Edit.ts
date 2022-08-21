@@ -1,5 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -346,14 +346,8 @@ export class Edit {
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
             // and so before refreshing the screen we check for that edge case.
             // console.log("saveNodeResponse: " + S.util.prettyPrint(node));
-            let parentPath = S.props.getParentPath(node);
+            const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
-
-            // I had expected the save to have already move into the non-pending folder by now,
-            // but i haven't investigated yet, this must be right.
-            if (parentPath.startsWith("/r/p")) {
-                parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
-            }
 
             await this.refreshNodeFromServer(node.id);
 
@@ -724,20 +718,17 @@ export class Edit {
      * has currenly selected (via checkboxes)
      */
     deleteSelNodes = async (evt: Event = null, id: string = null) => {
-        const state = getAppState();
         id = S.util.allowIdFromEvent(evt, id);
 
         // if a nodeId was specified we use it as the selected nodes to delete
         if (id) {
-            // note we ARE updating 'state' here but it doesn't matter we can discard state, becasue
-            // all we needed is selNodesArray which we get and as long as selNodesArray is preserved
-            // we can let that change to 'state' get discarded in the next dispatch
-            dispatch("delSelNodes", s => {
+            await promiseDispatch("SelectNode", s => {
                 S.nav.setNodeSel(true, id, s);
                 return s;
             });
         }
 
+        const state = getAppState();
         // note: the setNodeSel above isn't causing this to get anything here
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
 
@@ -803,7 +794,7 @@ export class Edit {
             the added complexity to achieve that for recursive tree deletes doesn't pay off */
             setTimeout(() => {
                 S.util.loadBookmarks();
-            }, 1000);
+            }, 500);
         }
     }
 

@@ -6,23 +6,17 @@ import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
-import { Log } from "./Log";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
-        const selArray: string[] = [];
-
-        if (!state.selectedNodes.size) {
-            Log.log("no selected nodes.");
-        }
-
+        const sels: string[] = [];
         state.selectedNodes.forEach(id => {
-            selArray.push(id);
+            sels.push(id);
             return true;
         });
-        return selArray;
+        return sels;
     }
 
     /* return an object with properties for each NodeInfo where the key is the id */

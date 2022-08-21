@@ -1,4 +1,4 @@
-import { dispatch, getAppState, useAppState } from "./AppContext";
+import { getAppState, promiseDispatch, useAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
@@ -122,8 +122,9 @@ export class MenuPanel extends Div {
 
     // DO NOT DELETE
     // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
-    static setIpsmActive = () => {
-        dispatch("enableIpsm", s => {
+    static setIpsmActive = async () => {
+
+        await promiseDispatch("enableIpsm", s => {
             s.ipsmActive = true;
             setTimeout(() => {
                 // S.tabUtil.selectTab(C.TAB_IPSM);

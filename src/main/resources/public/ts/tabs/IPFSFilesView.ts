@@ -304,7 +304,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             });
 
             dispatch("loadIPFSFiles", s => {
-
                 // this condition just makes sure we're not pushing the same thing already at the top of the stack.
                 if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {
                     IPFSFilesView.history.push(folder);

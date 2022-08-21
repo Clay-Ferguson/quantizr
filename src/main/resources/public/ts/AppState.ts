@@ -11,6 +11,8 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
+    stateId: number = 0;
+
     // todo-1: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
     // only in the place where we load this config value, extract that into the typed property
     // Initialize to empty object so we don't get NPE
