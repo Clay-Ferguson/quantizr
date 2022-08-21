@@ -72,14 +72,14 @@ export class Factory {
     initApp() {
         try {
             console.log("calling initApp()");
-
-            // we require that the AppContainer has ran and rendered already becasue we're doing state management
-            // using the root component.
-            if (!getDispatcher()) {
-                throw new Error("dispatcher not ready in initApp");
-            }
-
-            S.quanta.initApp();
+            const interval = setInterval(() => {
+                // we require that the AppContainer has ran and rendered already becasue we're doing state management
+                // using the root component.
+                if (getDispatcher()) {
+                    clearInterval(interval);
+                    S.quanta.initApp();
+                }
+            }, 10);
         }
         catch (e) {
             alert("initApp failed: " + e);
