@@ -1,13 +1,12 @@
 import { ReactNode } from "react";
 import { dispatch, getAppState } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
-import { Validator } from "./Validator";
 import { S } from "./Singletons";
+import { Validator } from "./Validator";
 
 export abstract class DialogBase extends Comp {
     static BACKDROP_PREFIX = "backdrop-";
@@ -63,7 +62,7 @@ export abstract class DialogBase extends Comp {
                 await preLoadPromise;
             }
 
-            dispatch("OpenDialog", (s: AppState) => {
+            dispatch("OpenDialog", s => {
                 // adding to dialogStack will cause it to be rendered by main App component.
                 s.dialogStack.push(this);
 
@@ -106,7 +105,7 @@ export abstract class DialogBase extends Comp {
         this.opened = false;
         this.resolve(this);
 
-        dispatch("CloseDialog", (s: AppState) => {
+        dispatch("CloseDialog", s => {
             const index = s.dialogStack.indexOf(this);
             if (index > -1) {
                 s.dialogStack.splice(index, 1);

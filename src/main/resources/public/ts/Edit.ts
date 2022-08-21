@@ -732,7 +732,10 @@ export class Edit {
             // note we ARE updating 'state' here but it doesn't matter we can discard state, becasue
             // all we needed is selNodesArray which we get and as long as selNodesArray is preserved
             // we can let that change to 'state' get discarded in the next dispatch
-            S.nav.setNodeSel(true, id, state);
+            dispatch("delSelNodes", s => {
+                S.nav.setNodeSel(true, id, s);
+                return s;
+            });
         }
 
         // note: the setNodeSel above isn't causing this to get anything here

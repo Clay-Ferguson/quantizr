@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { dispatch, useAppState } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -131,14 +131,17 @@ export class NodeCompButtonBar extends Div {
                 // no need to ever select home node
                 this.node.id !== state.homeNodeId) {
                 selCheckbox = new Checkbox(null, {
-                    title: "Select Node for multi-node functions."
+                    title: "Select Nodes."
                 }, {
                     setValue: (checked: boolean) => {
-                        if (checked) {
-                            state.selectedNodes.add(this.node.id);
-                        } else {
-                            state.selectedNodes.delete(this.node.id);
-                        }
+                        dispatch("NodeCheckboxChange", s => {
+                            if (checked) {
+                                s.selectedNodes.add(this.node.id);
+                            } else {
+                                s.selectedNodes.delete(this.node.id);
+                            }
+                            return s;
+                        });
                     },
                     getValue: (): boolean => state.selectedNodes.has(this.node.id)
                 }, "float-start");

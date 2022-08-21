@@ -75,7 +75,7 @@ export class FullScreenCalendar extends Main {
                     weekendsEventButton: {
                         text: "weekend",
                         click: () => {
-                            dispatch("Action_CalendarToggleWeekends", (s: AppState): AppState => {
+                            dispatch("Action_CalendarToggleWeekends", s => {
                                 s.calendarShowWeekends = !state.calendarShowWeekends;
                                 return s;
                             });

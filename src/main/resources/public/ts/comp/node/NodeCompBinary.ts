@@ -74,7 +74,7 @@ export class NodeCompBinary extends Div {
         id = S.util.allowIdFromEvent(evt, id);
         if (this.isEditorEmbed) return;
 
-        dispatch("ClickImage", (s: AppState) => {
+        dispatch("ClickImage", s => {
             if (s.fullScreenConfig.type === FullScreenType.IMAGE && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }
