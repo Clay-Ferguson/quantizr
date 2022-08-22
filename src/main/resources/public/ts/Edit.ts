@@ -408,7 +408,7 @@ export class Edit {
 
         for (const ac of aclEntries) {
             // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
-            await S.edit.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
+            await this.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
         }
         // console.log("Key distribution complete.");
     }
@@ -1067,7 +1067,7 @@ export class Edit {
 
         // auto-enable edit mode
         if (!state.userPrefs.editMode) {
-            await S.edit.toggleEditMode(state);
+            await this.toggleEditMode(state);
         }
 
         // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
@@ -1116,7 +1116,7 @@ export class Edit {
 
         // auto-enable edit mode
         if (!state.userPrefs.editMode) {
-            await S.edit.toggleEditMode(state);
+            await this.toggleEditMode(state);
         }
         this.createSubNodeResponse(res, forceUsePopup, null, null, state);
     }

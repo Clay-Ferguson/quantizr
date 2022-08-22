@@ -477,12 +477,12 @@ export class Render {
                             }
                         }
 
-                        S.render.fadeInId = targetNodeId;
+                        this.fadeInId = targetNodeId;
                         s.pendingLocationHash = null;
                     }
                     else {
-                        if (!S.render.fadeInId) {
-                            S.render.fadeInId = s.node.id;
+                        if (!this.fadeInId) {
+                            this.fadeInId = s.node.id;
                         }
                     }
 

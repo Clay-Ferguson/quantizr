@@ -138,7 +138,7 @@ export class Search {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
-        S.srch.search(node, null, null, state, null, "Priority Listing",
+        this.search(node, null, null, state, null, "Priority Listing",
             false,
             false, 0,
             true,
@@ -285,7 +285,7 @@ export class Search {
             return s;
         });
 
-        S.srch.feed(FeedTab.inst.props.page, FeedTab.inst.props.searchTextState.getValue(), false, false);
+        this.feed(FeedTab.inst.props.page, FeedTab.inst.props.searchTextState.getValue(), false, false);
     }
 
     /* growResults==true is the "infinite scrolling" support */
@@ -577,6 +577,6 @@ export class Search {
             type = "appendable";
         }
 
-        S.srch.findSharedNodes(focusNode, 0, type, shareTarget, accessOption, state);
+        this.findSharedNodes(focusNode, 0, type, shareTarget, accessOption, state);
     }
 }

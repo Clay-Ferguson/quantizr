@@ -52,15 +52,15 @@ export class Nav {
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
         }
-        S.nav.openNodeById(null, selNode.id, state);
+        this.openNodeById(null, selNode.id, state);
     }
 
     navToPrev = () => {
-        S.nav.navToSibling(-1);
+        this.navToSibling(-1);
     }
 
     navToNext = () => {
-        S.nav.navToSibling(1);
+        this.navToSibling(1);
     }
 
     navToSibling = async (siblingOffset: number, state?: AppState): Promise<string> => {

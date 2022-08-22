@@ -273,7 +273,7 @@ export class User {
 
     userLogout = (state: AppState = null) => {
         state = getAppState(state);
-        S.user.logout(true, state);
+        this.logout(true, state);
     }
 
     userSignup = () => {
