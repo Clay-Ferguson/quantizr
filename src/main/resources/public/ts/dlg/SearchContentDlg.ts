@@ -154,10 +154,6 @@ export class SearchContentDlg extends DialogBase {
     }
 
     graph = () => {
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         // until we have better validation
         const node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {
@@ -172,10 +168,6 @@ export class SearchContentDlg extends DialogBase {
     }
 
     search = () => {
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         // until we have better validation
         const node = S.nodeUtil.getHighlightedNode(getAppState());
         if (!node) {

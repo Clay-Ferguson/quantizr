@@ -40,10 +40,6 @@ export class SearchByIDDlg extends DialogBase {
             return;
         }
 
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "For ID: " + SearchByIDDlg.defaultSearchText;

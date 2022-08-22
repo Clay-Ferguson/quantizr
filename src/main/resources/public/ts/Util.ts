@@ -97,14 +97,20 @@ export class Util {
     };
 
     rhost: string;
-    logAjax: boolean = false;
-    logAjaxShort: boolean = false;
+    logRpc: boolean = false;
+    logRpcShort: boolean = false;
     timeoutMessageShown: boolean = false;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
 
+    /*
+     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
+     * session is only allowed one concurrent call and simultaneous calls just "queue up".
+     */
+    private rpcCounter: number = 0;
+
     // accepts letters, numbers, underscore, dash.
-    // todo-2: enforce this same rule on the server side (Java)
+    // todo-2: enforce this same rule on the server side
     validUsername = (v: string): boolean => {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
@@ -349,22 +355,9 @@ export class Util {
         }
     }
 
-    /*
-     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
-     * session is only allowed one concurrent call and simultaneous calls just "queue up".
-     */
-    private _ajaxCounter: number = 0;
-
-    daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
-
-    toJson = (obj: Object): string => {
-        return JSON.stringify(obj, null, 4);
-    }
-
     /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor to be all prettyPrint */
     prettyPrint = (obj: Object): string => {
-        if (!obj) return "null";
-        return JSON.stringify(obj, null, 4);
+        return obj ? JSON.stringify(obj, null, 4) : "null"
     }
 
     /*
@@ -397,7 +390,7 @@ export class Util {
          querying server like the APP would do (index.html) */
         if (__page !== "index") return;
 
-        const isWaiting = this.isAjaxWaiting();
+        const isWaiting = this.isRpcWaiting();
         if (isWaiting) {
             this.waitCounter++;
             if (this.waitCounter >= 3) {
@@ -441,15 +434,16 @@ export class Util {
 
         try {
             reqPromise = new Promise<ResponseType>((resolve, reject) => {
-                if (this.logAjax) {
+                if (this.logRpc) {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
                 }
-                else if (this.logAjaxShort) {
+                else if (this.logRpcShort) {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
                 }
 
+                // This setOverlay is turned back off
                 if (!background) {
-                    this._ajaxCounter++;
+                    this.rpcCounter++;
                     S.quanta.setOverlay(true);
                 }
 
@@ -497,109 +491,91 @@ export class Util {
             return null;
         }
 
-        /**
-         * Notes
-         *
-         * If using then function: promise.then(successFunction, failFunction);
-         *
-         * I think the way these parameters get passed into done/fail functions, is because there are resolve/reject
-         * methods getting called with the parameters. Basically the parameters passed to 'resolve' get distributed
-         * to all the waiting methods just like as if they were subscribing in a pub/sub model. So the 'promise'
-         * pattern is sort of a pub/sub model in a way
-         *
-         * The reason to return a 'promise.promise()' method is so no other code can call resolve/reject but can
-         * only react to a done/fail/complete.
-         *
-         * deferred.when(promise1, promise2) creates a new promise that becomes 'resolved' only when all promises
-         * are resolved. It's a big "and condition" of resolvement, and if any of the promises passed to it end up
-         * failing, it fails this "ANDed" one also.
-         */
-        reqPromise.then(//
-            // ------------------------------------------------
-            // Handle Success
-            // ------------------------------------------------
-            (data: any) => {
-                try {
-                    if (!background) {
-                        this._ajaxCounter--;
-                        this.progressInterval(null);
-                    }
-
-                    if (this.logAjax) {
-                        console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                            this.prettyPrint(data));
-                    }
-
-                    if (!data.success && data.message) {
-                        // if we didn't just console log it then console log it now.
-                        if (!this.logAjax) {
-                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                                this.prettyPrint(data));
-                        }
-                        this.showMessage(data.message, "Message");
-
-                        // get rid of message so it can't be shown again
-                        data.message = null;
-                        return;
-                    }
-                } catch (ex) {
-                    this.logAndReThrow("Failed handling result of: " + postName, ex);
-                }
-                finally {
-                    if (!background) {
-                        S.quanta.setOverlay(false);
-                    }
-                }
-            })
-            // ------------------------------------------------
-            // Handle Fail
-            // We should only reach here when there's an actual failure to call the server, and is completely
-            // separete from the server perhaps haveing an exception where it sent back an error.
-            // ------------------------------------------------
-            .catch((error) => {
-                try {
-                    if (!background) {
-                        this._ajaxCounter--;
-                        this.progressInterval(null);
-                    }
-                    let status = error.response ? error.response.status : "";
-                    const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
-                    console.log("HTTP RESP [" + postName + "]: Error: " + info);
-
-                    if (error.response?.status === 401) {
-                        console.log("Not logged in detected.");
-                        if (!this.timeoutMessageShown) {
-                            this.timeoutMessageShown = true;
-                        }
-                        return;
-                    }
-
-                    let msg: string = `Failed: \nPostName: ${postName}\n`;
-                    msg += "PostData: " + this.prettyPrint(postData) + "\n";
-
-                    if (error.response) {
-                        msg += "Error Response: " + this.prettyPrint(error.response) + "\n";
-                    }
-
-                    msg += info;
-                    console.error("Request failed: msg=" + msg);
-
-                    status = error.response ? error.response.status : "";
-
-                    if (!background) {
-                        console.error("Failed: " + status + " " + (error.message || ""));
-                        this.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
-                    }
-                } catch (ex) {
-                    this.logAndReThrow("Failed processing: " + postName, ex);
-                }
-                finally {
-                    if (!background) {
-                        S.quanta.setOverlay(false);
-                    }
-                }
-            });
+        reqPromise.then((data: any) => this.rpcSuccess(data, background, postName))
+            .catch((error: any) => this.rpcFail(error, background, postName, postData));
         return reqPromise;
+    }
+
+    rpcSuccess = (data: any, background: boolean, postName: string) => {
+        try {
+            if (!background) {
+                this.rpcCounter--;
+                this.progressInterval(null);
+            }
+
+            if (this.logRpc) {
+                console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+                    this.prettyPrint(data));
+            }
+
+            if (!data.success && data.message) {
+                // if we didn't just console log it then console log it now.
+                if (!this.logRpc) {
+                    console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+                        this.prettyPrint(data));
+                }
+                this.showMessage(data.message, "Message");
+
+                // get rid of message so it can't be shown again
+                data.message = null;
+                return;
+            }
+        } catch (ex) {
+            this.logAndReThrow("Failed handling result of: " + postName, ex);
+        }
+        finally {
+            if (!background) {
+                S.quanta.setOverlay(false);
+            }
+        }
+    }
+
+    /**
+     * We should only reach here when there's an actual failure to call the server, and is completely
+     * separete from the server perhaps haveing an exception where it sent back an error.
+     */
+    rpcFail = (error: any, background: boolean, postName: string, postData: any) => {
+        try {
+            if (!background) {
+                this.rpcCounter--;
+                this.progressInterval(null);
+            }
+            let status = error.response ? error.response.status : "";
+            const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
+            console.log("HTTP RESP [" + postName + "]: Error: " + info);
+
+            if (error.response?.status === 401) {
+                console.log("Not logged in detected.");
+                if (!this.timeoutMessageShown) {
+                    this.timeoutMessageShown = true;
+                }
+                return;
+            }
+
+            let msg: string = `Failed: \nPostName: ${postName}\n`;
+            msg += "PostData: " + this.prettyPrint(postData) + "\n";
+
+            if (error.response) {
+                msg += "Error Response: " + this.prettyPrint(error.response) + "\n";
+            }
+
+            msg += info;
+            console.error("Request failed: msg=" + msg);
+
+            status = error.response ? error.response.status : "";
+
+            if (!background) {
+                console.error("Failed: " + status + " " + (error.message || ""));
+                this.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
+            }
+        } catch (ex) {
+            this.logAndReThrow("Failed processing: " + postName, ex);
+        }
+        finally {
+            if (!background) {
+                S.quanta.setOverlay(false);
+            }
+        }
     }
 
     logAndThrow = (message: string) => {
@@ -622,16 +598,8 @@ export class Util {
         throw exception;
     }
 
-    ajaxReady = (requestName: string): boolean => {
-        if (this._ajaxCounter > 0) {
-            console.log("Ignoring requests: " + requestName + ". Ajax currently in progress.");
-            return false;
-        }
-        return true;
-    }
-
-    isAjaxWaiting = (): boolean => {
-        return this._ajaxCounter > 0;
+    isRpcWaiting = (): boolean => {
+        return this.rpcCounter > 0;
     }
 
     isElmVisible = (elm: HTMLElement) => {
@@ -1116,7 +1084,7 @@ export class Util {
             tags.forEach((t: any) => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {
                     const img = `<img src='${t.icon.url}'">`;
-                    val = S.util.replaceAll(val, t.name, img);
+                    val = this.replaceAll(val, t.name, img);
                 }
             })
         }
@@ -1187,8 +1155,8 @@ export class Util {
     }
 
     sendTestEmail = async () => {
-        await S.util.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
-        S.util.showMessage("Send Test Email Initiated.", "Note");
+        await this.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
+        this.showMessage("Send Test Email Initiated.", "Note");
     }
 
     // Used to sent a message to the server simply to log into the log file as DEBUG, INFO, TRACE, for the purpose of
@@ -1197,15 +1165,15 @@ export class Util {
     sendLogText = async () => {
         const text = window.prompt("Enter text to log on server: ");
         if (text) {
-            await S.util.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
-            S.util.showMessage("Send log text completed.", "Note");
+            await this.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
+            this.showMessage("Send log text completed.", "Note");
         }
     }
 
     showSystemNotification = (title: string, message: string) => {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user
-                message = S.util.removeHtmlTags(message);
+                message = this.removeHtmlTags(message);
 
                 // eslint-disable-next-line no-unused-vars
                 const n = new Notification(title, {
@@ -1239,7 +1207,7 @@ export class Util {
     loadBookmarks = async () => {
         const state = getAppState();
         if (!state.isAnonUser) {
-            const res = await S.util.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
+            const res = await this.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
@@ -1434,9 +1402,9 @@ export class Util {
     }
 
     playAudioIfRequested = () => {
-        const audioUrl = S.util.getParameterByName("audioUrl");
+        const audioUrl = this.getParameterByName("audioUrl");
         if (audioUrl) {
-            const startTimeStr = S.util.getParameterByName("t");
+            const startTimeStr = this.getParameterByName("t");
             const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
             setTimeout(() => {
                 new AudioPlayerDlg(null, null, null, audioUrl, startTime).open();
@@ -1445,7 +1413,7 @@ export class Util {
     }
 
     processUrlParams = (state: AppState) => {
-        const passCode = S.util.getParameterByName("passCode");
+        const passCode = this.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
                 new ChangePasswordDlg(passCode).open();
@@ -1461,7 +1429,7 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                const res = await this.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
@@ -1491,7 +1459,7 @@ export class Util {
 
     saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
         if (!state.isAnonUser) {
-            await S.util.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            await this.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
                 userPreferences: state.userPrefs
             });
@@ -1610,4 +1578,8 @@ export class Util {
                 break;
         }
     }
+
+    // Leave this at the END of the module since it makes calls to methods that might not be created at
+    // arbitrary earlier places in the code.
+    daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
 }

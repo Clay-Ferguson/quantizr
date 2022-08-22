@@ -47,10 +47,6 @@ export class SearchFileSystemDlg extends DialogBase {
             return;
         }
 
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         // until we have better validation
         const node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {

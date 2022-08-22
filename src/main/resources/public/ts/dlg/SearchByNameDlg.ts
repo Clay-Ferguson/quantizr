@@ -40,10 +40,6 @@ export class SearchByNameDlg extends DialogBase {
             return;
         }
 
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "Node Name: " + SearchByNameDlg.defaultSearchText;

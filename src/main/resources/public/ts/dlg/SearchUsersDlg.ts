@@ -100,10 +100,6 @@ export class SearchUsersDlg extends DialogBase {
             return;
         }
 
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;

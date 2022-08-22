@@ -147,8 +147,7 @@ export abstract class DialogBase extends Comp {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            // only show the close 'X' icon for non-embed dialogs
-            this.mode !== DialogMode.EMBED ? new Div(null, { className: "app-modal-title-close-icon float-end" }, [
+            new Div(null, { className: "app-modal-title-close-icon float-end" }, [
                 new Icon({
                     className: "fa fa-times",
                     onClick: () => {
@@ -157,7 +156,7 @@ export abstract class DialogBase extends Comp {
                     },
                     title: "Close Dialog"
                 })
-            ]) : null
+            ])
         ];
 
         this.setChildren([

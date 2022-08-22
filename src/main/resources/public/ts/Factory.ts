@@ -1,15 +1,11 @@
 /*
-This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a SpringContext
+This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a SpringContext (in Java)
 but actually existing for mostly different reasons having to do with our need to support circular
 references.
 
 WARNING: Singletons (just like in Spring) are not allowed to do any logic that requires other modules
 inside their constructors becasue there is no guarantee that all (or any) of the other Singletons have
 been constructed yet.
-
-NOTE: This Factory is allowed to import anything it wants and the way we allow Circular Dependencies to exist without
-being a problem is by having the rule that no other modules are allowed to import this Factory module,
-but only the interface of it.
 */
 import { isDispatcherReady } from "./AppContext";
 import { Attachment } from "./Attachment";
@@ -65,7 +61,10 @@ export class Factory {
             console.log("Factory.ts instances ready.");
         }
         catch (e) {
-            console.error("app failed to initialize components.");
+            const msg = "app failed to initialize components.\n" + e;
+            console.error(msg);
+            alert(msg);
+            throw e;
         }
     }
 

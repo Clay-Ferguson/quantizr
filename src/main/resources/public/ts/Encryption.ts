@@ -322,7 +322,7 @@ export class Encryption {
             const privDat = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
             // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
 
-            ret += "Key Pair (JWK Format):\n" + S.util.toJson({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
+            ret += "Key Pair (JWK Format):\n" + S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
 
             // yes we export to spki for PEM (not a bug)
             const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
@@ -334,7 +334,7 @@ export class Encryption {
         if (obj) {
             const key: CryptoKey = obj.val;
             const dat = await crypto.subtle.exportKey("jwk", key);
-            const keyStr = S.util.toJson(dat);
+            const keyStr = S.util.prettyPrint(dat);
             ret += "Symmetric Key (JWK Format):\n" + keyStr + "\n\n";
         }
         return ret;
@@ -424,7 +424,7 @@ export class Encryption {
         const jwk = await crypto.subtle.exportKey("jwk", key);
 
         // get JSON string of jwk
-        const jwkJson = S.util.toJson(jwk);
+        const jwkJson = S.util.prettyPrint(jwk);
 
         // const pubKeyJson = await crypto.subtle.exportKey("jwk", publicKey);
         // console.log("Initial KEY encrypted with owner publicKey: " + S.util.prettyPrint(pubKeyJson));
