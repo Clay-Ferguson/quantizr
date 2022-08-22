@@ -154,7 +154,7 @@ export class HistoryPanel extends Div {
     }
 
     makeDropTarget = (attribs: any, id: string) => {
-        S.util.setDropHandler(attribs, true, (evt: DragEvent) => {
+        S.domUtil.setDropHandler(attribs, true, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);

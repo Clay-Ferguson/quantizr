@@ -106,7 +106,7 @@ export class MenuPanel extends Div {
     static export = () => S.edit.openExportDlg(getAppState(null));
     static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
     static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
-    static mouseEffects = () => { S.util.toggleMouseEffect(); };
+    static mouseEffects = () => { S.domUtil.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, getAppState(null));
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", getAppState(null));
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", getAppState(null));

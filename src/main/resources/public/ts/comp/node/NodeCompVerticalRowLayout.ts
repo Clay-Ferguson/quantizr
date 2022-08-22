@@ -126,7 +126,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 ]));
 
                 // todo-1: document this in tips and tricks
-                S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();

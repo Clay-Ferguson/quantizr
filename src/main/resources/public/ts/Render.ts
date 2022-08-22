@@ -164,10 +164,10 @@ export class Render {
 
             highlight: (code, language) => {
                 // Check whether the given language is valid for highlight.js.
-                const validLang = !!(language && highlightjs.getLanguage(language));
+                const validLang: boolean = !!(language && highlightjs.getLanguage(language));
 
                 // Highlight only if the language is valid.
-                const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
+                const highlighted: string = validLang ? highlightjs.highlight(language, code).value : code;
 
                 // Render the highlighted code with `hljs` class.
                 // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
@@ -202,7 +202,7 @@ export class Render {
         if (!node) return;
         // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
-        S.util.setDropHandler(attribs, false, (evt: DragEvent) => {
+        S.domUtil.setDropHandler(attribs, false, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);

@@ -172,9 +172,10 @@ export class Quanta {
                 }
                 clearInterval(interval);
 
+                // todo-0: move INTO domUtil
                 document.body.addEventListener("mousemove", function (e: any) {
-                    S.util.mouseX = e.clientX;
-                    S.util.mouseY = e.clientY;
+                    S.domUtil.mouseX = e.clientX;
+                    S.domUtil.mouseY = e.clientY;
                 });
 
                 document.body.addEventListener("click", function (e: any) {
@@ -201,7 +202,7 @@ export class Quanta {
 
                     if (event.code === "Backquote") {
                         if (S.util.ctrlKeyCheck()) {
-                            S.util.addAnnotation();
+                            S.domUtil.addAnnotation();
                         }
                     }
                     else {
@@ -211,7 +212,7 @@ export class Quanta {
                                 this.ctrlKeyTime = new Date().getTime();
                                 break;
                             case "Escape":
-                                S.util.removeAnnotation();
+                                S.domUtil.removeAnnotation();
                                 if (S.util.fullscreenViewerActive(state)) {
                                     S.nav.closeFullScreenViewer(state);
                                 }
@@ -284,7 +285,7 @@ export class Quanta {
             //     Log.log("The hash has changed: hash=" + location.hash);
             // }, false);
 
-            S.util.initClickEffect();
+            S.domUtil.initClickEffect();
 
             // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
@@ -324,7 +325,7 @@ export class Quanta {
             }, 250);
 
             Log.log("initApp complete.");
-            S.util.enableMouseEffect();
+            S.domUtil.enableMouseEffect();
 
             setTimeout(() => {
                 S.encryption.initKeys();

@@ -93,7 +93,7 @@ export class NodeCompRow extends Div {
                 ]);
 
                 // todo-1: Need to document this in "Tips and Tricks"
-                S.util.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                         if (item.kind === "file") {

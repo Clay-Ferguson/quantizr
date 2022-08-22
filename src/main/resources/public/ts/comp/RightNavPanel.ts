@@ -110,7 +110,7 @@ export class RightNavPanel extends Div {
         }) : null;
 
         if (addNoteButton) {
-            S.util.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
+            S.domUtil.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
                 for (const item of evt.dataTransfer.items) {
                     // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                     if (item.kind === "file") {
