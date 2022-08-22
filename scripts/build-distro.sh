@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# IMPORTANT: When doing a build for pushing to docker public repo go into the two *.sh files that
+# have this version set and update them both (i.e. `export QUANTA_VER=2.0.0`), then after building
+# boost that number so the one you just built remains frozen, and not being updated every time you do 
+# your own private build.
+
 # =================================================================================================
 # Builds a production distro zip file, which should be able to be unzipped and run on any
 # linux box to run an instance of the Quanta. You should be able to find the most recent

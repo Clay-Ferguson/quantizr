@@ -18,7 +18,7 @@ export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
 export ipfsEnabled=
 
-export QUANTA_VER=1.0.29
+export QUANTA_VER=2.0.0
 
 export JAR_FILE=
 export PORT=8185
