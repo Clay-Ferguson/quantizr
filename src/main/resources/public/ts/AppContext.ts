@@ -1,5 +1,7 @@
 import { createContext, useContext, useReducer } from "react";
 import { AppState } from "./AppState";
+import { Constants as C } from "./Constants";
+import { PubSub } from "./PubSub";
 
 /* Redux Replacement!!
 
@@ -41,6 +43,7 @@ export function useAppState(): AppState {
  */
 export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
+    PubSub.pub(C.PUBSUB_dispatcherReady);
     // console.log("****** initDispatch stateId: " + state.stateId);
 }
 
@@ -81,8 +84,4 @@ export function promiseDispatch(type: string, func: (s: AppState) => AppState): 
             }
         });
     });
-}
-
-export function isDispatcherReady() {
-    return !!dispatcher;
 }

@@ -7,8 +7,8 @@ WARNING: Singletons (just like in Spring) are not allowed to do any logic that r
 inside their constructors becasue there is no guarantee that all (or any) of the other Singletons have
 been constructed yet.
 */
-import { isDispatcherReady } from "./AppContext";
 import { Attachment } from "./Attachment";
+import { Constants as C } from "./Constants";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
@@ -17,6 +17,7 @@ import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
+import { PubSub } from "./PubSub";
 import { Quanta } from "./Quanta";
 import { Render } from "./Render";
 import { Search } from "./Search";
@@ -71,17 +72,7 @@ export class Factory {
     initApp() {
         try {
             console.log("calling initApp()");
-
-            // todo-0: use pubsub here instead of polling. This was a quick hack
-            // during the transition away from Redux, not intended to be permanent.
-            const interval = setInterval(() => {
-                // we require that the AppContainer has ran and rendered already becasue we're doing state management
-                // using the root component.
-                if (isDispatcherReady()) {
-                    clearInterval(interval);
-                    S.quanta.initApp();
-                }
-            }, 10);
+            PubSub.subSingleOnce(C.PUBSUB_dispatcherReady, S.quanta.initApp);
         }
         catch (e) {
             alert("initApp failed: " + e);

@@ -84,7 +84,7 @@ export class Quanta {
 
     initApp = async () => {
         try {
-            Log.log("initApp()");
+            Log.log("quanta.initApp()");
 
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "all-users");
             if (mobileMode) {
