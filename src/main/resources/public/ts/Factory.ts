@@ -11,7 +11,7 @@ NOTE: This Factory is allowed to import anything it wants and the way we allow C
 being a problem is by having the rule that no other modules are allowed to import this Factory module,
 but only the interface of it.
 */
-import { getDispatcher } from "./AppContext";
+import { isDispatcherReady } from "./AppContext";
 import { Attachment } from "./Attachment";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
@@ -72,10 +72,13 @@ export class Factory {
     initApp() {
         try {
             console.log("calling initApp()");
+
+            // todo-0: use pubsub here instead of polling. This was a quick hack
+            // during the transition away from Redux, not intended to be permanent.
             const interval = setInterval(() => {
                 // we require that the AppContainer has ran and rendered already becasue we're doing state management
                 // using the root component.
-                if (getDispatcher()) {
+                if (isDispatcherReady()) {
                     clearInterval(interval);
                     S.quanta.initApp();
                 }

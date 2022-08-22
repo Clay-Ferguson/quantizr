@@ -17,7 +17,7 @@ export const AppContext = createContext(state);
 
 /* Our architecture is to always have the payload as a function, and do that pattern everywhere */
 export function reducer(s: AppState, action: any) {
-    // s.stateId++;
+    // s.stateId++; // used only for troubleshooting state changes
     // console.log("****** stateId: " + s.stateId);
     state = { ...action.payload(s) };
     return state;
@@ -35,12 +35,21 @@ export function useAppState(): AppState {
     return state;
 }
 
-/* Must be called from the context of a running root level react function */
+/**
+ * Must be called from the context of a running root level react function, and should be called only once by
+ * a top level component.
+ */
 export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
     // console.log("****** initDispatch stateId: " + state.stateId);
 }
 
+/**
+ * Simple dispatch to transform state. When using this you have no way, however, to wait for
+ * the state transform to complete, so use the 'promiseDispatch' for that. Our design pattern is to
+ * always do state changes (dispatches) only thru this 'dispatcher', local to this module, and we also
+ * allow a function to be passed, rather than an object payload.
+ */
 export function dispatch(type: string, func: (s: AppState) => AppState) {
     // console.log("asyncDispatch: " + type);
     if (!dispatcher) {
@@ -51,6 +60,10 @@ export function dispatch(type: string, func: (s: AppState) => AppState) {
     // console.log("act: " + type + " " + (new Date().getTime() - startTime) + "ms");
 }
 
+/**
+ * Schedules a dispatch to run, and returns a promise that will resolve only after the state
+ * change has completed.
+ */
 export function promiseDispatch(type: string, func: (s: AppState) => AppState): Promise<AppState> {
     return new Promise<AppState>(async (resolve, reject) => {
         // console.log("dispatch: " + type);
@@ -70,6 +83,6 @@ export function promiseDispatch(type: string, func: (s: AppState) => AppState): 
     });
 }
 
-export function getDispatcher() {
-    return dispatcher;
+export function isDispatcherReady() {
+    return !!dispatcher;
 }

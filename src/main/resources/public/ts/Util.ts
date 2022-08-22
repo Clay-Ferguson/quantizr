@@ -499,17 +499,17 @@ export class Util {
 
         /**
          * Notes
-         * <p>
+         *
          * If using then function: promise.then(successFunction, failFunction);
-         * <p>
+         *
          * I think the way these parameters get passed into done/fail functions, is because there are resolve/reject
          * methods getting called with the parameters. Basically the parameters passed to 'resolve' get distributed
          * to all the waiting methods just like as if they were subscribing in a pub/sub model. So the 'promise'
          * pattern is sort of a pub/sub model in a way
-         * <p>
+         *
          * The reason to return a 'promise.promise()' method is so no other code can call resolve/reject but can
          * only react to a done/fail/complete.
-         * <p>
+         *
          * deferred.when(promise1, promise2) creates a new promise that becomes 'resolved' only when all promises
          * are resolved. It's a big "and condition" of resolvement, and if any of the promises passed to it end up
          * failing, it fails this "ANDed" one also.
@@ -672,10 +672,6 @@ export class Util {
         });
     }
 
-    nullOrUndef = (obj: any): boolean => {
-        return obj === null || obj === undefined;
-    }
-
     isObject = (obj: any): boolean => {
         return obj && obj.length !== 0;
     }
@@ -766,32 +762,6 @@ export class Util {
         }, () => {
             this.showMessage("Unable to write to clipboard.", "Warning");
         });
-    }
-
-    triggerCustom = (elm: HTMLElement, evt: string, obj: Object) => {
-        if (!elm) {
-            console.error("Ignoring Util.triggerCustom. elm is null");
-        }
-
-        let event = null;
-        if ((<any>window).CustomEvent) {
-            event = new CustomEvent(evt, { detail: obj });
-        } else {
-            event = document.createEvent("CustomEvent");
-            event.initCustomEvent(evt, true, true, obj);
-        }
-
-        elm.dispatchEvent(event);
-    }
-
-    trigger = (elm: HTMLElement, evt: string) => {
-        if (!elm) {
-            console.error("Ignoring Util.trigger. elm is null");
-        }
-        // For a full list of event types: https://developer.mozilla.org/en-US/docs/Web/API/document.createEvent
-        const event = document.createEvent("HTMLEvents");
-        event.initEvent(evt, true, false);
-        elm.dispatchEvent(event);
     }
 
     formatDate = (date: Date): string => {
@@ -1284,44 +1254,6 @@ export class Util {
                 }, 250);
                 return s;
             });
-        }
-    }
-
-    /* We look at the node, and get the parent path from it, and then if there is a node matching that's being displayed
-    in the tree we ensure that the "Open" button is visible. This normally indicates this node has been replied to
-
-    If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
-    getState and then dispatching the change.
-
-    WARNING: Both places that were calling this are commented out, so I need to remember why, becasue I didn't
-    add comments when comment thing out saying why.
-    */
-    refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState) => {
-        if (!node || !state.node || !state.node.children) return;
-        const doDispatch = !state;
-        state = getAppState(state);
-
-        const path = node.path;
-        const slashIdx: number = path.lastIndexOf("/");
-        if (slashIdx === -1) return;
-        const parentPath = path.substring(0, slashIdx);
-
-        /* scan all children being displayed and if one of them is the target parent set the hasChildren
-        on it so it'll display the "open" button */
-        for (const node of state.node.children) {
-            if (node.path === parentPath) {
-                node.hasChildren = true;
-                if (doDispatch) {
-                    dispatch("NodeChanges", s => {
-                        // 1: this is a bug even if everything's working ok. We need the entire for loop
-                        // to be INSIDE this dispatch, and when you do that be careful and check how 'doDispatch'
-                        // flag is supposed to work. This will also be FASTER with only a single dispatch
-                        return state;
-                    });
-                }
-                // break out of loop, we're done here.
-                break;
-            }
         }
     }
 
