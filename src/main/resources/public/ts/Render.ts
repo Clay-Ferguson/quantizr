@@ -253,7 +253,7 @@ export class Render {
             return;
         }
 
-        const res = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+        const res = await S.util.rpc<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
         dispatch("ShowCalendar", s => {
@@ -610,7 +610,7 @@ export class Render {
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
-                const res = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                const res = await S.util.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                     ids
                 }, true);
 
@@ -730,7 +730,7 @@ export class Render {
     showGraph = async (node: J.NodeInfo, searchText: string, state: AppState) => {
         node = node || S.nodeUtil.getHighlightedNode(state);
 
-        const res = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+        const res = await S.util.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchText,
             nodeId: node.id
         });

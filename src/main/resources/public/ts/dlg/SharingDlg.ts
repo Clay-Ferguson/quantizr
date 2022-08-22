@@ -88,7 +88,7 @@ export class SharingDlg extends DialogBase {
     }
 
     shareImmediate = async (userName: string) => {
-        await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        await S.util.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
@@ -104,7 +104,7 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and saves into state.
      */
     reload = async () => {
-        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
@@ -115,7 +115,7 @@ export class SharingDlg extends DialogBase {
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.util.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
             privilege: "*"
@@ -131,7 +131,7 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                    await S.util.rpc<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: this.node.id
                     });
                     S.quanta.refresh(getAppState());
@@ -145,7 +145,7 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.util.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
             privilege
@@ -154,7 +154,7 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilegeResponse = async () => {
-        const res = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.util.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
@@ -177,7 +177,7 @@ export class SharingDlg extends DialogBase {
          *
          * TODO: this additional call can be avoided as an optimization
          */
-        await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        await S.util.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: "public",
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]

@@ -61,7 +61,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        const res = await S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
+        const res = await S.util.rpc<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
             recursive: this.getState<LS>().recursive,
             nodeId: node.id,
             fromUser: this.fromUserState.getValue(),

@@ -70,7 +70,7 @@ export class EditNodeDlgUtil {
         this.savePropsToNode(dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
-        const res = await S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+        const res = await S.util.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: state.node
         });
 
@@ -190,7 +190,7 @@ export class EditNodeDlgUtil {
     }
 
     deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
-        const res = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
+        const res = await S.util.rpc<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
             nodeId: dlg.getState<LS>().node.id,
             propNames
         });
@@ -292,7 +292,7 @@ export class EditNodeDlgUtil {
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
     refreshBinaryPropsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
-        const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
             siblingOffset: 0,

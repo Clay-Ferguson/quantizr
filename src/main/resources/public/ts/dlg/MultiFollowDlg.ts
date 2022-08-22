@@ -33,7 +33,7 @@ export class MultiFollowDlg extends DialogBase {
     }
 
     follow = async () => {
-        await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+        await S.util.rpc<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: this.userNamesState.getValue()
         });
         this.close();

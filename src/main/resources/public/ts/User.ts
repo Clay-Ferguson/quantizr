@@ -21,7 +21,7 @@ export class User {
         await dlg.open();
         if (dlg.yes) {
             await this.deleteAllUserLocalDbEntries();
-            await S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
+            await S.util.rpc<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
 
             /* Remove warning dialog to ask user about leaving the page */
             window.onbeforeunload = null;
@@ -74,7 +74,7 @@ export class User {
             S.util.loadAnonPageHome();
         } else {
             try {
-                const res = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                const res = await S.util.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
@@ -125,7 +125,7 @@ export class User {
 
         S.quanta.loggingOut = true;
         try {
-            await S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout");
+            await S.util.rpc<J.LogoutRequest, J.LogoutResponse>("logout");
         }
         finally {
             this.logoutResponse();
@@ -244,7 +244,7 @@ export class User {
     }
 
     checkMessages = async () => {
-        const res = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
+        const res = await S.util.rpc<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
             dispatch("SetNewMessageCount", s => {
                 s.newMessageCount = res.numNew;
@@ -254,7 +254,7 @@ export class User {
     }
 
     queryUserProfile = async (userId: string) => {
-        const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.util.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId
         });
 

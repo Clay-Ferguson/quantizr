@@ -32,7 +32,7 @@ export class EditTagsDlg extends DialogBase {
     }
 
     reload = async () => {
-        const res = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.util.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: getAppState().userProfile.userNodeId
         });
 
@@ -51,7 +51,7 @@ export class EditTagsDlg extends DialogBase {
             return s;
         });
 
-        S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        S.util.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: appState.userProfile.userTags,
             userBio: appState.userProfile.userBio,

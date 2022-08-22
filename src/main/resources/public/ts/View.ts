@@ -67,7 +67,7 @@ export class View {
         }
 
         try {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: a.nodeId,
                 upLevel: false,
                 siblingOffset: 0,
@@ -137,7 +137,7 @@ export class View {
         console.log("loadPage nodeId=" + state.node.id);
 
         try {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: false,
                 siblingOffset: 0,
@@ -344,7 +344,7 @@ export class View {
 
     getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(state);
-        const res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        const res = await S.util.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,
             feed,
@@ -358,7 +358,7 @@ export class View {
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
         const node = S.nodeUtil.getHighlightedNode(state);
 
-        const res = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
+        const res = await S.util.rpc<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,
             parameter,
             nodeId: node ? node.id : null

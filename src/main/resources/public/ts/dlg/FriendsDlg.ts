@@ -41,7 +41,7 @@ export class FriendsDlg extends DialogBase {
         });
 
         (async () => {
-            const res = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
+            const res = await S.util.rpc<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
             this.mergeState<LS>({
                 friends: res.friends,
                 loading: false

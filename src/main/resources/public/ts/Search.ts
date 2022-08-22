@@ -25,7 +25,7 @@ import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
     findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState) => {
-        const res = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
+        const res = await S.util.rpc<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
             shareTarget,
@@ -56,7 +56,7 @@ export class Search {
     }
 
     showThreadAddMore = async (nodeId: string, state: AppState) => {
-        const res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        const res = await S.util.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             loadOthers: false
         });
@@ -90,7 +90,7 @@ export class Search {
     }
 
     showThread = async (node: J.NodeInfo) => {
-        const res = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+        const res = await S.util.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId: node.id,
             loadOthers: true
         });
@@ -149,7 +149,7 @@ export class Search {
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
-        const res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        const res = await S.util.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
             searchText,
@@ -214,7 +214,7 @@ export class Search {
             return;
         }
 
-        const res = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        const res = await S.util.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node.id,
             searchText: "",
@@ -298,7 +298,7 @@ export class Search {
         // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
 
         // console.log("Getting results page=" + page + " growResults=" + growResults);
-        const res = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+        const res = await S.util.rpc<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
             toMe: FeedTab.inst.props.feedFilterToMe,
@@ -380,7 +380,7 @@ export class Search {
         if (state.isAnonUser) return;
         userName = userName || state.userName;
 
-        const res = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
+        const res = await S.util.rpc<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
             targetUserName: userName
         });
@@ -419,7 +419,7 @@ export class Search {
         if (state.isAnonUser) return;
         userName = userName || state.userName;
 
-        const res = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
+        const res = await S.util.rpc<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,
             targetUserName: userName
         });
@@ -540,7 +540,7 @@ export class Search {
     }
 
     searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState) => {
-        const res = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
+        const res = await S.util.rpc<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
             search,

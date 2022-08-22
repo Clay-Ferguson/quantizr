@@ -111,7 +111,7 @@ export class SelectTagsDlg extends DialogBase {
     updateSuggestTags = async () => {
         const node = getAppState().node;
 
-        const res = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        const res = await S.util.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending: false,
             feed: false,

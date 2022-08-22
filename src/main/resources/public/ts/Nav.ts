@@ -68,7 +68,7 @@ export class Nav {
         if (!state.node) return null;
 
         try {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: false,
                 siblingOffset: siblingOffset,
@@ -106,7 +106,7 @@ export class Nav {
         }
 
         try {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
                 upLevel: true,
                 siblingOffset: 0,
@@ -188,7 +188,7 @@ export class Nav {
         // console.log("openContentNode(): " + nodePathOrId);
 
         try {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: nodePathOrId,
                 upLevel: false,
                 siblingOffset: 0,
@@ -293,7 +293,7 @@ export class Nav {
         } else {
             try {
                 // console.log("renderNode (navHome): " + state.homeNodeId);
-                const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                     nodeId: state.homeNodeId,
                     upLevel: false,
                     siblingOffset: 0,
@@ -366,7 +366,7 @@ export class Nav {
         }
         // if node not in local memory, then we have to get it from the server first...
         else {
-            const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: id,
                 upLevel: false,
                 siblingOffset: 0,

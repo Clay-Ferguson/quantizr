@@ -60,7 +60,7 @@ export class Attachment {
             const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
-                await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                await S.util.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
                     nodeId: node.id
                 });
             }

@@ -434,7 +434,7 @@ export class Util {
         return this.getRemoteHost() + "/mobile/api/";
     }
 
-    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
+    rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
         background: boolean = false): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
@@ -1176,7 +1176,7 @@ export class Util {
     loadOpenGraph = async (url: string, callback: Function) => {
         // console.log("loadOpenGraph: " + url);
         try {
-            const res: J.GetOpenGraphResponse = await this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+            const res: J.GetOpenGraphResponse = await this.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
             }, true);
             callback(res.openGraph);
@@ -1187,7 +1187,7 @@ export class Util {
     }
 
     sendTestEmail = async () => {
-        await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
+        await S.util.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         S.util.showMessage("Send Test Email Initiated.", "Note");
     }
 
@@ -1197,7 +1197,7 @@ export class Util {
     sendLogText = async () => {
         const text = window.prompt("Enter text to log on server: ");
         if (text) {
-            await S.util.ajax<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
+            await S.util.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
             S.util.showMessage("Send log text completed.", "Note");
         }
     }
@@ -1239,7 +1239,7 @@ export class Util {
     loadBookmarks = async () => {
         const state = getAppState();
         if (!state.isAnonUser) {
-            const res = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
+            const res = await S.util.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
@@ -1461,7 +1461,7 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                const res = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
@@ -1491,7 +1491,7 @@ export class Util {
 
     saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
         if (!state.isAnonUser) {
-            await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            await S.util.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
                 userPreferences: state.userPrefs
             });
