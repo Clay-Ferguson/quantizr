@@ -611,6 +611,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     save = () => {
+        // it's important to call saveNode before close, because close destroys some of our state, what we need
+        // to complete the updating and page refresh.
         this.utl.saveNode(this);
         this.close();
         if (this.afterEditAction) {
@@ -708,6 +710,7 @@ export class EditNodeDlg extends DialogBase {
     super_close = this.close;
     close = () => {
         this.super_close();
+
         if (this.mode === DialogMode.EMBED) {
             EditNodeDlg.embedInstance = null;
             dispatch("endEditing", s => {

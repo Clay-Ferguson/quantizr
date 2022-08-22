@@ -58,9 +58,7 @@ public class NodeInfo {
 	 */
 	private String cipherKey;
 
-	// NOTE: These two booleans are hints for gui enablement (for moveUp, moveDown,
-	// etc) in the browser,
-	// and are not necessarily reqired to be always even correct
+	// NOTE: Just a hint for gui enablement (for moveUp, moveDown, etc) in the browser,
 	private boolean lastChild;
 
 	private int width;

@@ -48,6 +48,10 @@ export class EditNodeDlgUtil {
     public saveNode = async (dlg: EditNodeDlg) => {
         const state = dlg.getState<LS>();
 
+        // save these two values, becasue the S.quanta copy can get overwritten before we use them here.
+        const newNodeTargetId = S.quanta.newNodeTargetId;
+        const newNodeTargetOffset = S.quanta.newNodeTargetOffset;
+
         let content: string;
         if (dlg.contentEditor) {
             content = dlg.contentEditor.getValue();
@@ -90,7 +94,7 @@ export class EditNodeDlgUtil {
         }
         else {
             S.render.fadeInId = state.node.id;
-            S.edit.saveNodeResponse(state.node, res, true, getAppState());
+            S.edit.saveNodeResponse(state.node, res, true, newNodeTargetId, newNodeTargetOffset, getAppState());
 
             if (askToSplit) {
                 new SplitNodeDlg(state.node).open();

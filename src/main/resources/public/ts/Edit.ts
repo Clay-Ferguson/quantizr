@@ -89,8 +89,8 @@ export class Edit {
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
                 const editInPopup = forceUsePopup || state.mobileMode ||
                     // node not found on tree.
-                    (!S.nodeUtil.getDisplayingNode(state, res.nodeInfo.id) &&
-                        !S.nodeUtil.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
+                    (!S.nodeUtil.displayingOnTree(state, res.nodeInfo.id) &&
+                        !S.nodeUtil.displayingOnTree(state, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
                     S.util.fullscreenViewerActive(state);
@@ -315,8 +315,10 @@ export class Edit {
         }
     }
 
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState) => {
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean,
+        newNodeTargetId: string, newNodeTargetOffset: number, state: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
+
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
@@ -349,11 +351,19 @@ export class Edit {
             const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
-            await this.refreshNodeFromServer(node.id);
+            const newNode = await this.refreshNodeFromServer(node.id, newNodeTargetId);
 
-            // if 'node.id' is not being displayed on the page we need to jump to it from scratch
-            if (state.activeTab === C.TAB_MAIN && !S.nodeUtil.getDisplayingNode(state, node.id)) {
-                S.view.jumpToId(node.id);
+            if (state.activeTab === C.TAB_MAIN) {
+                // Inject the new node right into the page children
+                if (newNodeTargetId) {
+                    await this.injectNewNodeIntoChildren(newNode, newNodeTargetId, newNodeTargetOffset);
+                }
+                // any kind of insert that's not a new node injected into the page ends up here.
+                else {
+                    if (!S.nodeUtil.displayingOnTree(state, node.id)) {
+                        S.view.jumpToId(node.id);
+                    }
+                }
             }
 
             if (state.fullScreenConfig.type === FullScreenType.CALENDAR) {
@@ -362,42 +372,92 @@ export class Edit {
         }
     }
 
-    refreshNodeFromServer = async (nodeId: string): Promise<void> => {
-        // console.log("refreshNodeFromServer: " + nodeId);
-        const state = getAppState();
+    injectNewNodeIntoChildren = (newNode: J.NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<AppState> => {
+        // we return the promise from the dispatch and to not wait for it here.
+        return promiseDispatch("InjectNewNodeIntoChildren", s => {
+            if (s.node.children) {
+                const newChildren: J.NodeInfo[] = [];
 
-        const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: false,
-            forceRenderParent: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: true,
-            parentCount: state.userPrefs.showParents ? 1 : 0
-        });
+                // we'll be renumbering ordinals so use this to keep track, by starting at whatever
+                // the first child was at before the insert
+                let ord = s.node.children[0].logicalOrdinal;
 
-        if (!res?.node) {
-            return;
-        }
+                // build newChildren by inserting the 'newNode' into it's proper place into the children array.
+                s.node.children.forEach(child => {
+                    // offset==0 means insert above.
+                    if (newNodeTargetId === child.id && newNodeTargetOffset === 0) {
+                        newNode.logicalOrdinal = ord++;
+                        newChildren.push(newNode);
+                    }
+                    child.logicalOrdinal = ord++;
+                    newChildren.push(child);
 
-        dispatch("RefreshNodeFromServer", s => {
-            // if the node is our page parent (page root)
-            if (res.node.id === s.node.id) {
-                // preserve the children, when updating the root node, because they will not have been obtained
-                // due to the 'singleNode=true' in the request
-                res.node.children = s.node.children;
-                s.node = res.node;
+                    // offset==0 means insert below.
+                    if (newNodeTargetId === child.id && newNodeTargetOffset === 1) {
+
+                        // if node was the lastChild, we have a new last child.
+                        if (child.lastChild) {
+                            child.lastChild = false;
+                            newNode.lastChild = true;
+                        }
+
+                        newNode.logicalOrdinal = ord++;
+                        newChildren.push(newNode);
+                    }
+                });
+                s.node.children = newChildren;
             }
+            else {
+                s.node.children = [newNode];
+            }
+            return s;
+        });
+    }
 
-            // make all tabs update their copy of the node of they have it
-            state.tabData.forEach((td: TabIntf) => {
-                td.replaceNode(s, res.node);
+    refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
+        return new Promise<J.NodeInfo>(async (resolve, reject) => {
+            // console.log("refreshNodeFromServer: " + nodeId);
+            const state = getAppState();
+
+            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                forceRenderParent: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: true,
+                parentCount: state.userPrefs.showParents ? 1 : 0
             });
 
-            return s;
+            if (!res || !res.node) {
+                resolve(null);
+                return;
+            }
+
+            resolve(res.node);
+
+            // we only need to update/dispatch here if we're NOT doing an 'insert into page' type insert
+            if (!newNodeTargetId) {
+                await promiseDispatch("RefreshNodeFromServer", s => {
+                    // if the node is our page parent (page root)
+                    if (res.node.id === s.node.id) {
+                        // preserve the children, when updating the root node, because they will not have been obtained
+                        // due to the 'singleNode=true' in the request
+                        res.node.children = s.node.children;
+                        s.node = res.node;
+                    }
+
+                    // make all tabs update their copy of the node of they have it
+                    state.tabData.forEach((td: TabIntf) => {
+                        td.replaceNode(s, res.node);
+                    });
+
+                    return s;
+                });
+            }
         });
     }
 

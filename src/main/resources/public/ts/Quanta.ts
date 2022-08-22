@@ -172,7 +172,6 @@ export class Quanta {
                 }
                 clearInterval(interval);
 
-                // todo-0: move INTO domUtil
                 document.body.addEventListener("mousemove", function (e: any) {
                     S.domUtil.mouseX = e.clientX;
                     S.domUtil.mouseY = e.clientY;

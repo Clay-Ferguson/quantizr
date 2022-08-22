@@ -176,7 +176,7 @@ export class NodeUtil {
     }
 
     /* Returns the node if it's currently displaying on the page. For now we don't have ability */
-    getDisplayingNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    displayingOnTree = (state: AppState, nodeId: string): J.NodeInfo => {
         if (!state.node) return null;
         if (state.node.id === nodeId) return state.node;
         if (!state.node.children) return null;

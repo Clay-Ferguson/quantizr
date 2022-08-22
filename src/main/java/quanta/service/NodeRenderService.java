@@ -277,7 +277,7 @@ public class NodeRenderService extends ServiceBase {
 		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
 		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
-		int queryLimit = ok(scanToNode) ? -1 : limit + 2;
+		int queryLimit = ok(scanToNode) ? -1 : limit + 1;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
 
@@ -400,10 +400,13 @@ public class NodeRenderService extends ServiceBase {
 			ninfo = render.processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
 			nodeInfo.getChildren().add(ninfo);
 
+			if (!iterator.hasNext()) {
+				// since we query for 'limit+1', we will end up here if we're at the true end of the records.
+				endReached = true;
+				break;
+			}
+
 			if (nodeInfo.getChildren().size() >= limit) {
-				if (!iterator.hasNext()) {
-					endReached = true;
-				}
 				/* break out of while loop, we have enough children to send back */
 				// log.debug("Full page is ready. Exiting loop.");
 				break;
@@ -437,8 +440,9 @@ public class NodeRenderService extends ServiceBase {
 			log.trace("no child nodes found.");
 		}
 
-		if (endReached && ok(ninfo) && nodeInfo.getChildren().size() > 1) {
-			ninfo.setLastChild(true);
+		if (endReached && ok(ninfo) && nodeInfo.getChildren().size() > 0) {
+			// set 'lastChild' on the last child
+			nodeInfo.getChildren().get(nodeInfo.getChildren().size() - 1).setLastChild(true);
 		}
 
 		// log.debug("Setting endReached="+endReached);
@@ -486,8 +490,7 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, 
-		true, false,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false,
 				false, false, null);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
