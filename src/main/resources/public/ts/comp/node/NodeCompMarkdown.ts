@@ -103,7 +103,10 @@ export class NodeCompMarkdown extends Html {
         this.urls = null;
         const elm = document.createElement("html");
         elm.innerHTML = val;
-        elm.querySelectorAll("a").forEach((e: any) => {
+
+        // BEWARE: The elements we scan here are NOT part of the DOM, we are just extracting out
+        // the urls here.
+        elm.querySelectorAll("a").forEach((e: HTMLAnchorElement) => {
             if (!e.href) return;
             let href = e.href.trim();
             href = S.util.stripIfEndsWith(href, "/");
