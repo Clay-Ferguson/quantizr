@@ -35,6 +35,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -84,49 +85,10 @@ public class ActPubUtil extends ServiceBase {
     public APObj buildObj(byte[] bytes) {
         try {
             APObj payload = ActPubUtil.mapper.readValue(bytes, new TypeReference<>() {});
-            return typeFromFactory(payload);
+            return AP.typeFromFactory(payload);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns a specific APObj-derived concrete class if we can, or else returns the same APObj passed
-     * in.
-     */
-    public APObj typeFromFactory(APObj obj) {
-        APObj ret = obj;
-
-        switch (obj.getType()) {
-            case APType.Create:
-                break;
-
-            case APType.Update:
-                break;
-
-            case APType.Follow:
-                break;
-
-            case APType.Undo:
-                break;
-
-            case APType.Delete:
-                break;
-
-            case APType.Accept:
-                break;
-
-            case APType.Like:
-                break;
-
-            case APType.Announce:
-                break;
-
-            default:
-                log.debug("Unsupported type: " + XString.prettyPrint(obj));
-                break;
-        }
-        return ret;
     }
 
     /*
@@ -974,7 +936,7 @@ public class ActPubUtil extends ServiceBase {
         // todo-1: we only support "Note" for now.
         String type = apStr(obj, APObj.type);
         switch (type) {
-            // todo-0: I know we don't support type "Question" or type "Video" yet so I need to at least
+            // todo-1: I know we don't support type "Question" or type "Video" yet so I need to at least
             // send back a visible message to the user saying that this type of node is not yet supported by
             // Quanta and so the history cannot be displayed.
             case APType.Note:

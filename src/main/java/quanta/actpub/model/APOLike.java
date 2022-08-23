@@ -2,6 +2,7 @@ package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
 import java.util.List;
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
@@ -10,7 +11,11 @@ import quanta.actpub.APConst;
  * 
  * Like object
  */
-public class APOLike extends APObj {
+public class APOLike extends APOActivity {
+    public APOLike(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOLike() {
         put(context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APOAccept;
+import quanta.actpub.model.APOActivity;
 import quanta.actpub.model.APOFollow;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
@@ -121,19 +122,23 @@ public class ActPubFollowing extends ServiceBase {
      * FRIEND_LIST created to represent the person he's following, if not already existing.
      * 
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
+     * 
+     * This 'activity' can be either APOUndo or APOFollow
      */
-    public void processFollowAction(APObj followAction, String followerActorUrl, boolean unFollow) {
+    public void processFollowActivity(APOActivity activity) {
+        boolean unFollow = activity instanceof APOUndo;
+
         Runnable runnable = () -> {
             arun.<APObj>run(as -> {
                 try {
                     // #todo-optimization: we can call apub.getUserProperty() to get followerUserName right?
-                    APObj followerActor = apUtil.getActorByUrl(as, null, followerActorUrl);
+                    APObj followerActor = apUtil.getActorByUrl(as, null, activity.getActor());
                     if (no(followerActor)) {
-                        apLog.trace("no followerActor object gettable from actor: " + followerActorUrl);
+                        apLog.trace("no followerActor object gettable from actor: " + activity.getActor());
                         return null;
                     }
 
-                    log.debug("getLongUserNameFromActorUrl: " + followerActorUrl); // + "\n" +
+                    log.debug("getLongUserNameFromActorUrl: " + activity.getActor()); // + "\n" +
                                                                                    // XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
@@ -149,10 +154,11 @@ public class ActPubFollowing extends ServiceBase {
                     String actorBeingFollowedUrl = null;
 
                     // Actor being followed (local to our server)
-                    Object followObj = apObj(followAction, APObj.object);
+                    // Note: followObj CAN be a String here.
+                    Object followObj = apObj(activity, APObj.object);
 
                     if (no(followObj)) {
-                        log.debug("Can't get followObj from: " + XString.prettyPrint(followAction));
+                        log.debug("Can't get followObj from: " + XString.prettyPrint(activity));
                         throw new RuntimeException("no followObj");
                     }
 
@@ -168,7 +174,7 @@ public class ActPubFollowing extends ServiceBase {
                     log.debug("actorBeingFollowedUrl: " + actorBeingFollowedUrl);
 
                     if (no(actorBeingFollowedUrl)) {
-                        log.debug("failed to get actorBeingFollowed from this object: " + XString.prettyPrint(followAction));
+                        log.debug("failed to get actorBeingFollowed from this object: " + XString.prettyPrint(activity));
                         return null;
                     }
 
@@ -212,7 +218,7 @@ public class ActPubFollowing extends ServiceBase {
                         Util.sleep(2000);
 
                         // Must send either Accept or Reject. Currently we auto-accept all.
-                        APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, _actorBeingFollowedUrl) : //
+                        APObj acceptPayload = unFollow ? new APOUndo(null, activity.getActor(), _actorBeingFollowedUrl) : //
                                 new APOFollow();
 
                         /*
@@ -220,13 +226,13 @@ public class ActPubFollowing extends ServiceBase {
                          * unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta
                          * users and see what the format of the message is sent from those).
                          */
-                        acceptPayload.put(APObj.id, apStr(followAction, APObj.id));
-                        acceptPayload.put(APObj.actor, followerActorUrl);
+                        acceptPayload.put(APObj.id, activity.getId());
+                        acceptPayload.put(APObj.actor, activity.getActor());
                         acceptPayload.put(APObj.object, _actorBeingFollowedUrl);
 
                         APOAccept accept = new APOAccept(//
                                 _actorBeingFollowedUrl, // actor
-                                followerActorUrl, // to
+                                activity.getActor(), // to
                                 // for now we generate bogus accepts
                                 prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
                                 acceptPayload); // object

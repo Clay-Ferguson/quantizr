@@ -1,13 +1,19 @@
 package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Create object.
  */
-public class APOCreate extends APObj {
+public class APOCreate extends APOActivity {
+    public APOCreate(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOCreate() {
+        super();
         put(context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(new APOLanguage()));

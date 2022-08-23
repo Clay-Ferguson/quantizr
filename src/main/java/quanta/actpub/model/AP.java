@@ -177,9 +177,9 @@ public class AP {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         } else {
-            ExUtil.warn(
-                    "[1]getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
-                            + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: "
+                    + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
+                    + XString.prettyPrint(obj));
         }
         return null;
     }
@@ -190,11 +190,11 @@ public class AP {
     public static APObj apAPObj(Object obj, String prop) {
         Object o = apObj(obj, prop);
         if (o instanceof Map<?, ?>) {
-            return new APObj((Map<?, ?>) o);
+            return typeFromFactory(new APObj((Map<?, ?>) o));
         } else {
-            ExUtil.warn(
-                    "[2]getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
-                            + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+            ExUtil.warn("[2]getting prop " + prop + " from unsupported container type: "
+                    + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
+                    + XString.prettyPrint(obj));
         }
         return null;
     }
@@ -204,5 +204,45 @@ public class AP {
             return new Val<Object>(((Map<?, ?>) obj).get(prop));
         }
         return null;
+    }
+
+    /**
+     * Returns a specific APObj-derived concrete class if we can, or else returns the same APObj passed
+     * in.
+     */
+    public static APObj typeFromFactory(APObj obj) {
+        APObj ret = obj;
+
+        /* Parse "Activity" Objects */
+        switch (obj.getType()) {
+            case APType.Create:
+                return new APOCreate(obj);
+
+            case APType.Update:
+                return new APOUpdate(obj);
+
+            case APType.Follow:
+                return new APOFollow(obj);
+
+            case APType.Undo:
+                return new APOUndo(obj);
+
+            case APType.Delete:
+                return new APODelete(obj);
+
+            case APType.Accept:
+                return new APOAccept(obj);
+
+            case APType.Like:
+                return new APOLike(obj);
+
+            case APType.Announce:
+                return new APOAnnounce(obj);
+
+            default:
+                log.debug("Unsupported type: " + XString.prettyPrint(obj));
+                break;
+        }
+        return ret;
     }
 }

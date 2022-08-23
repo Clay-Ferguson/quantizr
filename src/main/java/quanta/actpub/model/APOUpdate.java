@@ -1,12 +1,17 @@
 package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Update object.
  */
-public class APOUpdate extends APObj {
+public class APOUpdate extends APOActivity {
+    public APOUpdate(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOUpdate() {
         put(context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //

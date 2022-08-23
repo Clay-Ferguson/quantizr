@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAnnounce;
-import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APOOrderedCollection;
@@ -132,10 +131,9 @@ public class ActPubOutbox extends ServiceBase {
                                 // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
                                 // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                                 // }
-                            } 
+                            }
                             // todo-0: need to handle "Boosts" and other types here too.
-                            else if (apIsType(object, APType.Note) || //
-                                    apIsType(object, APType.ChatMessage)) {
+                            else if (apIsType(object, APType.Note)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create, null,
@@ -345,9 +343,9 @@ public class ActPubOutbox extends ServiceBase {
                         APObj ret = null;
 
                         /*
-                         * This branch of code is not yet tested (not sure how to get foreign server to run this),
-                         * but similar code is working. There is one other similar block of code elsewhere in the app
-                         * where boosts are published.
+                         * This branch of code is not yet tested (not sure how to get foreign server to run this), but
+                         * similar code is working. There is one other similar block of code elsewhere in the app where
+                         * boosts are published.
                          */
                         if (!StringUtils.isEmpty(boostTarget)) {
                             // log.debug("processing boostTarget: " + boostTarget + " in outbox gen for " + userName);
@@ -497,19 +495,10 @@ public class ActPubOutbox extends ServiceBase {
         String hexId = child.getIdStr();
         String published = DateUtil.isoStringFromDate(child.getModifyTime());
         String actor = apUtil.makeActorUrlForUserName(userName);
-        String objType = child.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
-        APObj ret = null;
 
-        // if objType is ChatMessage use that
-        if (APType.ChatMessage.equals(objType)) {
-            ret = new APOChatMessage(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-        }
-        // or fall back to 'Note' type for everything else.
-        else {
-            ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-        }
+        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+
 
         // build the 'tags' array for this object from the sharing ACLs.
         List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
@@ -537,19 +526,9 @@ public class ActPubOutbox extends ServiceBase {
         String hexId = child.getIdStr();
         String published = DateUtil.isoStringFromDate(child.getModifyTime());
         String actor = apUtil.makeActorUrlForUserName(userName);
-        String objType = child.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
-        APObj ret = null;
-
-        // if objType is ChatMessage use that
-        if (APType.ChatMessage.equals(objType)) {
-            ret = new APOChatMessage(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-        }
-        // or fall back to 'Note' type for everything else.
-        else {
-            ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-        }
+    
+        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
         if (ok(parent)) {
             String replyTo = apUtil.buildUrlForReplyTo(as, parent);

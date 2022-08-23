@@ -1,12 +1,17 @@
 package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Undo object
  */
-public class APOUndo extends APObj {
+public class APOUndo extends APOActivity {
+    public APOUndo(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOUndo() {
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.Undo);

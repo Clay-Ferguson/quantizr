@@ -1,11 +1,16 @@
 package quanta.actpub.model;
 
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Announce object
  */
-public class APOAnnounce extends APObj {
+public class APOAnnounce extends APOActivity {
+    public APOAnnounce(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOAnnounce() {
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.Announce);

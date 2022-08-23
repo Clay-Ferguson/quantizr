@@ -1,11 +1,16 @@
 package quanta.actpub.model;
 
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Accept object
  */
-public class APOAccept extends APObj {
+public class APOAccept extends APOActivity {
+    public APOAccept(Map<?, ?> obj) {
+        super(obj);
+    }
+
     public APOAccept() { 
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.Accept);

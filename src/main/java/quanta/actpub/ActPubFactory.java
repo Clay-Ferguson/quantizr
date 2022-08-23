@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAnnounce;
-import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APODelete;
 import quanta.actpub.model.APOLike;
@@ -24,7 +23,6 @@ import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APOTombstone;
 import quanta.actpub.model.APOUpdate;
 import quanta.actpub.model.APObj;
-import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
 
@@ -68,26 +66,19 @@ public class ActPubFactory extends ServiceBase {
 	}
 
 	/**
-	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
+	 * Creates a new 'Note' object, depending on what's being replied to.
 	 */
 	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
 			String inReplyTo, String replyToType, String content, String noteUrl, ZonedDateTime now, boolean privateMessage,
 			APList attachments) {
-		APObj ret = null;
-
 		if (ok(content)) {
 			// convert all double and single spaced lines to <br> for formatting, for servers that don't
 			// understand Markdown
 			content = content.replace("\n", "<br>");
 		}
 
-		if (APType.ChatMessage.equals(replyToType)) {
-			ret = new APOChatMessage(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false,
-					content, null);
-		} else {
-			ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content,
+		APObj ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content,
 					null);
-		}
 
 		if (ok(inReplyTo)) {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);

@@ -1,12 +1,17 @@
 package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
+import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
  * Follow object
  */
-public class APOFollow extends APObj {
+public class APOFollow extends APOActivity {
+    public APOFollow(Map<?, ?> obj) {
+        super(obj);
+    }
+    
     public APOFollow() {
         put(context, APConst.CONTEXT_STREAMS);
 
