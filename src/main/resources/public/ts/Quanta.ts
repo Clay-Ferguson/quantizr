@@ -13,7 +13,6 @@ import { S } from "./Singletons";
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
     mainMenu: MainMenuDlg;
-    hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
     activeTab: string;
 

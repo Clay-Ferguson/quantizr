@@ -132,23 +132,6 @@ export class Nav {
         }
     }
 
-    /*
-     * turn of row selection DOM element of whatever row is currently selected
-     */
-    getSelectedDomElement = (state: AppState): HTMLElement => {
-        const selNode = S.nodeUtil.getHighlightedNode(state);
-        if (selNode) {
-            // console.log("found highlighted node.id=" + node.id);
-
-            /* now make CSS id from node */
-            const nodeId: string = this._UID_ROWID_PREFIX + selNode.id;
-            // console.log("looking up using element id: "+nodeId);
-
-            return S.domUtil.domElm(nodeId);
-        }
-        return null;
-    }
-
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
     clickTreeNode = async (evt: Event, id: string, state?: AppState) => {

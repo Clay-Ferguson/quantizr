@@ -476,6 +476,7 @@ export abstract class Comp implements CompIntf {
         if (this.getScrollPos()) {
             this.setScrollPos(pos);
         }
+
         const elm = this.getRef();
         if (elm) {
             if (C.DEBUG_SCROLLING) {

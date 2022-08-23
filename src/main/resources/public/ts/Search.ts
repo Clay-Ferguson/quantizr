@@ -530,13 +530,12 @@ export class Search {
     }
 
     clickSearchNode = (id: string, state: AppState) => {
-        setTimeout(() => {
-            S.view.jumpToId(id);
-            dispatch("RenderSearchResults", s => {
-                s.highlightSearchNodeId = id;
-                return s;
-            });
-        }, 10);
+        S.view.jumpToId(id);
+
+        dispatch("RenderSearchResults", s => {
+            s.highlightSearchNodeId = id;
+            return s;
+        });
     }
 
     searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState) => {

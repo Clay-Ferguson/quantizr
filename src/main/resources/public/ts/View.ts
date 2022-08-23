@@ -269,66 +269,32 @@ export class View {
         }
     }
 
-    scrollToNode = (state: AppState, node: J.NodeInfo = null) => {
-        // S.quanta.setOverlay(true);
-
+    scrollToNode = (state: AppState, node: J.NodeInfo = null, delay: number = 100) => {
         const func = () => {
-            //    try {
-            /* Check to see if we are rendering the top node (page root), and if so
-            it is better looking to just scroll to zero index, because that will always
-            be what user wants to see */
-            node = node || S.nodeUtil.getHighlightedNode(state);
+            setTimeout(() => {
+                /* Check to see if we are rendering the top node (page root), and if so
+                it is better looking to just scroll to zero index, because that will always
+                be what user wants to see */
+                node = node || S.nodeUtil.getHighlightedNode(state);
 
-            /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
-             a case where the user is editing a node and we KNOW we don't need to scroll after editing,
-             so this is where we detect and reset that scenario. */
-            if (node?.id === S.quanta.noScrollToId) {
-                // console.log("noScrollToId flag");
-                return;
-            }
-
-            if (state.node.id === node?.id) {
-                // console.log("is root, scroll to top");
-                this.scrollAllTop(state);
-                return;
-            }
-
-            if (C.DEBUG_SCROLLING) {
-                console.log("ScrollToNode: id=" + node?.id)
-            }
-
-            let elm: any = null;
-            if (node) {
-                // console.log("looking up using element id: " + nodeId);
-                elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
-            }
-
-            elm = elm || S.nav.getSelectedDomElement(state);
-            if (elm) {
-                if (elm.firstElementChild) {
-                    // console.log("Got first element: " + elm.firstElementChild);
-                    elm = elm.firstElementChild;
+                /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
+                 a case where the user is editing a node and we KNOW we don't need to scroll after editing,
+                 so this is where we detect and reset that scenario. */
+                if (!node || node.id === S.quanta.noScrollToId) {
+                    // console.log("noScrollToId flag");
+                    return;
                 }
 
-                if (C.DEBUG_SCROLLING) {
-                    console.log("scrollIntoView elm: " + elm.id);
+                if (state.node.id === node.id) {
+                    // console.log("is root, scroll to top");
+                    this.scrollAllTop(state);
+                    return;
                 }
-                elm.scrollIntoView(true);
-            }
-            else {
-                if (C.DEBUG_SCROLLING) {
-                    console.log("getSelectedDomElement was null. Scroll top now.")
-                }
-                this.scrollAllTop(state);
-            }
+
+                const elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
+                elm?.scrollIntoView(true);
+            }, delay);
         };
-
-        //     } finally {
-        //         setTimeout(() => {
-        //             S.quanta.setOverlay(false);
-        //         }, 100);
-        //     }
-        // }, 100);
 
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToNode");

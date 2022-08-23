@@ -19,7 +19,6 @@ export class Attachment {
 
         new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, () => {
             S.view.jumpToId(node.id);
-            // S.quanta.refresh(state);
         }).open();
 
         /* Note: To run legacy uploader just put this version of the dialog here, and

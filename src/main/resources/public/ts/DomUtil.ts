@@ -178,66 +178,6 @@ export class DomUtil {
         });
     }
 
-        // DO NOT DELETE: THIS CODE WORKS FINE
-    // //Linear Animated Scroll
-    // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
-    // scrollToTopLinear = () => {
-    //     let scrollDuration = 900;
-    //     var scrollStep = -window.scrollY / (scrollDuration / 15),
-    //         scrollInterval = setInterval(function () {
-    //             if (window.scrollY != 0) {
-    //                 window.scrollBy(0, scrollStep);
-    //             }
-    //             else clearInterval(scrollInterval);
-    //         }, 15);
-    // }
-
-    // //Non-Linear Animated Scroll (ease in and out):
-    // //https://stackoverflow.com/questions/21474678/scrolltop-animation-without-jquery
-    animateScrollToTop_v1 = () => {
-        const scrollDuration = 900;
-        const scrollHeight = window.scrollY;
-        const scrollStep = Math.PI / (scrollDuration / 15);
-        const cosParameter = scrollHeight / 2;
-        let scrollCount = 0;
-        let scrollMargin = 0;
-
-        const scrollInterval = setInterval(() => {
-            if (window.scrollY !== 0) {
-                scrollCount = scrollCount + 1;
-                scrollMargin = cosParameter - cosParameter * Math.cos(scrollCount * scrollStep);
-                window.scrollTo(0, (scrollHeight - scrollMargin));
-            }
-            else {
-                clearInterval(scrollInterval);
-            }
-        }, 15);
-    }
-
-    animateScrollToTop = () => {
-
-        // just to be careful we can fall back to simpler version of animation frames aren't supported.
-        if (!window.requestAnimationFrame) {
-            this.animateScrollToTop_v1();
-            return;
-        }
-
-        const scrollDuration = 900;
-        const cosParameter = window.scrollY / 2;
-        let scrollCount = 0;
-        let oldTimestamp = performance.now();
-
-        const step = (newTimestamp: number) => {
-            scrollCount += Math.PI / (scrollDuration / (newTimestamp - oldTimestamp));
-            if (scrollCount >= Math.PI) window.scrollTo(0, 0);
-            if (window.scrollY === 0) return;
-            window.scrollTo(0, Math.round(cosParameter + cosParameter * Math.cos(scrollCount)));
-            oldTimestamp = newTimestamp;
-            window.requestAnimationFrame(step);
-        };
-        window.requestAnimationFrame(step);
-    }
-
     resetDropHandler = (attribs: any) => {
         delete attribs.onDragEnter;
         delete attribs.onDragOver;

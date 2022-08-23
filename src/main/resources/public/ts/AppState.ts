@@ -34,11 +34,6 @@ export class AppState {
     has been done, or else we can get a bad flicker effect when page renders at wrong scroll position and then scrolls
     while the user is watching. With this flag it helps us just pop up instantly to the correct content AND scrolled to exactly
     where we want it.
-
-    UPDATE: This flag works as intended but it turns out blanking the screen while it prepares it at the new
-    scroll position is MORE visually annoying than watching the scroll change. Perhaps I've improved rendering so much
-    since this was first written that things are totally different now, but regardless, I'm leaving this code in place but
-    it's ignored for now, by having meta64.hiddenRenderingEnabled=false.
     */
     rendering: boolean = false;
 

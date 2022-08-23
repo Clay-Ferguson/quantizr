@@ -450,6 +450,8 @@ export class Render {
                     MainTab.inst.openGraphComps = [];
                 }
 
+                let delay: number = 200;
+
                 /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
                 back to false, no matter what */
                 try {
@@ -497,12 +499,6 @@ export class Render {
                         console.log("RENDER NODE: " + s.node.id);
                     }
 
-                    if (s.activeTab !== C.TAB_MAIN) {
-                        allowScroll = false;
-                    }
-
-                    // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
-                    // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
                     if (s.pendingLocationHash) {
                         // console.log("highlight: pendingLocationHash");
                         window.location.hash = s.pendingLocationHash;
@@ -510,10 +506,7 @@ export class Render {
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
                             S.nodeUtil.highlightRowById(s.pendingLocationHash.substring(1), true, s);
-
-                            if (S.quanta.hiddenRenderingEnabled) {
-                                s.rendering = true;
-                            }
+                            s.rendering = true;
                         }
                         s.pendingLocationHash = null;
                     }
@@ -521,36 +514,32 @@ export class Render {
                         if (C.DEBUG_SCROLLING) {
                             console.log("highlight: byId");
                         }
+
                         if (!S.nodeUtil.highlightRowById(targetNodeId, true, s)) {
                             // console.log("highlight: byId...didn't find node: " + targetNodeId);
                         }
 
-                        if (S.quanta.hiddenRenderingEnabled) {
-                            s.rendering = true;
-                        }
-                    } //
+                        s.rendering = true;
+                    }
                     else if (allowScroll && (scrollToTop || !S.nodeUtil.getHighlightedNode(s))) {
                         if (C.DEBUG_SCROLLING) {
                             console.log("rendering highlight: scrollTop");
                         }
                         S.view.scrollToTop();
-                        if (S.quanta.hiddenRenderingEnabled) {
-                            s.rendering = true;
-                        }
-                    } //
+                        s.rendering = true;
+                    }
                     else if (allowScroll) {
                         if (C.DEBUG_SCROLLING) {
                             console.log("highlight: scrollToSelected");
                         }
-                        S.view.scrollToNode(s);
-                        if (S.quanta.hiddenRenderingEnabled) {
-                            s.rendering = true;
-                        }
+                        delay = 2000;
+                        S.view.scrollToNode(s, null, delay);
+                        s.rendering = true;
                     }
                 }
                 finally {
                     if (s.rendering) {
-                        /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
+                        /* This event is published when the page has finished the render stage */
                         PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
                             setTimeout(() => {
                                 dispatch("settingVisible", s => {
@@ -559,11 +548,10 @@ export class Render {
                                     return s;
                                 });
                             },
-                                /* This delay has to be long enough to be sure scrolling has taken place already
-                                   I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
-                                   browsers, because it's critical that this be long enough, but not long enough to be noticeable.
+                                /* This delay has to be long enough to be sure scrolling has taken place already, so if we
+                                set a longer delay above this delay should be even a bit longer than that.
                                 */
-                                300);
+                                delay + 200);
                         });
                     }
                     else {
@@ -581,7 +569,6 @@ export class Render {
                         S.domUtil.focusId(C.TAB_MAIN);
                     }
                 }
-
                 return s;
             });
         }
