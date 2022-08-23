@@ -72,13 +72,61 @@ public class ActPubUtil extends ServiceBase {
      * instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
-    private static final ObjectMapper mapper = new ObjectMapper();
+    public static final ObjectMapper mapper = new ObjectMapper();
 
     // NOTE: This didn't allow unknown properties as expected but putting the
     // following in the JSON classes did:
     // @JsonIgnoreProperties(ignoreUnknown = true)
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    public APObj buildObj(byte[] bytes) {
+        try {
+            APObj payload = ActPubUtil.mapper.readValue(bytes, new TypeReference<>() {});
+            return typeFromFactory(payload);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Returns a specific APObj-derived concrete class if we can, or else returns the same APObj passed
+     * in.
+     */
+    public APObj typeFromFactory(APObj obj) {
+        APObj ret = obj;
+
+        switch (obj.getType()) {
+            case APType.Create:
+                break;
+
+            case APType.Update:
+                break;
+
+            case APType.Follow:
+                break;
+
+            case APType.Undo:
+                break;
+
+            case APType.Delete:
+                break;
+
+            case APType.Accept:
+                break;
+
+            case APType.Like:
+                break;
+
+            case APType.Announce:
+                break;
+
+            default:
+                log.debug("Unsupported type: " + XString.prettyPrint(obj));
+                break;
+        }
+        return ret;
     }
 
     /*
@@ -868,8 +916,7 @@ public class ActPubUtil extends ServiceBase {
                      * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
                      * parentt
                      */
-                    if (loadOthers && nodes.size() == 1 && !node.isType(NodeType.POSTS)
-                            && !node.isType(NodeType.ACT_PUB_POSTS)) {
+                    if (loadOthers && nodes.size() == 1 && !node.isType(NodeType.POSTS) && !node.isType(NodeType.ACT_PUB_POSTS)) {
                         // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them
                         // all)
                         Iterable<SubNode> iter =
@@ -925,12 +972,11 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // todo-1: we only support "Note" for now.
-        String type = apStr(obj, APObj.type); 
+        String type = apStr(obj, APObj.type);
         switch (type) {
-            // todo-0: I know we don't support type "Question" or type "Video" yet so I need to at least 
-            // send back a visible message to the user saying that this type of node is not yet supported by Quanta
-            // and so the history cannot be displayed. However we do support at least "Boosts" which will be in here
-            // as an "Announce" type right? ...so we can at least add that with minimal effort right?
+            // todo-0: I know we don't support type "Question" or type "Video" yet so I need to at least
+            // send back a visible message to the user saying that this type of node is not yet supported by
+            // Quanta and so the history cannot be displayed.
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);
                 if (ok(ownerActorUrl)) {

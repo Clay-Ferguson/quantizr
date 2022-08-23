@@ -1,12 +1,18 @@
 package quanta.actpub.model;
 
+import static quanta.actpub.model.AP.apStr;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
- * The objects in the ActivityPub Spec are so highly variable that we cannot determine ahead of time
- * what the shape (types) of any reply will be so the best approach is to just use a map.
+ * The objects in the ActivityPub Spec are so highly dynamic that we cannot determine ahead of time
+ * what the property typoes of any reply will be so we just use a map, which can successfully
+ * unmarshall any format of JSON thrown at us, and then we can let out getter methods be smart
+ * enough to extract what we need out of these objects.
  * 
- * todo-2: Consider a refactor to use: org.json.JSONObject, and org.json.JSONArray, instead of this APObj
+ * todo-2: Consider a refactor to use: org.json.JSONObject, and org.json.JSONArray, instead of this
+ * APObj
  */
 public class APObj extends HashMap<String, Object> {
     private static final long serialVersionUID = 1L;
@@ -15,7 +21,8 @@ public class APObj extends HashMap<String, Object> {
     public static final String context = "@context";
     public static final String type = "type";
     public static final String did = "did";
-    public static final String language = "@language"; // NOTE: I had this as "language" for a long time, which I guess was getting ignored
+    public static final String language = "@language"; // NOTE: I had this as "language" for a long time, which I guess was
+                                                       // getting ignored
     public static final String object = "object";
     public static final String actor = "actor";
     public static final String published = "published";
@@ -56,6 +63,19 @@ public class APObj extends HashMap<String, Object> {
     public static final String supportsFriendRequests = "supportsFriendRequests";
 
     public APObj() {}
+
+    public APObj(Map<?, ?> obj) {
+        this.putAll((Map<String, Object>) obj);
+    }
+
+    public String getType() {
+        String type = apStr(this, APObj.type);
+        return ok(type) ? type.trim() : null;
+    }
+
+    public String getActor() {
+        return apStr(this, APObj.actor);
+    }
 
     public APObj put(String key, Object val) {
         super.put(key, val);

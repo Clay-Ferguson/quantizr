@@ -170,24 +170,37 @@ public class AP {
         return null;
     }
 
+    /**
+     * Gets an Object from 'prop' entry of map 'obj'
+     */
     public static Object apObj(Object obj, String prop) {
-        if (obj instanceof LinkedHashMap<?, ?>) {
-            return ((LinkedHashMap<?, ?>) obj).get(prop);
-        } //
-        else if (obj instanceof Map<?, ?>) {
+        if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
+        } else {
+            ExUtil.warn(
+                    "[1]getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
+                            + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         }
-        ExUtil.warn("getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
-                + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 
-    // instanceof Map won't always work as instanceof when LinkedHashMap
+    /**
+     * Makes an APObj from 'prop' entry of map 'obj'
+     */
+    public static Object apAPObj(Object obj, String prop) {
+        Object o = apObj(obj, prop);
+        if (o instanceof Map<?, ?>) {
+            return new APObj((Map<?, ?>) o);
+        } else {
+            ExUtil.warn(
+                    "[2]getting prop " + prop + " from unsupported container type: " + (ok(obj) ? obj.getClass().getName() : "null")
+                            + "Unable to get property " + prop + " from obj " + XString.prettyPrint(obj));
+        }
+        return null;
+    }
+
     private static Val<Object> getFromMap(Object obj, String prop) {
-        if (obj instanceof LinkedHashMap<?, ?>) {
-            return new Val<Object>(((LinkedHashMap<?, ?>) obj).get(prop));
-        } //
-        else if (obj instanceof Map<?, ?>) {
+        if (obj instanceof Map<?, ?>) {
             return new Val<Object>(((Map<?, ?>) obj).get(prop));
         }
         return null;

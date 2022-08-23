@@ -38,15 +38,6 @@ public class ActPubController extends ServiceBase {
 	@Autowired
 	private ActPubLog apLog;
 
-	private static final ObjectMapper mapper = new ObjectMapper();
-
-	// NOTE: This didn't allow unknown properties as expected but putting the
-	// following in the JSON classes did:
-	// @JsonIgnoreProperties(ignoreUnknown = true)
-	{
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
-
 	/**
 	 * WebFinger GET
 	 */
@@ -121,7 +112,7 @@ public class ActPubController extends ServiceBase {
 			@RequestBody byte[] body, //
 			HttpServletRequest req) {
 		try {
-			APObj payload = mapper.readValue(body, new TypeReference<>() {});
+			APObj payload = apUtil.buildObj(body);
 			apLog.trace("INBOX (shared): " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apub.processInboxPost(req, payload, body);
@@ -147,9 +138,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
 		try {
-			APObj payload = mapper.readValue(body, new TypeReference<>() {});
+			APObj payload = apUtil.buildObj(body);
 			// log.debug("INBOX[" + userName + "]: " + XString.prettyPrint(payload));
-
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, payload, body);
 			return new ResponseEntity<String>(HttpStatus.OK);

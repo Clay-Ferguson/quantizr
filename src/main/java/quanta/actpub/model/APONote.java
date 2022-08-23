@@ -7,6 +7,12 @@ import quanta.actpub.APConst;
  * Note object
  */
 public class APONote extends APObj {
+
+    // Constructor to use when injesting from a foreign source, an objec that's KNOWN to be a "note"
+    public APONote(APObj obj) {
+        this.putAll(obj);
+    }
+
     public APONote() {
         put(context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //

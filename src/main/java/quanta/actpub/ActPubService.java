@@ -638,48 +638,46 @@ public class ActPubService extends ServiceBase {
      * follow a user on this server
      */
     @PerfMon(category = "apub")
-    public void processInboxPost(HttpServletRequest httpReq, Object payload, byte[] bodyBytes) {
-        String type = apStr(payload, APObj.type);
-        if (no(type))
+    public void processInboxPost(HttpServletRequest httpReq, APObj payload, byte[] bodyBytes) {
+        if (no(payload.getType()))
             return;
-        type = type.trim();
-        apLog.trace("inbox type: " + type);
+
+        apLog.trace("inbox type: " + payload.getType());
 
         /*
          * todo-1: verify that for follow types the actorUrl can be obtained also from payload, rather than
          * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
          */
-        String actorUrl = apStr(payload, APObj.actor);
-        if (no(actorUrl)) {
+        if (no(payload.getActor())) {
             log.error("no 'actor' found on payload: " + XString.prettyPrint(payload));
             throw new RuntimeException("No actor on payload");
         }
 
         Val<String> keyEncoded = new Val<>();
-        if (!apCrypto.verifySignature(httpReq, payload, actorUrl, bodyBytes, keyEncoded)) {
+        if (!apCrypto.verifySignature(httpReq, payload, payload.getActor(), bodyBytes, keyEncoded)) {
             throw new RuntimeException("Signature check fail: " + XString.prettyPrint(payload));
         }
 
-        switch (type) {
+        switch (payload.getType()) {
             case APType.Create:
             case APType.Update:
                 /*
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                processCreateOrUpdateAction(httpReq, payload, actorUrl, type, bodyBytes, keyEncoded);
+                processCreateOrUpdateAction(httpReq, payload, payload.getActor(), payload.getType(), bodyBytes, keyEncoded);
                 break;
 
             case APType.Follow:
-                apFollowing.processFollowAction(payload, actorUrl, false);
+                apFollowing.processFollowAction(payload, payload.getActor(), false);
                 break;
 
             case APType.Undo:
-                processUndoAction(httpReq, payload, actorUrl, bodyBytes);
+                processUndoAction(httpReq, payload, payload.getActor(), bodyBytes);
                 break;
 
             case APType.Delete:
-                processDeleteAction(httpReq, payload, actorUrl, bodyBytes, keyEncoded);
+                processDeleteAction(httpReq, payload, payload.getActor(), bodyBytes, keyEncoded);
                 break;
 
             case APType.Accept:
@@ -687,11 +685,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, actorUrl, false, bodyBytes);
+                processLikeAction(httpReq, payload, payload.getActor(), false, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(payload, actorUrl, false, bodyBytes);
+                processAnnounceAction(payload, payload.getActor(), false, bodyBytes);
                 break;
 
             default:
@@ -743,7 +741,7 @@ public class ActPubService extends ServiceBase {
 
     /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateAction(HttpServletRequest httpReq, Object payload, String actorUrl, String action,
+    public void processCreateOrUpdateAction(HttpServletRequest httpReq, APObj payload, String actorUrl, String action,
             byte[] bodyBytes, Val<String> keyEncoded) {
         arun.<Object>run(ms -> {
             apLog.trace("processCreateOrUpdateAction");

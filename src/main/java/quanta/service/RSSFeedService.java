@@ -114,17 +114,14 @@ public class RSSFeedService extends ServiceBase {
 				}
 			};
 
-
-	private static int runCount = 0;
-
 	// NOTE: Same value appears in RSSTypeHandler.ts
 	private static final int MAX_FEED_ITEMS = 50;
 
-	private static final int REFRESH_FREQUENCY_MINS = 120; // 2 hrs
+	private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
 	static boolean run = false;
 
 	/*
-	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.
+	 * Runs immediately at startup, and then every few minutes, to refresh the feedCache.
 	 */
 	@Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
 	public void run() {
@@ -133,7 +130,6 @@ public class RSSFeedService extends ServiceBase {
 
 		try {
 			run = true;
-			runCount++;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 				log.debug("ignoring RSSFeedService schedule cycle");
 				return;
