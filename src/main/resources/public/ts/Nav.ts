@@ -268,7 +268,7 @@ export class Nav {
 
     navHome = async (state: AppState = null) => {
         state = getAppState(state);
-        S.view.scrollAllTop(state);
+        S.view.scrollActiveToTop(state);
 
         // console.log("navHome()");
         if (state.isAnonUser) {

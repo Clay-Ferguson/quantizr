@@ -79,7 +79,7 @@ export class App extends Main {
 
                 state.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
                     onClick: () => {
-                        S.view.scrollAllTop(state);
+                        S.view.scrollActiveToTop(state);
                     },
                     title: "Scroll to Top"
                 }, "btn-secondary scrollTopButtonLowerRight", "off")

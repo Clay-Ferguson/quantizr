@@ -245,12 +245,12 @@ export class View {
     //     }
     // }
 
-    scrollAllTop = (state: AppState) => {
+    scrollActiveToTop = (state: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
         const activeTabComp = S.tabUtil.getActiveTabComp(state);
-        if (activeTabComp && activeTabComp.getRef()) {
+        if (activeTabComp?.getRef()) {
             activeTabComp.setScrollTop(0);
             // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
         }
@@ -262,11 +262,6 @@ export class View {
         // S.domUtil.getElm(C.ID_TAB, (elm: HTMLElement) => {
         //     elm.scrollTop = 0;
         // });
-
-        else {
-            LeftNavPanel.inst?.setScrollTop(0);
-            RightNavPanel.inst?.setScrollTop(0);
-        }
     }
 
     scrollToNode = (state: AppState, node: J.NodeInfo = null, delay: number = 100) => {
@@ -287,7 +282,7 @@ export class View {
 
                 if (state.node.id === node.id) {
                     // console.log("is root, scroll to top");
-                    this.scrollAllTop(state);
+                    this.scrollActiveToTop(state);
                     return;
                 }
 
@@ -304,7 +299,7 @@ export class View {
 
     scrollToTop = async () => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            this.scrollAllTop(getAppState());
+            this.scrollActiveToTop(getAppState());
         });
     }
 
