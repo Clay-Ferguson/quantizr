@@ -231,7 +231,7 @@ export class Edit {
             }
 
             if (nodeInsertTarget) {
-                const res = await S.util.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                const res = await S.rpcUtil.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: false,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -243,7 +243,7 @@ export class Edit {
                     this.insertNodeResponse(res, state);
                 }
             } else {
-                const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -268,7 +268,7 @@ export class Edit {
         }
         else {
             if (nodeInsertTarget) {
-                const res = await S.util.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                const res = await S.rpcUtil.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: true,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
@@ -278,7 +278,7 @@ export class Edit {
                 });
                 this.insertNodeResponse(res, state);
             } else {
-                const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -419,7 +419,7 @@ export class Edit {
             // console.log("refreshNodeFromServer: " + nodeId);
             const state = getAppState();
 
-            const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId,
                 upLevel: false,
                 siblingOffset: 0,
@@ -539,7 +539,7 @@ export class Edit {
             id = selNode.id;
         }
 
-        const res = await S.util.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "up"
         });
@@ -554,7 +554,7 @@ export class Edit {
             id = selNode.id;
         }
 
-        const res = await S.util.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "down"
         });
@@ -567,7 +567,7 @@ export class Edit {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const res = await S.util.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "top"
         });
@@ -580,7 +580,7 @@ export class Edit {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
-        const res = await S.util.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "bottom"
         });
@@ -641,7 +641,7 @@ export class Edit {
             return;
         }
 
-        const res = await S.util.rpc<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
+        const res = await S.rpcUtil.rpc<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         });
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
@@ -712,7 +712,7 @@ export class Edit {
 
     selectAllNodes = async (state: AppState) => {
         const highlightNode = S.nodeUtil.getHighlightedNode(state);
-        const res = await S.util.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
+        const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
         S.nodeUtil.selectAllNodes(res.nodeIds);
@@ -725,7 +725,7 @@ export class Edit {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            await S.util.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: ["~" + J.NodeType.INBOX],
                 childrenOnly: true,
                 bulkDelete: false
@@ -748,7 +748,7 @@ export class Edit {
             "btn-danger", "alert alert-info");
         await dlg.open();
         if (dlg.yes) {
-            const res = await S.util.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+            const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
                 nodeIds: selNodesArray
             });
             this.joinNodesResponse(res, state);
@@ -764,7 +764,7 @@ export class Edit {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            const res = await S.util.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: null,
                 childrenOnly: false,
                 bulkDelete: true
@@ -812,7 +812,7 @@ export class Edit {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            const res = await S.util.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: selNodesArray,
                 childrenOnly: false,
                 bulkDelete: false
@@ -923,7 +923,7 @@ export class Edit {
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
-        const res = await S.util.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
             nodeIds: state.nodesToMove,
             location
@@ -952,7 +952,7 @@ export class Edit {
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
             } else {
-                const res = await S.util.rpc<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
+                const res = await S.rpcUtil.rpc<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
                     truncated: S.user.isTestUserAccount(state)
@@ -1002,7 +1002,7 @@ export class Edit {
             return;
         }
 
-        const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
@@ -1048,7 +1048,7 @@ export class Edit {
             return;
         }
 
-        const res = await S.util.rpc<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
+        const res = await S.rpcUtil.rpc<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             splitType: splitType,
             nodeId: node.id,
             delimiter
@@ -1081,7 +1081,7 @@ export class Edit {
     addLinkBookmark = async (content: any, audioUrl: string, state: AppState) => {
         state = getAppState(state);
 
-        const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
             newNodeName: "",
@@ -1101,7 +1101,7 @@ export class Edit {
 
     // like==false means 'unlike'
     likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
-        await S.util.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
+        await S.rpcUtil.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
         }, true);
@@ -1132,7 +1132,7 @@ export class Edit {
 
         // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
         // so we save the node without any content in this case.
-        const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: !boostTarget,
             nodeId,
             newNodeName: "",
@@ -1158,7 +1158,7 @@ export class Edit {
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = getAppState(state);
 
-        const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
             newNodeName: "",
@@ -1184,7 +1184,7 @@ export class Edit {
     addCalendarEntry = async (initDate: number, state: AppState) => {
         state = getAppState(state);
 
-        const res = await S.util.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: state.fullScreenConfig.nodeId,
             newNodeName: "",
@@ -1212,7 +1212,7 @@ export class Edit {
         // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = getAppState(null);
 
-        const res = await S.util.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
             location
@@ -1250,7 +1250,7 @@ export class Edit {
         state = getAppState(state);
         const node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
-            await S.util.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
+            await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
             });
             S.quanta.refresh(state);
@@ -1309,7 +1309,7 @@ export class Edit {
 
         /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
         then store this key alongside the ACL (access control list) for the sharing entry for this user */
-        await S.util.rpc<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
+        await S.rpcUtil.rpc<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
             nodeId: node.id,
             principalNodeId,
             cipherKey: userCipherKey

@@ -24,7 +24,7 @@ export class ServerPush {
         if (this.eventSource) return;
 
         console.log("ServerPush.init");
-        this.eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
+        this.eventSource = new EventSource(S.rpcUtil.getRpcPath() + "serverPush");
 
         // DO NOT DELETE.
         // eventSource.onmessage = e => {

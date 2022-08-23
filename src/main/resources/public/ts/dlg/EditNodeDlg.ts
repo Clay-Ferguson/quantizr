@@ -428,13 +428,13 @@ export class EditNodeDlg extends DialogBase {
             return;
         }
 
-        await S.util.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: state.node.id,
             principal: "public",
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
-        const res = await S.util.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: state.node.id,
             includeAcl: true,
             includeOwners: true

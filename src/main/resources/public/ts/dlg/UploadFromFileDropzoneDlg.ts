@@ -197,10 +197,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
         let action;
         if (this.importMode) {
-            action = S.util.getRpcPath() + "streamImport";
+            action = S.rpcUtil.getRpcPath() + "streamImport";
         }
         else {
-            action = S.util.getRpcPath() + "upload";
+            action = S.rpcUtil.getRpcPath() + "upload";
         }
         const url = action;
         const dlg = this;

@@ -40,7 +40,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        const res = await S.util.rpc<J.ImportRequest, J.ImportResponse>("import", {
+        const res = await S.rpcUtil.rpc<J.ImportRequest, J.ImportResponse>("import", {
             nodeId: hltNode.id,
             sourceFileName: this.fileNameState.getValue()
         });

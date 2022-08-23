@@ -59,7 +59,7 @@ export class Attachment {
             const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
-                await S.util.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
                     nodeId: node.id
                 });
             }
@@ -90,7 +90,7 @@ export class Attachment {
             if (ipfsLink) {
                 bin = "ipfs";
             }
-            let ret: string = S.util.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
+            let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + node.id;
 
             if (downloadLink) {
                 ret += "&download=true";

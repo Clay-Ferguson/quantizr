@@ -123,7 +123,7 @@ export class RssTypeHandler extends TypeBase {
             }
 
             (async () => {
-                const res = await S.util.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                     urls: feedSrc,
                     page
                 }, true);

@@ -56,7 +56,7 @@ export class UploadFromIPFSDlg extends DialogBase {
             return;
         }
 
-        const res = await S.util.rpc<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
+        const res = await S.rpcUtil.rpc<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
             pinLocally: false, // UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             cid: this.cidState.getValue(),

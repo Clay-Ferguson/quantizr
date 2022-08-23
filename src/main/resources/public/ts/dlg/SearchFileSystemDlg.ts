@@ -56,7 +56,7 @@ export class SearchFileSystemDlg extends DialogBase {
 
         SearchFileSystemDlg.defaultSearchText = this.searchTextState.getValue();
 
-        const res = await S.util.rpc<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
+        const res = await S.rpcUtil.rpc<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
             nodeId: node.id,
             text: SearchFileSystemDlg.defaultSearchText
         });

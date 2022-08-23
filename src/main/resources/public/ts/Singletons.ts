@@ -9,6 +9,7 @@ import type { PluginMgr } from "./PluginMgr";
 import type { Props } from "./Props";
 import type { Quanta } from "./Quanta";
 import type { Render } from "./Render";
+import { RpcUtil } from "./RpcUtil";
 import type { Search } from "./Search";
 import type { ServerPush } from "./ServerPush";
 import type { SpeechRecog } from "./SpeechRecog";
@@ -24,6 +25,7 @@ export interface Singletons {
     plugin: PluginMgr;
     util: Util;
     domUtil: DomUtil;
+    rpcUtil: RpcUtil;
     nodeUtil: NodeUtil;
     tabUtil: TabUtil;
     push: ServerPush;

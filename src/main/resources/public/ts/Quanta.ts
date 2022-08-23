@@ -299,7 +299,7 @@ export class Quanta {
             await S.user.refreshLogin(getAppState());
             console.log("refreshLogin completed.");
 
-            S.util.initProgressMonitor();
+            S.rpcUtil.initProgressMonitor();
             S.util.processUrlParams(null);
             this.setOverlay(false);
             S.util.playAudioIfRequested();
@@ -307,7 +307,7 @@ export class Quanta {
             // This timer delay is just for asthetics and should not be required.
             setTimeout(async () => {
                 S.push.init();
-                const res = await S.util.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+                const res = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
                     appGuid: Quanta.appGuid
                 }, true);
                 if (res.config) {

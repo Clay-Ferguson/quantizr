@@ -202,14 +202,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     deleteFriend = async () => {
-        await S.util.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+        await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
     }
 
     unblockUser = async () => {
-        await S.util.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
+        await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);
@@ -227,7 +227,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async (userNodeId: string) => {
-        const res = await S.util.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: userNodeId
         });
 
@@ -243,7 +243,7 @@ export class UserProfileDlg extends DialogBase {
 
     save = async () => {
         const state = this.getState<LS>();
-        const res = await S.util.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -256,7 +256,7 @@ export class UserProfileDlg extends DialogBase {
 
     publish = async () => {
         const state = this.getState<LS>();
-        const res = await S.util.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+        const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userTags: getAppState().userProfile.userTags,
             userBio: this.bioState.getValue(),
@@ -269,7 +269,7 @@ export class UserProfileDlg extends DialogBase {
 
     addFriend = async () => {
         const state: any = this.getState<LS>();
-        const res = await S.util.rpc<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+        const res = await S.rpcUtil.rpc<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         });
 
@@ -299,7 +299,7 @@ export class UserProfileDlg extends DialogBase {
 
     blockUser = async () => {
         const state: any = this.getState<LS>();
-        const res = await S.util.rpc<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+        const res = await S.rpcUtil.rpc<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
 
@@ -345,7 +345,7 @@ export class UserProfileDlg extends DialogBase {
             if (this.readOnly) return;
 
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, async () => {
-                const res = await S.util.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
 
@@ -404,7 +404,7 @@ export class UserProfileDlg extends DialogBase {
 
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false,
                 async () => {
-                    const res = await S.util.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                    const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                         userId: state.userProfile.userNodeId
                     });
 
@@ -446,7 +446,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     async preLoad(): Promise<void> {
-        await S.util.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
         await this.reload(this.userNodeId);
     }
 }

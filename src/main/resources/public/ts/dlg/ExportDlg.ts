@@ -71,7 +71,7 @@ export class ExportDlg extends DialogBase {
 
     exportNodes = async () => {
         const state = this.getState<LS>();
-        const res = await S.util.rpc<J.ExportRequest, J.ExportResponse>("export", {
+        const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,
             fileName: this.fileNameState.getValue(),

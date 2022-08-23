@@ -206,7 +206,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     updateTooltip = async (d: any, x: number, y: number) => {
-        const res = await S.util.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
             upLevel: false,
             siblingOffset: 0,

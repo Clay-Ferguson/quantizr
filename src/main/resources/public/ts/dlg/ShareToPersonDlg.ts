@@ -58,7 +58,7 @@ export class ShareToPersonDlg extends DialogBase {
     }
 
     shareImmediate = async (userName: string) => {
-        const res = await S.util.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        const res = await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]

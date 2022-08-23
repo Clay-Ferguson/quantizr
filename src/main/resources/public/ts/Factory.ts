@@ -20,6 +20,7 @@ import { Props } from "./Props";
 import { PubSub } from "./PubSub";
 import { Quanta } from "./Quanta";
 import { Render } from "./Render";
+import { RpcUtil } from "./RpcUtil";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
 import { S } from "./Singletons";
@@ -44,6 +45,7 @@ export class Factory {
             S.plugin = new PluginMgr();
             S.util = new Util();
             S.domUtil = new DomUtil();
+            S.rpcUtil = new RpcUtil();
             S.tabUtil = new TabUtil();
             S.nodeUtil = new NodeUtil();
             S.push = new ServerPush();

@@ -253,7 +253,7 @@ export class Render {
             return;
         }
 
-        const res = await S.util.rpc<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+        const res = await S.rpcUtil.rpc<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
         dispatch("ShowCalendar", s => {
@@ -597,7 +597,7 @@ export class Render {
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
-                const res = await S.util.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                const res = await S.rpcUtil.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                     ids
                 }, true);
 
@@ -673,12 +673,12 @@ export class Render {
 
     getAvatarImgUrl = (ownerId: string, avatarVer: string) => {
         if (!avatarVer) return null;
-        return S.util.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
+        return S.rpcUtil.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
     getProfileHeaderImgUrl = (ownerId: string, avatarVer: string) => {
         if (!avatarVer) return null;
-        return S.util.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
+        return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
     makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
@@ -717,7 +717,7 @@ export class Render {
     showGraph = async (node: J.NodeInfo, searchText: string, state: AppState) => {
         node = node || S.nodeUtil.getHighlightedNode(state);
 
-        const res = await S.util.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
+        const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchText,
             nodeId: node.id
         });

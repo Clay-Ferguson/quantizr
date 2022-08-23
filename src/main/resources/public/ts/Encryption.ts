@@ -287,7 +287,7 @@ export class Encryption {
                 pubKeyStr = JSON.stringify(publicKeyDat);
             }
 
-            const res = await S.util.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+            const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                 keyJson: pubKeyStr
             });
             if (showConfirm) {

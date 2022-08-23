@@ -57,7 +57,7 @@ export class AudioPlayerDlg extends DialogBase {
         // ping server at 10 minute intervals (if audio playing), to avoid session timeout
         this.longTimer = setInterval(() => {
             if (!this.player.paused && !this.player.ended) {
-                S.util.rpc<J.PingRequest, J.PingResponse>("ping");
+                S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
             }
         }, 600000);
 

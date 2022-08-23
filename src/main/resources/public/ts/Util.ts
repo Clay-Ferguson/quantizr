@@ -10,14 +10,11 @@ import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-
-declare const __page: any;
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -80,20 +77,6 @@ export class Util {
         txt: true,
         sh: true
     };
-
-    rpcPath: string = null;
-    rhost: string = null;
-    logRpc: boolean = false;
-    logRpcShort: boolean = false;
-    timeoutMessageShown: boolean = false;
-    waitCounter: number = 0;
-    pgrsDlg: ProgressDlg = null;
-
-    /*
-     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
-     * session is only allowed one concurrent call and simultaneous calls just "queue up".
-     */
-    private rpcCounter: number = 0;
 
     // accepts letters, numbers, underscore, dash.
     // todo-2: enforce this same rule on the server side
@@ -358,203 +341,8 @@ export class Util {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    initProgressMonitor = () => {
-        // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
-        setInterval(this.progressInterval, 1000);
-    }
-
-    progressInterval = (state: AppState) => {
-        /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
-         querying server like the APP would do (index.html) */
-        if (__page !== "index") return;
-
-        const isWaiting = this.isRpcWaiting();
-        if (isWaiting) {
-            this.waitCounter++;
-            if (this.waitCounter >= 3) {
-                if (!this.pgrsDlg) {
-                    const dlg = new ProgressDlg();
-                    this.pgrsDlg = dlg;
-                    this.pgrsDlg.open();
-                }
-            }
-        } else {
-            this.waitCounter = 0;
-            if (this.pgrsDlg) {
-                this.pgrsDlg.close();
-                this.pgrsDlg = null;
-            }
-        }
-    }
-
     getHostAndPort = (): string => {
         return location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
-    }
-
-    getRemoteHost = (): string => {
-        if (this.rhost) {
-            return this.rhost;
-        }
-
-        this.rhost = this.getParameterByName("rhost");
-        this.rhost = this.rhost || window.location.origin;
-        return this.rhost;
-    }
-
-    getRpcPath = (): string => {
-        return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/mobile/api/");
-    }
-
-    // todo-1: put everything related to rpc in an Rpc.ts service
-    rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
-        background: boolean = false): Promise<ResponseType> => {
-        postData = postData || {} as RequestType;
-        let reqPromise: Promise<ResponseType> = null;
-
-        try {
-            reqPromise = new Promise<ResponseType>((resolve, reject) => {
-                if (this.logRpc) {
-                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
-                }
-                else if (this.logRpcShort) {
-                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
-                }
-
-                // This setOverlay is turned back off
-                if (!background) {
-                    this.rpcCounter++;
-                    S.quanta.setOverlay(true);
-                }
-
-                const startTime = new Date().getTime();
-                // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
-                fetch(this.getRpcPath() + postName, {
-                    method: "POST",
-                    body: JSON.stringify(postData),
-                    headers: {
-                        "Content-Type": "application/json",
-                        Bearer: S.quanta.authToken || ""
-                    },
-                    mode: "cors", // no-cors, *cors, same-origin
-                    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-                    credentials: "same-origin", // include, *same-origin, omit
-                    referrerPolicy: "no-referrer"
-                })
-                    .then((res: any) => {
-                        if (res.status !== 200) {
-                            console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
-                            reject({ response: res });
-                        }
-                        else {
-                            return res.text();
-                        }
-                    })
-                    .then((json: string) => {
-                        /* if we did a reject above in the first 'then' we will get here with json undefined
-                        so we ignore that */
-                        if (json) {
-                            console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
-                            resolve(JSON.parse(json));
-                        }
-                    })
-                    .catch((error) => {
-                        console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
-                        reject(error);
-                    });
-            });
-        } catch (ex) {
-            this.logAndReThrow("Failed starting request: " + postName, ex);
-            if (!background) {
-                S.quanta.setOverlay(false);
-            }
-            return null;
-        }
-
-        reqPromise.then((data: any) => this.rpcSuccess(data, background, postName))
-            .catch((error: any) => this.rpcFail(error, background, postName, postData));
-        return reqPromise;
-    }
-
-    rpcSuccess = (data: any, background: boolean, postName: string) => {
-        try {
-            if (!background) {
-                this.rpcCounter--;
-                this.progressInterval(null);
-            }
-
-            if (this.logRpc) {
-                console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                    this.prettyPrint(data));
-            }
-
-            if (!data.success && data.message) {
-                // if we didn't just console log it then console log it now.
-                if (!this.logRpc) {
-                    console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                        this.prettyPrint(data));
-                }
-                this.showMessage(data.message, "Message");
-
-                // get rid of message so it can't be shown again
-                data.message = null;
-                return;
-            }
-        } catch (ex) {
-            this.logAndReThrow("Failed handling result of: " + postName, ex);
-        }
-        finally {
-            if (!background) {
-                S.quanta.setOverlay(false);
-            }
-        }
-    }
-
-    /**
-     * We should only reach here when there's an actual failure to call the server, and is completely
-     * separete from the server perhaps haveing an exception where it sent back an error.
-     */
-    rpcFail = (error: any, background: boolean, postName: string, postData: any) => {
-        try {
-            if (!background) {
-                this.rpcCounter--;
-                this.progressInterval(null);
-            }
-            let status = error.response ? error.response.status : "";
-            const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
-            console.log("HTTP RESP [" + postName + "]: Error: " + info);
-
-            if (error.response?.status === 401) {
-                console.log("Not logged in detected.");
-                if (!this.timeoutMessageShown) {
-                    this.timeoutMessageShown = true;
-                }
-                return;
-            }
-
-            let msg: string = `Failed: \nPostName: ${postName}\n`;
-            msg += "PostData: " + this.prettyPrint(postData) + "\n";
-
-            if (error.response) {
-                msg += "Error Response: " + this.prettyPrint(error.response) + "\n";
-            }
-
-            msg += info;
-            console.error("Request failed: msg=" + msg);
-
-            status = error.response ? error.response.status : "";
-
-            if (!background) {
-                console.error("Failed: " + status + " " + (error.message || ""));
-                this.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
-            }
-        } catch (ex) {
-            this.logAndReThrow("Failed processing: " + postName, ex);
-        }
-        finally {
-            if (!background) {
-                S.quanta.setOverlay(false);
-            }
-        }
     }
 
     logAndThrow = (message: string) => {
@@ -575,10 +363,6 @@ export class Util {
         catch (e) { }
         console.error(message + ": " + exception.message + "\nSTACK: " + stack);
         throw exception;
-    }
-
-    isRpcWaiting = (): boolean => {
-        return this.rpcCounter > 0;
     }
 
     isElmVisible = (elm: HTMLElement) => {
@@ -994,7 +778,7 @@ export class Util {
     loadOpenGraph = async (url: string, callback: Function) => {
         // console.log("loadOpenGraph: " + url);
         try {
-            const res: J.GetOpenGraphResponse = await this.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+            const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
             }, true);
             callback(res.openGraph);
@@ -1005,7 +789,7 @@ export class Util {
     }
 
     sendTestEmail = async () => {
-        await this.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
+        await S.rpcUtil.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         this.showMessage("Send Test Email Initiated.", "Note");
     }
 
@@ -1015,7 +799,7 @@ export class Util {
     sendLogText = async () => {
         const text = window.prompt("Enter text to log on server: ");
         if (text) {
-            await this.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
+            await S.rpcUtil.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
             this.showMessage("Send log text completed.", "Note");
         }
     }
@@ -1057,7 +841,7 @@ export class Util {
     loadBookmarks = async () => {
         const state = getAppState();
         if (!state.isAnonUser) {
-            const res = await this.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
+            const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
@@ -1103,7 +887,7 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                const res = await this.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
@@ -1133,7 +917,7 @@ export class Util {
 
     saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
         if (!state.isAnonUser) {
-            await this.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: state.homeNodeId,
                 userPreferences: state.userPrefs
             });

@@ -70,7 +70,7 @@ export class NodeUtil {
 
     // note: this code is not currently in use
     updateNodeInfo = (node: J.NodeInfo) => {
-        S.util.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: false,
             includeOwners: true
@@ -257,7 +257,7 @@ export class NodeUtil {
     }
 
     publishNodeToIpfs = async (node: J.NodeInfo) => {
-        const res = await S.util.rpc<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+        const res = await S.rpcUtil.rpc<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
         });
         S.util.showMessage(res.message, "Server Reply", true);
@@ -268,7 +268,7 @@ export class NodeUtil {
     }
 
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
-        await S.util.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: "public",
             privilege: "*"
@@ -277,7 +277,7 @@ export class NodeUtil {
     }
 
     removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp) => {
-        const res = await S.util.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+        const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id,
             includeAcl: true,
             includeOwners: true
