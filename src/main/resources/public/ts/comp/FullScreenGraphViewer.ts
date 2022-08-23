@@ -47,7 +47,7 @@ export class FullScreenGraphViewer extends Main {
             const nodes: any = root.descendants();
 
             const simulation = d3.forceSimulation(nodes)
-                .force("link", d3.forceLink(links).id((d: any) => d.id).distance(0).strength(1))
+                .force("link", d3.forceLink(links).id(function (d: any) { return d.id; }).distance(0).strength(1))
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
@@ -105,7 +105,7 @@ export class FullScreenGraphViewer extends Main {
                 .data(nodes)
                 .join("circle")
 
-                .attr("fill", (d: any) => {
+                .attr("fill", function (d: any) {
                     let color = "transparent";
                     if (d.data.id === nodeId) {
                         color = "red";
@@ -115,15 +115,15 @@ export class FullScreenGraphViewer extends Main {
                     }
                     return color;
                 })
-                .attr("stroke", (d: any) => {
+                .attr("stroke", function (d: any) {
                     return thiz.getColorForLevel(d.data.level);
                 })
-                .attr("r", (d: any) => {
+                .attr("r", function (d: any) {
                     if (d.data.id === nodeId) return 5;
                     return 3.5;
                 })
 
-                .on("mouseover", (event: any, d: any) => {
+                .on("mouseover", function (event: any, d: any) {
                     if (d.data.id.startsWith("/")) {
                         thiz.updateTooltip(d, event.pageX, event.pageY);
                     }
@@ -131,7 +131,7 @@ export class FullScreenGraphViewer extends Main {
                         thiz.showTooltip(d, event.pageX, event.pageY);
                     }
                 })
-                .on("mouseout", () => {
+                .on("mouseout", function () {
                     thiz.tooltip.transition()
                         .duration(300)
                         .style("opacity", 0);
@@ -151,16 +151,16 @@ export class FullScreenGraphViewer extends Main {
                 })
                 .call(drag(simulation));
 
-            simulation.on("tick", () => {
+            simulation.on("tick", function () {
                 link
-                    .attr("x1", (d: any) => d.source.x)
-                    .attr("y1", (d: any) => d.source.y)
-                    .attr("x2", (d: any) => d.target.x)
-                    .attr("y2", (d: any) => d.target.y);
+                    .attr("x1", function (d: any) { return d.source.x; })
+                    .attr("y1", function (d: any) { return d.source.y; })
+                    .attr("x2", function (d: any) { return d.target.x; })
+                    .attr("y2", function (d: any) { return d.target.y; });
 
                 node
-                    .attr("cx", (d: any) => d.x)
-                    .attr("cy", (d: any) => d.y);
+                    .attr("cx", function (d: any) { return d.x; })
+                    .attr("cy", function (d: any) { return d.y; });
             });
 
             const zoomHandler = d3.zoom()
