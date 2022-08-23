@@ -187,7 +187,7 @@ public class AP {
     /**
      * Makes an APObj from 'prop' entry of map 'obj'
      */
-    public static Object apAPObj(Object obj, String prop) {
+    public static APObj apAPObj(Object obj, String prop) {
         Object o = apObj(obj, prop);
         if (o instanceof Map<?, ?>) {
             return new APObj((Map<?, ?>) o);

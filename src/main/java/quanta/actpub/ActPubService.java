@@ -4,6 +4,7 @@ import static quanta.actpub.model.AP.apBool;
 import static quanta.actpub.model.AP.apDate;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apAPObj;
 import static quanta.actpub.model.AP.apParseList;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
@@ -665,7 +666,7 @@ public class ActPubService extends ServiceBase {
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                processCreateOrUpdateAction(httpReq, payload, payload.getActor(), payload.getType(), bodyBytes, keyEncoded);
+                processCreateOrUpdateAction(httpReq, payload, bodyBytes, keyEncoded);
                 break;
 
             case APType.Follow:
@@ -673,11 +674,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                processUndoAction(httpReq, payload, payload.getActor(), bodyBytes);
+                processUndoAction(httpReq, payload, bodyBytes);
                 break;
 
             case APType.Delete:
-                processDeleteAction(httpReq, payload, payload.getActor(), bodyBytes, keyEncoded);
+                processDeleteAction(httpReq, payload, bodyBytes, keyEncoded);
                 break;
 
             case APType.Accept:
@@ -685,11 +686,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, payload.getActor(), false, bodyBytes);
+                processLikeAction(httpReq, payload, false, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(payload, payload.getActor(), false, bodyBytes);
+                processAnnounceAction(payload, false, bodyBytes);
                 break;
 
             default:
@@ -700,21 +701,20 @@ public class ActPubService extends ServiceBase {
 
     /* Process inbound undo actions (coming from foreign servers) */
     @PerfMon(category = "apub")
-    public void processUndoAction(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes) {
-        Object obj = apObj(payload, APObj.object);
-        String type = apStr(obj, APObj.type);
-        apLog.trace("Undo Type: " + type);
-        switch (type) {
+    public void processUndoAction(HttpServletRequest httpReq, APObj payload, byte[] bodyBytes) {
+        APObj obj = apAPObj(payload, APObj.object);
+        apLog.trace("Undo Type: " + obj.getType());
+        switch (obj.getType()) {
             case APType.Follow:
-                apFollowing.processFollowAction(obj, actorUrl, true);
+                apFollowing.processFollowAction(obj, payload.getActor(), true);
                 break;
 
             case APType.Like:
-                processLikeAction(httpReq, payload, actorUrl, true, bodyBytes);
+                processLikeAction(httpReq, payload, true, bodyBytes);
                 break;
 
             case APType.Announce:
-                processAnnounceAction(payload, actorUrl, true, bodyBytes);
+                processAnnounceAction(payload, true, bodyBytes);
                 break;
 
             default:
@@ -741,8 +741,7 @@ public class ActPubService extends ServiceBase {
 
     /* action will be APType.Create or APType.Update */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateAction(HttpServletRequest httpReq, APObj payload, String actorUrl, String action,
-            byte[] bodyBytes, Val<String> keyEncoded) {
+    public void processCreateOrUpdateAction(HttpServletRequest httpReq, APObj payload, byte[] bodyBytes, Val<String> keyEncoded) {
         arun.<Object>run(ms -> {
             apLog.trace("processCreateOrUpdateAction");
 
@@ -753,16 +752,16 @@ public class ActPubService extends ServiceBase {
             switch (type) {
                 case APType.ChatMessage:
                 case APType.Note:
-                    processCreateOrUpdateNote(ms, actorUrl, object, action, keyEncoded.getVal());
+                    processCreateOrUpdateNote(ms, payload.getActor(), object, payload.getType(), keyEncoded.getVal());
                     break;
 
                 case APType.Person:
-                    processUpdatePerson(ms, actorUrl, object, action, keyEncoded.getVal());
+                    processUpdatePerson(ms, payload.getActor(), object, payload.getType(), keyEncoded.getVal());
                     break;
 
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Action: " + action + "  type=" + type + "\n" + XString.prettyPrint(payload));
+                    log.debug("Unhandled Action: " + payload.getType() + "  type=" + type + "\n" + XString.prettyPrint(payload));
                     break;
             }
             return null;
@@ -770,11 +769,11 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processLikeAction(HttpServletRequest httpReq, Object payload, String actorUrl, boolean unlike, byte[] bodyBytes) {
+    public void processLikeAction(HttpServletRequest httpReq, APObj payload, boolean unlike, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (unlike ? "unlike" : "like"));
 
-            String objectIdUrl = apStr(payload, APObj.object); // &&&
+            String objectIdUrl = apStr(payload, APObj.object);
 
             if (no(objectIdUrl)) {
                 log.debug("Unable to get object from payload: " + XString.prettyPrint(payload));
@@ -799,12 +798,12 @@ public class ActPubService extends ServiceBase {
             }
 
             if (!unlike) {
-                if (node.getLikes().add(actorUrl)) {
+                if (node.getLikes().add(payload.getActor())) {
                     // set node to dirty only if it just changed.
                     ThreadLocals.dirty(node);
                 }
             } else {
-                if (node.getLikes().remove(actorUrl)) {
+                if (node.getLikes().remove(payload.getActor())) {
                     // set node to dirty only if it just changed.
                     ThreadLocals.dirty(node);
 
@@ -820,7 +819,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processAnnounceAction(Object payload, String actorUrl, boolean undo, byte[] bodyBytes) {
+    public void processAnnounceAction(APObj payload, boolean undo, byte[] bodyBytes) {
         arun.<Object>run(as -> {
             apLog.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(payload));
 
@@ -844,7 +843,7 @@ public class ActPubService extends ServiceBase {
                 // log.debug("BOOSTING: " + XString.prettyPrint(boostedNode));
 
                 // get account node for person doing the boosting
-                SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, actorUrl);
+                SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, payload.getActor());
                 if (ok(actorAccountNode)) {
                     String userName = actorAccountNode.getStr(NodeProp.USER);
 
@@ -863,7 +862,7 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processDeleteAction(HttpServletRequest httpReq, Object payload, String actorUrl, byte[] bodyBytes,
+    public void processDeleteAction(HttpServletRequest httpReq, APObj payload, byte[] bodyBytes,
             Val<String> keyEncoded) {
         arun.<Object>run(as -> {
             apLog.trace("processDeleteAction");

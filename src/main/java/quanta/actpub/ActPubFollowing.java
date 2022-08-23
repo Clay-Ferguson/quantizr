@@ -122,7 +122,7 @@ public class ActPubFollowing extends ServiceBase {
      * 
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
-    public void processFollowAction(Object followAction, String followerActorUrl, boolean unFollow) {
+    public void processFollowAction(APObj followAction, String followerActorUrl, boolean unFollow) {
         Runnable runnable = () -> {
             arun.<APObj>run(as -> {
                 try {
