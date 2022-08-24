@@ -46,7 +46,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "resource", required = true) String resource, //
 			HttpServletRequest req) {
 		apLog.trace("getWebFinger: " + resource);
-		Object ret = apUtil.generateWebFinger(resource);
+		APObj ret = apUtil.generateWebFinger(resource);
 		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_JRD_JSON);

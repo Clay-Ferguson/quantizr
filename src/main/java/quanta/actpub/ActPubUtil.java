@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.AP;
-import quanta.actpub.model.APList;
+import quanta.actpub.model.APOWebFinger;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
@@ -471,16 +471,7 @@ public class ActPubUtil extends ServiceBase {
 
                         SubNode userNode = read.getUserNodeByUserName(null, username);
                         if (ok(userNode)) {
-                            APObj webFinger = new APObj() //
-                                    .put(APObj.subject, "acct:" + username + "@" + fullHost) //
-                                    .put(APObj.links, new APList() //
-                                            .val(new APObj() //
-                                                    .put(APObj.rel, "self") //
-                                                    .put(APObj.type, APConst.CTYPE_ACT_JSON) //
-                                                    .put(APObj.href, makeActorUrlForUserName(username))));
-
-                            apLog.trace("Reply with WebFinger: " + XString.prettyPrint(webFinger));
-                            return webFinger;
+                            return new APOWebFinger(username + "@" + fullHost, makeActorUrlForUserName(username));
                         }
                     }
                 }

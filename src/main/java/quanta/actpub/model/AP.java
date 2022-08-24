@@ -29,12 +29,6 @@ public class AP {
         return obj instanceof Map<?, ?> || obj instanceof LinkedHashMap<?, ?>;
     }
 
-    public static boolean apIsType(Object obj, String type) {
-        if (no(obj))
-            return false;
-        return type.equalsIgnoreCase(apStr(obj, APObj.type));
-    }
-
     /**
      * Looks in all elements of list, to find all elements that are Objects, and returns the value of
      * the first one containing the prop val as a property of it

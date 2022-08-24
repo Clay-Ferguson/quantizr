@@ -114,8 +114,8 @@ public class ActPubOutbox extends ServiceBase {
                     // If this is a new post our server hasn't yet injested.
                     if (!apIdSet.contains(apId)) {
                         Object object = apObj(obj, APObj.object);
-
                         if (ok(object)) {
+                            String type = apStr(object, APObj.type);
                             if (object instanceof String) {
                                 // todo-1: handle boosts.
                                 //
@@ -133,7 +133,7 @@ public class ActPubOutbox extends ServiceBase {
                                 // }
                             }
                             // todo-0: need to handle "Boosts" and other types here too.
-                            else if (apIsType(object, APType.Note)) {
+                            else if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create, null,

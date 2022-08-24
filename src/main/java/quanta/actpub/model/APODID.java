@@ -3,7 +3,7 @@ package quanta.actpub.model;
 import quanta.actpub.APConst;
 
 /**
- * Decentralized Identity Info
+ * Decentralized Identity Info. This was just an experiment and is not part of ActivityPub
  */
 public class APODID extends APObj {
     public APODID() {
