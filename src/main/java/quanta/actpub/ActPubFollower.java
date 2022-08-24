@@ -111,18 +111,18 @@ public class ActPubFollower extends ServiceBase {
         List<String> followers = new LinkedList<>();
         log.debug("getFollowers of " + userName + " minId=" + minId);
 
-        arun.run(ms -> {
+        arun.run(as -> {
             /*
              * Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e.
              * representing followers of this user)
              */
-            Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
+            Iterable<SubNode> iter = getFriendsByUserName(as, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower Node found: " + n.getIdStr());
 
                 // the owner of the friend node is the "Follower".
-                SubNode ownerOfFriendNode = read.getNode(ms, n.getOwner());
+                SubNode ownerOfFriendNode = read.getNode(as, n.getOwner());
 
                 if (ok(ownerOfFriendNode)) {
                     // log.debug(" owner (follower): " + ownerOfFriendNode.getIdStr());
@@ -152,8 +152,8 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public Long getFollowersCount(String userMakingRequest, String userName) {
-        return (Long) arun.run(ms -> {
-            Long count = countFollowersOfUser(ms, userMakingRequest, userName, null);
+        return (Long) arun.run(as -> {
+            Long count = countFollowersOfUser(as, userMakingRequest, userName, null);
             return count;
         });
     }

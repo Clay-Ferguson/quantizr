@@ -297,8 +297,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			boolean _urlId = urlId;
 
 			// todo-0: name ALL 'ms' uses in these places as 'as' instead.
-			arun.run(ms -> {
-				SubNode node = read.getNode(ms, _id);
+			arun.run(as -> {
+				SubNode node = read.getNode(as, _id);
 
 				if (ok(node)) {
 					if (_urlId) {
@@ -306,7 +306,7 @@ public class AppController extends ServiceBase implements ErrorController {
 						ThreadLocals.getSC().setUrlId(_id);
 					}
 
-					if (AclService.isPublic(ms, node)) {
+					if (AclService.isPublic(as, node)) {
 						render.populateSocialCardProps(node, model);
 					}
 				}
@@ -970,10 +970,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			if (ok(id)) {
 				String _id = id;
-				arun.run(ms -> {
+				arun.run(as -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
-					SubNode node = read.getNode(ms, _id);
+					SubNode node = read.getNode(as, _id);
 
 					if (no(node)) {
 						throw new RuntimeException("Node not found.");
@@ -1013,7 +1013,7 @@ public class AppController extends ServiceBase implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attach.getBinary(ms, "", node, null, ok(download), response);
+						attach.getBinary(as, "", node, null, ok(download), response);
 					}
 					return null;
 				});
@@ -1055,20 +1055,20 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (no(token)) {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
-				arun.run(ms -> {
-					attach.getBinary(ms, "", null, nodeId, ok(download), response);
+				arun.run(as -> {
+					attach.getBinary(as, "", null, nodeId, ok(download), response);
 					return null;
 				});
 			}
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
-				arun.run(ms -> {
+				arun.run(as -> {
 					/*
 					 * Note: the "Header" suffix will be applied to all image-related property names to distinguish them
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
-					attach.getBinary(ms, "Header", null, nodeId, ok(download), response);
+					attach.getBinary(as, "Header", null, nodeId, ok(download), response);
 					return null;
 				});
 			}
@@ -1085,8 +1085,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			}
 		} else {
 			if (SessionContext.validToken(token, null)) {
-				arun.run(ms -> {
-					attach.getBinary(ms, "", null, nodeId, ok(download), response);
+				arun.run(as -> {
+					attach.getBinary(as, "", null, nodeId, ok(download), response);
 					return null;
 				});
 			}

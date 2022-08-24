@@ -67,7 +67,7 @@ public class SystemService extends ServiceBase {
 		try {
 			prop.setDaemonsEnabled(false);
 
-			arun.run(ms -> {
+			arun.run(as -> {
 				// different types of database conversions can be put here as needed
 				// mongoUtil.fixSharing(ms);
 				return null;
@@ -101,8 +101,8 @@ public class SystemService extends ServiceBase {
 				ret = ipfsGarbageCollect(statsMap);
 			}
 
-			arun.run(ms -> {
-				user.writeUserStats(ms, statsMap);
+			arun.run(as -> {
+				user.writeUserStats(as, statsMap);
 				return null;
 			});
 

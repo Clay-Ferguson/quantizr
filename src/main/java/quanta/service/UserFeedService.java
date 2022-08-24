@@ -443,8 +443,8 @@ public class UserFeedService extends ServiceBase {
 	 * user.
 	 */
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
-		arun.run(ms -> {
-			List<SubNode> nodeList = user.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), userName, false);
+		arun.run(as -> {
+			List<SubNode> nodeList = user.getSpecialNodesList(as, NodeType.BLOCKED_USERS.s(), userName, false);
 			if (no(nodeList))
 				return null;
 

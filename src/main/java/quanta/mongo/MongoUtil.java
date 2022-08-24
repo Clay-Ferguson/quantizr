@@ -306,7 +306,7 @@ public class MongoUtil extends ServiceBase {
 			return;
 		}
 
-		arun.run(ms -> {
+		arun.run(as -> {
 			for (String accountInfo : testUserAccountsList) {
 				log.debug("Verifying test Account: " + accountInfo);
 
@@ -318,7 +318,7 @@ public class MongoUtil extends ServiceBase {
 
 				String userName = accountInfoList.get(0);
 
-				SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
+				SubNode ownerNode = read.getUserNodeByUserName(as, userName);
 				if (no(ownerNode)) {
 					log.debug("userName not found: " + userName + ". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();

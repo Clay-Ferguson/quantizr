@@ -121,8 +121,8 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public void setNodePublicAppendable(SubNode node) {
-		arun.run(ms -> {
-			acl.makePublicAppendable(ms, node);
+		arun.run(as -> {
+			acl.makePublicAppendable(as, node);
 			return null;
 		});
 	}

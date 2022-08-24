@@ -72,8 +72,8 @@ public class IPFSSwarm extends ServiceBase {
 
     public void connect() {
         if (!prop.ipfsEnabled()) return;
-        arun.run(ms -> {
-            List<String> adrsList = getConnectAddresses(ms);
+        arun.run(as -> {
+            List<String> adrsList = getConnectAddresses(as);
             if (ok(adrsList)) {
                 for (String adrs : adrsList) {
                     if (adrs.startsWith("/")) {

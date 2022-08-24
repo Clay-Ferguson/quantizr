@@ -270,12 +270,12 @@ public class UserManagerService extends ServiceBase {
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
 		log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
-		arun.run(ms -> {
+		arun.run(as -> {
 			String userName = ThreadLocals.getSC().getUserName();
 
-			SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
+			SubNode ownerNode = read.getUserNodeByUserName(as, userName);
 			if (ok(ownerNode)) {
-				delete.delete(ms, ownerNode, false);
+				delete.delete(as, ownerNode, false);
 			}
 			return null;
 		});
@@ -364,12 +364,12 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public String processSignupCode(String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
-		return arun.run(ms -> {
+		return arun.run(as -> {
 
 			// signupCode is just the new account node id? I guess that's secure, if user
 			// has this value it's the only user
 			// who could possibly know this unguessable value.
-			SubNode node = read.getNode(ms, signupCode);
+			SubNode node = read.getNode(as, signupCode);
 
 			if (ok(node)) {
 				if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
@@ -381,7 +381,7 @@ public class UserManagerService extends ServiceBase {
 						return "processSignupCode should not be called for admin user.";
 					} else {
 						node.delete(NodeProp.SIGNUP_PENDING);
-						update.save(ms, node);
+						update.save(as, node);
 						return "Signup Successful. You may login now.";
 					}
 				}
@@ -400,8 +400,8 @@ public class UserManagerService extends ServiceBase {
 
 	public List<String> getOwnerNames(SubNode node) {
 		Val<List<String>> ret = new Val<List<String>>();
-		arun.run(ms -> {
-			ret.setVal(acl.getOwnerNames(ms, node));
+		arun.run(as -> {
+			ret.setVal(acl.getOwnerNames(as, node));
 			return null;
 		});
 		return ret.getVal();
@@ -414,7 +414,7 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
 		SignupResponse res = new SignupResponse();
-		arun.run(ms -> {
+		arun.run(as -> {
 			String userName = req.getUserName().trim();
 			String password = req.getPassword().trim();
 			String email = req.getEmail();
@@ -463,9 +463,9 @@ public class UserManagerService extends ServiceBase {
 			}
 
 			if (!automated) {
-				initiateSignup(ms, userName, password, email);
+				initiateSignup(as, userName, password, email);
 			} else {
-				initNewUser(ms, userName, password, email, automated);
+				initNewUser(as, userName, password, email, automated);
 			}
 			return null;
 		});
@@ -518,8 +518,8 @@ public class UserManagerService extends ServiceBase {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(ms -> {
-			SubNode userNode = read.getUserNodeByUserName(ms, userName);
+		arun.run(as -> {
+			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			if (ok(userNode)) {
 				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getKeyJson());
@@ -541,8 +541,8 @@ public class UserManagerService extends ServiceBase {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(ms -> {
-			SubNode userNode = read.getUserNodeByUserName(ms, userName);
+		arun.run(as -> {
+			SubNode userNode = read.getUserNodeByUserName(as, userName);
 			if (no(userNode)) {
 				res.setMessage("unknown user: " + userName);
 				res.setSuccess(false);
@@ -581,8 +581,8 @@ public class UserManagerService extends ServiceBase {
 			ThreadLocals.getSC().setEnableIPSM(true);
 		}
 
-		arun.run(ms -> {
-			SubNode prefsNode = read.getNode(ms, req.getUserNodeId());
+		arun.run(as -> {
+			SubNode prefsNode = read.getNode(as, req.getUserNodeId());
 			if (no(prefsNode))
 				throw new RuntimeException("Unable to update preferences.");
 
@@ -622,9 +622,9 @@ public class UserManagerService extends ServiceBase {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(ms -> {
+		arun.run(as -> {
 			boolean failed = false;
-			SubNode userNode = read.getUserNodeByUserName(ms, userName);
+			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userName)
 			// If userName is changing, validate it first.
@@ -647,14 +647,14 @@ public class UserManagerService extends ServiceBase {
 				userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
 
 				// sessionContext.setUserName(req.getUserName());
-				update.save(ms, userNode);
+				update.save(as, userNode);
 				res.setSuccess(true);
 
 				if (req.isPublish()) {
 					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
 				}
 
-				edit.processAfterSave(ms, userNode);
+				edit.processAfterSave(as, userNode);
 			}
 			return null;
 		});
@@ -669,14 +669,14 @@ public class UserManagerService extends ServiceBase {
 		// Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
 		String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
 		exec.run(() -> {
-			arun.run(ms -> {
-				SubNode userNode = read.getNode(ms, userNodeId, false);
+			arun.run(as -> {
+				SubNode userNode = read.getNode(as, userNodeId, false);
 				String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
 
 				// If we didn't already generate the key for this user, then generate one.
 				if (!sc.getRootId().equals(key)) {
 					// make sure there is an IPFS key with same name as user's root ID.
-					Map<String, Object> keyGenResult = ipfsKey.gen(ms, sc.getRootId());
+					Map<String, Object> keyGenResult = ipfsKey.gen(as, sc.getRootId());
 					if (no(keyGenResult)) {
 						log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
 						// return null;
@@ -702,7 +702,7 @@ public class UserManagerService extends ServiceBase {
 				log.debug("identity file: " + fileName);
 
 				// Instead let's wrap in a MFS folder type for now. This is all experimental so far.
-				ipfsFiles.addFile(ms, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
+				ipfsFiles.addFile(as, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
 
 				// Now we have to read the file we just wrote to get it's CID so we can publish it.
 				IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
@@ -720,11 +720,11 @@ public class UserManagerService extends ServiceBase {
 				cid = pathStat.getHash();
 
 				log.debug("Publishing CID (root folder): " + cid);
-				Map<String, Object> ret = ipfsName.publish(ms, sc.getRootId(), cid);
+				Map<String, Object> ret = ipfsName.publish(as, sc.getRootId(), cid);
 				log.debug("Publishing complete!");
 
 				userNode.set(NodeProp.USER_DID_IPNS, ret.get("Name"));
-				update.save(ms, userNode);
+				update.save(as, userNode);
 
 				push.sendServerPushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete.", false));
 				return null;
@@ -933,20 +933,20 @@ public class UserManagerService extends ServiceBase {
 		GetUserProfileResponse res = new GetUserProfileResponse();
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		arun.run(ms -> {
+		arun.run(as -> {
 			SubNode userNode = null;
 
 			if (no(req.getUserId())) {
-				userNode = read.getUserNodeByUserName(ms, sessionUserName);
+				userNode = read.getUserNodeByUserName(as, sessionUserName);
 			} else {
-				userNode = read.getNode(ms, req.getUserId(), false);
+				userNode = read.getNode(as, req.getUserId(), false);
 			}
 
 			if (ok(userNode)) {
 				UserProfile userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER);
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-				SubNode userHomeNode = read.getNodeByName(ms, nodeUserName + ":" + NodeName.HOME);
+				SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + NodeName.HOME);
 
 				res.setUserProfile(userProfile);
 				userProfile.setUserName(nodeUserName);
@@ -969,10 +969,10 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 
-				Long followerCount = apFollower.countFollowersOfUser(ms, sessionUserName, nodeUserName, actorUrl);
+				Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, nodeUserName, actorUrl);
 				userProfile.setFollowerCount(followerCount.intValue());
 
-				Long followingCount = apFollowing.countFollowingOfUser(ms, sessionUserName, nodeUserName, actorUrl);
+				Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
 				userProfile.setFollowingCount(followingCount.intValue());
 
 				if (!ThreadLocals.getSC().isAnonUser()) {
@@ -980,10 +980,10 @@ public class UserManagerService extends ServiceBase {
 					 * Only for local users do we attemp to generate followers and following, but theoretically we can
 					 * use the ActPub API to query for this for foreign users also.
 					 */
-					boolean blocked = userIsBlockedByMe(ms, nodeUserName);
+					boolean blocked = userIsBlockedByMe(as, nodeUserName);
 					userProfile.setBlocked(blocked);
 
-					boolean following = userIsFollowedByMe(ms, nodeUserName);
+					boolean following = userIsFollowedByMe(as, nodeUserName);
 					userProfile.setFollowing(following);
 				}
 
@@ -1021,10 +1021,10 @@ public class UserManagerService extends ServiceBase {
 	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
 		UserPreferences userPrefs = new UserPreferences();
 
-		arun.run(ms -> {
+		arun.run(as -> {
 			SubNode prefsNode = _prefsNode;
 			if (no(prefsNode)) {
-				prefsNode = read.getUserNodeByUserName(ms, userName);
+				prefsNode = read.getUserNodeByUserName(as, userName);
 			}
 
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
@@ -1131,7 +1131,7 @@ public class UserManagerService extends ServiceBase {
 
 	public ResetPasswordResponse resetPassword(ResetPasswordRequest req) {
 		ResetPasswordResponse res = new ResetPasswordResponse();
-		arun.run(ms -> {
+		arun.run(as -> {
 			String user = req.getUser();
 			String email = req.getEmail();
 
@@ -1142,7 +1142,7 @@ public class UserManagerService extends ServiceBase {
 				return null;
 			}
 
-			SubNode ownerNode = read.getUserNodeByUserName(ms, user);
+			SubNode ownerNode = read.getUserNodeByUserName(as, user);
 			if (no(ownerNode)) {
 				res.setMessage("User does not exist.");
 				res.setSuccess(false);
@@ -1174,7 +1174,7 @@ public class UserManagerService extends ServiceBase {
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
 
 			ownerNode.set(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE, String.valueOf(authCode));
-			update.save(ms, ownerNode);
+			update.save(as, ownerNode);
 
 			String passCode = ownerNode.getIdStr() + "-" + String.valueOf(authCode);
 			String link = prop.getHostAndPort() + "?passCode=" + passCode;

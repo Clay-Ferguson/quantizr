@@ -782,8 +782,8 @@ public class ActPubUtil extends ServiceBase {
         if (!MongoRepository.fullInit)
             return;
 
-        arun.run(ms -> {
-            SubNode node = read.getNode(ms, nodeId);
+        arun.run(as -> {
+            SubNode node = read.getNode(as, nodeId);
             if (ok(node) && node.isType(NodeType.FRIEND)) {
                 String friendUserName = node.getStr(NodeProp.USER);
                 if (ok(friendUserName)) {

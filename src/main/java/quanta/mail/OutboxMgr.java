@@ -44,9 +44,9 @@ public class OutboxMgr extends ServiceBase {
 		// findNodeByProp will be fast.
 		if (true) throw new RuntimeException("currently not used.");
 
-		arun.run(ms -> {
+		arun.run(as -> {
 			SubNode userInbox =
-					read.getUserNodeByType(ms, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
+					read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
 			if (ok(userInbox)) {
 				// log.debug("userInbox id=" + userInbox.getIdStr());
@@ -55,13 +55,13 @@ public class OutboxMgr extends ServiceBase {
 				 * First look to see if there is a target node already existing in this persons inbox that points to
 				 * the node in question
 				 */
-				SubNode notifyNode = read.findNodeByProp(ms, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
+				SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
 
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one
 				 */
 				if (no(notifyNode)) {
-					notifyNode = create.createNode(ms, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
+					notifyNode = create.createNode(as, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
 							CreateNodeLocation.FIRST, null, null, true);
 
 					// trim to 280 like twitter.
@@ -72,7 +72,7 @@ public class OutboxMgr extends ServiceBase {
 					notifyNode.setContent(content);
 					notifyNode.touch();
 					notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
-					update.save(ms, notifyNode);
+					update.save(as, notifyNode);
 				}
 
 				/*
@@ -112,8 +112,8 @@ public class OutboxMgr extends ServiceBase {
 	}
 
 	public void queueEmail(String recipients, String subject, String content) {
-		arun.run(ms -> {
-			queueMail(ms, recipients, subject, content);
+		arun.run(as -> {
+			queueMail(as, recipients, subject, content);
 			return null;
 		});
 	}

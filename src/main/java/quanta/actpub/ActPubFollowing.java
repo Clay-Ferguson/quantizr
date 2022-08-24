@@ -62,14 +62,14 @@ public class ActPubFollowing extends ServiceBase {
                 return;
             }
 
-            arun.run(ms -> {
+            arun.run(as -> {
                 // try getting actor url from cache first
                 String actorUrlOfUserBeingFollowed = apCache.actorUrlsByUserName.get(apUserName);
 
                 // if not found in cache, get it the harder way.
                 if (no(actorUrlOfUserBeingFollowed)) {
                     actorUrlOfUserBeingFollowed =
-                            apub.getUserProperty(ms, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
+                            apub.getUserProperty(as, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
 
                     // if we got the actor url put it in the cache now.
                     if (ok(actorUrlOfUserBeingFollowed)) {
@@ -100,9 +100,9 @@ public class ActPubFollowing extends ServiceBase {
                 }
 
                 // #todo-optimization: we can call apub.getUserProperty() to get toInbox right?
-                APOActor toActor = apUtil.getActorByUrl(ms, followerUserName, actorUrlOfUserBeingFollowed);
+                APOActor toActor = apUtil.getActorByUrl(as, followerUserName, actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
-                    String privateKey = apCrypto.getPrivateKey(ms, followerUserName);
+                    String privateKey = apCrypto.getPrivateKey(as, followerUserName);
                     apUtil.securePostEx(toActor.getInbox(), privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
@@ -343,8 +343,8 @@ public class ActPubFollowing extends ServiceBase {
         final List<String> following = new LinkedList<>();
         // log.debug("getFollowing of user: " + userName);
 
-        arun.run(ms -> {
-            Iterable<SubNode> iter = findFollowingOfUser(ms, userName);
+        arun.run(as -> {
+            Iterable<SubNode> iter = findFollowingOfUser(as, userName);
 
             for (SubNode n : iter) {
                 // log.debug(" Found Friend Node: " + n.getIdStr());
@@ -376,8 +376,8 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     public Long getFollowingCount(String userDoingAction, String userName) {
-        return (Long) arun.run(ms -> {
-            Long count = countFollowingOfUser(ms, userDoingAction, userName, null);
+        return (Long) arun.run(as -> {
+            Long count = countFollowingOfUser(as, userDoingAction, userName, null);
             return count;
         });
     }

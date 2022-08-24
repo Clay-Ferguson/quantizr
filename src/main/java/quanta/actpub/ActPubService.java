@@ -1529,10 +1529,10 @@ public class ActPubService extends ServiceBase {
     public void refreshActorPropsForAllUsers() {
         Runnable runnable = () -> {
             accountsRefreshed = 0;
-            arun.run(ms -> {
+            arun.run(as -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+                        read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
@@ -1545,7 +1545,7 @@ public class ActPubService extends ServiceBase {
 
                     try {
                         if (ok(url)) {
-                            APOActor actor = apUtil.getActor(ms, null, url);
+                            APOActor actor = apUtil.getActor(as, null, url);
 
                             if (ok(actor)) {
                                 // we could double check userName, and bail if wrong, but this is not needed.
@@ -1555,7 +1555,7 @@ public class ActPubService extends ServiceBase {
 
                                 // since we're passing in the account node this importActor will basically just update the
                                 // properties on it and save it.
-                                importActor(ms, acctNode, actor);
+                                importActor(as, acctNode, actor);
                                 log.debug("import ok");
                                 accountsRefreshed++;
                             } else {
@@ -1581,20 +1581,20 @@ public class ActPubService extends ServiceBase {
     }
 
     public void loadForeignUser(String userMakingRequest, String userName) {
-        arun.run(ms -> {
+        arun.run(as -> {
             apLog.trace("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByForeignUserName(ms, userMakingRequest, userName, false, true);
+            SubNode userNode = getAcctNodeByForeignUserName(as, userMakingRequest, userName, false, true);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;
             }
 
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-            APOActor actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
+            APOActor actor = apUtil.getActorByUrl(as, userMakingRequest, actorUrl);
             if (ok(actor)) {
                 // if their outbox fails just, stop processing and don't bother trying to get followers or
                 // following,.
-                if (!apOutbox.loadForeignOutbox(ms, userMakingRequest, actor, userNode, userName)) {
+                if (!apOutbox.loadForeignOutbox(as, userMakingRequest, actor, userNode, userName)) {
                     return null;
                 }
 
@@ -1662,7 +1662,7 @@ public class ActPubService extends ServiceBase {
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
             return;
 
-        arun.run(ms -> {
+        arun.run(as -> {
             if (scanningForeignUsers)
                 return null;
 
@@ -1670,7 +1670,7 @@ public class ActPubService extends ServiceBase {
                 scanningForeignUsers = true;
 
                 Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+                        read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
@@ -1729,7 +1729,7 @@ public class ActPubService extends ServiceBase {
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers)
             return;
 
-        arun.run(ms -> {
+        arun.run(as -> {
             if (refreshingForeignUsers)
                 return null;
 
@@ -1745,7 +1745,7 @@ public class ActPubService extends ServiceBase {
                 HashSet<ObjectId> blockedUserIds = new HashSet<>();
                 userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
-                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
+                Iterable<SubNode> accountNodes = read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
                 int pushSkipCounter = 0;
@@ -1803,9 +1803,9 @@ public class ActPubService extends ServiceBase {
         if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return arun.run(ms -> {
+        return arun.run(as -> {
             Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+                    read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1825,7 +1825,7 @@ public class ActPubService extends ServiceBase {
 
                     // This userName may be an actor url, and if so we convert it to an actual username.
                     if (userName.startsWith("https://")) {
-                        userName = apUtil.getLongUserNameFromActorUrl(ms, null, userName);
+                        userName = apUtil.getLongUserNameFromActorUrl(as, null, userName);
                         // log.debug("Converted to: " + userName);
                     }
 
@@ -1850,9 +1850,9 @@ public class ActPubService extends ServiceBase {
         if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return arun.run(ms -> {
+        return arun.run(as -> {
             log.debug("Starting AP Large Delete...");
-            long delCount = delete.deleteOldActPubPosts(9, ms);
+            long delCount = delete.deleteOldActPubPosts(9, as);
             String message = "AP Maintence Complete. Deleted " + String.valueOf(delCount) + " old posts.";
             log.debug(message);
             return message;

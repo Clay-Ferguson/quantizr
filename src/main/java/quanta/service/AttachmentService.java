@@ -1112,7 +1112,7 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public int getGridItemCount() {
-		return arun.run(ms -> {
+		return arun.run(as -> {
 			int count = 0;
 			GridFSFindIterable files = gridBucket.find();
 
@@ -1141,7 +1141,7 @@ public class AttachmentService extends ServiceBase {
 	 * nodes.
 	 */
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
-		arun.run(ms -> {
+		arun.run(as -> {
 			int delCount = 0;
 			// todo-1: do we need to replace this with a 'stream' of some kind to keep from getting out of memory errors?
 			GridFSFindIterable files = gridBucket.find();
@@ -1171,7 +1171,7 @@ public class AttachmentService extends ServiceBase {
 
 						if (ok(id)) {
 							/* Find the node */
-							SubNode subNode = read.getNode(ms, id);
+							SubNode subNode = read.getNode(as, id);
 
 							/*
 							 * If the node doesn't exist then this grid file is an orphan and should go away
@@ -1207,7 +1207,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			Iterable<SubNode> accountNodes =
-					read.getChildren(ms, MongoUtil.allUsersRootNode.getId(), null, null, 0, null, null);
+					read.getChildren(as, MongoUtil.allUsersRootNode.getId(), null, null, 0, null, null);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
