@@ -682,23 +682,23 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                processUndoActivity(httpReq, (APOUndo)payload, body);
+                processUndoActivity(httpReq, (APOUndo) payload, body);
                 break;
 
             case APType.Delete:
-                processDeleteActivity(httpReq, (APODelete)payload, body, keyEncoded);
+                processDeleteActivity(httpReq, (APODelete) payload, body, keyEncoded);
                 break;
 
             case APType.Accept:
-                processAcceptActivity((APOAccept)payload);
+                processAcceptActivity((APOAccept) payload);
                 break;
 
             case APType.Like:
-                processLikeActivity(httpReq, (APOLike)payload, body);
+                processLikeActivity(httpReq, (APOLike) payload, body);
                 break;
 
             case APType.Announce:
-                processAnnounceActivity((APOAnnounce)payload, body);
+                processAnnounceActivity((APOAnnounce) payload, body);
                 break;
 
             default:
@@ -858,7 +858,8 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveObj(as, null, actorAccountNode, postsNode, activity, false, APType.Announce, boostedNode.getIdStr(), null);
+                    saveObj(as, null, actorAccountNode, postsNode, activity, false, APType.Announce, boostedNode.getIdStr(),
+                            null);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");
@@ -1352,86 +1353,14 @@ public class ActPubService extends ServiceBase {
 
     @PerfMon(category = "apub")
     public APOPerson generatePersonObj(String userName) {
-        SubNode userNode = read.getUserNodeByUserName(null, userName);
-        if (ok(userNode)) {
-            return generatePersonObj(userNode);
-        }
-        return null;
-    }
-
-    /*
-     * Generates an Actor object for one of our own local users
-     */
-    @PerfMon(category = "apub")
-    public APOPerson generatePersonObj(SubNode userNode) {
-        String host = prop.getProtocolHostAndPort();
-        String userName = userNode.getStr(NodeProp.USER);
-
-        try {
-            user.ensureValidCryptoKeys(userNode);
-
-            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
-            String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-            String avatarMime = userNode.getStr(NodeProp.BIN_MIME);
-            String avatarVer = userNode.getStr(NodeProp.BIN);
-            String did = userNode.getStr(NodeProp.USER_DID_IPNS);
-            String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
-                    + userNode.getIdStr() + "&v=" + avatarVer;
-
-            APOPerson actor = new APOPerson() //
-                    /*
-                     * Note: this is a self-reference, and must be identical to the URL that returns this object
-                     */
-                    .put(APObj.id, apUtil.makeActorUrlForUserName(userName)) //
-                    .put(APObj.did, did) //
-                    .put(APObj.preferredUsername, userName) //
-                    .put(APObj.name, displayName) //
-
-                    .put(APObj.icon, new APObj() //
-                            .put(APObj.type, APType.Image) //
-                            .put(APObj.mediaType, avatarMime) //
-                            .put(APObj.url, avatarUrl));
-
-            String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
-            if (ok(headerImageMime)) {
-                String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
-                if (ok(headerImageVer)) {
-                    String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
-                            + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
-
-                    actor.put(APObj.image, new APObj() //
-                            .put(APObj.type, APType.Image) //
-                            .put(APObj.mediaType, headerImageMime) //
-                            .put(APObj.url, headerImageUrl));
-                }
+        return arun.<APOPerson>run(as -> {
+            // we get the usernode without authorizing becasue the APOPerson is guaranteed to only contain public info.
+            SubNode userNode = read.getUserNodeByUserName(as, userName, false);
+            if (ok(userNode)) {
+                return apFactory.generatePersonObj(userNode);
             }
-
-            actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO)) //
-                    .put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //
-                    .put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
-                    .put(APObj.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
-                    .put(APObj.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
-
-                    /*
-                     * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
-                     * this in our ActPubController. We tolerate Mastodon breaking spec here.
-                     */
-                    .put(APObj.url, host + "/u/" + userName + "/home") //
-                    .put(APObj.endpoints, new APObj().put(APObj.sharedInbox, host + APConst.PATH_INBOX)) //
-
-                    .put(APObj.publicKey, new APObj() //
-                            .put(APObj.id, apStr(actor, APObj.id) + "#main-key") //
-                            .put(APObj.owner, apStr(actor, APObj.id)) //
-                            .put(APObj.publicKeyPem, "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n")) //
-
-                    .put(APObj.supportsFriendRequests, true);
-
-            apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
-            return actor;
-        } catch (Exception e) {
-            log.error("actor query failed", e);
-            throw new RuntimeException(e);
-        }
+            return null;
+        });
     }
 
     /*

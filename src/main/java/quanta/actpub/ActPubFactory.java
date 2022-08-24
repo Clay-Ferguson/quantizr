@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import quanta.AppController;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APOCreate;
@@ -23,7 +24,10 @@ import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APOTombstone;
 import quanta.actpub.model.APOUpdate;
 import quanta.actpub.model.APObj;
+import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
+import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
@@ -39,7 +43,7 @@ public class ActPubFactory extends ServiceBase {
 			SubNode node) {
 		String objUrl = snUtil.getIdBasedUrl(node);
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-		APOPerson payload = apub.generatePersonObj(node);
+		APOPerson payload = generatePersonObj(node);
 
 		return newUpdate(userDoingAction, payload, fromActor, toUserNames, objUrl, now, privateMessage);
 	}
@@ -80,7 +84,7 @@ public class ActPubFactory extends ServiceBase {
 		}
 
 		APObj ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content,
-					null);
+				null);
 
 		if (ok(inReplyTo)) {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);
@@ -188,54 +192,130 @@ public class ActPubFactory extends ServiceBase {
 	}
 
 	public APObj makeAPONote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
-        SubNode parent = read.getParent(as, child, false);
+		SubNode parent = read.getParent(as, child, false);
 
-        String hexId = child.getIdStr();
-        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-        String actor = apUtil.makeActorUrlForUserName(userName);
+		String hexId = child.getIdStr();
+		String published = DateUtil.isoStringFromDate(child.getModifyTime());
+		String actor = apUtil.makeActorUrlForUserName(userName);
 
-        APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 
-        // build the 'tags' array for this object from the sharing ACLs.
-        List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
-        if (ok(userNames)) {
-            APList tags = apub.getTagListFromUserNames(null, userNames);
-            if (ok(tags)) {
-                ret.put(APObj.tag, tags);
-            }
-        }
+		// build the 'tags' array for this object from the sharing ACLs.
+		List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
+		if (ok(userNames)) {
+			APList tags = apub.getTagListFromUserNames(null, userNames);
+			if (ok(tags)) {
+				ret.put(APObj.tag, tags);
+			}
+		}
 
-        if (ok(parent)) {
-            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-            if (ok(replyTo)) {
-                ret = ret.put(APObj.inReplyTo, replyTo);
-            }
-        }
+		if (ok(parent)) {
+			String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+			if (ok(replyTo)) {
+				ret = ret.put(APObj.inReplyTo, replyTo);
+			}
+		}
 
-        return ret;
-    }
+		return ret;
+	}
 
-    public APObj makeAPOCreateNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
-        SubNode parent = read.getParent(as, child, false);
+	public APObj makeAPOCreateNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
+		SubNode parent = read.getParent(as, child, false);
 
-        String hexId = child.getIdStr();
-        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-        String actor = apUtil.makeActorUrlForUserName(userName);
-    
-        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+		String hexId = child.getIdStr();
+		String published = DateUtil.isoStringFromDate(child.getModifyTime());
+		String actor = apUtil.makeActorUrlForUserName(userName);
 
-        if (ok(parent)) {
-            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-            if (ok(replyTo)) {
-                ret = ret.put(APObj.inReplyTo, replyTo);
-            }
-        }
+		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
-        return new APOCreate(
-                // todo-1: what is the create=t here? That was part of my own temporary test right?
-                nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-    }
+		if (ok(parent)) {
+			String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+			if (ok(replyTo)) {
+				ret = ret.put(APObj.inReplyTo, replyTo);
+			}
+		}
+
+		return new APOCreate(
+				// todo-1: what is the create=t here? That was part of my own temporary test right?
+				nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+	}
+
+	/*
+	 * Generates an APOPerson object for one of our own local users
+	 */
+	@PerfMon(category = "apub")
+	public APOPerson generatePersonObj(SubNode userNode) {
+		String host = prop.getProtocolHostAndPort();
+		String userName = userNode.getStr(NodeProp.USER);
+
+		try {
+			user.ensureValidCryptoKeys(userNode);
+
+			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
+			String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
+			String avatarMime = userNode.getStr(NodeProp.BIN_MIME);
+			String avatarVer = userNode.getStr(NodeProp.BIN);
+			String did = userNode.getStr(NodeProp.USER_DID_IPNS);
+			String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
+					+ userNode.getIdStr() + "&v=" + avatarVer;
+
+			APOPerson actor = new APOPerson() //
+					/*
+					 * Note: this is a self-reference, and must be identical to the URL that returns this object
+					 */
+					.put(APObj.id, apUtil.makeActorUrlForUserName(userName)) //
+					.put(APObj.did, did) //
+					.put(APObj.preferredUsername, userName) //
+					.put(APObj.name, displayName) //
+
+					.put(APObj.icon, new APObj() //
+							.put(APObj.type, APType.Image) //
+							.put(APObj.mediaType, avatarMime) //
+							.put(APObj.url, avatarUrl));
+
+			String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
+			if (ok(headerImageMime)) {
+				String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
+				if (ok(headerImageVer)) {
+					String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+							+ "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
+
+					actor.put(APObj.image, new APObj() //
+							.put(APObj.type, APType.Image) //
+							.put(APObj.mediaType, headerImageMime) //
+							.put(APObj.url, headerImageUrl));
+				}
+			}
+
+			actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO)) //
+					.put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //
+					.put(APObj.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
+					.put(APObj.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
+					.put(APObj.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
+
+					/*
+					 * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
+					 * this in our ActPubController. We tolerate Mastodon breaking spec here.
+					 */
+					.put(APObj.url, host + "/u/" + userName + "/home") //
+					.put(APObj.endpoints, new APObj().put(APObj.sharedInbox, host + APConst.PATH_INBOX)) //
+
+					.put(APObj.publicKey, new APObj() //
+							.put(APObj.id, apStr(actor, APObj.id) + "#main-key") //
+							.put(APObj.owner, apStr(actor, APObj.id)) //
+							.put(APObj.publicKeyPem, "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n")) //
+
+					.put(APObj.supportsFriendRequests, true);
+
+			// apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
+			return actor;
+		} catch (Exception e) {
+			log.error("actor query failed", e);
+			throw new RuntimeException(e);
+		}
+	}
+
 }
