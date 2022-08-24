@@ -166,7 +166,7 @@ public class ActPubOutbox extends ServiceBase {
         if (no(url))
             return null;
 
-        APObj outbox = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
+        APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));

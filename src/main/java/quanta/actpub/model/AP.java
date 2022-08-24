@@ -233,6 +233,12 @@ public class AP {
             case APType.Announce:
                 return new APOAnnounce(obj);
 
+            case APType.Person:
+                return new APOPerson();
+
+            case APType.Note:
+                return new APONote();
+
             default:
                 log.debug("Unsupported type: " + XString.prettyPrint(obj));
                 break;

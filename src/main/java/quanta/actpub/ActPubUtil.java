@@ -178,11 +178,18 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
+    public APObj getRemoteAP(MongoSession ms, String userDoingGet, String url) {
+        return getJson(ms, APObj.class, userDoingGet, url, APConst.MTYPE_ACT_JSON);
+    }
+
     /*
      * Does the get with userDoingGet if exists, or else falls back to either the supplied ms, or the
      * admin ms.
+     * 
+     * todo-0: create a version of this method that doesn't have MediaType and assumes some default, to
+     * wrap call to this.
      */
-    public APObj getJson(MongoSession ms, String userDoingGet, String url, MediaType mediaType) {
+    public APObj getJson(MongoSession ms, Class<?> clazz, String userDoingGet, String url, MediaType mediaType) {
 
         if (PrincipalName.ANON.s().equals(userDoingGet)) {
             userDoingGet = null;
@@ -198,7 +205,7 @@ public class ActPubUtil extends ServiceBase {
                 if (no(privateKey)) {
                     throw new RuntimeException("Unable to get private key for user.");
                 }
-                return secureGet(url, privateKey, actor, mediaType);
+                return secureGet(url, clazz, privateKey, actor, mediaType);
             });
         } else if (ok(ms)) {
             String actor = apUtil.makeActorUrlForUserName(ms.getUserName());
@@ -208,7 +215,7 @@ public class ActPubUtil extends ServiceBase {
             if (no(privateKey)) {
                 throw new RuntimeException("Unable to get private key for user.");
             }
-            return secureGet(url, privateKey, actor, mediaType);
+            return secureGet(url, clazz, privateKey, actor, mediaType);
         } else {
             return (APObj) arun.run(as -> {
                 String actor = apUtil.makeActorUrlForUserName(as.getUserName());
@@ -218,17 +225,17 @@ public class ActPubUtil extends ServiceBase {
                 if (no(privateKey)) {
                     throw new RuntimeException("Unable to get private key for user.");
                 }
-                return secureGet(url, privateKey, actor, mediaType);
+                return secureGet(url, clazz, privateKey, actor, mediaType);
             });
         }
     }
 
     /**
      * Headers can be optionally passed in, preloaded with security properties, or else null is
-     * acceptable too
+     * acceptable too. 'clazz' is optional and tells which APObj-derived class to marshall into.
      */
     @PerfMon(category = "apUtil")
-    public APObj getJson(String url, MediaType mediaType, HttpHeaders headers) {
+    public APObj getJson(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
         // log.debug("getJson: " + url);
         APObj ret = null;
         int responseCode = 0;
@@ -248,7 +255,11 @@ public class ActPubUtil extends ServiceBase {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             if (ok(response)) {
                 responseCode = response.getStatusCodeValue();
-                ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
+                // if (ok(clazz)) {
+                ret = (APObj) mapper.readValue(response.getBody(), clazz);
+                // } else {
+                // ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
+                // }
             }
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (HttpClientErrorException.Gone goneEx) {
@@ -265,10 +276,10 @@ public class ActPubUtil extends ServiceBase {
         return ret;
     }
 
-    public APObj secureGet(String url, String privateKey, String actor, MediaType mediaType) {
+    public APObj secureGet(String url, Class<?> clazz, String privateKey, String actor, MediaType mediaType) {
         HttpHeaders headers = new HttpHeaders();
         apCrypto.loadSignatureHeaderVals(headers, privateKey, url, actor, null, "get");
-        return getJson(url, mediaType, headers);
+        return getJson(url, clazz, mediaType, headers);
     }
 
     /* Posts to all inboxes */
@@ -410,7 +421,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
-        finger = getJson(ms, userDoingAction, url, APConst.MTYPE_JRD_JSON);
+        finger = getJson(ms, APObj.class, userDoingAction, url, APConst.MTYPE_JRD_JSON);
 
         if (ok(finger)) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
@@ -644,7 +655,7 @@ public class ActPubUtil extends ServiceBase {
 
             // if firstPage contained a String consider it a URL to the page and get it.
             if (firstPage instanceof String) {
-                ocPage = getJson(ms, userDoingAction, (String) firstPage, APConst.MTYPE_ACT_JSON);
+                ocPage = getRemoteAP(ms, userDoingAction, (String) firstPage);
             }
             // else consider firstPage to be the ACTUAL first page object
             else {
@@ -691,7 +702,7 @@ public class ActPubUtil extends ServiceBase {
 
                     // if nextPage is a string consider that a reference to the URL of the page and get it
                     if (nextPage instanceof String) {
-                        ocPage = getJson(ms, userDoingAction, (String) nextPage, APConst.MTYPE_ACT_JSON);
+                        ocPage = getRemoteAP(ms, userDoingAction, (String) nextPage);
                     } else {
                         ocPage = nextPage;
                     }
@@ -711,7 +722,7 @@ public class ActPubUtil extends ServiceBase {
 
             // if lastPage is a string it's the url
             if (lastPage instanceof String) {
-                ocPage = getJson(ms, userDoingAction, (String) lastPage, APConst.MTYPE_ACT_JSON);
+                ocPage = getRemoteAP(ms, userDoingAction, (String) lastPage);
             }
             // else it's the page object
             else {
@@ -916,7 +927,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // node not found in DB yet, so we have to get it from off the web from scratch
-        APObj obj = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
+        APObj obj = apUtil.getRemoteAP(ms, userDoingAction, url);
         if (no(obj)) {
             log.debug("unable to get json: " + url);
             return null;
@@ -1045,8 +1056,6 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public APOActor getActor(MongoSession ms, String userDoingGet, String url) {
-        // todo-0: can't we unmarshal DIRECTLY into the APOActor type?
-        APObj actor = apUtil.getJson(ms, userDoingGet, url, APConst.MTYPE_ACT_JSON);
-        return new APOActor(actor);
+        return (APOActor) apUtil.getJson(ms, APOActor.class, userDoingGet, url, APConst.MTYPE_ACT_JSON);
     }
 }

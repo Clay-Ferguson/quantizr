@@ -757,13 +757,12 @@ public class ActPubService extends ServiceBase {
 
             switch (object.getType()) {
                 case APType.Note:
-                    // todo-0: get rid of Create or Update, and just decide WHICH
-                    // it is before calling a method like this??? maybe.
                     processCreateOrUpdateNote(as, activity, keyEncoded.getVal());
                     break;
 
                 case APType.Person:
-                    processUpdatePerson(as, new APOActor(object), keyEncoded.getVal());
+                    // we can safely cast to APOActor here because getAPObj returns the proper type object.
+                    processUpdatePerson(as, (APOActor) object, keyEncoded.getVal());
                     break;
 
                 default:
@@ -916,7 +915,8 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin())
+            throw new NodeAuthFailedException();
 
         SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
         if (no(actorAccnt)) {
@@ -953,7 +953,8 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     public void processCreateOrUpdateNote(MongoSession as, APOActivity payload, String encodedKey) {
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin())
+            throw new NodeAuthFailedException();
         apLog.trace("processCreateOrUpdateNote");
         APObj obj = payload.getAPObj();
 
@@ -1259,7 +1260,7 @@ public class ActPubService extends ServiceBase {
              */
             boolean allow = false;
             if (allow) {
-                APObj followersObj = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
+                APObj followersObj = apUtil.getRemoteAP(ms, userDoingAction, url);
                 if (ok(followersObj)) {
                     // note/warning: the ActPubFollower.java class also has code to read followers.
                     apUtil.iterateOrderedCollection(ms, userDoingAction, followersObj, MAX_FOLLOWERS, obj -> {
@@ -1968,7 +1969,7 @@ public class ActPubService extends ServiceBase {
 
         String userDoingAction = ThreadLocals.getSC().getUserName();
         try {
-            APObj obj = apUtil.getJson(ms, userDoingAction, objUrl, APConst.MTYPE_ACT_JSON);
+            APObj obj = apUtil.getRemoteAP(ms, userDoingAction, objUrl);
             if (ok(obj)) {
                 return "URL: " + objUrl + "\n\n" + XString.prettyPrint(obj);
             } else {

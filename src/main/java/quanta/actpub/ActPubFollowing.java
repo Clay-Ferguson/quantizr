@@ -324,7 +324,7 @@ public class ActPubFollowing extends ServiceBase {
         if (no(url))
             return null;
 
-        APObj outbox = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
+        APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
         apLog.trace("Following: " + XString.prettyPrint(outbox));
