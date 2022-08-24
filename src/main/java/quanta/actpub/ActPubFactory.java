@@ -24,7 +24,9 @@ import quanta.actpub.model.APOTombstone;
 import quanta.actpub.model.APOUpdate;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
+import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.DateUtil;
 
 /**
  * Convenience factory for some types of AP objects
@@ -184,4 +186,56 @@ public class ActPubFactory extends ServiceBase {
 		setRecipients(fromActor, userDoingAction, ret, toUserNames, privateMessage, true);
 		return ret;
 	}
+
+	public APObj makeAPONote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
+        SubNode parent = read.getParent(as, child, false);
+
+        String hexId = child.getIdStr();
+        String published = DateUtil.isoStringFromDate(child.getModifyTime());
+        String actor = apUtil.makeActorUrlForUserName(userName);
+
+        APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+
+
+        // build the 'tags' array for this object from the sharing ACLs.
+        List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
+        if (ok(userNames)) {
+            APList tags = apub.getTagListFromUserNames(null, userNames);
+            if (ok(tags)) {
+                ret.put(APObj.tag, tags);
+            }
+        }
+
+        if (ok(parent)) {
+            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+            if (ok(replyTo)) {
+                ret = ret.put(APObj.inReplyTo, replyTo);
+            }
+        }
+
+        return ret;
+    }
+
+    public APObj makeAPOCreateNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
+        SubNode parent = read.getParent(as, child, false);
+
+        String hexId = child.getIdStr();
+        String published = DateUtil.isoStringFromDate(child.getModifyTime());
+        String actor = apUtil.makeActorUrlForUserName(userName);
+    
+        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+
+        if (ok(parent)) {
+            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+            if (ok(replyTo)) {
+                ret = ret.put(APObj.inReplyTo, replyTo);
+            }
+        }
+
+        return new APOCreate(
+                // todo-1: what is the create=t here? That was part of my own temporary test right?
+                nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+    }
 }

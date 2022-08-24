@@ -1,6 +1,5 @@
 package quanta.actpub;
 
-import static quanta.actpub.model.AP.apIsType;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
@@ -12,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAnnounce;
-import quanta.actpub.model.APOCreate;
-import quanta.actpub.model.APONote;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
@@ -368,7 +364,7 @@ public class ActPubOutbox extends ServiceBase {
                             }
                         } else {
                             // log.debug("not a boost.");
-                            ret = makeAPActivityForNote(as, userName, nodeIdBase, child);
+                            ret = apFactory.makeAPOCreateNote(as, userName, nodeIdBase, child);
                         }
 
                         if (ok(ret)) {
@@ -404,7 +400,6 @@ public class ActPubOutbox extends ServiceBase {
             }
 
             acl.failIfAdminOwned(node);
-
             boolean authSuccess = false;
 
             // leaving this turned on, for now just to collect info into the logs about how things work.
@@ -426,8 +421,6 @@ public class ActPubOutbox extends ServiceBase {
                 apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
 
                 if (ok(keyId.getVal())) {
-                    log.debug("keyId=" + keyId.getVal());
-
                     // keyId should be like this:
                     // actorId + "#main-key"
                     String actorId = keyId.getVal().replace("#main-key", "");
@@ -437,7 +430,7 @@ public class ActPubOutbox extends ServiceBase {
                         log.debug("got Actor: " + actorAccnt.getIdStr());
 
                         // create a MongoSession representing the user account we just looked up
-                        MongoSession userSess = MongoSession(actorAccnt.getStr(NodeProp.USER), actorAccnt.getId());
+                        MongoSession userSess = new MongoSession(actorAccnt.getStr(NodeProp.USER), actorAccnt.getId());
 
                         // now verify they have access to this node
                         // for now all we do is show results in log file until we prove this works.
@@ -477,68 +470,11 @@ public class ActPubOutbox extends ServiceBase {
              * todo-1: We should be able to get an object as whatever actual type it is based on the type (not
              * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
              */
-            APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
+            APObj ret = apFactory.makeAPONote(as, userName, nodeIdBase, node);
             if (ok(ret)) {
                 apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
             }
             return ret;
         });
-    }
-
-    private MongoSession MongoSession(String str, ObjectId id) {
-        return null;
-    }
-
-    public APObj makeAPForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
-        SubNode parent = read.getParent(as, child, false);
-
-        String hexId = child.getIdStr();
-        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-        String actor = apUtil.makeActorUrlForUserName(userName);
-
-        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-
-
-        // build the 'tags' array for this object from the sharing ACLs.
-        List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
-        if (ok(userNames)) {
-            APList tags = apub.getTagListFromUserNames(null, userNames);
-            if (ok(tags)) {
-                ret.put(APObj.tag, tags);
-            }
-        }
-
-        if (ok(parent)) {
-            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-            if (ok(replyTo)) {
-                ret = ret.put(APObj.inReplyTo, replyTo);
-            }
-        }
-
-        return ret;
-    }
-
-    // todo-1: The bulk of this method IS existing two places, in our code and needs to be consolidated
-    public APObj makeAPActivityForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
-        SubNode parent = read.getParent(as, child, false);
-
-        String hexId = child.getIdStr();
-        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-        String actor = apUtil.makeActorUrlForUserName(userName);
-    
-        APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-
-        if (ok(parent)) {
-            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-            if (ok(replyTo)) {
-                ret = ret.put(APObj.inReplyTo, replyTo);
-            }
-        }
-
-        return new APOCreate(
-                // todo-1: what is the create=t here? That was part of my own temporary test right?
-                nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
     }
 }

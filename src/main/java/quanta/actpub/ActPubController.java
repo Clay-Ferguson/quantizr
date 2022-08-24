@@ -109,10 +109,8 @@ public class ActPubController extends ServiceBase {
 			@RequestBody byte[] body, //
 			HttpServletRequest req) {
 		try {
-			APObj payload = apUtil.buildObj(body);
-			apLog.trace("INBOX (shared): " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apub.processInboxPost(req, payload, body);
+			apub.processInboxPost(req, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -135,10 +133,8 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
 		try {
-			APObj payload = apUtil.buildObj(body);
-			// log.debug("INBOX[" + userName + "]: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apub.processInboxPost(httpReq, payload, body);
+			apub.processInboxPost(httpReq, body);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

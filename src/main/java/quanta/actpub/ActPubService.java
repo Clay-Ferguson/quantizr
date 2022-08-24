@@ -644,7 +644,9 @@ public class ActPubService extends ServiceBase {
      * follow a user on this server
      */
     @PerfMon(category = "apub")
-    public void processInboxPost(HttpServletRequest httpReq, APObj payload, byte[] bodyBytes) {
+    public void processInboxPost(HttpServletRequest httpReq, byte[] body) {
+        APObj payload = apUtil.buildObj(body);
+        apLog.trace("INBOX: " + XString.prettyPrint(payload));
         if (no(payload.getType()))
             return;
 
@@ -660,7 +662,7 @@ public class ActPubService extends ServiceBase {
         }
 
         Val<String> keyEncoded = new Val<>();
-        if (!apCrypto.verifySignature(httpReq, payload, payload.getActor(), bodyBytes, keyEncoded)) {
+        if (!apCrypto.verifySignature(httpReq, payload, payload.getActor(), body, keyEncoded)) {
             throw new RuntimeException("Signature check fail: " + XString.prettyPrint(payload));
         }
 
@@ -672,7 +674,7 @@ public class ActPubService extends ServiceBase {
                  * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
                  * coding the outbound call but don't know of any live instances that support it yet.
                  */
-                processCreateOrUpdateActivity(httpReq, (APOActivity) payload, bodyBytes, keyEncoded);
+                processCreateOrUpdateActivity(httpReq, (APOActivity) payload, body, keyEncoded);
                 break;
 
             case APType.Follow:
@@ -680,11 +682,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Undo:
-                processUndoActivity(httpReq, (APOUndo)payload, bodyBytes);
+                processUndoActivity(httpReq, (APOUndo)payload, body);
                 break;
 
             case APType.Delete:
-                processDeleteActivity(httpReq, (APODelete)payload, bodyBytes, keyEncoded);
+                processDeleteActivity(httpReq, (APODelete)payload, body, keyEncoded);
                 break;
 
             case APType.Accept:
@@ -692,11 +694,11 @@ public class ActPubService extends ServiceBase {
                 break;
 
             case APType.Like:
-                processLikeActivity(httpReq, (APOLike)payload, bodyBytes);
+                processLikeActivity(httpReq, (APOLike)payload, body);
                 break;
 
             case APType.Announce:
-                processAnnounceActivity((APOAnnounce)payload, bodyBytes);
+                processAnnounceActivity((APOAnnounce)payload, body);
                 break;
 
             default:
