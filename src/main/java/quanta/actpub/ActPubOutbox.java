@@ -55,7 +55,8 @@ public class ActPubOutbox extends ServiceBase {
      * 
      * Returns true only if everything successful
      */
-    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode, String apUserName) {
+    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode,
+            String apUserName) {
         Val<Boolean> success = new Val<>(true);
         try {
             // try to read outboxUrl first and if we can't we just return false
@@ -112,23 +113,24 @@ public class ActPubOutbox extends ServiceBase {
                         if (ok(object)) {
                             String type = apStr(object, APObj.type);
                             // if (object instanceof String) {
-                            //     // todo-1: handle boosts.
-                            //     //
-                            //     // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
-                            //     // + XString.prettyPrint(obj));
-                            //     // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                            //     // {
-                            //     // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                            //     // AP.type : "Announce",
-                            //     // AP.actor : "https://dobbs.town/users/onan",
-                            //     // AP.published : "2021-01-25T01:20:30Z",
-                            //     // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                            //     // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
-                            //     // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                            //     // }
+                            // // todo-1: handle boosts.
+                            // //
+                            // // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
+                            // // + XString.prettyPrint(obj));
+                            // // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
+                            // // {
+                            // // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
+                            // // AP.type : "Announce",
+                            // // AP.actor : "https://dobbs.town/users/onan",
+                            // // AP.published : "2021-01-25T01:20:30Z",
+                            // // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                            // // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers"
+                            // ],
+                            // // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                            // // }
                             // }
                             // // todo-0: need to handle "Boosts" and other types here too.
-                            // else 
+                            // else
                             if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
@@ -251,8 +253,7 @@ public class ActPubOutbox extends ServiceBase {
                 // actorId + "#main-key"
                 String actorId = keyId.getVal().replace("#main-key", "");
 
-                MongoSession as = auth.getAdminSession();
-                SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
+                SubNode actorAccnt = arun.run(as -> read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId));
                 if (ok(actorAccnt)) {
                     log.debug("got Actor: " + actorAccnt.getIdStr());
 

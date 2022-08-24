@@ -161,7 +161,7 @@ public class NodeEditService extends ServiceBase {
 			// else add default sharing
 			else {
 				// we always determine the access controls from the parent for any new nodes
-				auth.setDefaultReplyAcl(null, node, newNode);
+				auth.setDefaultReplyAcl(node, newNode);
 
 				// Moved to below to let isFediSend always control UNPUBLISHED prop
 				// inherit UNPUBLISHED prop from parent.
@@ -255,7 +255,7 @@ public class NodeEditService extends ServiceBase {
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 			} else {
 				// we always copy the access controls from the parent for any new nodes
-				auth.setDefaultReplyAcl(null, parentNode, newNode);
+				auth.setDefaultReplyAcl(parentNode, newNode);
 
 				// Moved to below to let isFediSend always control UNPUBLISHED prop
 				// inherit UNPUBLISHED prop from parent.
@@ -560,8 +560,7 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, 
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
 				false, true, true, null);
 		res.setNode(newNodeInfo);
 
@@ -895,14 +894,14 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		SubNode toUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getToUser());
+		SubNode toUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getToUser()));
 		if (no(toUserNode)) {
 			throw new RuntimeEx("User not found: " + req.getToUser());
 		}
 
 		SubNode fromUserNode = null;
 		if (!StringUtils.isEmpty(req.getFromUser())) {
-			fromUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getFromUser());
+			fromUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getFromUser()));
 			if (no(fromUserNode)) {
 				throw new RuntimeEx("User not found: " + req.getFromUser());
 			}
@@ -933,7 +932,10 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (transfers > 0) {
-			update.saveSession(auth.getAdminSession());
+			arun.run(as -> {
+				update.saveSession(as);
+				return null;
+			});
 		}
 
 		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");

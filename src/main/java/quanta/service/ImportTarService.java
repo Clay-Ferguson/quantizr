@@ -43,7 +43,7 @@ public class ImportTarService extends ImportArchiveBase {
 		}
 		used = true;
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, ThreadLocals.getSC().getUserName()));
 		if (no(userNode)) {
 			throw new RuntimeEx("UserNode not found: " + ThreadLocals.getSC().getUserName());
 		}

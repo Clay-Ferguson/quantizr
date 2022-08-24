@@ -65,7 +65,7 @@ public class ImportZipService extends ImportArchiveBase {
 		}
 		used = true;
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
 		if (no(userNode)) {
 			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
 		}

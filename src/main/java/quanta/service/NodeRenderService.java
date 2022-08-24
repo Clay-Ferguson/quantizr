@@ -529,26 +529,27 @@ public class NodeRenderService extends ServiceBase {
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
 	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
-		MongoSession as = auth.getAdminSession();
-		boolean ret = false;
+		return arun.run(as -> {
+			boolean ret = false;
 
-		SubNode node = read.getNodeByName(as, nodeName, true);
-		if (ok(node)) {
-			Iterable<SubNode> iter = read.getNamedNodes(as, node);
-			List<SubNode> children = read.iterateToList(iter);
+			SubNode node = read.getNodeByName(as, nodeName, true);
+			if (ok(node)) {
+				Iterable<SubNode> iter = read.getNamedNodes(as, node);
+				List<SubNode> children = read.iterateToList(iter);
 
-			if (ok(children)) {
-				for (SubNode child : children) {
-					if (!StringUtils.isEmpty(child.getName())) {
-						model.put(child.getName(), child.getContent());
+				if (ok(children)) {
+					for (SubNode child : children) {
+						if (!StringUtils.isEmpty(child.getName())) {
+							model.put(child.getName(), child.getContent());
+						}
 					}
 				}
+				ret = true;
+			} else {
+				log.debug("unable to find node named: " + nodeName);
 			}
-			ret = true;
-		} else {
-			log.debug("unable to find node named: " + nodeName);
-		}
-		return ret;
+			return ret;
+		});
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {

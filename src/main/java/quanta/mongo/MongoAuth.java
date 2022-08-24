@@ -152,15 +152,11 @@ public class MongoAuth extends ServiceBase {
 	 * in the parent Acl, because that would represent 'child' node sharing to himself which is never
 	 * done)
 	 */
-	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
+	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
 
 		// if parent or child is null or parent is an ACCOUNT node do nothing here.
 		if (no(parent) || parent.isType(NodeType.ACCOUNT) || no(child))
 			return;
-
-		if (no(ms)) {
-			ms = getAdminSession();
-		}
 
 		// log.debug("childNode: " + child.getIdStr() + " being created under " + parent.getIdStr());
 
@@ -186,7 +182,7 @@ public class MongoAuth extends ServiceBase {
 
 			// if we have a userProp, find the account node for the user
 			if (ok(userName)) {
-				SubNode accountNode = read.getUserNodeByUserName(ms, userName);
+				SubNode accountNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 				if (ok(accountNode)) {
 					ac.put(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
 				}
@@ -208,7 +204,7 @@ public class MongoAuth extends ServiceBase {
 
 			// if no content, and the parent isn't our own node
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
-				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
+				SubNode parentUserNode = arun.run(as -> read.getNode(as, parent.getOwner()));
 				if (ok(parentUserNode)) {
 					mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
 				}

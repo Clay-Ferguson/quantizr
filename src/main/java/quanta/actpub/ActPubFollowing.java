@@ -139,7 +139,7 @@ public class ActPubFollowing extends ServiceBase {
                     }
 
                     log.debug("getLongUserNameFromActorUrl: " + activity.getActor()); // + "\n" +
-                                                                                   // XString.prettyPrint(followerActor));
+                                                                                      // XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user
@@ -385,26 +385,27 @@ public class ActPubFollowing extends ServiceBase {
     public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
 
-        MongoSession as = auth.getAdminSession();
-        Query q = findFollowingOfUser_query(as, req.getTargetUserName());
-        if (no(q))
-            return null;
+        return arun.run(as -> {
+            Query q = findFollowingOfUser_query(as, req.getTargetUserName());
+            if (no(q))
+                return null;
 
-        q.limit(ConstantInt.ROWS_PER_PAGE.val());
-        q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+            q.limit(ConstantInt.ROWS_PER_PAGE.val());
+            q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = mongoUtil.find(q);
-        List<NodeInfo> searchResults = new LinkedList<>();
-        int counter = 0;
+            Iterable<SubNode> iterable = mongoUtil.find(q);
+            List<NodeInfo> searchResults = new LinkedList<>();
+            int counter = 0;
 
-        for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
-                    false, false, false, false, null);
-            searchResults.add(info);
-        }
+            for (SubNode node : iterable) {
+                NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
+                        false, false, false, false, null);
+                searchResults.add(info);
+            }
 
-        res.setSearchResults(searchResults);
-        return res;
+            res.setSearchResults(searchResults);
+            return res;
+        });
     }
 
     /* Returns FRIEND nodes for every user 'userName' is following */

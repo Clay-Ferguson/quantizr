@@ -144,7 +144,7 @@ public class MongoUtil extends ServiceBase {
 		// Otherwise check parent for correctness
 		else {
 			// log.debug("checking existing parent");
-			SubNode parent = read.getNode(auth.getAdminSession(), node.getParent());
+			SubNode parent = arun.run(as -> read.getNode(as, node.getParent()));
 
 			// if we didn't find parent or it's path is not a match then update parent.
 			if (!ok(parent) || !parent.getPath().equals(node.getParentPath())) {

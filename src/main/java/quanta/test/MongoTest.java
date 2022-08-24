@@ -285,7 +285,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 	}
 
 	private MongoSession asUser(String userName) {
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 		if (no(userNode)) {
 			throw new RuntimeException("UserNode not found for userName " + userName);
 		}

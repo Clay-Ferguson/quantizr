@@ -169,9 +169,8 @@ public class ActPubFactory extends ServiceBase {
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
 			 * attributedTo)
 			 */
-			// todo-0: just using AdminSession isn't enough. It needs to be wrapped in 
-			// arun.run so the threadlocals are correct.
-			APOActor fromActorObj = apUtil.getActorByUrl(auth.getAdminSession(), userDoingAction, fromActor);
+			APOActor fromActorObj = (APOActor) arun.run(as -> apUtil.getActorByUrl(as, userDoingAction, fromActor));
+
 			if (ok(fromActorObj)) {
 				ccActors.add(fromActorObj.getFollowers());
 			}

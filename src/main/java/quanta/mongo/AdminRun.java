@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
+import static quanta.util.Util.ok;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the
@@ -17,18 +18,29 @@ import quanta.util.ThreadLocals;
 public class AdminRun extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
 
+	// Runs 'runner' using 'ms' if not null, or falls back to using 'admin' if ms is null
+	public <T> T run(MongoSession ms, MongoRunnableEx<T> runner) {
+		return ok(ms) ? runner.run(ms) : run(runner);
+	}
+
+	// Runs 'runner' as admin.
 	public <T> T run(MongoRunnableEx<T> runner) {
-		MongoSession ms = null;
-		MongoSession savedMs = null;
+		// Get what session we're runningn from the thread.
+		MongoSession savedMs = ThreadLocals.getMongoSession();
+
+		// if this thread is already using 'admin' we can just run the function immediately
+		if (ok(savedMs) && savedMs.isAdmin()) {
+			return runner.run(savedMs);
+		}
+
+		// otherwise we need to run on the context of admin, and then restore the savedMs afterwards.
+		MongoSession as = null;
 		T ret = null;
 		try {
-			// get current MongoSession to restore on exit in finally below
-			savedMs = ThreadLocals.getMongoSession();
-
 			// set current session to admin session
-			ThreadLocals.setMongoSession(ms = auth.getAdminSession());
-			ret = runner.run(ms);
-			update.saveSession(ms, true);
+			ThreadLocals.setMongoSession(as = auth.getAdminSession());
+			ret = runner.run(as);
+			update.saveSession(as, true);
 		} catch (Exception ex) {
 			log.error("error", ex);
 			throw ex;

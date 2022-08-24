@@ -343,8 +343,7 @@ public class ActPubUtil extends ServiceBase {
     public String getActorUrlFromForeignUserName(String userDoingAction, String userName) {
         String actorUrl = null;
 
-        MongoSession as = auth.getAdminSession();
-        SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false, true);
+        SubNode userNode = arun.run(as -> apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false, true));
         if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
         }
@@ -969,7 +968,7 @@ public class ActPubUtil extends ServiceBase {
 
         // todo-0: need to also support icon being an array here, to be compatable with spec:
         // "icon": [
-        //     "https://kenzoishii.example.com/image/165987aklre4"
+        // "https://kenzoishii.example.com/image/165987aklre4"
         // ]
 
         if (ok(icon)) {

@@ -85,7 +85,7 @@ public class SystemService extends ServiceBase {
 		try {
 			prop.setDaemonsEnabled(false);
 
-			delete.deleteNodeOrphans(null);
+			delete.deleteNodeOrphans();
 			// do not delete.
 			// usrMgr.cleanUserAccounts();
 
@@ -188,7 +188,7 @@ public class SystemService extends ServiceBase {
 		sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
 		sb.append(String.format("Sessions: %d\n", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
-		sb.append("Node Count: " + read.getNodeCount(null) + "\n");
+		sb.append("Node Count: " + read.getNodeCount() + "\n");
 		sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
 		sb.append(user.getUserAccountsReport(null));
 

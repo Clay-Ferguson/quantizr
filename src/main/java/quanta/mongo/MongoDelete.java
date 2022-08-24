@@ -210,14 +210,10 @@ public class MongoDelete extends ServiceBase {
 		// log.debug("Nodes deleted: " + res.getDeletedCount());
 	}
 
-	public void deleteNodeOrphans(MongoSession ms) {
+	public void deleteNodeOrphans() {
 		log.debug("deleteNodeOrphans()");
 		// long nodeCount = read.getNodeCount(null);
 		// log.debug("initial Node Count: " + nodeCount);
-
-		if (no(ms)) {
-			ms = auth.getAdminSession();
-		}
 
 		Val<Integer> orphanCount = new Val<>(0);
 		int loops = 0;

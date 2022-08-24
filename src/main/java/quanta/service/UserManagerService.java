@@ -128,7 +128,7 @@ public class UserManagerService extends ServiceBase {
 		/* User Login */
 		else {
 			// lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
-			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
+			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, req.getUserName()));
 			String userName = userNode.getStr(NodeProp.USER);
 
 			String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
@@ -207,7 +207,7 @@ public class UserManagerService extends ServiceBase {
 	public void processLogin(MongoSession ms, LoginResponse res, String userName) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 
 		if (no(userNode)) {
 			throw new RuntimeEx("User not found: " + userName);
@@ -819,7 +819,7 @@ public class UserManagerService extends ServiceBase {
 		}
 		// else if following multiple users run in an async exector thread
 		else if (users.size() > 1) {
-			
+
 			// For now we only allow FollowBot to do this.
 			if (!userDoingAction.equals(PrincipalName.FOLLOW_BOT.s())) {
 				throw new RuntimeException("Account not authorized for multi-follows.");
@@ -1317,12 +1317,14 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public void updateLastActiveTime(SessionContext sc) {
-		MongoSession ms = auth.getAdminSession();
-		SubNode userNode = read.getUserNodeByUserName(ms, sc.getUserName());
-		if (ok(userNode)) {
-			userNode.set(NodeProp.LAST_ACTIVE_TIME, sc.getLastActiveTime());
-			update.save(ms, userNode);
-		}
+		arun.run(as -> {
+			SubNode userNode = read.getUserNodeByUserName(as, sc.getUserName());
+			if (ok(userNode)) {
+				userNode.set(NodeProp.LAST_ACTIVE_TIME, sc.getLastActiveTime());
+				update.save(as, userNode);
+			}
+			return null;
+		});
 	}
 
 	public int getMaxUploadSize(MongoSession ms) {
@@ -1333,7 +1335,7 @@ public class UserManagerService extends ServiceBase {
 			return Integer.MAX_VALUE;
 		}
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
+		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, ThreadLocals.getSC().getUserName()));
 		long ret = userNode.getInt(NodeProp.BIN_QUOTA);
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;

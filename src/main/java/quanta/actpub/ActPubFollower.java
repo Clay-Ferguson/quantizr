@@ -183,26 +183,27 @@ public class ActPubFollower extends ServiceBase {
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
 
-        MongoSession as = auth.getAdminSession();
-        Query q = getFriendsByUserName_query(as, req.getTargetUserName());
-        if (no(q))
-            return null;
+        return arun.run(as -> {
+            Query q = getFriendsByUserName_query(as, req.getTargetUserName());
+            if (no(q))
+                return null;
 
-        q.limit(ConstantInt.ROWS_PER_PAGE.val());
-        q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+            q.limit(ConstantInt.ROWS_PER_PAGE.val());
+            q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = mongoUtil.find(q);
-        List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
-        int counter = 0;
+            Iterable<SubNode> iterable = mongoUtil.find(q);
+            List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+            int counter = 0;
 
-        for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
-                    false, true, false, false, null);
-            searchResults.add(info);
-        }
+            for (SubNode node : iterable) {
+                NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
+                        false, true, false, false, null);
+                searchResults.add(info);
+            }
 
-        res.setSearchResults(searchResults);
-        return res;
+            res.setSearchResults(searchResults);
+            return res;
+        });
     }
 
     public long countFollowersOfUser(MongoSession ms, String userMakingRequest, String userName, String actorUrl) {

@@ -44,6 +44,7 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -327,10 +328,8 @@ public class ActPubService extends ServiceBase {
      * of them all.
      */
     public void getSharedInboxesOfFollowers(String userName, HashSet<String> sharedInboxes, HashSet<String> userInboxes) {
-        MongoSession as = auth.getAdminSession();
-
         // This query gets the FRIEND nodes that specify userName on them
-        Query q = apFollower.getFriendsByUserName_query(as, userName);
+        Query q = arun.run(as -> apFollower.getFriendsByUserName_query(as, userName));
         if (no(q))
             return;
 
@@ -341,7 +340,7 @@ public class ActPubService extends ServiceBase {
              * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
              * node which is in node.ownerId
              */
-            SubNode followerAccount = read.getNode(as, node.getOwner());
+            SubNode followerAccount = arun.run(as -> read.getNode(as, node.getOwner()));
             if (ok(followerAccount)) {
                 String followerUserName = followerAccount.getStr(NodeProp.USER);
 
@@ -750,7 +749,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void processCreateOrUpdateActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes,
             Val<String> keyEncoded) {
-        arun.<Object>run(ms -> {
+        arun.run(as -> {
             apLog.trace("processCreateOrUpdateAction");
 
             APObj object = activity.getAPObj();
@@ -760,11 +759,11 @@ public class ActPubService extends ServiceBase {
                 case APType.Note:
                     // todo-0: get rid of Create or Update, and just decide WHICH
                     // it is before calling a method like this??? maybe.
-                    processCreateOrUpdateNote(ms, activity, keyEncoded.getVal());
+                    processCreateOrUpdateNote(as, activity, keyEncoded.getVal());
                     break;
 
                 case APType.Person:
-                    processUpdatePerson(ms, new APOActor(object), keyEncoded.getVal());
+                    processUpdatePerson(as, new APOActor(object), keyEncoded.getVal());
                     break;
 
                 default:
@@ -915,10 +914,10 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processUpdatePerson(MongoSession ms, APOActor actor, String encodedKey) {
+    public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
+        if (!as.isAdmin()) throw new NodeAuthFailedException();
 
-        MongoSession as = auth.getAdminSession();
         SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
         if (no(actorAccnt)) {
             log.debug("user not found: " + actor.getId());
@@ -953,7 +952,8 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateNote(MongoSession ms, APOActivity payload, String encodedKey) {
+    public void processCreateOrUpdateNote(MongoSession as, APOActivity payload, String encodedKey) {
+        if (!as.isAdmin()) throw new NodeAuthFailedException();
         apLog.trace("processCreateOrUpdateNote");
         APObj obj = payload.getAPObj();
 
@@ -976,7 +976,7 @@ public class ActPubService extends ServiceBase {
             String replyToId = null;
             if (lastIdx != -1) {
                 replyToId = inReplyTo.substring(lastIdx + 1);
-                nodeBeingRepliedTo = read.getNode(ms, replyToId, false);
+                nodeBeingRepliedTo = read.getNode(as, replyToId, false);
             }
         }
 
@@ -985,7 +985,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveObj(ms, null, null, nodeBeingRepliedTo, obj, false, payload.getType(), null, encodedKey);
+            saveObj(as, null, null, nodeBeingRepliedTo, obj, false, payload.getType(), null, encodedKey);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -996,12 +996,12 @@ public class ActPubService extends ServiceBase {
             apLog.trace("not reply to existing Quanta node.");
 
             // get actor's account node from their actorUrl
-            SubNode actorAccountNode = getAcctNodeByActorUrl(ms, null, payload.getActor());
+            SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, payload.getActor());
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
-                SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
+                SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveObj(ms, null, actorAccountNode, postsNode, obj, false, payload.getType(), null, encodedKey);
+                saveObj(as, null, actorAccountNode, postsNode, obj, false, payload.getType(), null, encodedKey);
             }
         }
     }
@@ -1351,7 +1351,8 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public APOPerson generatePersonObj(String userName) {
         return arun.<APOPerson>run(as -> {
-            // we get the usernode without authorizing becasue the APOPerson is guaranteed to only contain public info.
+            // we get the usernode without authorizing becasue the APOPerson is guaranteed to only contain
+            // public info.
             SubNode userNode = read.getUserNodeByUserName(as, userName, false);
             if (ok(userNode)) {
                 return apFactory.generatePersonObj(userNode);

@@ -215,7 +215,7 @@ public class SessionContext extends ServiceBase {
 		setUserName(userName);
 
 		if (no(userNodeId)) {
-			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 			// we found user's node.
 			if (ok(userNode)) {
 				setUserNodeId(userNode.getId());
@@ -307,8 +307,7 @@ public class SessionContext extends ServiceBase {
 								guids.add(sc.getAppGuid());
 							}
 						}
-					} 
-					else if (requireToken) {
+					} else if (requireToken) {
 						if (ok(sc.getUserToken())) {
 							if (!tokens.contains(sc.getUserToken())) {
 								ret.add(sc);

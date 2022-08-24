@@ -148,12 +148,9 @@ public class MongoRead extends ServiceBase {
     }
 
     @PerfMon(category = "read")
-    public long getNodeCount(MongoSession ms) {
-        if (no(ms)) {
-            ms = auth.getAdminSession();
-        }
+    public long getNodeCount() {
         Query q = new Query();
-        Criteria crit = auth.addSecurityCriteria(ms, null);
+        Criteria crit = arun.run(as -> auth.addSecurityCriteria(as, null));
         if (ok(crit)) {
             q.addCriteria(crit);
         }
@@ -1069,10 +1066,6 @@ public class MongoRead extends ServiceBase {
         // character.
         user = convertIfLocalName(user);
 
-        if (no(ms)) {
-            ms = auth.getAdminSession();
-        }
-
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
@@ -1081,7 +1074,6 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-
         Criteria crit = null;
 
         // Note: This one CAN get called before allUsersRootNode is set.
@@ -1100,7 +1092,13 @@ public class MongoRead extends ServiceBase {
 
         ret = mongoUtil.findOne(q);
         if (allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
+            SubNode _ret = ret;
+
+            // we run with 'ms' if it's non-null, or with admin if ms is null
+            arun.run(ms, as -> {
+                auth.auth(as, _ret, PrivilegeType.READ);
+                return null;
+            });
         }
         if (ok(ret)) {
             ThreadLocals.cacheNode(cacheKey, ret);

@@ -231,7 +231,8 @@ public class AclService extends ServiceBase {
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
 		 */
 		else {
-			principalNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
+			String _principal = principal;
+			principalNode = arun.run(as -> read.getUserNodeByUserName(as, _principal));
 			if (no(principalNode)) {
 				if (ok(res)) {
 					res.setMessage("Unknown user name: " + principal);

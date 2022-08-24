@@ -23,7 +23,7 @@ public class AppUserDetailsService extends ServiceBase implements UserDetailsSer
         if (PrincipalName.ADMIN.s().equals(userName)) {
             return new AppUserDetails(userName, prop.getMongoAdminPassword());
         } else {
-            SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+            SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
             if (ok(userNode)) {
                 String pwdHash = userNode.getStr(NodeProp.PWD_HASH);
                 return new AppUserDetails(userName, pwdHash);
