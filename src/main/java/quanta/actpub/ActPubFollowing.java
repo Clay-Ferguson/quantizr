@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APOAccept;
 import quanta.actpub.model.APOActivity;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOFollow;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
@@ -99,11 +100,10 @@ public class ActPubFollowing extends ServiceBase {
                 }
 
                 // #todo-optimization: we can call apub.getUserProperty() to get toInbox right?
-                APObj toActor = apUtil.getActorByUrl(ms, followerUserName, actorUrlOfUserBeingFollowed);
+                APOActor toActor = apUtil.getActorByUrl(ms, followerUserName, actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
-                    String toInbox = apStr(toActor, APObj.inbox);
                     String privateKey = apCrypto.getPrivateKey(ms, followerUserName);
-                    apUtil.securePostEx(toInbox, privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
+                    apUtil.securePostEx(toActor.getInbox(), privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -132,7 +132,7 @@ public class ActPubFollowing extends ServiceBase {
             arun.<APObj>run(as -> {
                 try {
                     // #todo-optimization: we can call apub.getUserProperty() to get followerUserName right?
-                    APObj followerActor = apUtil.getActorByUrl(as, null, activity.getActor());
+                    APOActor followerActor = apUtil.getActorByUrl(as, null, activity.getActor());
                     if (no(followerActor)) {
                         apLog.trace("no followerActor object gettable from actor: " + activity.getActor());
                         return null;
@@ -237,10 +237,9 @@ public class ActPubFollowing extends ServiceBase {
                                 prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
                                 acceptPayload); // object
 
-                        String followerInbox = apStr(followerActor, APObj.inbox);
-                        log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
+                        log.debug("Sending Accept of Follow Request to inbox " + followerActor.getInbox());
 
-                        apUtil.securePostEx(followerInbox, privateKey, _actorBeingFollowedUrl, accept,
+                        apUtil.securePostEx(followerActor.getInbox(), privateKey, _actorBeingFollowedUrl, accept,
                                 APConst.MTYPE_LD_JSON_PROF);
                         log.debug("Secure post completed.");
                     });
@@ -285,12 +284,10 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowing(MongoSession ms, String userDoingAction, APObj actor) {
-
-        String followingUrl = apStr(actor, APObj.following);
-        APObj followings = getFollowing(ms, userDoingAction, followingUrl);
+    public int loadRemoteFollowing(MongoSession ms, String userDoingAction, APOActor actor) {
+        APObj followings = getFollowing(ms, userDoingAction, actor.getFollowing());
         if (no(followings)) {
-            log.debug("Unable to get followings for AP user: " + followingUrl);
+            log.debug("Unable to get followings for AP user: " + actor.getFollowing());
             return 0;
         }
 
@@ -430,12 +427,11 @@ public class ActPubFollowing extends ServiceBase {
             int ret = 0;
             if (ok(actorUrl)) {
                 // #todo-optimization: we can call apub.getUserProperty() to get 'following' prop right?
-                APObj actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
+                APOActor actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
                 if (ok(actor)) {
-                    String followingUrl = apStr(actor, APObj.following);
-                    APObj following = getFollowing(ms, userDoingAction, followingUrl);
+                    APObj following = getFollowing(ms, userDoingAction, actor.getFollowing());
                     if (no(following)) {
-                        log.debug("Unable to get followers for AP user: " + followingUrl);
+                        log.debug("Unable to get followers for AP user: " + actor.getFollowing());
                     }
                     ret = apInt(following, APObj.totalItems);
                 }

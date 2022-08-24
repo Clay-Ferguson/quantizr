@@ -1,6 +1,6 @@
 package quanta.actpub;
 
-import static quanta.actpub.model.AP.apObj;
+import static quanta.actpub.model.AP.apAPObj;
 import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
@@ -18,6 +18,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
@@ -54,12 +55,11 @@ public class ActPubOutbox extends ServiceBase {
      * 
      * Returns true only if everything successful
      */
-    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, Object actor, SubNode userNode, String apUserName) {
+    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode, String apUserName) {
         Val<Boolean> success = new Val<>(true);
         try {
             // try to read outboxUrl first and if we can't we just return false
-            String outboxUrl = apStr(actor, APObj.outbox);
-            APObj outbox = getOutbox(ms, userDoingAction, outboxUrl);
+            APObj outbox = getOutbox(ms, userDoingAction, actor.getOutbox());
             if (no(outbox)) {
                 log.debug("outbox read fail: " + apUserName);
                 return false;
@@ -104,32 +104,32 @@ public class ActPubOutbox extends ServiceBase {
                     // if (ok(obj )) {
                     // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
-
                     String apId = apStr(obj, APObj.id);
 
                     // If this is a new post our server hasn't yet injested.
                     if (!apIdSet.contains(apId)) {
-                        Object object = apObj(obj, APObj.object);
+                        APObj object = apAPObj(obj, APObj.object);
                         if (ok(object)) {
                             String type = apStr(object, APObj.type);
-                            if (object instanceof String) {
-                                // todo-1: handle boosts.
-                                //
-                                // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
-                                // + XString.prettyPrint(obj));
-                                // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                                // {
-                                // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                                // AP.type : "Announce",
-                                // AP.actor : "https://dobbs.town/users/onan",
-                                // AP.published : "2021-01-25T01:20:30Z",
-                                // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                                // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
-                                // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                                // }
-                            }
-                            // todo-0: need to handle "Boosts" and other types here too.
-                            else if (APType.Note.equals(type)) {
+                            // if (object instanceof String) {
+                            //     // todo-1: handle boosts.
+                            //     //
+                            //     // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
+                            //     // + XString.prettyPrint(obj));
+                            //     // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
+                            //     // {
+                            //     // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
+                            //     // AP.type : "Announce",
+                            //     // AP.actor : "https://dobbs.town/users/onan",
+                            //     // AP.published : "2021-01-25T01:20:30Z",
+                            //     // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                            //     // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
+                            //     // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                            //     // }
+                            // }
+                            // // todo-0: need to handle "Boosts" and other types here too.
+                            // else 
+                            if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create, null,

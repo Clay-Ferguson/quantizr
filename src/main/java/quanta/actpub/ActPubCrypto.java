@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
@@ -163,17 +164,17 @@ public class ActPubCrypto extends ServiceBase {
         }
     }
 
-    public String getEncodedPubKeyFromActorObj(Object actorObj) {
-        Object pubKeyObj = apObj(actorObj, APObj.publicKey);
-        if (no(pubKeyObj))
+    public String getEncodedPubKeyFromActorObj(APOActor actorObj) {
+        Object pubKey = apObj(actorObj, APObj.publicKey);
+        if (no(pubKey))
             return null;
 
-        String pkeyEncoded = apStr(pubKeyObj, APObj.publicKeyPem);
-        if (no(pkeyEncoded))
+        String pubKeyPem = apStr(pubKey, APObj.publicKeyPem);
+        if (no(pubKeyPem))
             return null;
 
         // WARNING: This is a REGEX. replaceAll() uses REGEX., we extract out just the data part of the key
-        return pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
+        return pubKeyPem.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
     }
 
     public PublicKey getPubKeyFromActorUrl(String userDoingAction, String actorUrl, Val<String> keyVal) {
@@ -204,7 +205,7 @@ public class ActPubCrypto extends ServiceBase {
                 log.debug("NOTE: actorUrl " + actorUrl + " doesn't have pkey in account node yet");
 
                 // Get ActorObject from actor url.
-                APObj actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
+                APOActor actorObj = apUtil.getActorByUrl(as, userDoingAction, actorUrl);
                 if (no(actorObj)) {
                     log.warn("Unable to load actorUrl: " + actorUrl);
                     return null;
@@ -222,8 +223,8 @@ public class ActPubCrypto extends ServiceBase {
         });
     }
 
-    public PublicKey getPublicKeyFromActor(Object actorObj) {
-        String pkeyEncoded = getEncodedPubKeyFromActorObj(actorObj);
+    public PublicKey getPublicKeyFromActor(APOActor actor) {
+        String pkeyEncoded = getEncodedPubKeyFromActorObj(actor);
         return getPublicKeyFromEncoding(pkeyEncoded);
     }
 

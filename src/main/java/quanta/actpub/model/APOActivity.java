@@ -20,6 +20,8 @@ public class APOActivity extends APObj {
         return apObj(this, APObj.object);
     }
 
+    // todo-0: make this smart enough to return the correct concrete class, based on type, even though we can
+    // leave teh actual return value as APObj....or else have a getPerson(), getNote(), type pattern for that.
     public APObj getAPObj() {
         return apAPObj(this, APObj.object);
     }

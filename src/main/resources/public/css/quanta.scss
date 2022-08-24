@@ -1674,8 +1674,9 @@ i'm backing out for now
 .boost-row {
     border: 2px solid gray;
     border-radius: $border-radius;
-    margin-left: 40px;
-    padding-top: 8px;
+    margin-left: $tinyGap;
+    padding-right: $tinyGap;
+    padding-top: $tinyGap;
     background-color: #17202A;
 }
 
@@ -2212,6 +2213,7 @@ audio::-webkit-media-controls-play-button {
 .openGraphTitle {
     font-size: 130%;
     margin-bottom: 8px;
+    margin-right: 1rem;
     cursor: pointer;
     text-decoration: none;
 }

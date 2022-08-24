@@ -5,8 +5,9 @@ import quanta.actpub.APConst;
 /**
  * Person object
  */
-public class APOPerson extends APObj {
+public class APOPerson extends APOActor {
     public APOPerson() {
+        super();
         put(APObj.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(APConst.CONTEXT_SECURITY));

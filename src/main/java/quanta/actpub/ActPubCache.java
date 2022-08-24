@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
@@ -27,7 +28,7 @@ public class ActPubCache extends ServiceBase {
     public final ConcurrentHashMap<String, Boolean> allUserNames = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by UserName in memory only for now */
-    public final ConcurrentHashMap<String, APObj> actorsByUserName = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, APOActor> actorsByUserName = new ConcurrentHashMap<>();
 
     /* Cache Actor URLS by UserName in memory only for now */
     public final ConcurrentHashMap<String, String> actorUrlsByUserName = new ConcurrentHashMap<>();
@@ -36,7 +37,7 @@ public class ActPubCache extends ServiceBase {
     public final ConcurrentHashMap<String, String> inboxesByUserName = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by URL in memory only for now */
-    public final ConcurrentHashMap<String, APObj> actorsByUrl = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, APOActor> actorsByUrl = new ConcurrentHashMap<>();
 
     /* Cache of user account node Ids by actor url */
     public final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<>();

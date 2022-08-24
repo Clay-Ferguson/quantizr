@@ -30,10 +30,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import quanta.AppController;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAccept;
 import quanta.actpub.model.APOActivity;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APODelete;
 import quanta.actpub.model.APOLike;
@@ -435,7 +435,7 @@ public class ActPubService extends ServiceBase {
                 return toActorUrl;
             }
 
-            APObj toActorObj = apUtil.getActorByUrl(ms, userDoingAction, toActorUrl);
+            APOActor toActorObj = apUtil.getActorByUrl(ms, userDoingAction, toActorUrl);
             if (ok(toActorObj)) {
                 // log.debug(" actor: " + toActorUrl);
                 val = apStr(toActorObj, apProp);
@@ -529,7 +529,7 @@ public class ActPubService extends ServiceBase {
 
         if (no(acctNode) && allowImport) {
             /* First try to get a cached actor APObj */
-            APObj actor = apCache.actorsByUserName.get(apUserName);
+            APOActor actor = apCache.actorsByUserName.get(apUserName);
 
             // if we have actor object skip the step of getting it and import using it.
             if (ok(actor)) {
@@ -581,7 +581,7 @@ public class ActPubService extends ServiceBase {
             return acctNode;
         }
 
-        APObj actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
+        APOActor actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (ok(actor)) {
@@ -601,7 +601,7 @@ public class ActPubService extends ServiceBase {
      * used.
      */
     @PerfMon(category = "apub")
-    public SubNode importActor(MongoSession ms, SubNode userNode, Object actor) {
+    public SubNode importActor(MongoSession ms, SubNode userNode, APOActor actor) {
 
         // if userNode unknown then get and/or create one. May be creating a brand new one even.
         if (no(userNode)) {
@@ -758,11 +758,13 @@ public class ActPubService extends ServiceBase {
 
             switch (object.getType()) {
                 case APType.Note:
+                    // todo-0: get rid of Create or Update, and just decide WHICH
+                    // it is before calling a method like this??? maybe.
                     processCreateOrUpdateNote(ms, activity, keyEncoded.getVal());
                     break;
 
                 case APType.Person:
-                    processUpdatePerson(ms, activity, keyEncoded.getVal());
+                    processUpdatePerson(ms, new APOActor(object), keyEncoded.getVal());
                     break;
 
                 default:
@@ -913,15 +915,13 @@ public class ActPubService extends ServiceBase {
     }
 
     @PerfMon(category = "apub")
-    public void processUpdatePerson(MongoSession ms, APOActivity payload, String encodedKey) {
+    public void processUpdatePerson(MongoSession ms, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
 
-        APObj obj = payload.getAPObj();
-        String actorId = obj.getId();
         MongoSession as = auth.getAdminSession();
-        SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
+        SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
         if (no(actorAccnt)) {
-            log.debug("user not found: " + actorId);
+            log.debug("user not found: " + actor.getId());
             return;
         }
         log.debug("got Actor: " + actorAccnt.getIdStr());
@@ -941,7 +941,7 @@ public class ActPubService extends ServiceBase {
         }
 
         // and finally if we reach here, put all the properties onto the SubNode and save it.
-        if (apUtil.updateNodeFromActorObject(actorAccnt, obj)) {
+        if (apUtil.updateNodeFromActorObject(actorAccnt, actor)) {
             update.save(as, actorAccnt, false);
             log.debug("Updated Person from ActPub: NodeId=" + actorAccnt.getIdStr());
         }
@@ -1019,18 +1019,16 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create, APType.Update, or APType.Announce
      */
     @PerfMon(category = "apub")
-    // todo-0: can we pass a typed object instead of 'Object' to this
-    public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, Object obj,
+    public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, APObj obj,
             boolean forcePublic, String action, String boostTargetId, String encodedKey) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
-        String id = apStr(obj, APObj.id);
 
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
          * 
          * note: partial index "unique-apid", is what makes this lookup fast.
          */
-        SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
+        SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), obj.getId());
 
         if (ok(dupNode)) {
             // If we found this node by ID and we aren't going to be updating it, return it as is.
@@ -1053,7 +1051,6 @@ public class ActPubService extends ServiceBase {
         String contentHtml = APType.Announce.equals(action) ? "" : apStr(obj, APObj.content);
         String objUrl = apStr(obj, APObj.url);
         String objAttributedTo = apStr(obj, APObj.attributedTo);
-        String objType = apStr(obj, APObj.type);
         Boolean sensitive = apBool(obj, APObj.sensitive);
         Object tagArray = apList(obj, APObj.tag, false);
 
@@ -1154,10 +1151,10 @@ public class ActPubService extends ServiceBase {
             newNode.set(NodeProp.ACT_PUB_SENSITIVE, "y");
         }
 
-        newNode.set(NodeProp.ACT_PUB_ID, id);
+        newNode.set(NodeProp.ACT_PUB_ID, obj.getId());
         newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
         newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, inReplyTo);
-        newNode.set(NodeProp.ACT_PUB_OBJ_TYPE, objType);
+        newNode.set(NodeProp.ACT_PUB_OBJ_TYPE, obj.getType());
         newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, objAttributedTo);
 
         if (ok(boostTargetId)) {
@@ -1547,7 +1544,7 @@ public class ActPubService extends ServiceBase {
 
                     try {
                         if (ok(url)) {
-                            APObj actor = apUtil.getJson(ms, null, url, APConst.MTYPE_ACT_JSON);
+                            APOActor actor = apUtil.getActor(ms, null, url);
 
                             if (ok(actor)) {
                                 // we could double check userName, and bail if wrong, but this is not needed.
@@ -1592,7 +1589,7 @@ public class ActPubService extends ServiceBase {
             }
 
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-            APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
+            APOActor actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
             if (ok(actor)) {
                 // if their outbox fails just, stop processing and don't bother trying to get followers or
                 // following,.

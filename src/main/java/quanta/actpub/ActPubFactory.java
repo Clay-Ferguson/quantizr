@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APODelete;
@@ -168,9 +169,11 @@ public class ActPubFactory extends ServiceBase {
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
 			 * attributedTo)
 			 */
-			APObj fromActorObj = apUtil.getActorByUrl(auth.getAdminSession(), userDoingAction, fromActor);
+			// todo-0: just using AdminSession isn't enough. It needs to be wrapped in 
+			// arun.run so the threadlocals are correct.
+			APOActor fromActorObj = apUtil.getActorByUrl(auth.getAdminSession(), userDoingAction, fromActor);
 			if (ok(fromActorObj)) {
-				ccActors.add(apStr(fromActorObj, APObj.followers));
+				ccActors.add(fromActorObj.getFollowers());
 			}
 		}
 

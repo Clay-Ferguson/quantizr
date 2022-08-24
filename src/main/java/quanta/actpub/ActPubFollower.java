@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
@@ -52,12 +53,11 @@ public class ActPubFollower extends ServiceBase {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowers(MongoSession ms, String userMakingRequest, APObj actor) {
+    public int loadRemoteFollowers(MongoSession ms, String userMakingRequest, APOActor actor) {
 
-        String followersUrl = apStr(actor, APObj.followers);
-        APObj followers = getRemoteFollowers(ms, userMakingRequest, followersUrl);
+        APObj followers = getRemoteFollowers(ms, userMakingRequest, actor.getFollowers());
         if (no(followers)) {
-            log.debug("Unable to get followers for AP user: " + followersUrl);
+            log.debug("Unable to get followers for AP user: " + actor.getFollowers());
             return 0;
         }
 
@@ -216,7 +216,7 @@ public class ActPubFollower extends ServiceBase {
             int ret = 0;
             if (ok(actorUrl)) {
                 // #todo-optimization: we can call apub.getUserProperty() to get followersUrl right?
-                APObj actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
+                APOActor actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
                 if (ok(actor)) {
                     String followersUrl = apStr(actor, APObj.followers);
                     APObj followers = getRemoteFollowers(ms, userMakingRequest, followersUrl);

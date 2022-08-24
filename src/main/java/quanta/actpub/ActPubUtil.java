@@ -36,6 +36,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.AP;
+import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOWebFinger;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -312,20 +313,20 @@ public class ActPubUtil extends ServiceBase {
      * ...so we can definitely do a little optimization here around this
      */
     @PerfMon(category = "apUtil")
-    public APObj getActorByUrl(MongoSession ms, String userDoingAction, String url) {
+    public APOActor getActorByUrl(MongoSession ms, String userDoingAction, String url) {
         if (no(url))
             return null;
 
         apub.saveFediverseName(url);
 
         // first try to return from cache.
-        APObj actor = apCache.actorsByUrl.get(url);
+        APOActor actor = apCache.actorsByUrl.get(url);
         if (ok(actor)) {
             return actor;
         }
 
         try {
-            actor = apUtil.getJson(ms, userDoingAction, url, APConst.MTYPE_ACT_JSON);
+            actor = apUtil.getActor(ms, userDoingAction, url);
         } catch (Exception e) {
             log.error("Unable to get actor from url: " + url);
         }
@@ -499,7 +500,7 @@ public class ActPubUtil extends ServiceBase {
             return longUserName;
         }
 
-        APObj actor = getActorByUrl(ms, userDoingAction, actorUrl);
+        APOActor actor = getActorByUrl(ms, userDoingAction, actorUrl);
         if (no(actor)) {
             return null;
         }
@@ -512,11 +513,9 @@ public class ActPubUtil extends ServiceBase {
      * Uses the 'preferredUsername' in the 'actor' object to build the long name of the user like
      * preferredUserName@host.com
      */
-    public String getLongUserNameFromActor(Object actor) {
-        String shortUserName = apStr(actor, APObj.preferredUsername); // short name like 'alice'
-        String inbox = apStr(actor, APObj.inbox);
+    public String getLongUserNameFromActor(APOActor actor) {
         try {
-            URL url = new URL(inbox);
+            URL url = new URL(actor.getInbox());
             String host = url.getHost();
 
             // get port number (normally not set and thus '-1')
@@ -531,7 +530,7 @@ public class ActPubUtil extends ServiceBase {
             }
 
             // log.debug("long user name: " + shortUserName + "@" + host);
-            return shortUserName + "@" + host;
+            return actor.getPreferredUsername() + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
         }
@@ -964,9 +963,15 @@ public class ActPubUtil extends ServiceBase {
      * Updates all the ActPub properties from actor object onto the node, and returns true only of
      * something was indeed changed so that the DB will only get updated if something DID change
      */
-    public boolean updateNodeFromActorObject(SubNode node, Object actor) {
+    public boolean updateNodeFromActorObject(SubNode node, APOActor actor) {
         boolean changed = false;
         Object icon = apObj(actor, APObj.icon);
+
+        // todo-0: need to also support icon being an array here, to be compatable with spec:
+        // "icon": [
+        //     "https://kenzoishii.example.com/image/165987aklre4"
+        // ]
+
         if (ok(icon)) {
             String iconUrl = apStr(icon, APObj.url);
             if (ok(iconUrl)) {
@@ -1020,12 +1025,10 @@ public class ActPubUtil extends ServiceBase {
         if (node.set(NodeProp.ACT_PUB_ACTOR_ID, actorId))
             changed = true;
 
-        String inbox = apStr(actor, APObj.inbox);
-
         // update cache just because we can
-        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), inbox);
+        apCache.inboxesByUserName.put(node.getStr(NodeProp.USER), actor.getInbox());
 
-        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, inbox))
+        if (node.set(NodeProp.ACT_PUB_ACTOR_INBOX, actor.getInbox()))
             changed = true;
 
         // this is the URL of the HTML of the actor.
@@ -1040,5 +1043,11 @@ public class ActPubUtil extends ServiceBase {
             changed = true;
 
         return changed;
+    }
+
+    public APOActor getActor(MongoSession ms, String userDoingGet, String url) {
+        // todo-0: can't we unmarshal DIRECTLY into the APOActor type?
+        APObj actor = apUtil.getJson(ms, userDoingGet, url, APConst.MTYPE_ACT_JSON);
+        return new APOActor(actor);
     }
 }
