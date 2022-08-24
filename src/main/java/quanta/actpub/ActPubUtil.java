@@ -85,7 +85,7 @@ public class ActPubUtil extends ServiceBase {
 
     public APObj buildObj(byte[] bytes) {
         try {
-            APObj payload = ActPubUtil.mapper.readValue(bytes, new TypeReference<>() {});
+            APObj payload = ActPubUtil.mapper.readValue(bytes, APObj.class);
             return AP.typeFromFactory(payload);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -185,9 +185,6 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Does the get with userDoingGet if exists, or else falls back to either the supplied ms, or the
      * admin ms.
-     * 
-     * todo-0: create a version of this method that doesn't have MediaType and assumes some default, to
-     * wrap call to this.
      */
     public APObj getJson(MongoSession ms, Class<?> clazz, String userDoingGet, String url, MediaType mediaType) {
 
@@ -255,11 +252,9 @@ public class ActPubUtil extends ServiceBase {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             if (ok(response)) {
                 responseCode = response.getStatusCodeValue();
-                // if (ok(clazz)) {
+                // DO NOT DELETE: Example of how to query with completely unknown class.
+                //    mapper.readValue(response.getBody(), new TypeReference<>() {});
                 ret = (APObj) mapper.readValue(response.getBody(), clazz);
-                // } else {
-                // ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
-                // }
             }
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (HttpClientErrorException.Gone goneEx) {

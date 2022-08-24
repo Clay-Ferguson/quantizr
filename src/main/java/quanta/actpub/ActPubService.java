@@ -701,7 +701,7 @@ public class ActPubService extends ServiceBase {
                 break;
 
             default:
-                log.debug("Unsupported type:" + XString.prettyPrint(payload));
+                log.debug("Unsupported inbox type:" + XString.prettyPrint(payload));
                 break;
         }
     }
@@ -952,11 +952,11 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create or APType.Update
      */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateNote(MongoSession as, APOActivity payload, String encodedKey) {
+    public void processCreateOrUpdateNote(MongoSession as, APOActivity activity, String encodedKey) {
         if (!as.isAdmin())
             throw new NodeAuthFailedException();
         apLog.trace("processCreateOrUpdateNote");
-        APObj obj = payload.getAPObj();
+        APObj obj = activity.getAPObj();
 
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
@@ -986,7 +986,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveObj(as, null, null, nodeBeingRepliedTo, obj, false, payload.getType(), null, encodedKey);
+            saveObj(as, null, null, nodeBeingRepliedTo, obj, false, activity.getType(), null, encodedKey);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -997,12 +997,12 @@ public class ActPubService extends ServiceBase {
             apLog.trace("not reply to existing Quanta node.");
 
             // get actor's account node from their actorUrl
-            SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, payload.getActor());
+            SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveObj(as, null, actorAccountNode, postsNode, obj, false, payload.getType(), null, encodedKey);
+                saveObj(as, null, actorAccountNode, postsNode, obj, false, activity.getType(), null, encodedKey);
             }
         }
     }

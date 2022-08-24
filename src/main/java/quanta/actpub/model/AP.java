@@ -240,7 +240,7 @@ public class AP {
                 return new APONote();
 
             default:
-                log.debug("Unsupported type: " + XString.prettyPrint(obj));
+                // log.debug("using APObj for type: " + obj.getType());
                 break;
         }
         return ret;
