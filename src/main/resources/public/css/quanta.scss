@@ -1427,9 +1427,9 @@ Will come back later and study this more. todo-1 */
 }
 
 @keyframes fadeToHidden {
-    from {
-        opacity: 1;
-    }
+    // from {
+    //     opacity: 1;
+    // }
 
     to {
         opacity: 0;
@@ -1437,31 +1437,38 @@ Will come back later and study this more. todo-1 */
 }
 
 .compHidden {
-    //visibility: hidden;
+    visibility: hidden;
 
     // animating the hiding part doesn't work well, because the effect gets interrupted by other parts of 
     // our animation flow, so we have to set to hidden instantly without animation.
     // animation-name: fadeToHidden;
-    // animation-duration: 1s;
+    // animation-duration: .2s;
+    // opacity: 0;
 
-    opacity: 0;
+    margin-bottom: 20px;
 }
 
 /* Note: visibility is not allowed to be animated. This is a rule of CSS engines, not our own limitation. Also we don't set the 
 'from' value becasue if it's already visibible 'opacity=1' we don't want to cause a screen flicker by setting invisible first for no reason.
 */
 @keyframes fadeToVisible {
-
-    // from {opacity: 0;}
+    from {
+        opacity: hidden;
+    }
     to {
-        opacity: 1;
+        visibility: visible;
     }
 }
 
 .compVisible {
-    // visibility: visible;
-    animation-name: fadeToVisible;
-    animation-duration: .5s;
+    visibility: visible;
+
+    // this was an experiment, an may not even have been desirable
+    // so for now we just set to visible instantly which is better
+    // performance anyway, and may not be any less eye-strain
+    // than I had thought this animation might solve.
+    // animation-name: fadeToVisible;
+    // animation-duration: 1s; <-------this didn't work. Comes back to visible instantly (no amination).
     margin-bottom: 20px;
 }
 
