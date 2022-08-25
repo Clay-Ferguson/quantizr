@@ -23,6 +23,7 @@ export class EmojiPickerDlg extends DialogBase {
             },
             getValue: (): string => this.getState<LS>().selectedEmoji
         };
+        this.mergeState<LS>({ selectedEmoji: null });
     }
 
     renderDlg(): CompIntf[] {

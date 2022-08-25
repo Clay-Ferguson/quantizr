@@ -37,10 +37,18 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.valState.setError(error);
     }
 
-    insertTextAtCursor = (text: string) => {
+    getSelStart = (): number => {
+        return this.input.getRef() ? (this.input.getRef() as any).selectionStart : -1;
+    }
+
+    /* if pos is passed in we use it for the selection pos, or else use the live actual pos of the input */
+    insertTextAtCursor = (text: string, pos: number = -1) => {
         this.input?.onMount((elm: any) => {
-            if (elm.selectionStart >= 0) {
-                this.setValue(S.util.insertString(this.getValue(), text, elm.selectionStart));
+            if (pos === -1) {
+                pos = elm.selectionStart;
+            }
+            if (pos >= 0) {
+                this.setValue(S.util.insertString(this.getValue(), text, pos));
             }
         });
     }

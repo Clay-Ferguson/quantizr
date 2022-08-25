@@ -28,14 +28,14 @@ export class SharingDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         const isPublic = S.props.isPublic(this.node);
         const state: LS = this.getState<LS>();
+        const numShares: number = state.nodePrivsInfo?.aclEntries?.length;
 
         return [
             new Div(null, null, [
-                new Div("Note: All usernames mentioned in the content text will also be automatically added to this sharing list when you save the node, " +
-                    "so you don't need to add users here if they're mentioned when you save.", { className: "marginBottom" }),
+                numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
                 new EditPrivsTable((allowAppends: boolean) => {
                     this.shareNodeToPublic(allowAppends);
-                }, this.getState<LS>().nodePrivsInfo, this.removePrivilege),
+                }, state.nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges

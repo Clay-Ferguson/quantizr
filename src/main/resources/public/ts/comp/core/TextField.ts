@@ -52,6 +52,10 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         this.onMount(() => this.input?.focus());
     }
 
+    getSelStart = (): number => {
+        return this.input.getRef() ? (this.input.getRef() as any).selectionStart : -1;
+    }
+
     insertTextAtCursor(text: string) {
     }
 

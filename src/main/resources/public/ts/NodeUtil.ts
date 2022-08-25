@@ -1,6 +1,7 @@
 import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
+import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
@@ -295,12 +296,19 @@ export class NodeUtil {
 
         const ret: Comp[] = [];
         if (S.props.isPublic(node)) {
-            ret.push(new Span("Public" + this.getPublicPrivilegesDisplay(node),
-                {
-                    title: "Shared to Public (Everyone)",
+            ret.push(
+                new Span(null, {
+                    title: "Shared to Public (Everyone)\n\nClick to remove Public Sharing",
                     className: "sharingNamePublic marginLeftIfNotFirst",
                     onClick: () => this.removePublicShare(node, editorDlg)
-                }));
+                }, [
+                    new Icon({
+                        className: "fa fa-globe fa-lg microMarginRight",
+                        title: "Node is Public"
+                    }),
+                    new Span("Public" + this.getPublicPrivilegesDisplay(node))
+                ])
+            );
         }
 
         let showMore = "";

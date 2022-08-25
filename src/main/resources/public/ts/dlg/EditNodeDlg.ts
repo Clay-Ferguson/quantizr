@@ -213,15 +213,14 @@ export class EditNodeDlg extends DialogBase {
                     onClick: this.openChangeNodeTypeDlg
                 }));
             }
+            if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
+                span = span || new Span();
+                span.addChild(new Icon({
+                    title: "Node has a 'Date' property.",
+                    className: "fa fa-calendar fa-lg iconMarginRight"
+                }));
+            }
             span.addChild(new Span(typeHandler.getName(), { className: "marginRight" }));
-        }
-
-        if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
-            span = span || new Span();
-            span.addChild(new Icon({
-                title: "Node has a 'Date' property.",
-                className: "fa fa-calendar fa-lg iconMarginRight"
-            }));
         }
 
         if (this.showJumpButton) {
@@ -355,7 +354,7 @@ export class EditNodeDlg extends DialogBase {
             }, [
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
-                !isPublic ? new IconButton("fa-globe", "Add Public", { onClick: () => { this.makePublic(state, true); } }, "btn-secondary marginLeft") : null
+                !isPublic ? new Button("Make Public", () => { this.makePublic(state, true); }, { className: "marginLeft" }) : null
                 // #unpublish-disabled
                 // unpublishedStr ? new Icon({
                 //     className: "fa fa-eye-slash fa-lg marginLeft"
@@ -394,7 +393,7 @@ export class EditNodeDlg extends DialogBase {
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "marginRight", "", "", "div") : null;
+            }, EditNodeDlg.morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
         const morePanel = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel
@@ -647,12 +646,12 @@ export class EditNodeDlg extends DialogBase {
             new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
-            allowUpload ? new IconButton("fa-upload", null, {
+            allowUpload ? new IconButton("fa-paperclip", "Attach", {
                 onClick: () => this.utl.upload(null, this),
                 title: "Upload file attachment"
             }) : null,
 
-            allowShare ? new IconButton("fa-share-alt", null, {
+            allowShare ? new IconButton("fa-share-alt", "Share", {
                 onClick: () => this.utl.share(this),
                 title: "Share Node"
             }) : null,
@@ -672,29 +671,9 @@ export class EditNodeDlg extends DialogBase {
                     this.close();
                 }) : null,
 
-            advancedButtons ? new IconButton((S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone"), null, {
-                title: "Toggle on/off Speech Recognition to input text",
-                onClick: () => this.utl.speechRecognition(this)
-            }) : null,
-
-            advancedButtons ? new IconButton("fa-clock-o", null, {
-                title: "Insert current time at cursor",
-                onClick: () => this.utl.insertTime(this)
-            }) : null,
-
             advancedButtons && !datePropExists ? new IconButton("fa-calendar", null, {
-                title: "Add 'date' property to node (makes Calendar entry)",
+                title: "Add 'date' property to node\n\nMakes node a Calendar Entry)",
                 onClick: () => this.utl.addDateProperty(this)
-            }) : null,
-
-            advancedButtons ? new IconButton("fa-user", null, {
-                title: "Insert username/mention at cursor",
-                onClick: () => this.utl.insertMention(this)
-            }) : null,
-
-            advancedButtons ? new IconButton("fa-smile-o", null, {
-                title: "Insert emoji at cursor",
-                onClick: () => this.utl.insertEmoji(this)
             }) : null,
 
             this.editorHelp ? new HelpButton(() => this.editorHelp) : null
@@ -824,7 +803,7 @@ export class EditNodeDlg extends DialogBase {
 
     makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
         const value = node.content || "";
-        const editItems = [];
+        const editItems: Comp[] = [];
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
@@ -864,7 +843,33 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor.focus();
         }
 
+        editItems.push(new ButtonBar([
+            new Icon({
+                className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-microphone editorIcon"),
+                title: "Toggle on/off Speech Recognition to input text",
+                onClick: () => this.utl.speechRecognition(this)
+            }),
+
+            new Icon({
+                className: "fa fa-lg fa-clock-o editorIcon",
+                title: "Insert current time at cursor",
+                onClick: () => this.utl.insertTime(this)
+            }),
+
+            new Icon({
+                className: "fa fa-lg fa-user editorIcon",
+                title: "Insert username/mention at cursor",
+                onClick: () => this.utl.insertMention(this)
+            }),
+
+            new Icon({
+                className: "fa fa-lg fa-smile-o editorIcon",
+                title: "Insert emoji at cursor",
+                onClick: () => this.utl.insertEmoji(this)
+            })
+        ], "float-end microMarginBottom"));
         editItems.push(this.contentEditor as any as Comp);
+
         return new Div(null, null, editItems);
     }
 }

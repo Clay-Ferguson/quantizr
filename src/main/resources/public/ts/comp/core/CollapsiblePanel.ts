@@ -34,7 +34,7 @@ export class CollapsiblePanel extends Comp {
 
     compRender = (): ReactNode => {
         const state = this.getState<LS>();
-        const style = this.textLink ? "collapse-panel-link" : "btn btn-secondary ";
+        const style = this.textLink ? "collapse-panel-link" : "btn btn-primary ";
         const collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,

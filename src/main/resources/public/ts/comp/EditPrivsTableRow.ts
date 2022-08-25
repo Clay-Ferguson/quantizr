@@ -1,13 +1,13 @@
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Heading } from "../comp/core/Heading";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Checkbox } from "./core/Checkbox";
+import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
@@ -62,7 +62,11 @@ export class EditPrivsTableRow extends ListBoxRow {
             new Div(null, { className: "microMarginAll" }, [
                 this.renderAclPrivileges(this.aclEntry),
                 img,
-                isPublic ? new Heading(5, "Public")
+                isPublic ? new Icon({
+                    className: "fa fa-globe fa-lg marginAll",
+                    title: "Node is Public"
+                }) : null,
+                isPublic ? new Span("Public (Everyone)", { className: "largeFont bigMarginRight" })
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),
                         onClick: () => {

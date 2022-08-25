@@ -640,7 +640,7 @@ strong em {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
     border-radius: $border-radius;
-    padding: 10px;
+    padding: 14px;
     width: 100%;
     margin-bottom: 10px;
     margin-top: 12px;
@@ -650,7 +650,7 @@ strong em {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
     margin: $smallGap auto;
-    padding: 8px 16px 16px 16px;
+    padding: 14px;
     width: 75%;
     max-width: 800px;
     border-radius: $border-radius;
@@ -962,6 +962,10 @@ Will come back later and study this more. todo-1 */
 
 .microMarginBottom {
     margin-bottom: $microGap;
+}
+
+.microMarginRight {
+    margin-right: $microGap;
 }
 
 .marginTop {
@@ -1881,6 +1885,15 @@ i'm backing out for now
 }
 
 .mobileRHSPanel {
+    font-size: 140%;
+}
+
+.editorIcon {
+    margin-left: $smallGap;
+    cursor: pointer;
+}
+
+.largeFont {
     font-size: 140%;
 }
 

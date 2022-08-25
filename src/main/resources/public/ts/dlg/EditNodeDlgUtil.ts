@@ -446,19 +446,26 @@ an upload has been added or removed. */
 
     insertMention = async (dlg: EditNodeDlg) => {
         if (!dlg.contentEditor) return;
+
+        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
+        // loose the cursor position.
+        const selStart = dlg.contentEditor.getSelStart();
         const friendDlg: FriendsDlg = new FriendsDlg(null, true);
         await friendDlg.open();
         if (friendDlg.getState().selectedName) {
-            dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
+            dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ", selStart);
         }
     }
 
     insertEmoji = async (dlg: EditNodeDlg) => {
         if (!dlg.contentEditor) return;
+        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
+        // loose the cursor position.
+        const selStart = dlg.contentEditor.getSelStart();
         const emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
         await emojiDlg.open();
         if (emojiDlg.getState().selectedEmoji) {
-            dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);
+            dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji, selStart);
         }
     }
 

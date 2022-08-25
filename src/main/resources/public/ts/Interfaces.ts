@@ -32,7 +32,8 @@ export class AdSegment {
 export interface TextEditorIntf {
     setWordWrap(wordWrap: boolean): void;
     setMode(mode: string): void;
-    insertTextAtCursor(text: string): void;
+    insertTextAtCursor(text: string, pos?: number): void;
+    getSelStart(): number;
     getValue(): string;
     setValue(val: string): void;
     focus(): void;
