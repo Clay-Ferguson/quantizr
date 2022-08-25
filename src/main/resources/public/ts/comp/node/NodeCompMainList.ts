@@ -78,21 +78,20 @@ export class NodeCompMainList extends Div {
                          and these conditions will always apply about control if we want to grow page or not. */
                         const state = getAppState();
 
-                        // Make sure this button has existed for 3 seconds at least before allowing it to trigger a growPage, becasue
-                        // if it renders as visible without the user scrolling to it that would be bad by triggering a grow
-                        // in an awkward way.
                         if (!state.editNode) {
                             entries.forEach((entry: any) => {
                                 if (entry.isIntersecting) {
                                     // if this button comes into visibility within 2 seconds of it being created
                                     // that means it was rendered visible without user scrolling so in this case
                                     // we want to disallow the auto loading
-                                    const curTime = new Date().getTime();
-                                    if (curTime - buttonCreateTime < 3000) {
+                                    if (new Date().getTime() - buttonCreateTime < 2000) {
                                         observer.disconnect();
-                                        return;
                                     }
-                                    S.view.growPage(state);
+                                    // otherwise the 'more' button came into view because the user had to have
+                                    // scrolled to it, so we scroll in the new nodes to display (infinite scrolling)
+                                    else {
+                                        S.view.growPage(state);
+                                    }
                                 }
                             });
                         }

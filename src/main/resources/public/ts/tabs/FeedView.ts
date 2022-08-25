@@ -223,14 +223,13 @@ export class FeedView extends AppTab<FeedViewProps> {
                                         // if this button comes into visibility within 2 seconds of it being created
                                         // that means it was rendered visible without user scrolling so in this case
                                         // we want to disallow the auto loading
-                                        const curTime: number = new Date().getTime();
-                                        if (curTime - buttonCreateTime < 3000) {
+                                        if (new Date().getTime() - buttonCreateTime < 2000) {
                                             observer.disconnect();
-                                            return;
                                         }
-
-                                        // console.log("Loading more...");
-                                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
+                                        else {
+                                            // console.log("Loading more...");
+                                            S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
+                                        }
                                     }
                                 });
                             });
