@@ -26,12 +26,6 @@ import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
-export function imageErrorFunc(evt: any) {
-    evt.target.hidden = true;
-    evt.target.onerror = null;
-    return true;
-}
-
 export class Render {
     private debug: boolean = false;
     private markedRenderer: any = null;
@@ -692,9 +686,6 @@ export class Render {
         return new Img(key, {
             src,
             className: "avatarImage",
-            // I haven't yet proven that this onError wasn't contributing to a page flicker bug but am suspicious
-            // and since this is not that important, i'm removing until I have an abundane of time to retest.
-            onError: imageErrorFunc,
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 

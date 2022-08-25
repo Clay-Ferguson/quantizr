@@ -6,7 +6,6 @@ import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
-import { imageErrorFunc } from "../Render";
 import { S } from "../Singletons";
 import { HorizontalLayout } from "./core/HorizontalLayout";
 import { Html } from "./core/Html";
@@ -158,8 +157,7 @@ export class OpenGraphPanel extends Div {
                 imgAndDesc = new Div(null, null, [
                     new Img(null, {
                         className: "openGraphImageVert",
-                        src: state.og.image,
-                        onError: imageErrorFunc
+                        src: state.og.image
                     }),
                     new Div(state.og.description)
                 ]);
