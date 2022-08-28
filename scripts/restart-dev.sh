@@ -1,6 +1,7 @@
 #!/bin/bash
-# This script is for recompiling just the Java files, and then restarting the test servers,
-# as fast as possible without doing a full build. Note that our dev project is setup to read
+
+# This script is for recompiling just the Java files, and then restarting the already running dev server
+# as fast as possible without doing a full build (only a compile). Note that our dev project is setup to read
 # java class files directly from disk, so we don't even need to really do an actual build, and
 # we can get away with just compiling the new classes, and then restarting docker!
 # This makes for a very rapid development cycle (edit->test->edit->test, etc.)
@@ -27,12 +28,6 @@ sudo rm -rf ${QUANTA_BASE}/log/*
 # load right from /src/mai/resouces which is the spring default location.)
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
 
-docker-compose -f ${dc_app_yaml} restart quanta-dev
+docker service update --force quanta-stack-dev_quanta-dev
 
-# This is another way, but slower. Not needed.
-# dockerDown ${dc_app_yaml} quanta-dev
-# sudo rm -rf ${QUANTA_BASE}/log/*
-# dockerBuild
-# dockerUp
-
-verifySuccess "Docker Restart"
+verifySuccess "Docker Service Update"

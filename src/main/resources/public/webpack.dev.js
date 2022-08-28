@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const { merge } = require("webpack-merge");
 const common = require("./webpack.common.js");
 
-// todo-2: need a way to export this out of common
+// todo-2: need to export this out of common
 function formatDate(date) {
     var hours = date.getHours();
     var minutes = date.getMinutes();

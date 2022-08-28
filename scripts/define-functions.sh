@@ -11,96 +11,118 @@ verifySuccess () {
 }
 export -f verifySuccess
 
-dockerCheck () {
-    if docker ps | grep $1; then
-        echo "$1 started ok"
+serviceCheck () {
+    if docker service inspect $1 | grep $1; then
+        echo "service $1 started ok"
     else
-        read -p "$1 failed to start"
+        # if this fails can that mean you just didn't give docker enough time? So maybe it was in process of starting?
+        read -p "service $1 failed to start"
     fi
 }
-export -f dockerCheck
+export -f serviceCheck
+
+imageCheck () {
+    if docker image ls | grep $1; then
+        echo "image $1 exists"
+    else
+        # if this fails can that mean you just didn't give docker enough time? So maybe it was in process of starting?
+        read -p "image $1 does not exist"
+    fi
+}
+export -f imageCheck
 
 ipfsConfig () {
+    echo "Oops. Not converted so Swarm mode yet"
+    return
+
     # This sleeping is required to be sure ipfs is started and not 'repo locked'
     echo "Sleeping a few seconds before accessing ipfs"
     sleep 20s
 
     # todo-1: I'm pretty sure maybe only the API headers need to be set and not Gateway, but haven't confirmed yet
     # (Also there's probably a way to do this inside an actual config text file, rather than on command line)
-    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
 
-    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
 
     echo "Sleeping again before restarting ipfs"
     sleep 10s
-    docker-compose -f ${dc_app_yaml} restart $1
+
+    # todo-0: what is swarm equivalent of this?
+    docker-compose -f ${dc_yaml} restart $1
 }
 export -f ipfsConfig
 
 dockerBuild () {
     echo "dockerBuild: app"
-
-    docker-compose -f ${dc_app_yaml} build --no-cache \
-        --build-arg PORT="${PORT}" \
-        --build-arg PORT_DEBUG="${PORT_DEBUG}" \
-        --build-arg PORT_SEC="${PORT_SEC}" \
-        --build-arg XMS="${XMS}" \
-        --build-arg XMX="${XMX}" \
-        --build-arg JAR_FILE="${JAR_FILE}"
-
+    docker-compose -f ${dc_yaml} build
     verifySuccess "Docker Compose: build app"
 }
 export -f dockerBuild
 
-dockerUp () {
-    # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
-    # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-    # https://stackoverflow.com/questions/35231362/dockerfile-and-dc-not-updating-with-new-instructions
-    echo "dockerUp"
+dockerUp() {
+    echo "removing previous network"
+    docker network rm ${DOCKER_NETWORK}
+    sleep 6s
+    
+    echo "creating new network"
+    docker network create --driver=bridge --subnet=${SUBNET} --gateway=${GATEWAY} ${DOCKER_NETWORK}
+    verifySuccess "Started docker network."
+    sleep 6s
 
-    if [[ -z ${ipfsEnabled} ]];  
-        then  
-            echo "ipfs not in use"
-        else
-            docker-compose --compatibility -f ${dc_ipfs_yaml} up -d
-            verifySuccess "IPFS Compose: up"
+    echo "Deploying stack"
+    docker stack deploy -c ${dc_yaml} ${docker_stack}
+    verifySuccess "Stack deployed."
+    echo "waiting..."
+    sleep 15s
 
-            echo "Sleeping long enough to let IPFS fully initialize..."
-            sleep 10s
-    fi
 
-    docker-compose -f ${dc_mongo_yaml} up -d
-    verifySuccess "MongoDB Compose: up"
+    # docker service ls
+    # docker service ps ${docker_stack}
+    # docker network inspect ${DOCKER_NETWORK}
+    # read -p "Docker Swarm Ok?"
 
-    docker-compose -f ${dc_app_yaml} up -d
-    verifySuccess "Docker Compose: up"
-
+    # will this work with swarm mode ?
     # sleep 10
     # echo "Sleeping 10 seconds before checking logs"
-    # docker-compose -f ${dc_app_yaml} logs $1
+    # docker-compose -f ${dc_yaml} logs $1
     # verifySuccess "Docker Compose: logs"
 }
 export -f dockerUp
 
-# Arg1=yaml file name, Arg2=service
-dockerDown () {
-    echo "dockerDown $1 serivce $2"
+dockerDown() {
+    echo "Stopping docker stack"
+    docker stack rm ${docker_stack}
+    sleep 15s
 
-    # NOTE: with remove-orphans it takes down not just what's in our YAML but 
-    # also every other docker thing running on the machine!
-    # docker-compose -f ${dc_app_yaml} down --remove-orphans
-    # docker-compose -f ${dc_app_yaml} stop $2
-    #
-    # NOTE: If you get errors that your network is still in use do this:
-    #     docker network disconnect -f net-distro quanta-distro
-    #     docker network disconnect -f net-distro quanta-distro
-    docker-compose -f $1 stop -t 30 $2
-    docker-compose -f $1 rm -f -s $2
-    # docker ps
-    # read -p "service $2 should be missing in above"
+    echo "Removing network"
+    docker network rm ${DOCKER_NETWORK}
+    sleep 5s
 }
 export -f dockerDown
 
+printUrlsMessage() {
+    echo ================================================
+    echo Quanta Started OK!
+    echo http://${quanta_domain}:${HOST_PORT}
+    echo To Test: curl -X POST  http://${quanta_domain}:${HOST_PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
+    echo ================================================
+    read -p "Press enter key."
+}
+export -f printUrlsMessage
 
+genMongoConfig() {
+    echo "Generating MongoDB Config: ${MONGOD_CONF}"
+cat > ${MONGOD_CONF} <<- EOM
+# NOTE: This file is generated by the builder.
+net:
+    port: ${MONGO_PORT}
+    bindIp: ${MONGO_HOST}
+
+security:
+    authorization: enabled
+EOM
+}
+export -f genMongoConfig

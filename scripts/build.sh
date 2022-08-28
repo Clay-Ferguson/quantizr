@@ -33,7 +33,10 @@ cd ${PRJROOT}/pom/common
 # build with apidocs
 # mvn install javadoc:javadoc 
 
+echo "Maven Profile: ${mvn_profile}"
+
 # build without apidocs
+echo "mvn install"
 mvn install -Dmaven.javadoc.skip=true
 
 cd ${PRJROOT}
@@ -45,6 +48,7 @@ cd ${PRJROOT}
 # This build command creates the SpringBoot fat jar in the /target/ folder.
 # Note: If CLEAN is false we're going for the fastest possible build.
 if [ "$CLEAN" == "true" ]; then
+    echo "mvn package"
     # This run is required only to ensure TypeScript generated files are up to date.
     # Always do the same profile here (pdev-vscode)
     mvn package -DskipTests=true -Pdev-vscode
@@ -52,6 +56,7 @@ if [ "$CLEAN" == "true" ]; then
     # Then this is the actual full build.
     mvn clean package -DskipTests=true -P${mvn_profile}
 else
+    echo "mvn package"
     mvn --offline package -DskipTests=true -P${mvn_profile} 
 fi
 verifySuccess "Maven Build"

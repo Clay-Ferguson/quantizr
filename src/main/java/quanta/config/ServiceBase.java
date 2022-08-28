@@ -171,7 +171,7 @@ public class ServiceBase {
 	public static final Object initLock = new Object();
 
 	public ServiceBase() {
-		// log.debug("ServiceBase: " + getClass().getName());
+		// log.debug("ServiceBase(a): " + getClass().getName());
 	}
 
 	/*

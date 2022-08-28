@@ -1,0 +1,82 @@
+#!/bin/bash
+# This is the version of the 'setenv' file that's used to build the distro. The file named
+# 'setenv-run-distro.sh' is the environment setter for the runtime/deployment.
+
+THISFILE=$(readlink -f "$0")
+export SCRIPTPATH=$(dirname "$THISFILE")
+export PRJROOT=$(dirname "$SCRIPTPATH")
+export PRJPARENT=$(dirname "$PRJROOT")
+
+source ./define-functions.sh
+
+export QUANTA_VER=2.8.27
+
+# always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
+# builds we run on our machine should ever target to the 'subnode/repo:'
+export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
+export DOCKER_TAG=quanta-${QUANTA_VER}
+
+export SCRIPTS=${PRJROOT}/scripts
+# This jar file will be the one copied into the distro folder. The folder that will be zipped but without the file in it.
+export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
+
+export DOCKER_NETWORK=quanta-net
+export SUBNET=192.168.2.0/24
+export GATEWAY=192.168.2.9
+
+# If you're using a DNS name that should go here instead of the ip.
+# This is the domain name as your BROWSER sees it.
+export quanta_domain=${GATEWAY}
+
+# IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
+export CLEAN=true
+
+export dc_yaml=dc-distro.yaml
+export docker_stack=quanta-stack-distro
+
+export mvn_profile=prod
+
+# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
+# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
+export ipfsEnabled=
+
+# deploy target folder is where we will be running the app from or what will become the ZIP file content
+export DEPLOY_TARGET=${PRJPARENT}/quanta-distro
+mkdir -p ${DEPLOY_TARGET}
+
+export MONGO_SCRIPTS=${PRJPARENT}/scripts/mongo
+mkdir -p ${MONGO_SCRIPTS}
+
+export ipfs_data=${DEPLOY_TARGET}/ipfs
+export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
+
+# Note: define-functions.sh is where we pass the ARGS into dockerfile
+export HOST_PORT=80
+export PORT=80
+export PORT_DEBUG=8000
+export XMS=512m
+export XMX=2g
+
+export MONGO_DATA=${DEPLOY_TARGET}/data
+export MONGO_HOST=mongo-host-distro
+export MONGO_PORT=27020
+export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
+
+# SECRETS 
+
+# Fill these in if you are supporting signups which requires you to have access
+# to an email server, but won't be required if you're running your peer as a single
+# user instance, or just doing localhost p2p testing/development.
+export emailPassword=
+
+# Warning: To be able to create our test accounts we need this email prop defined even
+# even if it's a dummy string
+export devEmail=somebody@someserver.com
+
+# admin password: login to web app with "admin/password" credentials. Note also that
+# this password is used in the yaml as the root password for MongoDB.
+export adminPassword=password
+
+# This is the password that will be used by the auto-generated test accounts you'll see 
+# in the docker yaml for accounts adam, bob, cory, etc.
+export testPassword=password

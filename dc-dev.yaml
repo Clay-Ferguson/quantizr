@@ -1,0 +1,121 @@
+version: '3.7'
+services:
+    mongo-dev: 
+        hostname: mongo-host-dev
+        networks:
+            quanta-net:
+                aliases:
+                    - mongo-host-dev
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
+            - '${MONGO_SCRIPTS}:/mongo-scripts'
+            - '${MONGOD_CONF}:/etc/mongod.conf'
+        command: mongod --config /etc/mongod.conf
+        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
+
+        # don't publish to outside world
+        # ports:
+        #     - '${MONGO_PORT}:${MONGO_PORT}'
+
+        # NOTE: Leave this as an example of how to read env from a file.    
+        # env_file: 
+        #     - '???/mongo.env'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
+
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    quanta-dev:
+        image: ${DOCKER_IMAGE}
+        build: 
+            context: .
+            args:
+                PORT: "${PORT}"
+                PORT_DEBUG: "${PORT_DEBUG}"
+                JAR_FILE: "${JAR_FILE}"
+                XMS: "${XMS}"
+                XMX: "${XMX}"
+            dockerfile: ./dockerfile
+
+        hostname: quanta-host
+        networks:
+            quanta-net:
+                aliases:
+                    - quanta-host
+        volumes:
+            - '${QUANTA_BASE}/tmp:/tmp'
+            - '${QUANTA_BASE}/log:/log'
+            - '${QUANTA_BASE}/config:/config'
+            - '${QUANTA_BASE}/lucene:/subnode-lucene'
+            - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
+            - '${PRJROOT}/target/classes:/loader-path'
+            # - $PWD:/app
+        ports:
+            - '${HOST_PORT}:${PORT}'
+            - '${PORT_DEBUG}:${PORT_DEBUG}'
+
+        environment:
+            logging.config: /log/logback.xml
+            XMS: "${XMS}"
+            XMX: "${XMX}"
+            
+            # Can be a comma-delimited list of TestIntf-derived tests to run
+            # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest"
+            # **** Tip ****: remember to put this line in setenv-dev.sh if running IPFS tests: `export ipfsEnabled="true"`
+            runTests:
+            
+            mongoAdminPassword: "${adminPassword}"
+            mongoSecurity: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >-
+                FollowBot:${adminPassword}:${devEmail},
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail},
+                eric:${testPassword}:${devEmail}
+    
+            testPassword: "${testPassword}"
+            throttleTime: "0"
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "${MONGO_HOST}"
+            mongodb.port: "${MONGO_PORT}" 
+            instanceId: "dev"
+            profileName: "dev"
+            server.port: "${PORT}" 
+            httpProtocol: "http" 
+            metaHost: "${quanta_domain}" 
+            allowFileSystemSearch: "false"
+            actPubEnabled: "false"
+            ipfsEnabled: "${ipfsEnabled}"
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com" 
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quanta.wiki"
+
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${PORT_DEBUG},server=y,suspend=n"
+            
+            ipfs.host: "http://ipfs-dev"
+            ipfs.apiPort: "5001"
+            ipfs.gatewayPort: "8080"
+
+        depends_on:
+            - mongo-dev
+        #     - ipfs-dev
+
+networks:
+    quanta-net:

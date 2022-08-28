@@ -1,5 +1,7 @@
-version: '3.7'
-services:
+# This file should be considered obsolete and dead until merged
+# into dc-dev.yaml which will be done soon
+xxxversion: '3.7'
+xxxservices:
     # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
     # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 
@@ -43,7 +45,8 @@ services:
         ports:
             - "4001:4001"
             - "4001:4001/udp"
-            - "5001:5001"
+            # don't publish to outside world
+            # - "5001:5001"
         networks:
             - net-dev
         image: ipfs/go-ipfs:v0.12.2

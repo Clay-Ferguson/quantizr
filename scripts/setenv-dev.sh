@@ -1,39 +1,48 @@
 #!/bin/bash
 
+THISFILE=$(readlink -f "$0")
+export SCRIPTPATH=$(dirname "$THISFILE")
+export PRJROOT=$(dirname "$SCRIPTPATH")
+export PRJPARENT=$(dirname "$PRJROOT")
+
+echo "SCRIPTPATH=${SCRIPTPATH}"
+echo "PRJROOT=${PRJROOT}"
+echo "PRJPARENT=${PRJPARENT}"
+
 # Defines some reusable functions that are common to many of these scripts
 source ./define-functions.sh
 
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
+export QUANTA_VER=0.0.1
+export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
+export DOCKER_TAG=quanta-dev-${QUANTA_VER}
+
 # Must be the folder where the Quantizr project (from Github) is located. The root of the source folders.
-export PRJROOT=/home/clay/ferguson/Quantizr
 export SCRIPTS=${PRJROOT}/scripts
 
+# Tells our scripts where the actual executable code is expected to be found
+export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
+
 # Don't worry about this if you don't know what it is. Point it to an empty folder at least, but do set it.
-export MONGO_SCRIPTS=/home/clay/ferguson/scripts/mongo
+export MONGO_SCRIPTS=${PRJPARENT}/scripts/mongo
 mkdir -p ${MONGO_SCRIPTS}
 
-# You need to create your own secrets.sh file with your own passwords and store it somewhere secure on your machine
-# and then set these vars to point to that file. There's an example 'secrets.sh' in the source you can use to see
-# what goes in this file
-export SECRETS=/home/clay/ferguson/secrets
-source ${SECRETS}/secrets.sh
+export DOCKER_NETWORK=quanta-net-dev
+export SUBNET=192.168.1.0/24
+export GATEWAY=192.168.1.10
 
-# Configure the domain name your instance will be running on.
-export quanta_domain=localhost
+# If you're using a DNS name that should go here instead of the ip.
+# This is the domain name as your BROWSER sees it.
+export quanta_domain=${GATEWAY}
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
 
-# If this string is defined it causes the build/run to deploy to the minikube environment insead of the host machine.
-# Kubernetes is not yet working. Ignore this if you don't know what it is.
-export TARGET_K8=
-
 # Docker files are relative to project root. We hold these in variables so that none of the scripts have them hardcoded
-export dc_app_yaml=dc-dev-app.yaml
-export dc_mongo_yaml=dc-dev-mongo.yaml
-export dc_ipfs_yaml=dc-dev-ipfs.yaml
+export dc_yaml=dc-dev.yaml
+export docker_stack=quanta-stack-dev
 
 # Configure some locations for IPFS-related runtime files
 export ipfs_data=/home/clay/.ipfs
@@ -46,24 +55,59 @@ export ipfsEnabled=
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev
 
-# Tells our scripts where the actual executable code is expected to be found
-export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
-
 # Configue the application ports
+export HOST_PORT=8182
 export PORT=8182
 export PORT_DEBUG=8000
 
+# NOTE: Browser app will be available at http://${GATEWAY}:${PORT}
+
 # Configure memory allocations
 export XMS=512m
-export XMX=4g
+export XMX=2g
 
-# Configure MongoDB-spedific variables
-export MONGO_HOST=mongo-dev
+# Configure MongoDB-specific variables
+export MONGO_HOST=mongo-host-dev
 export MONGO_PORT=27016
-export MONGOD_CONF=${SECRETS}/mongod-dev.conf
+
+# NOTE: This file gets *generated* by the build.
+export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 
 # Sets a base location for MongoDB
-export MONGO_BASE=/home/clay/ferguson
+export MONGO_BASE=${PRJPARENT}
 
-# This tells our scripts where we are actually running from (The Distro Folder on this machine. The folder containing the runtime and configs)
+# This tells our scripts where we are actually running from 
+# (The Distro Folder on this machine. The folder containing the runtime and configs)
 export QUANTA_BASE=/home/clay/quanta-localhost-dev
+
+
+# SECRETS 
+
+# Fill these in if you are supporting signups which requires you to have access
+# to an email server, but won't be required if you're running your peer as a single
+# user instance, or just doing localhost p2p testing/development.
+export emailPassword=
+
+# Warning: To be able to create our test accounts we need this email prop defined even
+# even if it's a dummy string
+export devEmail=somebody@someserver.com
+
+# admin password: login to web app with "admin/password" credentials. Note also that
+# this password is used in the yaml as the root password for MongoDB.
+export adminPassword=password
+
+# This is the password that will be used by the auto-generated test accounts you'll see 
+# in the docker yaml for accounts adam, bob, cory, etc.
+export testPassword=password
+
+# OVERRIDE SECRETS IN here....
+
+# If this additional variable setter file exists we run it, so it can 
+# be used to override any of these settings
+if [ -f "${PRJPARENT}/secrets/setenv-quanta-ext.sh" ]; then
+    echo "Overriding Secrets with: ${PRJPARENT}/secrets/setenv-quanta-ext.sh"
+    source ${PRJPARENT}/secrets/setenv-quanta-ext.sh
+else 
+    echo "Environment Override didn't exist: ${PRJPARENT}/secrets/setenv-quanta-ext.sh"
+    read -p "Press a key to run with default secrets."
+fi

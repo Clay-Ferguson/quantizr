@@ -1,5 +1,9 @@
 #!/bin/bash
 
+clear
+# show commands as they are run.
+# set -x
+
 # ===================================================================
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}
 #
@@ -16,7 +20,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 echo "cd $SCRIPTPATH"
 cd "$SCRIPTPATH"
 
-source ./setenv-distro-runner.sh
+source ./setenv-run-distro.sh
 
 ./stop-distro.sh
 
@@ -27,48 +31,49 @@ echo "removing logs"
 rm -rf ./log/archived/*
 rm -rf ./log/*.log
 
+mkdir -p ./dumps
+mkdir -p ./tmp
+mkdir -p ./log
+mkdir -p ./config
+mkdir -p ./data
+mkdir -p ./scripts
+
 # Uncomment this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
-# docker-compose -f ${dc_app_yaml} config
+# docker-compose -f ${dc_yaml} config
 # read -p "Config look ok?"
 
-./gen-mongod-conf-file.sh 
-
-docker-compose -v
+genMongoConfig
 
 # If we detect that the springboot fat jar (the executable) exists in this folder then we run
-# the dockerBuild function which does a docker-compose 'build' to create the image we will actually run USING the JAR
-# file executable.
-# This 'build' step will reference the `dockerfile` which is where the JAR_FILE is actually copied into the
-# image. Once this is done our 'dockerUp' function will be able to start the actual server.
-if [ -f "${JAR_FILE}" ]; then
-    echo "Installing JAR file: ${JAR_FILE}"
-    dockerBuild
+# the dockerBuild function which does a docker-compose 'build' to update to a new docker image that contains
+# this current latest jar file.
+if [ -f "${JAR_FILE}" ]; 
+    then
+        echo "Building new Docker Image (${DOCKER_IMAGE}) based on JAR file: ${JAR_FILE}"
+        dockerBuild
+    else 
+        echo "Running from IMAGE: ${DOCKER_IMAGE}"
 fi
 dockerUp
 
-dockerCheck quanta-distro
-dockerCheck mongo-distro
+serviceCheck ${docker_stack}_quanta-distro
+serviceCheck ${docker_stack}_mongo-distro
 
 if [[ -z ${ipfsEnabled} ]];  
     then  
         echo "ipfs not in use"
     else
-        dockerCheck ipfs-distro
+        serviceCheck ${docker_stack}_ipfs-distro
 fi
 
-# docker-compose -f ${dc_app_yaml} logs --tail="all" quanta-distro
+# docker-compose -f ${dc_yaml} logs --tail="all" quanta-distro
 
-echo ================================================
-echo Quanta Started OK!
-echo http://${quanta_domain}:${PORT}
-echo To Test: curl -X POST  http://${quanta_domain}:${PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
-echo ================================================
-read -p "Press any key."
+printUrlsMessage
 
 # If we detected the JAR_FILE above, and ran the dockerBuild step, then we don't need to do it again
 # the next time we run because the docker image will already exist, and not need to be rebuild, so
 # we rename the JAR_FILE so it won't cause another build, on next run.
-if [ -f "${JAR_FILE}" ]; then
-    mv ${JAR_FILE} ${JAR_FILE}.bak
-fi
+# if [ -f "${JAR_FILE}" ]; then
+#     mv ${JAR_FILE} ${JAR_FILE}.bak
+# fi

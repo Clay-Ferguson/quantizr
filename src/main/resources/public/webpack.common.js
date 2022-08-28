@@ -2,8 +2,9 @@ const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
-const prod = process.argv.indexOf("-p") !== -1;
-const env = prod ? "prod" : "dev";
+
+const isProduction = process.argv[process.argv.indexOf("--mode") + 1] === "production";
+const env = isProduction ? "prod" : "dev";
 
 console.log("TARGET ENV: " + env);
 

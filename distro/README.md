@@ -2,68 +2,16 @@
 
 ## Overview
 
-The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. Regardless of whether you run from the Docker public repository image, or an image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. Such a runtime folder can be created simply by unzipping the "Distro Zip" which contains all that stuff, pre-configured with usable defaults. Inside that zip file is also the `run-distro.sh` which will run the app.
+The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. Regardless of whether you run from the Docker public repository image, or a docker image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. You can crete this runtime folder by unzipping the "Distro Zip" which contains all that stuff, pre-configured with usable defaults. Inside that zip file is also the `run-distro.sh` which will run the app.
 
 ## Option #1: Run from Public Docker Image
 
-To run a Quanta instance from the Docker Public Repository you can simply unzip the Distro Zip file (named like `./distro/quanta-1.0.25.tar.gz`) onto an empty folder, and then start the app with `run-distro.sh`. This will create an instance running at `http://localhost:8185`. To stop the app run `stop-distro.sh`. The only prerequisite for this is that you have `docker` and `docker-compose` installed first. Also you should comment out the 'build' section from the YAML file (dc-distro-app.yaml) since you won't be duing the build. This means commenting out like the following:
+To run a Quanta instance from the Docker Public Repository you can simply unzip the Distro Zip file (named like `./distro/quanta-1.0.25.tar.gz`) onto an empty folder, and then start the app with `run-distro.sh`. To stop the app run `stop-distro.sh`. The only prerequisite for this is that you have `docker` and `docker-compose` installed, and you need to setup docker to have 'swarm' capability using this command: `docker swarm init`
 
-    # build: 
-    #    context: .
-    #    dockerfile: dockerfile
-
-NOTE: You may have to run with `sudo ./run-distro.sh` for now. I need for finalize the configs and instructions for how to run from a normal user.
-
-NOTE: You should edit the password in `secrets.sh`, before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user, and the same password will also be the password securing your MongoDB instance. Also before you run the app you should probably at least look in the `setenv-*.sh` file, to see what configs are in there, and perhaps the docker-compose YAML file too, but they should all contain usable defaults right out of the box.
+NOTE: You should edit the password in the `setenv-*.sh` file before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user in the app, and also will be the password securing your MongoDB instance. Also before you run the app you should probably at least look in the `setenv-*.sh` file, to see what configs are in there, and perhaps the docker-compose YAML file too, but they should all contain usable defaults right out of the box.
 
 So to reiterate, this Distro Zip contains everything needed to configure the app, and by default it will have the effect of using the Public Docker image as the executable to run. Below, "Option #2" describes how to run your own executable that you build yourself.
 
-## Troubleshooting 
-
-If something doesn't work, here's some tips to troubleshoot docker and the app:
-
-### Check to see what Docker has Running
-
-    docker ps
-
-Should show something like these two: 'subnode/repo:quanta1.0.26' and 'mongo:4.0'
-
-### Check Docker Images
-
-https://docs.docker.com/engine/reference/commandline/image_ls/
-
-    docker image ls --digests | grep "quanta"
-    docker image ls --digests | grep "mongo"
-    docker image ls --digests | grep "ipfs"
-
-### Inspect your Docker Repository
-
-    docker image inspect subnode/repo:quanta1.0.26
-
-The "RepoDigests" in the output should contain the same digest shown in the "hub.docker.com" website.
-
-### Check Docker Logs
-
-    docker logs quanta-distro
-
-### Try to Pull again. 
-
-Should tell you image is already up to date
-
-    docker image pull subnode/repo:quanta1.0.26
-
-### IPFS Not Working ?
-
-Run this to see the ipfs logs:
-
-    docker logs ipfs
-
-If you see an error like this:
-
-    Error: lock /data/ipfs/repo.lock: permission denied
-
-Then that means something went wrong starting or terminating IPFS, and the emergency fix for that which is hopefully safe seems to work is to just reboot your Linux instance to be sure everything's clean and nothing in IPFS is running, and then simply delete the 'repo.lock' file. This should then allow IPFS to be working fine the next time you startup Quanta. This is a bug in IPFS not a Quanta bug. The IPFS system doesn't always correctly manage this lock file.
-    
 ## Option #2: Run from Locally-built Executable 
 
 If you want to run Quanta executable code you've built yourself, you'll still use a Distro Zip to create a configuration location and files (by just unzipping the Distro Zip into some folder), but after unzipping this Distro Zip you'll drop in the actual SpringBoot fat-jar file (that you built) onto the Distro Zip directory before running `run-distro.sh`. The scripts in the distro folder will automatically detect that the SpringBoot file exists (by looking for the `${JAR_FILE}` file named in the `setenv*.sh`), and if that JAR file (executable) is found then the script will automatically do a docker build that installs and runs from this local JAR file instead of the Public Docker Repository file.
@@ -71,6 +19,8 @@ If you want to run Quanta executable code you've built yourself, you'll still us
 So to summarize, your Distro Zip files will automatically use the JAR file if it's found, or default to the Public Docker Repo if no JAR is found.
 
 ## Building the Distro Zip (and executable JAR)
+
+If you are running your first build you might not have node and npm installed but the pom.xml should take care of that for you in the targets named `install-node-and-npm` and `npm-install` sections but the 'dev' build will have those commented out to speed up the dev builds.
 
 If the above made sense so far, you'll know there's a zip file (the Distro Zip) which contains a confuration for the installation files, and also a SpringBoot fat JAR that can be built too. Both of those things (Distro Zip file, and Fat JAR file) can themselves be built from scratch using `./scripts/build-distro.sh`, which will build them both at the same time. After you run the `build-distro.sh` you'll find the Fat JAR in the `./target/` folder and the Distro Zip file in the `./distro` folder. 
 
@@ -115,6 +65,67 @@ The other thing required to make this [almost] Hot Deploy work is that you need 
 
 You'll notice neither of those two volumes are defined for the distro (PROD) YAML, because they're specifically development-time tricks that allow you to override the executables used at runtime, to inject fresh Java CLASS files whenever you build. Because you're injecting these class files directly at the file-system layer, you can simply tell docker to restart the server (which is pretty quick), and make the new executable class files "go live" instantly.
 
+## Troubleshooting 
 
+If something doesn't work, here's some tips to troubleshoot docker and the app:
 
+### Check to see what Docker has Running
 
+    docker ps
+    docker network ls
+    docker service ls
+
+Should show something like these two: 'subnode/repo:quanta1.0.26' and 'mongo:4.0'
+
+### Check Docker Images
+
+https://docs.docker.com/engine/reference/commandline/image_ls/
+
+    docker image ls --digests | grep "quanta"
+    docker image ls --digests | grep "mongo"
+    docker image ls --digests | grep "ipfs"
+
+### Inspect your Docker Repository
+
+    docker image inspect subnode/repo:quanta1.0.26
+
+The "RepoDigests" in the output should contain the same digest shown in the "hub.docker.com" website.
+
+### Check Docker Logs
+
+    docker logs quanta-distro
+
+### Try to Pull again. 
+
+Should tell you image is already up to date
+
+    docker image pull subnode/repo:quanta1.0.26
+
+### To Remove Most Running things
+
+    docker kill $(docker ps -q)
+
+    docker stack ls
+    docker stack rm ${stack_name}
+
+    docker service ls
+    docker service rm ${serice_name}
+
+    docker network ls
+    docker network prune
+
+### Prune entire system of unused things
+
+    docker system prune -a
+
+### IPFS Not Working ?
+
+Run this to see the ipfs logs:
+
+    docker logs ipfs
+
+If you see an error like this:
+
+    Error: lock /data/ipfs/repo.lock: permission denied
+
+Then that means something went wrong starting or terminating IPFS, and the emergency fix for that which is hopefully safe seems to work is to just reboot your Linux instance to be sure everything's clean and nothing in IPFS is running, and then simply delete the 'repo.lock' file. This should then allow IPFS to be working fine the next time you startup Quanta. This is a bug in IPFS not a Quanta bug. The IPFS system doesn't always correctly manage this lock file.

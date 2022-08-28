@@ -1,9 +1,24 @@
 #!/bin/bash
+
+# *** IMPORTANT ***
+#
+# If you're running this before you've ever built the app you need to uncomment the
+# install-node-and-npm and npm-install sections in the pom.xml so that NPM itself gets installed
+# and all the packages get installed before your first run, then unless you add more dependencies
+# without doing a manual 'npm install' yourself (from the correct folder!, with packages.json) you can
+# keep those two POM sections permanently commented out so DEV builds run as fast as possible.
+# 
 # Script for doing a dev build for localhost testing of a single instance (no ActivityPub support)
 ###############################################################################
 # This script is for normal localhost development. After running this script 
 # you should have an instance running at http(s)://${quanta_domain}:${PORT}, for testing/debugging
 ###############################################################################
+
+# Make the folder holding this script be the current working directory
+
+clear
+# show commands as they are run.
+# set -x
 
 # Make the folder holding this script become the current working directory
 SCRIPT=$(readlink -f "$0")
@@ -11,23 +26,12 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 echo "cd $SCRIPTPATH"
 cd "$SCRIPTPATH"
 
-# show commands as they are run.
-# set -x
+# Set all environment variables
 source ./setenv-dev.sh
 
-if [[ -z ${TARGET_K8} ]];  
-then  
-    echo "Targeting host machine (not minikube)"
-else
-    echo "Targeting Minikube"
-    # NOTE: This will cause the docker images to go into the 
-    # minikube environment so that for example `docker images` will show the build
-    # image only from inside minikube, and not on the actual host machine.
-    eval $(minikube docker-env)
-fi
-
-echo "Stopping any existing server instance..."
-curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+# I'm no longer forcing a gracefull shutdown this way, becasue I'm assuming Docker Swarm is graceful enough.
+# echo "Stopping any existing server instance..."
+# curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
 
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
@@ -37,48 +41,39 @@ rm -rf ${QUANTA_BASE}/log/*
 # load right from /src/mai/resouces which is the spring default location.)
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
 
-# Take all the services offline
 cd ${PRJROOT}
-dockerDown ${dc_app_yaml} quanta-dev
-dockerDown ${dc_mongo_yaml} mongo-dev
+# IMPORTANT: Use this to troubleshoot the variable substitutions in the yaml file
+# docker-compose -f ${dc_yaml} config 
+# read -p "Config look ok?"
 
-if [[ -z ${ipfsEnabled} ]];  
-    then  
-        echo "ipfs not in use"
-    else
-        dockerDown ${dc_ipfs_yaml} ipfs-dev
-fi
+# Take all the services offline
+dockerDown
 
+# Build the application from source
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
 
-# IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
-# docker-compose -f ${dc_app_yaml} config 
-# read -p "Config look ok?"
+genMongoConfig
 
-${SCRIPTS}/gen-mongod-conf-file.sh
-
+# run docker compose build
 cd ${PRJROOT}
 dockerBuild
+echo "Docker build complete..."
 
-if [[ -z ${TARGET_K8} ]];  
-then  
-    echo "Docker build complete..."
-else
-    echo "For K8, we're done after docker build. Exiting script."
-    exit 0
-fi
+imageCheck ${DOCKER_TAG}
+echo "Image is in repo: ${DOCKER_TAG}"
 
+# Start the app
 dockerUp
 
-dockerCheck quanta-dev
-dockerCheck mongo-dev
+serviceCheck ${docker_stack}_quanta-dev
+serviceCheck ${docker_stack}_mongo-dev
 
 if [[ -z ${ipfsEnabled} ]];  
     then  
         echo "ipfs not in use"
     else
-        dockerCheck ipfs-dev
+        serviceCheck ${docker_stack}_ipfs-dev
 fi
 
 # configure ipfs 
@@ -88,6 +83,12 @@ fi
 # of every time we build.
 # ipfsConfig ipfs-dev
 # check ipfs again
-# dockerCheck ipfs-dev
+# serviceCheck ipfs-dev
 
 # read -p "Build and Start Complete. press a key"
+
+echo "Waiting for server to initialize..."
+sleep 7s
+
+printUrlsMessage
+
