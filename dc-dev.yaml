@@ -3,7 +3,7 @@ services:
     mongo-dev: 
         hostname: mongo-host-dev
         networks:
-            quanta-net:
+            bridge:
                 aliases:
                     - mongo-host-dev
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
@@ -43,7 +43,7 @@ services:
 
         hostname: quanta-host
         networks:
-            quanta-net:
+            bridge:
                 aliases:
                     - quanta-host
         volumes:
@@ -118,4 +118,4 @@ services:
         #     - ipfs-dev
 
 networks:
-    quanta-net:
+    bridge:

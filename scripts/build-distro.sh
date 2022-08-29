@@ -2,7 +2,6 @@
 
 # *********** Special Hack for Clay Ferguson's machine (everyone else delete this!)
 docker stack rm quanta-stack-distro
-docker network rm quanta-net 
 sudo rm -r /home/clay/ferguson/distro-test
 mkdir /home/clay/ferguson/distro-test
 # *********************************************************************************
@@ -123,7 +122,7 @@ cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar /home/clay/ferguson/distro-test/q
 
 echo
 echo "==================== NOTE ======================================="
-echo "Run docker-publish-distro.sh to publish the distro do docker repo"
+echo "Run docker-publish-distro.sh to publish the distro to docker repo"
 echo "You can test locally (before publishing) by running:"
 echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "================================================================="

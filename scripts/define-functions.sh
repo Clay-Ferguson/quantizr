@@ -63,14 +63,14 @@ dockerBuild () {
 export -f dockerBuild
 
 dockerUp() {
-    echo "removing previous network"
-    docker network rm ${DOCKER_NETWORK}
-    sleep 6s
+    # echo "removing previous network"
+    # docker network rm ${DOCKER_NETWORK}
+    # sleep 6s
     
-    echo "creating new network"
-    docker network create --driver=bridge --subnet=${SUBNET} --gateway=${GATEWAY} ${DOCKER_NETWORK}
-    verifySuccess "Started docker network."
-    sleep 6s
+    # echo "creating new network"
+    # # docker network create --driver=bridge --subnet=${SUBNET} --gateway=${GATEWAY} ${DOCKER_NETWORK}
+    # verifySuccess "Started docker network."
+    # sleep 6s
 
     echo "Deploying stack"
     docker stack deploy -c ${dc_yaml} ${docker_stack}
@@ -97,9 +97,9 @@ dockerDown() {
     docker stack rm ${docker_stack}
     sleep 15s
 
-    echo "Removing network"
-    docker network rm ${DOCKER_NETWORK}
-    sleep 5s
+    # echo "Removing network"
+    # docker network rm ${DOCKER_NETWORK}
+    # sleep 5s
 }
 export -f dockerDown
 

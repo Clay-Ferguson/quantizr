@@ -6,21 +6,18 @@ services:
             bridge:
                 aliases:
                     - mongo-host-distro
+                    
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${MONGO_DATA}:/data/db'
-            # - '${MONGO_SCRIPTS}:/mongo-scripts'
             - '${MONGOD_CONF}:/etc/mongod.conf'
-            - '${DEPLOY_TARGET}/dumps:/dumps'
+
         command: mongod --config /etc/mongod.conf
-        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
-        # don't publish to outside world
+
+        # # todo-0 (prod had this ports section. Need to verify it works in my new config files: dev & distro)
         # ports:
         #     - '${MONGO_PORT}:${MONGO_PORT}'
 
-        # NOTE: Leave this as an example of how to read env from a file.    
-        # env_file: 
-        #     - '???/mongo.env'
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
@@ -34,6 +31,7 @@ services:
         build: 
             context: .
             args:
+                PORT_SEC: "${PORT_SEC}"
                 PORT: "${PORT}"
                 PORT_DEBUG: "${PORT_DEBUG}"
                 JAR_FILE: "${JAR_FILE}"
@@ -46,13 +44,21 @@ services:
             bridge:
                 aliases:
                     - quanta-host
+
         volumes:
-            - "${DEPLOY_TARGET}/tmp:/tmp"
-            - "${DEPLOY_TARGET}/log:/log"
+            - '${DATA_FOLDER}/docs:/docs'
+            - '${DATA_FOLDER}/tmp:/tmp'
+            - '${DATA_FOLDER}/log:/log'
             - '${DEPLOY_TARGET}/config:/config'
-            # - $PWD:/app
+            - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
+
+            # todo-0: why do we have this? Still needed?
+            # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
+            - $PWD:/app
         ports:
+            - '${HOST_PORT_SEC}:${PORT_SEC}'
             - '${HOST_PORT}:${PORT}'
+
             # Uncomment for debugging...
             #- '8000:8000'
         
@@ -60,6 +66,14 @@ services:
             logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
+
+            # ----- todo-0: I think these properties are all obsolete, but I'm leaving them for now
+            JAR_FILE: "${JAR_FILE}"
+            PORT: "${PORT}"
+            PORT_SEC: "${PORT_SEC}"
+            PORT_DEBUG: "${PORT_DEBUG}" 
+            # ----- end paranoia
+
             mongoAdminPassword: "${adminPassword}"
             mongoSecurity: "true"
 
@@ -78,13 +92,16 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}"
             mongodb.port: "${MONGO_PORT}" 
+
             instanceId: "prod"
             profileName: "prod"
-            server.port: "${PORT}" 
-            httpProtocol: "http" 
+
+            server.port: "${PORT_SEC}" 
+            httpProtocol: "https" 
             metaHost: "${quanta_domain}" 
+            
             allowFileSystemSearch: "false"
-            actPubEnabled: "false"
+            actPubEnabled: "true"
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
@@ -92,18 +109,24 @@ services:
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
 
-            # mail.port: ""
-            # mail.user: "your mail user" 
-            # mail.password: "${emailPassword}" 
-            # mail.host: "your host" 
-            # mail.from: "your address"
-
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
-            #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
             ipfs.host: "http://ipfs-distro"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
+
+            security.require-ssl: "true" 
+            server.ssl.key-store: "/letsencrypt/keystore.p12" 
+            server.ssl.key-store-password: "${prodKeyStorePassword}" 
+            server.ssl.keyStoreType: "PKCS12" 
+            server.ssl.keyAlias: "tomcat" 
+
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com"
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quanta.wiki"
 
         depends_on:
             - mongo-distro

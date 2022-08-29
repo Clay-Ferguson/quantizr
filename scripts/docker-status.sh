@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # SERVICE=quanta-stack-distro_quanta-distro
-SERVICE=quanta-stack-dev_mongo-dev
-NETWORK=quanta-net-dev
+SERVICE=quanta-stack-dev_quanta-dev
+NETWORK=bridge
 
 echo "_________________________________________________________"
 echo "Running Containers "
@@ -58,4 +58,4 @@ echo ""
 docker image ls
 echo ""
 
-read _p "Press a key"
+read -p "Press ENTER"

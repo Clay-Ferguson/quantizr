@@ -27,21 +27,22 @@ source ./setenv-run-distro.sh
 # take ownership of this directory as current user
 sudo chown -R $USER .
 
-echo "removing logs"
-rm -rf ./log/archived/*
-rm -rf ./log/*.log
-
 mkdir -p ./dumps
 mkdir -p ./tmp
 mkdir -p ./log
+
+# todo-0: I think config foldelr is obsolete
 mkdir -p ./config
+
 mkdir -p ./data
+
+# todo-0: I think scripts is obsolete 
 mkdir -p ./scripts
 
-# Uncomment this to troubeshoot the variable substitutions in the yaml file, and will
+# Use this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
-# docker-compose -f ${dc_yaml} config
-# read -p "Config look ok?"
+# WARNING: This will expose your passwords in the output file!
+docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
 genMongoConfig
 
@@ -67,13 +68,4 @@ if [[ -z ${ipfsEnabled} ]];
         serviceCheck ${docker_stack}_ipfs-distro
 fi
 
-# docker-compose -f ${dc_yaml} logs --tail="all" quanta-distro
-
 printUrlsMessage
-
-# If we detected the JAR_FILE above, and ran the dockerBuild step, then we don't need to do it again
-# the next time we run because the docker image will already exist, and not need to be rebuild, so
-# we rename the JAR_FILE so it won't cause another build, on next run.
-# if [ -f "${JAR_FILE}" ]; then
-#     mv ${JAR_FILE} ${JAR_FILE}.bak
-# fi

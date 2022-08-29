@@ -20,13 +20,13 @@ export SCRIPTS=${PRJROOT}/scripts
 # This jar file will be the one copied into the distro folder. The folder that will be zipped but without the file in it.
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 
-export DOCKER_NETWORK=quanta-net
-export SUBNET=192.168.2.0/24
-export GATEWAY=192.168.2.9
+export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
 # This is the domain name as your BROWSER sees it.
-export quanta_domain=${GATEWAY}
+# The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
+#  but can be verified by running `docker network inspect bridge`.
+export quanta_domain=172.17.0.1
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true

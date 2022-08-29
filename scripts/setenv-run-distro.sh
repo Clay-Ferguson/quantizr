@@ -15,20 +15,22 @@ export DOCKER_TAG=quanta-${QUANTA_VER}
 # OPTION 2) To Build Image from a local JAR
 #
 #    Having this JAR_FILE exist in the current folder will trigger a full docker-compose build
-#    and install the contents of thta into the DOCKER_IMAGE specified here.
+#    and install that JAR into the DOCKER_IMAGE specified here. After this you can delete the JAR
+#    and it will be able to run from the local repo cache, or drop in an updated jar any time
+#    and run again to once again put the jar into the repo and upgrade to that latest jar.
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 # ================================================================
 
 export DEPLOY_TARGET=$PWD
 
-export DOCKER_NETWORK=quanta-net
-export SUBNET=192.168.2.0/24
-export GATEWAY=192.168.2.9
+export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
 # This is the domain name as your BROWSER sees it.
-export quanta_domain=${GATEWAY}
+# The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
+#  but can be verified by running `docker network inspect bridge`.
+export quanta_domain=172.17.0.1
 
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
@@ -75,6 +77,14 @@ export testPassword=password
 
 # If this additional variable setter file exists we run it, so it can 
 # be used to override any of these settings
+
+# first apply any overrides that exist in this folder
+if [ -f "setenv-quanta-ext.sh" ]; then
+    echo "Overriding secrets with setenv-quanta-ext.sh"
+    source setenv-quanta-ext.sh
+fi
+
+# then apply any overrides from parent folder
 if [ -f "../setenv-quanta-ext.sh" ]; then
     echo "Overriding secrets with ../setenv-quanta-ext.sh"
     source ../setenv-quanta-ext.sh

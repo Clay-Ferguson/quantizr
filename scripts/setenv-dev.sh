@@ -29,13 +29,13 @@ export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
 export MONGO_SCRIPTS=${PRJPARENT}/scripts/mongo
 mkdir -p ${MONGO_SCRIPTS}
 
-export DOCKER_NETWORK=quanta-net-dev
-export SUBNET=192.168.1.0/24
-export GATEWAY=192.168.1.10
+export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
 # This is the domain name as your BROWSER sees it.
-export quanta_domain=${GATEWAY}
+# The 172.17.0.1 value is the default gateway docker creates for it's 'bridge' network, which I *think* a constant.
+#  but can be verified by running `docker network inspect bridge`.
+export quanta_domain=172.17.0.1
 
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
@@ -59,8 +59,6 @@ export mvn_profile=dev
 export HOST_PORT=8182
 export PORT=8182
 export PORT_DEBUG=8000
-
-# NOTE: Browser app will be available at http://${GATEWAY}:${PORT}
 
 # Configure memory allocations
 export XMS=512m
