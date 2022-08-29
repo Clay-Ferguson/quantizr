@@ -45,6 +45,7 @@ import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.filter.AuditFilter;
 import quanta.filter.HitFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
@@ -1468,6 +1469,11 @@ public class AppController extends ServiceBase implements ErrorController {
 				case "refreshAPAccounts":
 					apub.refreshActorPropsForAllUsers();
 					res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
+					break;
+
+				case "toggleAuditFilter":
+					AuditFilter.enabled = !AuditFilter.enabled;
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
 					break;
 
 				case "toggleDaemons":

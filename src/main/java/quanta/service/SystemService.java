@@ -21,6 +21,7 @@ import quanta.AppController;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.filter.AuditFilter;
 import quanta.filter.HitFilter;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
@@ -181,6 +182,7 @@ public class SystemService extends ServiceBase {
 
 	public String getSystemInfo() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("AuditFilter Enabed: " + String.valueOf(AuditFilter.enabled) + "\n");
 		sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
