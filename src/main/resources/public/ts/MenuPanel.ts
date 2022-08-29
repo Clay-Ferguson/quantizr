@@ -475,6 +475,7 @@ export class MenuPanel extends Div {
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null, appState)), //
                 new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null, appState)), //
+                new MenuItem("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null, appState)), //
                 new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, appState)), //
                 new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, appState)), //
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
