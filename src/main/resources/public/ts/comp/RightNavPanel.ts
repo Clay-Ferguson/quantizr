@@ -95,7 +95,7 @@ export class RightNavPanel extends Div {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 let content = null;
                 if (S.util.ctrlKeyCheck()) {
-                    content = await (navigator as any).clipboard.readText();
+                    content = await (navigator as any)?.clipboard?.readText();
 
                     if (!content) {
                         const blob = await S.util.readClipboardFile();

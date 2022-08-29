@@ -133,7 +133,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return;
         }
 
-        (navigator as any).clipboard.read().then(async (data: any) => {
+        (navigator as any)?.clipboard?.read().then(async (data: any) => {
             let done: boolean = false;
             for (const clipboardItem of data) {
                 // this was supposed to be only images, but i'm getting all types as blob. whoops.

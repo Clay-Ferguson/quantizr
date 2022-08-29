@@ -480,11 +480,28 @@ export class Util {
     }
 
     clipboardReadable = (): boolean => {
-        return (typeof (navigator as any).clipboard?.read) === "function";
+        const allowed = (typeof (navigator as any)?.clipboard?.read) === "function";
+        if (!allowed) {
+            // looks like on localhost (http) we always end up here unable to access clipboard but the
+            // prod server (https) allows the clipboard to work. Not sure the reason.
+            console.warn("clipboard.read not available");
+
+            // This experiment fails on localhost
+            // const f: Function = navigator.permissions.query;
+            // f({ name: "clipboard-read" }).then((result: any) => {
+            //     if (result.state === "granted" || result.state === "prompt") {
+            //         console.log("granted");
+            //     }
+            //     else {
+            //         debugger;
+            //     }
+            // });
+        }
+        return allowed;
     }
 
     copyToClipboard = (text: string) => {
-        (<any>navigator).clipboard.writeText(text).then(() => {
+        (<any>navigator)?.clipboard?.writeText(text).then(() => {
             console.log("Copied to clipboard successfully!");
         }, () => {
             this.showMessage("Unable to write to clipboard.", "Warning");
@@ -996,7 +1013,7 @@ export class Util {
 
     readClipboardFile = (): Promise<any> => {
         return new Promise<any>(async (resolve, reject) => {
-            (navigator as any).clipboard.read().then(async (data: any) => {
+            (navigator as any)?.clipboard?.read().then(async (data: any) => {
                 let done: boolean = false;
                 let blob = null;
                 for (const item of data) {

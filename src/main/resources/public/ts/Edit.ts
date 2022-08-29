@@ -222,7 +222,7 @@ export class Edit {
 
         if (S.util.ctrlKeyCheck()) {
             let blob = null;
-            const clipboardText = await (navigator as any).clipboard.readText();
+            const clipboardText = await (navigator as any)?.clipboard?.readText();
             if (!clipboardText) {
                 blob = await S.util.readClipboardFile();
                 if (blob) {
@@ -973,7 +973,7 @@ export class Edit {
     // }
 
     saveClipboardToChildNode = async (parentId: string) => {
-        let clipText: string = await (navigator as any).clipboard.readText();
+        let clipText: string = await (navigator as any)?.clipboard?.readText();
         if (clipText) {
             clipText = clipText.trim();
         }
