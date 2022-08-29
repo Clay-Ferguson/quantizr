@@ -22,7 +22,8 @@ clear
 
 # Set all environment variables
 source ./setenv-dev.sh
-initScriptFile
+THIS_FILE=$(readlink -f "$0")
+THIS_FOLDER=$(dirname "$THIS_FILE")
 
 # I'm no longer forcing a gracefull shutdown this way, becasue I'm assuming Docker Swarm is graceful enough.
 # echo "Stopping any existing server instance..."

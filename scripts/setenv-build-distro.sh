@@ -3,7 +3,8 @@
 # 'setenv-run-distro.sh' is the environment setter for the runtime/deployment.
 
 source ./define-functions.sh
-initScriptFile
+THIS_FILE=$(readlink -f "$0")
+THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 

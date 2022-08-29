@@ -114,8 +114,3 @@ EOM
 }
 export -f genMongoConfig
 
-initScriptFile() {
-    THIS_FILE=$(readlink -f "$0")
-    THIS_FOLDER=$(dirname "$THIS_FILE")
-}
-export -f initScriptFile

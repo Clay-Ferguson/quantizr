@@ -2,7 +2,8 @@
 
 # Defines some reusable functions that are common to many of these scripts
 source ./define-functions.sh
-initScriptFile
+THIS_FILE=$(readlink -f "$0")
+THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
