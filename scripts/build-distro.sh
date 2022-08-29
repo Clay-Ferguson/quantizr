@@ -15,14 +15,9 @@ clear
 # show commands as they are run.
 # set -x
 
-# Make the folder holding this script become the current working directory
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
-echo "cd $SCRIPTPATH"
-cd "$SCRIPTPATH"
-
 # Set all environment variables
 source ./setenv-build-distro.sh
+initScriptFile
 
 # remove this to be sure we will notice if it doesn't successfully build
 sudo rm -f ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz
@@ -61,9 +56,6 @@ mkdir -p ${DEPLOY_TARGET}/tmp
 mkdir -p ${DEPLOY_TARGET}/log
 mkdir -p ${DEPLOY_TARGET}/config
 mkdir -p ${MONGO_DATA}
-
-# I think ALL references to MONGO_SCRIPTS can be deleted now. Not needed.
-mkdir -p ${MONGO_SCRIPTS}
 
 # Default app configs
 # We only need this if overriding/extending the default properties
@@ -128,4 +120,4 @@ echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "================================================================="
 echo 
 echo "Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
-read -p "Press any Key"
+read -p "Press ENTER Key"

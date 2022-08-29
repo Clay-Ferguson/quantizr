@@ -6,27 +6,16 @@ services:
             bridge:
                 aliases:
                     - mongo-host-dev
-        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+       
         volumes:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
-            - '${MONGO_SCRIPTS}:/mongo-scripts'
             - '${MONGOD_CONF}:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
-        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
 
-        # don't publish to outside world
-        # ports:
-        #     - '${MONGO_PORT}:${MONGO_PORT}'
-
-        # NOTE: Leave this as an example of how to read env from a file.    
-        # env_file: 
-        #     - '???/mongo.env'
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
 
-        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-        # and we don't want that happening unexpectedly
         image: mongo:4.0
 
     quanta-dev:
@@ -53,7 +42,7 @@ services:
             - '${QUANTA_BASE}/lucene:/subnode-lucene'
             - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
             - '${PRJROOT}/target/classes:/loader-path'
-            # - $PWD:/app
+            
         ports:
             - '${HOST_PORT}:${PORT}'
             - '${PORT_DEBUG}:${PORT_DEBUG}'

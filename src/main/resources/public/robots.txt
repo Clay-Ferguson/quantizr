@@ -10,7 +10,6 @@ User-agent: Googlebot-News
 User-agent: Googlebot-Video
 User-agent: Mediapartners-Google
 User-agent: AdsBot-Google-Mobile-Apps
-Disallow: /app/
 # xDisallow: /mobile/api/
 
 # Group 2

@@ -9,7 +9,6 @@ services:
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${MONGO_DATA}:/data/db'
-            # - '${MONGO_SCRIPTS}:/mongo-scripts'
             - '${MONGOD_CONF}:/etc/mongod.conf'
             - '${DEPLOY_TARGET}/dumps:/dumps'
         command: mongod --config /etc/mongod.conf
@@ -50,7 +49,7 @@ services:
             - "${DEPLOY_TARGET}/tmp:/tmp"
             - "${DEPLOY_TARGET}/log:/log"
             - '${DEPLOY_TARGET}/config:/config'
-            # - $PWD:/app
+
         ports:
             - '${HOST_PORT}:${PORT}'
             # Uncomment for debugging...

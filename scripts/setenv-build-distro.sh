@@ -2,12 +2,10 @@
 # This is the version of the 'setenv' file that's used to build the distro. The file named
 # 'setenv-run-distro.sh' is the environment setter for the runtime/deployment.
 
-THISFILE=$(readlink -f "$0")
-export SCRIPTPATH=$(dirname "$THISFILE")
-export PRJROOT=$(dirname "$SCRIPTPATH")
-export PRJPARENT=$(dirname "$PRJROOT")
-
 source ./define-functions.sh
+initScriptFile
+export PRJROOT=$(dirname "$THIS_FOLDER")
+export PRJPARENT=$(dirname "$PRJROOT")
 
 export QUANTA_VER=2.8.27
 
@@ -43,9 +41,6 @@ export ipfsEnabled=
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
 export DEPLOY_TARGET=${PRJPARENT}/quanta-distro
 mkdir -p ${DEPLOY_TARGET}
-
-export MONGO_SCRIPTS=${PRJPARENT}/scripts/mongo
-mkdir -p ${MONGO_SCRIPTS}
 
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging

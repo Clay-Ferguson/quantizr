@@ -1,16 +1,10 @@
 #!/bin/bash
 
-THISFILE=$(readlink -f "$0")
-export SCRIPTPATH=$(dirname "$THISFILE")
-export PRJROOT=$(dirname "$SCRIPTPATH")
-export PRJPARENT=$(dirname "$PRJROOT")
-
-echo "SCRIPTPATH=${SCRIPTPATH}"
-echo "PRJROOT=${PRJROOT}"
-echo "PRJPARENT=${PRJPARENT}"
-
 # Defines some reusable functions that are common to many of these scripts
 source ./define-functions.sh
+initScriptFile
+export PRJROOT=$(dirname "$THIS_FOLDER")
+export PRJPARENT=$(dirname "$PRJROOT")
 
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
@@ -19,15 +13,11 @@ export QUANTA_VER=0.0.1
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
 export DOCKER_TAG=quanta-dev-${QUANTA_VER}
 
-# Must be the folder where the Quantizr project (from Github) is located. The root of the source folders.
+# Must be the folder where the Quantizr project is located. The root of the source folders.
 export SCRIPTS=${PRJROOT}/scripts
 
 # Tells our scripts where the actual executable code is expected to be found
 export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
-
-# Don't worry about this if you don't know what it is. Point it to an empty folder at least, but do set it.
-export MONGO_SCRIPTS=${PRJPARENT}/scripts/mongo
-mkdir -p ${MONGO_SCRIPTS}
 
 export DOCKER_NETWORK=bridge
 
@@ -107,5 +97,5 @@ if [ -f "${PRJPARENT}/secrets/setenv-quanta-ext.sh" ]; then
     source ${PRJPARENT}/secrets/setenv-quanta-ext.sh
 else 
     echo "Environment Override didn't exist: ${PRJPARENT}/secrets/setenv-quanta-ext.sh"
-    read -p "Press a key to run with default secrets."
+    read -p "Press ENTER to run with default secrets."
 fi

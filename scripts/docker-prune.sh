@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Warning! This wipes all your docker images!"
-read -p "Press any key."
+read -p "Press ENTER key."
 
 # sudo -i
 docker image prune --all

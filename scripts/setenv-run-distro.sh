@@ -49,7 +49,6 @@ export XMS=1000m
 export XMX=2500m
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
-export MONGO_SCRIPTS=${DEPLOY_TARGET}/scripts
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020

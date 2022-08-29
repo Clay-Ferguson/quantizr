@@ -20,14 +20,9 @@ clear
 # show commands as they are run.
 # set -x
 
-# Make the folder holding this script become the current working directory
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
-echo "cd $SCRIPTPATH"
-cd "$SCRIPTPATH"
-
 # Set all environment variables
 source ./setenv-dev.sh
+initScriptFile
 
 # I'm no longer forcing a gracefull shutdown this way, becasue I'm assuming Docker Swarm is graceful enough.
 # echo "Stopping any existing server instance..."

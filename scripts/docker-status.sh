@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # SERVICE=quanta-stack-distro_quanta-distro
-SERVICE=quanta-stack-dev_quanta-dev
+SERVICE=quanta-stack-distro_quanta-distro
 NETWORK=bridge
 
 echo "_________________________________________________________"

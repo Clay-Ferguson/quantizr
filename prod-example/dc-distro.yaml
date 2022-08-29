@@ -14,10 +14,6 @@ services:
 
         command: mongod --config /etc/mongod.conf
 
-        # # todo-0 (prod had this ports section. Need to verify it works in my new config files: dev & distro)
-        # ports:
-        #     - '${MONGO_PORT}:${MONGO_PORT}'
-
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
@@ -52,9 +48,6 @@ services:
             - '${DEPLOY_TARGET}/config:/config'
             - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
 
-            # todo-0: why do we have this? Still needed?
-            # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
-            - $PWD:/app
         ports:
             - '${HOST_PORT_SEC}:${PORT_SEC}'
             - '${HOST_PORT}:${PORT}'
@@ -66,13 +59,6 @@ services:
             logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
-
-            # ----- todo-0: I think these properties are all obsolete, but I'm leaving them for now
-            JAR_FILE: "${JAR_FILE}"
-            PORT: "${PORT}"
-            PORT_SEC: "${PORT_SEC}"
-            PORT_DEBUG: "${PORT_DEBUG}" 
-            # ----- end paranoia
 
             mongoAdminPassword: "${adminPassword}"
             mongoSecurity: "true"
@@ -88,7 +74,7 @@ services:
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
     
-            # throttleTime: "0"
+            throttleTime: "0"
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}"
             mongodb.port: "${MONGO_PORT}" 

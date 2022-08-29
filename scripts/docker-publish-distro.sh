@@ -14,4 +14,4 @@ docker login
 # now push it up to public docker repo!
 docker push subnode/repo:quanta-${QUANTA_VER}
 
-read -p "Docker push complete: subnode/repo:quanta-${QUANTA_VER} press a key."
+read -p "Docker push complete: subnode/repo:quanta-${QUANTA_VER}. Press ENTER."

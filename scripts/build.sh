@@ -1,5 +1,4 @@
 #!/bin/bash
-# DO NOT call this script directly. It's called from other scripts.
 
 # show commands as they are run.
 # set -x

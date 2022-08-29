@@ -5,7 +5,7 @@ verifySuccess () {
         echo "$1 successful."
     else
         echo "$1 failed. EXIT CODE: $?"
-        read -p "Press any key to exit."
+        read -p "Press ENTER."
         exit $?
     fi
 }
@@ -75,20 +75,8 @@ dockerUp() {
     echo "Deploying stack"
     docker stack deploy -c ${dc_yaml} ${docker_stack}
     verifySuccess "Stack deployed."
-    echo "waiting..."
-    sleep 15s
-
-
-    # docker service ls
-    # docker service ps ${docker_stack}
-    # docker network inspect ${DOCKER_NETWORK}
-    # read -p "Docker Swarm Ok?"
-
-    # will this work with swarm mode ?
-    # sleep 10
-    # echo "Sleeping 10 seconds before checking logs"
-    # docker-compose -f ${dc_yaml} logs $1
-    # verifySuccess "Docker Compose: logs"
+    echo "waiting 30 seconds..."
+    sleep 30s
 }
 export -f dockerUp
 
@@ -105,9 +93,8 @@ export -f dockerDown
 
 printUrlsMessage() {
     echo ================================================
-    echo Quanta Started OK!
-    echo http://${quanta_domain}:${HOST_PORT}
-    echo To Test: curl -X POST  http://${quanta_domain}:${HOST_PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
+    echo Quanta is Running at: http://${quanta_domain}:${HOST_PORT}
+    # echo To Test: curl -X POST  http://${quanta_domain}:${HOST_PORT}/mobile/api/ping -H "Accept: application/json" -H "Content-Type: application/json" -d "{}"
     echo ================================================
     read -p "Press enter key."
 }
@@ -126,3 +113,9 @@ security:
 EOM
 }
 export -f genMongoConfig
+
+initScriptFile() {
+    THIS_FILE=$(readlink -f "$0")
+    THIS_FOLDER=$(dirname "$THIS_FILE")
+}
+export -f initScriptFile

@@ -14,12 +14,6 @@ clear
 #
 # ===================================================================
 
-# Make the folder holding this script become the current working directory
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
-echo "cd $SCRIPTPATH"
-cd "$SCRIPTPATH"
-
 source ./setenv-run-distro.sh
 
 ./stop-distro.sh
@@ -30,14 +24,8 @@ sudo chown -R $USER .
 mkdir -p ./dumps
 mkdir -p ./tmp
 mkdir -p ./log
-
-# todo-0: I think config foldelr is obsolete
 mkdir -p ./config
-
 mkdir -p ./data
-
-# todo-0: I think scripts is obsolete 
-mkdir -p ./scripts
 
 # Use this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
