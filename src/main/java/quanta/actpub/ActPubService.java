@@ -767,8 +767,11 @@ public class ActPubService extends ServiceBase {
 
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n"
-                            + XString.prettyPrint(activity));
+                    // not showing quesitons. they eat up too much log space.
+                    if (!"Question".equals(object.getType())) {
+                        log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n"
+                                + XString.prettyPrint(activity));
+                    }
                     break;
             }
             return null;

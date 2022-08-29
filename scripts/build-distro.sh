@@ -19,6 +19,11 @@ clear
 source ./setenv-build-distro.sh
 initScriptFile
 
+sudo rm -r ${DEPLOY_TARGET}
+
+echo "Preparing DEPLOY_TARGET: ${DEPLOY_TARGET}"
+mkdir -p ${DEPLOY_TARGET}
+
 # remove this to be sure we will notice if it doesn't successfully build
 sudo rm -f ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz
 
@@ -26,9 +31,6 @@ sudo rm -f ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
 sudo rm -rf ${DEPLOY_TARGET}/*
 verifySuccess "Cleaned deploy target"
-
-echo "Preparing DEPLOY_TARGET: ${DEPLOY_TARGET}"
-mkdir -p ${DEPLOY_TARGET}
 
 mkdir -p ${DEPLOY_TARGET}/log
 # Copy our primary logger file out to the live-loadable configured location

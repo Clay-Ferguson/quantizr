@@ -298,22 +298,16 @@ public class SystemService extends ServiceBase {
 	 * that represent actual users accessing thru their browsers
 	 */
 	private static String getIpReport() {
-		return "Unique IPs: " + HitFilter.getUniqueIpHits().size() + "\n" + "Unique USER IPs: " //
-				+ AppController.uniqueUserIpHits.size() + "\n";
-
-		// StringBuilder sb = new StringBuilder();
-		// sb.append("Unique IPs During Run<br>");
-		// int count = 0;
-		// HashMap<String, Integer> map = HitFilter.getUniqueIpHits();
-		// synchronized (map) {
-		// for (String key : map.keySet()) {
-		// int hits = map.get(key);
-		// sb.append("IP=" + key + " hits=" + hits);
-		// sb.append("<br>");
-		// count++;
-		// }
-		// }
-		// sb.append("count=" + count + "<br>");
-		// return sb.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("Unique IPs: " + HitFilter.getUniqueIpHits().size() + "\n");
+		HashMap<String, Integer> map = HitFilter.getUniqueIpHits();
+		synchronized (map) {
+			for (String key : map.keySet()) {
+				int hits = map.get(key);
+				sb.append("    IP=" + key + " hits=" + hits + "\n");
+			}
+		}
+		sb.append("Unique USER IPs: " + AppController.uniqueUserIpHits.size() + "\n");
+		return sb.toString();
 	}
 }
