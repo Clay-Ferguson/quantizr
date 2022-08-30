@@ -21,13 +21,14 @@ export quanta_domain=quanta.wiki
 mkdir -p ${DATA_FOLDER}/docs
 mkdir -p ${DATA_FOLDER}/tmp
 mkdir -p ${DATA_FOLDER}/log
+mkdir -p ${DATA_FOLDER}/ipfs
 mkdir -p ${DEPLOY_TARGET}/config
 
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
 
-export ipfs_data=${DEPLOY_TARGET}/ipfs
-export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
+export ipfs_data=${DATA_FOLDER}/ipfs
+export ipfs_staging=${DATA_FOLDER}/ipfs/staging
 
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts

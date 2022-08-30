@@ -8,5 +8,5 @@ source ./setenv-run-distro.sh
 dockerDown
 
 echo "Waiting 30s for graceful shutdowns..."
-sleep 30
+sleep 30s
 echo "done waiting!"
