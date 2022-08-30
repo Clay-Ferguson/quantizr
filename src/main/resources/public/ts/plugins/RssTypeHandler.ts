@@ -312,13 +312,6 @@ export class RssTypeHandler extends TypeBase {
 
         let anchor: Anchor = null;
         if (entry.title) {
-            if (entry.parentFeedTitle) {
-                headerDivChildren.push(new Div(null, {
-                    className: "rssParentTitle",
-                    dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
-                }));
-            }
-
             headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
                 anchor = new Anchor(entry.link, null, {
                     className: "rssAnchor",
@@ -440,10 +433,15 @@ export class RssTypeHandler extends TypeBase {
         }) : null;
 
         const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
+        const parentTitle =
+            entry.parentFeedTitle ? new Span(null, {
+                className: "marginRight",
+                dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
+            }) : null;
 
         children.push(new Div(null, null, [
             new Span(null, { className: "float-end" }, [
-                footerSpan, postIcon, linkIcon, bookmarkIcon
+                parentTitle, footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),
             // is this clearfix needed now that we wrapped this stuff in this div?
             new Clearfix()

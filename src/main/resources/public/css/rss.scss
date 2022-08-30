@@ -61,10 +61,6 @@
     margin-left: 15px;
 }
 
-.rssParentTitle {
-    font-size: 125%;
-}
-
 .rssFeedTitle {
     font-size: 150%;
     text-decoration: none;
@@ -83,14 +79,14 @@
 }
 
 .rss-feed-item {
-    border-top: 1px dotted $nodeBorderBottomColor;
+    border-top: 1px solid $nodeBorderBottomColor;
     margin-bottom: 12px;
     margin-left: 12px;
     padding-top: 4px;
 }
 
 .rss-feed-item:last-child {
-    border-bottom: 1px dotted $nodeBorderBottomColor;
+    border-bottom: 1px solid $nodeBorderBottomColor;
     margin-bottom: 12px;
     margin-left: 12px;
     padding-top: 4px;
