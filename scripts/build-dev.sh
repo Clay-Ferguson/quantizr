@@ -83,8 +83,8 @@ fi
 
 # read -p "Build and Start Complete. press a key"
 
-echo "Waiting for server to initialize..."
-sleep 7s
+echo "Waiting 12s for server to initialize..."
+sleep 12s
 
 printUrlsMessage
 

@@ -9,13 +9,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import quanta.util.ThreadLocals;
-import quanta.util.Util;
 
 /**
  * Servlet filter for monitoring load statistics
@@ -25,7 +24,7 @@ import quanta.util.Util;
 public class HitFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(HitFilter.class);
 
-	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<>();
+	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -41,28 +40,28 @@ public class HitFilter extends GenericFilterBean {
 	}
 
 	private void updateHitCounter(HttpServletRequest httpReq) {
-		ThreadLocals.setIp(Util.getClientIpAddr(httpReq));
-		addHit(uniqueIpHits);
+		HttpSession session = ((HttpServletRequest) httpReq).getSession(false);
+		if (ok(session)) {
+			addHit(uniqueHits, session.getId());
+		}
 	}
 
-	public static void addHit(HashMap<String, Integer> hashMap) {
-		String ip = ThreadLocals.getIp();
-		if (no(ip)) return;
-
+	// Identifier can be a username OR a sessionId, depending on which map is being updated
+	public static void addHit(HashMap<String, Integer> hashMap, String id) {
 		synchronized (hashMap) {
-			Integer hitCount = ok(ip) ? hashMap.get(ip) : null;
+			Integer hitCount = ok(id) ? hashMap.get(id) : null;
 
 			if (no(hitCount)) {
-				hashMap.put(ip, 1);
+				hashMap.put(id, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;
-				hashMap.put(ip, hitCount);
+				hashMap.put(id, hitCount);
 			}
 		}
 	}
 
-	public static HashMap<String, Integer> getUniqueIpHits() {
-		return uniqueIpHits;
+	public static HashMap<String, Integer> getHits() {
+		return uniqueHits;
 	}
 
 	public void destroy() {}

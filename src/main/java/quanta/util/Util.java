@@ -1,11 +1,7 @@
 package quanta.util;
 
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import javax.servlet.http.HttpServletRequest;
@@ -58,23 +54,6 @@ public class Util {
 		}
 	}
 
-	/*
-	 * I found this code online and it is not fully tested, but according to my research it is the best
-	 * way you can try determining the source IP.
-	 */
-	public static String getClientIpAddr(HttpServletRequest request) {
-		for (String header : IP_HEADERS_TO_TRY) {
-			String ip = request.getHeader(header);
-			if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
-				return ip;
-			}
-		}
-		return request.getRemoteAddr();
-	}
-
-	public static boolean unknownIp(String ip) {
-		return no(ip) || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
-	}
 
 	public static boolean isSpringAuthenticated() {
 		return ok(SecurityContextHolder.getContext().getAuthentication())

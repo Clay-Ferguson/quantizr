@@ -322,7 +322,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (ok(signupCode)) {
 			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
 		}
-		HitFilter.addHit(uniqueUserIpHits);
+		HitFilter.addHit(uniqueUserIpHits, ThreadLocals.getSC().getUserName());
 		return "index";
 	}
 

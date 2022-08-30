@@ -86,7 +86,6 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				ThreadLocals.setReqBearerToken(bearer);
-				sc.setIp(Util.getClientIpAddr(httpReq));
 
 				if (simulateSlowServer > 0) {
 					Util.sleep(simulateSlowServer);

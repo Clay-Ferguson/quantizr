@@ -32,6 +32,8 @@ import quanta.util.Util;
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
 
+	private HttpSession session;
+
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
@@ -53,7 +55,6 @@ public class SessionContext extends ServiceBase {
 	private String userName = PrincipalName.ANON.s();
 	private ObjectId userNodeId;
 	private String pastUserName = userName;
-	private String ip;
 	private String timezone;
 	private String timeZoneAbbrev;
 
@@ -136,7 +137,16 @@ public class SessionContext extends ServiceBase {
 		}
 		ThreadLocals.setHttpSession(session);
 		ThreadLocals.setSC(sc);
+		sc.setSession(session);
 		return sc;
+	}
+
+	public HttpSession getSession() {
+		return session;
+	}
+
+	public void setSession(HttpSession session) {
+		this.session = session;
 	}
 
 	/* Extra layer of security to invalidate this session object */
@@ -158,7 +168,6 @@ public class SessionContext extends ServiceBase {
 		sc.userName = userName;
 		sc.userNodeId = userNodeId;
 		sc.pastUserName = pastUserName;
-		sc.ip = ip;
 		sc.timezone = timezone;
 		sc.timeZoneAbbrev = timeZoneAbbrev;
 		sc.lastLoginTime = lastLoginTime;
@@ -476,14 +485,6 @@ public class SessionContext extends ServiceBase {
 
 	public void setTimelinePath(String timelinePath) {
 		this.timelinePath = timelinePath;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
 	}
 
 	public boolean isLive() {

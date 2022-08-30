@@ -106,7 +106,7 @@ export class FullScreenGraphViewer extends Main {
                 .join("circle")
 
                 .attr("fill", function (d: any) {
-                    let color = "transparent";
+                    let color = "black";
                     if (d.data.id === nodeId) {
                         color = "red";
                     }

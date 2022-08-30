@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.AppProp;
 import quanta.model.IPInfo;
-import quanta.util.Util;
 
 /**
  * ServletFilter for throttling access
@@ -56,11 +56,14 @@ public class ThrottleFilter extends GenericFilterBean {
 
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
-			String ip = Util.getClientIpAddr(sreq);
-			synchronized (ipInfo) {
-				info = ipInfo.get(ip);
-				if (no(info)) {
-					ipInfo.put(ip, info = new IPInfo());
+			HttpSession session = sreq.getSession(false);
+			if (ok(session)) {
+				String ip = session.getId();
+				synchronized (ipInfo) {
+					info = ipInfo.get(ip);
+					if (no(info)) {
+						ipInfo.put(ip, info = new IPInfo());
+					}
 				}
 			}
 			throttleRequest(sreq, info);

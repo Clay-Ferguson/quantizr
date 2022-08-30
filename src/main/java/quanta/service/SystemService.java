@@ -189,7 +189,7 @@ public class SystemService extends ServiceBase {
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;
 		sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
 		sb.append(String.format("Sessions: %d\n", AppSessionListener.getSessionCounter()));
-		sb.append(getIpReport());
+		sb.append(getSessionReport());
 		sb.append("Node Count: " + read.getNodeCount() + "\n");
 		sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
 		sb.append(user.getUserAccountsReport(null));
@@ -235,8 +235,8 @@ public class SystemService extends ServiceBase {
 
 		List<SessionContext> sessions = SessionContext.getHistoricalSessions();
 		sessions.sort((s1, s2) -> {
-			String s1key = s1.getUserName() + "/" + (no(s1.getIp()) ? "?" : s1.getIp());
-			String s2key = s2.getUserName() + "/" + (no(s2.getIp()) ? "?" : s2.getIp());
+			String s1key = s1.getUserName();
+			String s2key = s2.getUserName();
 			return s1key.compareTo(s2key);
 		});
 
@@ -244,7 +244,7 @@ public class SystemService extends ServiceBase {
 		for (SessionContext s : sessions) {
 			if (s.isLive()) {
 				sb.append("User: ");
-				sb.append(s.getUserName() + "/" + (no(s.getIp()) ? "?" : s.getIp()));
+				sb.append(s.getUserName());
 				sb.append("\n");
 				sb.append(s.dumpActions("      ", 3));
 			}
@@ -254,7 +254,7 @@ public class SystemService extends ServiceBase {
 		for (SessionContext s : sessions) {
 			if (!s.isLive()) {
 				sb.append("User: ");
-				sb.append(s.getPastUserName() + "/" + (no(s.getIp()) ? "?" : s.getIp()));
+				sb.append(s.getPastUserName());
 				sb.append("\n");
 				sb.append(s.dumpActions("      ", 3));
 			}
@@ -299,17 +299,30 @@ public class SystemService extends ServiceBase {
 	 * uniqueIps are all IPs even comming from foreign FediverseServers, but uniqueUserIps are the ones
 	 * that represent actual users accessing thru their browsers
 	 */
-	private static String getIpReport() {
+	private static String getSessionReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Unique IPs: " + HitFilter.getUniqueIpHits().size() + "\n");
-		HashMap<String, Integer> map = HitFilter.getUniqueIpHits();
+		sb.append("All Sessions (over 10 hits): " + HitFilter.getHits().size() + "\n");
+		HashMap<String, Integer> map = HitFilter.getHits();
 		synchronized (map) {
 			for (String key : map.keySet()) {
 				int hits = map.get(key);
-				sb.append("    IP=" + key + " hits=" + hits + "\n");
+				if (hits > 10) {
+					sb.append("    " + key + " hits=" + hits + "\n");
+				}
 			}
 		}
-		sb.append("Unique USER IPs: " + AppController.uniqueUserIpHits.size() + "\n");
+		sb.append("User Sessions: " + AppController.uniqueUserIpHits.size() + "\n");
+
+		sb.append("Live Sessions:\n");
+		for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
+			if (sc.isLive() && ok(sc.getUserName())) {
+				Integer hits = map.get(sc.getSession().getId());
+				sb.append("    " + sc.getUserName() + " hits=" + (ok(hits) ? String.valueOf(hits) : "?"));
+				sb.append("\n");
+			}
+		}
+		sb.append("\n");
+
 		return sb.toString();
 	}
 }
