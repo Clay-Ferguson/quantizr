@@ -395,10 +395,8 @@ public class IPFSService extends ServiceBase {
                     }
                 }
             }
-
         } catch (Exception e) {
-            // Don't show this. Sometimes we try to read a file to see if it's present or not.
-            // log.error("Failed in restTemplate.exchange", e);
+            log.error("Failed in restTemplate.exchange", e);
         }
         return ret;
     }

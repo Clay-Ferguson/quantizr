@@ -28,6 +28,38 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
+    # ipfs-distro: 
+    #     # https://hub.docker.com/r/ipfs/kubo/
+    #     image: ipfs/kubo:release
+    #     hostname: ipfs-host-distro
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - ipfs-host-distro
+    #     deploy:
+    #         resources:
+    #             limits:
+    #                 # Give docker 10% of CPU and 1 GB max
+    #                 cpus: "0.1"
+    #                 memory: 1000M
+    #             # reservations:
+    #             #   cpus: 0.25
+    #             #   memory: 128M
+
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         IPFS_PROFILE: "server" 
+    #         IPFS_PATH: "/data/ipfs"
+        
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+
+    #     ports:
+    #         # Allow this thru your firewall: sudo ufw allow 4001
+    #         - "4001:4001"
+    #         - "4001:4001/udp"
+
     quanta-distro:
         image: ${DOCKER_IMAGE}
         build: 
@@ -100,13 +132,13 @@ services:
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
-            ipfs.host: "http://ipfs-distro"
+            ipfs.host: "http://ipfs-host-distro"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
 
         depends_on:
             - mongo-distro
-        #     - ipfs-dev
+            # - ipfs-distro
 
 networks:
     bridge:

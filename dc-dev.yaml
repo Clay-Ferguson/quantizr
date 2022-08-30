@@ -1,6 +1,7 @@
 version: '3.7'
 services:
     mongo-dev: 
+        image: mongo:4.0
         hostname: mongo-host-dev
         networks:
             bridge:
@@ -16,7 +17,37 @@ services:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
 
-        image: mongo:4.0
+    # ipfs-dev: 
+    #     # https://hub.docker.com/r/ipfs/kubo/
+    #     image: ipfs/kubo:release
+    #     hostname: ipfs-host-dev
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - ipfs-host-dev
+    #     deploy:
+    #         resources:
+    #             limits:
+    #                 # Give docker 10% of CPU and 1 GB max
+    #                 cpus: "0.1"
+    #                 memory: 1000M
+    #             # reservations:
+    #             #   cpus: 0.25
+    #             #   memory: 128M
+
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         IPFS_PROFILE: "server" 
+    #         IPFS_PATH: "/data/ipfs"
+        
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+
+    #     ports:
+    #         # Allow this thru your firewall: sudo ufw allow 4001
+    #         - "4001:4001"
+    #         - "4001:4001/udp"
 
     quanta-dev:
         image: ${DOCKER_IMAGE}
@@ -98,13 +129,13 @@ services:
 
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${PORT_DEBUG},server=y,suspend=n"
             
-            ipfs.host: "http://ipfs-dev"
+            ipfs.host: "http://ipfs-host-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
 
         depends_on:
             - mongo-dev
-        #     - ipfs-dev
+            # - ipfs-dev
 
 networks:
     bridge:
