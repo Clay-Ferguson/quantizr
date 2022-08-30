@@ -31,6 +31,7 @@ imageCheck () {
 }
 export -f imageCheck
 
+# todo-0: review this now that IPFS is reenabled.
 ipfsConfig () {
     echo "Oops. Not converted so Swarm mode yet"
     return
@@ -63,31 +64,20 @@ dockerBuild () {
 export -f dockerBuild
 
 dockerUp() {
-    # echo "removing previous network"
-    # docker network rm ${DOCKER_NETWORK}
-    # sleep 6s
-    
-    # echo "creating new network"
-    # # docker network create --driver=bridge --subnet=${SUBNET} --gateway=${GATEWAY} ${DOCKER_NETWORK}
-    # verifySuccess "Started docker network."
-    # sleep 6s
-
     echo "Deploying stack"
     docker stack deploy -c ${dc_yaml} ${docker_stack}
     verifySuccess "Stack deployed."
-    echo "waiting 30 seconds..."
-    sleep 30s
+
+    echo "waiting ${DOCKER_UP_DELAY}, after deploying..."
+    sleep ${DOCKER_UP_DELAY}
 }
 export -f dockerUp
 
 dockerDown() {
     echo "Stopping docker stack"
     docker stack rm ${docker_stack}
-    sleep 15s
-
-    # echo "Removing network"
-    # docker network rm ${DOCKER_NETWORK}
-    # sleep 5s
+    echo "waiting ${DOCKER_DOWN_DELAY} after stack removed..."
+    sleep ${DOCKER_DOWN_DELAY}
 }
 export -f dockerDown
 

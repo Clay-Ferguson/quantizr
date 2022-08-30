@@ -69,6 +69,8 @@ export MONGO_BASE=${PRJPARENT}
 # (The Distro Folder on this machine. The folder containing the runtime and configs)
 export QUANTA_BASE=/home/clay/quanta-localhost-dev
 
+export DOCKER_DOWN_DELAY=5s
+export DOCKER_UP_DELAY=5s
 
 # SECRETS 
 

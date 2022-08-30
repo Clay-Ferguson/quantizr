@@ -53,6 +53,9 @@ export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
 
+export DOCKER_DOWN_DELAY=15s
+export DOCKER_UP_DELAY=20s
+
 # SECRETS 
 
 # Fill these in if you are supporting signups which requires you to have access
