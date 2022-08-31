@@ -49,6 +49,17 @@ dockerUp() {
 export -f dockerUp
 
 dockerDown() {
+    # Trying to help docker not blow up (which it has been doing), by giving it as graceful a shutdown as I can
+    if [[ -z ${ipfsEnabled} ]];  
+    then
+        echo "ipfs not enabled"
+    else
+        # todo-0: not yet tested on PROD
+        echo "running IPFS internal damon shutdown: Service=${docker_stack}_${ipfs_container}"
+        docker exec $(docker ps -q -f name=${docker_stack}_${ipfs_container}) ipfs shutdown ; sleep 3s
+        echo "waiting ${DOCKER_DOWN_DELAY} after IPFS shutdown..."
+    fi
+
     echo "Stopping docker stack"
     docker stack rm ${docker_stack}
     echo "waiting ${DOCKER_DOWN_DELAY} after stack removed..."

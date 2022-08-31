@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Defines some reusable functions that are common to many of these scripts
-source ./define-functions.sh
 THIS_FILE=$(readlink -f "$0")
 THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
+
+# Defines some reusable functions that are common to many of these scripts
+source ./define-functions.sh
 
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
@@ -42,6 +43,7 @@ export ipfs_staging=/home/clay/.ipfs/staging
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
 export ipfsEnabled=
+export ipfs_container=ipfs-dev
 
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev

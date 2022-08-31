@@ -41,6 +41,7 @@ export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
 export ipfsEnabled=
+export ipfs_container=ipfs-distro
 
 export HOST_PORT=80
 export PORT=80

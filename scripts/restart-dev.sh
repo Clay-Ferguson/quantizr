@@ -19,7 +19,7 @@ cd $PRJROOT
 # use the compiler:compile it keeps even the compile phase from looking at any resources, and this is safe if you know
 # the only files you have touched were Java Source files and no properties files for example.
 
-mvn --offline compiler:compile -DskipTests=true -Pjava-compile
+mvn -T 1C --offline compiler:compile -DskipTests=true -Pjava-compile
 
 sudo rm -rf ${QUANTA_BASE}/log/*
 

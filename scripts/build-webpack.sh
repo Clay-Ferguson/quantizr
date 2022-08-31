@@ -5,6 +5,6 @@
 source ./setenv-dev.sh
 
 cd ${PRJROOT}
-mvn generate-resources -DskipTests -Pwebpack
+mvn -T 1C generate-resources -DskipTests -Pwebpack
 
 # read -p "Build and Start Complete. press a key"
