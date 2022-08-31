@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
 import { AppTab } from "./AppTab";
 import { CompIntf } from "./base/CompIntf";
+import { ButtonBar } from "./core/ButtonBar";
 
 export class TabPanel extends Div {
 
@@ -32,10 +33,17 @@ export class TabPanel extends Div {
                 role: "main",
                 id: "tabPanelContentId"
             }, this.buildTabs(state)),
-            !state.mobileMode ? new IconButton("fa-angle-double-up", null, {
-                onClick: () => S.view.scrollActiveToTop(state),
-                title: "Scroll to Top"
-            }, "btn-primary scrollTopButtonLowerRight", "off") : null
+            !state.mobileMode ? new ButtonBar([
+                S.quanta.activeTab === C.TAB_MAIN && S.nav.parentVisibleToUser(state) ? new IconButton("fa-folder", "Up Level", {
+                    nid: state.node.id,
+                    onClick: S.nav.navUpLevelClick,
+                    title: "Go to Parent Node"
+                }) : null,
+                new IconButton("fa-angle-double-up", null, {
+                    onClick: () => S.view.scrollActiveToTop(state),
+                    title: "Scroll to Top"
+                }, null, "off")
+            ], null, "scrollTopButtonLowerRight") : null
         ]);
     }
 
