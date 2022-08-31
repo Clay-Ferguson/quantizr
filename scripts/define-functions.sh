@@ -31,31 +31,6 @@ imageCheck () {
 }
 export -f imageCheck
 
-# todo-0: review this now that IPFS is reenabled.
-ipfsConfig () {
-    echo "Oops. Not converted so Swarm mode yet"
-    return
-
-    # This sleeping is required to be sure ipfs is started and not 'repo locked'
-    echo "Sleeping a few seconds before accessing ipfs"
-    sleep 20s
-
-    # todo-1: I'm pretty sure maybe only the API headers need to be set and not Gateway, but haven't confirmed yet
-    # (Also there's probably a way to do this inside an actual config text file, rather than on command line)
-    docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${dc_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
-
-    docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${dc_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
-
-    echo "Sleeping again before restarting ipfs"
-    sleep 10s
-
-    # todo-0: what is swarm equivalent of this?
-    docker-compose -f ${dc_yaml} restart $1
-}
-export -f ipfsConfig
-
 dockerBuild () {
     echo "dockerBuild: app"
     docker-compose -f ${dc_yaml} build

@@ -199,7 +199,7 @@ export class Encryption {
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         if (!crypto.subtle) {
             // apparently chrome no longer allows this on http connections? todo-0
-            // todo-0: if so need an across-the-board way to disable all crypto features which will apply to just DEV environment?
+            // todo-0: if so, we need an across-the-board way to disable all crypto features when crypto supported by browser?
             console.warn("crypto.subtle is not enabled");
             return;
         }

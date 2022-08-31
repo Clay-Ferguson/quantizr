@@ -72,17 +72,6 @@ if [[ -z ${ipfsEnabled} ]];
         serviceCheck ${docker_stack}_ipfs-dev
 fi
 
-# configure ipfs 
-# todo-1: need to find out if there's a way to pass config parameters into the ipfs docker file or not, because that
-# would be much cleaner than setting these parameters and then doing a restart
-# Disabling this for now. Only needed to enable HTTP API over port 5001, and also needs to be run just once instead
-# of every time we build.
-# ipfsConfig ipfs-dev
-# check ipfs again
-# serviceCheck ipfs-dev
-
-# read -p "Build and Start Complete. press a key"
-
 echo "Waiting 12s for server to initialize..."
 sleep 12s
 
