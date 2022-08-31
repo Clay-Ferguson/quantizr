@@ -122,5 +122,5 @@ echo "You can test locally (before publishing) by running:"
 echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "================================================================="
 echo 
-echo "Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
-read -p "Press ENTER Key"
+echo "************ Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
+

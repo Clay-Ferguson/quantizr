@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Defining Functions..."
+
 verifySuccess () {
     if [ $? -eq 0 ]; then
         echo "$1 successful."
@@ -92,4 +94,6 @@ security:
 EOM
 }
 export -f genMongoConfig
+
+echo "Functions ready"
 

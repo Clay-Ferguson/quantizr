@@ -18,11 +18,11 @@ export DATA_FOLDER=/home/clay/q2-data
 export quanta_domain=quanta.wiki
 
 # I'm expanding scope of setenv to have the responsibility of ALSO creating folders
-mkdir -p ${DATA_FOLDER}/docs
-mkdir -p ${DATA_FOLDER}/tmp
-mkdir -p ${DATA_FOLDER}/log
-mkdir -p ${DATA_FOLDER}/ipfs
-mkdir -p ${DEPLOY_TARGET}/config
+mkdir -pv ${DATA_FOLDER}/docs
+mkdir -pv ${DATA_FOLDER}/tmp
+mkdir -pv ${DATA_FOLDER}/log
+mkdir -pv ${DATA_FOLDER}/ipfs
+mkdir -pv ${DEPLOY_TARGET}/config
 
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
@@ -32,7 +32,7 @@ export ipfs_staging=${DATA_FOLDER}/ipfs/staging
 
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
-export ipfsEnabled=false
+export ipfsEnabled=
 export ipfs_container=ipfs-distro
 
 export HOST_PORT=80
