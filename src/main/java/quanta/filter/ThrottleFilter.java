@@ -65,8 +65,8 @@ public class ThrottleFilter extends GenericFilterBean {
 						ipInfo.put(ip, info = new IPInfo());
 					}
 				}
+				throttleRequest(sreq, info);
 			}
-			throttleRequest(sreq, info);
 		}
 
 		/*
