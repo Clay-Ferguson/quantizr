@@ -26,6 +26,11 @@ public class ExUtil {
 		}
 	}
 
+	public static RuntimeException logAndWrapEx(Logger logger, String msg, Throwable ex) {
+		error(logger, msg, ex);
+		return wrapEx(ex);
+	}
+
 	public static RuntimeException wrapEx(Throwable ex) {
 		if (ex instanceof RuntimeException) {
 			return (RuntimeException) ex;

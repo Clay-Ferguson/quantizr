@@ -186,7 +186,6 @@ public class ExportServiceFlexmark extends ServiceBase {
 						StreamUtil.close(is);
 					}
 				}
-
 			} else {
 				throw new RuntimeException("invalid format.");
 			}

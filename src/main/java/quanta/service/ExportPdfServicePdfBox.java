@@ -81,7 +81,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 		if (nodeId.equals("/")) {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
-			log.info("Exporting to Text File");
+			log.info("Exporting to File");
 			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
@@ -107,7 +107,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			newPage();
 			recurseNode(exportNode, 0);
 		} catch (Exception ex) {
-			throw ExUtil.wrapEx(ex);
+			throw ExUtil.logAndWrapEx(log, "Failed Generating PDF", ex);
 		} finally {
 			try {
 				if (ok(stream)) {
@@ -117,7 +117,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 				doc.save(fullFileName);
 				doc.close();
 			} catch (Exception e) {
-				throw ExUtil.wrapEx(e);
+				throw ExUtil.logAndWrapEx(log, "Failed Unwinding PDF", e);
 			}
 
 			(new File(fullFileName)).deleteOnExit();
