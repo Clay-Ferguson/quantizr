@@ -49,7 +49,7 @@ export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
 
-export DOCKER_DOWN_DELAY=20s
+export DOCKER_DOWN_DELAY=30s
 export DOCKER_UP_DELAY=20s
 
 # SECRETS come out of the setenv-quanta-ext.sh (real passwords, etc)
