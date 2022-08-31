@@ -22,37 +22,39 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
-    ipfs-distro: 
-        # https://hub.docker.com/r/ipfs/kubo/
-        image: ipfs/kubo:release
-        hostname: ipfs-host-distro
-        networks:
-            bridge:
-                aliases:
-                    - ipfs-host-distro
-        deploy:
-            resources:
-                limits:
-                    # cpus is a percentage of total power: 1.0==100%
-                    cpus: "0.1"
-                    memory: 512M
-                # reservations:
-                #   cpus: 0.25
-                #   memory: 128M
+    # I'm Disabling IPFS for now, because it always just runs for a while and then just mysteriously terminates.
+    # Need to investigate asap (todo-0)
+    # ipfs-distro: 
+    #     # https://hub.docker.com/r/ipfs/kubo/
+    #     image: ipfs/kubo:release
+    #     hostname: ipfs-host-distro
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - ipfs-host-distro
+    #     deploy:
+    #         resources:
+    #             limits:
+    #                 # cpus is a percentage of total power: 1.0==100%
+    #                 cpus: "0.1"
+    #                 memory: 512M
+    #             # reservations:
+    #             #   cpus: 0.25
+    #             #   memory: 128M
 
-        environment:
-            # IPFS_PROFILE options (lowpower | server)
-            IPFS_PROFILE: "server" 
-            IPFS_PATH: "/data/ipfs"
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         IPFS_PROFILE: "server" 
+    #         IPFS_PATH: "/data/ipfs"
         
-        volumes:
-            - '${ipfs_staging}:/export'
-            - '${ipfs_data}:/data/ipfs'
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
 
-        ports:
-            # Allow this thru your firewall: sudo ufw allow 4001
-            - "4001:4001"
-            - "4001:4001/udp"
+    #     ports:
+    #         # Allow this thru your firewall: sudo ufw allow 4001
+    #         - "4001:4001"
+    #         - "4001:4001/udp"
 
     quanta-distro:
         image: ${DOCKER_IMAGE}
@@ -148,7 +150,7 @@ services:
 
         depends_on:
             - mongo-distro
-            - ipfs-distro
+            # - ipfs-distro
 
 networks:
     bridge:

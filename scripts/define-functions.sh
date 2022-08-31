@@ -54,7 +54,10 @@ dockerDown() {
     then
         echo "ipfs not enabled"
     else
-        # todo-0: not yet tested on PROD
+        # todo-0: not yet tested on PROD. I had added this to try to see if it's the reason IPFS cannot stay up (but always 
+        # crashes apparently completely on it's own), but I discovered the IPFS lock file failure is not related to shutdown
+        # but IS indeed just IPFS deciding to shutdown all on it's own, so for now I'm disabling IPFS completely on prod
+        # until I have time to investigate.
         echo "running IPFS internal damon shutdown: Service=${docker_stack}_${ipfs_container}"
         docker exec $(docker ps -q -f name=${docker_stack}_${ipfs_container}) ipfs shutdown ; sleep 3s
         echo "waiting ${DOCKER_DOWN_DELAY} after IPFS shutdown..."
