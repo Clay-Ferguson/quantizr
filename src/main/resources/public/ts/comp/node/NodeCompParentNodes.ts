@@ -23,7 +23,7 @@ export class NodeCompParentNodes extends Div {
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
          from 'parents' array, but the system architecture is such that if we ever want to display
          more than one parent we can implement that easily */
-        const node = state.node.parents[0];
+        const node = state.node?.parents?.length > 0 ? state.node?.parents[0] : null;
 
         if (!node) {
             this.setChildren(null);

@@ -7,6 +7,7 @@ import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
+declare let g_initialTab: string;
 export class User {
     closeAccount = async () => {
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
@@ -216,8 +217,9 @@ export class User {
             let childId: string = null;
             let renderParentIfLeaf = true;
 
-            if (res.initialTab) {
-                S.tabUtil.selectTab(res.initialTab);
+            if (g_initialTab) {
+                S.tabUtil.selectTab(g_initialTab);
+                g_initialTab = null;
                 return;
             }
 

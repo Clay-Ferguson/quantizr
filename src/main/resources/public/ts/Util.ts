@@ -943,7 +943,7 @@ export class Util {
         if (dispatchNow) {
             dispatch("SetUserPreferences", s => {
                 s.userPrefs = state.userPrefs;
-                if (!s.userPrefs.showParents) {
+                if (!s.userPrefs.showParents && s.node) {
                     s.node.parents = null;
                 }
                 return s;

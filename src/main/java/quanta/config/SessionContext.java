@@ -72,9 +72,6 @@ public class SessionContext extends ServiceBase {
 	/* Initial id param parsed from first URL request */
 	private String urlId;
 
-	// if user enters /tab/[tabName] on url, this holds the tabName
-	private String initialTab;
-
 	public int counter;
 
 	/* Emitter for sending push notifications to the client */
@@ -557,13 +554,5 @@ public class SessionContext extends ServiceBase {
 
 	public void setAppGuid(String appGuid) {
 		this.appGuid = appGuid;
-	}
-
-	public String getInitialTab() {
-		return initialTab;
-	}
-
-	public void setInitialTab(String initialTab) {
-		this.initialTab = initialTab;
 	}
 }
