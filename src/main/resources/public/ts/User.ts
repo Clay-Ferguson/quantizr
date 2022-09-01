@@ -45,8 +45,8 @@ export class User {
             lcUserName === "dan";
     }
 
-    refreshLogin = async (state: AppState, initialTab: string) => {
-        console.log("refreshLogin: initialTab=" + initialTab);
+    refreshLogin = async (state: AppState) => {
+        console.log("refreshLogin: initialTab=" + g_initialTab);
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
         // console.log("got loginState");
@@ -54,8 +54,9 @@ export class User {
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
             console.log("loginState known as logged out.");
-            if (initialTab) {
-                S.tabUtil.selectTab(initialTab);
+            if (g_initialTab) {
+                S.tabUtil.selectTab(g_initialTab);
+                g_initialTab = null;
             }
             else {
                 S.util.loadAnonPageHome();
@@ -77,12 +78,7 @@ export class User {
         console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
-            if (initialTab) {
-                S.tabUtil.selectTab(initialTab);
-            }
-            else {
-                S.util.loadAnonPageHome();
-            }
+            this.anonInitialRender();
         } else {
             try {
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
@@ -107,25 +103,24 @@ export class User {
                     if (res.success) {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
-
-                    if (initialTab) {
-                        S.tabUtil.selectTab(initialTab);
-                    }
-                    else {
-                        S.util.loadAnonPageHome();
-                    }
+                    this.anonInitialRender();
                 }
             }
             catch (e) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
-                if (initialTab) {
-                    S.tabUtil.selectTab(initialTab);
-                }
-                else {
-                    S.util.loadAnonPageHome();
-                }
+                this.anonInitialRender();
             }
+        }
+    }
+
+    anonInitialRender = () => {
+        if (g_initialTab) {
+            S.tabUtil.selectTab(g_initialTab);
+            g_initialTab = null;
+        }
+        else {
+            S.util.loadAnonPageHome();
         }
     }
 
