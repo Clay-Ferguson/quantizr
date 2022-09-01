@@ -196,6 +196,11 @@ export class User {
             let childId: string = null;
             let renderParentIfLeaf = true;
 
+            if (res.initialTab) {
+                S.tabUtil.selectTab(res.initialTab);
+                return;
+            }
+
             if (res.homeNodeOverride) {
                 id = res.homeNodeOverride;
                 // console.log("homeNodeOverride=" + id);

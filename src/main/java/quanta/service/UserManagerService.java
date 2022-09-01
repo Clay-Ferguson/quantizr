@@ -150,6 +150,10 @@ public class UserManagerService extends ServiceBase {
 		res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
 		log.debug("Processing Login: urlId=" + (ok(sc.getUrlId()) ? sc.getUrlId() : "null"));
 
+		if (ok(sc.getInitialTab())) {
+			res.setInitialTab(sc.getInitialTab());
+		}
+
 		if (ok(sc.getUrlId())) {
 			// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
 			res.setHomeNodeOverride(sc.getUrlId());

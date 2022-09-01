@@ -25,6 +25,7 @@ public class LoginResponse extends ResponseBase {
 	 * override for anything else.
 	 */
 	private String homeNodeOverride;
+	private String initialTab;
 
 	private UserPreferences userPreferences;
 
@@ -108,5 +109,13 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowedFeatures(String allowedFeatures) {
 		this.allowedFeatures = allowedFeatures;
+	}
+
+	public String getInitialTab() {
+		return initialTab;
+	}
+
+	public void setInitialTab(String initialTab) {
+		this.initialTab = initialTab;
 	}
 }

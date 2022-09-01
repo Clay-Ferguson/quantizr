@@ -243,14 +243,20 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * Renders with Thymeleaf.
 	 */
 	@PerfMon
-	@RequestMapping(value = {"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
+	@RequestMapping(value = {"/", "/tab/{tabName}", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
+			// =======================================================================================
+			/* PATH PARAMS */
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
 			@PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
 
 			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
 			@PathVariable(value = "userName", required = false) String userName, //
+			@PathVariable(value = "tabName", required = false) String tabName, //
+
+			// =======================================================================================
+			/* REQUEST PARAMS */
 			@RequestParam(value = "id", required = false) String id, //
 
 			// be careful removing this, clicking on a node updates the browser history to
@@ -278,6 +284,12 @@ public class AppController extends ServiceBase implements ErrorController {
 			} else if (!StringUtils.isEmpty(name)) {
 				id = ":" + name;
 			}
+
+			// Conver tab name if short name given
+			if ("feed".equals(tabName)) {
+				tabName = "feedTab";
+			}
+			ThreadLocals.getSC().setInitialTab(tabName);
 
 			// make sure urlId is defaulted to null
 			ThreadLocals.getSC().setUrlId(null);
@@ -454,7 +466,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("signup", req, session, ms -> {
-			// This automated flag will bypass the captcha check, and email confirmation, and just immediately create the user.
+			// This automated flag will bypass the captcha check, and email confirmation, and just immediately
+			// create the user.
 			boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
 			return user.signup(req, automated);
 		});

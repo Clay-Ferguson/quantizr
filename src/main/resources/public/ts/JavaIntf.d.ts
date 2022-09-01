@@ -716,6 +716,7 @@ export interface LoginResponse extends ResponseBase {
     allowedFeatures: string;
     anonUserLandingPageNode: string;
     homeNodeOverride: string;
+    initialTab: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
 }

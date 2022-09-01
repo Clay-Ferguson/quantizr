@@ -23,7 +23,10 @@ export class Constants {
     static TAB_TIMELINE: string = "timelineResultSetView";
     static TAB_FOLLOWERS: string = "followersResultSetView";
     static TAB_FOLLOWING: string = "followingResultSetView";
+
+    // note: This tab name does exist in java, so we probably should put it in a constants that comes from JAVA.
     static TAB_FEED: string = "feedTab";
+
     // static TAB_IPSM: string = "ipsmTab";
     static TAB_TRENDING: string = "trendingTab";
     static TAB_THREAD: string = "threadTab";
