@@ -70,7 +70,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 new Div(null, null, [
                     newItems,
-                    state.displayFeedSearch ? new TextField({
+                    state.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                         val: this.data.props.searchTextState,
                         placeholder: "Search for...",
                         enter: S.srch.refreshFeed,
