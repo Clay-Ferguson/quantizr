@@ -1441,14 +1441,12 @@ public class ActPubService extends ServiceBase {
 
         try {
             userRefresh = true;
-
-            // todo-0: bring this back maybe. Remove the delay/sleep in that function
-            // try {
-            // saveUserNames();
-            // } catch (Exception e) {
-            // // log and ignore.
-            // log.error("saveUserNames", e);
-            // }
+            try {
+                saveUserNames();
+            } catch (Exception e) {
+                // log and ignore.
+                log.error("saveUserNames", e);
+            }
 
             refreshUsers();
         } catch (Exception e) {
@@ -1641,14 +1639,10 @@ public class ActPubService extends ServiceBase {
             fName.setName(name);
             fName.setCreateTime(Calendar.getInstance().getTime());
 
-            /*
-             * I'm not sure if it's faster to try to save and let the unique index block duplicates, or if it's
-             * faster to check for dups before calling save here.
-             */
             try {
                 // log.debug("Saving Name: " + fName.getName());
                 ops.save(fName);
-                Thread.sleep(500);
+                // Thread.sleep(500);
             } catch (Exception e) {
                 // this will happen for every duplicate. so A LOT!
             }
@@ -1671,9 +1665,6 @@ public class ActPubService extends ServiceBase {
 
     /*
      * Generates the list of all users being followed into 'apCache.followedUsers'
-     * 
-     * todo-0: need a specific version of this that queries FollowBot follows only
-     * 
      */
     public void identifyFollowedAccounts(boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
