@@ -236,6 +236,10 @@ public class MongoRead extends ServiceBase {
              * but it always safe to get this node this way here.
              */
             userNode = getUserNodeByUserName(null, userName);
+            if (no(userNode)) {
+                log.debug("Unable to find node by: " + name);
+                return null;
+            }
             nodeOwnerId = userNode.getOwner();
             name = name.substring(colonIdx + 1);
         }
