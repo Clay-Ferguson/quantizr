@@ -44,16 +44,21 @@ export class User {
             lcUserName === "dan";
     }
 
-    refreshLogin = async (state: AppState) => {
-        console.log("refreshLogin.");
+    refreshLogin = async (state: AppState, initialTab: string) => {
+        console.log("refreshLogin: initialTab=" + initialTab);
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
-        console.log("got loginState");
+        // console.log("got loginState");
 
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
             console.log("loginState known as logged out.");
-            S.util.loadAnonPageHome();
+            if (initialTab) {
+                S.tabUtil.selectTab(initialTab);
+            }
+            else {
+                S.util.loadAnonPageHome();
+            }
             return;
         }
 
@@ -71,7 +76,12 @@ export class User {
         console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
-            S.util.loadAnonPageHome();
+            if (initialTab) {
+                S.tabUtil.selectTab(initialTab);
+            }
+            else {
+                S.util.loadAnonPageHome();
+            }
         } else {
             try {
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
@@ -97,13 +107,23 @@ export class User {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
 
-                    S.util.loadAnonPageHome();
+                    if (initialTab) {
+                        S.tabUtil.selectTab(initialTab);
+                    }
+                    else {
+                        S.util.loadAnonPageHome();
+                    }
                 }
             }
             catch (e) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
-                S.util.loadAnonPageHome();
+                if (initialTab) {
+                    S.tabUtil.selectTab(initialTab);
+                }
+                else {
+                    S.util.loadAnonPageHome();
+                }
             }
         }
     }

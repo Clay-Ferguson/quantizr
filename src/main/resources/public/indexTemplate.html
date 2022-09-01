@@ -152,8 +152,11 @@
             }, 2000);
         }, true);
 
-        /* Thymeleaf vars */
+        /* Thymeleaf vars. The purpose of these vars is for the cases where we need to have data
+        loaded immediately when the page loads, rather than calling to the server before allowing the page to render, so
+        these vars are the ones that are needed BEFORE the first render. */
         var g_brandingAppName = [[${ brandingAppName }]];
+        var g_initialTab = [[${ initialTab }]];
         console.log("Page JS Running");
     </script>
 

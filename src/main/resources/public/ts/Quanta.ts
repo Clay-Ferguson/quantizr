@@ -10,6 +10,8 @@ import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
+declare const g_initialTab: string;
+
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
     mainMenu: MainMenuDlg;
@@ -296,7 +298,7 @@ export class Quanta {
              * This call checks the server to see if we have a session already, and gets back the login information from
              * the session, and then renders page content, after that.
              */
-            await S.user.refreshLogin(getAppState());
+            await S.user.refreshLogin(getAppState(), g_initialTab);
             console.log("refreshLogin completed.");
 
             S.rpcUtil.initProgressMonitor();

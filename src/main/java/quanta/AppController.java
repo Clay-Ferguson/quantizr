@@ -185,7 +185,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	public static final String API_PATH = "/mobile/api";
 
-	// maps classpath resource names to their md5 values
 	private static HashMap<String, String> thymeleafAttribs = null;
 
 	/*
@@ -243,7 +242,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * Renders with Thymeleaf.
 	 */
 	@PerfMon
-	@RequestMapping(value = {"/", "/tab/{tabName}", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
+	@RequestMapping(value = {"/", "/tab/{initialTab}", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// =======================================================================================
 			/* PATH PARAMS */
@@ -253,7 +252,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
 			@PathVariable(value = "userName", required = false) String userName, //
-			@PathVariable(value = "tabName", required = false) String tabName, //
+			@PathVariable(value = "initialTab", required = false) String initialTab, //
 
 			// =======================================================================================
 			/* REQUEST PARAMS */
@@ -270,7 +269,15 @@ public class AppController extends ServiceBase implements ErrorController {
 			if (!MongoRepository.fullInit) {
 				throw new RuntimeException("Server temporarily offline.");
 			}
+
+			// Conver tab name if short name given
+			if ("feed".equals(initialTab)) {
+				initialTab = "feedTab";
+			}
+			ThreadLocals.getSC().setInitialTab(initialTab);
+
 			initThymeleafAttribs();
+			thymeleafAttribs.put("initialTab", initialTab);
 
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
@@ -284,12 +291,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			} else if (!StringUtils.isEmpty(name)) {
 				id = ":" + name;
 			}
-
-			// Conver tab name if short name given
-			if ("feed".equals(tabName)) {
-				tabName = "feedTab";
-			}
-			ThreadLocals.getSC().setInitialTab(tabName);
 
 			// make sure urlId is defaulted to null
 			ThreadLocals.getSC().setUrlId(null);
