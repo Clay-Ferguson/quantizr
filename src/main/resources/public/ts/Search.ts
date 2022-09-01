@@ -282,6 +282,9 @@ export class Search {
 
         await promiseDispatch("RefreshFeed", s => {
             FeedTab.inst.props.feedLoading = true;
+            if (!FeedTab.inst.props.searchTextState.getValue()) {
+                s.displayFeedSearch = false;
+            }
             return s;
         });
 

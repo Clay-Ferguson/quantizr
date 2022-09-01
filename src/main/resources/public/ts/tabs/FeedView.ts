@@ -70,15 +70,26 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 new Div(null, null, [
                     newItems,
-                    new TextField({
+                    state.displayFeedSearch ? new TextField({
                         val: this.data.props.searchTextState,
                         placeholder: "Search for...",
                         enter: S.srch.refreshFeed,
                         outterClass: "marginBottom feedSearchField"
-                    }),
-                    new IconButton("fa-refresh", "Refresh", {
-                        onClick: S.srch.refreshFeed,
-                        title: "Refresh or Search"
+                    }) : null,
+                    // we show this button just as an icon unless the search field is displaying
+                    new IconButton("fa-search", state.displayFeedSearch ? "Search" : null, {
+                        onClick: () => {
+                            if (state.displayFeedSearch) {
+                                S.srch.refreshFeed()
+                            }
+                            else {
+                                dispatch("DisplayFeedSearch", s => {
+                                    s.displayFeedSearch = true;
+                                    return s;
+                                });
+                            }
+                        },
+                        title: "Search this Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
