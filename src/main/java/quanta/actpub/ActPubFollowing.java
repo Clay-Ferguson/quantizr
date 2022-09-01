@@ -6,8 +6,10 @@ import static quanta.actpub.model.AP.apStr;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -270,7 +272,7 @@ public class ActPubFollowing extends ServiceBase {
      */
     @PerfMon(category = "apFollowing")
     public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
-        List<String> following = getFollowing(userName, true, true, minId);
+        List<String> following = getFollowing(userName, true, true, minId, false, null);
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
@@ -339,7 +341,8 @@ public class ActPubFollowing extends ServiceBase {
      * 
      * todo-0: do paging. Implement minId.
      */
-    public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId) {
+    public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId,
+            boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
         final List<String> following = new LinkedList<>();
         // log.debug("getFollowing of user: " + userName);
 
@@ -347,6 +350,10 @@ public class ActPubFollowing extends ServiceBase {
             Iterable<SubNode> iter = findFollowingOfUser(as, userName);
 
             for (SubNode n : iter) {
+                if (queueForRefresh && ok(blockedUserIds) && !blockedUserIds.contains(n.getId())) {
+                    apub.queueUserForRefresh(n.getStr(NodeProp.USER), true);
+                }
+
                 // log.debug(" Found Friend Node: " + n.getIdStr());
                 // if this Friend node is a foreign one it will have the actor url property
                 String remoteActorId = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);

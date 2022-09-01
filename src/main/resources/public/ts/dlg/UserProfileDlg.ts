@@ -192,8 +192,10 @@ export class UserProfileDlg extends DialogBase {
                     !appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Block", this.blockUser) : null,
 
-                    state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
-                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
+                    appState.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
+
+                        state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
+                        new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

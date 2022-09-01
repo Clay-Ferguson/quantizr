@@ -65,7 +65,9 @@ public class APObj extends HashMap<String, Object> {
     public APObj() {}
 
     public APObj(Map<?, ?> obj) {
-        this.putAll((Map<String, Object>) obj);
+        if (ok(obj)) {
+            this.putAll((Map<String, Object>) obj);
+        }
     }
 
     public String getType() {

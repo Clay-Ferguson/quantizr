@@ -49,6 +49,10 @@ public class ActPubOutbox extends ServiceBase {
     @Autowired
     private ActPubLog apLog;
 
+    // For actual WEB CRAWLER we'd set this larger but for now
+    // we just collest some from each outbox, to update the feed
+    static final int MAX_OUTBOX_READ = 10;
+
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
@@ -80,9 +84,8 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            // Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true, false); // slow
-            // way (was using this for years)
-            Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode);
+            Iterable<SubNode> outboxItems =
+                    read.getChildren(ms, outboxNode, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0);
 
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
@@ -100,10 +103,10 @@ public class ActPubOutbox extends ServiceBase {
             final SubNode _userNode = userNode;
 
             // log.debug("scanning outbox orderedCollection");
-            apUtil.iterateOrderedCollection(ms, userDoingAction, outbox, Integer.MAX_VALUE, obj -> {
+            apUtil.iterateOrderedCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
                 try {
-                    // if (ok(obj )) {
-                    // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
+                    // if (ok(obj)) {
+                    //     log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
                     String apId = apStr(obj, APObj.id);
 

@@ -1037,7 +1037,7 @@ public class ActPubService extends ServiceBase {
         if (ok(dupNode)) {
             // If we found this node by ID and we aren't going to be updating it, return it as is.
             if (!action.equals(APType.Update)) {
-                // apLog.trace("duplicate ActivityPub post ignored: " + id);
+                apLog.trace("duplicate post ignored: ActPubId: " + obj.getId() + " nodeId=" + dupNode.getIdStr());
                 return dupNode;
             }
             // if we're updating the node, need to validate they encodedKey owns it.
@@ -1400,6 +1400,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
+        // log.debug("queueForRefresh: " + apUserName);
 
         // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
         if (!prop.isActPubEnabled()) {
@@ -1426,7 +1427,8 @@ public class ActPubService extends ServiceBase {
         if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
-        refreshForeignUsers();
+        // refreshForeignUsers();
+        // refreshFollowedUsers();
     }
 
     /*
@@ -1440,12 +1442,13 @@ public class ActPubService extends ServiceBase {
         try {
             userRefresh = true;
 
-            try {
-                saveUserNames();
-            } catch (Exception e) {
-                // log and ignore.
-                log.error("saveUserNames", e);
-            }
+            // todo-0: bring this back maybe. Remove the delay/sleep in that function
+            // try {
+            // saveUserNames();
+            // } catch (Exception e) {
+            // // log and ignore.
+            // log.error("saveUserNames", e);
+            // }
 
             refreshUsers();
         } catch (Exception e) {
@@ -1584,12 +1587,17 @@ public class ActPubService extends ServiceBase {
         exec.run(runnable);
     }
 
+    public String readOutbox(String userName) {
+        loadForeignUser("FollowBot", userName);
+        return "Outbox requested";
+    }
+
     public void loadForeignUser(String userMakingRequest, String userName) {
         arun.run(as -> {
-            apLog.trace("Reload user outbox: " + userName);
+            log.debug("Reading outbox: " + userName);
             SubNode userNode = getAcctNodeByForeignUserName(as, userMakingRequest, userName, false, true);
             if (no(userNode)) {
-                // log.debug("Unable to getAccount Node for userName: "+userName);
+                log.debug("Unable to getAccount Node for userName: " + userName);
                 return null;
             }
 
@@ -1661,8 +1669,13 @@ public class ActPubService extends ServiceBase {
         return count;
     }
 
-    /* This code is no longer being used, but I want to leave for future reference and possible use. */
-    public void identifyFollowedAccounts() {
+    /*
+     * Generates the list of all users being followed into 'apCache.followedUsers'
+     * 
+     * todo-0: need a specific version of this that queries FollowBot follows only
+     * 
+     */
+    public void identifyFollowedAccounts(boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
             return;
 
@@ -1687,7 +1700,8 @@ public class ActPubService extends ServiceBase {
                         continue;
 
                     // we query for only the foreign users this local user is following
-                    List<String> following = apFollowing.getFollowing(userName, true, false, null);
+                    List<String> following =
+                            apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
 
                     // todo-1: this info should be saved so we can dump it out in a "server info" printout for admin
                     log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
@@ -1704,7 +1718,6 @@ public class ActPubService extends ServiceBase {
                 }
                 // need a 'server info' query that can dump these out for the admin user to see in browser.
                 log.debug("FOLLOWED USERS: " + sb.toString());
-
             } finally {
                 scanningForeignUsers = false;
             }
@@ -1712,23 +1725,28 @@ public class ActPubService extends ServiceBase {
         });
     }
 
+    public void refreshFollowedUsers() {
+        log.debug("refreshFollowedUsers()");
+
+        // get list of admin blocked users
+        HashSet<ObjectId> blockedUserIds = new HashSet<>();
+        userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+
+        // queue all followed users for refresh
+        identifyFollowedAccounts(true, blockedUserIds);
+    }
+
     /*
      * This code was needed for curating content into our database before we had the FollowBot for this
      * purpose. This code grabs some users from the DB (not necessarily followed by any user) and
-     * queries their actual outboxes. However now that we have FollowBot, we can depend on other forgign
+     * queries their outboxes. However now that we have FollowBot, we can depend on other foreign
      * servers posting to us all the content we need to populate our curated fediverse feed.
      * 
      * I'm leaving this code here, and the hooks to call it, rather than deleting it, in case we have a
      * need for this kind of processing in the future.
      */
     public void refreshForeignUsers() {
-
-        // YAY!!! We no longer need this method.
-        if (true) {
-            log.debug("Ignoring obsolete refreshForeignUsers call.");
-            return;
-        }
-        identifyFollowedAccounts();
+        log.debug("refreshForeignUsers()");
 
         if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || refreshingForeignUsers)
             return;
@@ -1752,7 +1770,6 @@ public class ActPubService extends ServiceBase {
                 Iterable<SubNode> accountNodes = read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
                         false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
 
-                int pushSkipCounter = 0;
                 StringBuilder usersToFollow = new StringBuilder();
 
                 // process each account in the system
@@ -1770,25 +1787,11 @@ public class ActPubService extends ServiceBase {
                     if (no(userName) || !userName.contains("@"))
                         continue;
 
-                    String remoteActorId = node.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-                    synchronized (apCache.followedUsers) {
-                        if (ok(remoteActorId) && apCache.followedUsers.contains(remoteActorId)) {
-                            log.debug("SKIP CRAWL: " + remoteActorId);
-                            pushSkipCounter++;
-
-                            // if account is being followed by someone, ignore. No need to pull when we're expecting
-                            // to get pushes.
-                            continue;
-                        }
-                    }
-
                     refreshForeignUsersQueuedCount++;
                     queueUserForRefresh(userName, true);
                     usersToFollow.append(userName + "\n");
                 }
 
-                log.debug("refreshForeignUsers skipped " + String.valueOf(pushSkipCounter)
-                        + " because they're followed by someone.");
                 log.debug("usersToFollow: " + usersToFollow.toString());
 
                 /* Setting the trending data to null causes it to refresh itself the next time it needs to. */

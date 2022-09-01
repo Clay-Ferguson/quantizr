@@ -85,9 +85,7 @@ services:
         ports:
             - '${HOST_PORT_SEC}:${PORT_SEC}'
             - '${HOST_PORT}:${PORT}'
-
-            # Uncomment for debugging...
-            #- '8000:8000'
+            - '8000:8000'
         
         environment:
             logging.config: /log/logback.xml

@@ -122,7 +122,8 @@ public class MongoRepository extends ServiceBase {
 			publisher.getPublisher().publishEvent(new AppStartupEvent());
 
 			delete.removeAbandonedNodes(as);
-			apub.refreshForeignUsers();
+			// apub.refreshForeignUsers();
+			// apub.refreshFollowedUsers();
 		}
 	}
 

@@ -234,10 +234,10 @@ public class AP {
                 return new APOAnnounce(obj);
 
             case APType.Person:
-                return new APOPerson();
+                return new APOPerson(obj);
 
             case APType.Note:
-                return new APONote();
+                return new APONote(obj);
 
             default:
                 // log.debug("using APObj for type: " + obj.getType());
