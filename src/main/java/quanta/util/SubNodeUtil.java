@@ -101,15 +101,17 @@ public class SubNodeUtil extends ServiceBase {
 	 * secure to always have the server allow misbehaving javascript for security reasons.
 	 */
 	public static boolean isReadonlyProp(String propName) {
-		// we don't allow users to modify directly ActPub properties, because we rely on looking up nodes by these values
-		// and this would allow someone to hijack or masquerade stuff, maily by setting objectID values or ActorIDs.
+		// we don't allow users to modify directly ActPub properties, because we rely on looking up nodes by
+		// these values
+		// and this would allow someone to hijack or masquerade stuff, maily by setting objectID values or
+		// ActorIDs.
 		if (propName.startsWith("ap:")) {
 			return false;
 		}
 		switch (propName) {
 			case "apid":
 
-			// we don't allow user to modify storage, becasue only admin can control storage.
+				// we don't allow user to modify storage, becasue only admin can control storage.
 			case "bin":
 			case "sn:binTot":
 			case "sn:binQuota":
@@ -321,7 +323,9 @@ public class SubNodeUtil extends ServiceBase {
 			ogTitle = render.stripRenderTags(ogTitle);
 			ret.setTitle(ogTitle);
 
-			description = description.substring(newLineIdx).trim();
+			if (newLineIdx > 2) {
+				description = description.substring(newLineIdx).trim();
+			}
 			description = render.stripRenderTags(description);
 			ret.setDescription(description);
 		} else {
