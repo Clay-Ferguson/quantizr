@@ -274,6 +274,9 @@ public class AppController extends ServiceBase implements ErrorController {
 			if ("feed".equals(initialTab)) {
 				initialTab = "feedTab";
 			}
+			else if ("trending".equals(initialTab)) {
+				initialTab = "trendingTab";
+			}
 
 			initThymeleafAttribs();
 			thymeleafAttribs.put("initialTab", initialTab);

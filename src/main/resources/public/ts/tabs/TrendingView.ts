@@ -11,30 +11,26 @@ import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
 import { FeedTab } from "./data/FeedTab";
 
-export class TrendingView extends AppTab<TrendingRSInfo> {
+PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
+    // console.log("Tab Changing in TrendingView [id=" + this.getId() + "]: " + tabName);
+    if (tabId === C.TAB_TRENDING) {
+        // We have this timer to allow the TrendingView to come into existence.
+        setTimeout(() => {
+            // only ever do this once, just to save CPU load on server.
+            if (TrendingView.loaded || !TrendingView.inst) return;
+            TrendingView.loaded = true;
+            TrendingView.inst.refresh();
+        }, 500);
+    }
+});
 
+export class TrendingView extends AppTab<TrendingRSInfo> {
     static loaded: boolean = false;
-    static subscribed: boolean = false;
     static inst: TrendingView = null;
 
     constructor(data: TabIntf) {
         super(data);
         data.inst = TrendingView.inst = this;
-
-        // only create one subscriber method, which will always act on the static instance most recently set.
-        if (!TrendingView.subscribed) {
-            TrendingView.subscribed = true;
-
-            PubSub.sub(C.PUBSUB_tabChanging, (tabName: string) => {
-                // console.log("Tab Changing in TrendingView [id=" + this.getId() + "]: " + tabName);
-                if (tabName === TrendingView.inst.data.id) {
-                    // only ever do this once, just to save CPU load on server.
-                    if (TrendingView.loaded) return;
-                    TrendingView.loaded = true;
-                    this.refresh();
-                }
-            });
-        }
     }
 
     refresh = async () => {
