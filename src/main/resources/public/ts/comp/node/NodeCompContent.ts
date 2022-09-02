@@ -16,7 +16,6 @@ export class NodeCompContent extends Div {
         public showHeader: boolean,
         public idPrefix: string,
         public isFeed: boolean,
-        public imgSizeOverride: string,
         public isTreeView: boolean,
         public isLinkedNode: boolean,
         public wrapperClass: string) {
@@ -65,7 +64,7 @@ export class NodeCompContent extends Div {
         const isAnAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
 
         if (!embeddedImg && S.props.hasBinary(this.node) && !isAnAccountNode) {
-            children.push(new NodeCompBinary(this.node, false, false, this.imgSizeOverride));
+            children.push(new NodeCompBinary(this.node, false, false));
         }
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", this.node);

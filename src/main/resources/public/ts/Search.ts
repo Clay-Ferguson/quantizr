@@ -470,7 +470,7 @@ export class Search {
             parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
         }
 
-        const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false, false, null);
+        const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
 
         let clazz = isFeed ? "feed-node" : "results-node";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
@@ -491,7 +491,7 @@ export class Search {
 
         let boostComp: Div = null;
         if (node.boostedNode) {
-            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, null, false, true, "feed-boost");
+            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
             // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
             boostComp = new Div(null, { className: "boost-row" }, [

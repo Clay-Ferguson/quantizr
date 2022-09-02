@@ -9,7 +9,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompParentNodes extends Div {
 
-    constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {
+    constructor(private state: AppState, public tabData: TabIntf<any>) {
         super(null, {
             id: "parent_" + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -43,7 +43,7 @@ export class NodeCompParentNodes extends Div {
 
             // todo-1: hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,
             // so not worried about that here, for now.
-            new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false, null)
+            new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null)
         ]);
     }
 }

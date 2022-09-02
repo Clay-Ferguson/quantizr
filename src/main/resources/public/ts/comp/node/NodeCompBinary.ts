@@ -22,7 +22,7 @@ interface LS {
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean, public imgSizeOverride: string) {
+    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
         super();
         this.mergeState<LS>({ node });
     }
@@ -39,7 +39,7 @@ export class NodeCompBinary extends Div {
             size = "150px";
         }
         else {
-            size = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
+            size = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         }
         const style: any = {};
 

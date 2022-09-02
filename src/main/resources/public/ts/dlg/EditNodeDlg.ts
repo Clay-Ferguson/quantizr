@@ -252,7 +252,6 @@ export class EditNodeDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state = this.getState<LS>();
-        const appState = getAppState();
         const hasAttachment: boolean = S.props.hasBinary(state.node);
 
         this.editorHelp = null;
@@ -281,15 +280,6 @@ export class EditNodeDlg extends DialogBase {
 
         if (state.node.hasChildren) {
             flowPanel.addChild(this.createLayoutSelection());
-
-            // I'm going to remove CHILDREN_IMG_SIZES, because it's too awkward and hard to understand for ordinary users.
-            // It works, but is confusing. I'll instead
-            // add someday a feature called "Set Image Sizes on Subnodes" for this capability
-            // For now I'll keep in case I need it myself in the interim.
-            if (appState.isAdminUser) {
-                flowPanel.addChild(this.createImgSizeSelection("Subnode Images", true, "imagesSelection", //
-                    new PropValueHolder(this.getState<LS>().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")));
-            }
         }
 
         flowPanel.addChildren(this.makeCheckboxesRow(state, customProps));
@@ -539,7 +529,7 @@ export class EditNodeDlg extends DialogBase {
             new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         const topBinRow = new HorizontalLayout([
-            new NodeCompBinary(state.node, true, false, null),
+            new NodeCompBinary(state.node, true, false),
 
             new HorizontalLayout([
                 new Div(null, { className: "bigPaddingRight" }, [

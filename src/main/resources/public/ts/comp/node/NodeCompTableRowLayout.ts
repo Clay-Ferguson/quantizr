@@ -56,7 +56,6 @@ export class NodeCompTableRowLayout extends Div {
                     console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id);
                 }
 
-                const childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
                 const typeHandler = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
@@ -67,7 +66,7 @@ export class NodeCompTableRowLayout extends Div {
                     if (n.children && !inVerticalSpace) {
                         comps.push(new Div(null, { className: "vertical-space" }));
                     }
-                    const row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, true, false, null, state);
+                    const row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, true, false, null, state);
                     inVerticalSpace = false;
                     comps.push(row);
                 }

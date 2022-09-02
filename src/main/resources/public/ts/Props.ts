@@ -289,8 +289,7 @@ export class Props {
             J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
-            J.NodeProp.IMG_SIZE,
-            J.NodeProp.CHILDREN_IMG_SIZES
+            J.NodeProp.IMG_SIZE
         ]);
     }
 

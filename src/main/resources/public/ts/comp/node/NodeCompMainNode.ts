@@ -18,7 +18,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
 
-    constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {
+    constructor(private state: AppState, public tabData: TabIntf<any>) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -97,9 +97,8 @@ export class NodeCompMainNode extends Div {
             let boostComp: NodeCompRow = null;
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                const childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, node.boostedNode);
                 const typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, childrenImgSizes, true, false, true, true, null, state);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, true, false, true, true, null, state);
             }
 
             this.setChildren([
@@ -107,7 +106,7 @@ export class NodeCompMainNode extends Div {
                 !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, null) : null,
                 new Clearfix(),
                 jumpButton,
-                new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true, false, null),
+                new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),
                 boostComp,
                 new NodeCompRowFooter(node, false, true),
                 new Clearfix()
