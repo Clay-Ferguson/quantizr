@@ -341,6 +341,7 @@ export class Edit {
             const histItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                 return h.id === node.id;
             });
+
             if (histItem) {
                 histItem.content = S.nodeUtil.getShortContent(node);
             }
@@ -443,7 +444,7 @@ export class Edit {
             if (!newNodeTargetId) {
                 await promiseDispatch("RefreshNodeFromServer", s => {
                     // if the node is our page parent (page root)
-                    if (res.node.id === s.node.id) {
+                    if (res.node.id === s.node?.id) {
                         // preserve the children, when updating the root node, because they will not have been obtained
                         // due to the 'singleNode=true' in the request
                         res.node.children = s.node.children;
