@@ -803,7 +803,7 @@ export class Edit {
             return;
         }
 
-        if (selNodesArray.find(id => id === state.node.id)) {
+        if (selNodesArray.find(id => id === state.node?.id)) {
             S.util.showMessage("You can't delete your page node! Go up a level to do that.", "Warning");
             return;
         }
@@ -821,7 +821,8 @@ export class Edit {
             this.removeNodesFromHistory(selNodesArray, state);
             this.removeNodesFromCalendarData(selNodesArray, state);
 
-            if (S.util.checkSuccess("Delete node", res)) {
+            /* Node: state.node can be null if we've never been to the tree view yet */
+            if (state.node && S.util.checkSuccess("Delete node", res)) {
                 if (state.node.children) {
                     state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                 }
