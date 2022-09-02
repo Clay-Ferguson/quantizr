@@ -639,7 +639,7 @@ strong em {
 
 .app-embed-content {
     background-color: $modal-content-bg;
-    border: 2px solid $modal-content-border-color;
+    border: 2px solid gray;
     border-radius: $border-radius;
     padding: 14px;
     width: 100%;
@@ -649,7 +649,7 @@ strong em {
 
 .app-modal-content {
     background-color: $modal-content-bg;
-    border: 2px solid $modal-content-border-color;
+    border: 2px solid gray;
     margin: $smallGap auto;
     padding: 14px;
     width: 75%;
