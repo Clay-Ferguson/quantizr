@@ -18,7 +18,7 @@ export class Selection extends Comp {
 
         const select = new Select({
             value: this.valueIntf.getValue(),
-            className: "form-select " + this.moreClasses
+            className: "form-select formSelect " + (this.moreClasses || "")
         }, this.selectionOptions, this.valueIntf);
 
         if (this.label) {

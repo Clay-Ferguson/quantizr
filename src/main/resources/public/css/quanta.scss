@@ -1082,6 +1082,7 @@ Will come back later and study this more. todo-1 */
     font-family: inherit;
     background-color: #1b2631 !important;
     border-radius: 0px !important;
+    border: 1px solid gray;
 }
 
 .pre-textfield {
@@ -1089,10 +1090,11 @@ Will come back later and study this more. todo-1 */
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
     font-family: inherit;
     border-radius: 0px !important;
+    border: 1px solid gray;
 }
 
-.my-ace-editor {
-    border: 1px solid $gray-500;
+.formSelect {
+    border: 1px solid gray !important;
 }
 
 .tagIndent {
