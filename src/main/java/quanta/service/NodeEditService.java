@@ -82,47 +82,45 @@ public class NodeEditService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		boolean makePublicWritable = false;
 		boolean allowSharing = true;
-
-		// todo-0: rename to parentNode
-		SubNode node = null;
+		SubNode parentNode = null;
 
 		/*
 		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
 		 * "My Posts" node
 		 */
 		if (no(nodeId) && !linkBookmark) {
-			node = read.getUserNodeByType(ms, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
+			parentNode = read.getUserNodeByType(ms, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
 					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-			if (ok(node)) {
-				nodeId = node.getIdStr();
+			if (ok(parentNode)) {
+				nodeId = parentNode.getIdStr();
 				makePublicWritable = true;
 			}
 		}
 
 		/* Node still null, then try other ways of getting it */
-		if (no(node) && !linkBookmark) {
+		if (no(parentNode) && !linkBookmark) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
-				node = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
+				parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
 			} else {
-				node = read.getNode(ms, nodeId);
+				parentNode = read.getNode(ms, nodeId);
 			}
 		}
 
 		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
 		if (ok(plugin)) {
-			Val<SubNode> vcNode = new Val<>(node);
+			Val<SubNode> vcNode = new Val<>(parentNode);
 			plugin.createSubNode(ms, vcNode, req, linkBookmark);
-			node = vcNode.getVal();
+			parentNode = vcNode.getVal();
 		}
 
-		if (no(node)) {
+		if (no(parentNode)) {
 			throw new RuntimeException("unable to locate parent for insert");
 		}
 
-		auth.authForChildNodeCreate(ms, node);
+		auth.authForChildNodeCreate(ms, parentNode);
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-		SubNode newNode = create.createNode(ms, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
+		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		if (req.isPendingEdit()) {
 			mongoUtil.setPendingPath(newNode, true);
@@ -143,7 +141,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		// If we're inserting a node under the POSTS it should be public, rather than inherit.
-		if (node.isType(NodeType.POSTS)) {
+		if (parentNode.isType(NodeType.POSTS)) {
 			makePublicWritable = true;
 		}
 
@@ -162,14 +160,14 @@ public class NodeEditService extends ServiceBase {
 			// else add default sharing
 			else {
 				// we always determine the access controls from the parent for any new nodes
-				auth.setDefaultReplyAcl(node, newNode);
+				auth.setDefaultReplyAcl(parentNode, newNode);
 
 				// inherit UNPUBLISHED prop from parent, if we own the parent
-				if (node.getBool(NodeProp.UNPUBLISHED) && node.getOwner().equals(ms.getUserNodeId())) {
+				if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
 					newNode.set(NodeProp.UNPUBLISHED, true);
 				}
 
-				String cipherKey = node.getStr(NodeProp.ENC_KEY);
+				String cipherKey = parentNode.getStr(NodeProp.ENC_KEY);
 				if (ok(cipherKey)) {
 					res.setEncrypt(true);
 				}
