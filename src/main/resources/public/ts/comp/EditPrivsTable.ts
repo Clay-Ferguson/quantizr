@@ -29,7 +29,7 @@ export class EditPrivsTable extends ListBox {
         }
 
         if (children.length === 0) {
-            children.push(new Div("Node is not currently shared"));
+            children.push(new Div("Node is not currently shared. Add people or make it public to share."));
         }
 
         this.setChildren(children);

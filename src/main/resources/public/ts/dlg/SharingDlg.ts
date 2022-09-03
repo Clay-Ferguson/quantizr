@@ -41,27 +41,22 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                // todo-1: There's a bug in turning this OFF and also it just needs more thought in the design, becasue it's too
-                // easy to create a node and share it with someone and then have it NOT end up visible in the feeds of the people it's shared to.
-                // #unpublish-disabled
-                // new Checkbox("Unpublished", null, {
-                //     setValue: async (checked: boolean) => {
-                //         let state: LS = this.getState<LS>();
-                //         this.dirty = true;
-                //         state.nodePrivsInfo.unpublished = checked;
-                //         await S.util.ajax<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
-                //             nodeId: this.node.id,
-                //             unpublished: checked
-                //         });
-
-                //         this.mergeState<LS>({ nodePrivsInfo: state.nodePrivsInfo });
-                //         return null;
-                //     },
-                //     getValue: (): boolean => {
-                //         return state.nodePrivsInfo.unpublished;
-                //     }
-                // }),
-                new Checkbox("Apply to all children (that you own)", null, {
+                appState.editNode.ac?.length > 0 ? new Checkbox("Unpublished", null, {
+                    setValue: async (checked: boolean) => {
+                        this.dirty = true;
+                        await S.rpcUtil.rpc<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
+                            nodeId: appState.editNode.id,
+                            unpublished: checked
+                        });
+                        S.props.setPropVal(J.NodeProp.UNPUBLISHED, appState.editNode, checked ? "true" : null);
+                        S.edit.updateNode(appState.editNode);
+                        return null;
+                    },
+                    getValue: (): boolean => {
+                        return !!S.props.getPropStr(J.NodeProp.UNPUBLISHED, appState.editNode);
+                    }
+                }) : null,
+                new Checkbox("Apply to Subnodes", null, {
                     setValue: (checked: boolean) => {
                         this.dirty = true;
                         this.mergeState<LS>({ recursive: checked });

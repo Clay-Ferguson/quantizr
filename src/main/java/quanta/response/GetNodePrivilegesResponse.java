@@ -8,6 +8,8 @@ import quanta.response.base.ResponseBase;
 public class GetNodePrivilegesResponse extends ResponseBase {
 	private List<AccessControlInfo> aclEntries;
 	private List<String> owners;
+
+	// todo-0: unpublished doesn't really belong here. It's separate from privs
 	private boolean unpublished;
 
 	public List<AccessControlInfo> getAclEntries() {

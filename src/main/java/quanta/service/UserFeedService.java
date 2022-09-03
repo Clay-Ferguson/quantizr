@@ -209,9 +209,9 @@ public class UserFeedService extends ServiceBase {
 			allowBadWords = false;
 		}
 
-		// Don't show UNPUBLISHED nodes.
-		// #unpublish-disabled
-		// crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
+		// Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so we 
+		// can do this criteria right here and not show those in feeds.
+		crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
 
 		/*
 		 * Save the 'string' representations for blocked user ids for use below, to mask out places where

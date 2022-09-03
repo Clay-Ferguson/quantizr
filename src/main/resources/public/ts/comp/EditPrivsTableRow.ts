@@ -63,7 +63,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 this.renderAclPrivileges(this.aclEntry),
                 img,
                 isPublic ? new Icon({
-                    className: "fa fa-globe fa-lg marginAll",
+                    className: "fa fa-globe fa-lg sharingIcon marginAll",
                     title: "Node is Public"
                 }) : null,
                 isPublic ? new Span("Public (Everyone)", { className: "largeFont bigMarginRight" })

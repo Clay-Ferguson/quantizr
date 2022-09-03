@@ -53,6 +53,8 @@ export class EditNodeDlg extends DialogBase {
     tagsState: Validator = new Validator();
 
     // holds a map of states by property names.
+    // todo-0: it would be good if there were a way to have this state management using the ACTUAL 'appState.editNode'
+    // as the holder of the property value so everything is always in sync easier.
     propStates: Map<string, Validator> = new Map<string, Validator>();
 
     // todo-1: these should be in our local state really
@@ -332,25 +334,23 @@ export class EditNodeDlg extends DialogBase {
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         const binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        const shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), appState.editNode, this);
+        const shareComps: Comp[] = S.nodeUtil.getSharingNames(appState, appState.editNode, this);
         const isPublic = S.props.isPublic(appState.editNode);
-
-        // #unpublish-disabled
-        // let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
 
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
+            const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, appState.editNode);
             sharingDiv = new Div(null, {
                 className: "float-end clickable marginBottom"
             }, [
                 new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => { this.makePublic(state, true); }, { className: "marginLeft" }) : null
-                // #unpublish-disabled
-                // unpublishedStr ? new Icon({
-                //     className: "fa fa-eye-slash fa-lg marginLeft"
-                // }) : null
+                !isPublic ? new Button("Make Public", () => { this.makePublic(state, true); }, { className: "marginLeft" }) : null,
+                unpublished ? new Icon({
+                    className: "fa fa-eye-slash fa-lg sharingIcon marginLeft",
+                    title: "Node is Unpublished\n\nWill not appear in feed"
+                }) : null
             ]);
             sharingDivClearFix = new Clearfix();
         }

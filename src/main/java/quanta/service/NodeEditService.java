@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
-import quanta.actpub.model.APList;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -83,6 +82,8 @@ public class NodeEditService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		boolean makePublicWritable = false;
 		boolean allowSharing = true;
+
+		// todo-0: rename to parentNode
 		SubNode node = null;
 
 		/*
@@ -163,11 +164,10 @@ public class NodeEditService extends ServiceBase {
 				// we always determine the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(node, newNode);
 
-				// Moved to below to let isFediSend always control UNPUBLISHED prop
-				// inherit UNPUBLISHED prop from parent.
-				// if (node.getBool(NodeProp.UNPUBLISHED)) {
-				// newNode.set(NodeProp.UNPUBLISHED, true);
-				// }
+				// inherit UNPUBLISHED prop from parent, if we own the parent
+				if (node.getBool(NodeProp.UNPUBLISHED) && node.getOwner().equals(ms.getUserNodeId())) {
+					newNode.set(NodeProp.UNPUBLISHED, true);
+				}
 
 				String cipherKey = node.getStr(NodeProp.ENC_KEY);
 				if (ok(cipherKey)) {
@@ -175,9 +175,6 @@ public class NodeEditService extends ServiceBase {
 				}
 			}
 		}
-
-		// #unpublish-disabled
-		// newNode.set(NodeProp.UNPUBLISHED, !req.isFediSend() ? Boolean.TRUE : null);
 
 		if (!StringUtils.isEmpty(req.getBoostTarget())) {
 			/* If the node being boosted is itself a boost then boost the original boost instead */
@@ -257,25 +254,12 @@ public class NodeEditService extends ServiceBase {
 				// we always copy the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(parentNode, newNode);
 
-				// Moved to below to let isFediSend always control UNPUBLISHED prop
-				// inherit UNPUBLISHED prop from parent.
-				// // inherit UNPUBLISHED prop from parent.
-				// if (parentNode.getBool(NodeProp.UNPUBLISHED)) {
-				// newNode.set(NodeProp.UNPUBLISHED, true);
-				// }
+				// inherit UNPUBLISHED prop from parent, if we own the parent
+				if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
+					newNode.set(NodeProp.UNPUBLISHED, true);
+				}
 			}
 		}
-
-		/*
-		 * It's not a bug that there's no isFediSend on this request. It happens to be the case that all
-		 * nodes created thru this method are done by interactions that will not ever send an
-		 * isFediSend=true. These are mainly the '+'-buttons that are only active when a user is modifying
-		 * his OWN nodes, and ALL of these shold be unpublished. newNode.set(NodeProp.UNPUBLISHED,
-		 * !req.isFediSend() ? Boolean.TRUE : null);
-		 */
-
-		// #unpublish-disabled
-		// newNode.set(NodeProp.UNPUBLISHED, Boolean.TRUE);
 
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,

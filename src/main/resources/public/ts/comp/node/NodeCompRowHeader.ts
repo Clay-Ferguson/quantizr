@@ -197,18 +197,27 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
+        const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, this.node);
+        const unpublishedIcon = unpublished ? new Icon({
+            className: "fa fa-eye-slash fa-lg sharingIcon marginLeft",
+            title: "Node is Unpublished\n\nWill not appear in feed"
+        }) : null;
+
         // If node is shared to public we just show the globe icon and not the rest of the shares that may be present.
         if (S.props.isPublic(this.node)) {
             const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
-            floatUpperRightDiv.addChild(new Icon({
-                className: "fa fa-globe fa-lg sharingGlobeIcon",
-                title: "Node is Public\n(" + appendNode + ")"
-            }));
+            floatUpperRightDiv.addChildren([
+                new Icon({
+                    className: "fa fa-globe fa-lg sharingIcon marginLeft",
+                    title: "Node is Public\n(" + appendNode + ")"
+                }),
+                unpublishedIcon
+            ]);
         }
         // Show all the share names
         else if (S.props.isShared(this.node)) {
             const shareComps = S.nodeUtil.getSharingNames(state, this.node, null);
-            floatUpperRightDiv.addChild(
+            floatUpperRightDiv.addChildren([
                 new Span(null, {
                     className: "rowHeaderSharingNames"
                 }, [
@@ -216,7 +225,9 @@ export class NodeCompRowHeader extends Div {
                         className: "fa fa-envelope fa-lg"
                     }),
                     ...shareComps
-                ]));
+                ]),
+                unpublishedIcon
+            ]);
         }
 
         let editingAllowed = S.edit.isEditAllowed(this.node, state);

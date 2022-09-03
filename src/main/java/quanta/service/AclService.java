@@ -103,9 +103,7 @@ public class AclService extends ServiceBase {
 
 				try {
 					auth.ownerAuth(ms, n);
-					
-					// #unpublish-disabled
-					//n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
+					n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
 
 					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
 					// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(node.getAc()));
@@ -116,9 +114,8 @@ public class AclService extends ServiceBase {
 				}
 			} else {
 				auth.ownerAuth(ms, n);
-
-				// #unpublish-disabled
-				// n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
+				n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
+				log.debug("Set Unpublished on node " + n.getIdStr() + " to " + unpublished);
 				n.setAc(node.getAc());
 			}
 		}
@@ -154,14 +151,10 @@ public class AclService extends ServiceBase {
 	 */
 	public SetUnpublishedResponse setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
 		SetUnpublishedResponse res = new SetUnpublishedResponse();
-
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
-
-		// #unpublish-disabled
-		// node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
-
+		node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
 		res.setSuccess(true);
 		return res;
 	}
@@ -439,6 +432,11 @@ public class AclService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 
 		removeAclEntry(ms, node, req.getPrincipalNodeId(), req.getPrivilege());
+
+		// if there are no privileges left remove the "unpublished" flag, because there's no need for it.
+		if (no(node.getAc()) || node.getAc().size() == 0) {
+			node.set(NodeProp.UNPUBLISHED, null);
+		}
 
 		res.setSuccess(true);
 		return res;

@@ -283,13 +283,16 @@ export class Props {
             J.NodeProp.REPLY
         ]);
 
+        /* These props are the ones we don't create a TextField for during editing, becasue the editor will have
+        some other more specialized way of managing the property */
         S.util.addAllToSet(this.controlBasedPropertyList, [ //
             J.NodeProp.INLINE_CHILDREN, //
             J.NodeProp.NOWRAP, //
             J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
-            J.NodeProp.IMG_SIZE
+            J.NodeProp.IMG_SIZE, //
+            J.NodeProp.UNPUBLISHED //
         ]);
     }
 
