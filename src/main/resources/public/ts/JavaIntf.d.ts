@@ -231,8 +231,6 @@ export interface GetNodeMetaInfoRequest extends RequestBase {
 
 export interface GetNodePrivilegesRequest extends RequestBase {
     nodeId: string;
-    includeAcl: boolean;
-    includeOwners: boolean;
 }
 
 export interface GetNodeStatsRequest extends RequestBase {
@@ -628,8 +626,6 @@ export interface GetNodeMetaInfoResponse extends ResponseBase {
 
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
-    owners: string[];
-    unpublished: boolean;
 }
 
 export interface GetNodeStatsResponse extends ResponseBase {

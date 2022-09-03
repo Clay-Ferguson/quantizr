@@ -102,9 +102,7 @@ export class SharingDlg extends DialogBase {
     reload = async () => {
         const appState = getAppState();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: appState.editNode.id,
-            includeAcl: true,
-            includeOwners: true
+            nodeId: appState.editNode.id
         });
         appState.editNode.ac = res.aclEntries;
         S.edit.updateNode(appState.editNode);
@@ -154,9 +152,7 @@ export class SharingDlg extends DialogBase {
     removePrivilegeResponse = async () => {
         const appState = getAppState();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: appState.editNode.id,
-            includeAcl: true,
-            includeOwners: true
+            nodeId: appState.editNode.id
         });
 
         appState.editNode.ac = res.aclEntries;

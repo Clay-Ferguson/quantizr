@@ -427,9 +427,7 @@ export class EditNodeDlg extends DialogBase {
         });
 
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: appState.editNode.id,
-            includeAcl: true,
-            includeOwners: true
+            nodeId: appState.editNode.id
         });
         appState.editNode.ac = res.aclEntries;
 

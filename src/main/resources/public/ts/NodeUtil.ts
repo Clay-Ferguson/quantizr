@@ -69,15 +69,6 @@ export class NodeUtil {
         // });
     }
 
-    // note: this code is not currently in use
-    updateNodeInfo = (node: J.NodeInfo) => {
-        S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: node.id,
-            includeAcl: false,
-            includeOwners: true
-        });
-    }
-
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = getAppState(state);
         if (!state.node) return null;
@@ -279,9 +270,7 @@ export class NodeUtil {
 
     removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp) => {
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: node.id,
-            includeAcl: true,
-            includeOwners: true
+            nodeId: node.id
         });
 
         if (editorDlg) {

@@ -59,23 +59,7 @@ public class AclService extends ServiceBase {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
-
-		res.setUnpublished(node.getBool(NodeProp.UNPUBLISHED));
-
-		if (!req.isIncludeAcl() && !req.isIncludeOwners()) {
-			throw ExUtil.wrapEx("no specific information requested for getNodePrivileges");
-		}
-
-		if (req.isIncludeAcl()) {
-			res.setAclEntries(auth.getAclEntries(ms, node));
-		}
-
-		if (req.isIncludeOwners()) {
-			List<String> owners = user.getOwnerNames(node);
-			// log.info("Owner Count: " + owners.size());
-			res.setOwners(owners);
-		}
-
+		res.setAclEntries(auth.getAclEntries(ms, node));
 		res.setSuccess(true);
 		return res;
 	}
