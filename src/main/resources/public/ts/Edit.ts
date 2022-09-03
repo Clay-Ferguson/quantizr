@@ -78,7 +78,7 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
+    public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
             if (state.mobileMode) forceUsePopup = true;
 
@@ -110,7 +110,11 @@ export class Edit {
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
                 else if (editInPopup) {
-                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, null, afterEditAction);
+                    await promiseDispatch("startEditing", s => {
+                        s.editNode = res.nodeInfo;
+                        return s;
+                    });
+                    const dlg = new EditNodeDlg(encrypt, showJumpButton, null, afterEditAction);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
@@ -1269,7 +1273,8 @@ export class Edit {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
-        const dlg: SharingDlg = new SharingDlg(node);
+
+        const dlg: SharingDlg = new SharingDlg();
         await dlg.open();
     }
 
@@ -1315,6 +1320,13 @@ export class Edit {
             nodeId: node.id,
             principalNodeId,
             cipherKey: userCipherKey
+        });
+    }
+
+    updateNode = (node: J.NodeInfo) => {
+        dispatch("UpdateNode", s => {
+            s.editNode = node;
+            return s;
         });
     }
 }

@@ -71,8 +71,9 @@ export class EditNodeDlg extends DialogBase {
     allowEditAllProps: boolean = false;
     contentScrollPos = new ScrollPos();
 
-    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
+    constructor(private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, mode);
+        const appState = getAppState();
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;
@@ -86,21 +87,20 @@ export class EditNodeDlg extends DialogBase {
             EditNodeDlg.embedInstance = this;
         }
 
-        if (S.edit.pendingContent && node.id === S.edit.pendingContentId) {
-            node.content = S.edit.pendingContent;
+        if (S.edit.pendingContent && appState.editNode.id === S.edit.pendingContentId) {
+            appState.editNode.content = S.edit.pendingContent;
             S.edit.pendingContent = null;
             S.edit.pendingContentId = null;
         }
 
         this.mergeState<LS>({
-            node,
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
         });
 
         this.allowEditAllProps = getAppState().isAdminUser;
         this.utl.initStates(this);
-        this.initialProps = S.util.arrayClone(node.properties);
+        this.initialProps = S.util.arrayClone(appState.editNode.properties);
 
         /* This 'encrypt' will trigger this node to be encrypted whenever we're replying to
         an encrypted node. (i.e. the parent of this node is encrypted) */
@@ -125,9 +125,8 @@ export class EditNodeDlg extends DialogBase {
             // save editor state every 3 seconds so user can recover editing if anything goes wrong.
             // This should be CLEARED upon successful saves only, and have this static var set back to null
             EditNodeDlg.autoSaveTimer = setInterval(async () => {
-                const state = EditNodeDlg.currentInst.getState<LS>();
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
-                    nodeId: state.node.id,
+                    nodeId: appState.editNode.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
                 }, "all");
             }, 3000);
@@ -147,6 +146,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
+        const appState = getAppState();
         const selection: Selection = new Selection(null, "Subnode Layout", [
             { key: "v", val: "1 column" },
             { key: "c2", val: "2 columns" },
@@ -154,11 +154,12 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 columns" },
             { key: "c5", val: "5 columns" },
             { key: "c6", val: "6 columns" }
-        ], null, "layoutSelection", new PropValueHolder(this.getState<LS>().node, J.NodeProp.LAYOUT, "v"));
+        ], null, "layoutSelection", new PropValueHolder(appState.editNode, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
     createPrioritySelection = (): Selection => {
+        const appState = getAppState();
         return new Selection(null, "Priority", [
             { key: "0", val: "none" },
             { key: "1", val: "Top" },
@@ -166,7 +167,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], null, "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.PRIORITY, "0"));
+        ], null, "col-3", new PropValueHolder(appState.editNode, J.NodeProp.PRIORITY, "0"));
     }
 
     createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
@@ -199,10 +200,10 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getTitleIconComp(): CompIntf {
-        const state = this.getState<LS>();
+        const appState = getAppState();
         let span: Span = null;
 
-        const typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
         if (typeHandler) {
             const iconClass = typeHandler.getIconClass();
             if (iconClass) {
@@ -213,7 +214,7 @@ export class EditNodeDlg extends DialogBase {
                     onClick: this.openChangeNodeTypeDlg
                 }));
             }
-            if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
+            if (S.props.getPropStr(J.NodeProp.DATE, appState.editNode)) {
                 span = span || new Span();
                 span.addChild(new Icon({
                     title: "Node has a 'Date' property.",
@@ -231,7 +232,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => {
                     this.utl.cancelEdit(this);
                     S.nav.closeFullScreenViewer(getAppState());
-                    S.view.jumpToId(state.node.id);
+                    S.view.jumpToId(appState.editNode.id);
                 }
             }));
         }
@@ -239,8 +240,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getExtraTitleBarComps(): CompIntf[] {
-        const state = this.getState<LS>();
-        if (S.props.isEncrypted(state.node)) {
+        const appState = getAppState();
+        if (S.props.isEncrypted(appState.editNode)) {
             return [
                 new Icon({
                     className: "fa fa-lock fa-lg iconMarginLeft"
@@ -252,14 +253,15 @@ export class EditNodeDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state = this.getState<LS>();
-        const hasAttachment: boolean = S.props.hasBinary(state.node);
+        const appState = getAppState();
+        const hasAttachment: boolean = S.props.hasBinary(appState.editNode);
 
         this.editorHelp = null;
-        const typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
-            typeHandler.ensureDefaultProperties(state.node);
+            typeHandler.ensureDefaultProperties(appState.editNode);
             this.editorHelp = typeHandler.getEditorHelp();
         }
 
@@ -278,7 +280,7 @@ export class EditNodeDlg extends DialogBase {
 
         const flowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
 
-        if (state.node.hasChildren) {
+        if (appState.editNode.hasChildren) {
             flowPanel.addChild(this.createLayoutSelection());
         }
 
@@ -306,7 +308,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
-        const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, state.node);
+        const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode);
 
         let nodeNameTextField: TextField = null;
         if (!customProps) {
@@ -321,7 +323,7 @@ export class EditNodeDlg extends DialogBase {
             }
 
             if (!customProps || hasContentProp) {
-                const contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
+                const contentTableRow = this.makeContentEditor(appState.editNode, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
             }
@@ -330,8 +332,8 @@ export class EditNodeDlg extends DialogBase {
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         const binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        const shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), state.node, this);
-        const isPublic = S.props.isPublic(state.node);
+        const shareComps: Comp[] = S.nodeUtil.getSharingNames(getAppState(), appState.editNode, this);
+        const isPublic = S.props.isPublic(appState.editNode);
 
         // #unpublish-disabled
         // let unpublishedStr = S.props.getProp(J.NodeProp.UNPUBLISHED, state.node) ? "Unpublished" : "";
@@ -411,36 +413,38 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePublic = async (state: LS, allowAppends: boolean) => {
-        const encrypted = S.props.isEncrypted(state.node);
+        const appState = getAppState();
+        const encrypted = S.props.isEncrypted(appState.editNode);
         if (encrypted) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
 
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            nodeId: state.node.id,
+            nodeId: appState.editNode.id,
             principal: "public",
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: state.node.id,
+            nodeId: appState.editNode.id,
             includeAcl: true,
             includeOwners: true
         });
-        state.node.ac = res.aclEntries;
+        appState.editNode.ac = res.aclEntries;
 
-        this.mergeState<LS>({ node: state.node });
+        S.edit.updateNode(appState.editNode);
     }
 
     buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]) => {
         let numPropsShowing: number = 0;
-        if (state.node.properties) {
+        const appState = getAppState();
+        if (appState.editNode.properties) {
             // This loop creates all the editor input fields for all the properties
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
+            appState.editNode.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("prop=" + S.util.prettyPrint(prop));
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(appState.editNode, prop.name, getAppState())) {
                     // console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -507,8 +511,9 @@ export class EditNodeDlg extends DialogBase {
 
     // Generate GUI for handling the display info about any Node Attachments
     makeAttachmentPanel = (state: LS) => {
-        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
-        const mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
+        const appState = getAppState();
+        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, appState.editNode);
+        const mime = S.props.getPropStr(J.NodeProp.BIN_MIME, appState.editNode);
 
         let pinCheckbox = null;
         if (ipfsLink) {
@@ -518,18 +523,18 @@ export class EditNodeDlg extends DialogBase {
                         this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
                     }
                     else {
-                        S.props.setPropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
+                        S.props.setPropVal(J.NodeProp.IPFS_REF, appState.editNode, "1");
                     }
                 },
-                getValue: (): boolean => S.props.getProp(J.NodeProp.IPFS_REF, state.node) ? false : true
+                getValue: (): boolean => S.props.getProp(J.NodeProp.IPFS_REF, appState.editNode) ? false : true
             });
         }
 
-        const imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
-            new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
+        const imgSizeSelection = S.props.hasImage(appState.editNode) ? this.createImgSizeSelection("Image Size", false, "float-end", //
+            new PropValueHolder(appState.editNode, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         const topBinRow = new HorizontalLayout([
-            new NodeCompBinary(state.node, true, false),
+            new NodeCompBinary(appState.editNode, true, false),
 
             new HorizontalLayout([
                 new Div(null, { className: "bigPaddingRight" }, [
@@ -570,32 +575,34 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
+        const appState = getAppState();
         const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => this.utl.setEncryption(this, checked),
-            getValue: (): boolean => S.props.isEncrypted(state.node)
+            getValue: (): boolean => S.props.isEncrypted(appState.editNode)
         }) : null;
 
         const wordWrapCheckbox = new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
-                S.props.setPropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
+                S.props.setPropVal(J.NodeProp.NOWRAP, appState.editNode, checked ? null : "1");
                 if (this.contentEditor) {
                     this.contentEditor.setWordWrap(checked);
                 }
             },
-            getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1"
+            getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode) !== "1"
         });
 
-        const inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Subnodes", null,
+        const inlineChildrenCheckbox = appState.editNode.hasChildren ? new Checkbox("Inline Subnodes", null,
             this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
 
         return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox];
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
+        const appState = getAppState();
         return {
-            setValue: (checked: boolean) => S.props.setPropVal(propName, this.getState<LS>().node, checked ? "1" : null),
-            getValue: (): boolean => S.props.getPropStr(propName, this.getState<LS>().node) === "1"
+            setValue: (checked: boolean) => S.props.setPropVal(propName, appState.editNode, checked ? "1" : null),
+            getValue: (): boolean => S.props.getPropStr(propName, appState.editNode) === "1"
         };
     }
 
@@ -610,23 +617,23 @@ export class EditNodeDlg extends DialogBase {
     }
 
     renderButtons(): CompIntf {
-        const state = this.getState<LS>();
+        const appState = getAppState();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
-        const typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
         if (typeHandler) {
-            typeHandler.ensureDefaultProperties(state.node);
+            typeHandler.ensureDefaultProperties(appState.editNode);
         }
 
         // let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        const allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, getAppState())) : true;
-        const allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, getAppState())) : true;
+        const allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, appState.editNode, getAppState())) : true;
+        const allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, appState.editNode, getAppState())) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-        const datePropExists = S.props.getProp(J.NodeProp.DATE, state.node);
+        const datePropExists = S.props.getProp(J.NodeProp.DATE, appState.editNode);
 
         const numPropsShowing = this.utl.countPropsShowing(this);
         const advancedButtons: boolean = !!this.contentEditor;
@@ -657,7 +664,7 @@ export class EditNodeDlg extends DialogBase {
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive(getAppState())
                 ? new Button("Delete", () => {
-                    S.edit.deleteSelNodes(null, state.node.id);
+                    S.edit.deleteSelNodes(null, appState.editNode.id);
                     this.close();
                 }) : null,
 
@@ -680,19 +687,17 @@ export class EditNodeDlg extends DialogBase {
     close = () => {
         this.super_close();
 
-        if (this.mode === DialogMode.EMBED) {
-            EditNodeDlg.embedInstance = null;
-            dispatch("endEditing", s => {
-                s.editNode = null;
-                s.editNodeOnTab = null;
-                s.editNodeReplyToId = null;
-                S.quanta.newNodeTargetId = null;
-                S.quanta.newNodeTargetOffset = -1;
-                s.editShowJumpButton = false;
-                s.editEncrypt = false;
-                return s;
-            });
-        }
+        EditNodeDlg.embedInstance = null;
+        dispatch("endEditing", s => {
+            s.editNode = null;
+            s.editNodeOnTab = null;
+            s.editNodeReplyToId = null;
+            S.quanta.newNodeTargetId = null;
+            S.quanta.newNodeTargetOffset = -1;
+            s.editShowJumpButton = false;
+            s.editEncrypt = false;
+            return s;
+        });
     }
 
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
@@ -707,10 +712,12 @@ export class EditNodeDlg extends DialogBase {
     }
 
     openChangeNodeTypeDlg = () => {
-        new ChangeNodeTypeDlg(this.getState<LS>().node.type, (type: string) => this.utl.setNodeType(this, type)).open();
+        const appState = getAppState();
+        new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(this, type)).open();
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+        const appState = getAppState();
         const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
         const allowEditAllProps: boolean = getAppState().isAdminUser;
@@ -766,7 +773,7 @@ export class EditNodeDlg extends DialogBase {
             if (multiLine) {
                 valEditor = new TextArea(null, {
                     rows: "" + rows,
-                    id: "prop_" + this.getState<LS>().node.id
+                    id: "prop_" + appState.editNode.id
                 }, propState, "textarea-min-4 displayCell");
             }
             else {
@@ -792,6 +799,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
+        const appState = getAppState();
         const value = node.content || "";
         const editItems: Comp[] = [];
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
@@ -801,7 +809,7 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making field editor for val[" + value + "]");
 
         this.contentEditor = new TextArea(null, {
-            id: C.ID_PREFIX_EDIT + this.getState<LS>().node.id,
+            id: C.ID_PREFIX_EDIT + appState.editNode.id,
             rows
         }, this.contentEditorState, "font-inherit displayCell", true, this.contentScrollPos);
 

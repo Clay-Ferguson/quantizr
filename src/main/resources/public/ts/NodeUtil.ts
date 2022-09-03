@@ -285,9 +285,9 @@ export class NodeUtil {
         });
 
         if (editorDlg) {
-            const state = editorDlg.getState();
-            state.node.ac = res.aclEntries;
-            editorDlg.mergeState({ node: state.node });
+            const appState = getAppState();
+            appState.editNode.ac = res.aclEntries;
+            S.edit.updateNode(appState.editNode);
         }
     }
 

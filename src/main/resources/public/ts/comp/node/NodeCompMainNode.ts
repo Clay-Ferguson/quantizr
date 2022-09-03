@@ -61,7 +61,7 @@ export class NodeCompMainNode extends Div {
         }
 
         if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && node.id === state.editNode.id) {
-            this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null)]);
+            this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null)]);
         }
         else {
             const focusNode = S.nodeUtil.getHighlightedNode(state);

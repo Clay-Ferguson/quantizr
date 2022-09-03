@@ -15,20 +15,20 @@ import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
-        const state = dlg.getState<LS>();
-        const typeHandler = S.plugin.getTypeHandler(state.node.type);
+        const appState = getAppState();
+        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
         if (typeHandler) {
-            typeHandler.ensureDefaultProperties(state.node);
+            typeHandler.ensureDefaultProperties(appState.editNode);
             dlg.editorHelp = typeHandler.getEditorHelp();
         }
 
         let numPropsShowing: number = 0;
 
         // This loop creates all the editor input fields for all the properties
-        state.node.properties?.forEach((prop: J.PropertyInfo) => {
+        appState.editNode.properties?.forEach((prop: J.PropertyInfo) => {
             // console.log("prop=" + S.util.prettyPrint(prop));
 
-            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, getAppState())) {
+            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(appState.editNode, prop.name, getAppState())) {
                 // console.log("Hiding property: " + prop.name);
                 return;
             }
@@ -46,7 +46,8 @@ export class EditNodeDlgUtil {
     }
 
     public saveNode = async (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
+        const appState = getAppState();
+        const editNode = appState.editNode;
 
         // save these two values, becasue the S.quanta copy can get overwritten before we use them here.
         const newNodeTargetId = S.quanta.newNodeTargetId;
@@ -55,7 +56,7 @@ export class EditNodeDlgUtil {
         let content: string;
         if (dlg.contentEditor) {
             content = dlg.contentEditor.getValue();
-            const cipherKey = S.props.getCryptoKey(state.node, getAppState());
+            const cipherKey = S.props.getCryptoKey(editNode, getAppState());
             if (cipherKey) {
                 content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
                 content = J.Constant.ENC_TAG + content;
@@ -64,18 +65,19 @@ export class EditNodeDlgUtil {
         if (content) {
             content = content.trim();
         }
-        state.node.content = content;
-        state.node.name = dlg.nameState.getValue();
-        state.node.tags = dlg.tagsState.getValue();
 
-        const askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
-            (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
+        editNode.content = content;
+        editNode.name = dlg.nameState.getValue();
+        editNode.tags = dlg.tagsState.getValue();
+
+        const askToSplit = editNode.content && ((editNode as J.NodeInfo).content.indexOf("{split}") !== -1 ||
+            (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-            node: state.node
+            node: editNode
         });
 
         if (res?.success) {
@@ -89,20 +91,20 @@ export class EditNodeDlgUtil {
 
         // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
         // page refreshing after the edit.
-        if (res.node.type === J.NodeType.BOOKMARK && getAppState().node.type !== J.NodeType.BOOKMARK_LIST) {
+        if (res.node.type === J.NodeType.BOOKMARK && editNode.type !== J.NodeType.BOOKMARK_LIST) {
             // do nothing.
         }
         else {
-            S.render.fadeInId = state.node.id;
-            S.edit.saveNodeResponse(state.node, res, true, newNodeTargetId, newNodeTargetOffset, getAppState());
+            S.render.fadeInId = editNode.id;
+            S.edit.saveNodeResponse(editNode, res, true, newNodeTargetId, newNodeTargetOffset, getAppState());
 
             if (askToSplit) {
-                new SplitNodeDlg(state.node).open();
+                new SplitNodeDlg(editNode).open();
             }
         }
 
         // if we just saved a bookmark, reload bookmarks menu
-        if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
+        if ((editNode as J.NodeInfo).type === J.NodeType.BOOKMARK) {
             setTimeout(() => {
                 S.util.loadBookmarks();
             }, 250);
@@ -111,8 +113,8 @@ export class EditNodeDlgUtil {
 
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
-        state.node.properties?.forEach((prop: J.PropertyInfo) => {
+        const appState = getAppState();
+        appState.editNode.properties?.forEach((prop: J.PropertyInfo) => {
             // console.log("Save prop iterator: name=" + prop.name);
             const propState = dlg.propStates.get(prop.name);
             if (propState) {
@@ -134,13 +136,14 @@ export class EditNodeDlgUtil {
     }
 
     addProperty = async (dlg: EditNodeDlg): Promise<void> => {
+        const appState = getAppState();
         const state: LS = dlg.getState<LS>();
-        const propDlg = new EditPropertyDlg(state.node);
+        const propDlg = new EditPropertyDlg(appState.editNode);
         await propDlg.open();
 
         if (propDlg.nameState.getValue()) {
-            state.node.properties = state.node.properties || [];
-            state.node.properties.push({
+            appState.editNode.properties = appState.editNode.properties || [];
+            appState.editNode.properties.push({
                 name: propDlg.nameState.getValue(),
                 value: ""
             });
@@ -152,13 +155,14 @@ export class EditNodeDlgUtil {
 
     addDateProperty = (dlg: EditNodeDlg) => {
         const state = dlg.getState<LS>();
-        state.node.properties = state.node.properties || [];
+        const appState = getAppState();
+        appState.editNode.properties = appState.editNode.properties || [];
 
-        if (S.props.getProp(J.NodeProp.DATE, state.node)) {
+        if (S.props.getProp(J.NodeProp.DATE, appState.editNode)) {
             return;
         }
 
-        state.node.properties.push({
+        appState.editNode.properties.push({
             name: J.NodeProp.DATE,
             value: new Date().getTime()
         }, {
@@ -170,39 +174,41 @@ export class EditNodeDlgUtil {
     }
 
     share = async (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
-        await S.edit.editNodeSharing(getAppState(), state.node);
-        dlg.mergeState<LS>({ node: state.node });
+        const appState = getAppState();
+        await S.edit.editNodeSharing(getAppState(), appState.editNode);
+        S.edit.updateNode(appState.editNode);
     }
 
     upload = async (file: File, dlg: EditNodeDlg) => {
         const state = dlg.getState<LS>();
+        const appState = getAppState();
 
-        const uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, file, false, true, async () => {
-            await this.refreshBinaryPropsFromServer(dlg, state.node);
-            this.initPropStates(dlg, state.node, true);
-            dlg.mergeState<LS>({ node: state.node });
+        const uploadDlg = new UploadFromFileDropzoneDlg(appState.editNode.id, "", state.toIpfs, file, false, true, async () => {
+            await this.refreshBinaryPropsFromServer(dlg, appState.editNode);
+            this.initPropStates(dlg, appState.editNode, true);
+            S.edit.updateNode(appState.editNode);
             dlg.binaryDirty = true;
         });
         await uploadDlg.open();
     }
 
     setNodeType = (dlg: EditNodeDlg, newType: string) => {
-        const state = dlg.getState<LS>();
-        state.node.type = newType;
-        dlg.mergeState<LS>({ node: state.node });
+        const appState = getAppState();
+        appState.editNode.type = newType;
+        S.edit.updateNode(appState.editNode);
     }
 
     deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
+        const appState = getAppState();
         const res = await S.rpcUtil.rpc<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
-            nodeId: dlg.getState<LS>().node.id,
+            nodeId: appState.editNode.id,
             propNames
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
             const state = dlg.getState<LS>();
             propNames.forEach(propName => {
-                S.props.deleteProp(state.node, propName);
+                S.props.deleteProp(appState.editNode, propName);
             });
             dlg.mergeState<LS>(state);
         }
@@ -225,12 +231,13 @@ export class EditNodeDlgUtil {
 
     setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
         const state = dlg.getState<LS>();
+        const appState = getAppState();
         if (dlg.pendingEncryptionChange) return;
 
         (async () => {
-            const encrypted: boolean = S.props.isEncrypted(state.node);
+            const encrypted: boolean = S.props.isEncrypted(appState.editNode);
 
-            if (encrypt && S.props.isPublic(state.node)) {
+            if (encrypt && S.props.isPublic(appState.editNode)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
                 return;
             }
@@ -244,22 +251,22 @@ export class EditNodeDlgUtil {
                         /* Take what's in the editor and put
                         that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
                         in the case where the user made some changes before disabling encryption. */
-                        state.node.content = dlg.contentEditor.getValue();
-                        S.props.setPropVal(J.NodeProp.ENC_KEY, state.node, null);
+                        appState.editNode.content = dlg.contentEditor.getValue();
+                        S.props.setPropVal(J.NodeProp.ENC_KEY, appState.editNode, null);
                     }
                     /* Else need to ensure node is encrypted */
                     else {
                         // if we need to encrypt and the content is not currently encrypted.
-                        if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
+                        if (!appState.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
                             const content = dlg.contentEditor.getValue();
 
                             const skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                            state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
+                            appState.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
 
                             /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
                             the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
                             and so can only be decrypted with their private key. */
-                            S.props.setPropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
+                            S.props.setPropVal(J.NodeProp.ENC_KEY, appState.editNode, skdp.cipherKey);
                         }
                     }
 
@@ -273,20 +280,20 @@ export class EditNodeDlgUtil {
     }
 
     deleteUpload = async (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
+        const appState = getAppState();
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
         call has fully completed. */
-        const deleted: boolean = await S.attachment.deleteAttachment(state.node, getAppState());
+        const deleted: boolean = await S.attachment.deleteAttachment(appState.editNode, getAppState());
 
         if (deleted) {
-            S.attachment.removeBinaryProperties(state.node);
-            this.initPropStates(dlg, state.node, true);
-            dlg.mergeState<LS>({ node: state.node });
+            S.attachment.removeBinaryProperties(appState.editNode);
+            this.initPropStates(dlg, appState.editNode, true);
+            S.edit.updateNode(appState.editNode);
 
             if (dlg.mode === DialogMode.EMBED) {
                 dispatch("uploadDeleted", s => {
-                    s.editNode = state.node;
+                    s.editNode = appState.editNode;
                     return s;
                 });
             }
@@ -373,10 +380,10 @@ export class EditNodeDlgUtil {
     }
 
     initStates = (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
+        const appState = getAppState();
 
         /* Init main content text on node */
-        const value = state.node.content || "";
+        const value = appState.editNode.content || "";
         if (!value.startsWith(J.Constant.ENC_TAG)) {
             dlg.contentEditorState.setValue(value);
         }
@@ -385,9 +392,9 @@ export class EditNodeDlgUtil {
         }
 
         /* Initialize node name state */
-        dlg.nameState.setValue(state.node.name);
-        dlg.tagsState.setValue(state.node.tags);
-        this.initPropStates(dlg, state.node, false);
+        dlg.nameState.setValue(appState.editNode.name);
+        dlg.tagsState.setValue(appState.editNode.tags);
+        this.initPropStates(dlg, appState.editNode, false);
     }
 
     /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
@@ -470,11 +477,12 @@ an upload has been added or removed. */
     }
 
     cancelEdit = (dlg: EditNodeDlg) => {
+        const appState = getAppState();
         dlg.closeByUser();
         dlg.close();
 
         // rollback properties.
-        dlg.getState<LS>().node.properties = dlg.initialProps;
+        appState.editNode.properties = dlg.initialProps;
 
         if (dlg.binaryDirty) {
             S.quanta.refresh(getAppState());
