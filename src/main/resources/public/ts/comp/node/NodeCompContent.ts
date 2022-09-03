@@ -47,11 +47,11 @@ export class NodeCompContent extends Div {
             typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
 
             if (this.node.content && ( //
-            this.node.content.indexOf("{{imgUrl}}") !== -1 ||
-            this.node.content.indexOf("{{img}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
+                this.node.content.indexOf("{{imgUrl}}") !== -1 ||
+                this.node.content.indexOf("{{img}}") !== -1 ||
+                this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
+                this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
+                this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
                 embeddedImg = true;
             }
 
@@ -67,11 +67,11 @@ export class NodeCompContent extends Div {
             children.push(new NodeCompBinary(this.node, false, false));
         }
 
-        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", this.node);
+        this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.setChildren(children);
     }
 
-    maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo) => {
+    maybeRenderDateTime = (children: CompIntf[], propName: string, node: J.NodeInfo) => {
         const timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             const dateVal: Date = new Date(parseInt(timestampVal));
@@ -98,8 +98,9 @@ export class NodeCompContent extends Div {
                 }
             }
 
-            children.push(new Div(displayName + ": " + S.util.formatDate(dateVal) + //
-                " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
+            // if more than two days in future or past we don't show the time, just the date
+            const when = (diffDays <= -2 || diffDays >= 2) ? S.util.formatDateShort(dateVal) : S.util.formatDateTime(dateVal);
+            children.push(new Div(when + " " + S.util.getDayOfWeek(dateVal) + diffStr, {
                 className: "dateTimeDisplay float-end"
             }));
             children.push(new Clearfix());

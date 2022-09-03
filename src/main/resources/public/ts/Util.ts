@@ -508,7 +508,7 @@ export class Util {
         });
     }
 
-    formatDate = (date: Date): string => {
+    formatDateTime = (date: Date): string => {
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? "pm" : "am";
@@ -523,7 +523,11 @@ export class Util {
     }
 
     formatDateShort = (date: Date): string => {
-        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
+        let year = date.getFullYear();
+        if (year > 2000) {
+            year -= 2000;
+        }
+        return (date.getMonth() + 1) + "/" + date.getDate() + "/" + year;
     }
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks

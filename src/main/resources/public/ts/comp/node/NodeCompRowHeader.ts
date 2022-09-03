@@ -182,7 +182,7 @@ export class NodeCompRowHeader extends Div {
             if (reply) {
                 floatUpperRightDiv.addChild(new Span("Reply", { className: "reply-indicator", title: "This Post is a reply to it's parent Post" }));
             }
-            floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(this.node.lastModified))));
+            floatUpperRightDiv.addChild(new Span(S.util.formatDateTime(new Date(this.node.lastModified))));
         }
 
         if (this.node.name) {

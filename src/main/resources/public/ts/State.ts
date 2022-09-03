@@ -9,14 +9,13 @@ export class State {
         return s;
     }
 
-    mergeState<ST>(moreState: ST): any {
+    mergeState<T>(moreState: T): void {
         this.setStateEx((state: any) => {
-            this.state = { ...state, ...moreState };
-            return this.stateTranslator(this.state);
+            return this.state = this.stateTranslator({ ...state, ...moreState });
         });
     }
 
-    setState = <ST>(newState: ST): any => {
+    setState = <T>(newState: T): void => {
         this.setStateEx((state: any) => {
             return this.state = this.stateTranslator({ ...newState });
         });
@@ -24,17 +23,10 @@ export class State {
 
     /* We start out with this initial function which will allow us to set a state even before the 'useState' has been called
       because for functional components (which we're using) the useState hook won't (and cannot) be even called ever until
-      the react function itself is currently executing. One of the "Rules of Hooks"
+      the react function itself is currently executing (per the "Rules of Hooks")
     */
-    setStateEx<ST>(state: ST) {
-        state = state || {} as ST;
-
-        if (typeof state === "function") {
-            this.state = state(this.state);
-        }
-        else {
-            this.state = state;
-        }
+    private setStateEx(state: Function) {
+        this.state = state(this.state);
     }
 
     useState = () => {

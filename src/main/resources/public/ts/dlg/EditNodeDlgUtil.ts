@@ -448,7 +448,7 @@ an upload has been added or removed. */
     }
 
     insertTime = (dlg: EditNodeDlg) => {
-        dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
+        dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDateTime(new Date()) + "]");
     }
 
     insertMention = async (dlg: EditNodeDlg) => {
