@@ -176,6 +176,7 @@ export interface ExportRequest extends RequestBase {
     exportExt: string;
     fileName: string;
     toIpfs: boolean;
+    includeToc: boolean;
 }
 
 export interface FileSearchRequest extends RequestBase {

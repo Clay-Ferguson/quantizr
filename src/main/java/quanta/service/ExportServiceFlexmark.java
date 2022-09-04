@@ -131,11 +131,17 @@ public class ExportServiceFlexmark extends ServiceBase {
 			Parser parser = Parser.builder(options).build();
 			HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 
+			// if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension) as the place where we want the 
+			// table of contents injected so we can click the "Table of Contents" checkbox in the export, or theoretically we
+			// would also insert this [TOC] somewhere else in the text.
+			if ("pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
+				markdown.append("[TOC]");
+			}
+
 			recurseNode(exportNode, 0);
 
 			Node document = parser.parse(markdown.toString());
 			String body = renderer.render(document);
-
 			String html = generateHtml(body);
 
 			if ("html".equals(format)) {
@@ -167,7 +173,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 						String mime = "application/pdf";
 
-						//-----------------------------------------------------
+						// -----------------------------------------------------
 						// DO NOT DELETE
 						// ---------------
 						// this does the regular IPFS file add

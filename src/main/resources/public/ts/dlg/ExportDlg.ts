@@ -5,8 +5,10 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
+import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { DialogBase } from "../DialogBase";
@@ -20,6 +22,7 @@ import { MessageDlg } from "./MessageDlg";
 interface LS { // Local State
     exportType: string;
     toIpfs?: boolean;
+    includeToc?: boolean;
 }
 
 export class ExportDlg extends DialogBase {
@@ -30,7 +33,8 @@ export class ExportDlg extends DialogBase {
     constructor(private node: NodeInfo) {
         super("Export Node");
         this.mergeState<LS>({
-            exportType: "zip"
+            exportType: "zip",
+            includeToc: true
             // toIpfs: false <--- set by 'saveToIpfsState'
         });
         this.fileNameState.setValue(node.name);
@@ -40,6 +44,7 @@ export class ExportDlg extends DialogBase {
         const appState = getAppState();
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
+            new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
             new RadioButtonGroup([
                 this.radioButton("ZIP", "zip"),
                 this.radioButton("TAR", "tar"),
@@ -48,6 +53,7 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("PDF", "pdf"),
                 this.radioButton("HTML", "html")
             ], "radioButtonsBar marginTop"),
+            this.getState<LS>().exportType === "pdf" ? this.makePdfOptions() : null,
             appState.config.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
@@ -58,15 +64,27 @@ export class ExportDlg extends DialogBase {
         ];
     }
 
+    makePdfOptions = (): Div => {
+        return new Div(null, { className: "bigMarginBottom" }, [
+            new Heading(5, "PDF Options"),
+            new Checkbox("Include Table of Contents (using Markdown Headings)", null, {
+                setValue: (checked: boolean) => this.getState<LS>().includeToc = checked,
+                getValue: (): boolean => this.getState<LS>().includeToc
+            })
+        ]);
+    }
+
     radioButton = (name: string, exportType: string) => {
-        return new RadioButton(name, false, "exportTypeGroup", null, {
-            setValue: (checked: boolean) => {
-                if (checked) {
-                    this.mergeState<LS>({ exportType });
-                }
-            },
-            getValue: (): boolean => this.getState<LS>().exportType === exportType
-        });
+        return new Span(null, null, [
+            new RadioButton(name, false, "exportTypeGroup", null, {
+                setValue: (checked: boolean) => {
+                    if (checked) {
+                        this.mergeState<LS>({ exportType });
+                    }
+                },
+                getValue: (): boolean => this.getState<LS>().exportType === exportType
+            }, "form-check-inline marginRight")
+        ]);
     }
 
     exportNodes = async () => {
@@ -75,7 +93,8 @@ export class ExportDlg extends DialogBase {
             nodeId: this.node.id,
             exportExt: state.exportType,
             fileName: this.fileNameState.getValue(),
-            toIpfs: state.toIpfs
+            toIpfs: state.toIpfs,
+            includeToc: state.includeToc
         });
         this.exportResponse(res);
         this.close();

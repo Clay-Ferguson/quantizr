@@ -8,7 +8,8 @@ import { Label } from "./Label";
 
 export class RadioButton extends Comp {
 
-    constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf) {
+    constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf,
+        private layoutClass: string = null) {
         super(attribs, new State());
         valueIntf = this.valueIntf || new Value<string>(this, "val");
     }
@@ -16,7 +17,7 @@ export class RadioButton extends Comp {
     compRender = (): ReactNode => {
         let cbInput = null;
         return this.tag("span", {
-            className: "form-check"
+            className: "form-check " + (this.layoutClass || "")
         }, [
             cbInput = new CheckboxInput({
                 name: this.groupName,

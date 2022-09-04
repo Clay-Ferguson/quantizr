@@ -12,6 +12,8 @@ public class ExportRequest extends RequestBase {
 
 	private boolean toIpfs;
 
+	private boolean includeToc;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -42,5 +44,13 @@ public class ExportRequest extends RequestBase {
 
 	public void setToIpfs(boolean toIpfs) {
 		this.toIpfs = toIpfs;
+	}
+
+	public boolean isIncludeToc() {
+		return includeToc;
+	}
+
+	public void setIncludeToc(boolean includeToc) {
+		this.includeToc = includeToc;
 	}
 }
