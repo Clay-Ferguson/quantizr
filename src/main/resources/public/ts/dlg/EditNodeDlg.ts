@@ -37,14 +37,10 @@ import { SelectTagsDlg } from "./SelectTagsDlg";
  * Node Editor Dialog
  */
 export class EditNodeDlg extends DialogBase {
-
     static autoSaveTimer: any = null;
     static currentInst: EditNodeDlg = null;
-
     static pendingUploadFile: File = null;
-
     utl: EditNodeDlgUtil = new EditNodeDlgUtil();
-
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
@@ -325,15 +321,13 @@ export class EditNodeDlg extends DialogBase {
             }
 
             if (!customProps || hasContentProp) {
-                const contentTableRow = this.makeContentEditor(appState.editNode, isWordWrap, rows);
-                mainPropsTable.addChild(contentTableRow);
+                mainPropsTable.addChild(this.makeContentEditor(appState.editNode, isWordWrap, rows));
                 this.contentEditor.setWordWrap(isWordWrap);
             }
         }
 
-        this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
+        this.buildPropsEditing(propsParent, state, typeHandler, customProps);
         const binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
-
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(appState, appState.editNode, this);
         const isPublic = S.props.isPublic(appState.editNode);
 
@@ -360,9 +354,9 @@ export class EditNodeDlg extends DialogBase {
             propsTable = null;
         }
 
-        let propsCollapsablePanel: CollapsiblePanel = null;
+        let propsCollapsePanel: CollapsiblePanel = null;
         if (propsTable) {
-            propsCollapsablePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
+            propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
                 propsTable
             ], false,
                 (state: boolean) => {
@@ -375,7 +369,7 @@ export class EditNodeDlg extends DialogBase {
             this.createTagsIconButtons()
         ]);
 
-        const collapsiblePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+        const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             this.tagsState.getValue() ? null : tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
@@ -388,11 +382,11 @@ export class EditNodeDlg extends DialogBase {
             }, EditNodeDlg.morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
         const morePanel = new Div(null, { className: "marginBottom" }, [
-            collapsiblePanel
+            collapsePanel
         ]);
 
         const propsPanel = new Div(null, null, [
-            propsCollapsablePanel
+            propsCollapsePanel
         ]);
 
         // Allows user to drag-n-drop files onto editor to upload
@@ -434,7 +428,7 @@ export class EditNodeDlg extends DialogBase {
         S.edit.updateNode(appState.editNode);
     }
 
-    buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]) => {
+    buildPropsEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]) => {
         let numPropsShowing: number = 0;
         const appState = getAppState();
         if (appState.editNode.properties) {

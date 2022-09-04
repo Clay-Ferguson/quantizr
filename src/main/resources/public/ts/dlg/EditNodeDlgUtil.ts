@@ -41,7 +41,6 @@ export class EditNodeDlgUtil {
                 }
             }
         });
-
         return numPropsShowing;
     }
 
@@ -319,7 +318,6 @@ export class EditNodeDlgUtil {
             parentCount: 0
         });
 
-        if (!res.node) return;
         if (res.node?.properties) {
             S.props.transferBinaryProps(res.node, node);
         }
@@ -360,15 +358,7 @@ export class EditNodeDlgUtil {
     speechRecognition = (dlg: EditNodeDlg) => {
         S.speech.setCallback((transcript: string) => {
             if (dlg.contentEditor && transcript) {
-                // Capitalize and put period at end. This may be annoying in the long run but for now i "think"
-                // I will like it? Time will tell.
-                if (transcript.trim().length > 0) {
-                    transcript = transcript.charAt(0).toUpperCase() + transcript.slice(1);
-                    dlg.contentEditor.insertTextAtCursor(transcript + ". ");
-                }
-                else {
-                    dlg.contentEditor.insertTextAtCursor(transcript);
-                }
+                dlg.contentEditor.insertTextAtCursor(transcript);
             }
         });
 

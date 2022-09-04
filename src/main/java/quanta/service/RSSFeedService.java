@@ -901,7 +901,7 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	// DO NOT DELETE - this is the code to convert to HTML
-	// private Stringn convertMarkdownToHtml() {
+	// private String convertMarkdownToHtml() {
 	// MutableDataSet options = new MutableDataSet();
 	// options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
 	// TocExtension.create()));
