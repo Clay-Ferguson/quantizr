@@ -74,7 +74,7 @@ export class EditNodeDlgUtil {
             (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(dlg);
-        // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
+        // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode
@@ -129,7 +129,6 @@ export class EditNodeDlgUtil {
                 }
                 else {
                     prop.value = propState.getValue();
-                    // console.log("   val=" + prop.value);
                 }
             }
         });
@@ -143,11 +142,15 @@ export class EditNodeDlgUtil {
 
         if (propDlg.nameState.getValue()) {
             appState.editNode.properties = appState.editNode.properties || [];
-            appState.editNode.properties.push({
+            const newProp: J.PropertyInfo = {
                 name: propDlg.nameState.getValue(),
                 value: ""
-            });
+            }
+            appState.editNode.properties.push(newProp);
+
+            // this forces a rerender, even though it looks like we're doing nothing to state.
             dlg.mergeState<LS>(state);
+            this.initPropState(dlg, appState.editNode, newProp);
         }
         // we don't need to return an actual promise here
         return null;
@@ -322,7 +325,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, propEntry: J.PropertyInfo, allowCheckbox: boolean) => {
+    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, propEntry: J.PropertyInfo) => {
         const allowEditAllProps: boolean = getAppState().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const propVal = propEntry.value;
@@ -332,7 +335,7 @@ export class EditNodeDlgUtil {
 
         let propState: Validator = dlg.propStates.get(propEntry.name);
         if (!propState) {
-            propState = new Validator();
+            propState = new Validator(propVal);
             dlg.propStates.set(propEntry.name, propState);
         }
 
@@ -402,9 +405,7 @@ the properties on node that are in 'S.props.allBinaryProps' list, which is how w
 an upload has been added or removed. */
     initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
         const typeHandler = S.plugin.getTypeHandler(node.type);
-        let customProps: string[] = null;
         if (typeHandler) {
-            customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(node);
         }
 
@@ -425,7 +426,7 @@ an upload has been added or removed. */
                 // if onlyBinaries and this is NOT a binary prop then skip it.
                 if (onlyBinaries) {
                     if (S.props.allBinaryProps.has(prop.name)) {
-                        this.initPropState(dlg, node, prop, false);
+                        this.initPropState(dlg, node, prop);
                     }
                     return;
                 }
@@ -439,8 +440,7 @@ an upload has been added or removed. */
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!dlg.isGuiControlBasedProp(prop)) {
-                        const allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        this.initPropState(dlg, node, prop, allowSelection);
+                        this.initPropState(dlg, node, prop);
                     }
                 }
             });
