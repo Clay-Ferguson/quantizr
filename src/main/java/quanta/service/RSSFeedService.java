@@ -223,7 +223,7 @@ public class RSSFeedService extends ServiceBase {
 		}
 	}
 
-	public SyndFeed getFeed(String url, boolean fromCache) {
+	public SyndFeed getFeed(final String url, boolean fromCache) {
 		// log.debug("getFeed: " + url);
 
 		/*
@@ -232,7 +232,8 @@ public class RSSFeedService extends ServiceBase {
 		 * feed has failed
 		 */
 		if (fromCache && failedFeeds.contains(url)) {
-			return null;
+			// if the feed has failed at least attempt to get from the cache whatever the latest is that we have
+			return feedCache.get(url);
 		}
 
 		Reader reader = null;
@@ -346,7 +347,9 @@ public class RSSFeedService extends ServiceBase {
 			 */
 			log.debug("Error reading feed: " + url + " -> " + e.getMessage());
 			failedFeeds.add(url);
-			return null;
+			
+			// if the feed has failed at least attempt to get from the cache whatever the latest is that we have
+			return feedCache.get(url);
 		} finally {
 			if (ok(reader)) {
 				StreamUtil.close(reader);
