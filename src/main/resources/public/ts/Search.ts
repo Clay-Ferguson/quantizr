@@ -527,6 +527,8 @@ export class Search {
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
 
+        // todo-0: for the document view, we need to be able to pass in (only when no divider lines are showing) a
+        // clazz here that has more bottom margin...between paragraphs
         let clazz = isFeed ? "feed-node" : "results-node";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;

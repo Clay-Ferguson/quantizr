@@ -206,7 +206,9 @@ public enum NodeProp {
     // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the
     // node is s boost.
     BOOST("boost", "s"), //
-    DURATION("duration", "s");
+    DURATION("duration", "s"), //
+
+    TRUNCATED("trunc", "s");
 
     @JsonValue
     private final String value;

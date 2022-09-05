@@ -4,6 +4,7 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ import quanta.util.XString;
  */
 @Component
 public class MongoRead extends ServiceBase {
-    int MAX_DOC_DEPTH = 5;
+    int MAX_DOC_DEPTH = 7;
     int MAX_DOC_ITEMS_PER_CALL = 50;
 
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
@@ -1314,10 +1315,15 @@ public class MongoRead extends ServiceBase {
         return mongoUtil.find(q);
     }
 
-    /* Generates a Document-like View of a Subgraph. Nodes in "document order", as if reading like a book, or 
-     * conventional word processing monolilthic document view. 
+    /*
+     * Generates a Document-like View of a Subgraph. Nodes in "document order", as if reading like a
+     * book, or conventional word processing monolilthic document view. Very powerful becasue of 'nodeId' which
+     * is the place to start loading from. With 'nodeId' it's like we can start our recursion from anywhere, so as
+     * we're browsing down a document scrolling in new content each time this method is called to load more
+     * records, the nodeId passed in will be whatever was at the bottom of the document which is being appended to
+     * by using the results of calling this method.
      */
-    public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId) {
+    public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId, HashSet<String> truncates) {
         LinkedList<SubNode> doc = new LinkedList<>();
         SubNode rootNode = read.getNode(ms, new ObjectId(rootId));
 
@@ -1329,7 +1335,7 @@ public class MongoRead extends ServiceBase {
         int rootSlashCount = StringUtils.countMatches(rootNode.getPath(), "/");
 
         // entry point into recusion
-        if (!recurseDocList(doc, ms, node, rootSlashCount)) {
+        if (!recurseDocList(doc, ms, node, rootSlashCount, truncates)) {
             // log.debug("Started from root. Found enough");
             return doc;
         }
@@ -1371,7 +1377,7 @@ public class MongoRead extends ServiceBase {
             while (iterator.hasNext()) {
                 SubNode sibling = iterator.next();
                 // log.debug("sibling[" + count + "] " + sibling.getContent() + " ordinal=" + sibling.getOrdinal());
-                if (!recurseDocList(doc, ms, sibling, rootSlashCount)) {
+                if (!recurseDocList(doc, ms, sibling, rootSlashCount, truncates)) {
                     break;
                 }
             }
@@ -1396,29 +1402,32 @@ public class MongoRead extends ServiceBase {
 
     // Adds 'node' and it's entire subgraph (up to limits) into 'doc'
     // returns false to terminate then we have enough doc items
-    public boolean recurseDocList(LinkedList<SubNode> doc, MongoSession ms, SubNode node, int rootSlashCount) {
+    public boolean recurseDocList(LinkedList<SubNode> doc, MongoSession ms, SubNode node, int rootSlashCount, HashSet<String> truncates) {
         doc.add(node);
         int thisSlashCount = StringUtils.countMatches(node.getPath(), "/");
         int depth = thisSlashCount - rootSlashCount;
         if (depth < 0) {
             throw new RuntimeException("oops depth is negative.");
         }
+        // log.debug("RECURSE: " + " ".repeat(depth) + node.getContent() + " ordinal=" + node.getOrdinal());
 
-        // log.debug("RECURSE: " + "    ".repeat(depth) + node.getContent() + " ordinal=" + node.getOrdinal());
+        if (depth >= MAX_DOC_DEPTH) {
+            // log.debug("MAX DEPTH (ignoring). " + node.getContent());
+            if (ok(truncates) && hasChildren(ms, node.getId())) {
+                truncates.add(node.getIdStr());
+            }
+            // return true to keep iterating, although we're ignoring these 'too deep' ones.
+            return true;
+        }
 
         // if we reach iteration limits return false to unwind, we're done
-        if (depth >= MAX_DOC_DEPTH) {
-            log.debug("MAX DEPTH.");
-            return false;
-        }
-
         if (doc.size() >= MAX_DOC_ITEMS_PER_CALL) {
-            log.debug("MAX ITEMS.");
+            // log.debug("MAX ITEMS.");
             return false;
         }
 
-        for (SubNode n : read.getChildren(ms, node)) {
-            if (!recurseDocList(doc, ms, n, rootSlashCount)) {
+        for (SubNode n : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), MAX_DOC_ITEMS_PER_CALL, 0)) {
+            if (!recurseDocList(doc, ms, n, rootSlashCount, truncates)) {
                 return false;
             }
         }

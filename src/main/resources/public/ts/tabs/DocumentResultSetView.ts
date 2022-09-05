@@ -1,6 +1,7 @@
 import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { DocumentRSInfo } from "../DocumentRSInfo";
@@ -25,8 +26,19 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         const itemClass = allowHeader ? "userFeedItem" : null;
         const itemClassHighlight = allowHeader ? "userFeedItemHighlight" : null;
 
-        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
+        const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, state);
+
+        if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
+            // todo-0: We could easily make this icon clickable to render this node as the root of a new document
+            // but then we'd need to have a "back button" capability to get back to previous document render.
+            row.addChild(new Icon({
+                className: "fa fa-warning float-end warningIcon",
+                title: "Nodes truncated. Tree too Deep."
+            }));
+            row.addChild(new Clearfix());
+        }
+        return row;
     }
 
     pageChange(delta: number): void {

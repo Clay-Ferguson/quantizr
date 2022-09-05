@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
+import quanta.model.PropertyInfo;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
@@ -82,11 +83,17 @@ public class NodeSearchService extends ServiceBase {
 		List<NodeInfo> results = new LinkedList<>();
 		res.setSearchResults(results);
 
-		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId());
+		HashSet<String> truncates = new HashSet<>();
+		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), truncates);
 		int counter = 0;
 		for (SubNode n : nodes) {
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, n, true, false, counter + 1, false, false, false,
 					false, false, true, null);
+
+			if (truncates.contains(n.getIdStr())) {
+				info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
+			}
+
 			results.add(info);
 		}
 		return res;

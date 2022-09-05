@@ -1053,6 +1053,7 @@ export const enum NodeProp {
     UNPUBLISHED = "unpub",
     BOOST = "boost",
     DURATION = "duration",
+    TRUNCATED = "trunc",
 }
 
 export const enum NodeType {
