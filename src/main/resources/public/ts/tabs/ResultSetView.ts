@@ -90,8 +90,9 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+        const allowHeader = this.allowHeader && (state.userPrefs.showMetaData || state.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true,
-            jumpButton, this.allowHeader, this.allowFooter, true, "userFeedItem " + this.data.id,
+            jumpButton, allowHeader, this.allowFooter, true, "userFeedItem " + this.data.id,
             "userFeedItemHighlight " + this.data.id, state);
     }
 
