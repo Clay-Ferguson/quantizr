@@ -997,6 +997,10 @@ Will come back later and study this more. todo-1 */
     margin-left: $bigGap;
 }
 
+.bigMargin {
+    margin: $bigGap;
+}
+
 .anchorBigMarginBottom {
     display: inline-block;
     margin-bottom: $smallGap;

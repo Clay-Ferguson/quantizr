@@ -4,10 +4,14 @@ import { Comp } from "../base/Comp";
 import { Img } from "./Img";
 import { Italic } from "./Italic";
 import { Span } from "./Span";
+import { Spinner } from "./Spinner";
 
 interface LS { // Local State
     visible: boolean;
     disabled: boolean;
+
+    // infinite scrolling turns this on while querying
+    waiting: boolean;
 }
 
 export class IconButton extends Comp {
@@ -19,8 +23,19 @@ export class IconButton extends Comp {
         this.mergeState({ visible: true });
     }
 
+    replaceWithWaitIcon = (): void => {
+        this.mergeState({ waiting: true });
+    }
+
     compRender = (): ReactNode => {
         const state = this.getState<LS>();
+
+        // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner
+        // while loading more records
+        if (state.waiting) {
+            return new Spinner("bigMargin").compRender();
+        }
+
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
         return this.tag("button", null, [

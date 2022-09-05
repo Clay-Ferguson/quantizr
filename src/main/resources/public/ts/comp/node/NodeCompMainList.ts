@@ -37,7 +37,7 @@ export class NodeCompMainList extends Div {
     addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState, pageTop: boolean) => {
         let firstButton: Comp;
         let prevButton: Comp;
-        let nextButton: Comp;
+        let nextButton: IconButton;
         let prevNodeButton: Comp;
         let nextNodeButton: Comp;
         const firstChild = S.edit.getFirstChildNode(state);
@@ -90,6 +90,7 @@ export class NodeCompMainList extends Div {
                                     // otherwise the 'more' button came into view because the user had to have
                                     // scrolled to it, so we scroll in the new nodes to display (infinite scrolling)
                                     else {
+                                        nextButton.replaceWithWaitIcon();
                                         S.view.growPage(state);
                                     }
                                 }

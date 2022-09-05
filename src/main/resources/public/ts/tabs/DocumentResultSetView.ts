@@ -13,7 +13,7 @@ import { ResultSetView } from "./ResultSetView";
 export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetView<T> {
 
     constructor(data: TabIntf) {
-        super(data, false, false);
+        super(data, false, false, true);
         data.inst = this;
     }
 
@@ -30,7 +30,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, state);
 
         if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
-            // todo-0: We could easily make this icon clickable to render this node as the root of a new document
+            // todo-1: We could easily make this icon clickable to render this node as the root of a new document
             // but then we'd need to have a "back button" capability to get back to previous document render.
             row.addChild(new Icon({
                 className: "fa fa-warning float-end warningIcon",

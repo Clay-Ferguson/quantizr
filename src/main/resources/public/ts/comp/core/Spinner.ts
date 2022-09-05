@@ -3,9 +3,9 @@ import { Comp } from "../base/Comp";
 
 export class Spinner extends Comp {
 
-    constructor() {
+    constructor(extraClasses: string = "") {
         super({
-            className: "spinner-border text-success",
+            className: "spinner-border text-success " + extraClasses,
             role: "status"
         });
     }

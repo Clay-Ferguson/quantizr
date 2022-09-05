@@ -12,6 +12,7 @@ import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
+import { Constants as C } from "../Constants";
 
 export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
@@ -19,8 +20,11 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
 
-    constructor(data: TabIntf, private showRoot: boolean = true, private showPageNumber: boolean = true) {
+    constructor(data: TabIntf, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
+        if (infiniteScrolling && showPageNumber) {
+            throw new Error("page numbering incompatable with infinite scrolling")
+        }
     }
 
     preRender(): void {
@@ -95,6 +99,39 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             children.push(extraPagingDiv);
         }
 
+        let moreButton: IconButton = null;
+        if (!this.data.props.endReached) {
+            moreButton = new IconButton("fa-angle-right", "More", {
+                onClick: () => this.pageChange(1),
+                title: "Next Page"
+            })
+        }
+
+        if (this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
+            const buttonCreateTime: number = new Date().getTime();
+            // When the 'more' button scrolls into view go ahead and load more records.
+            moreButton.onMount((elm: HTMLElement) => {
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach((entry: any) => {
+                        if (entry.isIntersecting) {
+                            // if this button comes into visibility within 2 seconds of it being created
+                            // that means it was rendered visible without user scrolling so in this case
+                            // we want to disallow the auto loading
+                            if (new Date().getTime() - buttonCreateTime < 2000) {
+                                observer.disconnect();
+                            }
+                            else {
+                                moreButton.replaceWithWaitIcon()
+                                // console.log("Loading more...");
+                                this.pageChange(1);
+                            }
+                        }
+                    });
+                });
+                observer.observe(elm);
+            });
+        }
+
         children.push(
             this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
             new ButtonBar([
@@ -110,10 +147,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                     onClick: () => this.pageChange(-1),
                     title: "Previous Page"
                 }) : null,
-                !this.data.props.endReached ? new IconButton("fa-angle-right", "More", {
-                    onClick: () => this.pageChange(1),
-                    title: "Next Page"
-                }) : null
+                moreButton
             ], "text-center marginBottom marginTop"));
     }
 

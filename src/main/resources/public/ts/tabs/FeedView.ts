@@ -239,7 +239,8 @@ export class FeedView extends AppTab<FeedViewProps> {
                                             observer.disconnect();
                                         }
                                         else {
-                                            // console.log("Loading more...");
+                                            // console.log("Loading more...")
+                                            moreButton.replaceWithWaitIcon();
                                             S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
                                         }
                                     }
