@@ -13,10 +13,17 @@ export interface TabIntf<T = any> {
 
     /* DOM ID of the tab button itself, but also the unique identifier for the tab. Note: even if there are perhaps
      multiple different instances of the same AppTab-derived class each one will need to have a unique id. This means
-    we can in the future support multiple SearchView tabs opened simultaneously, each with a different ID of course */
+    we can in the future support multiple SearchView tabs opened simultaneously, each with a different ID of course.
+
+    This 'id' is ALSO used as an 'identification-only' class name on each of the rows/nodes displayed on any tab
+    */
     id: string;
     scrollPos: number;
     inst?: AppTab;
+
+    // used for re-scrolling screen back to same place after the page layout may have changed due to 'edit mode' or 'info mode'
+    // turning on/off or other places.
+    topmostVisibleElmId: string;
 
     constructView(data: TabIntf): AppTab;
     getTabSubOptions(state: AppState): Div;

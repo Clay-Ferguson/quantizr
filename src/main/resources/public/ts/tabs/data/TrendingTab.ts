@@ -16,6 +16,7 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
     props = new TrendingRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: TrendingTab = null;
     constructor() {

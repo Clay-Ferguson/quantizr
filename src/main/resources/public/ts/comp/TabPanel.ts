@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppContext";
+import { getAppState, promiseDispatch, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
@@ -9,9 +9,11 @@ import { CompIntf } from "./base/CompIntf";
 import { ButtonBar } from "./core/ButtonBar";
 
 export class TabPanel extends Div {
+    static inst: TabPanel;
 
     constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB });
+        TabPanel.inst = this;
         const state = getAppState();
 
         if (state.mobileMode) {
@@ -23,8 +25,21 @@ export class TabPanel extends Div {
         }
     }
 
+    setVisibility = async (visible: boolean) => {
+        await promiseDispatch("SetTabPanelVis", s => {
+            s.tabPanelVisible = visible;
+            return s;
+        });
+    }
+
     preRender(): void {
         const state = useAppState();
+
+        if (!state.tabPanelVisible) {
+            // todo-0: not sure why, but this had no effect, we're ok without it, but
+            // would be MUCH nicer if we hide the comp during scrolling.
+            this.attribs.className += " comp-hidden";
+        }
 
         this.setChildren([
             this.customTopComp,

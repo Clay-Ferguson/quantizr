@@ -483,14 +483,6 @@ export class Edit {
         S.util.saveUserPreferences(state);
     }
 
-    toggleEditMode = async (state: AppState) => {
-        state.userPrefs.editMode = !state.userPrefs.editMode;
-        S.util.saveUserPreferences(state);
-
-        /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-        S.view.scrollToNode(state);
-    }
-
     setMainPanelCols = (val: number) => {
         setTimeout(() => {
             const state = getAppState();
@@ -509,12 +501,60 @@ export class Edit {
         }, 100);
     };
 
-    toggleShowMetaData = (state: AppState) => {
-        state.userPrefs.showMetaData = !state.userPrefs.showMetaData;
-        S.util.saveUserPreferences(state);
+    // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
+    saveTabsTopmostVisible = (state: AppState) => {
+        // this doesn't work so unfortunately the user can see a render BEFORE the final scroll is done.
+        // TabPanel.inst.setVisibility(false);
 
-        /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-        S.view.scrollToNode(state);
+        for (const data of state.tabData) {
+            // NOTE: This is tricky here, but good. The first 'id' is an ID, and the second one is a "class", and this
+            // is not a bug.
+            const elm = S.util.findFirstVisibleElm(data.id, data.id);
+            data.topmostVisibleElmId = elm?.id;
+        }
+    }
+
+    // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
+    scrollTabsTopmostVisible = (state: AppState) => {
+        for (const data of state.tabData) {
+            if (data.topmostVisibleElmId) {
+                setTimeout(() => {
+                    // we have to lookup the element again, because our DOM will have rendered and we will likely
+                    // have a new actual element.
+                    const elm = document.getElementById(data.topmostVisibleElmId);
+                    if (elm) {
+                        elm.scrollIntoView(true);
+                    }
+
+                    // this doesn't work so unfortunately the user can see a render BEFORE the final scroll is done.
+                    // TabPanel.inst.setVisibility(true);
+                }, 500);
+            }
+        }
+    }
+
+    runScrollAffectingOp = async (state: AppState, func: Function) => {
+        this.saveTabsTopmostVisible(state);
+        await func();
+        this.scrollTabsTopmostVisible(state);
+    }
+
+    toggleEditMode = async (state: AppState) => {
+        this.runScrollAffectingOp(state, async () => {
+            state.userPrefs.editMode = !state.userPrefs.editMode;
+            await S.util.saveUserPreferences(state);
+            /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
+            // S.view.scrollToNode(state);
+        });
+    }
+
+    toggleShowMetaData = (state: AppState) => {
+        this.runScrollAffectingOp(state, async () => {
+            state.userPrefs.showMetaData = !state.userPrefs.showMetaData;
+            await S.util.saveUserPreferences(state);
+            /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
+            // S.view.scrollToNode(state);
+        });
     }
 
     toggleNsfw = async (state: AppState) => {

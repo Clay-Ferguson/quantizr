@@ -138,12 +138,12 @@ export class RightNavPanel extends Div {
 
                     new Div(null, { className: "bigMarginBottom" }, [
                         addNoteButton,
-                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Allows you to create posts, edit, and delete content" }, {
+                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
                             setValue: (checked: boolean) => S.edit.toggleEditMode(state),
                             getValue: (): boolean => state.userPrefs.editMode
                         }, "form-switch form-check-inline") : null,
 
-                        !fullScreenViewer ? new Checkbox("Info", { title: "Turns on display of avatars, timestamps, etc." }, {
+                        !fullScreenViewer ? new Checkbox("Info", { title: "Display of avatars, timestamps, etc." }, {
                             setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
                             getValue: (): boolean => state.userPrefs.showMetaData
                         }, "form-switch form-check-inline") : null

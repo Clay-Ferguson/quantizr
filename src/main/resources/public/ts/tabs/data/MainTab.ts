@@ -16,6 +16,7 @@ export class MainTab implements TabIntf<any> {
     scrollPos = 0;
     props = {};
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: MainTab = null;
     constructor() {

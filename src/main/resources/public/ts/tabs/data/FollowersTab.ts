@@ -15,6 +15,7 @@ export class FollowersTab implements TabIntf<FollowersRSInfo> {
     props = new FollowersRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: FollowersTab = null;
     constructor() {

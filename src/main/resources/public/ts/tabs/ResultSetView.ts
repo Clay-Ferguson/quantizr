@@ -53,7 +53,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
-                        title: "Back to Node that was Searched"
+                        title: "Back to Node Tree view"
                     }, "marginRight") : null,
                 this.renderHeading(state)
             ]),
@@ -87,9 +87,12 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     /* overridable (don't use arrow function) */
+    // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
+    // it's essentially to support DOM finding.
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true,
-            jumpButton, this.allowHeader, this.allowFooter, true, "userFeedItem", "userFeedItemHighlight", state);
+            jumpButton, this.allowHeader, this.allowFooter, true, "userFeedItem " + this.data.id,
+            "userFeedItemHighlight " + this.data.id, state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]) => {

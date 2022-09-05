@@ -17,6 +17,7 @@ export class SharesTab implements TabIntf<SharesRSInfo> {
     props = new SharesRSInfo();
     scrollPos: 0;
     openGraphComps: [];
+    topmostVisibleElmId: string = null;
 
     static inst: SharesTab = null;
     constructor() {

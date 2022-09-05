@@ -16,6 +16,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
     scrollPos = 0;
     props = new FeedViewProps();
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: FeedTab = null;
     constructor() {

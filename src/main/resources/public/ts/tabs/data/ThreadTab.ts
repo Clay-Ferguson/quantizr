@@ -15,6 +15,7 @@ export class ThreadTab implements TabIntf<ThreadRSInfo> {
     props = new ThreadRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: ThreadTab = null;
     constructor() {

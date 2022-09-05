@@ -17,13 +17,14 @@ export class Constants {
     static ADMIN_COMMAND_FEDIVERSE = "{{FederatedFeedButton}}";
     static ADMIN_COMMAND_TRENDING = "{{TrendingHashtagsButton}}";
 
-    static TAB_MAIN: string = "mainTab";
-    static TAB_SEARCH: string = "resultSetView";
-    static TAB_SHARES: string = "sharedNodesResultSetView";
-    static TAB_TIMELINE: string = "timelineResultSetView";
-    static TAB_DOCUMENT: string = "documentResultSetView";
-    static TAB_FOLLOWERS: string = "followersResultSetView";
-    static TAB_FOLLOWING: string = "followingResultSetView";
+    // WARNING: These must be able to be prefixes on class names.
+    static TAB_MAIN: string = "mainRS";
+    static TAB_SEARCH: string = "srchRS";
+    static TAB_SHARES: string = "sharRS";
+    static TAB_TIMELINE: string = "timeRS";
+    static TAB_DOCUMENT: string = "docRS";
+    static TAB_FOLLOWERS: string = "flwrsRS";
+    static TAB_FOLLOWING: string = "flwngRS";
 
     // note: This tab name does exist in java, so we probably should put it in a constants that comes from JAVA.
     static TAB_FEED: string = "feedTab";

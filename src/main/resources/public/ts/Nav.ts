@@ -311,7 +311,6 @@ export class Nav {
     openDocumentView = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const state = getAppState();
-        this.clickTreeNode(null, id);
 
         setTimeout(() => {
             const node = MainTab.inst?.findNode(state, id);

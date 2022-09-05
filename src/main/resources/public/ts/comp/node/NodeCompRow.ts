@@ -112,6 +112,7 @@ export class NodeCompRow extends Div {
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row");
+        layoutClass += " "+this.tabData.id
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 

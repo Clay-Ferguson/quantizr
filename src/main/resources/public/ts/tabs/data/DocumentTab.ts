@@ -16,6 +16,8 @@ export class DocumentTab implements TabIntf<DocumentRSInfo> {
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
 
+    topmostVisibleElmId: string = null;
+
     static inst: DocumentTab = null;
     constructor() {
         DocumentTab.inst = this;

@@ -25,8 +25,10 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
 
         // we have 'marginButtom' on these just to add extra space between paragraphs for a less compact view. We could
         // make this paragraph spacing a user preference...some day.
-        const itemClass = allowHeader ? "userFeedItem" : "marginBottom";
-        const itemClassHighlight = allowHeader ? "userFeedItemHighlight" : "marginBottom";
+        // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
+        // it's essentially to support DOM finding.
+        const itemClass = (allowHeader ? "userFeedItem" : "marginBottom") + " " + this.data.id;
+        const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom") + " " + this.data.id;
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, state);

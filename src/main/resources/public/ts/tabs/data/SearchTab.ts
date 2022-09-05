@@ -15,6 +15,7 @@ export class SearchTab implements TabIntf<ResultSetInfo> {
     props = new ResultSetInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: SearchTab = null;
     constructor() {

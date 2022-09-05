@@ -18,6 +18,7 @@ export class IPFSTab implements TabIntf<any> {
     };
 
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: IPFSTab = null;
     constructor() {

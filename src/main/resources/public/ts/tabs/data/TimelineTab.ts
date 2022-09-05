@@ -15,6 +15,7 @@ export class TimelineTab implements TabIntf<TimelineRSInfo> {
     props = new TimelineRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: TimelineTab = null;
     constructor() {

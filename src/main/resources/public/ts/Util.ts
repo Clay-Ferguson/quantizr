@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -77,6 +77,23 @@ export class Util {
         txt: true,
         sh: true
     };
+
+    findFirstVisibleElm = (parentId: string, childrenClass: string): Element => {
+        const parent: HTMLElement = document.getElementById(parentId);
+        if (parent) {
+            const containerRect = parent.getBoundingClientRect();
+            const elements = document.getElementsByClassName(childrenClass);
+            if (!elements) return;
+            for (const e of elements) {
+                const { bottom, height, top } = e.getBoundingClientRect();
+                const visible = top <= containerRect.top ? containerRect.top - top <= height : bottom - containerRect.bottom <= height;
+                if (visible) {
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
 
     // accepts letters, numbers, underscore, dash.
     // todo-2: enforce this same rule on the server side
@@ -942,7 +959,7 @@ export class Util {
         }
 
         if (dispatchNow) {
-            dispatch("SetUserPreferences", s => {
+            await promiseDispatch("SetUserPreferences", s => {
                 s.userPrefs = state.userPrefs;
                 if (!s.userPrefs.showParents && s.node) {
                     s.node.parents = null;

@@ -253,6 +253,10 @@ $mobileHeaderHeight: 3.5rem;
     visibility: hidden !important;
 }
 
+.comp-hidden {
+    visibility: hidden;
+}
+
 .visible {
     display: inline-block; 
     visibility: visible !important;
@@ -1092,7 +1096,7 @@ Will come back later and study this more. todo-1 */
 .pre-textfield {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    padding: 3px 3px 3px 6px;
+    padding: 3px 3px 3px 10px;
     font-family: inherit;
     border-radius: 0px !important;
     border: 1px solid gray;
@@ -1100,6 +1104,7 @@ Will come back later and study this more. todo-1 */
 
 .formSelect {
     border: 1px solid gray !important;
+    padding: 3px 3px 3px 10px;
 }
 
 .tagIndent {
@@ -1857,7 +1862,7 @@ i'm backing out for now
 }
 
 .selectLabel {
-    margin-bottom: 0px;
+    margin-bottom: 3px;
     margin-right: 6px;
 }
 

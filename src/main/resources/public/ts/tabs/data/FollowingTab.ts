@@ -15,6 +15,7 @@ export class FollowingTab implements TabIntf<FollowingRSInfo> {
     props = new FollowingRSInfo();
     scrollPos = 0;
     openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
     static inst: FollowingTab = null;
     constructor() {
