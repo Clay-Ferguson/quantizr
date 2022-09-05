@@ -23,8 +23,10 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         // of these user prefs is active we show the header bar.
         const allowHeader = state.userPrefs.showMetaData || state.userPrefs.editMode;
 
-        const itemClass = allowHeader ? "userFeedItem" : null;
-        const itemClassHighlight = allowHeader ? "userFeedItemHighlight" : null;
+        // we have 'marginButtom' on these just to add extra space between paragraphs for a less compact view. We could
+        // make this paragraph spacing a user preference...some day.
+        const itemClass = allowHeader ? "userFeedItem" : "marginBottom";
+        const itemClassHighlight = allowHeader ? "userFeedItemHighlight" : "marginBottom";
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, state);
