@@ -105,31 +105,31 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                 onClick: () => this.pageChange(1),
                 title: "Next Page"
             })
-        }
 
-        if (this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
-            const buttonCreateTime: number = new Date().getTime();
-            // When the 'more' button scrolls into view go ahead and load more records.
-            moreButton.onMount((elm: HTMLElement) => {
-                const observer = new IntersectionObserver(entries => {
-                    entries.forEach((entry: any) => {
-                        if (entry.isIntersecting) {
-                            // if this button comes into visibility within 2 seconds of it being created
-                            // that means it was rendered visible without user scrolling so in this case
-                            // we want to disallow the auto loading
-                            if (new Date().getTime() - buttonCreateTime < 2000) {
-                                observer.disconnect();
+            if (this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
+                const buttonCreateTime: number = new Date().getTime();
+                // When the 'more' button scrolls into view go ahead and load more records.
+                moreButton.onMount((elm: HTMLElement) => {
+                    const observer = new IntersectionObserver(entries => {
+                        entries.forEach((entry: any) => {
+                            if (entry.isIntersecting) {
+                                // if this button comes into visibility within 2 seconds of it being created
+                                // that means it was rendered visible without user scrolling so in this case
+                                // we want to disallow the auto loading
+                                if (new Date().getTime() - buttonCreateTime < 2000) {
+                                    observer.disconnect();
+                                }
+                                else {
+                                    moreButton.replaceWithWaitIcon()
+                                    // console.log("Loading more...");
+                                    this.pageChange(1);
+                                }
                             }
-                            else {
-                                moreButton.replaceWithWaitIcon()
-                                // console.log("Loading more...");
-                                this.pageChange(1);
-                            }
-                        }
+                        });
                     });
+                    observer.observe(elm);
                 });
-                observer.observe(elm);
-            });
+            }
         }
 
         children.push(
