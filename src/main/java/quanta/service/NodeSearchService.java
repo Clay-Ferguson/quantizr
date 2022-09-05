@@ -36,10 +36,12 @@ import quanta.request.GetBookmarksRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetSharedNodesRequest;
 import quanta.request.NodeSearchRequest;
+import quanta.request.RenderDocumentRequest;
 import quanta.response.GetBookmarksResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetSharedNodesResponse;
 import quanta.response.NodeSearchResponse;
+import quanta.response.RenderDocumentResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
@@ -73,6 +75,22 @@ public class NodeSearchService extends ServiceBase {
 	static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
 	static final int TRENDING_LIMIT = 10000;
+
+	public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
+		RenderDocumentResponse res = new RenderDocumentResponse();
+
+		List<NodeInfo> results = new LinkedList<>();
+		res.setSearchResults(results);
+
+		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId());
+		int counter = 0;
+		for (SubNode n : nodes) {
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, n, true, false, counter + 1, false, false, false,
+					false, false, true, null);
+			results.add(info);
+		}
+		return res;
+	}
 
 	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
@@ -403,7 +421,7 @@ public class NodeSearchService extends ServiceBase {
 
 		for (SubNode node : iter) {
 			nodeCount++;
-			
+
 			if (no(node.getContent()))
 				continue;
 

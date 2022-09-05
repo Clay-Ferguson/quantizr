@@ -4,6 +4,7 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,9 @@ import quanta.util.XString;
  */
 @Component
 public class MongoRead extends ServiceBase {
+    int MAX_DOC_DEPTH = 5;
+    int MAX_DOC_ITEMS_PER_CALL = 50;
+
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     // todo-1: All cached nodes like this will NOT work once we have a multi-instance load-balanced web
@@ -1308,5 +1312,116 @@ public class MongoRead extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.MCID).ne(null);
         q.addCriteria(crit);
         return mongoUtil.find(q);
+    }
+
+    /* Generates a Document-like View of a Subgraph. Nodes in "document order", as if reading like a book, or 
+     * conventional word processing monolilthic document view. 
+     */
+    public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId) {
+        LinkedList<SubNode> doc = new LinkedList<>();
+        SubNode rootNode = read.getNode(ms, new ObjectId(rootId));
+
+        // get the node we're querying starting at.
+        SubNode node = read.getNode(ms, new ObjectId(nodeId));
+        if (!ok(node))
+            return doc;
+
+        int rootSlashCount = StringUtils.countMatches(rootNode.getPath(), "/");
+
+        // entry point into recusion
+        if (!recurseDocList(doc, ms, node, rootSlashCount)) {
+            // log.debug("Started from root. Found enough");
+            return doc;
+        }
+
+        if (node.getIdStr().equals(rootId)) {
+            // log.debug("Started from root. Nothing more to scan");
+            return doc;
+        }
+
+        // if we jave enough we're done.
+        while (doc.size() < MAX_DOC_ITEMS_PER_CALL) {
+            /*
+             * General Algorighm
+             * 
+             * if the subgraph under 'doc' didn't lead to capturing enough doc items when we simply process all
+             * the siblings below 'node', to gather more, and complete the level of the tree where 'node' was a
+             * child, but if we STILL didn't get enough doc items we go up a level on the tree and repeat the
+             * process of building doc items, until we reach a node with rootId, and then we know that's the end
+             * of the subgraph under rootId
+             */
+
+            // log.debug("siblingsBelow " + node.getContent() + " ordinal=" + node.getOrdinal());
+            // IMPORTANT: build this critera BEFORE we set 'node' to the parent.
+            Criteria siblingsBelow = Criteria.where(SubNode.ORDINAL).gt(node.getOrdinal());
+
+            node = read.getParent(ms, node);
+            if (no(node)) {
+                log.warn("oops, no parent. This should never happen!");
+                break;
+            }
+
+            // log.debug("Processing remaining children under: " + node.getContent());
+
+            Iterable<SubNode> nodeIter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL),
+                    MAX_DOC_ITEMS_PER_CALL, 0, siblingsBelow);
+            Iterator<SubNode> iterator = nodeIter.iterator();
+
+            // iterates here for all siblings of 'node' that are below it in ordinal order.
+            while (iterator.hasNext()) {
+                SubNode sibling = iterator.next();
+                // log.debug("sibling[" + count + "] " + sibling.getContent() + " ordinal=" + sibling.getOrdinal());
+                if (!recurseDocList(doc, ms, sibling, rootSlashCount)) {
+                    break;
+                }
+            }
+
+            // if we just processed the rest of the children of the root, we're done.
+            if (node.getIdStr().equals(rootId)) {
+                // log.debug("out of children under root. done.");
+                break;
+            }
+        }
+
+        // always throw away the first node which will nodeId
+        SubNode first = doc.removeFirst();
+        if (!first.getIdStr().equals(nodeId)) {
+            log.error("Algorithm failed. Document scan list had wrong first item, not nodeId " + nodeId + " as expected, but "
+                    + first.getIdStr());
+        }
+
+        // log.debug("Returning: " + XString.prettyPrint(doc));
+        return doc;
+    }
+
+    // Adds 'node' and it's entire subgraph (up to limits) into 'doc'
+    // returns false to terminate then we have enough doc items
+    public boolean recurseDocList(LinkedList<SubNode> doc, MongoSession ms, SubNode node, int rootSlashCount) {
+        doc.add(node);
+        int thisSlashCount = StringUtils.countMatches(node.getPath(), "/");
+        int depth = thisSlashCount - rootSlashCount;
+        if (depth < 0) {
+            throw new RuntimeException("oops depth is negative.");
+        }
+
+        // log.debug("RECURSE: " + "    ".repeat(depth) + node.getContent() + " ordinal=" + node.getOrdinal());
+
+        // if we reach iteration limits return false to unwind, we're done
+        if (depth >= MAX_DOC_DEPTH) {
+            log.debug("MAX DEPTH.");
+            return false;
+        }
+
+        if (doc.size() >= MAX_DOC_ITEMS_PER_CALL) {
+            log.debug("MAX ITEMS.");
+            return false;
+        }
+
+        for (SubNode n : read.getChildren(ms, node)) {
+            if (!recurseDocList(doc, ms, n, rootSlashCount)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

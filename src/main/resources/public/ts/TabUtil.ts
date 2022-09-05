@@ -4,6 +4,7 @@ import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
@@ -61,6 +62,7 @@ export class TabUtil {
         dispatch("initTabs", s => {
             s.tabData = [
                 new MainTab(),
+                new DocumentTab(),
                 new SearchTab(),
                 new SharesTab(),
                 new TimelineTab(),

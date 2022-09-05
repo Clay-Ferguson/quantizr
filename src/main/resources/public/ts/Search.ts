@@ -8,12 +8,14 @@ import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { DocumentRSInfo } from "./DocumentRSInfo";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
+import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
@@ -199,6 +201,58 @@ export class Search {
         else {
             new MessageDlg("No search results found.", "Search", null, null, false, 0, null).open();
         }
+    }
+
+    showDocument = async (node: J.NodeInfo, growPage: boolean, state: AppState) => {
+        node = node || S.nodeUtil.getHighlightedNode(state);
+
+        if (!node) {
+            S.util.showMessage("Select a node to render a document", "Document View");
+            return;
+        }
+
+        // set startNode to the last node we had at the end of the current document
+        let startNode: J.NodeInfo = null;
+        if (growPage) {
+            const info = DocumentTab.inst.props as DocumentRSInfo;
+            if (info.results?.length > 0) {
+                startNode = info.results[info.results.length - 1];
+            }
+        }
+
+        const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
+            rootId: node.id,
+            startNodeId: startNode ? startNode.id : node.id
+        });
+
+        if (!res.searchResults || res.searchResults.length === 0) {
+            dispatch("RenderDocumentResults", s => {
+                DocumentTab.inst.openGraphComps = [];
+                const info = DocumentTab.inst.props as DocumentRSInfo;
+                info.endReached = true;
+                return s;
+            });
+            return;
+        }
+
+        dispatch("RenderDocumentResults", s => {
+            S.domUtil.focusId(C.TAB_DOCUMENT);
+            if (!DocumentTab.inst) return;
+            DocumentTab.inst.openGraphComps = [];
+            const info = DocumentTab.inst.props as DocumentRSInfo;
+
+            if (!growPage) {
+                info.endReached = false;
+                S.tabUtil.tabScroll(s, C.TAB_DOCUMENT, 0);
+            }
+
+            // set 'results' if this is the top of page being rendered, or else append results if we
+            // were pulling down more items at the end of the doc.
+            info.results = growPage ? info.results.concat(res.searchResults) : res.searchResults;
+            info.node = node;
+            S.tabUtil.selectTabStateOnly(DocumentTab.inst.id, s);
+            return s;
+        });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
@@ -460,14 +514,15 @@ export class Search {
      * Renders a single line of search results on the search results page.
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number, prefix: string,
-        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, showThreadButton: boolean, state: AppState): Comp => {
+        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
+        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, state);
         }
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
@@ -503,10 +558,11 @@ export class Search {
         }
 
         // this divClass goes on the parent if we have a parentItem, or else on the 'itemDiv' itself if we don't
-        const divClass: string = state.highlightSearchNodeId === node.id ? " userFeedItemHighlight" : " userFeedItem";
+        let divClass: string = state.highlightSearchNodeId === node.id ? outterClassHighlight : outterClass;
+        divClass = divClass || "";
 
         const itemDiv = new Div(null, {
-            className: clazz + (parentItem ? "" : divClass),
+            className: clazz + (parentItem ? "" : (" " + divClass)),
             // todo-1: this 'tabData.id' can be a bit long and eat some memory but not that much.
             id: tabData.id + "_" + node.id,
             nid: node.id

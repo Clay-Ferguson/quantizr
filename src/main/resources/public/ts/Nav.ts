@@ -308,6 +308,20 @@ export class Nav {
         }, 500);
     }
 
+    openDocumentView = (evt: Event) => {
+        const id = S.util.allowIdFromEvent(evt, null);
+        const state = getAppState();
+        this.clickTreeNode(null, id);
+
+        setTimeout(() => {
+            const node = MainTab.inst?.findNode(state, id);
+            if (!node) {
+                return;
+            }
+            S.srch.showDocument(node, false, state);
+        }, 500);
+    }
+
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const state = getAppState();

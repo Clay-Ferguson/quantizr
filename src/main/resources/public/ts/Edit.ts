@@ -831,7 +831,7 @@ export class Edit {
                     state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                 }
 
-                if (state.node.children.length === 0) {
+                if (state.activeTab === C.TAB_MAIN && state.node.children.length === 0) {
                     dispatch("NodeDeleteComplete", s => {
                         // remove this node from all data from all the tabs, so they all refresh without
                         // the deleted node without being queries from the server again.

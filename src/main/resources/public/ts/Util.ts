@@ -492,9 +492,6 @@ export class Util {
             //     if (result.state === "granted" || result.state === "prompt") {
             //         console.log("granted");
             //     }
-            //     else {
-            //         debugger;
-            //     }
             // });
         }
         return allowed;

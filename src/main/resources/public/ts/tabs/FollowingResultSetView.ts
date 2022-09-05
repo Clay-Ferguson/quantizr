@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { FollowingRSInfo } from "../FollowingRSInfo";
 import { TabIntf } from "../intf/TabIntf";
@@ -28,5 +29,9 @@ export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSet
 
     renderHeading(state: AppState): CompIntf {
         return new Heading(4, "@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
+    }
+
+    extraPagingDiv(): Div {
+        return null;
     }
 }

@@ -84,6 +84,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true, jumpButton, true, true, false, state);
+        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
+            true, jumpButton, true, true, false, "userFeedItem", "userFeedItemHighlight", state);
     }
 }

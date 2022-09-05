@@ -1,4 +1,5 @@
 import { getAppState } from "../AppContext";
+import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
@@ -33,5 +34,9 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
             this.data.props.sortDir,
             false,
             null);
+    }
+
+    extraPagingDiv(): Div {
+        return null;
     }
 }

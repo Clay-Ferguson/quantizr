@@ -21,6 +21,7 @@ export class Constants {
     static TAB_SEARCH: string = "resultSetView";
     static TAB_SHARES: string = "sharedNodesResultSetView";
     static TAB_TIMELINE: string = "timelineResultSetView";
+    static TAB_DOCUMENT: string = "documentResultSetView";
     static TAB_FOLLOWERS: string = "followersResultSetView";
     static TAB_FOLLOWING: string = "followingResultSetView";
 

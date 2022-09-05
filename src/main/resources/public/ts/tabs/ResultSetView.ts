@@ -19,7 +19,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf, private showRoot: boolean = true, private showPageNumber: boolean = true) {
         super(data);
     }
 
@@ -53,7 +53,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                     }, "marginRight") : null,
                 this.renderHeading(state)
             ]),
-            content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
+            this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.props.description ? new Div(this.data.props.description) : null
         ]));
 
@@ -84,12 +84,19 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, true, state);
+        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true,
+            jumpButton, this.allowHeader, this.allowFooter, true, "userFeedItem", "userFeedItemHighlight", state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]) => {
+
+        const extraPagingDiv = this.extraPagingDiv();
+        if (extraPagingDiv) {
+            children.push(extraPagingDiv);
+        }
+
         children.push(
-            new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }),
+            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
             new ButtonBar([
                 new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
@@ -111,4 +118,6 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     abstract pageChange(delta: number): void;
+
+    abstract extraPagingDiv(): Div;
 }

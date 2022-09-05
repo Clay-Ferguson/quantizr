@@ -106,6 +106,7 @@ import quanta.request.PingRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.RenderCalendarRequest;
+import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveNodeRequest;
@@ -1268,6 +1269,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		// SessionContext.checkReqToken();
 		return callProc.run("nodeSearch", req, session, ms -> {
 			return search.search(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
+	public @ResponseBody Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
+		// SessionContext.checkReqToken();
+		return callProc.run("renderDocuoment", req, session, ms -> {
+			return search.renderDocument(ms, req);
 		});
 	}
 

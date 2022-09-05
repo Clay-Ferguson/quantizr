@@ -1,4 +1,5 @@
 import { getAppState } from "../AppContext";
+import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
@@ -26,5 +27,9 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
             this.data.props.shareTarget,
             this.data.props.accessOption,
             state);
+    }
+
+    extraPagingDiv(): Div {
+        return null;
     }
 }

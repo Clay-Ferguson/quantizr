@@ -5,6 +5,7 @@ import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -38,11 +39,13 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
+		// testDocOrderQuery();
+
 		// testComplexProperties();
 
 		// testDirtyReads();
 
-		testPathRegex();
+		// testPathRegex();
 
 		// authTest();
 
@@ -88,6 +91,36 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
 		log.debug("Mongo Test Ok.");
 		log.debug("*****************************************************************************************");
+	}
+
+	private void testDocOrderQuery() {
+		arun.run(as -> {
+			String rootId = "631503fdb6acb76f73971fec";
+
+			SubNode rootNode = read.getNode(as, rootId);
+
+			log.debug("______________________________________");
+			// log.debug("START: " + rootNode.getContent());
+			// iterate from root first.
+			docOrderTest(as, rootId, rootId);
+
+			Iterable<SubNode> iter = read.getSubGraph(as, rootNode, null, -1, false, false);
+
+			// this runs a test to iterate down from every possible starting place in the subgraph
+			for (SubNode n : iter) {
+				log.debug("______________________________________");
+				// log.debug("START: " + n.getContent());
+				docOrderTest(as, rootId, n.getIdStr());
+			}
+			return null;
+		});
+	}
+
+	private void docOrderTest(MongoSession as, String rootId, String nodeId) {
+		List<SubNode> nodes = read.genDocList(as, rootId, nodeId);
+		for (SubNode n : nodes) {
+			log.debug("CONTENT: " + n.getContent());
+		}
 	}
 
 	// "name": ":catjam:",

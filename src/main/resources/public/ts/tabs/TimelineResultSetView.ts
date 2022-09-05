@@ -1,4 +1,5 @@
 import { getAppState } from "../AppContext";
+import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
@@ -22,5 +23,9 @@ export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetVi
         S.srch.timeline(this.data.props.node, this.data.props.prop, state, this.data.props.timeRangeType,
             this.data.props.description,
             page, this.data.props.recursive);
+    }
+
+    extraPagingDiv(): Div {
+        return null;
     }
 }

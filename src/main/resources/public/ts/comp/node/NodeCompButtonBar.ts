@@ -230,6 +230,7 @@ export class NodeCompButtonBar extends Div {
 
         let searchIcon: Icon = null;
         let timelineIcon: Icon = null;
+        let docIcon: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;
@@ -257,6 +258,13 @@ export class NodeCompButtonBar extends Div {
         }
 
         if (isPageRootNode && this.node.hasChildren) {
+            docIcon = new Icon({
+                className: "fa fa-file-text fa-lg buttonBarIcon",
+                title: "Show Document View",
+                nid: this.node.id,
+                onClick: S.nav.openDocumentView
+            });
+
             searchIcon = new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search Subnodes",
@@ -274,7 +282,7 @@ export class NodeCompButtonBar extends Div {
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
             new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
-                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, searchIcon, timelineIcon, pasteSpan])];
+                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, docIcon, searchIcon, timelineIcon, pasteSpan])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);

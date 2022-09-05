@@ -391,6 +391,11 @@ export interface RenderCalendarRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface RenderDocumentRequest extends RequestBase {
+    rootId: string;
+    startNodeId: string;
+}
+
 export interface RenderNodeRequest extends RequestBase {
     nodeId: string;
     offset: number;
@@ -768,6 +773,10 @@ export interface RemovePrivilegeResponse extends ResponseBase {
 
 export interface RenderCalendarResponse extends ResponseBase {
     items: CalendarItem[];
+}
+
+export interface RenderDocumentResponse extends ResponseBase {
+    searchResults: NodeInfo[];
 }
 
 export interface RenderNodeResponse extends ResponseBase {

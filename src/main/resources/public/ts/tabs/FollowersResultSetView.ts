@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
@@ -71,5 +72,9 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
             displayName, "userFeedItem", "listFriendImage", false, (evt: any) => {
                 new UserProfileDlg(node.ownerId).open();
             });
+    }
+
+    extraPagingDiv(): Div {
+        return null;
     }
 }
