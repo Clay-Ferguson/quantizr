@@ -63,7 +63,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
-        this.addPaginationBar(state, children);
+        this.addPaginationBar(state, children, false);
 
         let i = 0;
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
@@ -77,7 +77,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             rowCount++;
         });
 
-        this.addPaginationBar(state, children);
+        this.addPaginationBar(state, children, true);
         this.setChildren(children);
     }
 
@@ -95,7 +95,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             "userFeedItemHighlight " + this.data.id, state);
     }
 
-    addPaginationBar = (state: AppState, children: CompIntf[]) => {
+    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean) => {
 
         const extraPagingDiv = this.extraPagingDiv();
         if (extraPagingDiv) {
@@ -109,7 +109,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                 title: "Next Page"
             })
 
-            if (this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
+            if (allowInfiniteScroll && this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
                 const buttonCreateTime: number = new Date().getTime();
                 // When the 'more' button scrolls into view go ahead and load more records.
                 moreButton.onMount((elm: HTMLElement) => {

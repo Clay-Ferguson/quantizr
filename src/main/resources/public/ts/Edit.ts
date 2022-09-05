@@ -502,39 +502,46 @@ export class Edit {
     };
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
-    saveTabsTopmostVisible = (state: AppState) => {
-        // this doesn't work so unfortunately the user can see a render BEFORE the final scroll is done.
-        // TabPanel.inst.setVisibility(false);
+    saveTabsTopmostVisible = async (state: AppState): Promise<AppState> => {
 
+        // in this loop record the currently topmost visible element in each tab, so we can scroll
+        // those back it view after doing some change to the DOM that will potentially cause the page
+        // to jump to a different effective scroll position.
         for (const data of state.tabData) {
             // NOTE: This is tricky here, but good. The first 'id' is an ID, and the second one is a "class", and this
             // is not a bug.
             const elm = S.util.findFirstVisibleElm(data.id, data.id);
             data.topmostVisibleElmId = elm?.id;
         }
+
+        // calling this does blank the screen during scrolling, but then the final scrolling fails too.
+        // return TabPanel.inst.setVisibility(false);
+        return null;
     }
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     scrollTabsTopmostVisible = (state: AppState) => {
-        for (const data of state.tabData) {
-            if (data.topmostVisibleElmId) {
-                setTimeout(() => {
+        // this timer is becasue all scrolling in browser needs to be delayed or we can have failures.
+        setTimeout(async () => {
+            // this didn't work.
+            // await TabPanel.inst.setVisibility(true);
+
+            // scroll into view whatever was the topmost item before the last operation
+            for (const data of state.tabData) {
+                if (data.topmostVisibleElmId) {
                     // we have to lookup the element again, because our DOM will have rendered and we will likely
                     // have a new actual element.
                     const elm = document.getElementById(data.topmostVisibleElmId);
                     if (elm) {
                         elm.scrollIntoView(true);
                     }
-
-                    // this doesn't work so unfortunately the user can see a render BEFORE the final scroll is done.
-                    // TabPanel.inst.setVisibility(true);
-                }, 500);
+                }
             }
-        }
+        }, 500);
     }
 
     runScrollAffectingOp = async (state: AppState, func: Function) => {
-        this.saveTabsTopmostVisible(state);
+        await this.saveTabsTopmostVisible(state);
         await func();
         this.scrollTabsTopmostVisible(state);
     }

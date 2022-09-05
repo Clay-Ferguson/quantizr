@@ -25,8 +25,8 @@ export class TabPanel extends Div {
         }
     }
 
-    setVisibility = async (visible: boolean) => {
-        await promiseDispatch("SetTabPanelVis", s => {
+    setVisibility = async (visible: boolean): Promise<AppState> => {
+        return promiseDispatch("SetTabPanelVis", s => {
             s.tabPanelVisible = visible;
             return s;
         });
@@ -36,8 +36,8 @@ export class TabPanel extends Div {
         const state = useAppState();
 
         if (!state.tabPanelVisible) {
-            // todo-0: not sure why, but this had no effect, we're ok without it, but
-            // would be MUCH nicer if we hide the comp during scrolling.
+            // not sure why, but this had no effect, we're ok without it, but
+            // would be nicer if we could hide the comp during preparing final scrolling.
             this.attribs.className += " comp-hidden";
         }
 

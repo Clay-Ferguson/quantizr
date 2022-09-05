@@ -253,8 +253,9 @@ $mobileHeaderHeight: 3.5rem;
     visibility: hidden !important;
 }
 
+// for some reason, the 'hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
 .comp-hidden {
-    visibility: hidden;
+    opacity: 0;
 }
 
 .visible {
