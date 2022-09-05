@@ -1,5 +1,5 @@
 import { getAppState } from "../AppContext";
-import { Div } from "../comp/core/Div";
+import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
@@ -29,7 +29,7 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
             state);
     }
 
-    extraPagingDiv(): Div {
+    extraPagingComps = (): Comp[] => {
         return null;
     }
 }

@@ -1,5 +1,5 @@
 import { getAppState } from "../AppContext";
-import { Div } from "../comp/core/Div";
+import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
@@ -36,7 +36,7 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
             null);
     }
 
-    extraPagingDiv(): Div {
+    extraPagingComps = (): Comp[] => {
         return null;
     }
 }

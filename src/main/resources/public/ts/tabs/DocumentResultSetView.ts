@@ -1,8 +1,9 @@
-import { getAppState } from "../AppContext";
+import { dispatch, getAppState } from "../AppContext";
 import { AppState } from "../AppState";
+import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
@@ -15,6 +16,10 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
     constructor(data: TabIntf) {
         super(data, false, false, true);
         data.inst = this;
+
+        // turn the top more button off for infinite scrolling
+        this.allowTopMoreButton = false;
+        this.pagingContainerClass = "float-end";
     }
 
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
@@ -30,8 +35,17 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         const itemClass = (allowHeader ? "userFeedItem" : "marginBottom") + " " + this.data.id;
         const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom") + " " + this.data.id;
 
+        const rootSlashesMatch = this.data.props.node.path.match(/\//g);
+        const nodeSlashesMatch = node.path.match(/\//g);
+
+        let style = null;
+        if (state.docIndent) {
+            const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
+            style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 25) + "px" } : null;
+        }
+
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
-            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, state);
+            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style, state);
 
         if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
             // todo-1: We could easily make this icon clickable to render this node as the root of a new document
@@ -52,8 +66,19 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         }, 500);
     }
 
-    extraPagingDiv = (): Div => {
-        return new Div(null, { className: "float-end" }, [
+    extraPagingComps = (): Comp[] => {
+        return [
+            new Checkbox("Indent", { className: "bigMarginLeft" }, {
+                setValue: (checked: boolean) => {
+                    dispatch("DocIndent", s => {
+                        s.docIndent = checked;
+                        return s;
+                    });
+                },
+                getValue: (): boolean => {
+                    return getAppState().docIndent;
+                }
+            }),
             new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search Subnodes",
@@ -66,6 +91,6 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                 nid: this.data.props.node.id,
                 onClick: S.nav.runTimeline
             })
-        ]);
+        ];
     }
 }

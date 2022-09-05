@@ -1,24 +1,27 @@
 import { useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
+import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
+import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
-import { Constants as C } from "../Constants";
 
 export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
+    allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
+    pagingContainerClass: string = "marginBottom marginTop"; // used to have 'text-center' to center buttons
 
     constructor(data: TabIntf, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
@@ -48,7 +51,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         }
 
         children.push(new Div(null, null, [
-            new Div(null, { className: "marginBottom marginTop" }, [
+            new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
@@ -63,7 +66,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
-        this.addPaginationBar(state, children, false);
+        this.addPaginationBar(state, children, false, this.allowTopMoreButton);
 
         let i = 0;
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
@@ -77,13 +80,13 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             rowCount++;
         });
 
-        this.addPaginationBar(state, children, true);
+        this.addPaginationBar(state, children, true, true);
         this.setChildren(children);
     }
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.name, { className: "resultsTitle" });
+        return new Div(this.data.name, { className: "tabTitle" });
     }
 
     /* overridable (don't use arrow function) */
@@ -93,18 +96,13 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         const allowHeader = this.allowHeader && (state.userPrefs.showMetaData || state.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true,
             jumpButton, allowHeader, this.allowFooter, true, "userFeedItem " + this.data.id,
-            "userFeedItemHighlight " + this.data.id, state);
+            "userFeedItemHighlight " + this.data.id, null, state);
     }
 
-    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean) => {
-
-        const extraPagingDiv = this.extraPagingDiv();
-        if (extraPagingDiv) {
-            children.push(extraPagingDiv);
-        }
+    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean) => {
 
         let moreButton: IconButton = null;
-        if (!this.data.props.endReached) {
+        if (!this.data.props.endReached && allowMoreButton) {
             moreButton = new IconButton("fa-angle-right", "More", {
                 onClick: () => this.pageChange(1),
                 title: "Next Page"
@@ -136,6 +134,8 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             }
         }
 
+        const extraPagingComps = this.extraPagingComps();
+
         children.push(
             this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
             new ButtonBar([
@@ -151,11 +151,14 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                     onClick: () => this.pageChange(-1),
                     title: "Previous Page"
                 }) : null,
-                moreButton
-            ], "text-center marginBottom marginTop"));
+                moreButton,
+                ...(extraPagingComps || [])
+            ], this.pagingContainerClass));
+
+        children.push(new Clearfix());
     }
 
     abstract pageChange(delta: number): void;
 
-    abstract extraPagingDiv(): Div;
+    abstract extraPagingComps(): Comp[];
 }

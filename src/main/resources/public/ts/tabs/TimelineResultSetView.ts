@@ -1,5 +1,5 @@
 import { getAppState } from "../AppContext";
-import { Div } from "../comp/core/Div";
+import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
@@ -25,7 +25,7 @@ export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetVi
             page, this.data.props.recursive);
     }
 
-    extraPagingDiv(): Div {
+    extraPagingComps = (): Comp[] => {
         return null;
     }
 }

@@ -3,6 +3,7 @@ import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
+import { Spinner } from "../comp/core/Spinner";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -55,13 +56,16 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         const res = this.data ? this.data.props.res : null;
 
         if (!res) {
-            this.setChildren([new Heading(4, "Generating statistics...", { className: "marginTop" })]);
+            this.setChildren([
+                new Heading(4, "Generating statistics...", { className: "marginTop" }),
+                new Spinner()
+            ]);
             return;
         }
 
         const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
-            tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle" }));
+            tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
             res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
@@ -73,7 +77,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         const mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
-            mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle" }));
+            mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle alert alert-primary" }));
             res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
@@ -85,7 +89,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
-            wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle" }));
+            wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle alert alert-primary" }));
             res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
@@ -96,7 +100,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         }
 
         this.setChildren([
-            new Heading(4, "Trending", { className: "trendingTitle" }),
+            new Div("Trending", { className: "tabTitle marginTop" }),
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.

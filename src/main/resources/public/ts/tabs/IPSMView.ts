@@ -4,7 +4,6 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
-import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
 import { TabIntf } from "../intf/TabIntf";
 
@@ -43,6 +42,6 @@ export class IPSMView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, "IPSM Console", { className: "resultsTitle" });
+        return new Div("IPSM Console", { className: "tabTitle" });
     }
 }

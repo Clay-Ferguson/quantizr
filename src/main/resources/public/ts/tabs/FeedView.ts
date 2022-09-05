@@ -202,7 +202,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 else {
                     // console.log("FEED: node id=" + node.id + " content: " + node.content);
                     children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, "feed", true,
-                    false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", state));
+                    false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, state));
                     i++;
                     rowCount++;
 
@@ -261,7 +261,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
+        return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
     // todo-1: this can be modified and used to show indicator on Feed Sub items about which thing is active.

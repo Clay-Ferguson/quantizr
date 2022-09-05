@@ -207,10 +207,17 @@ $mobileHeaderHeight: 3.5rem;
 }
 
 .statsWord {
+    padding-left: 8px;
+    padding-right: 8px;
     margin-right: $smallGap;
     display: inline-block;
     cursor: pointer;
     font-size: x-large;
+    border-radius: $border-radius;
+}
+
+.statsWord:hover {
+    background-color: $primary;
 }
 
 .statsWordMobile {
@@ -229,12 +236,12 @@ $mobileHeaderHeight: 3.5rem;
 }
 
 .trendingWordStatsArea {
-    border: 1px solid $nodeBorderBottomColor;
+    border: 2px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
     border-radius: $border-radius;
     background-color: $baseBgColor;
-    padding: 24px;
+    padding: 12px;
 }
 
 .d3Graph {
@@ -423,13 +430,12 @@ a {
     border-radius: $border-radius;
 }
 
-.resultsTitle {
+.tabTitle {
     display: inline-block;
-}
-
-.trendingTitle {
-    margin-top: $smallGap;
-    margin-bottom: $smallGap;
+    font-size: 1.5rem;
+    font-weight: 600;
+    vertical-align: middle;
+    color: lightGreen;
 }
 
 .logViewTitle {
@@ -766,6 +772,10 @@ Will come back later and study this more. todo-1 */
     overflow-y: scroll;
     padding-top: 12px;
     padding-bottom: 20px;
+}
+
+.tabPanelHeader {
+    background-color: $primary ;
 }
 
 .tabSubOptions {
@@ -1671,6 +1681,7 @@ i'm backing out for now
 }
 
 .widthSizerPanel {
+    margin-top: 5px;
     display: inline-block;
     background: $body-bg;
 }
@@ -1992,6 +2003,13 @@ audio::-webkit-media-controls-play-button {
     padding: 12px;
     border: 6px solid lightGray;
     border-radius: $border-radius;
+}
+
+.headingBar {
+    margin-top: 12px;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 4px solid $secondary;
 }
 
 .monospace {

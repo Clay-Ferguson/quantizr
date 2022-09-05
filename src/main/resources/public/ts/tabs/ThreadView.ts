@@ -34,7 +34,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
-                new Heading(4, this.data.name + " / Hierarchy", { className: "resultsTitle" }),
+                new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
                     : "Chain of replies going back towards original post", { className: "float-end" }),
                 new Clearfix(),
@@ -85,6 +85,6 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
-            true, jumpButton, true, true, false, "userFeedItem", "userFeedItemHighlight", state);
+            true, jumpButton, true, true, false, "userFeedItem", "userFeedItemHighlight", null, state);
     }
 }

@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
+import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
-import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
 import { TabIntf } from "../intf/TabIntf";
@@ -31,7 +31,7 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
         const text = this.data.props.showingFollowersOfUser === state.userName //
             ? "Your followers..." //
             : "Followers of @" + this.data.props.showingFollowersOfUser + "...";
-        return new Heading(4, text, { className: "resultsTitle" });
+        return new Div(text, { className: "tabTitle" });
     }
 
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically
@@ -74,7 +74,7 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
             });
     }
 
-    extraPagingDiv(): Div {
+    extraPagingComps = (): Comp[] => {
         return null;
     }
 }

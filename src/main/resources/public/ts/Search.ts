@@ -515,14 +515,14 @@ export class Search {
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number, prefix: string,
         isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
-        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string, state: AppState): Comp => {
+        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string, extraStyle: any, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle, state);
         }
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
@@ -560,12 +560,18 @@ export class Search {
         let divClass: string = state.highlightSearchNodeId === node.id ? outterClassHighlight : outterClass;
         divClass = divClass || "";
 
-        const itemDiv = new Div(null, {
+        const attrs: any = {
             className: clazz + (parentItem ? "" : (" " + divClass)),
             // todo-1: this 'tabData.id' can be a bit long and eat some memory but not that much.
             id: tabData.id + "_" + node.id,
             nid: node.id
-        }, [
+        };
+
+        if (extraStyle) {
+            attrs.style = extraStyle;
+        }
+
+        const itemDiv = new Div(null, attrs, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false) : null,
             content,
             boostComp,
