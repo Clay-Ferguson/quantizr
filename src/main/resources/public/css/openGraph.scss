@@ -1,0 +1,77 @@
+.openGraphPanel {
+    margin-left: 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    padding: 10px;
+    margin-bottom: $smallGap;
+    margin-right: $smallGap;
+    border-radius: $border-radius;
+    overflow-x: hidden;
+    background-color: #17202A;
+}
+
+.openGraphPanelBoost {
+    @extend .openGraphPanel;
+    background-color: black;
+    margin-right: 0px;
+}
+
+.openGraphPanelRss {
+    overflow-x: hidden;
+    margin-top: $smallGap;
+}
+
+.openGraphImage {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 100%;
+    margin-top: 8px;
+}
+
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
+.openGraphImageRss {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 100%;
+}
+
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
+.openGraphImageVert {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 50%;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
+.openGraphNoImage {
+    margin-top: 8px;
+    margin-right: 8px;
+}
+
+.openGraphLhs {
+    margin: 8px;
+    width: 25%;
+    // This min width is required when there are some crazy long strings in the RHS, and the browser
+    // crowds out the left hand side smashin it down to zero size unless we give a min size.
+    min-width: 100px;
+}
+
+.openGraphRhs {
+    margin: 8px;
+    width: 75%;
+    padding-left: 18px;
+    padding-top: 10px;
+}
+
+.openGraphDesc {
+    max-width: 45rem;
+}
+
+.openGraphTitle {
+    font-size: 130%;
+    margin-bottom: 8px;
+    margin-right: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}

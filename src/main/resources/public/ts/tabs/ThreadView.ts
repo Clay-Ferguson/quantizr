@@ -38,7 +38,8 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                 new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
                     : "Chain of replies going back towards original post", { className: "float-end" }),
                 new Clearfix(),
-                !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() }, { className: "float-end" }) : null,
+                !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() },
+                    { className: "float-end" }, "btn-primary") : null,
                 new Clearfix()
             ]),
             this.data.props.description ? new Div(this.data.props.description) : null

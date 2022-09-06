@@ -10,6 +10,8 @@ import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
+declare const g_brandingAppName: string;
+
 export class MainTabComp extends AppTab {
 
     constructor(data: TabIntf) {
@@ -41,6 +43,11 @@ export class MainTabComp extends AppTab {
         const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         this.setChildren([
+            new Div(g_brandingAppName, {
+                className: "tabTitle",
+                onClick: () => S.util.loadAnonPageHome(),
+                title: "Go to Portal Home Node"
+            }),
             widthSizerPanel,
             widthSizerPanel ? new Clearfix() : null,
             new Div(null, {

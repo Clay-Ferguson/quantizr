@@ -28,6 +28,8 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
+declare const g_brandingAppName: string;
+
 export class MenuPanel extends Div {
     static activeMenu: Set<string> = new Set<string>();
     static inst: MenuPanel;
@@ -201,7 +203,7 @@ export class MenuPanel extends Div {
         }
 
         if (!appState.isAnonUser) {
-            children.push(new Menu(state, "Quanta", [
+            children.push(new Menu(state, g_brandingAppName, [
                 new MenuItem("My Account", S.nav.navHome, !appState.isAnonUser),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !appState.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !appState.isAnonUser),

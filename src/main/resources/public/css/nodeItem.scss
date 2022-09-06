@@ -1,0 +1,345 @@
+.nodeTags {
+    display: inline-block;
+    background-color: darkolivegreen;
+    border-radius: 6px;
+    padding: 0 5px 0 5px;
+    margin-right: 8px;
+}
+
+.typeName {
+    border: 2px solid gray;
+    padding: 0px 4px 0px 4px;
+    white-space: nowrap;
+    display: inline-block;
+    border-radius: $border-radius;
+}
+
+.treeFriendImage {
+    max-width: 70px;
+    cursor: pointer;
+    border: 2px solid $nodeBorderBottomColor;
+    margin: 0 10px 0px 10px;
+    border-radius: $border-radius;
+}
+
+.commentMarkdownClass {
+    border: 2px solid darkkhaki;
+    margin: 8px;
+    border-radius: $border-radius;
+    background-color: #17202A;
+}
+
+.row-toolbar {
+    margin-left: 16px;
+}
+
+.downloadLink {
+    margin-left: $smallGap;
+    margin-top: $smallGap;
+    white-space: nowrap;
+    padding: 6px;
+    border: 2px solid $gray-700;
+    border-radius: $border-radius;
+}
+
+.nodeCompButtonBar {
+    margin-left: 8px;
+}
+
+.img-in-row {
+    cursor: pointer;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    margin-top: $smallGap;
+    border: 1px solid $gray-700;
+    vertical-align: top;
+    border-radius: $border-radius;
+    max-width: 98%;
+}
+
+.attachmentLinksPanel {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    padding-left: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.created-by {
+    padding: 6px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-radius: $border-radius;
+}
+
+.created-by-me {
+    @extend .created-by;
+    background: $createdByMeBackgroundColor;
+    color: $createdByMeTextColor;
+}
+
+.created-by-me:first-child {
+    margin-left: 0px;
+}
+
+.created-by-other {
+    @extend .created-by;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
+}
+
+.created-by-other:first-child {
+    margin-left: 0px;
+}
+
+.reply-indicator {
+    padding: 6px;
+    margin-right: 8px;
+    margin-left: 6px;
+    border-radius: $border-radius;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
+}
+
+.row-header {
+    font-size: small;
+    margin-left: 8px;
+    cursor: pointer;
+
+    // warning: don't be tempted again to make this less than 2em!
+    min-height: 2rem;
+}
+
+.row-footer {
+    font-size: small;
+    cursor: pointer;
+}
+
+.nodeName {
+    padding: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: $border-radius;
+}
+
+.node-table-row {
+    position: relative;
+    padding-right: 10px;
+    padding-top: 16px;
+    padding-bottom: 8px;
+}
+
+.node-table-row-compact {
+    position: relative;
+    padding-right: 10px;
+    padding-top: 8px;
+    padding-bottom: 4px;
+}
+
+.row-border {
+    /* If no border is defined here then borders only show up during edit or metadata display modes */
+    border-bottom: 1px dotted $nodeBorderBottomColor;
+}
+
+.row-border-inline-children {
+    /* If no border is defined here then borders only show up during edit or metadata display modes */
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
+/* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
+.row-border-edit {
+    border-bottom: 1px solid $nodeBorderBottomColor;
+}
+
+/*
+With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
+height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 
+and the table-cell (all three)
+
+update: oops, that 100% is causing vertical scrollbar to ALWAYS show up because something's off by a few pixels, so
+i'm backing out for now
+*/
+.node-grid-table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    // remove border-collapse for round borders
+    // border-collapse: collapse;
+    border-spacing: 8px;
+}
+
+.node-grid-item {
+    height: 100%;
+    width: 100%;
+    padding-right: 12px;
+}
+
+.node-grid-row {
+    display: table-row;
+}
+
+.node-grid-cell {
+    border: 1px solid $nodeBorderBottomColor;
+    display: table-cell;
+    padding-top: 8px;
+    padding-bottom: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+    vertical-align: top;
+}
+
+.node-table-row .top-right-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.active-row {
+    border-left: $highlightBorderSize solid $primary;
+}
+
+.boost-row {
+    border: 2px solid gray;
+    border-radius: $border-radius;
+    margin-left: $tinyGap;
+    margin-right: $tinyGap;
+    padding-top: $tinyGap;
+    background-color: #17202A;
+}
+
+.active-row:hover {
+    // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
+    // see other places with a lighten function on a ":hover"
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.inactive-row {
+    border-left: $highlightBorderSize solid transparent;
+}
+
+.inactive-row:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.active-row-main {
+    border-left: $highlightBorderSize solid $primary;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    padding-top: 8px;
+    // margin-bottom: 5px;
+}
+
+.active-row-main:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.inactive-row-main {
+    border-left: $highlightBorderSize solid transparent;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    padding-top: 8px;
+    // margin-bottom: 5px;
+}
+
+.inactive-row-main:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+@keyframes fadeInRowBkg {
+    from {
+        background-color: $gray-700;
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
+.fadeInRowBkgClz {
+    animation-name: fadeInRowBkg;
+    animation-duration: 3.5s;
+}
+
+.rowFooterIcon {
+    margin-top: .5rem;
+    margin-right: 6px;
+    margin-bottom: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.priorityTag {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 4px;
+    margin-left: 5px;
+    border-radius: 100px;
+}
+
+.priorityTag1 {
+    @extend .priorityTag;
+    border: 5px solid red;
+}
+
+.priorityTag2 {
+    @extend .priorityTag;
+    border: 5px solid orange;
+}
+
+.priorityTag3 {
+    @extend .priorityTag;
+    border: 5px solid purple;
+}
+
+.priorityTag4 {
+    @extend .priorityTag;
+    border: 5px solid blue;
+}
+
+.priorityTag5 {
+    @extend .priorityTag;
+    border: 5px solid green;
+}
+
+.dateTimeDisplay {
+    margin-right: 5px;
+    padding: 0 8px 0 8px;
+    display: inline-block;
+    border-radius: $border-radius;
+    background-color: cadetblue;
+    color: black;
+}
+
+.nodeNameDisp {
+    margin-left: 6px;
+    padding: 4px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    background-color: $primary;
+}
+
+.sharingIcon {
+    color: cyan;
+}
+
+.sharingName {
+    border: 2px solid gray;
+    border-radius: 6px;
+    margin-left: 3px;
+    display: inline-block;
+    padding: 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0px;
+}
+
+.sharingNamePublic {
+    border: 2px solid cyan;
+    border-radius: 6px;
+    margin-left: 3px;
+    display: inline-block;
+    padding: 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0px;
+}

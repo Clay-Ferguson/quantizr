@@ -115,3 +115,9 @@
 .buttonIconNoText {
     margin-right: 0px;
 }
+
+// we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
+// wrapped to a new line (position) that where the row isn't full and has space to stretch. 
+.btnGroup {
+    display: inline;
+}

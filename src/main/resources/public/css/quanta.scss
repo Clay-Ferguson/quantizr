@@ -1,7 +1,6 @@
 @import "variables.scss";
 
 $profileImgSize: 200px;
-$rootNodeBorder: true;
 $highlightActiveMenuItems: false;
 
 $border-radius: 6px;
@@ -68,15 +67,7 @@ $mediumBorderSize: 6px;
 $highlightBorderSize: 6px;
 $smallBorderSize: 3px;
 
-// @keyframes animatedBackground {
-// 	from { 
-//         background-size: 100% 100%; 
-//     }
-
-// 	to { 
-//         background-size: 400% 400%; 
-//     }
-// }
+$mobileHeaderHeight: 3.5rem;
 
 @font-face {
     font-family: "QuantaCustomFont";
@@ -92,12 +83,13 @@ $smallBorderSize: 3px;
 @import 'list.scss';
 @import 'button.scss';
 @import 'dropzone.scss';
-@import 'sidebar.scss';
 @import 'breadcrumbs.scss';
 @import 'media-queries.scss';
 @import 'feed.scss';
 @import 'rss.scss';
 @import 'profile.scss';
+@import 'openGraph.scss';
+@import 'nodeItem.scss';
 
 body {
     font-family: "QuantaCustomFont" !important;
@@ -136,24 +128,14 @@ td {
     top: 0px;
     left: 0px;
     width: 100%;
-    background-color: $nodeBorderBottomColor; 
+    background-color: $nodeBorderBottomColor;
     border-bottom: 1px solid gray;
     height: $mobileHeaderBarHeight;
-}
-
-.nodeTags {
-    display: inline-block;
-    background-color: darkolivegreen;
-    border-radius: 6px;
-    padding: 0 5px 0 5px;
-    margin-right: 8px;
 }
 
 .displayNameTextField {
     max-width: 40rem;
 }
-
-$mobileHeaderHeight: 3.5rem;
 
 .helpPanel {
     margin-top: 10px;
@@ -162,14 +144,6 @@ $mobileHeaderHeight: 3.5rem;
     padding-top: $smallGap;
     padding-left: $smallGap;
     padding-right: $smallGap;
-    border-radius: $border-radius;
-}
-
-.typeName {
-    border: 2px solid gray;
-    padding: 0px 4px 0px 4px;
-    white-space: nowrap;
-    display: inline-block;
     border-radius: $border-radius;
 }
 
@@ -260,20 +234,14 @@ $mobileHeaderHeight: 3.5rem;
     visibility: hidden !important;
 }
 
-// for some reason, the 'hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
+// for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
 .comp-hidden {
     opacity: 0;
 }
 
 .visible {
-    display: inline-block; 
+    display: inline-block;
     visibility: visible !important;
-}
-
-// we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
-// wrapped to a new line (position) that where the row isn't full and has space to stretch. 
-.btnGroup {
-    display: inline;
 }
 
 /* Need a way that we can set font sizes, on anchors but this actually messes up button styling because my buttons
@@ -391,15 +359,6 @@ a {
     height: 100%;
 }
 
-.welcome-body {
-    font-family: $fontFamily  !important;
-    font-size: 1.4rem;
-    font-weight: 300;
-    line-height: 1.5;
-
-    padding-bottom: 1rem;
-}
-
 .highlightBorder {
     border: 1px solid green;
 }
@@ -436,6 +395,7 @@ a {
     font-weight: 600;
     vertical-align: middle;
     color: lightGreen;
+    margin-bottom: 6px;
 }
 
 .logViewTitle {
@@ -496,14 +456,6 @@ a {
     border-radius: $border-radius;
 }
 
-.treeFriendImage {
-    max-width: 70px;
-    cursor: pointer;
-    border: 2px solid $nodeBorderBottomColor;
-    margin: 0 10px 0px 10px;
-    border-radius: $border-radius;
-}
-
 /* This is how the search terms get highlighted by wrapping them like this in 
 the markdown **_term_** */
 strong em {
@@ -518,20 +470,6 @@ strong em {
 
 .textfield-label {
     margin-bottom: 0px;
-}
-
-.checkboxLabel {
-    margin-right: 16px;
-    // margin-bottom: $smallGap;
-}
-
-.radioLabel {
-    margin-right: 16px;
-    margin-bottom: $smallGap;
-}
-
-.radioButtonsBar {
-    margin-bottom: $smallGap;
 }
 
 .form-group-border {
@@ -613,13 +551,6 @@ strong em {
     top: 0;
     cursor: progress;
     display: none;
-}
-
-.commentMarkdownClass {
-    border: 2px solid darkkhaki;
-    margin: 8px;
-    border-radius: $border-radius;
-    background-color: #17202A;
 }
 
 .extraPagingComps {
@@ -888,10 +819,6 @@ Will come back later and study this more. todo-1 */
     display: table-cell;
 }
 
-.row-toolbar {
-    margin-left: 16px;
-}
-
 /* I experimented with limiting height of rows and allowing individual scrolling on nodes but
    i think usability and asthetics make this slightly awkward. You can simply uncomment these styles
    and look, any time, to remember what that looks like. The style is in place in the code
@@ -924,19 +851,6 @@ Will come back later and study this more. todo-1 */
     margin-left: 0px;
     margin-right: 0px;
     margin-bottom: 10px;
-}
-
-.downloadLink {
-    margin-left: $smallGap;
-    margin-top: $smallGap;
-    white-space: nowrap;
-    padding: 6px;
-    border: 2px solid $gray-700;
-    border-radius: $border-radius;
-}
-
-.nodeCompButtonBar {
-    margin-left: 8px;
 }
 
 .marginLeftIfNotFirst {
@@ -1239,26 +1153,11 @@ Will come back later and study this more. todo-1 */
     border: 3px solid $gray-700;
 }
 
-.img-in-row {
-    cursor: pointer;
-    margin-left: $smallGap;
-    margin-bottom: $smallGap;
-    margin-top: $smallGap;
-    border: 1px solid $gray-700;
-    vertical-align: top;
-    border-radius: $border-radius;
-    max-width: 98%;
-}
-
 .img-in-editor {
     cursor: pointer;
     border: 1px solid $gray-700;
     vertical-align: top;
     border-radius: $border-radius;
-}
-
-.meta64-input {
-    max-width: 50%;
 }
 
 .systemFileRow {
@@ -1282,24 +1181,6 @@ Will come back later and study this more. todo-1 */
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     padding-left: $smallGap;
-}
-
-.attachmentLinksPanel {
-    border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    padding-left: $smallGap;
-    margin-bottom: $smallGap;
-}
-
-.ace-edit-panel {
-    margin-top: $smallGap;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 200px;
 }
 
 .vert-space {
@@ -1329,21 +1210,6 @@ Will come back later and study this more. todo-1 */
 .timelinePanel {
     // padding: $smallGap;
     // margin: $smallGap;
-}
-
-.mainNodeContentStyle {
-    @if $rootNodeBorder {
-        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
-        border-left: $highlightBorderSize solid $nodeBorderBottomColor;
-    }
-
-    @else {
-        border-left: $fatBorderSize solid $nodeBorderBottomColor;
-    }
-
-    padding-top: 8px;
-    margin-bottom: 8px;
-    margin-top: 8px;
 }
 
 .parentNodeContentStyle {
@@ -1389,51 +1255,6 @@ Will come back later and study this more. todo-1 */
     font-size: large;
     margin-top: $smallGap;
     margin-bottom: $smallGap;
-}
-
-.created-by {
-    padding: 6px;
-    margin-right: 10px;
-    margin-left: 10px;
-    border-radius: $border-radius;
-}
-
-.created-by-me {
-    @extend .created-by;
-    background: $createdByMeBackgroundColor;
-    color: $createdByMeTextColor;
-}
-
-.created-by-me:first-child {
-    margin-left: 0px;
-}
-
-.created-by-other {
-    @extend .created-by;
-    background: $createdByAnotherBackgroundColor;
-    color: $createdByAnotherTextColor;
-}
-
-.created-by-other:first-child {
-    margin-left: 0px;
-}
-
-.reply-indicator {
-    padding: 6px;
-    margin-right: 8px;
-    margin-left: 6px;
-    border-radius: $border-radius;
-    background: $createdByAnotherBackgroundColor;
-    color: $createdByAnotherTextColor;
-}
-
-.row-header {
-    font-size: small;
-    margin-left: 8px;
-    cursor: pointer;
-
-    // warning: don't be tempted again to make this less than 2em!
-    min-height: 2rem;
 }
 
 .headerInfoDivExpanded {
@@ -1497,6 +1318,7 @@ Will come back later and study this more. todo-1 */
     from {
         opacity: hidden;
     }
+
     to {
         visibility: visible;
     }
@@ -1528,18 +1350,6 @@ Will come back later and study this more. todo-1 */
 
 .threadNodeDivider {
     width: 100%;
-}
-
-.row-footer {
-    font-size: small;
-    cursor: pointer;
-}
-
-.nodeName {
-    padding: 6px;
-    margin-right: 10px;
-    cursor: pointer;
-    border-radius: $border-radius;
 }
 
 .content-narrow {
@@ -1622,20 +1432,6 @@ Will come back later and study this more. todo-1 */
     width: 75%;
 }
 
-.node-table-row {
-    position: relative;
-    padding-right: 10px;
-    padding-top: 16px;
-    padding-bottom: 8px;
-}
-
-.node-table-row-compact {
-    position: relative;
-    padding-right: 10px;
-    padding-top: 8px;
-    padding-bottom: 4px;
-}
-
 .vertical-space {
     height: 16px;
     min-height: 16px;
@@ -1644,58 +1440,6 @@ Will come back later and study this more. todo-1 */
 .results-node {
     // why relative here ? todo-1
     position: relative;
-}
-
-.row-border {
-    /* If no border is defined here then borders only show up during edit or metadata display modes */
-    border-bottom: 1px dotted $nodeBorderBottomColor;
-}
-
-.row-border-inline-children {
-    /* If no border is defined here then borders only show up during edit or metadata display modes */
-    border-bottom: 2px solid $nodeBorderBottomColor;
-}
-
-/* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
-.row-border-edit {
-    border-bottom: 1px solid $nodeBorderBottomColor;
-}
-
-/*
-With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
-height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 
-and the table-cell (all three)
-
-update: oops, that 100% is causing vertical scrollbar to ALWAYS show up because something's off by a few pixels, so
-i'm backing out for now
-*/
-.node-grid-table {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    // remove border-collapse for round borders
-    // border-collapse: collapse;
-    border-spacing: 8px;
-}
-
-.node-grid-item {
-    height: 100%;
-    width: 100%;
-    padding-right: 12px;
-}
-
-.node-grid-row {
-    display: table-row;
-}
-
-.node-grid-cell {
-    border: 1px solid $nodeBorderBottomColor;
-    display: table-cell;
-    padding-top: 8px;
-    padding-bottom: 5px;
-    border-radius: 6px;
-    overflow: hidden;
-    vertical-align: top;
 }
 
 .widthSizerPanel {
@@ -1711,76 +1455,9 @@ i'm backing out for now
     cursor: pointer;
 }
 
-.node-table-row .top-right-image {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
 .showParentsIcon {
     cursor: pointer;
     color: gray;
-}
-
-.active-row {
-    border-left: $highlightBorderSize solid $primary;
-}
-
-.boost-row {
-    border: 2px solid gray;
-    border-radius: $border-radius;
-    margin-left: $tinyGap;
-    margin-right: $tinyGap;
-    padding-top: $tinyGap;
-    background-color: #17202A;
-}
-
-.active-row:hover {
-    // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
-    // see other places with a lighten function on a ":hover"
-    // background-color: lighten($body-bg, $lightenRowFactor);
-}
-
-.inactive-row {
-    border-left: $highlightBorderSize solid transparent;
-}
-
-.inactive-row:hover {
-    // background-color: lighten($body-bg, $lightenRowFactor);
-}
-
-.active-row-main {
-    @if $rootNodeBorder {
-        // border-bottom: $highlightBorderSize solid $primary;
-        // border-left: $highlightBorderSize solid $primary;
-        border: $highlightBorderSize solid $primary;
-        border-radius: 12px;
-    }
-
-    @else {
-        border-left: $mediumBorderSize solid $primary;
-    }
-}
-
-.active-row-main:hover {
-    // background-color: lighten($body-bg, $lightenRowFactor);
-}
-
-.inactive-row-main {
-    @if $rootNodeBorder {
-        // border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
-        // border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
-        border: $highlightBorderSize solid $nodeBorderBottomColor;
-        border-radius: 12px;
-    }
-
-    @else {
-        border-left: $mediumBorderSize solid $nodeBorderBottomColor;
-    }
-}
-
-.inactive-row-main:hover {
-    // background-color: lighten($body-bg, $lightenRowFactor);
 }
 
 .main {
@@ -1820,29 +1497,6 @@ i'm backing out for now
 
 .testHighlight {
     background-color: green;
-}
-
-@keyframes fadeInRowBkg {
-    from {
-        background-color: $gray-700;
-    }
-
-    to {
-        background-color: transparent;
-    }
-}
-
-.fadeInRowBkgClz {
-    animation-name: fadeInRowBkg;
-    animation-duration: 3.5s;
-}
-
-.rowFooterIcon {
-    margin-top: .5rem;
-    margin-right: 6px;
-    margin-bottom: 12px;
-    vertical-align: middle;
-    cursor: pointer;
 }
 
 .userFeedItem {
@@ -1960,40 +1614,6 @@ i'm backing out for now
     margin-left: 24px;
 }
 
-.priorityTag {
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1;
-    padding: 4px;
-    margin-left: 5px;
-    border-radius: 100px;
-}
-
-.priorityTag1 {
-    @extend .priorityTag;
-    border: 5px solid red;
-}
-
-.priorityTag2 {
-    @extend .priorityTag;
-    border: 5px solid orange;
-}
-
-.priorityTag3 {
-    @extend .priorityTag;
-    border: 5px solid purple;
-}
-
-.priorityTag4 {
-    @extend .priorityTag;
-    border: 5px solid blue;
-}
-
-.priorityTag5 {
-    @extend .priorityTag;
-    border: 5px solid green;
-}
-
 .durationTypeInput {
     max-width: 8rem;
 }
@@ -2032,51 +1652,6 @@ audio::-webkit-media-controls-play-button {
 
 .monospace {
     font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
-}
-
-.dateTimeDisplay {
-    margin-right: 5px;
-    padding: 0 8px 0 8px;
-    display: inline-block;
-    border-radius: $border-radius;
-    background-color: cadetblue;
-    color: black;
-}
-
-.nodeNameDisp {
-    margin-left: 6px;
-    padding: 4px;
-    border: 2px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    background-color: $primary;
-}
-
-.sharingIcon {
-    color: cyan;
-}
-
-.sharingName {
-    border: 2px solid gray;
-    border-radius: 6px;
-    margin-left: 3px;
-    display: inline-block;
-    padding: 3px;
-}
-
-.sharingName:first-child {
-    margin-left: 0px;
-}
-
-.sharingNamePublic {
-    border: 2px solid cyan;
-    border-radius: 6px;
-    margin-left: 3px;
-    display: inline-block;
-    padding: 3px;
-}
-
-.sharingName:first-child {
-    margin-left: 0px;
 }
 
 .rowHeaderSharingNames {
@@ -2150,7 +1725,6 @@ audio::-webkit-media-controls-play-button {
     border-collapse: collapse;
 }
 
-
 .displayTableNoSpacing {
     display: table;
 }
@@ -2179,72 +1753,6 @@ audio::-webkit-media-controls-play-button {
 .userInfo {
     cursor: pointer;
     width: 100%;
-}
-
-.openGraphPanel {
-    margin-left: 12px;
-    border: 1px solid $nodeBorderBottomColor;
-    padding: 10px;
-    margin-bottom: $smallGap;
-    margin-right: $smallGap;
-    border-radius: $border-radius;
-    overflow-x: hidden;
-    background-color: #17202A;
-}
-
-.openGraphPanelBoost {
-    @extend .openGraphPanel;
-    background-color: black;
-    margin-right: 0px;
-}
-
-.openGraphPanelRss {
-    overflow-x: hidden;
-    margin-top: $smallGap;
-}
-
-.openGraphImage {
-    border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    width: 100%;
-    margin-top: 8px;
-}
-
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
-.openGraphImageRss {
-    border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    width: 100%;
-}
-
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
-.openGraphImageVert {
-    border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    width: 50%;
-    margin-top: 8px;
-    margin-bottom: 10px;
-}
-
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
-.openGraphNoImage {
-    margin-top: 8px;
-    margin-right: 8px;
-}
-
-.openGraphLhs {
-    margin: 8px;
-    width: 25%;
-    // This min width is required when there are some crazy long strings in the RHS, and the browser
-    // crowds out the left hand side smashin it down to zero size unless we give a min size.
-    min-width: 100px;
-}
-
-.openGraphRhs {
-    margin: 8px;
-    width: 75%;
-    padding-left: 18px;
-    padding-top: 10px;
 }
 
 .textField {
@@ -2278,18 +1786,6 @@ audio::-webkit-media-controls-play-button {
     margin-bottom: 6px;
     margin-left: 10px;
     margin-right: 8px;
-}
-
-.openGraphDesc {
-    max-width: 45rem;
-}
-
-.openGraphTitle {
-    font-size: 130%;
-    margin-bottom: 8px;
-    margin-right: 1rem;
-    cursor: pointer;
-    text-decoration: none;
 }
 
 .welcomeText {
@@ -2344,4 +1840,3 @@ audio::-webkit-media-controls-play-button {
 .textField {
     font-family: "monospace";
 }
-

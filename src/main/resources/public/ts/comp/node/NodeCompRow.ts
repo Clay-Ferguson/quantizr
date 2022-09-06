@@ -80,7 +80,7 @@ export class NodeCompRow extends Div {
 
             const isMine = S.props.isMine(state.node, state);
 
-            if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(this.node, state)) {
+            if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed) {
 
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root ???

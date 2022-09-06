@@ -66,7 +66,7 @@ export class NodeCompMainNode extends Div {
         else {
             const focusNode = S.nodeUtil.getHighlightedNode(state);
             const selected: boolean = (focusNode && focusNode.id === node.id);
-            this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
+            this.attribs.className = selected ? "active-row-main" : "inactive-row-main";
 
             if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
                 S.render.fadeInId = null;

@@ -7,8 +7,6 @@ import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 
-declare const g_brandingAppName: string;
-
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
     public static inst: LeftNavPanel = null;
@@ -70,11 +68,11 @@ export class LeftNavPanel extends Div {
                     onClick: () => S.util.loadAnonPageHome(),
                     title: "Go to Portal Home Node"
                 }),
-                new Span(g_brandingAppName, {
-                    className: "logo-text",
-                    onClick: () => S.util.loadAnonPageHome(),
-                    title: "Go to Portal Home Node"
-                }),
+                // new Span(g_brandingAppName, {
+                //     className: "logo-text",
+                //     onClick: () => S.util.loadAnonPageHome(),
+                //     title: "Go to Portal Home Node"
+                // }),
                 // todo-2: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
                 messages ? new Span(messages, {
