@@ -70,8 +70,11 @@ export class EditNodeDlg extends DialogBase {
     contentScrollPos = new ScrollPos();
 
     constructor(private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
-        super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, mode);
+        super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
         const appState = getAppState();
+
+        // need a deterministic id here, that can be found across renders, for scrolling.
+        this.setId("EditNodeDlg_" + appState.editNode.id);
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;

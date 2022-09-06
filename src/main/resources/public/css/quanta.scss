@@ -627,8 +627,11 @@ strong em {
 
 .app-modal-title {
     margin-bottom: .7rem;
-    font-size: 120%;
-    margin-left: 4px;
+    font-size: 130%;
+    border: 1px solid gray;
+    background-color: $primary;
+    border-radius: $border-radius;
+    padding: 4px 10px 4px 10px;
 }
 
 .app-modal-title-close-icon {
@@ -1016,12 +1019,12 @@ Will come back later and study this more. todo-1 */
     margin: $bigGap;
 }
 
-.anchorBigMarginBottom {
+.linkDisplay {
     display: inline-block;
     margin-bottom: $smallGap;
     margin-left: 20px;
     cursor: pointer;
-    padding: 3px;
+    padding: 6px;
     border: 1px solid olivedrab;
     border-radius: $border-radius;
 }

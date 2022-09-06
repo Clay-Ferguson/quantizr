@@ -92,7 +92,7 @@ export abstract class Comp implements CompIntf {
         return prefix ? prefix + this.attribs.id : this.attribs.id;
     }
 
-    private setId(id: string) {
+    public setId(id: string) {
         this.attribs.id = id;
         this.attribs.key = this.attribs.key || id;
     }
