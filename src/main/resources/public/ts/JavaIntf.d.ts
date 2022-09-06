@@ -394,6 +394,7 @@ export interface RenderCalendarRequest extends RequestBase {
 export interface RenderDocumentRequest extends RequestBase {
     rootId: string;
     startNodeId: string;
+    includeComments: boolean;
 }
 
 export interface RenderNodeRequest extends RequestBase {
@@ -1068,6 +1069,7 @@ export const enum NodeType {
     EXPORTS = "sn:exports",
     CALCULATOR = "sn:calculator",
     CALENDAR = "sn:calendar",
+    COMMENT = "sn:comment",
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",

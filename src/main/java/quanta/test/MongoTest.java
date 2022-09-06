@@ -117,7 +117,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 	}
 
 	private void docOrderTest(MongoSession as, String rootId, String nodeId) {
-		List<SubNode> nodes = read.genDocList(as, rootId, nodeId, null);
+		List<SubNode> nodes = read.genDocList(as, rootId, nodeId, true, null);
 		for (SubNode n : nodes) {
 			log.debug("CONTENT: " + n.getContent());
 		}

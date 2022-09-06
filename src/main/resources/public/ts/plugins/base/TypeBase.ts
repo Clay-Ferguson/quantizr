@@ -47,6 +47,10 @@ export class TypeBase implements TypeHandlerIntf {
         return true;
     }
 
+    getExtraMarkdownClass(): string {
+        return null;
+    }
+
     getAllowRowHeader(): boolean {
         return true;
     }
@@ -101,7 +105,7 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        const comp: NodeCompMarkdown = node.content ? new NodeCompMarkdown(node, state) : null;
+        const comp: NodeCompMarkdown = node.content ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), state) : null;
 
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state

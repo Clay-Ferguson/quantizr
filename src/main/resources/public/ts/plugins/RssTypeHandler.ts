@@ -418,7 +418,7 @@ export class RssTypeHandler extends TypeBase {
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
-                S.edit.addNode(null, false, entry.title + "\n\n" + entry.link, null, null, null, null, false, state);
+                S.edit.addNode(null, null, false, entry.title + "\n\n" + entry.link, null, null, null, null, false, state);
             }
         }) : null;
 

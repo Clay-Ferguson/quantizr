@@ -1175,7 +1175,7 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (nodeId: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, fediSend: boolean, state: AppState) => {
+    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, fediSend: boolean, state: AppState) => {
         state = getAppState(state);
 
         // auto-enable edit mode
@@ -1189,7 +1189,7 @@ export class Edit {
             pendingEdit: !boostTarget,
             nodeId,
             newNodeName: "",
-            typeName: J.NodeType.NONE,
+            typeName: typeName || J.NodeType.NONE,
             createAtTop: true,
             content,
             typeLock: false,

@@ -1317,13 +1317,14 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Generates a Document-like View of a Subgraph. Nodes in "document order", as if reading like a
-     * book, or conventional word processing monolilthic document view. Very powerful becasue of 'nodeId' which
-     * is the place to start loading from. With 'nodeId' it's like we can start our recursion from anywhere, so as
-     * we're browsing down a document scrolling in new content each time this method is called to load more
-     * records, the nodeId passed in will be whatever was at the bottom of the document which is being appended to
-     * by using the results of calling this method.
+     * book, or conventional word processing monolilthic document view. Very powerful becasue of
+     * 'nodeId' which is the place to start loading from. With 'nodeId' it's like we can start our
+     * recursion from anywhere, so as we're browsing down a document scrolling in new content each time
+     * this method is called to load more records, the nodeId passed in will be whatever was at the
+     * bottom of the document which is being appended to by using the results of calling this method.
      */
-    public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId, HashSet<String> truncates) {
+    public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId, boolean includeComments,
+            HashSet<String> truncates) {
         LinkedList<SubNode> doc = new LinkedList<>();
         SubNode rootNode = read.getNode(ms, new ObjectId(rootId));
 
@@ -1335,7 +1336,7 @@ public class MongoRead extends ServiceBase {
         int rootSlashCount = StringUtils.countMatches(rootNode.getPath(), "/");
 
         // entry point into recusion
-        if (!recurseDocList(doc, ms, node, rootSlashCount, truncates)) {
+        if (!recurseDocList(doc, ms, node, rootSlashCount, includeComments, truncates)) {
             // log.debug("Started from root. Found enough");
             return doc;
         }
@@ -1361,6 +1362,10 @@ public class MongoRead extends ServiceBase {
             // IMPORTANT: build this critera BEFORE we set 'node' to the parent.
             Criteria siblingsBelow = Criteria.where(SubNode.ORDINAL).gt(node.getOrdinal());
 
+            if (!includeComments) {
+                siblingsBelow = siblingsBelow.and(SubNode.TYPE).ne(NodeType.COMMENT);
+            }
+
             node = read.getParent(ms, node);
             if (no(node)) {
                 log.warn("oops, no parent. This should never happen!");
@@ -1377,7 +1382,7 @@ public class MongoRead extends ServiceBase {
             while (iterator.hasNext()) {
                 SubNode sibling = iterator.next();
                 // log.debug("sibling[" + count + "] " + sibling.getContent() + " ordinal=" + sibling.getOrdinal());
-                if (!recurseDocList(doc, ms, sibling, rootSlashCount, truncates)) {
+                if (!recurseDocList(doc, ms, sibling, rootSlashCount, includeComments, truncates)) {
                     break;
                 }
             }
@@ -1402,8 +1407,13 @@ public class MongoRead extends ServiceBase {
 
     // Adds 'node' and it's entire subgraph (up to limits) into 'doc'
     // returns false to terminate then we have enough doc items
-    public boolean recurseDocList(LinkedList<SubNode> doc, MongoSession ms, SubNode node, int rootSlashCount, HashSet<String> truncates) {
+    public boolean recurseDocList(LinkedList<SubNode> doc, MongoSession ms, SubNode node, int rootSlashCount,
+            boolean includeComments, HashSet<String> truncates) {
+        if (!includeComments && node.isType(NodeType.COMMENT)) {
+            return true;
+        }
         doc.add(node);
+
         int thisSlashCount = StringUtils.countMatches(node.getPath(), "/");
         int depth = thisSlashCount - rootSlashCount;
         if (depth < 0) {
@@ -1426,8 +1436,11 @@ public class MongoRead extends ServiceBase {
             return false;
         }
 
-        for (SubNode n : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), MAX_DOC_ITEMS_PER_CALL, 0)) {
-            if (!recurseDocList(doc, ms, n, rootSlashCount, truncates)) {
+        Criteria typeCriteria = !includeComments ? Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT) : null;
+
+        for (SubNode n : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), MAX_DOC_ITEMS_PER_CALL, 0,
+                typeCriteria)) {
+            if (!recurseDocList(doc, ms, n, rootSlashCount, includeComments, truncates)) {
                 return false;
             }
         }

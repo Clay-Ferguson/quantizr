@@ -104,7 +104,7 @@ export class RightNavPanel extends Div {
                         }
                     }
                 }
-                S.edit.addNode("~" + J.NodeType.NOTES, false, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
             },
             title: "Create new Private Note"
         }) : null;
@@ -115,7 +115,7 @@ export class RightNavPanel extends Div {
                     // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
-                        S.edit.addNode("~" + J.NodeType.NOTES, false, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
                         return;
                     }
                 }

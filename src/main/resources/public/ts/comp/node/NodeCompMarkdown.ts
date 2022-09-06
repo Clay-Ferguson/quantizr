@@ -18,7 +18,7 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, appState: AppState) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, appState: AppState) {
         super(null, { key: "ncmkd_" + node.id });
 
         // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
@@ -31,6 +31,10 @@ export class NodeCompMarkdown extends Html {
         }
         else {
             this.attribs.className = "markdown-content";
+        }
+
+        if (extraContainerClass) {
+            this.attribs.className += " " + extraContainerClass;
         }
 
         const content = node.content || "";

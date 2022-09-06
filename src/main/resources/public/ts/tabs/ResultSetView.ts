@@ -66,7 +66,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
-        this.addPaginationBar(state, children, false, this.allowTopMoreButton);
+        this.addPaginationBar(state, children, false, this.allowTopMoreButton, true);
 
         let i = 0;
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
@@ -80,13 +80,17 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             rowCount++;
         });
 
-        this.addPaginationBar(state, children, true, true);
+        this.addPaginationBar(state, children, true, true, false);
         this.setChildren(children);
     }
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Div(this.data.name, { className: "tabTitle" });
+        let countDisplay = "";
+        if (this.data.props.endReached && this.data.props.results?.length > 0) {
+            countDisplay = " (" + this.data.props.results?.length + ")"
+        }
+        return new Div(this.data.name + countDisplay, { className: "tabTitle" });
     }
 
     /* overridable (don't use arrow function) */
@@ -99,7 +103,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             "userFeedItemHighlight " + this.data.id, null, state);
     }
 
-    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean) => {
+    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
 
         let moreButton: IconButton = null;
         if (!this.data.props.endReached && allowMoreButton) {
@@ -134,7 +138,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             }
         }
 
-        const extraPagingComps = this.extraPagingComps();
+        const extraPagingComps = isTopBar ? this.extraPagingComps() : null;
 
         children.push(
             this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,

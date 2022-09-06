@@ -4,6 +4,7 @@ import { APPostsTypeHandler } from "./plugins/APPostsTypeHandler";
 import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
+import { CommentTypeHandler } from "./plugins/CommentTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
 import { CalendarTypeHandler } from "./plugins/CalendarTypeHandler";
 import { ExportsTypeHandler } from "./plugins/ExportsTypeHandler";
@@ -67,6 +68,7 @@ export class PluginMgr {
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new BookmarkTypeHandler());
+        this.addTypeHandler(new CommentTypeHandler());
         this.addTypeHandler(new BookmarkListTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new BlockedUsersTypeHandler());

@@ -4,6 +4,7 @@ import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
+import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
@@ -41,7 +42,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         let style = null;
         if (state.docIndent) {
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
-            style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 25) + "px" } : null;
+            style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         }
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
@@ -68,29 +69,51 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
 
     extraPagingComps = (): Comp[] => {
         return [
-            new Checkbox("Indent", { className: "bigMarginLeft" }, {
-                setValue: (checked: boolean) => {
-                    dispatch("DocIndent", s => {
-                        s.docIndent = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => {
-                    return getAppState().docIndent;
-                }
-            }),
-            new Icon({
-                className: "fa fa-search fa-lg buttonBarIcon",
-                title: "Search Subnodes",
-                nid: this.data.props.node.id,
-                onClick: S.nav.runSearch
-            }),
-            new Icon({
-                className: "fa fa-clock-o fa-lg buttonBarIcon",
-                title: "View Timeline (by Mod Time)",
-                nid: this.data.props.node.id,
-                onClick: S.nav.runTimeline
-            })
+            new Div(null, { className: "extraPagingComps" }, [
+                new Checkbox("Indent", {
+                    className: "bigMarginLeft",
+                    title: "Indent the Document based on content hierarchy"
+                }, {
+                    setValue: (checked: boolean) => {
+                        dispatch("DocIndent", s => {
+                            s.docIndent = checked;
+                            return s;
+                        });
+                    },
+                    getValue: (): boolean => {
+                        return getAppState().docIndent;
+                    }
+                }),
+                new Checkbox("Comments", {
+                    className: "marginLeft",
+                    title: "Include all the Comment Nodes in the Document"
+                }, {
+                    setValue: (checked: boolean) => {
+                        dispatch("SetIncludeComments", s => {
+                            s.includeDocComments = checked;
+                            return s;
+                        });
+
+                        // refresh the view.
+                        this.pageChange(null);
+                    },
+                    getValue: (): boolean => {
+                        return getAppState().includeDocComments;
+                    }
+                }),
+                new Icon({
+                    className: "fa fa-search fa-lg buttonBarIcon",
+                    title: "Search Subnodes",
+                    nid: this.data.props.node.id,
+                    onClick: S.nav.runSearch
+                }),
+                new Icon({
+                    className: "fa fa-clock-o fa-lg buttonBarIcon",
+                    title: "View Timeline (by Mod Time)",
+                    nid: this.data.props.node.id,
+                    onClick: S.nav.runTimeline
+                })
+            ])
         ];
     }
 }

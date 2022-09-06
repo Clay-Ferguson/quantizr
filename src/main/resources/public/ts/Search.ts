@@ -222,7 +222,8 @@ export class Search {
 
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
             rootId: node.id,
-            startNodeId: startNode ? startNode.id : node.id
+            startNodeId: startNode ? startNode.id : node.id,
+            includeComments: state.includeDocComments
         });
 
         if (!res.searchResults || res.searchResults.length === 0) {

@@ -84,7 +84,7 @@ public class NodeSearchService extends ServiceBase {
 		res.setSearchResults(results);
 
 		HashSet<String> truncates = new HashSet<>();
-		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), truncates);
+		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), req.isIncludeComments(), truncates);
 		int counter = 0;
 		for (SubNode n : nodes) {
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, n, true, false, counter + 1, false, false, false,

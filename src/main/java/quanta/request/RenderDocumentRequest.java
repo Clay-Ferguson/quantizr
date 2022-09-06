@@ -5,6 +5,7 @@ import quanta.request.base.RequestBase;
 public class RenderDocumentRequest extends RequestBase {
     private String rootId;
     private String startNodeId;
+    private boolean includeComments;
 
     public String getRootId() {
         return rootId;
@@ -20,5 +21,13 @@ public class RenderDocumentRequest extends RequestBase {
 
     public void setStartNodeId(String startNodeId) {
         this.startNodeId = startNodeId;
+    }
+
+    public boolean isIncludeComments() {
+        return includeComments;
+    }
+
+    public void setIncludeComments(boolean includeComments) {
+        this.includeComments = includeComments;
     }
 }
