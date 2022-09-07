@@ -52,7 +52,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
             // todo-1: We could easily make this icon clickable to render this node as the root of a new document
             // but then we'd need to have a "back button" capability to get back to previous document render.
             row.addChild(new Icon({
-                className: "fa fa-warning float-end warningIcon",
+                className: "fa fa-warning fa-lg float-end warningIcon",
                 title: "Nodes truncated. Tree too Deep."
             }));
             row.addChild(new Clearfix());
