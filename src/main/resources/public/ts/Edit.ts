@@ -171,48 +171,10 @@ export class Edit {
     /* returns true if we are admin or else the owner of the node */
     isEditAllowed = (node: any, state: AppState): boolean => {
         if (!node) return false;
-        let owner: string = node.owner;
-
-        // if we don't know who owns this node assume the admin owns it.
-        owner = owner || "admin";
-        return state.isAdminUser || state.userName === owner;
-    }
-
-    isInsertAllowed = (node: J.NodeInfo, state: AppState): boolean => {
-        if (!node) return false;
-        if (state.homeNodeId === node.id) {
-            return true;
-        }
-
-        if (S.props.isPublicWritable(node)) {
-            return true;
-        }
-
-        // if we don't know who owns this node assume the admin owns it.
-        const owner = node.owner || "admin";
-
-        // if this node is admin owned, and we aren't the admin, then just disable editing. Admin himself is not even allowed to
-        // make nodes editable by any other user.
-        if (owner === "admin" && !state.isAdminUser) return false;
-
-        // right now, for logged in users, we enable the 'new' button because the CPU load for determining it's enablement is too much, so
-        // we throw an exception if they cannot. todo-2: need to make this work better.
-        // however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
         if (state.isAdminUser) return true;
-        if (state.isAnonUser) return false;
 
-        /* if we own the node we can edit it! */
-        if (state.userName === node.owner) {
-            // console.log("node owned by me: " + node.owner);
-            return true;
-        }
-
-        if (S.props.isPublicReadOnly(node)) {
-            return false;
-        }
-
-        // console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
-        return node.owner !== "admin";
+         // if no owner treat as if admin owns
+        return state.userName === (node.owner || "admin");
     }
 
     /*
@@ -221,7 +183,7 @@ export class Edit {
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
     startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState) => {
-        if (!this.isInsertAllowed(parentNode, state)) {
+        if (!S.props.isWritableByMe(parentNode)) {
             // console.log("Rejecting request to edit. Not authorized");
             return;
         }

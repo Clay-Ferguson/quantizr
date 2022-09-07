@@ -111,11 +111,11 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        const publicWritable = S.props.isPublicWritable(this.node);
+        const editInsertAllowed = S.props.isWritableByMe(this.node);
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        if (showInfo && (publicWritable || isMine || actPubId)) {
+        if (showInfo && (editInsertAllowed || actPubId)) {
             verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",

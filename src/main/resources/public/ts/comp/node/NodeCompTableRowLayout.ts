@@ -38,7 +38,7 @@ export class NodeCompTableRowLayout extends Div {
             maxCols = 6;
         }
         const cellWidth = 100 / maxCols;
-        const allowInsert = S.edit.isInsertAllowed(this.node, state);
+        const allowInsert = S.props.isWritableByMe(this.node);
         let curCols = 0;
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;

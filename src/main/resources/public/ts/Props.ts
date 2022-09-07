@@ -1,3 +1,4 @@
+import { getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { PropTable } from "./comp/PropTable";
 import { PropTableCell } from "./comp/PropTableCell";
@@ -143,6 +144,29 @@ export class Props {
 
     isPublicWritable = (node: J.NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
+    }
+
+    isWritableByMe = (node: J.NodeInfo): boolean => {
+        const appState = getAppState();
+
+        // anonymous can never write
+        if (appState.isAnonUser) return false;
+
+        // if we own the node
+        if (appState.userName === node.owner) return true;
+
+        // if we are admin
+        if (appState.isAdminUser) return true;
+
+        // if it's our home node
+        if (appState.homeNodeId === node.id) {
+            return true;
+        }
+
+        // writeable by us if there's any kind of share to us or a writable public share.
+        return node && node.ac && !!node.ac.find(ace =>
+            (ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE)) ||
+            ace.principalNodeId === appState.homeNodeId);
     }
 
     isPublicReadOnly = (node: J.NodeInfo): boolean => {

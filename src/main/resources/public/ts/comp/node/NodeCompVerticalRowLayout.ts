@@ -23,7 +23,7 @@ export class NodeCompVerticalRowLayout extends Div {
         const childCount: number = this.node.children.length;
         const comps: Comp[] = [];
         const collapsedComps: Object[] = [];
-        const allowInsert = S.edit.isInsertAllowed(this.node, state);
+        const allowInsert = S.props.isWritableByMe(this.node);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;

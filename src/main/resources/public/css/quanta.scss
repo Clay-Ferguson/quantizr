@@ -64,7 +64,7 @@ $lightenRowFactor: 5;
 
 $fatBorderSize: 8px;
 $mediumBorderSize: 6px;
-$highlightBorderSize: 6px;
+$highlightBorderSize: 7px;
 $smallBorderSize: 3px;
 
 $mobileHeaderHeight: 3.5rem;
@@ -343,9 +343,9 @@ a {
     color: var(--bs-green);
 }
 
-.logo-text-small {
+.newMessagesNote {
     cursor: pointer;
-    padding: 0px 4px 0px 4px;
+    padding: 2px 6px 2px 6px;
     color: var(--bs-green); 
     border: 2px solid var(--bs-green);
     border-radius: 12px;

@@ -7,7 +7,7 @@ export class CommentTypeHandler extends TypeBase {
     }
 
     // For now i'm not sure how we should indicate visibly that a
-    // node is a comment, so I'm just not doing it, but this code DOES work. 
+    // node is a comment, so I'm just not doing it, but this code DOES work.
     // getExtraMarkdownClass(): string {
     //     return "commentMarkdownClass";
     // }
