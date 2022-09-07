@@ -58,7 +58,13 @@ public class UserFeedService extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
-		crit = crit.and(SubNode.TYPE).is(NodeType.NONE.s());
+		// todo-0: Is there a faster way to accomplish the filtering we need based on type and WHY are we filtering based on type?
+		//         i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special (system defined) user's nodes.
+		//         but we can probably do some kind of hack/hijack and make those special system nodes use a priority value or something whic
+		//         we can filter out by saying "not equal to special node priority"...becasue we have a priority index already.
+		//         Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely be ONE MORE index.
+		//   IMPORTANT: this code is in OTHER PLACES in this file too!
+		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		// DO NOT DELETE (keep as example)
 		// This pattern is what is required when you have multiple conditions added to a single field.
@@ -198,8 +204,9 @@ public class UserFeedService extends ServiceBase {
 		// criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		// }
 
-		// limit to just markdown types (no type)
-		crit = crit.and(SubNode.TYPE).is(NodeType.NONE.s());
+		// limit to just markdown types (no type), and comments 
+		// IMPORTANT: see long comment above where we have similar type filtering.
+		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		boolean allowBadWords = true;
 
