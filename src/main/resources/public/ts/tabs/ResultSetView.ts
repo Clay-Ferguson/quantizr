@@ -53,12 +53,12 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         children.push(new Div(null, null, [
             new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
+                this.renderHeading(state),
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
-                        title: "Back to Node Tree view"
-                    }, "marginRight") : null,
-                this.renderHeading(state)
+                        title: "Back to Tree View"
+                    }, "bigMarginLeft") : null
             ]),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.props.description ? new Div(this.data.props.description) : null
@@ -87,7 +87,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
         let countDisplay = "";
-        if (this.data.props.endReached && this.data.props.results?.length > 0) {
+        if (this.infiniteScrolling && this.data.props.endReached && this.data.props.results?.length > 0) {
             countDisplay = " (" + this.data.props.results?.length + ")"
         }
         return new Div(this.data.name + countDisplay, { className: "tabTitle" });
@@ -156,7 +156,8 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                     title: "Previous Page"
                 }) : null,
                 moreButton,
-                ...(extraPagingComps || [])
+                ...(extraPagingComps || []),
+                this.data.props.endReached && !isTopBar && this.showPageNumber ? new Span("*** Last Page ***", { className: "bigMarginLeft" }) : null
             ], this.pagingContainerClass));
 
         children.push(new Clearfix());

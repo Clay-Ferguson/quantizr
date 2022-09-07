@@ -35,11 +35,11 @@ export class NodeCompMainList extends Div {
     }
 
     addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState, pageTop: boolean) => {
-        let firstButton: Comp;
-        let prevButton: Comp;
-        let nextButton: IconButton;
-        let prevNodeButton: Comp;
-        let nextNodeButton: Comp;
+        let firstButton: IconButton;
+        let prevButton: IconButton;
+        let moreButton: IconButton;
+        let prevNodeButton: IconButton;
+        let nextNodeButton: IconButton;
         const firstChild = S.edit.getFirstChildNode(state);
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
@@ -57,7 +57,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (!endReached) {
-            nextButton = new IconButton("fa-angle-right", "More", {
+            moreButton = new IconButton("fa-angle-right", "More", {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
@@ -72,7 +72,7 @@ export class NodeCompMainList extends Div {
                 // If nextButton is the one at the bottom of the page we watch it so we can dynamically load in
                 // new content when it scrolls info view. What's happening here is that once
                 // the nextButton scrolls into view, we load in more nodes!
-                nextButton.onMount((elm: HTMLElement) => {
+                moreButton.onMount((elm: HTMLElement) => {
                     const observer = new IntersectionObserver(entries => {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
@@ -90,7 +90,7 @@ export class NodeCompMainList extends Div {
                                     // otherwise the 'more' button came into view because the user had to have
                                     // scrolled to it, so we scroll in the new nodes to display (infinite scrolling)
                                     else {
-                                        nextButton.replaceWithWaitIcon();
+                                        moreButton.replaceWithWaitIcon();
                                         S.view.growPage(state);
                                     }
                                 }
@@ -115,8 +115,8 @@ export class NodeCompMainList extends Div {
             }
         }
 
-        if (firstButton || prevButton || nextButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton], "marginBottom text-center " + moreClasses));
+        if (firstButton || prevButton || moreButton) {
+            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginBottom text-center " + moreClasses));
         }
 
         if (prevNodeButton || nextNodeButton) {

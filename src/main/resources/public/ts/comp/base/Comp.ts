@@ -24,6 +24,9 @@ export abstract class Comp implements CompIntf {
     private static guid: number = 0;
     private static renderClassInDom: boolean = false;
 
+    // this is a global flag for overriding/disabling scroll setting which we need to do in some cases.
+    static allowScrollSets = true;
+
     attribs: any;
 
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
@@ -436,10 +439,13 @@ export abstract class Comp implements CompIntf {
         }
         const elm = this.getRef();
         if (elm) {
-            elm.scrollTop = this.getScrollPos();
+            if (Comp.allowScrollSets) {
+                elm.scrollTop = this.getScrollPos();
+            }
+
             elm.addEventListener("scroll", () => {
                 if (C.DEBUG_SCROLLING) {
-                    console.log("Scroll Evt [" + this.getCompClass + "]: elm.scrollTop=" + elm.scrollTop);
+                    console.log("Scroll Evt [" + this.getCompClass() + "]: elm.scrollTop=" + elm.scrollTop);
                 }
                 this.setScrollPos(elm.scrollTop);
             }, { passive: true });
@@ -447,6 +453,7 @@ export abstract class Comp implements CompIntf {
     }
 
     scrollDomPreUpdateEvent = () => {
+        if (!Comp.allowScrollSets) return;
         const elm = this.getRef();
         if (elm) {
             if (C.DEBUG_SCROLLING) {

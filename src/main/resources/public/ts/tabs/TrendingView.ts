@@ -100,7 +100,9 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         }
 
         this.setChildren([
-            new Div("Trending", { className: "tabTitle marginTop" }),
+            new Div(null, { className: "headingBar" }, [
+                new Div("Trending", { className: "tabTitle" })
+            ]),
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.

@@ -1,5 +1,6 @@
 import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
+import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import * as J from "./JavaIntf";
@@ -152,7 +153,11 @@ export class View {
 
             // if this is an "infinite scroll" call to load in additional nodes
             if (growingPage) {
-                let scrollToTop = true;
+
+                // todo-0: need to re-test how MAX_DYNAMIC_ROWS is used to reset, and only in that case would we
+                // need to scrollToTop
+                // let scrollToTop = true;
+                const scrollToTop = false;
 
                 /* if the response has some children, and we already have local children we can add to, and we haven't reached
                 max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
@@ -167,7 +172,7 @@ export class View {
 
                     // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
                     res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
-                    scrollToTop = false;
+                    // scrollToTop = false;
                 }
 
                 if (C.DEBUG_SCROLLING) {
@@ -263,6 +268,8 @@ export class View {
     }
 
     scrollToNode = (state: AppState, node: J.NodeInfo = null, delay: number = 100) => {
+        if (!Comp.allowScrollSets) return;
+
         const func = () => {
             setTimeout(() => {
                 /* Check to see if we are rendering the top node (page root), and if so

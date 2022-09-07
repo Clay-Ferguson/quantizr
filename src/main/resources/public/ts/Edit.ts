@@ -1,6 +1,8 @@
 import { EventInput } from "@fullcalendar/react";
 import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
+import { Comp } from "./comp/base/Comp";
+import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -502,31 +504,40 @@ export class Edit {
     };
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
-    saveTabsTopmostVisible = async (state: AppState): Promise<AppState> => {
+    saveTabsTopmostVisible = async (state: AppState): Promise<boolean> => {
+        let doScrolling = false;
 
         // in this loop record the currently topmost visible element in each tab, so we can scroll
         // those back it view after doing some change to the DOM that will potentially cause the page
         // to jump to a different effective scroll position.
         for (const data of state.tabData) {
-            // NOTE: This is tricky here, but good. The first 'id' is an ID, and the second one is a "class", and this
-            // is not a bug.
-            const elm = S.util.findFirstVisibleElm(data.id, data.id);
-            data.topmostVisibleElmId = elm?.id;
+            // Warning: Uninitialized tabs will have 'scrollPos==undefined' here, so we check for that case, because
+            // otherwise it will get interpreted as a number
+            // We do nothing if user hasn't scrolled down enough to loose their place when the screen rerenders.
+            if (data.scrollPos == null || data.scrollPos === undefined || data.scrollPos < window.innerHeight / 2) {
+                // do nothing, if window isn't scrolled hafway at least
+            }
+            else {
+                doScrolling = true;
+                // NOTE: This is tricky here, but correct. The first 'id' is an ID, and the second one is a "class" (passed as arguments
+                // into findFirstVisibleElm), and this is not a bug. It's just a coincidence that 'data.id' is the correct thing
+                // to use for both parameters per what's in the DOM.
+                const elm = S.util.findFirstVisibleElm(data.id, data.id);
+                data.topmostVisibleElmId = elm?.id;
+            }
         }
 
-        // calling this does blank the screen during scrolling, but then the final scrolling fails too.
-        // return TabPanel.inst.setVisibility(false);
-        return null;
+        if (doScrolling) {
+            await TabPanel.inst.setVisibility(false);
+        }
+        return doScrolling;
     }
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     scrollTabsTopmostVisible = (state: AppState) => {
-        // this timer is becasue all scrolling in browser needs to be delayed or we can have failures.
+        // this timer is because all scrolling in browser needs to be delayed or we can have failures.
         setTimeout(async () => {
-            // this didn't work.
-            // await TabPanel.inst.setVisibility(true);
-
-            // scroll into view whatever was the topmost item before the last operation
+            // scroll into view whatever was the topmost item
             for (const data of state.tabData) {
                 if (data.topmostVisibleElmId) {
                     // we have to lookup the element again, because our DOM will have rendered and we will likely
@@ -537,13 +548,26 @@ export class Edit {
                     }
                 }
             }
-        }, 500);
+            setTimeout(async () => {
+                await TabPanel.inst.setVisibility(true);
+            }, 300);
+        }, 300);
     }
 
+    // WARNING: This func is expected to NOT alter that the active tab is!
     runScrollAffectingOp = async (state: AppState, func: Function) => {
-        await this.saveTabsTopmostVisible(state);
+        const doScrolling = await this.saveTabsTopmostVisible(state);
+
+        if (doScrolling) {
+            // turn off Comp stuff so it doesn't interfere with what we're about to do with scrolling.
+            Comp.allowScrollSets = false;
+        }
         await func();
-        this.scrollTabsTopmostVisible(state);
+
+        if (doScrolling) {
+            this.scrollTabsTopmostVisible(state);
+            Comp.allowScrollSets = true;
+        }
     }
 
     toggleEditMode = async (state: AppState) => {

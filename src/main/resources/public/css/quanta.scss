@@ -389,15 +389,6 @@ a {
     border-radius: $border-radius;
 }
 
-.tabTitle {
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: 600;
-    vertical-align: middle;
-    color: lightGreen;
-    margin-bottom: 6px;
-}
-
 .logViewTitle {
     margin-bottom: 10px;
 }
@@ -985,11 +976,11 @@ Will come back later and study this more. todo-1 */
 }
 
 .tinyMarginTop {
-    margin: $tinyGap;
+    margin-top: $tinyGap;
 }
 
 .tinyMarginBottom {
-    margin: $tinyGap;
+    margin-bottom: $tinyGap;
 }
 
 .small-padding {
@@ -1443,7 +1434,7 @@ Will come back later and study this more. todo-1 */
 }
 
 .widthSizerPanel {
-    margin-top: 5px;
+    margin-top: 8px;
     display: inline-block;
     background: $body-bg;
 }
@@ -1645,9 +1636,17 @@ audio::-webkit-media-controls-play-button {
 
 .headingBar {
     margin-top: 12px;
-    margin-bottom: 4px;
-    padding-bottom: 4px;
-    border-bottom: 4px solid $secondary;
+    margin-bottom: 8px;
+    border-bottom: 6px solid $nodeBorderBottomColor;
+}
+
+.tabTitle {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    vertical-align: middle;
+    color: lightGreen;
+    margin-bottom: 6px;
 }
 
 .monospace {

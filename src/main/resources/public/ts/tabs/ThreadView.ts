@@ -33,7 +33,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         const children: CompIntf[] = [S.render.makeWidthSizerPanel()];
 
         children.push(new Div(null, null, [
-            new Div(null, { className: "marginBottom marginTop" }, [
+            new Div(null, { className: "headingBar" }, [
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
                     : "Chain of replies going back towards original post", { className: "float-end" }),

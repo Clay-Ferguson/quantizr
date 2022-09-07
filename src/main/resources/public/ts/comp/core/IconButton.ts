@@ -18,6 +18,13 @@ export class IconButton extends Comp {
     constructor(public iconClass: string = "", public text: string, attribs: Object = {}, specialClasses: string = "btn-secondary", private toggle: string = "", private imageUrl: string = null) {
         super(attribs);
         this.attribs.type = "button";
+        specialClasses = specialClasses || "";
+
+        // tolerate caller not providing a btn- class and add secondary as default.
+        if (specialClasses.indexOf("btn-") === -1) {
+            specialClasses = "btn-secondary " + specialClasses;
+        }
+
         this.attribs.className = "btn align-middle clickable " + specialClasses +
             (getAppState().mobileMode ? " mobileIconButton" : "");
         this.mergeState({ visible: true });

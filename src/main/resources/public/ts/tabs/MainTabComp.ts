@@ -43,13 +43,14 @@ export class MainTabComp extends AppTab {
         const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         this.setChildren([
-            new Div(g_brandingAppName, {
-                className: "tabTitle",
-                onClick: () => S.util.loadAnonPageHome(),
-                title: "Go to Portal Home Node"
-            }),
             widthSizerPanel,
-            widthSizerPanel ? new Clearfix() : null,
+            new Div(null, { className: "headingBar" }, [
+                new Div(g_brandingAppName, {
+                    className: "tabTitle",
+                    onClick: () => S.util.loadAnonPageHome(),
+                    title: "Go to Portal Home Node"
+                })
+            ]),
             new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: state.rendering ? "compHidden" : "compVisible"

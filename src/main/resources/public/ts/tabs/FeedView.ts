@@ -60,12 +60,12 @@ export class FeedView extends AppTab<FeedViewProps> {
         topChildren.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
 
-                new Div(null, { className: "marginBottom" }, [
+                new Div(null, { className: "headingBar" }, [
+                    this.renderHeading(state),
                     this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                         onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
-                        title: "Back to Node"
-                    }, "marginRight") : null,
-                    this.renderHeading(state)
+                        title: "Back to Tree View"
+                    }, "bigMarginLeft ") : null
                 ]),
 
                 new Div(null, null, [

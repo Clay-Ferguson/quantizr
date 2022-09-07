@@ -5,7 +5,6 @@ import { S } from "../../Singletons";
 import { Div } from "../core/Div";
 import { Icon } from "../core/Icon";
 import { NodeCompContent } from "./NodeCompContent";
-import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompParentNodes extends Div {
 
@@ -34,7 +33,7 @@ export class NodeCompParentNodes extends Div {
         const showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
 
         this.setChildren([
-            state.userPrefs.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,
+            // state.userPrefs.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,
             showCloseParentsIcon ? new Icon({
                 className: "fa fa-level-up fa-lg showParentsIcon float-end",
                 title: "Toggle: Show Parent on page",
