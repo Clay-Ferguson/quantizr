@@ -535,7 +535,7 @@ public class MongoUtil extends ServiceBase {
 	 * parent to verify the path IS indeed the correct parent.
 	 */
 	public void setParentNodes(MongoSession ms) {
-		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
+		// WARNING: use 'ops.stream' (findAll will be out of memory error on prod)
 		// log.debug("Processing setParentNodes");
 		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		// int counter = 0;
@@ -1062,6 +1062,8 @@ public class MongoUtil extends ServiceBase {
 
 		// make node public
 		acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+
+		publicHome.set(NodeProp.UNPUBLISHED, true);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 	}
