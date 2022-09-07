@@ -125,7 +125,7 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
-                    !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed on the Quanta Tree." }) : null,
+                    !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
                     // Not showing login on this panel in mobileMode, because it's shown at top of page instead
                     state.isAnonUser && !state.mobileMode ? new Div("Login / Signup", {

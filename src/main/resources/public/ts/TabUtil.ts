@@ -2,6 +2,7 @@ import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
+import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { DocumentTab } from "./tabs/data/DocumentTab";
@@ -121,6 +122,11 @@ export class TabUtil {
         if (!state.tabData) return null;
         const data = state.tabData.find(d => d.id === tabId);
         return data ? data.inst : null;
+    }
+
+    getAppTabData = (state: AppState, tabId: string): TabIntf => {
+        if (!state.tabData) return null;
+        return state.tabData.find(d => d.id === tabId);
     }
 
     tabScroll = (state: AppState, tabName: string, pos: number) => {

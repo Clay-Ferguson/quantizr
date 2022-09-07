@@ -143,7 +143,6 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
-    reply: boolean;
     fediSend: boolean;
     payloadType?: string;
 }
@@ -980,7 +979,6 @@ export const enum NodeProp {
     ACT_PUB_SENSITIVE = "ap:nsfw",
     ACT_PUB_TAG = "ap:tag",
     ENC_KEY = "sn:encKey",
-    REPLY = "reply",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

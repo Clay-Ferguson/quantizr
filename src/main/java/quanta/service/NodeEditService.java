@@ -183,10 +183,6 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
-		if (req.isReply()) {
-			newNode.set(NodeProp.REPLY, Boolean.TRUE);
-		}
-
 		update.save(ms, newNode);
 
 		/*

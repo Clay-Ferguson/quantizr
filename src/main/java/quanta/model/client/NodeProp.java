@@ -39,7 +39,6 @@ public enum NodeProp {
      * key to decrypt this key and gain access to the actual data.
      */
     ENC_KEY("sn:encKey", "s"), //
-    REPLY("reply", "s"), //
 
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by

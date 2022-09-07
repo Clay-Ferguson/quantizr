@@ -303,8 +303,7 @@ export class Props {
             J.NodeProp.IPFS_LINK, //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.TYPE_LOCK, //
-            J.NodeProp.UNPUBLISHED, //
-            J.NodeProp.REPLY
+            J.NodeProp.UNPUBLISHED
         ]);
 
         /* These props are the ones we don't create a TextField for during editing, becasue the editor will have

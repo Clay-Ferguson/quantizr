@@ -27,6 +27,7 @@ import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeMetaIntf;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeMetaInfoRequest;
@@ -295,7 +296,7 @@ public class NodeRenderService extends ServiceBase {
 
 		Criteria moreCriteria = null;
 		if (!showReplies) {
-			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.REPLY.s()).is(null);
+			moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
 		}
 
 		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria);

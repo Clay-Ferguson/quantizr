@@ -26,9 +26,6 @@ public class CreateSubNodeRequest extends RequestBase {
 	// for a DM this can be optionally provided to share the node with this person immeidately.
 	private String shareToUserId;
 
-	// this causes the node to get a reply=true property.
-	private boolean reply;
-
 	// send out over Fediverse only if this is true. Will generally be either something created by a
 	// "Post" button or a "Reply" button only
 	private boolean fediSend;
@@ -123,14 +120,6 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setBoostTarget(String boostTarget) {
 		this.boostTarget = boostTarget;
-	}
-
-	public boolean isReply() {
-		return reply;
-	}
-
-	public void setReply(boolean reply) {
-		this.reply = reply;
 	}
 
 	public boolean isFediSend() {

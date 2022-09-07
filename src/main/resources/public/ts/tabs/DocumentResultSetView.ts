@@ -90,7 +90,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("SetIncludeComments", s => {
-                            s.includeDocComments = checked;
+                            S.edit.setShowReplies(checked, getAppState());
                             return s;
                         });
 
@@ -98,7 +98,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                         this.pageChange(null);
                     },
                     getValue: (): boolean => {
-                        return getAppState().includeDocComments;
+                        return getAppState().userPrefs.showReplies;
                     }
                 }),
                 new Icon({

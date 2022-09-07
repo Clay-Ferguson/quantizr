@@ -187,10 +187,6 @@ export class NodeCompRowHeader extends Div {
         });
 
         if (showInfo && this.node.lastModified) {
-            const reply = S.props.getPropStr(J.NodeProp.REPLY, this.node);
-            if (reply) {
-                floatUpperRightDiv.addChild(new Span("Reply", { className: "reply-indicator", title: "This Post is a reply to it's parent Post" }));
-            }
             floatUpperRightDiv.addChild(new Span(S.util.formatDateTime(new Date(this.node.lastModified))));
         }
 

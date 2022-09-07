@@ -173,7 +173,7 @@ export class Edit {
         if (!node) return false;
         if (state.isAdminUser) return true;
 
-         // if no owner treat as if admin owns
+        // if no owner treat as if admin owns
         return state.userName === (node.owner || "admin");
     }
 
@@ -222,7 +222,6 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    reply: false,
                     fediSend: false
                 });
                 if (blob) {
@@ -257,7 +256,6 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    reply: false,
                     fediSend: false
                 });
                 this.createSubNodeResponse(res, false, null, null, state);
@@ -564,12 +562,42 @@ export class Edit {
         S.quanta.refresh(state);
     }
 
-    // without the await on saveUserPreferences the refresh will be done with WRONG userProfile SO...look for
-    // other places we need to have this await and perhaps don't.
+    // This updates userPref without affecting the GUI (no rerendering)
+    // todo-0: rename 'showReplies' varialbes+functions with 'showComments'
+    setShowReplies = async (showReplies: boolean, state: AppState) => {
+
+        // update render state
+        dispatch("setShowReplies", (s) => {
+            s.userPrefs.showReplies = showReplies;
+            return s;
+        });
+
+        // update our db
+        state.userPrefs.showReplies = showReplies;
+        S.util.saveUserPreferences(state, false);
+    }
+
     toggleShowReplies = async (state: AppState) => {
         state.userPrefs.showReplies = !state.userPrefs.showReplies;
         await S.util.saveUserPreferences(state, false);
-        S.quanta.refresh(state);
+
+        // todo-0: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
+        if (state.activeTab === C.TAB_MAIN) {
+            S.quanta.refresh(state);
+        }
+        if (state.activeTab === C.TAB_DOCUMENT) {
+            const data: TabIntf = S.tabUtil.getAppTabData(state, C.TAB_DOCUMENT);
+            if (data) {
+                S.srch.showDocument(data.props.node, false, getAppState());
+            }
+        }
+        else {
+            // update render state (using local state), this way if we're not refreshing the tree.
+            dispatch("setShowReplies", (s) => {
+                s.userPrefs.showReplies = state.userPrefs.showReplies;
+                return s;
+            });
+        }
     }
 
     moveNodeUp = async (evt: Event, id: string, state?: AppState) => {
@@ -577,14 +605,16 @@ export class Edit {
         state = getAppState(state);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
-            id = selNode.id;
+            id = selNode?.id;
         }
 
-        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-            nodeId: id,
-            targetName: "up"
-        });
-        this.setNodePositionResponse(res, id, state);
+        if (id) {
+            const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+                nodeId: id,
+                targetName: "up"
+            });
+            this.setNodePositionResponse(res, id, state);
+        }
     }
 
     moveNodeDown = async (evt: Event, id: string, state: AppState) => {
@@ -592,40 +622,48 @@ export class Edit {
         state = getAppState(state);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
-            id = selNode.id;
+            id = selNode?.id;
         }
 
-        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-            nodeId: id,
-            targetName: "down"
-        });
-        this.setNodePositionResponse(res, id, state);
+        if (id) {
+            const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+                nodeId: id,
+                targetName: "down"
+            });
+            this.setNodePositionResponse(res, id, state);
+        }
     }
 
     moveNodeToTop = async (id: string = null, state: AppState = null) => {
         state = getAppState(state);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
-            id = selNode.id;
+            id = selNode?.id;
         }
-        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-            nodeId: id,
-            targetName: "top"
-        });
-        this.setNodePositionResponse(res, id, state);
+
+        if (id) {
+            const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+                nodeId: id,
+                targetName: "top"
+            });
+            this.setNodePositionResponse(res, id, state);
+        }
     }
 
     moveNodeToBottom = async (id: string = null, state: AppState = null) => {
         state = getAppState(state);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
-            id = selNode.id;
+            id = selNode?.id;
         }
-        const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
-            nodeId: id,
-            targetName: "bottom"
-        });
-        this.setNodePositionResponse(res, id, state);
+
+        if (id) {
+            const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+                nodeId: id,
+                targetName: "bottom"
+            });
+            this.setNodePositionResponse(res, id, state);
+        }
     }
 
     getFirstChildNode = (state: AppState): any => {
@@ -1055,7 +1093,6 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             boostTarget: null,
-            reply: false,
             fediSend: false
         });
 
@@ -1135,7 +1172,6 @@ export class Edit {
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
             boostTarget: null,
-            reply: false,
             fediSend: false
         });
         this.createSubNodeResponse(res, true, null, null, state);
@@ -1185,7 +1221,6 @@ export class Edit {
             properties: null,
             shareToUserId,
             boostTarget,
-            reply,
             fediSend
         });
 
@@ -1212,7 +1247,6 @@ export class Edit {
             payloadType,
             shareToUserId: null,
             boostTarget: null,
-            reply: false,
             fediSend: false
         });
 
@@ -1237,7 +1271,6 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
             boostTarget: null,
-            reply: false,
             fediSend: false
         });
         this.createSubNodeResponse(res, false, null, null, state);
