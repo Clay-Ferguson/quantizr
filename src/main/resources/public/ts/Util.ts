@@ -82,6 +82,11 @@ export class Util {
         const parent: HTMLElement = document.getElementById(parentId);
         if (parent) {
             const containerRect = parent.getBoundingClientRect();
+
+            // This logic is making the assumption that getElementsByClassName() returns elements on top-down order
+            // so it can find the topmost one without verifying by position which is topmost, and I think browsers
+            // are required to implement the deterministic ordering in this way. (if not we would have to scan all elements
+            // here to find which one had the smallest 'top')
             const elements = document.getElementsByClassName(childrenClass);
             if (!elements) return;
             for (const e of elements) {
