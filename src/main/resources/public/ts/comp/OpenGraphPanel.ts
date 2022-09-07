@@ -163,23 +163,14 @@ export class OpenGraphPanel extends Div {
                 ]);
             }
             else {
-                let imgParent: Div;
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new HorizontalLayout([
-                    imgParent = new Div(null, { className: "openGraphLhs" }, [
+                    !S.quanta.brokenImages.has(state.og.image) ? new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
                             className: this.imageClass,
-                            src: state.og.image,
-
-                            // NOTE: this onError needs to remove the PARENT div of the image so that it won't leave
-                            // an ugly gap on the page, and will instead look like the content never had an image there.
-                            onError: () => {
-                                // WARNING: we must delay the evaluation of 'imgParent' until the ACUTUAL onError,
-                                // so keep INSIDE function braces.
-                                imgParent.onMount(elm => { elm.style.display = "none"; });
-                            }
+                            src: state.og.image
                         })
-                    ]),
+                    ]) : null,
                     new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
