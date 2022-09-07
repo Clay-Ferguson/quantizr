@@ -32,6 +32,7 @@ export class NodeCompRowHeader extends Div {
         const children = [];
         let avatarImg: Img = null;
 
+        const isMine = S.props.isMine(this.node, state);
         const showInfo = state.userPrefs.showMetaData || this.isFeed;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
@@ -55,7 +56,7 @@ export class NodeCompRowHeader extends Div {
             displayName = displayName || this.node.owner;
 
             children.push(new Span(displayName, {
-                className: (this.node.owner === state.userName) ? "created-by-me" : "created-by-other",
+                className: isMine ? "created-by-me" : "created-by-other",
                 title: "Show Profile:\n\n" + this.node.owner,
                 onClick: () => {
                     new UserProfileDlg(this.node.ownerId).open();
@@ -110,11 +111,11 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        const publicReadOnly = S.props.isPublicReadOnly(this.node);
+        const publicWritable = S.props.isPublicWritable(this.node);
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        if (showInfo && (!publicReadOnly || actPubId)) {
+        if (showInfo && (publicWritable || isMine || actPubId)) {
             verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
