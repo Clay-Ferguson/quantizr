@@ -18,7 +18,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
 
-    constructor(private state: AppState, public tabData: TabIntf<any>) {
+    constructor(state: AppState, public tabData: TabIntf<any>) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling

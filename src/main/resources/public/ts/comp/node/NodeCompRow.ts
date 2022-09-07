@@ -10,6 +10,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Icon } from "../core/Icon";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
@@ -112,7 +113,7 @@ export class NodeCompRow extends Div {
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
-        layoutClass += " "+this.tabData.id
+        layoutClass += " " + this.tabData.id
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
@@ -171,8 +172,21 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node, true, state);
         }
 
+        // This icon for editing a node shows up if user has edit mode and info mode both off, and they own the node. This just makes
+        // it easier to do a quick edit of a node without the need to turn edit mode on which clutters up the screen.
+        let quickEditIcon: Icon = null;
+        if (!this.isTableCell && !state.userPrefs.editMode && !state.userPrefs.showMetaData && S.props.isMine(this.node, state)) {
+            quickEditIcon = new Icon({
+                className: "fa fa-edit float-end quickEditIcon",
+                title: "Edit this Node",
+                nid: this.node.id,
+                onClick: S.edit.runEditNodeByClick
+            });
+        }
+
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
+            quickEditIcon,
             header,
             buttonBar,
             buttonBar ? new Clearfix() : null,

@@ -78,13 +78,12 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        /* for admin user shwo id, ordinal, and type right on the row. We have a bug where
-        the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
-        if (state.isAdminUser) {
-            // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
-            const ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
-            verboseChildren.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
-        }
+        /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
+        // if (state.isAdminUser) {
+        //     // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
+        //     const ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
+        //     verboseChildren.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
+        // }
 
         if (showInfo) {
             verboseChildren.push(new Icon({

@@ -294,6 +294,12 @@ export class NodeCompButtonBar extends Div {
         }
 
         this.setChildren([selCheckbox, encIcon, sharedIcon, buttonBar]);
+
+        // this is a workaround for when this component renders empty and consumes space, but we might need to just
+        // do this in the base class Comp for ALL components, or have a hidden-if-no-children flag
+        if (!this.hasChildren()) {
+            delete this.attribs.className;
+        }
     }
 
     makeDropTarget = (attribs: any, id: string) => {
