@@ -86,11 +86,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        let countDisplay = "";
-        if (this.infiniteScrolling && this.data.props.endReached && this.data.props.results?.length > 0) {
-            countDisplay = " (" + this.data.props.results?.length + ")"
-        }
-        return new Div(this.data.name + countDisplay, { className: "tabTitle" });
+        return new Div(this.data.name, { className: "tabTitle" });
     }
 
     /* overridable (don't use arrow function) */

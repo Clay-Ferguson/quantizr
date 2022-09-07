@@ -45,7 +45,7 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
 
-$createdByMeBackgroundColor: green;
+$createdByMeBackgroundColor: var(--bs-green);
 $createdByMeTextColor: white;
 
 $createdByAnotherBackgroundColor: $gray-700;
@@ -340,14 +340,14 @@ a {
     margin-left: 10px;
     margin-right: 15px;
     vertical-align: middle;
-    color: lightGreen;
+    color: var(--bs-green);
 }
 
 .logo-text-small {
     cursor: pointer;
     padding: 0px 4px 0px 4px;
-    color: lightGreen;
-    border: 2px solid lightGreen;
+    color: var(--bs-green); 
+    border: 2px solid var(--bs-green);
     border-radius: 12px;
 }
 
@@ -1018,6 +1018,17 @@ Will come back later and study this more. todo-1 */
     // max-height: 60em;
 }
 
+.markdown-codespan {
+    color: var(--bs-green);
+    word-wrap: break-word; 
+    // font-family: var(--bs-font-monospace)
+    // font-weight: bold;
+    
+    // I saw these in browser elements view but not sure if we need them.
+    // direction: ltr /* rtl:ignore */;
+    // unicode-bidi: bidi-override;
+}
+
 .pre-textarea {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
@@ -1513,7 +1524,7 @@ Will come back later and study this more. todo-1 */
 
 .iconToggleOn {
     @extend .iconToggle;
-    border: 3px solid lightGreen;
+    border: 3px solid var(--bs-green);
     padding: 1px;
 }
 
@@ -1643,9 +1654,9 @@ audio::-webkit-media-controls-play-button {
 .tabTitle {
     display: inline-block;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: bold;
     vertical-align: middle;
-    color: lightGreen;
+    color: var(--bs-green);
     margin-bottom: 6px;
 }
 
@@ -1735,14 +1746,6 @@ audio::-webkit-media-controls-play-button {
 .displayCell {
     display: table-cell;
     vertical-align: top;
-}
-
-.widthAdjustLink {
-    margin-right: 10px;
-    margin-bottom: 10px;
-    padding: 5px;
-    border: 1px solid green;
-    cursor: pointer;
 }
 
 .clickable {

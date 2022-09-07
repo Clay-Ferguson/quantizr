@@ -113,6 +113,7 @@ export class Render {
 
     /**
      * See: https://github.com/highlightjs/highlight.js
+     *      https://marked.js.org/using_pro#renderer
      */
     initMarkdown = () => {
         if (this.markedRenderer) return;
@@ -121,18 +122,9 @@ export class Render {
         }
         this.markedRenderer = new marked.Renderer();
 
-        // This code is discovered to have been dead, for a long time. Look into it.
-        // this.markedRenderer.code = (code, language) => {
-        //     // Check whether the given language is valid for highlight.js.
-        //     const validLang = !!(language && highlightjs.getLanguage(language));
-
-        //     // Highlight only if the language is valid.
-        //     const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
-
-        //     // Render the highlighted code with `hljs` class.
-        //     // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
-        //     return highlighted;
-        // };
+        this.markedRenderer.codespan = (code: string) => {
+            return `<span class='markdown-codespan'>${code}</span>`;
+        }
 
         // From Stack Overflow
         // https://github.com/markedjs/marked/issues/882

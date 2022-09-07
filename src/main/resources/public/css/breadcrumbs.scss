@@ -1,5 +1,5 @@
 .breadcrumbPanel {
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    // border-bottom: 2px solid $nodeBorderBottomColor;
     padding-bottom: 4px;
 }
 
@@ -15,6 +15,6 @@
 }
 
 .breadcrumbItem:hover {
-    border: 3px solid green;
+    border: 3px solid var(--bs-green);
     border-radius: $border-radius;
 }
