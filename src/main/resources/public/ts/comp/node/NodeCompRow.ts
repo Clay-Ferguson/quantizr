@@ -111,7 +111,7 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row");
+        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
         layoutClass += " "+this.tabData.id
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);

@@ -550,8 +550,8 @@ export class Edit {
             }
             setTimeout(async () => {
                 await TabPanel.inst.setVisibility(true);
-            }, 300);
-        }, 300);
+            }, 250);
+        }, 250);
     }
 
     // WARNING: This func is expected to NOT alter that the active tab is!
@@ -570,22 +570,25 @@ export class Edit {
         }
     }
 
-    toggleEditMode = async (state: AppState) => {
+    // We allow a function (func) to run here in such a way that the scroll positions of every tab panel are very
+    // intelligently maintained so the user doesn't loose their place after the screen completely updates.
+    setUserPreferenceVal = (state: AppState, func: (s: AppState) => void) => {
         this.runScrollAffectingOp(state, async () => {
-            state.userPrefs.editMode = !state.userPrefs.editMode;
-            await S.util.saveUserPreferences(state);
-            /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-            // S.view.scrollToNode(state);
+            // we force this to go thru immediately, but the saveUserPerference is call is async and we don't wait.
+            await promiseDispatch("modUserPref", (s) => {
+                func(s);
+                S.util.saveUserPreferences(s);
+                return s;
+            });
         });
     }
 
+    toggleEditMode = async (state: AppState) => {
+        this.setUserPreferenceVal(state, (s: AppState) => { s.userPrefs.editMode = !s.userPrefs.editMode; });
+    }
+
     toggleShowMetaData = (state: AppState) => {
-        this.runScrollAffectingOp(state, async () => {
-            state.userPrefs.showMetaData = !state.userPrefs.showMetaData;
-            await S.util.saveUserPreferences(state);
-            /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-            // S.view.scrollToNode(state);
-        });
+        this.setUserPreferenceVal(state, (s: AppState) => { s.userPrefs.showMetaData = !s.userPrefs.showMetaData; });
     }
 
     toggleNsfw = async (state: AppState) => {

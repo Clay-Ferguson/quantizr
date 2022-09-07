@@ -109,7 +109,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let insertButton: Button = null;
                 // todo-1: this button should have same enablement as "new" button, on the page root
                 // Note: this is the very last "+" button at the bottom, to insert below last child
-                comps.push(new Div(null, { className: (state.userPrefs.editMode ? "node-table-row-compact" : "node-table-row") }, [
+                comps.push(new Div(null, { className: (state.userPrefs.editMode ? "node-table-row-edit" : "node-table-row") }, [
                     insertButton = new Button(null, () => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);

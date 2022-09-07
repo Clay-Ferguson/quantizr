@@ -153,15 +153,9 @@ export class View {
 
             // if this is an "infinite scroll" call to load in additional nodes
             if (growingPage) {
-
-                // todo-0: need to re-test how MAX_DYNAMIC_ROWS is used to reset, and only in that case would we
-                // need to scrollToTop
-                // let scrollToTop = true;
-                const scrollToTop = false;
-
                 /* if the response has some children, and we already have local children we can add to, and we haven't reached
                 max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
-                if (res?.node?.children && state?.node?.children && state.node.children.length < C.MAX_DYNAMIC_ROWS) {
+                if (res?.node?.children && state?.node?.children) {
                     // create a set for duplicate detection
                     const idSet: Set<string> = new Set<string>();
 
@@ -172,18 +166,13 @@ export class View {
 
                     // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
                     res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
-                    // scrollToTop = false;
                 }
-
-                if (C.DEBUG_SCROLLING) {
-                    console.log("loadPage -> renderPage (scrollTop=" + scrollToTop + ")");
-                }
-                S.render.renderPage(res, scrollToTop, null, false, scrollToTop);
+                S.render.renderPage(res, false, null, false, false);
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {
                 if (C.DEBUG_SCROLLING) {
-                    console.log("loadPage(3) -> renderPage (scrollTop=true)");
+                    console.log("loadPage -> renderPage (scrollTop=true)");
                 }
                 S.render.renderPage(res, true, null, true, true);
             }
