@@ -188,6 +188,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 }
             });
 
+            // finally here's where we render the feed items
             this.data.props.feedResults.forEach((node: J.NodeInfo) => {
                 // if this node will be showing up as a boost don't display it on the page, skip it.
                 if (boosts.has(node.id)) {

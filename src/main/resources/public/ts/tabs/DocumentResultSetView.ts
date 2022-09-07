@@ -33,8 +33,8 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         // make this paragraph spacing a user preference...some day.
         // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
         // it's essentially to support DOM finding.
-        const itemClass = (allowHeader ? "userFeedItem" : "marginBottom") + " " + this.data.id;
-        const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom") + " " + this.data.id;
+        const itemClass = (allowHeader ? "userFeedItem" : "marginBottom");
+        const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom");
 
         const rootSlashesMatch = this.data.props.node.path.match(/\//g);
         const nodeSlashesMatch = node.path.match(/\//g);

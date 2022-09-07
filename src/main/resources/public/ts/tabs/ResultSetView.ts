@@ -95,8 +95,8 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         const allowHeader = this.allowHeader && (state.userPrefs.showMetaData || state.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true,
-            jumpButton, allowHeader, this.allowFooter, true, "userFeedItem " + this.data.id,
-            "userFeedItemHighlight " + this.data.id, null, state);
+            jumpButton, allowHeader, this.allowFooter, true, "userFeedItem",
+            "userFeedItemHighlight", null, state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {

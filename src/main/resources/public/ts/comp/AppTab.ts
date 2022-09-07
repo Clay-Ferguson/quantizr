@@ -2,6 +2,9 @@ import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 
+/* NOTE: All classes derived from AppTab should have each top-level (in the vertical dimension) item having
+a class 'data.id' tacked on to it. This class is expected to be there for managing scrolling, and also the
+IDs on each of those elements needs to be repeatable across all renders. */
 export class AppTab<T = any> extends Div {
     constructor(public data: TabIntf<T>, private extraEditModeClass: string = null) {
         super(null, {
