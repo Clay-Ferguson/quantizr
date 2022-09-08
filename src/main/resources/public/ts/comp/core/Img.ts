@@ -15,7 +15,7 @@ export class Img extends Comp {
         }
 
         this.attribs.onError = () => {
-            S.quanta.brokenImages.set(this.attribs.src, "");
+            S.quanta.brokenImages.add(this.attribs.src);
             this.onMount(elm => { elm.style.display = "none"; });
         };
 
