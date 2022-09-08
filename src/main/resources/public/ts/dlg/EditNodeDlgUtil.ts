@@ -9,7 +9,6 @@ import { EditNodeDlg } from "./EditNodeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
-import { FriendsDlg, LS as FriendsDlgLS } from "./FriendsDlg";
 import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -439,23 +438,6 @@ an upload has been added or removed. */
 
     insertTime = (dlg: EditNodeDlg) => {
         dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDateTime(new Date()) + "]");
-    }
-
-    insertMention = async (dlg: EditNodeDlg) => {
-        if (!dlg.contentEditor) return;
-
-        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
-        // loose the cursor position.
-        const selStart = dlg.contentEditor.getSelStart();
-        const friendDlg: FriendsDlg = new FriendsDlg(null, true);
-        await friendDlg.open();
-        // todo-0: the way this FriendsDlgLS works is how all dialogs should share out their state class
-        if (friendDlg.getState<FriendsDlgLS>().selections?.size > 0) {
-            let names: string = "";
-            friendDlg.getState<FriendsDlgLS>().selections.forEach(n => { names += " @" + n; });
-            names += " ";
-            dlg.contentEditor.insertTextAtCursor(names, selStart);
-        }
     }
 
     insertEmoji = async (dlg: EditNodeDlg) => {

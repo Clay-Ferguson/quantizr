@@ -46,7 +46,7 @@ export class FriendsTableRow extends ListBoxRow {
             new Div(null, null, [
                 new Checkbox(null, { className: "marginLeft" }, {
                     setValue: (checked: boolean) => {
-                        // todo-0: add typesafety here
+                        // todo-1: add typesafety here (would need FriendsDlg LS to be in separate interfaces, to avoid circular ref)
                         const state: any = this.dlg.getState();
                         if (checked) {
                             state.selections.add(this.friend.userName);

@@ -40,7 +40,7 @@ export class EditNodeDlg extends DialogBase {
     static autoSaveTimer: any = null;
     static currentInst: EditNodeDlg = null;
     static pendingUploadFile: File = null;
-    utl: EditNodeDlgUtil = new EditNodeDlgUtil();
+    public utl: EditNodeDlgUtil = new EditNodeDlgUtil();
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
@@ -850,12 +850,6 @@ export class EditNodeDlg extends DialogBase {
             }),
 
             new Icon({
-                className: "fa fa-lg fa-user editorIcon",
-                title: "Insert username/mention at cursor",
-                onClick: () => this.utl.insertMention(this)
-            }),
-
-            new Icon({
                 className: "fa fa-lg fa-smile-o editorIcon",
                 title: "Insert emoji at cursor",
                 onClick: () => this.utl.insertEmoji(this)
@@ -864,5 +858,33 @@ export class EditNodeDlg extends DialogBase {
         editItems.push(this.contentEditor as any as Comp);
 
         return new Div(null, null, editItems);
+    }
+
+    addSharingToContentText = () => {
+        const appState = getAppState();
+        if (appState.editNode.ac?.length > 0) {
+            let content: string = this.contentEditorState.getValue();
+            let newLine = false;
+            let accum = 0;
+            for (const ac of appState.editNode.ac) {
+                if (ac.principalName !== J.PrincipalName.PUBLIC) {
+                    const insertName = "@" + ac.principalName;
+                    if (content.indexOf(insertName) === -1) {
+                        if (!newLine) {
+                            content += "\n";
+                            newLine = true;
+                        }
+                        content += insertName + " ";
+
+                        // new line afer every 7 names.
+                        if (++accum >= 7) {
+                            content += "\n";
+                            accum = 0;
+                        }
+                    }
+                }
+            }
+            this.contentEditorState.setValue(content.trim());
+        }
     }
 }

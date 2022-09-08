@@ -3,12 +3,12 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { TextField } from "../comp/core/TextField";
 import { FriendsTable } from "../comp/FriendsTable";
 import { DialogBase } from "../DialogBase";
-import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { ShareToPersonDlg } from "./ShareToPersonDlg";
+import { Validator } from "../Validator";
 
 export interface LS { // Local State
     selections?: Set<string>;
@@ -17,9 +17,9 @@ export interface LS { // Local State
 }
 
 export class FriendsDlg extends DialogBase {
-    selectionValueIntf: ValueIntf;
+    userNameState: Validator = new Validator("");
 
-    constructor(private node: J.NodeInfo, private instantSelect: boolean) {
+    constructor() {
         super("Friends", "app-modal-content-medium-width");
 
         this.mergeState<LS>({
@@ -50,12 +50,9 @@ export class FriendsDlg extends DialogBase {
             new Div(null, null, [
                 message ? new Div(message)
                     : new FriendsTable(state.friends, this),
+                new TextField({ label: "User Names (comma separated)", val: this.userNameState }),
                 new ButtonBar([
                     new Button("Ok", this.save, null, "btn-primary"),
-                    this.node ? new Button("Enter Username", this.shareToPersonDlg) : null,
-                    (state.friends && !this.instantSelect) ? new Button("Choose", () => {
-                        this.close();
-                    }, null, "btn-primary") : null,
                     new Button("Cancel", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
@@ -71,15 +68,15 @@ export class FriendsDlg extends DialogBase {
     }
 
     save = () => {
-        this.close();
-    }
-
-    shareToPersonDlg = async () => {
-        const dlg = new ShareToPersonDlg(this.node, null);
-        await dlg.open();
-
-        if (dlg.userNameState.getValue()) {
-            this.selectionValueIntf.setValue(dlg.userNameState.getValue());
+        const usersText = this.userNameState.getValue();
+        if (usersText) {
+            const users: string[] = usersText.split(",");
+            const state = this.getState();
+            for (const user of users) {
+                state.selections.add(user);
+            }
+            this.mergeState<LS>(state);
         }
+        this.close();
     }
 }
