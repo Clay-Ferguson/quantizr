@@ -705,7 +705,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/savePublicKey", method = RequestMethod.POST)
 	public @ResponseBody Object savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("addPrivilege", req, session, ms -> {
+		return callProc.run("savePublicKey", req, session, ms -> {
 			return user.savePublicKey(req);
 		});
 	}

@@ -94,6 +94,8 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
+
+    // todo-0: somewhere recently I used a "HashMap" when I really wanted a Set, look for that...I think it was dead images onError
     expandedHeaderIds: Set<string> = new Set<string>();
 
     highlightSearchNodeId: string;

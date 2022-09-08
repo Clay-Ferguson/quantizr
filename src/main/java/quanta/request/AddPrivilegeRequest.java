@@ -11,7 +11,7 @@ public class AddPrivilegeRequest extends RequestBase {
 	/* for now only 'public' is the only option we support */
 	private List<String> privileges;
 
-	private String principal;
+	private String[] principals;
 
 	public String getNodeId() {
 		return nodeId;
@@ -21,12 +21,12 @@ public class AddPrivilegeRequest extends RequestBase {
 		this.nodeId = nodeId;
 	}
 
-	public String getPrincipal() {
-		return principal;
+	public String[] getPrincipals() {
+		return principals;
 	}
 
-	public void setPrincipal(String principal) {
-		this.principal = principal;
+	public void setPrincipals(String[] principals) {
+		this.principals = principals;
 	}
 
 	public List<String> getPrivileges() {

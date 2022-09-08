@@ -121,11 +121,17 @@ public class AclService extends ServiceBase {
 		AddPrivilegeResponse res = new AddPrivilegeResponse();
 
 		String nodeId = req.getNodeId();
-		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
+		boolean success = true;
 
-		boolean success = addPrivilege(ms, null, node, req.getPrincipal(), req.getPrivileges(), res);
+		// todo-0: instead of looping here we should make addPrivileges accept the array of users.
+		for (String principal : req.getPrincipals()) {
+			principal = XString.stripIfStartsWith(principal, "@");
+			if (!addPrivilege(ms, null, node, principal, req.getPrivileges(), res)) {
+				success = false;
+			}
+		}
 		res.setSuccess(success);
 		return res;
 	}

@@ -9,7 +9,7 @@ import { EditNodeDlg } from "./EditNodeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
-import { FriendsDlg } from "./FriendsDlg";
+import { FriendsDlg, LS as FriendsDlgLS } from "./FriendsDlg";
 import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -449,8 +449,12 @@ an upload has been added or removed. */
         const selStart = dlg.contentEditor.getSelStart();
         const friendDlg: FriendsDlg = new FriendsDlg(null, true);
         await friendDlg.open();
-        if (friendDlg.getState().selectedName) {
-            dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ", selStart);
+        // todo-0: the way this FriendsDlgLS works is how all dialogs should share out their state class
+        if (friendDlg.getState<FriendsDlgLS>().selections?.size > 0) {
+            let names: string = "";
+            friendDlg.getState<FriendsDlgLS>().selections.forEach(n => { names += " @" + n; });
+            names += " ";
+            dlg.contentEditor.insertTextAtCursor(names, selStart);
         }
     }
 

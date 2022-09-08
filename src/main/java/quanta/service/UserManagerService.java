@@ -1195,12 +1195,10 @@ public class UserManagerService extends ServiceBase {
 
 	public GetFriendsResponse getFriends(MongoSession ms) {
 		GetFriendsResponse res = new GetFriendsResponse();
-
 		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 
 		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();
-
 			for (SubNode friendNode : friendNodes) {
 				String userName = friendNode.getStr(NodeProp.USER);
 				if (ok(userName)) {

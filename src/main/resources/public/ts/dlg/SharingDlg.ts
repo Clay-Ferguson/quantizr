@@ -10,7 +10,7 @@ import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { FriendsDlg } from "./FriendsDlg";
+import { FriendsDlg, LS as FriendsDlgLS } from "./FriendsDlg";
 
 interface LS { // Local State
     recursive?: boolean;
@@ -64,12 +64,14 @@ export class SharingDlg extends DialogBase {
                     getValue: (): boolean => state.recursive
                 }),
                 new ButtonBar([
-                    new Button("Add Person", async () => {
+                    new Button("Add People", async () => {
                         const friendsDlg: FriendsDlg = new FriendsDlg(appState.editNode, true);
                         await friendsDlg.open();
-                        if (friendsDlg.getState().selectedName) {
+                        if (friendsDlg.getState<FriendsDlgLS>().selections?.size > 0) {
                             this.dirty = true;
-                            this.shareImmediate(friendsDlg.getState().selectedName);
+                            const names: string[] = [];
+                            friendsDlg.getState<FriendsDlgLS>().selections.forEach(n => names.push(n));
+                            this.shareImmediate(names);
                         }
                     }, null, "btn-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false), null, "btn-secondary"),
@@ -82,11 +84,11 @@ export class SharingDlg extends DialogBase {
         ];
     }
 
-    shareImmediate = async (userName: string) => {
+    shareImmediate = async (names: string[]) => {
         const appState = getAppState();
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: appState.editNode.id,
-            principal: userName,
+            principals: names,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
         this.reload();
@@ -174,7 +176,7 @@ export class SharingDlg extends DialogBase {
          */
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: appState.editNode.id,
-            principal: "public",
+            principals: ["public"],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 

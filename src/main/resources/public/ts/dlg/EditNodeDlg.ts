@@ -419,7 +419,7 @@ export class EditNodeDlg extends DialogBase {
 
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: appState.editNode.id,
-            principal: "public",
+            principals: ["public"],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 

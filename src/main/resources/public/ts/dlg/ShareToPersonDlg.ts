@@ -10,6 +10,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
 
+// todo-1: we really should have just put this edit field directly onto the FriendsDlg
 export class ShareToPersonDlg extends DialogBase {
 
     userNameState: Validator = new Validator("", [
@@ -60,7 +61,7 @@ export class ShareToPersonDlg extends DialogBase {
     shareImmediate = async (userName: string) => {
         const res = await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
-            principal: userName,
+            principals: [userName],
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
         this.reload(res);

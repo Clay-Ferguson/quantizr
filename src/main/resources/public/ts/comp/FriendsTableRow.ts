@@ -4,12 +4,14 @@ import { Span } from "../comp/core/Span";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
+import { CompIntf } from "./base/CompIntf";
+import { Checkbox } from "./core/Checkbox";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class FriendsTableRow extends ListBoxRow {
 
-    constructor(public friend: FriendInfo, onClickFunc: Function, public isSelected: boolean) {
-        super(null, onClickFunc);
+    constructor(public friend: FriendInfo, private dlg: CompIntf) {
+        super(null, null, null);
     }
 
     preRender(): void {
@@ -41,9 +43,21 @@ export class FriendsTableRow extends ListBoxRow {
             : ("@" + this.friend.userName);
 
         this.setChildren([
-            new Div(null, {
-                className: (this.isSelected ? " selectedListItem" : " unselectedListItem")
-            }, [
+            new Div(null, null, [
+                new Checkbox(null, { className: "marginLeft" }, {
+                    setValue: (checked: boolean) => {
+                        // todo-0: add typesafety here
+                        const state: any = this.dlg.getState();
+                        if (checked) {
+                            state.selections.add(this.friend.userName);
+                        }
+                        else {
+                            state.selections.delete(this.friend.userName);
+                        }
+                        this.dlg.mergeState(state);
+                    },
+                    getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
+                }),
                 img,
                 new Span(friendDisplay, { className: "friendListText" })
             ])

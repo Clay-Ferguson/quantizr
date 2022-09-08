@@ -102,7 +102,7 @@ export interface AddFriendRequest extends RequestBase {
 export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
-    principal: string;
+    principals: string[];
 }
 
 export interface AppDropRequest extends RequestBase {

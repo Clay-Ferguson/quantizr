@@ -10,33 +10,20 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
-interface LS { // Local State
-    selectedName?: string;
+export interface LS { // Local State
+    selections?: Set<string>;
     loading?: boolean;
     friends?: J.FriendInfo[];
 }
 
 export class FriendsDlg extends DialogBase {
-
     selectionValueIntf: ValueIntf;
 
     constructor(private node: J.NodeInfo, private instantSelect: boolean) {
         super("Friends", "app-modal-content-medium-width");
 
-        this.selectionValueIntf = {
-            setValue: (val: string) => {
-                this.mergeState<LS>({ selectedName: val });
-                if (this.instantSelect) {
-                    // this timeout IS required for correct state management, but is also ideal
-                    // so user has a chance to see their selection get highlighted.
-                    setTimeout(
-                        this.close, 500);
-                }
-            },
-            getValue: (): string => this.getState<LS>().selectedName
-        };
-
         this.mergeState<LS>({
+            selections: new Set<string>(),
             loading: true
         });
 
@@ -62,17 +49,29 @@ export class FriendsDlg extends DialogBase {
         return [
             new Div(null, null, [
                 message ? new Div(message)
-                    : new FriendsTable(state.friends, this.selectionValueIntf),
+                    : new FriendsTable(state.friends, this),
                 new ButtonBar([
-                    this.node ? new Button("Add by User Name", this.shareToPersonDlg, null, "btn-primary") : null,
+                    new Button("Ok", this.save, null, "btn-primary"),
+                    this.node ? new Button("Enter Username", this.shareToPersonDlg) : null,
                     (state.friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Cancel", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
+    }
+
+    cancel = () => {
+        this.mergeState<LS>({
+            selections: new Set<string>()
+        });
+        this.close();
+    }
+
+    save = () => {
+        this.close();
     }
 
     shareToPersonDlg = async () => {

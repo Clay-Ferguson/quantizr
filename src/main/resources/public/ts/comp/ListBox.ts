@@ -3,7 +3,7 @@ import { ValueIntf } from "../Interfaces";
 
 export class ListBox extends Div {
 
-    constructor(public valueIntf: ValueIntf) {
+    constructor(public valueIntf: ValueIntf = null) {
         super(null);
         this.setClass("list-group marginBottom");
 
