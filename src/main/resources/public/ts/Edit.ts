@@ -563,8 +563,7 @@ export class Edit {
     }
 
     // This updates userPref without affecting the GUI (no rerendering)
-    // todo-0: rename 'showReplies' varialbes+functions with 'showComments'
-    setShowReplies = async (showReplies: boolean, state: AppState) => {
+    setShowComments = async (showReplies: boolean, state: AppState) => {
 
         // update render state
         dispatch("setShowReplies", (s) => {

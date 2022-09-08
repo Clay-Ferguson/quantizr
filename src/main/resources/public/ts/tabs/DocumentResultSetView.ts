@@ -90,7 +90,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("SetIncludeComments", s => {
-                            S.edit.setShowReplies(checked, getAppState());
+                            S.edit.setShowComments(checked, getAppState());
                             return s;
                         });
 
