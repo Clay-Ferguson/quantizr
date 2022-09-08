@@ -81,7 +81,17 @@ export class NodeCompMainNode extends Div {
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
             const typeHandler = S.plugin.getTypeHandler(node.type);
-            if (state.userPrefs.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())) {
+
+            let allowHeader: boolean = false;
+            // special case, if node is owned by admin and we're not admin, never show header
+            if (node.owner===J.PrincipalName.ADMIN && state.userName!==J.PrincipalName.ADMIN) {
+                // leave allowHeader false
+            }
+            else {
+                allowHeader = state.userPrefs.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())
+            }
+
+            if (allowHeader) {
                 header = new NodeCompRowHeader(node, true, true, false, false, true, false);
             }
             else {

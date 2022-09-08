@@ -573,6 +573,11 @@ export class Search {
             attrs.style = extraStyle;
         }
 
+        // special case, if node is owned by admin and we're not admin, never show header
+        if (node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+            allowHeader = false;
+        }
+
         const itemDiv = new Div(null, attrs, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false) : null,
             content,

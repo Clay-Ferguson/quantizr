@@ -154,7 +154,17 @@ export class NodeCompRow extends Div {
 
         let header: NodeCompRowHeader = null;
         let jumpButton: CompIntf = null;
-        if (this.allowHeaders && state.userPrefs.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())) {
+
+        let allowHeader: boolean = false;
+        // special case, if node is owned by admin and we're not admin, never show header
+        if (this.node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+            // leave allowHeader false.
+        }
+        else {
+            allowHeader = this.allowHeaders && state.userPrefs.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())
+        }
+
+        if (allowHeader) {
             header = new NodeCompRowHeader(this.node, true, true, false, false, true, false);
         }
         else {
