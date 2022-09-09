@@ -23,5 +23,5 @@ public abstract class TypeBase extends ServiceBase {
 
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {}
 
-    public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
+    public void preCreateNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
 }

@@ -75,7 +75,7 @@ public class APObj extends HashMap<String, Object> {
         return ok(type) ? type.trim() : null;
     }
 
-    // todo-0: potentially this should ONLY be in APOActivity
+    // todo-1: potentially this should ONLY be in APOActivity
     public String getActor() {
         return apStr(this, APObj.actor);
     }

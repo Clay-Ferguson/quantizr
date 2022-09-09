@@ -17,7 +17,7 @@ public class BookmarkType extends TypeBase {
         return NodeType.BOOKMARK.s();
     }
 
-    public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
+    public void preCreateNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         // Note: if 'linkBookmark' is true then 'node' will be null here, and that's ok.
         SubNode nodeToBookmark = null;
         if (ok(node)) {

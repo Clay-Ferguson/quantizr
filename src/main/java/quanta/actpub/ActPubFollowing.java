@@ -339,7 +339,7 @@ public class ActPubFollowing extends ServiceBase {
      * 
      * Returns a list of all the 'actor urls' for all the users that 'userName' is following.
      * 
-     * todo-0: do paging. Implement minId.
+     * todo-1: do paging. Implement minId.
      */
     public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId,
             boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {

@@ -132,7 +132,7 @@ public class ActPubOutbox extends ServiceBase {
                             // // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                             // // }
                             // }
-                            // // todo-0: need to handle "Boosts" and other types here too.
+                            // // todo-1: need to handle "Boosts" and other types here too.
                             // else
                             if (APType.Note.equals(type)) {
                                 try {
@@ -312,7 +312,7 @@ public class ActPubOutbox extends ServiceBase {
                 int MAX_PER_PAGE = 25;
                 boolean collecting = false;
 
-                // todo-0: is this just unfinished code or a bug? Either way this paging is broken.
+                // todo-1: is this just unfinished code or a bug? Either way this paging is broken.
                 if (no(minId)) {
                     collecting = true;
                 }

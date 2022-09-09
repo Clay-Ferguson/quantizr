@@ -58,7 +58,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private ActPubCache apCache;
 
 	@Autowired
-	public static AclService acl;
+	private AclService acl;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -303,7 +303,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// Must have write privileges to this node.
 			auth.ownerAuth(node);
 
-			// only if this is creating a new node do we need to chech that the parent will allow it
+			// only if this is creating a new node do we need to check that the parent will allow it
 			if (isNew) {
 				SubNode parent = read.getParent(ms, node);
 				if (no(parent))
@@ -311,6 +311,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 				auth.authForChildNodeCreate(ms, parent);
 
+				if (no(acl)) {
+					throw new RuntimeException("acl autowiring failed.");
+				}
 				if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
 					throw new NodeAuthFailedException();
 				}

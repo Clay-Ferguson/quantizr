@@ -112,7 +112,7 @@ public class NodeEditService extends ServiceBase {
 		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
 		if (ok(plugin)) {
 			Val<SubNode> vcNode = new Val<>(parentNode);
-			plugin.createSubNode(ms, vcNode, req, linkBookmark);
+			plugin.preCreateNode(ms, vcNode, req, linkBookmark);
 			parentNode = vcNode.getVal();
 		}
 

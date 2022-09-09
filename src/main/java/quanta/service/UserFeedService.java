@@ -60,10 +60,12 @@ public class UserFeedService extends ServiceBase {
 		// limit to just markdown types (no type)
 		// todo-0: Is there a faster way to accomplish the filtering we need based on type and WHY are we filtering based on type?
 		//         i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special (system defined) user's nodes.
-		//         but we can probably do some kind of hack/hijack and make those special system nodes use a priority value or something whic
+		//         but we can probably do some kind of hack/hijack and make those special system nodes hijack the priority value or something which
 		//         we can filter out by saying "not equal to special node priority"...becasue we have a priority index already.
 		//         Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely be ONE MORE index.
 		//   IMPORTANT: this code is in OTHER PLACES in the app too! ...the in(a, b, ...) clause.
+		//   IMPORTANT: Feed queries in general will eventually have a "Comments" checkbox so that in a pure corporate collab
+		//              use case users can view the core document content v.s. the core and comments.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		// DO NOT DELETE (keep as example)

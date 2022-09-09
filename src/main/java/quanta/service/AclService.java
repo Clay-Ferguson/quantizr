@@ -40,7 +40,6 @@ import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
 import quanta.response.SetUnpublishedResponse;
-import quanta.util.ExUtil;
 import quanta.util.XString;
 
 /**
@@ -188,7 +187,7 @@ public class AclService extends ServiceBase {
 	 * Adds the privileges to the node sharing this node to principal, which will be either a userName
 	 * or 'public' (when the node is being shared to public)
 	 * 
-	 * If BulkOperations is non-null we use it instead of a non-bulk operation
+	 * If BulkOperations is non-null we use it instead of a non-bulk operation.
 	 */
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
@@ -290,23 +289,24 @@ public class AclService extends ServiceBase {
 			ac.setPrvs(prvs);
 			acl.put(mapKey, ac);
 
+			// Bulk ops is not currently being used and if/when we add it back it needs to be consistent
+			// with the immediateSave, which may be tricky.
 			// if bulk operation
-			if (ok(bops)) {
-				/*
-				 * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
-				 * work somehow. Seems like updating collections might not work in batching. Currently there are no
-				 * places we call this method with bops passed in, so this bops branch is not currently being used
-				 * for that reason.
-				 */
-				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-				Update update = new Update().set(SubNode.AC, acl);
-				bops.updateOne(query, update);
-			}
+			// if (ok(bops)) {
+			// 	/*
+			// 	 * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
+			// 	 * work somehow. Seems like updating collections might not work in batching. Currently there are no
+			// 	 * places we call this method with bops passed in, so this bops branch is not currently being used
+			// 	 * for that reason.
+			// 	 */
+			// 	Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+			// 	Update update = new Update().set(SubNode.AC, acl);
+			// 	bops.updateOne(query, update);
+			// }
 			// else non-bulk
-			else {
-				node.setAc(acl);
-				update.save(ms, node);
-			}
+			// else {
+			 	node.setAc(acl);
+			//}
 
 			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			// SubNode fromUserNode = read.getNode(session, node.getOwner());
@@ -510,7 +510,8 @@ public class AclService extends ServiceBase {
 	}
 
 	public boolean isAdminOwned(SubNode node) {
-		if (no(node)) return false;
+		if (no(node))
+			return false;
 		return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
 	}
 }

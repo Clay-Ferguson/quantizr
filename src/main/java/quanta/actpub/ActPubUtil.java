@@ -972,7 +972,7 @@ public class ActPubUtil extends ServiceBase {
         boolean changed = false;
         Object icon = apObj(actor, APObj.icon);
 
-        // todo-0: need to also support icon being an array here, to be compatable with spec:
+        // todo-1: need to also support icon being an array here, to be compatable with spec:
         // "icon": [
         // "https://kenzoishii.example.com/image/165987aklre4"
         // ]
