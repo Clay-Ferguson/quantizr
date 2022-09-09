@@ -28,14 +28,13 @@ import quanta.util.ThreadLocals;
  * didn't prove it yet or look into it yet. If this is true it might be that only public methods are
  * proxied by spring which would make sense, but I don't kow if that's the case.
  * 
- * Commenting class annotations to turn all the proxy objects back into direct object references
- * for all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is mostly
- * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the Instrumentation
- * unless turning on temporarily for performance analysis.
+ * Commenting class annotations to turn all the proxy objects back into direct object references for
+ * all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is mostly
+ * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
+ * Instrumentation unless turning on temporarily for performance analysis.
  * 
- * For reference:
- * import org.aspectj.lang.annotation.Aspect;
- * import org.springframework.stereotype.Component;
+ * For reference: import org.aspectj.lang.annotation.Aspect; import
+ * org.springframework.stereotype.Component;
  */
 // @Aspect
 // @Component
@@ -51,10 +50,6 @@ public class Instrument {
 	// looking version.
 	@Around("@annotation(PerfMon)")
 	public Object perfMonAdvice(ProceedingJoinPoint jp) throws Throwable {
-		if (data.size() > MAX_EVENTS) {
-			data.clear();
-		}
-
 		Object value = null;
 		long startTime = System.currentTimeMillis();
 		String userName = null;
@@ -100,14 +95,17 @@ public class Instrument {
 			PerfMon annotation = method.getAnnotation(PerfMon.class);
 
 			if (duration > CAPTURE_THRESHOLD) {
-				PerfMonEvent event = new PerfMonEvent();
-				event.duration = duration;
-				event.event = annotation.category().equals("") ? signature.getName() : //
-						(annotation.category() + "." + signature.getName());
-				event.user = userName;
-				data.add(event);
+				new PerfMonEvent(duration, annotation.category().equals("") ? signature.getName() : //
+						(annotation.category() + "." + signature.getName()), userName);
 			}
 		}
 		return value;
+	}
+
+	public static void add(PerfMonEvent event) {
+		if (data.size() > MAX_EVENTS) {
+			data.clear();
+		}
+		data.add(event);
 	}
 }

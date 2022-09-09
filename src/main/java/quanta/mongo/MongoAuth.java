@@ -317,11 +317,8 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
-		// String apId = node.getStr(NodeProp.ACT_PUB_ID);
-		// if (no(apId)) {
-			auth(ms, node, PrivilegeType.WRITE);
-		// }
-		// optimization: todo-0: once we do an auth on a node, save it's PATH in a ThreadLocal set so we can 
+		auth(ms, node, PrivilegeType.WRITE);
+		// optimization: todo-1: once we do an auth on a node, save it's PATH in a ThreadLocal set so we can
 		// detect it in other places (namely MongoEventListener)
 	}
 

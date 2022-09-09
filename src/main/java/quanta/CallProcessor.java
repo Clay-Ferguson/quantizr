@@ -114,11 +114,7 @@ public class CallProcessor extends ServiceBase {
 		} finally {
 			int duration = (int) (System.currentTimeMillis() - startTime);
 			if (duration > Instrument.CAPTURE_THRESHOLD) {
-				PerfMonEvent event = new PerfMonEvent();
-				event.duration = duration;
-				event.event = "callProc." + command;
-				event.user = userName;
-				Instrument.data.add(event);
+				new PerfMonEvent(duration, "callProc." + command, userName);
 			}
 
 			if (ok(mutex)) {

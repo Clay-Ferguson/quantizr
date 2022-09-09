@@ -211,7 +211,7 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	public void deleteNodeOrphans() {
-		// todo-0: removed until SubNode.getParent() is updated
+		// todo-0: removed due to SubNode.getParent() being deleted
 		// log.debug("deleteNodeOrphans()");
 		// // long nodeCount = read.getNodeCount(null);
 		// // log.debug("initial Node Count: " + nodeCount);

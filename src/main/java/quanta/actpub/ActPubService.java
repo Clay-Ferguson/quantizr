@@ -1845,7 +1845,7 @@ public class ActPubService extends ServiceBase {
 
         return arun.run(as -> {
             log.debug("Starting AP Large Delete...");
-            long delCount = delete.deleteOldActPubPosts(9, as);
+            long delCount = delete.deleteOldActPubPosts(6, as);
             String message = "AP Maintence Complete. Deleted " + String.valueOf(delCount) + " old posts.";
             log.debug(message);
             return message;

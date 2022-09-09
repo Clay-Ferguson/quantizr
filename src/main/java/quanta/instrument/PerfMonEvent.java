@@ -7,7 +7,20 @@ import static quanta.util.Util.no;
 
 public class PerfMonEvent {
 
-    public PerfMonEvent() {
+    public PerfMonEvent root;
+    public List<PerfMonEvent> subEvents;
+
+    // NO GETTERS/SETTERS. Not needed or wanted.
+    public int duration;
+    public String event;
+    public String user;
+
+    public PerfMonEvent(int duration, String event, String user) {
+        this.duration = duration;
+        this.event = event;
+        this.user = user;
+        
+        Instrument.add(this);
         PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
 
         // if there's no root event for this thread make this one the root.
@@ -24,12 +37,4 @@ public class PerfMonEvent {
             root = rootEvent;
         }
     }
-
-    public PerfMonEvent root;
-    public List<PerfMonEvent> subEvents;
-
-    // NO GETTERS/SETTERS. Not needed or wanted.
-    public int duration;
-    public String event;
-    public String user;
 }
