@@ -71,10 +71,6 @@ public class SubNode {
 	@Field(NAME)
 	private String name;
 
-	public static final String PARENT = "par";
-	@Field(PARENT)
-	private ObjectId parent;
-
 	public static final String OWNER = "own";
 	@Field(OWNER)
 	private ObjectId owner;
@@ -144,7 +140,6 @@ public class SubNode {
 			SubNode.ID, //
 			SubNode.ORDINAL, //
 			SubNode.OWNER, //
-			SubNode.PARENT, //
 			SubNode.CREATE_TIME, //
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
@@ -275,23 +270,6 @@ public class SubNode {
 	@JsonGetter(OWNER)
 	public String jsonOwner() {
 		return ok(owner) ? owner.toHexString() : null;
-	}
-
-	public ObjectId getParent() {
-		return parent;
-	}
-
-	@JsonProperty(PARENT)
-	public void setParent(ObjectId parent) {
-		if (Util.equalObjs(parent, this.parent))
-			return;
-		ThreadLocals.dirty(this);
-		this.parent = parent;
-	}
-
-	@JsonGetter(PARENT)
-	public String jsonParent() {
-		return ok(parent) ? parent.toHexString() : null;
 	}
 
 	@JsonProperty(CREATE_TIME)

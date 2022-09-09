@@ -20,7 +20,9 @@ import org.springframework.stereotype.Component;
 import quanta.EventPublisher;
 import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
+import quanta.exception.NodeAuthFailedException;
 import quanta.mongo.model.SubNode;
+import quanta.service.AclService;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -54,6 +56,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private ActPubCache apCache;
+
+	@Autowired
+	public static AclService acl;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -98,9 +103,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// if (StringUtils.isEmpty(node.getName())) {
 		// node.setName(id.toHexString())
 		// }
-
-		mongoUtil.validateParent(node, dbObj);
-
+	
 		/* if no owner is assigned... */
 		if (no(node.getOwner())) {
 			/*
@@ -306,6 +309,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
 				auth.authForChildNodeCreate(ms, parent);
+
+				if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
+					throw new NodeAuthFailedException();
+				}
 			}
 		}
 	}

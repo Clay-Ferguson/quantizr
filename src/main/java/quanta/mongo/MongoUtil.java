@@ -120,56 +120,6 @@ public class MongoUtil extends ServiceBase {
 		return ret;
 	}
 
-	public void validateParent(SubNode node, Document dbObj) {
-		// log.debug("validateParent of node: " + node.getIdStr());
-
-		// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
-		// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
-		if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/")) {
-			// log.debug("path was pending, so parent set to null");
-			if (ok(dbObj)) {
-				dbObj.put(SubNode.PARENT, null);
-			}
-			node.setParent(null);
-			return;
-		}
-
-		boolean updateParent = false;
-
-		// if we have no parent at all need to update
-		if (no(node.getParent())) {
-			// log.debug("updating parent first time.");
-			updateParent = true;
-		}
-		// Otherwise check parent for correctness
-		else {
-			// log.debug("checking existing parent");
-			SubNode parent = arun.run(as -> read.getNode(as, node.getParent()));
-
-			// if we didn't find parent or it's path is not a match then update parent.
-			if (!ok(parent) || !parent.getPath().equals(node.getParentPath())) {
-				// log.debug("path was invalid, will be udated.");
-				updateParent = true;
-			} else {
-				// log.debug("path matched ok");
-			}
-		}
-
-		if (updateParent) {
-			SubNode parent = read.findNodeByPath(node.getParentPath(), true);
-			if (!ok(parent)) {
-				// log.debug("Updating of parent id failed. Not able to find parent: " + node.getParentPath());
-				// throw exception if parent not found? No, we want to allow the save
-			} else {
-				// log.debug("Setting parent to id=" + parent.getIdStr());
-				if (ok(dbObj)) {
-					dbObj.put(SubNode.PARENT, parent.getId());
-				}
-				node.setParent(parent.getId());
-			}
-		}
-	}
-
 	/**
 	 * This find method should wrap ALL queries so that we can run our code inside this NodeIterable
 	 * wrapper which will detect any query results that reference objects cached in memory and point to
@@ -674,7 +624,6 @@ public class MongoUtil extends ServiceBase {
 		// createIndex(ms, SubNode.class, SubNode.CID);
 
 		createIndex(ms, SubNode.class, SubNode.OWNER);
-		createIndex(ms, SubNode.class, SubNode.PARENT);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
 
 		// This blows up in PROD because nodes shared with too many people exceed the size allowed for an

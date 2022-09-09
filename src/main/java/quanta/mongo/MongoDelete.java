@@ -211,87 +211,88 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	public void deleteNodeOrphans() {
-		log.debug("deleteNodeOrphans()");
-		// long nodeCount = read.getNodeCount(null);
-		// log.debug("initial Node Count: " + nodeCount);
+		// todo-0: removed until SubNode.getParent() is updated
+		// log.debug("deleteNodeOrphans()");
+		// // long nodeCount = read.getNodeCount(null);
+		// // log.debug("initial Node Count: " + nodeCount);
 
-		Val<Integer> orphanCount = new Val<>(0);
-		int loops = 0;
+		// Val<Integer> orphanCount = new Val<>(0);
+		// int loops = 0;
 
-		/*
-		 * Run this loop up to 3 per call. Note that for large orphaned subgraphs we only end up pruning off the
-		 * N deepest levels at a time, so running this multiple times will be required, but this is ideal.
-		 * We could raise this N to a larger number larger than any possible tree depth, but there's no
-		 * need. Running this several times has the same effect.
-		 */
-		while (++loops <= 3) {
-			log.debug("Delete Orphans. Loop: " + loops);
-			Val<Integer> nodesProcessed = new Val<>(0);
-			Val<Integer> deleteCount = new Val<>(0);
-			Val<Integer> batchSize = new Val<>(0);
+		// /*
+		//  * Run this loop up to 3 per call. Note that for large orphaned subgraphs we only end up pruning off the
+		//  * N deepest levels at a time, so running this multiple times will be required, but this is ideal.
+		//  * We could raise this N to a larger number larger than any possible tree depth, but there's no
+		//  * need. Running this several times has the same effect.
+		//  */
+		// while (++loops <= 3) {
+		// 	log.debug("Delete Orphans. Loop: " + loops);
+		// 	Val<Integer> nodesProcessed = new Val<>(0);
+		// 	Val<Integer> deleteCount = new Val<>(0);
+		// 	Val<Integer> batchSize = new Val<>(0);
 
-			// bulk operations is scoped only to one iteration, just so it itself can't be too large
-			Val<BulkOperations> bops = new Val<>(null);
+		// 	// bulk operations is scoped only to one iteration, just so it itself can't be too large
+		// 	Val<BulkOperations> bops = new Val<>(null);
 
-			Query allQuery = new Query().addCriteria(new Criteria(SubNode.PARENT).ne(null));
-			/*
-			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
-			 * the node is an orphan and can be deleted.
-			 */
-			ops.stream(allQuery, SubNode.class).forEachRemaining(node -> {
-				// print progress every 1000th node
-				nodesProcessed.setVal(nodesProcessed.getVal() + 1);
-				if (nodesProcessed.getVal() % 1000 == 0) {
-					log.debug("Nodes Processed: " + nodesProcessed.getVal());
-				}
+		// 	Query allQuery = new Query().addCriteria(new Criteria(SubNode.PARENT).ne(null));
+		// 	/*
+		// 	 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
+		// 	 * the node is an orphan and can be deleted.
+		// 	 */
+		// 	ops.stream(allQuery, SubNode.class).forEachRemaining(node -> {
+		// 		// print progress every 1000th node
+		// 		nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+		// 		if (nodesProcessed.getVal() % 1000 == 0) {
+		// 			log.debug("Nodes Processed: " + nodesProcessed.getVal());
+		// 		}
 
-				// ignore the root node and any of it's children.
-				if ("/r".equalsIgnoreCase(node.getPath()) || //
-						"/r".equalsIgnoreCase(node.getParentPath())) {
-					return;
-				}
+		// 		// ignore the root node and any of it's children.
+		// 		if ("/r".equalsIgnoreCase(node.getPath()) || //
+		// 				"/r".equalsIgnoreCase(node.getParentPath())) {
+		// 			return;
+		// 		}
 
-				/*
-				 * if there's a parent specified (always should be except for root), but we can't find the parent
-				 * then this node is an orphan to be deleted
-				 */
-				if (no(ops.findById(node.getParent(), SubNode.class))) {
-					log.debug("DEL ORPHAN id=" + node.getIdStr() + " path=" + node.getPath() + " Content=" + node.getContent());
-					orphanCount.setVal(orphanCount.getVal() + 1);
-					deleteCount.setVal(deleteCount.getVal() + 1);
+		// 		/*
+		// 		 * if there's a parent specified (always should be except for root), but we can't find the parent
+		// 		 * then this node is an orphan to be deleted
+		// 		 */
+		// 		if (no(ops.findById(node.getParent(), SubNode.class))) {
+		// 			log.debug("DEL ORPHAN id=" + node.getIdStr() + " path=" + node.getPath() + " Content=" + node.getContent());
+		// 			orphanCount.setVal(orphanCount.getVal() + 1);
+		// 			deleteCount.setVal(deleteCount.getVal() + 1);
 
-					// lazily create the bulk ops
-					if (no(bops.getVal())) {
-						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-					}
+		// 			// lazily create the bulk ops
+		// 			if (no(bops.getVal())) {
+		// 				bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+		// 			}
 
-					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-					bops.getVal().remove(query);
+		// 			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+		// 			bops.getVal().remove(query);
 
-					batchSize.setVal(batchSize.getVal() + 1);
-					if (batchSize.getVal() >= 200) {
-						batchSize.setVal(0);;
-						BulkWriteResult results = bops.getVal().execute();
-						log.debug("Orphans Deleted Batch: " + results.getDeletedCount());
-						bops.setVal(null);
-					}
-				}
-			});
+		// 			batchSize.setVal(batchSize.getVal() + 1);
+		// 			if (batchSize.getVal() >= 200) {
+		// 				batchSize.setVal(0);;
+		// 				BulkWriteResult results = bops.getVal().execute();
+		// 				log.debug("Orphans Deleted Batch: " + results.getDeletedCount());
+		// 				bops.setVal(null);
+		// 			}
+		// 		}
+		// 	});
 
-			if (ok(bops.getVal())) {
-				BulkWriteResult results = bops.getVal().execute();
-				log.debug("Orphans Deleted (batch remainder): " + results.getDeletedCount());
-			}
+		// 	if (ok(bops.getVal())) {
+		// 		BulkWriteResult results = bops.getVal().execute();
+		// 		log.debug("Orphans Deleted (batch remainder): " + results.getDeletedCount());
+		// 	}
 
-			// if no deletes were done, break out of while loop and return.
-			if (deleteCount.getVal() == 0) {
-				break;
-			}
-		}
+		// 	// if no deletes were done, break out of while loop and return.
+		// 	if (deleteCount.getVal() == 0) {
+		// 		break;
+		// 	}
+		// }
 
-		log.debug("TOTAL ORPHANS DELETED=" + orphanCount.getVal());
-		// nodeCount = read.getNodeCount(null);
-		// log.debug("final Node Count: " + nodeCount);
+		// log.debug("TOTAL ORPHANS DELETED=" + orphanCount.getVal());
+		// // nodeCount = read.getNodeCount(null);
+		// // log.debug("final Node Count: " + nodeCount);
 	}
 
 	/*

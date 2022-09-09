@@ -58,8 +58,11 @@ public class NodeRenderService extends ServiceBase {
 		res.setNodeIntf(list);
 
 		for (String id : req.getIds()) {
-			boolean hasChildren = read.hasChildren(ms, new ObjectId(id));
-			list.add(new NodeMetaIntf(id, hasChildren));
+			SubNode node = read.getNode(ms, new ObjectId(id));
+			if (ok(node)) {
+				boolean hasChildren = read.hasChildren(ms, node);
+				list.add(new NodeMetaIntf(id, hasChildren));
+			}
 		}
 		res.setSuccess(true);
 		return res;
@@ -75,6 +78,7 @@ public class NodeRenderService extends ServiceBase {
 
 		// by default we do showReplies
 		boolean showReplies = true;
+		boolean adminOnly = false;
 
 		SessionContext sc = ThreadLocals.getSC();
 
@@ -93,6 +97,7 @@ public class NodeRenderService extends ServiceBase {
 		SubNode node = null;
 		try {
 			node = read.getNode(ms, targetId);
+			adminOnly = acl.isAdminOwned(node);
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);
 			res.setMessage("Unauthorized.");
@@ -122,8 +127,8 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
-					false, true, true, null);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, -1, false,
+					false, true, false, true, true, null);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -206,8 +211,8 @@ public class NodeRenderService extends ServiceBase {
 			try {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (ok(highestUpParent)) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, highestUpParent, true, false, 0,
-							false, false, false, false, true, true, null);
+					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, true,
+							false, 0, false, false, false, false, true, true, null);
 
 					// each parent up goes on top of list for correct rendering order on client.
 					parentNodes.addFirst(nodeInfo);
@@ -222,7 +227,7 @@ public class NodeRenderService extends ServiceBase {
 		res.setBreadcrumbs(breadcrumbs);
 		render.getBreadcrumbs(ms, highestUpParent, breadcrumbs);
 
-		NodeInfo nodeInfo = render.processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
+		NodeInfo nodeInfo = render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
 		nodeInfo.setParents(parentNodes);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
@@ -236,9 +241,8 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	@PerfMon(category = "render")
-	public NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
-			SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-
+	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
+			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
 		/*
 		 * see also: tag #getNodeMetaInfo
 		 * 
@@ -253,8 +257,8 @@ public class NodeRenderService extends ServiceBase {
 		 * retrieve that information asynchronously and then updates the page, showing all the expand icons
 		 * on all the nodes that have children.
 		 */
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal, level > 0,
-				false, false, false, true, true, null);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal,
+				level > 0, false, false, false, true, true, null);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -355,7 +359,7 @@ public class NodeRenderService extends ServiceBase {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = render.processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit,
+								ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx, level + 1, limit,
 										showReplies);
 								nodeInfo.getChildren().add(0, ninfo);
 
@@ -398,7 +402,7 @@ public class NodeRenderService extends ServiceBase {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = render.processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
+			ninfo = render.processRenderNode(adminOnly, ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
 			nodeInfo.getChildren().add(ninfo);
 
 			if (!iterator.hasNext()) {
@@ -426,7 +430,8 @@ public class NodeRenderService extends ServiceBase {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = render.processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit, showReplies);
+					ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, (long) relativeIdx, level + 1, limit,
+							showReplies);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done
@@ -491,8 +496,8 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false,
-				false, false, null);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true,
+				false, false, false, null);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

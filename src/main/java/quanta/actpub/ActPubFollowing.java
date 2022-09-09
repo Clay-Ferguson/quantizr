@@ -405,8 +405,8 @@ public class ActPubFollowing extends ServiceBase {
             int counter = 0;
 
             for (SubNode node : iterable) {
-                NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
-                        false, false, false, false, null);
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, true, false, counter + 1, false,
+                        false, false, false, false, false, null);
                 searchResults.add(info);
             }
 
@@ -469,10 +469,11 @@ public class ActPubFollowing extends ServiceBase {
          * query all the direct children under the friendsListNode, that are FRIEND type although they
          * should all be FRIEND types.
          */
-        Criteria criteria = Criteria.where(SubNode.PARENT).is(friendsListNode.getId()) //
+        Criteria crit = Criteria.where(//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(friendsListNode.getPath()))//
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
-        q.addCriteria(criteria);
+        q.addCriteria(crit);
         return q;
     }
 }

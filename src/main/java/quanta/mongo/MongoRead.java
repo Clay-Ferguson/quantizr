@@ -100,20 +100,7 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public long getChildCount(MongoSession ms, SubNode node) {
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            return getChildCount(ms, node.getId());
-        } else {
-            return getChildCount(ms, node.getPath());
-        }
-    }
-
-    @PerfMon(category = "read")
-    public long getChildCount(MongoSession ms, ObjectId parentId) {
-        Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
-        crit = auth.addSecurityCriteria(ms, crit);
-        q.addCriteria(crit);
-        return ops.count(q, SubNode.class);
+        return getChildCount(ms, node.getPath());
     }
 
     @PerfMon(category = "read")
@@ -127,26 +114,13 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read(m,n)")
     public boolean hasChildren(MongoSession ms, SubNode node) {
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            return hasChildren(ms, node.getId());
-        } else {
-            return hasChildren(ms, node.getPath());
-        }
+        return hasChildren(ms, node.getPath());
     }
 
     @PerfMon(category = "read(m,pth)")
     public boolean hasChildren(MongoSession ms, String path) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
-        crit = auth.addSecurityCriteria(ms, crit);
-        q.addCriteria(crit);
-        return ops.exists(q, SubNode.class);
-    }
-
-    @PerfMon(category = "read")
-    public boolean hasChildren(MongoSession ms, ObjectId parentId) {
-        Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return ops.exists(q, SubNode.class);
@@ -379,8 +353,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
-        return MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent()) ? //
-                read.getNode(ms, node.getParent(), allowAuth) : getParentByPath(ms, node.getPath(), allowAuth);
+        return getParentByPath(ms, node.getPath(), allowAuth);
     }
 
     /*
@@ -445,13 +418,7 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
-        Criteria crit = null;
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
-        } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
-        }
-
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
         crit = auth.addSecurityCriteria(ms, crit);
 
         if (ordered) {
@@ -465,43 +432,6 @@ public class MongoRead extends ServiceBase {
             nodeIds.add(n.getIdStr());
         }
         return nodeIds;
-    }
-
-    /*
-     * Gets children under the parent of parentId. Relies on PARENTs of all nodes to be set properly
-     * which theoretically CAN be wrong, and so beware that only getChildrenUnderPath is guaranteed to
-     * be correct, because the single source of truth about tree structure is path (PTH)
-     */
-    @PerfMon(category = "read")
-    public Iterable<SubNode> getChildren(MongoSession ms, ObjectId parentId, Sort sort, Integer limit, int skip,
-            TextCriteria textCriteria, Criteria moreCriteria) {
-
-        Query q = new Query();
-        if (ok(limit) && limit.intValue() > 0) {
-            q.limit(limit.intValue());
-        }
-
-        if (skip > 0) {
-            q.skip(skip);
-        }
-
-        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
-
-        if (ok(textCriteria)) {
-            q.addCriteria(textCriteria);
-        }
-
-        if (ok(moreCriteria)) {
-            q.addCriteria(moreCriteria);
-        }
-
-        if (ok(sort)) {
-            q.with(sort);
-        }
-
-        crit = auth.addSecurityCriteria(ms, crit);
-        q.addCriteria(crit);
-        return mongoUtil.find(q);
     }
 
     /*
@@ -562,12 +492,7 @@ public class MongoRead extends ServiceBase {
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria) {
         auth.auth(ms, node, PrivilegeType.READ);
-
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            return read.getChildren(ms, node.getId(), sort, limit, skip, null, moreCriteria);
-        } else {
-            return read.getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria);
-        }
+        return read.getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria);
     }
 
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
@@ -606,9 +531,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = MongoRepository.PARENT_OPTIMIZATION && ok(node.getId()) ? //
-                Criteria.where(SubNode.PARENT).is(node.getId())
-                : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -628,9 +551,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = MongoRepository.PARENT_OPTIMIZATION && ok(node.getId()) ? //
-                Criteria.where(SubNode.PARENT).is(node.getId())
-                : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -654,12 +575,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = null;
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
-        } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
-        }
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
@@ -682,13 +598,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = null;
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
-        } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
-        }
-
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
@@ -766,11 +676,7 @@ public class MongoRead extends ServiceBase {
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())); //
         } else {
-            if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
-                crit = Criteria.where(SubNode.PARENT).is(node.getParent());
-            } else {
-                crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
-            }
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         }
 
         crit = auth.addSecurityCriteria(ms, crit);
@@ -1083,19 +989,11 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = null;
-
-        // Note: This one CAN get called before allUsersRootNode is set.
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(MongoUtil.allUsersRootNode)) {
-            crit = Criteria.where(SubNode.PARENT).is(MongoUtil.allUsersRootNode.getId()) //
-                    .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
-        } else {
-            crit = Criteria.where(//
-                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
-                    // .and(SubNode.PROPS + "." + NodeProp.USER).is(user);
-                    // case-insensitive lookup of username:
-                    .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
-        }
+        Criteria crit = Criteria.where(//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
+                // .and(SubNode.PROPS + "." + NodeProp.USER).is(user);
+                // case-insensitive lookup of username:
+                .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
 
         q.addCriteria(crit);
 
@@ -1124,15 +1022,9 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = null;
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
-                    .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
-        } else {
-            crit = Criteria.where(//
-                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                    .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
-        }
+        Criteria crit = Criteria.where(//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
 
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
@@ -1148,15 +1040,9 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = null;
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
-            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
-                    .and(SubNode.TYPE).is(type);
-        } else {
-            crit = Criteria.where(//
-                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                    .and(SubNode.TYPE).is(type);
-        }
+        Criteria crit = Criteria.where(//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                .and(SubNode.TYPE).is(type);
 
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
@@ -1217,17 +1103,9 @@ public class MongoRead extends ServiceBase {
     public SubNode findNodeByProp(MongoSession ms, SubNode parentNode, String propName, String propVal) {
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = null;
-
-        if (MongoRepository.PARENT_OPTIMIZATION && ok(parentNode.getId())) {
-            crit = Criteria.where(SubNode.PARENT).is(parentNode.getId()) //
-                    .and(SubNode.PROPS + "." + propName).is(propVal);
-        } else {
-            crit = Criteria.where(//
-                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(parentNode.getPath()))//
-                    .and(SubNode.PROPS + "." + propName).is(propVal);
-        }
-
+        Criteria crit = Criteria.where(//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(parentNode.getPath()))//
+                .and(SubNode.PROPS + "." + propName).is(propVal);
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
         auth.auth(ms, ret, PrivilegeType.READ);
@@ -1423,7 +1301,7 @@ public class MongoRead extends ServiceBase {
 
         if (depth >= MAX_DOC_DEPTH) {
             // log.debug("MAX DEPTH (ignoring). " + node.getContent());
-            if (ok(truncates) && hasChildren(ms, node.getId())) {
+            if (ok(truncates) && hasChildren(ms, node)) {
                 truncates.add(node.getIdStr());
             }
             // return true to keep iterating, although we're ignoring these 'too deep' ones.

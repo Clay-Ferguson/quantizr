@@ -83,12 +83,18 @@ public class NodeSearchService extends ServiceBase {
 		List<NodeInfo> results = new LinkedList<>();
 		res.setSearchResults(results);
 
+		SubNode node = read.getNode(ms, new ObjectId(req.getRootId()));
+		if (!ok(node)) {
+			return res;
+		}
+		boolean adminOnly = acl.isAdminOwned(node);
+
 		HashSet<String> truncates = new HashSet<>();
 		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), req.isIncludeComments(), truncates);
 		int counter = 0;
 		for (SubNode n : nodes) {
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, n, true, false, counter + 1, false, false, false,
-					false, false, true, null);
+			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, true, false, counter + 1, false,
+					false, false, false, false, true, null);
 
 			if (truncates.contains(n.getIdStr())) {
 				info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
@@ -118,8 +124,8 @@ public class NodeSearchService extends ServiceBase {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-						false, false, false, true, null);
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+						false, false, false, false, true, null);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
@@ -133,8 +139,8 @@ public class NodeSearchService extends ServiceBase {
 			}
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-						false, false, false, true, null);
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+						false, false, false, false, true, null);
 				searchResults.add(info);
 			}
 		}
@@ -149,6 +155,7 @@ public class NodeSearchService extends ServiceBase {
 			// else we're doing a normal subgraph search for the text
 			else {
 				SubNode searchRoot = read.getNode(ms, req.getNodeId());
+				boolean adminOnly = acl.isAdminOwned(searchRoot);
 
 				if ("timeline".equals(req.getSearchDefinition())) {
 					ThreadLocals.getSC().setTimelinePath(searchRoot.getPath());
@@ -159,8 +166,8 @@ public class NodeSearchService extends ServiceBase {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-								false, false, false, false, true, null);
+						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, counter + 1,
+								false, false, false, false, false, true, null);
 						searchResults.add(info);
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
@@ -211,7 +218,7 @@ public class NodeSearchService extends ServiceBase {
 
 		// Run this as admin because ordinary users don't have access to account nodes.
 		arun.run(as -> {
-			accountNodes.setVal(read.getChildren(as, MongoUtil.allUsersRootNode.getId(), null, ConstantInt.ROWS_PER_PAGE.val(),
+			accountNodes.setVal(read.getChildren(as, MongoUtil.allUsersRootNode.getPath(), null, ConstantInt.ROWS_PER_PAGE.val(),
 					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), _textCriteria, _moreCriteria));
 			return null;
 		});
@@ -223,8 +230,8 @@ public class NodeSearchService extends ServiceBase {
 			 */
 			for (SubNode node : accountNodes.getVal()) {
 				try {
-					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-							false, false, false, false, false, null);
+					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1,
+							false, false, false, false, false, false, null);
 					searchResults.add(info);
 				} catch (Exception e) {
 					ExUtil.error(log, "failed converting user node", e);
@@ -244,8 +251,8 @@ public class NodeSearchService extends ServiceBase {
 				SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
 				if (ok(userNode)) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
-								false, false, false, false, false, false, null);
+						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, true, false,
+								counter + 1, false, false, false, false, false, false, null);
 
 						searchResults.add(info);
 					} catch (Exception e) {
@@ -314,8 +321,8 @@ public class NodeSearchService extends ServiceBase {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-					false, false, false, true, null);
+			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+					false, false, false, false, true, null);
 			searchResults.add(info);
 		}
 

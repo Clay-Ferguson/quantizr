@@ -828,7 +828,7 @@ public class ActPubUtil extends ServiceBase {
             // iterate up the parent chain or chain of inReplyTo for ActivityPub
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
                 try {
-                    nodes.addFirst(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
+                    nodes.addFirst(convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
                             false, true, true, null));
 
                     // if inReplyTo exists try to use it first.
@@ -851,11 +851,12 @@ public class ActPubUtil extends ServiceBase {
                         }
                     }
 
+                    SubNode parent = read.getParent(ms, node);
                     // if no database parent, check and see if we can get the node via inReplyTo
-                    if (no(node.getParent())) {
+                    if (no(parent)) {
                         topReached = true;
                     } else {
-                        node = read.getParent(ms, node);
+                        node = parent;
 
                         /*
                          * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
@@ -881,7 +882,7 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition.
                             if (!child.getIdStr().equals(nodeId)) {
-                                others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false,
+                                others.add(convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, child, true, false, -1, false,
                                         false, false, false, true, true, null));
                             }
                         }

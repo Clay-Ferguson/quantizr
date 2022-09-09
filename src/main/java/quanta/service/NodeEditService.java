@@ -18,6 +18,7 @@ import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
@@ -119,8 +120,15 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
+
+		// note: redundant security
+		if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
+			throw new NodeAuthFailedException();
+		}
+
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
+		SubNode newNode =
+				create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		if (req.isPendingEdit()) {
 			mongoUtil.setPendingPath(newNode, true);
@@ -196,8 +204,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, newNode);
 		}
 
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
-				false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false,
+				false, false, false, null));
 		res.setSuccess(true);
 		return res;
 	}
@@ -217,6 +225,12 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
+
+		// note: redundant security
+		if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
+			throw new NodeAuthFailedException();
+		}
+
 		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null, null, true);
 
@@ -256,8 +270,8 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		update.save(ms, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false,
-				false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false,
+				false, false, false, null));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -538,8 +552,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true,
-				false, true, true, null);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, -1, false, false,
+				true, false, true, true, null);
 		res.setNode(newNodeInfo);
 
 		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check

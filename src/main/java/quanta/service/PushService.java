@@ -69,7 +69,7 @@ public class PushService extends ServiceBase {
 				// usersSharedToSet.contains("public") ||
 						usersSharedToSet.contains(sc.getUserName())) {
 					/* build our push message payload */
-					NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, 
+					NodeInfo nodeInfo = convert.convertToNodeInfo(false,sc, ms, node, true, false, 1, false, false, true, 
 					false, true, true, null);
 					FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
@@ -103,7 +103,7 @@ public class PushService extends ServiceBase {
 			if (ok(node.getPath()) && ok(sc.getWatchingPath()) && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
-				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false, 
+				NodeInfo nodeInfo = convert.convertToNodeInfo(false,sc, ms, node, true, false, 1, false, false, true, false, 
 				true, true, null);
 				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 

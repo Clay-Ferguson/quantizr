@@ -510,6 +510,7 @@ public class AclService extends ServiceBase {
 	}
 
 	public boolean isAdminOwned(SubNode node) {
+		if (no(node)) return false;
 		return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
 	}
 }
