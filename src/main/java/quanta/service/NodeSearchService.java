@@ -166,8 +166,8 @@ public class NodeSearchService extends ServiceBase {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, counter + 1,
-								false, false, false, false, false, true, null);
+						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false,
+								counter + 1, false, false, false, false, false, true, null);
 						searchResults.add(info);
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
@@ -433,8 +433,38 @@ public class NodeSearchService extends ServiceBase {
 			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false);
 		}
 
+		int publicCount = 0;
+		int publicWriteCount = 0;
+		int adminOwnedCount = 0;
+		int userShareCount = 0;
+		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
+
 		for (SubNode node : iter) {
 			nodeCount++;
+
+			// PART 1: Process sharing info
+			HashMap<String, AccessControl> aclEntry = node.getAc();
+			if (ok(aclEntry)) {
+				for (String key : aclEntry.keySet()) {
+					AccessControl ac = aclEntry.get(key);
+					if (PrincipalName.PUBLIC.s().equals(key)) {
+						publicCount++;
+						if (ok(ac) && ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+							publicWriteCount++;
+						}
+					}
+					else {
+						userShareCount++;
+						uniqueUsersSharedTo.add(key);
+					}
+				}
+			}
+
+			if (acl.isAdminOwned(node)) {
+				adminOwnedCount++;
+			}
+
+			// PART 2: process 'content' text.
 
 			if (no(node.getContent()))
 				continue;
@@ -541,8 +571,14 @@ public class NodeSearchService extends ServiceBase {
 		sb.append("Total Words: " + totalWords + ", ");
 
 		if (ok(wordList)) {
-			sb.append("Unique Words: " + wordList.size());
+			sb.append("Unique Words: " + wordList.size() + ", ");
 		}
+
+		sb.append("Public: " + publicCount + ", ");
+		sb.append("Public Writable: " + publicWriteCount + ", ");
+		sb.append("Admin Owned: " + adminOwnedCount+ ", ");
+		sb.append("User Shares: " + userShareCount + ", ");
+		sb.append("Unique Users Shared To: "+uniqueUsersSharedTo.size());
 		res.setStats(sb.toString());
 
 		if (ok(wordList)) {
