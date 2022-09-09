@@ -71,7 +71,7 @@ export class EditNodeDlgUtil {
         const askToSplit = editNode.content && ((editNode as J.NodeInfo).content.indexOf("{split}") !== -1 ||
             (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
-        this.savePropsToNode(dlg);
+        this.savePropsToNode(editNode, dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
@@ -110,9 +110,8 @@ export class EditNodeDlgUtil {
     }
 
     // Takes all the propStates values and converts them into node properties on the node
-    savePropsToNode = (dlg: EditNodeDlg) => {
-        const appState = getAppState();
-        appState.editNode.properties?.forEach((prop: J.PropertyInfo) => {
+    savePropsToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
+        editNode.properties?.forEach((prop: J.PropertyInfo) => {
             // console.log("Save prop iterator: name=" + prop.name);
             const propState = dlg.propStates.get(prop.name);
             if (propState) {
