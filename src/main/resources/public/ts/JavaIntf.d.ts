@@ -419,7 +419,8 @@ export interface SaveNodeRequest extends RequestBase {
 }
 
 export interface SavePublicKeyRequest extends RequestBase {
-    keyJson: string;
+    asymEncKey: string;
+    sigKey: string;
 }
 
 export interface SaveUserPreferencesRequest extends RequestBase {
@@ -982,6 +983,7 @@ export const enum NodeProp {
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
+    USER_PREF_PUBLIC_SIG_KEY = "sn:publicSigKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_NSFW = "sn:nsfw",

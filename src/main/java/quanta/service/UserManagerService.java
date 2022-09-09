@@ -514,7 +514,7 @@ public class UserManagerService extends ServiceBase {
 		prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
 	}
 
-	public SavePublicKeyResponse savePublicKey(SavePublicKeyRequest req) {
+	public SavePublicKeyResponse savePublicKeys(SavePublicKeyRequest req) {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
@@ -522,7 +522,8 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			if (ok(userNode)) {
-				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getKeyJson());
+				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
+				userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}

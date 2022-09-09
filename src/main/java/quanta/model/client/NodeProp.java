@@ -47,6 +47,8 @@ public enum NodeProp {
     RSS_FEED_SRC("sn:rssFeedSrc", "s"), AUDIO_URL("sn:audioUrl", "s"),
 
     USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
+    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey", "s"), //
+
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
     USER_PREF_NSFW("sn:nsfw", "s"), //
@@ -177,10 +179,8 @@ public enum NodeProp {
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.
      * 
-     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" is the key that's used
-     * and only the public key exists on the server for that E2E encryption. In other words,
-     * "sn:publicKey" is used to encrypt actual data and these two defined here are only used as part of
-     * the ActivityPub user authentication process.
+     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey" props are the keys used
+     * and only the public key exists on the server for that E2E encryption.
      */
     CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //

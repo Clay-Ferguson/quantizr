@@ -3,13 +3,19 @@ package quanta.request;
 import quanta.request.base.RequestBase;
 
 public class SavePublicKeyRequest extends RequestBase {
-	private String keyJson;
+	private String asymEncKey;
+	private String sigKey;
 
-	public String getKeyJson() {
-		return keyJson;
+	public String getAsymEncKey() {
+		return asymEncKey;
 	}
-
-	public void setKeyJson(String keyJson) {
-		this.keyJson = keyJson;
+	public void setAsymEncKey(String asymEncKey) {
+		this.asymEncKey = asymEncKey;
+	}
+	public String getSigKey() {
+		return sigKey;
+	}
+	public void setSigKey(String sigKey) {
+		this.sigKey = sigKey;
 	}
 }

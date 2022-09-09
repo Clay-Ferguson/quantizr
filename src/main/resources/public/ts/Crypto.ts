@@ -238,9 +238,22 @@ export class Crypto {
             console.warn("crypto.subtle is not enabled");
             return;
         }
-        await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
+        const asymEncKey = await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
-        await this.initSigKeys(forceUpdate, republish, showConfirm);
+        const sigKey = await this.initSigKeys(forceUpdate, republish, showConfirm);
+
+        if (republish && (asymEncKey || sigKey)) {
+            const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
+
+                // todo-0: I'm not sure I want to keep these as escaped JSON or convert to hex
+                asymEncKey,
+                sigKey
+            });
+
+            if (showConfirm) {
+                S.util.showMessage(res.message, "Published Public Keys");
+            }
+        }
     }
 
     getPrivateEncKey = async (): Promise<CryptoKey> => {
@@ -307,7 +320,7 @@ export class Crypto {
     Initialize keys for sign/verify.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+    initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -348,24 +361,15 @@ export class Crypto {
                 const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
                 pubKeyStr = JSON.stringify(publicKeyDat);
             }
-
-            // todo-0: enable this but we need to consolidate so that we can send this ENC key AND the sig public key to server,
-            // both at once, at the end of initKeys()
-            // const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
-            //     keyJson: pubKeyStr
-            // });
-            // if (showConfirm) {
-            //     S.util.showMessage(res.message, "Published Public Key");
-            // }
         }
-        console.log("sig key init done.");
+        return pubKeyStr;
     }
 
     /*
     Init keys for encryption.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -405,14 +409,8 @@ export class Crypto {
                 const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
                 pubKeyStr = JSON.stringify(publicKeyDat);
             }
-
-            const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
-                keyJson: pubKeyStr
-            });
-            if (showConfirm) {
-                S.util.showMessage(res.message, "Published Public Key");
-            }
         }
+        return pubKeyStr;
     }
 
     genSymKey = async (): Promise<CryptoKey> => {
