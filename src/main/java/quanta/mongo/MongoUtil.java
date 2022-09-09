@@ -591,7 +591,6 @@ public class MongoUtil extends ServiceBase {
 		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
 		// account)
 
-		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
 
 		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),

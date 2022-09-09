@@ -108,6 +108,7 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		// lets the type override the location where the node is created.
 		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
 		if (ok(plugin)) {
 			Val<SubNode> vcNode = new Val<>(parentNode);

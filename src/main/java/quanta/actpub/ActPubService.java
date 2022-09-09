@@ -861,7 +861,7 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveObj(as, null, actorAccountNode, postsNode, activity, false, APType.Announce, boostedNode.getIdStr(),
+                    saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce, boostedNode.getIdStr(),
                             null);
                 }
             } else {
@@ -989,7 +989,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveObj(as, null, null, nodeBeingRepliedTo, obj, false, activity.getType(), null, encodedKey);
+            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1005,7 +1005,7 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveObj(as, null, actorAccountNode, postsNode, obj, false, activity.getType(), null, encodedKey);
+                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey);
             }
         }
     }
@@ -1023,8 +1023,8 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create, APType.Update, or APType.Announce
      */
     @PerfMon(category = "apub")
-    public SubNode saveObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, APObj obj,
-            boolean forcePublic, String action, String boostTargetId, String encodedKey) {
+    public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, APObj obj,
+            String action, String boostTargetId, String encodedKey) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
 
         /*
@@ -1170,11 +1170,6 @@ public class ActPubService extends ServiceBase {
 
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
-
-        if (forcePublic) {
-            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-        }
 
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);

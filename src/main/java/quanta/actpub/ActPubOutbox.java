@@ -137,7 +137,7 @@ public class ActPubOutbox extends ServiceBase {
                             if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apub.saveObj(ms, userDoingAction, _userNode, outboxNode, object, false, APType.Create, null,
+                                    apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object, APType.Create, null,
                                             null);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {

@@ -15,7 +15,6 @@ import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
-import { TextContent } from "../comp/core/TextContent";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
@@ -26,6 +25,7 @@ import { S } from "../Singletons";
 import { MainTab } from "../tabs/data/MainTab";
 import { TypeBase } from "./base/TypeBase";
 
+// todo-0: stop making this block the editing of the content area.
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
     static lastGoodFeed: J.RssFeed;
@@ -63,11 +63,13 @@ export class RssTypeHandler extends TypeBase {
     }
 
     getAllowContentEdit(): boolean {
-        return false;
+        return true;
     }
 
     getCustomProperties(): string[] {
-        return [J.NodeProp.RSS_FEED_SRC];
+        // 'content' is not a prop actually (it's a field on SubNode), but we need to return it here to allow editing
+        // of it when we also have custom properties.
+        return [J.NodeProp.RSS_FEED_SRC, "content"];
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
@@ -78,93 +80,107 @@ export class RssTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
+    super_render = this.render;
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+
+        let feedContent: Comp = null;
 
         // console.log("RSSTypeHandler.render");
         const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
-        if (!feedSrc) {
-            return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
-        }
+        if (feedSrc) {
+            const feedSrcHash = S.util.hashOfString(feedSrc);
 
-        const feedSrcHash = S.util.hashOfString(feedSrc);
-        const itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
-
-        /*
-        If we find the RSS feed in the cache, use it.
-        disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
-        figure this out yet.
-        */
-        if (state.rssFeedCache[feedSrcHash] === "failed") {
-            return new Div("Feed Failed: " + feedSrc, {
-                className: "marginAll"
-            });
-        }
-        else if (state.rssFeedCache[feedSrcHash] === "loading") {
-            return new Div(null, null, [
-                new Div(null, {
-                    className: "progressSpinner"
-                }, [new Spinner()])
-            ]);
-        }
-        /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
-        else if (state.rssFeedCache[feedSrcHash]) {
-            this.renderItem(state.rssFeedCache[feedSrcHash], feedSrc, itemListContainer, state);
-        }
-        // otherwise read from the server
-        else {
-            itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
-            itemListContainer.addChild(new Spinner());
-
-            /* warning: paging here is not zero offset. First page is number 1 */
-            let page: number = state.rssFeedPage[feedSrcHash];
-            if (!page) {
-                page = 1;
-                state.rssFeedPage[feedSrcHash] = page;
+            /*
+            If we find the RSS feed in the cache, use it.
+            disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
+            figure this out yet.
+            */
+            if (state.rssFeedCache[feedSrcHash] === "failed") {
+                feedContent = new Div("Feed Failed: " + feedSrc, {
+                    className: "marginAll"
+                });
             }
-
-            (async () => {
-                const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
-                    urls: feedSrc,
-                    page
-                }, true);
-
-                if (!res?.feed) {
-                    // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
-                    // console.log(err.message || "RSS Feed failed to load.");
-                    dispatch("RSSUpdated", s => {
-                        s.rssFeedCache[feedSrcHash] = "failed";
+            // if it's currently loading show the spinner
+            else if (state.rssFeedCache[feedSrcHash] === "loading") {
+                feedContent = new Div(null, { className: "bigMargin" }, [
+                    new Heading(4, "Loading RSS Feed..."),
+                    new Spinner()
+                ]);
+            }
+            else if (!state.rssFeedCache[feedSrcHash]) {
+                feedContent = new Button("Load Feed", () => {
+                    dispatch("LoadingFeed", s => {
+                        s.rssFeedCache[feedSrcHash] = "loading";
+                        this.loadFeed(state, feedSrcHash, feedSrc);
                         return s;
                     });
-                }
-                else {
-                    dispatch("RSSUpdated", s => {
-                        S.domUtil.focusId(C.TAB_MAIN);
-                        S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
-                        setTimeout(() => {
-                            S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
-                        }, 1000);
-
-                        if (!res.feed.entries || res.feed.entries.length === 0) {
-                            s.rssFeedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
-                            s.rssFeedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
-                            setTimeout(() => {
-                                S.util.showMessage("No more RSS items found.", "RSS");
-                            }, 250);
-                        }
-                        else {
-                            s.rssFeedCache[feedSrcHash] = res.feed;
-                            RssTypeHandler.lastGoodFeed = res.feed;
-                            RssTypeHandler.lastGoodPage = s.rssFeedPage[feedSrcHash];
-                        }
-                        return s;
-                    });
-                }
-            })();
+                }, null, "btn-primary marginLeft marginBottom");
+            }
+            /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
+            else if (state.rssFeedCache[feedSrcHash]) {
+                feedContent = this.renderItem(state.rssFeedCache[feedSrcHash], feedSrc, state);
+            }
+            else {
+                console.error("unknown state in feed runner");
+            }
         }
-        return itemListContainer;
+
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, state);
+        return new Div(null, null, [
+            baseComp,
+            feedContent
+        ]);
     }
 
-    renderItem(feed: J.RssFeed, feedSrc: string, itemListContainer: Comp, state: AppState) {
+    // otherwise read from the server
+    loadFeed = async (state: AppState, feedSrcHash: string, feedSrc: string) => {
+        /* warning: paging here is not zero offset. First page is number 1 */
+        let page: number = state.rssFeedPage[feedSrcHash];
+        if (!page) {
+            page = 1;
+            state.rssFeedPage[feedSrcHash] = page;
+        }
+
+        const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+            urls: feedSrc,
+            page
+        }, true);
+
+        if (!res?.feed) {
+            // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
+            // console.log(err.message || "RSS Feed failed to load.");
+            dispatch("RSSUpdated", s => {
+                s.rssFeedCache[feedSrcHash] = "failed";
+                return s;
+            });
+        }
+        else {
+            dispatch("RSSUpdated", s => {
+                S.domUtil.focusId(C.TAB_MAIN);
+                S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
+                setTimeout(() => {
+                    S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
+                }, 1000);
+
+                if (!res.feed.entries || res.feed.entries.length === 0) {
+                    s.rssFeedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
+                    s.rssFeedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
+                    setTimeout(() => {
+                        S.util.showMessage("No more RSS items found.", "RSS");
+                    }, 250);
+                }
+                else {
+                    s.rssFeedCache[feedSrcHash] = res.feed;
+                    RssTypeHandler.lastGoodFeed = res.feed;
+                    RssTypeHandler.lastGoodPage = s.rssFeedPage[feedSrcHash];
+                }
+                return s;
+            });
+        }
+    }
+
+    renderItem(feed: J.RssFeed, feedSrc: string, state: AppState): Comp {
+        const feedList = new Div("", { className: "rss-feed-listing" });
         const feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
@@ -174,7 +190,7 @@ export class RssTypeHandler extends TypeBase {
             page = 1;
         }
 
-        itemListContainer.addChild(new Checkbox("Headlines Only", {
+        feedList.addChild(new Checkbox("Headlines Only", {
             className: "float-end"
         }, {
             setValue: (checked: boolean) => {
@@ -186,7 +202,7 @@ export class RssTypeHandler extends TypeBase {
             getValue: (): boolean => state.userPrefs.rssHeadlinesOnly
         }));
 
-        itemListContainer.addChild(this.makeNavButtonBar(page, feedSrcHash, state));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, state));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -229,23 +245,24 @@ export class RssTypeHandler extends TypeBase {
         }
 
         const feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
-        itemListContainer.addChild(feedOutDiv);
+        feedList.addChild(feedOutDiv);
 
         for (const item of feed.entries) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
-            itemListContainer.addChild(this.buildFeedItem(feed, item, state));
+            feedList.addChild(this.buildFeedItem(feed, item, state));
         }
 
-        itemListContainer.addChild(this.makeNavButtonBar(page, feedSrcHash, state));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, state));
+        return feedList;
     }
 
-    makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {
+    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, state: AppState): ButtonBar => {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.setPage(feedSrcHash, state, 1);
+                    this.setPage(feedSrc, feedSrcHash, state, 1);
                 },
                 title: "First Page"
             }) : null,
@@ -253,7 +270,7 @@ export class RssTypeHandler extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrcHash, state, -1);
+                    this.pageBump(feedSrc, feedSrcHash, state, -1);
                 },
                 title: "Previous Page"
             }) : null,
@@ -261,7 +278,7 @@ export class RssTypeHandler extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrcHash, state, 1);
+                    this.pageBump(feedSrc, feedSrcHash, state, 1);
                 },
                 title: "Next Page"
             })
@@ -269,20 +286,21 @@ export class RssTypeHandler extends TypeBase {
     }
 
     /* cleverly does both prev or next paging */
-    pageBump = (feedSrcHash: string, state: AppState, bump: number) => {
+    pageBump = (feedSrc: string, feedSrcHash: string, state: AppState, bump: number) => {
         let page: number = state.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
         if (page + bump < 1) return;
-        this.setPage(feedSrcHash, state, page + bump);
+        this.setPage(feedSrc, feedSrcHash, state, page + bump);
     }
 
-    setPage = (feedSrcHash: string, state: AppState, page: number) => {
+    setPage = (feedSrc: string, feedSrcHash: string, state: AppState, page: number) => {
         dispatch("RSSUpdated", s => {
             // deleting will force a requery from the server
-            delete s.rssFeedCache[feedSrcHash];
+            s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
+            this.loadFeed(state, feedSrcHash, feedSrc);
             return s;
         });
     }
@@ -326,6 +344,11 @@ export class RssTypeHandler extends TypeBase {
                 className: "rssSubTitle"
             }));
         }
+
+        children.push(entry.parentFeedTitle ? new Div(null, {
+            // className: "marginRight",
+            dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
+        }) : null);
 
         children.push(new Div(null, null, headerDivChildren));
 
@@ -433,15 +456,10 @@ export class RssTypeHandler extends TypeBase {
         }) : null;
 
         const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
-        const parentTitle =
-            entry.parentFeedTitle ? new Span(null, {
-                className: "marginRight",
-                dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
-            }) : null;
 
         children.push(new Div(null, null, [
             new Span(null, { className: "float-end" }, [
-                parentTitle, footerSpan, postIcon, linkIcon, bookmarkIcon
+                footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),
             // is this clearfix needed now that we wrapped this stuff in this div?
             new Clearfix()

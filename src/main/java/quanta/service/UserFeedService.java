@@ -63,7 +63,7 @@ public class UserFeedService extends ServiceBase {
 		//         but we can probably do some kind of hack/hijack and make those special system nodes use a priority value or something whic
 		//         we can filter out by saying "not equal to special node priority"...becasue we have a priority index already.
 		//         Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely be ONE MORE index.
-		//   IMPORTANT: this code is in OTHER PLACES in this file too!
+		//   IMPORTANT: this code is in OTHER PLACES in the app too! ...the in(a, b, ...) clause.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		// DO NOT DELETE (keep as example)

@@ -1275,7 +1275,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
 	public @ResponseBody Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
-		return callProc.run("renderDocuoment", req, session, ms -> {
+		return callProc.run("renderDocument", req, session, ms -> {
 			return search.renderDocument(ms, req);
 		});
 	}

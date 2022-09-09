@@ -16,6 +16,7 @@ public class RoomType extends TypeBase {
     }
 
     public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
-        snUtil.setNodePublicAppendable(node.getVal());
+        // todo-0: What was this? Creating a chat room makes the PARENT public appendable ?
+        // snUtil.setNodePublicAppendable(node.getVal());
     }
 }

@@ -759,7 +759,7 @@ export class EditNodeDlg extends DialogBase {
                 editItems.push(checkbox);
             }
             else {
-                editItems.push(new Label(label));
+                editItems.push(new Label(label, { className: "marginTop" }));
             }
 
             let valEditor: CompIntf = null;
