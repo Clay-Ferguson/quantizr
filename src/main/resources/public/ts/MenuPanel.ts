@@ -433,7 +433,7 @@ export class MenuPanel extends Div {
         children.push(new Menu(state, "Encrypt", [
             new MenuItem("Show Keys", MenuPanel.showKeys, !appState.isAnonUser), //
             new MenuItem("Generate Keys", MenuPanel.generateKeys, !appState.isAnonUser), //
-            new MenuItem("Publish Keys", MenuPanel.publishKeys, !appState.isAnonUser), //
+            new MenuItem("Publish Public Key", MenuPanel.publishKeys, !appState.isAnonUser), //
             new MenuItem("Import Keys", MenuPanel.importKeys, !appState.isAnonUser) //
         ], null, this.makeHelpIcon(":menu-encrypt")));
 

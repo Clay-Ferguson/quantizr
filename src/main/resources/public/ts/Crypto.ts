@@ -23,14 +23,19 @@ export class Crypto {
 
     static FORMAT_PEM: string = "pem";
 
-    // asymetric keys (public/private)
+    // asymetric ENCRYPTION keys (public/private)
     STORE_ASYMKEY = "asymkey";
 
-    // symmetric key
+    // symmetric ENCRYPTION key
     STORE_SYMKEY = "symkey";
+
+    // signature sign/verify keys (public/private)
+    STORE_SIGKEY = "sigkey";
 
     // 'Public Key' AES Encryption algo.
     ASYM_ALGO = "RSA-OAEP";
+
+    SIG_ALGO = "RSASSA-PKCS1-v1_5";
 
     // Symmetric Algo. We use GCM mode of AES because it detects data corruptions during decryption
     SYM_ALGO = "AES-GCM";
@@ -43,6 +48,7 @@ export class Crypto {
     };
 
     OP_ENC_DEC: KeyUsage[] = ["encrypt", "decrypt"];
+    OP_SIGN_VERIFY: KeyUsage[] = ["sign", "verify"];
     OP_ENC: KeyUsage[] = ["encrypt"];
     OP_DEC: KeyUsage[] = ["decrypt"];
 
@@ -87,9 +93,32 @@ export class Crypto {
     }
 
     signatureTest = async (): Promise<string> => {
-        // todo-0: ...implement
-        console.log("signatureTest Encryption Tests: OK");
+        const myData = "Data to be Signed";
+        const signature = await this.sign(null, myData);
+        console.log("Signature: " + signature);
+        const verified = await this.verify(null, signature, myData);
+        console.log("signatureTest Encryption Tests: Verified=" + verified);
         return "";
+    }
+
+    /* Returns hex string representing the signature data */
+    sign = async (privateKey: CryptoKey, data: string): Promise<string> => {
+        privateKey = privateKey || await this.getPrivateSigKey();
+
+        const sigBuf: ArrayBuffer = await crypto.subtle.sign(this.SIG_ALGO,
+            privateKey,
+            new TextEncoder().encode(data));
+
+        return S.util.buf2hex(new Uint8Array(sigBuf));
+    }
+
+    verify = async (publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> => {
+        publicKey = publicKey || await this.getPublicSigKey();
+
+        return await crypto.subtle.verify(this.SIG_ALGO,
+            publicKey,
+            S.util.hex2buf(sigBuf),
+            new TextEncoder().encode(data));
     }
 
     secureMessagingTest = async () => {
@@ -211,10 +240,27 @@ export class Crypto {
         }
         await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
+        await this.initSigKeys(forceUpdate, republish, showConfirm);
     }
 
-    getPrivateKey = async (): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(S.crypto.STORE_ASYMKEY);
+    getPrivateEncKey = async (): Promise<CryptoKey> => {
+        return this.getPrivateKey(S.crypto.STORE_ASYMKEY);
+    }
+
+    getPublicEncKey = async (): Promise<CryptoKey> => {
+        return this.getPublicKey(S.crypto.STORE_ASYMKEY);
+    }
+
+    getPrivateSigKey = async (): Promise<CryptoKey> => {
+        return this.getPrivateKey(S.crypto.STORE_SIGKEY);
+    }
+
+    getPublicSigKey = async (): Promise<CryptoKey> => {
+        return this.getPublicKey(S.crypto.STORE_SIGKEY);
+    }
+
+    getPrivateKey = async (storeName: string): Promise<CryptoKey> => {
+        const val: any = await S.localDB.readObject(storeName);
         if (!val || !val.val) {
             console.error("Unable to get private key.");
             return null;
@@ -225,8 +271,8 @@ export class Crypto {
         }
     }
 
-    getPublicKey = async (): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(S.crypto.STORE_ASYMKEY);
+    getPublicKey = async (storeName: string): Promise<CryptoKey> => {
+        const val: any = await S.localDB.readObject(storeName);
         if (!val || !val.val) {
             console.error("Unable to get public key.");
             return null;
@@ -257,7 +303,68 @@ export class Crypto {
         }
     }
 
-    /* Note: a 'forceUpdate' always triggers the 'republish' */
+    /*
+    Initialize keys for sign/verify.
+    Note: a 'forceUpdate' always triggers the 'republish'
+    */
+    initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+        let keyPair: CryptoKeyPair = null;
+        let pubKeyStr: string = null;
+
+        if (!forceUpdate) {
+            /* Check to see if there is a key stored, and if not force it to be created
+               val.val is the EncryptionKeyPair here.
+            */
+            const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
+            if (!val) {
+                forceUpdate = true;
+            }
+        }
+
+        if (forceUpdate) {
+            // todo-0: need to vet these parameters, this just came from an example online.
+            keyPair = await crypto.subtle.generateKey({
+                name: this.SIG_ALGO,
+                modulusLength: 2048,
+                publicExponent: new Uint8Array([1, 0, 1]),
+                hash: { name: "SHA-256" }
+            }, true, this.OP_SIGN_VERIFY);
+
+            await S.localDB.writeObject({ name: this.STORE_SIGKEY, val: keyPair });
+
+            const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            pubKeyStr = JSON.stringify(pubKeyDat);
+            // console.log("Exporting key string: " + pubKeyStr);
+            republish = true;
+        }
+
+        if (republish) {
+            if (!keyPair) {
+                const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
+                keyPair = val.val;
+            }
+
+            if (!pubKeyStr) {
+                const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+                pubKeyStr = JSON.stringify(publicKeyDat);
+            }
+
+            // todo-0: enable this but we need to consolidate so that we can send this ENC key AND the sig public key to server,
+            // both at once, at the end of initKeys()
+            // const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+            //     keyJson: pubKeyStr
+            // });
+            // if (showConfirm) {
+            //     S.util.showMessage(res.message, "Published Public Key");
+            // }
+        }
+        console.log("sig key init done.");
+    }
+
+    /*
+    Init keys for encryption.
+    Note: a 'forceUpdate' always triggers the 'republish'
+    */
     initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
@@ -399,7 +506,7 @@ export class Crypto {
     }
 
     symEncryptStringWithCipherKey = async (cipherKey: string, data: string): Promise<string> => {
-        const privateKey = await S.crypto.getPrivateKey();
+        const privateKey = await S.crypto.getPrivateEncKey();
         const symKeyJsonStr: string = await S.crypto.asymDecryptString(privateKey, cipherKey);
         const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
         const symKey = await S.crypto.importKey(symKeyJsonObj, S.crypto.SYM_ALGO, true, S.crypto.OP_ENC_DEC);
@@ -426,7 +533,7 @@ export class Crypto {
      * and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
-        publicKey = publicKey || await this.getPublicKey();
+        publicKey = publicKey || await this.getPublicEncKey();
 
         // generate random symmetric key
         const key: CryptoKey = await this.genSymKey();
@@ -466,7 +573,7 @@ export class Crypto {
 
         try {
             // console.log("decrypting [" + skpd.cipherText + "] with cipherKey: " + skpd.cipherKey);
-            privateKey = privateKey || await this.getPrivateKey();
+            privateKey = privateKey || await this.getPrivateEncKey();
 
             if (!privateKey) {
                 console.log("unable to get privateKey");
@@ -536,6 +643,8 @@ export class Crypto {
 
     // NOTE: TextEncoder() and TextDecoder() don't support this yet, so we have these two
     // functions.
+    // This can work?? in browser?
+    // const messageData = new TextEncoder().encode(message);
     convertStringToByteArray = (str: string): Uint8Array => {
         const bytes = new Uint8Array(str.length);
         for (let i = 0; i < str.length; i++) {

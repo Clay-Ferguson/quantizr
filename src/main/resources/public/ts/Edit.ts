@@ -1363,7 +1363,7 @@ export class Edit {
         // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
         // get this broswer's private key from browser storage
-        const privateKey: CryptoKey = await S.crypto.getPrivateKey();
+        const privateKey: CryptoKey = await S.crypto.getPrivateEncKey();
 
         // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
         const clearKey = await S.crypto.asymDecryptString(privateKey, cipherKey);
