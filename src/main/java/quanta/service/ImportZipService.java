@@ -39,7 +39,6 @@ public class ImportZipService extends ImportArchiveBase {
 	 * itself)
 	 */
 	public SubNode inportFromResource(MongoSession ms, String resourceName, SubNode node, String nodeName) {
-
 		Resource resource = context.getResource(resourceName);
 		InputStream is = null;
 		SubNode rootNode = null;
@@ -57,7 +56,10 @@ public class ImportZipService extends ImportArchiveBase {
 		return rootNode;
 	}
 
-	/* Returns the first node created which is always the root of the import */
+	/* Returns the first node created which is always the root of the import 
+	 * 
+	 * Assumes ms has already been verified as owner of 'node'
+	*/
 	public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node, boolean isNonRequestThread) {
 		SessionContext sc = ThreadLocals.getSC();
 		if (used) {

@@ -362,9 +362,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				 */
 				String fullPath = node.getPath();
 				String relPath = fullPath.substring(rootPathParent.length());
-				node.setPath(relPath);
-				String json = XString.prettyPrint(node);
-				node.setPath(fullPath);
+				String json = null;
+				try {
+					node.setPath(relPath);
+					json = XString.prettyPrint(node);
+				} finally {
+					node.setPath(fullPath);
+				}
 
 				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json", json.getBytes(StandardCharsets.UTF_8));
 

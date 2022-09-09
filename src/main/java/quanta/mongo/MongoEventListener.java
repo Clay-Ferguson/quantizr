@@ -158,6 +158,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// log.debug("Actual Path Saved: " + path);
 			dbObj.put(SubNode.PATH, path);
 			node.setPath(path);
+			isNew = true;
 		}
 
 		saveAuthByThread(node, isNew);
@@ -299,7 +300,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (ms.isAdmin())
 				return;
 
-			// Must have write privileges to this node or one of it's parents.
+			// Must have write privileges to this node.
 			auth.ownerAuth(node);
 
 			// only if this is creating a new node do we need to chech that the parent will allow it

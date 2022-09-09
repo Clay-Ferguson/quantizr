@@ -31,6 +31,7 @@ public class ImportService extends ServiceBase {
 		if (no(node)) {
 			throw ExUtil.wrapEx("Node not found.");
 		}
+		auth.ownerAuth(ms, node);
 
 		if (uploadFiles.length != 1) {
 			throw ExUtil.wrapEx("Multiple file import not allowed");

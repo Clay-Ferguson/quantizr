@@ -241,7 +241,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx(ex);
 			}
 		} else {
-			auth.ownerAuth(node);
+			auth.ownerAuth(ms, node);
 		}
 
 		/* mimeType can be passed as null if it's not yet determined */
