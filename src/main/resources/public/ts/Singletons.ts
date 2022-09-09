@@ -1,7 +1,7 @@
 import type { Attachment } from "./Attachment";
 import type { DomUtil } from "./DomUtil";
 import type { Edit } from "./Edit";
-import type { Encryption } from "./Encryption";
+import type { Crypto } from "./Crypto";
 import type { LocalDB } from "./LocalDB";
 import type { Nav } from "./Nav";
 import type { NodeUtil } from "./NodeUtil";
@@ -31,7 +31,7 @@ export interface Singletons {
     push: ServerPush;
     edit: Edit;
     attachment: Attachment;
-    encryption: Encryption;
+    crypto: Crypto;
     nav: Nav;
     props: Props;
     render: Render;

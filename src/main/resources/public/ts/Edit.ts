@@ -1363,10 +1363,10 @@ export class Edit {
         // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
         // get this broswer's private key from browser storage
-        const privateKey: CryptoKey = await S.encryption.getPrivateKey();
+        const privateKey: CryptoKey = await S.crypto.getPrivateKey();
 
         // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
-        const clearKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
+        const clearKey = await S.crypto.asymDecryptString(privateKey, cipherKey);
         if (!clearKey) {
             throw new Error("Unable to access encryption key.");
         }
@@ -1376,10 +1376,10 @@ export class Edit {
 
         // first parse the key and build a usable key from principalPublicKey.
         const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
-        const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
+        const principalPublicKey = await S.crypto.importKey(principalSymKeyJsonObj, S.crypto.ASYM_IMPORT_ALGO, true, S.crypto.OP_ENC);
 
         // now re-encrypt this clearTextKey using the public key (of the user being shared to).
-        const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearKey);
+        const userCipherKey = await S.crypto.asymEncryptString(principalPublicKey, clearKey);
         // console.log("userCipherKey=" + userCipherKey);
 
         /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will

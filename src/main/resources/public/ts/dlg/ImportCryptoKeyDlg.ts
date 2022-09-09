@@ -37,7 +37,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
             S.util.showMessage("Enter key text.", "Warning");
             return;
         }
-        const success = await S.encryption.importKeyPair(keyText);
+        const success = await S.crypto.importKeyPair(keyText);
         if (!success) {
             S.util.showMessage("Invalid key text", "Warning");
             return;

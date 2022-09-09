@@ -25,7 +25,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
     }
 
     async preLoad(): Promise<void> {
-        const keyJson: string = await S.encryption.exportKeys();
+        const keyJson: string = await S.crypto.exportKeys();
         this.mergeState<LS>({ keyJson });
     }
 }

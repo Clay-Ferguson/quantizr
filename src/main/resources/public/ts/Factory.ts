@@ -11,7 +11,7 @@ import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
-import { Encryption } from "./Encryption";
+import { Crypto } from "./Crypto";
 import { LocalDB } from "./LocalDB";
 import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
@@ -51,7 +51,7 @@ export class Factory {
             S.push = new ServerPush();
             S.edit = new Edit();
             S.attachment = new Attachment();
-            S.encryption = new Encryption();
+            S.crypto = new Crypto();
             S.nav = new Nav();
             S.props = new Props();
             S.render = new Render();

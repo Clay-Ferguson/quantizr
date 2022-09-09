@@ -166,7 +166,7 @@ export class NodeCompMarkdown extends Html {
         const cipherKey = S.props.getCryptoKey(this.node, appState);
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
-            let clearText = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+            let clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
             clearText = clearText || "[Decrypt Failed]";
             clearText = this.renderRawMarkdown(this.node, clearText);
 

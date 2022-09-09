@@ -1,6 +1,6 @@
 import { dispatch, getAppState } from "../AppContext";
 import { DialogMode } from "../DialogBase";
-import { SymKeyDataPackage } from "../Encryption";
+import { SymKeyDataPackage } from "../Crypto";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
@@ -56,7 +56,7 @@ export class EditNodeDlgUtil {
             content = dlg.contentEditor.getValue();
             const cipherKey = S.props.getCryptoKey(editNode, getAppState());
             if (cipherKey) {
-                content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
+                content = await S.crypto.symEncryptStringWithCipherKey(cipherKey, content);
                 content = J.Constant.ENC_TAG + content;
             }
         }
@@ -260,7 +260,7 @@ export class EditNodeDlgUtil {
                         if (!appState.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
                             const content = dlg.contentEditor.getValue();
 
-                            const skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                            const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
                             appState.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
 
                             /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt

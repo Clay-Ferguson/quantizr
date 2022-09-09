@@ -147,7 +147,7 @@ export class MenuPanel extends Div {
     };
 
     static generateKeys = () => { S.util.generateNewCryptoKeys(getAppState(null)); };
-    static publishKeys = () => { S.encryption.initKeys(false, true, true); };
+    static publishKeys = () => { S.crypto.initKeys(false, true, true); };
     static importKeys = () => { new ImportCryptoKeyDlg().open(); };
     static profile = () => { new UserProfileDlg(null).open(); };
     static accountSettings = () => { new ManageAccountDlg().open(); };
@@ -508,9 +508,13 @@ export class MenuPanel extends Div {
                 new MenuItem("Send Email", () => S.util.sendTestEmail()),
                 new MenuItem("Server Log Text", () => S.util.sendLogText()),
                 new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
-                new MenuItem("Encryption", async () => {
-                    await S.encryption.test();
-                    S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
+                new MenuItem("WebCrypto Encryption", async () => {
+                    await S.crypto.encryptionTest();
+                    S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
+                }),
+                new MenuItem("WebCrypto Signatures", async () => {
+                    await S.crypto.signatureTest();
+                    S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
                 }),
                 new MenuItem("Text to Speech", async () => {
                     const tts = window.speechSynthesis;

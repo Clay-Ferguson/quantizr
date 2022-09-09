@@ -818,7 +818,7 @@ export class EditNodeDlg extends DialogBase {
                 (async () => {
                     const cipherKey = S.props.getCryptoKey(node, getAppState());
                     if (cipherKey) {
-                        const clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+                        const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
 
                         if (!clearText) {
                             this.contentEditorState.setError("Decryption Failed");

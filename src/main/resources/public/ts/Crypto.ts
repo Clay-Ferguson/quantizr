@@ -19,7 +19,7 @@ Original way I had for creating a hashe-based key from a password:
     let keyPromise = this.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"]);
 */
 
-export class Encryption {
+export class Crypto {
 
     static FORMAT_PEM: string = "pem";
 
@@ -77,12 +77,18 @@ export class Encryption {
        Assumes that Encryption.initKeys() has previously been called, which is
        safe to assume because we run it during app initialization.
     */
-    test = async (): Promise<string> => {
+    encryptionTest = async (): Promise<string> => {
         this.runConversionTest();
         await this.runPublicKeyTest();
         await this.symetricEncryptionTest();
         await this.secureMessagingTest();
         console.log("All Encryption Tests: OK");
+        return "";
+    }
+
+    signatureTest = async (): Promise<string> => {
+        // todo-0: ...implement
+        console.log("signatureTest Encryption Tests: OK");
         return "";
     }
 
@@ -208,7 +214,7 @@ export class Encryption {
     }
 
     getPrivateKey = async (): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
+        const val: any = await S.localDB.readObject(S.crypto.STORE_ASYMKEY);
         if (!val || !val.val) {
             console.error("Unable to get private key.");
             return null;
@@ -220,7 +226,7 @@ export class Encryption {
     }
 
     getPublicKey = async (): Promise<CryptoKey> => {
-        const val: any = await S.localDB.readObject(S.encryption.STORE_ASYMKEY);
+        const val: any = await S.localDB.readObject(S.crypto.STORE_ASYMKEY);
         if (!val || !val.val) {
             console.error("Unable to get public key.");
             return null;
@@ -393,11 +399,11 @@ export class Encryption {
     }
 
     symEncryptStringWithCipherKey = async (cipherKey: string, data: string): Promise<string> => {
-        const privateKey = await S.encryption.getPrivateKey();
-        const symKeyJsonStr: string = await S.encryption.asymDecryptString(privateKey, cipherKey);
+        const privateKey = await S.crypto.getPrivateKey();
+        const symKeyJsonStr: string = await S.crypto.asymDecryptString(privateKey, cipherKey);
         const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
-        const symKey = await S.encryption.importKey(symKeyJsonObj, S.encryption.SYM_ALGO, true, S.encryption.OP_ENC_DEC);
-        return await S.encryption.symEncryptString(symKey, data);
+        const symKey = await S.crypto.importKey(symKeyJsonObj, S.crypto.SYM_ALGO, true, S.crypto.OP_ENC_DEC);
+        return await S.crypto.symEncryptString(symKey, data);
     }
 
     /**

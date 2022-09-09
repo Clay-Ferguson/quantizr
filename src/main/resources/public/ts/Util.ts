@@ -719,7 +719,7 @@ export class Util {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            S.encryption.initKeys(true);
+            S.crypto.initKeys(true);
         }
     }
 

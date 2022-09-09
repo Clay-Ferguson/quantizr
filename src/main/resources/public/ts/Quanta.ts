@@ -327,7 +327,7 @@ export class Quanta {
             S.domUtil.enableMouseEffect();
 
             setTimeout(() => {
-                S.encryption.initKeys();
+                S.crypto.initKeys();
             }, 1000);
         }
         catch (e) {
