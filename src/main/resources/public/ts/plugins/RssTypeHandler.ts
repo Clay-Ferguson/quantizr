@@ -25,7 +25,6 @@ import { S } from "../Singletons";
 import { MainTab } from "../tabs/data/MainTab";
 import { TypeBase } from "./base/TypeBase";
 
-// todo-0: stop making this block the editing of the content area.
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
     static lastGoodFeed: J.RssFeed;

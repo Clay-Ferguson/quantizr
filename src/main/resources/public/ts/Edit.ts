@@ -580,7 +580,7 @@ export class Edit {
         state.userPrefs.showReplies = !state.userPrefs.showReplies;
         await S.util.saveUserPreferences(state, false);
 
-        // todo-0: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
+        // todo-1: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
         if (state.activeTab === C.TAB_MAIN) {
             S.quanta.refresh(state);
         }
