@@ -108,6 +108,7 @@ public class SystemService extends ServiceBase {
 			});
 
 			ret += runMongoDbCommand(new Document("compact", "nodes"));
+			ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
 		}
 		//
 		finally {

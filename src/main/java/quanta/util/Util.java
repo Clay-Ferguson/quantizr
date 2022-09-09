@@ -54,7 +54,6 @@ public class Util {
 		}
 	}
 
-
 	public static boolean isSpringAuthenticated() {
 		return ok(SecurityContextHolder.getContext().getAuthentication())
 				&& SecurityContextHolder.getContext().getAuthentication().isAuthenticated();

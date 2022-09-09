@@ -147,6 +147,7 @@ export class Props {
     }
 
     isWritableByMe = (node: J.NodeInfo): boolean => {
+        if (!node) return false;
         const appState = getAppState();
 
         // anonymous can never write
