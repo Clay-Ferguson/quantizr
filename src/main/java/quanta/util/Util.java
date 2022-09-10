@@ -25,25 +25,22 @@ public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
 	private static final Random rand = new Random();
 
-	private static final String[] IP_HEADERS_TO_TRY = {
-		"X-Forwarded-For",
-		"Proxy-Client-IP",
-		"WL-Proxy-Client-IP",
-		"HTTP_X_FORWARDED_FOR",
-		"HTTP_X_FORWARDED",
-		"HTTP_X_CLUSTER_CLIENT_IP",
-		"HTTP_CLIENT_IP",
-		"HTTP_FORWARDED_FOR",
-		"HTTP_FORWARDED",
-		"HTTP_VIA",
-		"REMOTE_ADDR" };
-
 	public static boolean no(Object o) {
 		return o == null;
 	}
 
 	public static boolean ok(Object o) {
 		return o != null;
+	}
+
+	// supposedly in Java 17, we now have this: HexFormat.of().parseHex(s) that can replace this.
+	public static byte[] hexStringToBytes(String s) {
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		}
+		return data;
 	}
 
 	public static void sleep(long millis) {
@@ -69,9 +66,10 @@ public class Util {
 	 * the only requirement is unique and unguessable.
 	 */
 	static long counter = 1357;
+
 	public static String genStrongToken() {
 		return String.valueOf(Math.abs(++counter + (new Date().getTime()) ^ Math.abs(rand.nextLong())));
-		
+
 	}
 
 	public static boolean equalObjs(Object o1, Object o2) {

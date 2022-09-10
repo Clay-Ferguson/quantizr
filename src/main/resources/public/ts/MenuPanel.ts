@@ -95,8 +95,8 @@ export class MenuPanel extends Div {
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time", 0, true);
-    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time (non-Recursive)", 0, false);
-    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time (non-Recursive)", 0, false);
+    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", getAppState(null), null, "Rev-chron by Create Time (top level)", 0, false);
+    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", getAppState(null), null, "Rev-chron by Modify Time (top level)", 0, false);
     static showCalendar = () => S.render.showCalendar(null, getAppState(null));
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAppState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAppState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);

@@ -31,6 +31,7 @@ import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
+import quanta.service.CryptoService;
 import quanta.service.GraphNodesService;
 import quanta.service.IPFSCat;
 import quanta.service.IPFSConfig;
@@ -153,6 +154,7 @@ public class ServiceBase {
 	public static MongoTemplate ops;
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
+	public static CryptoService crypto;
 
 	public static IPFSService ipfs;
 	public static IPFSCat ipfsCat;
@@ -236,6 +238,7 @@ public class ServiceBase {
 			roomType = getBean(ctx, RoomType.class);
 			rssType = getBean(ctx, RssFeedType.class);
 			mongoRepo = getBean(ctx, MongoRepository.class);
+			crypto = getBean(ctx, CryptoService.class);
 
 			ipfs = getBean(ctx, IPFSService.class);
 			ipfsCat = getBean(ctx, IPFSCat.class);
@@ -248,7 +251,6 @@ public class ServiceBase {
 			ipfsRepo = getBean(ctx, IPFSRepo.class);
 			ipfsSwarm = getBean(ctx, IPFSSwarm.class);
 			ipfsConfig = getBean(ctx, IPFSConfig.class);
-
 			ipfsPubSub = getBean(ctx, IPFSPubSub.class);
 
 			initComplete = true;

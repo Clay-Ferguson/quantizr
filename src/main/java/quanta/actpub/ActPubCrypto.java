@@ -286,7 +286,7 @@ public class ActPubCrypto extends ServiceBase {
      */
     public boolean ownerHasKey(MongoSession ms, SubNode node, String key) {
         acl.failIfAdminOwned(node);
-        
+
         SubNode accntNode = read.getNode(ms, node.getOwner());
         if (ok(accntNode)) {
             return key.equals(accntNode.getStr(NodeProp.ACT_PUB_KEYPEM));
