@@ -1,3 +1,4 @@
+import { getAppState } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -721,7 +722,7 @@ export class Crypto {
         // we need to concat the path+content
         try {
             const sig: string = await S.crypto.sign(null, signData);
-            // console.log("signData: [" + signData + "] sig: " + sig);
+            // console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
 
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
         }
@@ -733,14 +734,14 @@ export class Crypto {
 
     // called after each "renderNode". A temporary hack to update admin signatures.
     renderNodeCryptoHook = (res: J.RenderNodeResponse) => {
-        if (!Crypto.avail) return;
+        if (!Crypto.avail || !getAppState().isAdminUser) return;
         if (res?.node) {
             this.autoSignNodes([res.node, ...(res.node.children || [])])
         }
     }
 
     autoSignNodes = async (children: J.NodeInfo[]) => {
-        if (!Crypto.avail) return;
+        if (!Crypto.avail || !getAppState().isAdminUser) return;
         const sigs: J.NodeSig[] = [];
 
         for (const child of children) {
@@ -755,7 +756,7 @@ export class Crypto {
                 // get the sig that signNode will have just now put on the node.
                 sig = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, child);
                 if (sig) {
-                    // console.log("AutoSigning node: " + child.id + " sig: " + sig);
+                    // console.log("AutoSigning node: " + child.id); // + " sig: " + sig);
                     sigs.push({ nodeId: child.id, sig });
                 }
             }
@@ -765,7 +766,6 @@ export class Crypto {
             await S.rpcUtil.rpc<J.SaveNodeSigsRequest, J.SaveNodeSigsResponse>("saveNodeSigs", {
                 sigs
             });
-            S.util.showPageMessage("Set " + sigs.length + " signatures!");
         }
     }
 

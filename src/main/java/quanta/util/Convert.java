@@ -51,18 +51,12 @@ public class Convert extends ServiceBase {
 		boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
 
 		// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
-		boolean sigFailed = false;
 		if (signed && !crypto.nodeSigVerify(node, null)) {
-			log.debug("********* SIG FAILED: nodeId=" + node.getIdStr());
+			log.debug("SIG FAILED: nodeId=" + node.getIdStr());
 
-			// allow admin to see bad nodes, but we mark them up below.
-			if (sc.isAdmin()) {
-				sigFailed = true;
-			}
-			// if not admin a failed signature hides the node from end users
-			else {
-				return null;
-			}
+			// wip: only return null here once we have CONFIRMED we can browse all admin data and not see the
+			// SIG FAILED message in the logs at all.
+			// return null;
 		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
@@ -202,12 +196,6 @@ public class Convert extends ServiceBase {
 		// }
 
 		String content = node.getContent();
-
-		// Note: only the admin can ever see this appear on screen, because above it can only get set true if we're admin
-		if (sigFailed) {
-			content = "## ***** SIG FAILED *****\n\n" + content;
-		}
-
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
 				owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, likes, hasChildren, //

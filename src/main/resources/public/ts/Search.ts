@@ -236,9 +236,11 @@ export class Search {
             return;
         }
 
-        setTimeout(() => {
-            S.crypto.autoSignNodes(res.searchResults);
-        }, 2000);
+        if (state.isAdminUser) {
+            setTimeout(() => {
+                S.crypto.autoSignNodes(res.searchResults);
+            }, 100);
+        }
 
         dispatch("RenderDocumentResults", s => {
             S.domUtil.focusId(C.TAB_DOCUMENT);
