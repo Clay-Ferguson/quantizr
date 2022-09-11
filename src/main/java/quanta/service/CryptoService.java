@@ -8,6 +8,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -101,7 +102,7 @@ public class CryptoService extends ServiceBase {
 			}
 
 			String strToSign = path + "-" + node.getOwner().toHexString();
-			if (ok(node.getContent())) {
+			if (StringUtils.isNotEmpty(node.getContent())) {
 				strToSign += "-" + node.getContent();
 			}
 
