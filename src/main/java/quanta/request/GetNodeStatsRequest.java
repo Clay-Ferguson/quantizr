@@ -5,7 +5,8 @@ import quanta.request.base.RequestBase;
 public class GetNodeStatsRequest extends RequestBase {
     private String nodeId;
     private boolean trending;
-
+    private boolean signatureVerify;
+    
     /* True if this will be the trending button on the Feed tab running this for the Feed tab */
     private boolean feed;
 
@@ -59,5 +60,13 @@ public class GetNodeStatsRequest extends RequestBase {
 
     public void setGetTags(boolean getTags) {
         this.getTags = getTags;
+    }
+
+    public boolean isSignatureVerify() {
+        return signatureVerify;
+    }
+
+    public void setSignatureVerify(boolean signatureVerify) {
+        this.signatureVerify = signatureVerify;
     }
 }

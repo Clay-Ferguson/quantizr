@@ -117,7 +117,8 @@ export class SelectTagsDlg extends DialogBase {
             feed: false,
             getWords: false,
             getTags: true,
-            getMentions: false
+            getMentions: false,
+            signatureVerify: false
         });
 
         if (res.topTags?.length > 0) {

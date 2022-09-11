@@ -78,6 +78,7 @@ export class View {
                 singleNode: false,
                 parentCount: a.state.userPrefs.showParents ? 1 : 0
             });
+            S.crypto.renderNodeCryptoHook(res);
             if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
@@ -148,6 +149,7 @@ export class View {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
+            S.crypto.renderNodeCryptoHook(res);
 
             if (!res.node) return;
 
@@ -305,9 +307,24 @@ export class View {
             feed,
             getWords: true,
             getTags: true,
-            getMentions: true
+            getMentions: true,
+            signatureVerify: false
         });
         new NodeStatsDlg(res, trending, feed).open();
+    }
+
+    getNodeSignatureVerify = async (state: AppState): Promise<any> => {
+        const node = S.nodeUtil.getHighlightedNode(state);
+        const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+            nodeId: node ? node.id : null,
+            trending: false,
+            feed: false,
+            getWords: false,
+            getTags: false,
+            getMentions: false,
+            signatureVerify: true
+        });
+        new NodeStatsDlg(res, false, false).open();
     }
 
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {

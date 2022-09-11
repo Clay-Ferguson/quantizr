@@ -130,7 +130,7 @@ export class EditNodeDlg extends DialogBase {
                     nodeId: appState.editNode.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
                 }, "all");
-            }, 3000);
+            }, 6000);
         }
     }
 

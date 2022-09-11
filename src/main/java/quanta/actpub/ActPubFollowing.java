@@ -407,7 +407,9 @@ public class ActPubFollowing extends ServiceBase {
             for (SubNode node : iterable) {
                 NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, true, false, counter + 1, false,
                         false, false, false, false, false, null);
-                searchResults.add(info);
+                if (ok(info)) {
+                    searchResults.add(info);
+                }
             }
 
             res.setSearchResults(searchResults);

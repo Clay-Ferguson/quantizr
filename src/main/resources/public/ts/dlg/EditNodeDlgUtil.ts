@@ -68,12 +68,27 @@ export class EditNodeDlgUtil {
         editNode.name = dlg.nameState.getValue();
         editNode.tags = dlg.tagsState.getValue();
 
+        // todo-0: how is the auto splitting going to work with node signatures? Probably just need to REMOVE all
+        // signatures from all those nodes, and need a way to warn user that's what will happen? Look everywhere
+        // in the app for places the server creates a node on behelf of the user, and just be sure they never
+        // sign, but actually threre's no WAY to sign. The key doesn't even exist. But when splitting the node that
+        // got split, if signed, will now have an INVALD signature.
         const askToSplit = editNode.content && ((editNode as J.NodeInfo).content.indexOf("{split}") !== -1 ||
             (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(editNode, dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
+        // Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
+        // been encrypted just above.
+        // wip: signatures is still in beta so we only sign if admin for now
+        if (appState.isAdminUser) {
+            // Note: this needs to come AFTER the 'savePropsToNode' above becasue we're overriding what was
+            // possibly in there.
+            await S.crypto.signNode(editNode);
+        }
+
+        // console.log("Node Being Saved: "+S.util.prettyPrint(editNode));
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode
         });
@@ -315,6 +330,7 @@ export class EditNodeDlgUtil {
             singleNode: true,
             parentCount: 0
         });
+        S.crypto.renderNodeCryptoHook(res);
 
         if (res.node?.properties) {
             S.props.transferBinaryProps(res.node, node);

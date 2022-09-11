@@ -110,6 +110,7 @@ import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveNodeRequest;
+import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
@@ -930,6 +931,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("saveNode", req, session, ms -> {
 			return edit.saveNode(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/saveNodeSigs", method = RequestMethod.POST)
+	public @ResponseBody Object saveNodeSigs(@RequestBody SaveNodeSigsRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("saveNodeSigs", req, session, ms -> {
+			return edit.saveNodeSigs(ms, req);
 		});
 	}
 

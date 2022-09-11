@@ -20,6 +20,13 @@ Original way I had for creating a hashe-based key from a password:
 */
 
 export class Crypto {
+    static readonly avail: boolean = !!(crypto?.subtle);
+
+    // cache the keys here for faster access.
+    privateEncKey: CryptoKey = null;
+    publicEncKey: CryptoKey = null;
+    privateSigKey: CryptoKey = null;
+    publicSigKey: CryptoKey = null;
 
     static FORMAT_PEM: string = "pem";
 
@@ -60,7 +67,7 @@ export class Crypto {
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https)
         web address plus also localhost */
 
-        if (!crypto || !crypto.subtle) {
+        if (!Crypto.avail) {
             console.log("WebCryptoAPI not available");
             return;
         }
@@ -103,7 +110,10 @@ export class Crypto {
 
     /* Returns hex string representing the signature data */
     sign = async (privateKey: CryptoKey, data: string): Promise<string> => {
-        privateKey = privateKey || await this.getPrivateSigKey();
+        if (!Crypto.avail) return null;
+        if (!privateKey) {
+            privateKey = await this.getPrivateSigKey();
+        }
 
         const sigBuf: ArrayBuffer = await crypto.subtle.sign(this.SIG_ALGO,
             privateKey,
@@ -113,6 +123,7 @@ export class Crypto {
     }
 
     verify = async (publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> => {
+        if (!Crypto.avail) return null;
         publicKey = publicKey || await this.getPublicSigKey();
 
         return await crypto.subtle.verify(this.SIG_ALGO,
@@ -208,10 +219,12 @@ export class Crypto {
     }
 
     importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> => {
+        if (!Crypto.avail) return null;
         return crypto.subtle.importKey("jwk", key, algos, extractable, keyUsages);
     }
 
     importKeyPair = async (keyPair: string): Promise<boolean> => {
+        if (!Crypto.avail) return null;
         const keyPairObj: EncryptionKeyPair = JSON.parse(keyPair);
 
         const publicKey = await crypto.subtle.importKey("jwk", keyPairObj.publicKey, {
@@ -232,19 +245,13 @@ export class Crypto {
     }
 
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
-        if (!crypto.subtle) {
-            // apparently chrome no longer allows this on http connections?
-            // todo-0: if so, we need an across-the-board way to disable all crypto features when crypto supported by browser?
-            console.warn("crypto.subtle is not enabled");
-            return;
-        }
+        if (!Crypto.avail) return;
         const asymEncKey = await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
         const sigKey = await this.initSigKeys(forceUpdate, republish, showConfirm);
 
         if (republish && (asymEncKey || sigKey)) {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
-
                 // todo-0: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey,
                 sigKey
@@ -257,19 +264,27 @@ export class Crypto {
     }
 
     getPrivateEncKey = async (): Promise<CryptoKey> => {
-        return this.getPrivateKey(S.crypto.STORE_ASYMKEY);
+        if (this.privateEncKey) return this.privateEncKey;
+        this.privateEncKey = await this.getPrivateKey(S.crypto.STORE_ASYMKEY);
+        return this.privateEncKey;
     }
 
     getPublicEncKey = async (): Promise<CryptoKey> => {
-        return this.getPublicKey(S.crypto.STORE_ASYMKEY);
+        if (this.publicEncKey) return this.publicEncKey;
+        this.publicEncKey = await this.getPublicKey(S.crypto.STORE_ASYMKEY);
+        return this.publicEncKey;
     }
 
     getPrivateSigKey = async (): Promise<CryptoKey> => {
-        return this.getPrivateKey(S.crypto.STORE_SIGKEY);
+        if (this.privateSigKey) return this.privateSigKey;
+        this.privateSigKey = await this.getPrivateKey(S.crypto.STORE_SIGKEY);
+        return this.privateSigKey;
     }
 
     getPublicSigKey = async (): Promise<CryptoKey> => {
-        return this.getPublicKey(S.crypto.STORE_SIGKEY);
+        if (this.publicSigKey) return this.publicSigKey;
+        this.publicSigKey = await this.getPublicKey(S.crypto.STORE_SIGKEY);
+        return this.publicSigKey;
     }
 
     getPrivateKey = async (storeName: string): Promise<CryptoKey> => {
@@ -297,6 +312,7 @@ export class Crypto {
     }
 
     initSymetricKey = async (forceUpdate: boolean = false) => {
+        if (!Crypto.avail) return;
         const val: any = await S.localDB.readObject(this.STORE_SYMKEY);
         if (!val) {
             forceUpdate = true;
@@ -321,6 +337,7 @@ export class Crypto {
     Note: a 'forceUpdate' always triggers the 'republish'
     */
     initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
+        if (!Crypto.avail) return null;
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -370,6 +387,7 @@ export class Crypto {
     Note: a 'forceUpdate' always triggers the 'republish'
     */
     initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
+        if (!Crypto.avail) return null;
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -414,6 +432,7 @@ export class Crypto {
     }
 
     genSymKey = async (): Promise<CryptoKey> => {
+        if (!Crypto.avail) return null;
         const key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,
             length: 256
@@ -427,10 +446,33 @@ export class Crypto {
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */
     exportKeys = async (): Promise<string> => {
+        if (!Crypto.avail) return null;
         let ret = "";
 
         let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
         if (obj) {
+            ret += "Encryption Keypair\n";
+            ret += "====================\n"
+            const keyPair: EncryptionKeyPair = obj.val;
+
+            const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
+
+            const privDat = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+            // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
+
+            ret += "Key Pair (JWK Format):\n" + S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
+
+            // yes we export to spki for PEM (not a bug)
+            const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+            const pem = this.spkiToPEM(privDatSpki);
+            ret += "Public Key (PEM Format):\n" + pem + "\n\n";
+        }
+
+        obj = await S.localDB.readObject(this.STORE_SIGKEY);
+        if (obj) {
+            ret += "Signature Keypair\n";
+            ret += "====================\n"
             const keyPair: EncryptionKeyPair = obj.val;
 
             const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -449,6 +491,8 @@ export class Crypto {
 
         obj = await S.localDB.readObject(this.STORE_SYMKEY);
         if (obj) {
+            ret += "Symmetric Key\n";
+            ret += "====================\n"
             const key: CryptoKey = obj.val;
             const dat = await crypto.subtle.exportKey("jwk", key);
             const keyStr = S.util.prettyPrint(dat);
@@ -657,6 +701,72 @@ export class Crypto {
             str += String.fromCharCode(buffer[i]);
         }
         return str;
+    }
+
+    signNode = async (node: J.NodeInfo): Promise<void> => {
+        if (!Crypto.avail) return null;
+        let path: string = node.path;
+        // convert any 'pending (p)' path to a final verion of the path (no '/p/')
+        if (path.startsWith("/r/p/")) {
+            path = "/r/" + path.substring(5);
+        }
+
+        // wip: Need a warning that moving a node removes it's digital signature, and
+        // for now we can just blow away signatures when a node move happens, and make it a future feature
+        let signData: string = path + "-" + node.ownerId;
+        if (node.content) {
+            signData += "-" + node.content;
+        }
+
+        // we need to concat the path+content
+        try {
+            const sig: string = await S.crypto.sign(null, signData);
+            // console.log("signData: [" + signData + "] sig: " + sig);
+
+            S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
+        }
+        catch (e) {
+            S.util.logAndReThrow("Failed to sign data.", e);
+        }
+        return null;
+    }
+
+    // called after each "renderNode". A temporary hack to update admin signatures.
+    renderNodeCryptoHook = (res: J.RenderNodeResponse) => {
+        if (!Crypto.avail) return;
+        if (res?.node) {
+            this.autoSignNodes([res.node, ...(res.node.children || [])])
+        }
+    }
+
+    autoSignNodes = async (children: J.NodeInfo[]) => {
+        if (!Crypto.avail) return;
+        const sigs: J.NodeSig[] = [];
+
+        for (const child of children) {
+            // todo-0: for now only auto-signing admin owned nodes
+            if (child.owner !== J.PrincipalName.ADMIN) {
+                continue;
+            }
+            let sig = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, child);
+            if (!sig) {
+                await this.signNode(child);
+
+                // get the sig that signNode will have just now put on the node.
+                sig = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, child);
+                if (sig) {
+                    // console.log("AutoSigning node: " + child.id + " sig: " + sig);
+                    sigs.push({ nodeId: child.id, sig });
+                }
+            }
+        }
+
+        if (sigs.length > 0) {
+            await S.rpcUtil.rpc<J.SaveNodeSigsRequest, J.SaveNodeSigsResponse>("saveNodeSigs", {
+                sigs
+            });
+            S.util.showPageMessage("Set " + sigs.length + " signatures!");
+        }
     }
 
     // ab2str = (buf: ArrayBuffer) => {

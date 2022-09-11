@@ -1,14 +1,11 @@
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
-/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
+/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API
+
+todo-0: I can probably change this back to where it holds the databse open forever.
+*/
 export class LocalDB {
-
-    // For performance, I think it may be better to just never close the database once opened, but this flag allows
-    // the logic to flow either way if we ever need to (close always or not)
-    keepDbOpen: boolean = true;
-    db: IDBDatabase = null;
-
     /* Name of logged in user or 'null' if anonymous user not logged in */
     userName: string;
 
@@ -23,107 +20,103 @@ export class LocalDB {
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
     static KEY_NAME = "name";
 
-    private openDB = (): IDBOpenDBRequest => {
+    private openDB = (): Promise<IDBDatabase> => {
         if (!indexedDB) {
             throw new Error("IndexedDB API not available in browser.");
         }
-        const req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
-        req.onupgradeneeded = () => {
-            req.result.createObjectStore(LocalDB.STORE_NAME, { keyPath: LocalDB.KEY_NAME });
-        };
-        return req;
-    }
+        return new Promise<IDBDatabase>((resolve, reject) => {
+            const req: IDBOpenDBRequest = indexedDB.open(LocalDB.DB_NAME, LocalDB.VERSION);
 
-    /* Runs a transaction by first opening the database, and then running the transaction */
-    private runTrans = (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-
-        if (this.db) {
-            const tx: IDBTransaction = this.db.transaction(LocalDB.STORE_NAME, access);
-            const store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
-            runner(store);
-
-            tx.oncomplete = () => {
-                if (!this.keepDbOpen) {
-                    // todo-2: need to research best practice for this, and see if we should be closing the DB here or if there's
-                    // some better pattern for keeping it open for more transactions.
-                    this.db.close();
-                    this.db = null;
-                }
+            req.onupgradeneeded = () => {
+                req.result.createObjectStore(LocalDB.STORE_NAME, { keyPath: LocalDB.KEY_NAME });
             };
-        }
-        else {
-            const req: IDBOpenDBRequest = this.openDB();
+
             req.onsuccess = () => {
                 // this is a one level recursion, just as a design choice. This isn't inherently a recursive operation.
                 if (req.result) {
-                    this.db = req.result;
-                    this.runTrans(access, runner);
+                    resolve(req.result);
                 }
             };
 
             req.onerror = () => {
-                // calling runner with null signals the error.
-                console.warn("runTrans failed: " + access + " error:" + req.error);
-                runner(null);
-            };
+                console.warn("indexedDB.open failed");
+                reject(null);
+            }
+        });
+    }
+
+    /* Runs a transaction by first opening the database, and then running the transaction */
+    private runTrans = async (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
+        const db: IDBDatabase = await this.openDB();
+        const tx: IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
+        const store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
+
+        if (store) {
+            runner(store);
+        }
+        else {
+            console.error("Failed to open indexDb store");
+        }
+
+        tx.oncomplete = () => {
+            // todo-2: need to research best practice for this, and see if we should be closing the DB here or if there's
+            // some better pattern for keeping it open for more transactions.
+            db.close();
+        };
+
+        tx.onabort = () => {
+            console.log("tx fail");
+            db.close();
+        }
+
+        tx.onerror = () => {
+            console.log("tx err");
+            db.close();
         }
     }
 
     // gets the value stored under the key (like a simple map/keystore)
-    getVal = async (key: string, userName: string = null): Promise<any> => {
-        let obj: any = null;
-        try {
-            const keyPrefix = this.getKeyPrefix(userName);
-            obj = await this.readObject(keyPrefix + key);
-            // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
-        }
-        catch (e) {
-            // ignore this exception
-            console.warn("db key not found: " + key);
-        }
+    public getVal = async (key: string, userName: string = null): Promise<any> => {
+        const obj: any = await this.readObject(this.getKeyPrefix(userName) + key);
+        // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + key + " val=" + obj?.val);
         return obj ? obj.val : null;
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    setVal = async (key: string, val: any, userName: string = null) => {
-        const keyPrefix = this.getKeyPrefix(userName);
-        // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
-        await this.writeObject({ name: keyPrefix + key, val });
+    public setVal = async (key: string, val: any, userName: string = null) => {
+        // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + key + " val=" + val);
+        await this.writeObject({ name: this.getKeyPrefix(userName) + key, val });
     }
 
-    writeObject = async (val: Object) => {
+    public writeObject = async (val: Object): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {
-                    if (store) {
-                        // console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
-                        store.put(val);
-                    }
-                    resolve();
+                    // console.log("LocalDB[" + LocalDB.DB_NAME + "] writeObject=" + S.util.prettyPrint(val));
+                    const req = store.put(val);
+                    req.onsuccess = () => {
+                        resolve();
+                    };
+                    req.onerror = () => {
+                        resolve();
+                    };
                 });
         });
     }
 
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
-    readObject = async (name: string): Promise<Object> => {
-        return new Promise<Object>(async (resolve, reject) => {
+    public readObject = async (name: string): Promise<Object> => {
+        return new Promise<Object>((resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READONLY,
                 (store: IDBObjectStore) => {
-                    // If anything goes wrong in runTrans, it will still call this method with a null store.
-                    // One possible way is for example in Firefox in Incognito Mode, where storage is not allowed.
-                    if (!store) {
-                        resolve(null);
-                    }
-
                     // NOTE: name is the "keyPath" value.
-                    const promise = store.get(name);
-
-                    promise.onsuccess = () => {
-                        resolve(promise.result);
+                    const req = store.get(name);
+                    req.onsuccess = () => {
+                        resolve(req.result);
                     };
-                    promise.onerror = () => {
+                    req.onerror = () => {
                         console.warn("readObject failed: name=" + name);
                         resolve(null);
                     };

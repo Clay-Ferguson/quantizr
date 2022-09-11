@@ -196,9 +196,11 @@ public class ActPubFollower extends ServiceBase {
             int counter = 0;
 
             for (SubNode node : iterable) {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
-                        false, true, false, false, null);
-                searchResults.add(info);
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, true, false, counter + 1, false,
+                        false, false, true, false, false, null);
+                if (ok(info)) {
+                    searchResults.add(info);
+                }
             }
 
             res.setSearchResults(searchResults);

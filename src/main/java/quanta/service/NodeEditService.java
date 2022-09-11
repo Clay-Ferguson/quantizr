@@ -22,6 +22,7 @@ import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
+import quanta.model.NodeSig;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -38,6 +39,7 @@ import quanta.request.DeletePropertyRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.SaveNodeRequest;
+import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
@@ -48,6 +50,7 @@ import quanta.response.DeletePropertyResponse;
 import quanta.response.InsertNodeResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.SaveNodeResponse;
+import quanta.response.SaveNodeSigsResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.TransferNodeResponse;
@@ -397,6 +400,42 @@ public class NodeEditService extends ServiceBase {
 		return res;
 	}
 
+	/*
+	 * 
+	 * WARNING: Before working to make this method any better remember it's probably only for temporary use by admin
+	 * 
+	 */
+	@PerfMon(category = "edit")
+	public SaveNodeSigsResponse saveNodeSigs(MongoSession ms, SaveNodeSigsRequest req) {
+		SaveNodeSigsResponse res = new SaveNodeSigsResponse();
+
+		// todo-1: potential optimization, create an 'ownerNode set' local to this method
+		// and use it to lookup parent node of each node, only if not in the set and then have an
+		// optional parameter to nodeSigVerify that can accept the ownerAcct node, and use it to
+		// avoid a call to db to get it.
+		//
+		// todo-1: This is an ideal place to use a MongoDb batch operation.
+		for (NodeSig sig : req.getSigs()) {
+			SubNode node = read.getNode(ms, sig.getNodeId());
+			if (ok(node)) {
+				boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
+
+				// we should never get here but if we get a sig sent for an already signed node ignore it.
+				if (signed) {
+					log.debug("Ignoring attempt to sign already signed node: " + node.getIdStr());
+					continue;
+				}
+
+				// if signature is valid put it on the node.
+				if (crypto.nodeSigVerify(node, sig.getSig())) {
+					// log.debug("Accepted SIG on nodeId: " + node.getIdStr());
+					node.set(NodeProp.CRYPTO_SIG, sig.getSig());
+				}
+			}
+		}
+		return res;
+	}
+
 	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
@@ -405,7 +444,7 @@ public class NodeEditService extends ServiceBase {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
+		log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
@@ -555,7 +594,9 @@ public class NodeEditService extends ServiceBase {
 
 		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, -1, false, false,
 				true, false, true, true, null);
-		res.setNode(newNodeInfo);
+		if (ok(newNodeInfo)) {
+			res.setNode(newNodeInfo);
+		}
 
 		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.

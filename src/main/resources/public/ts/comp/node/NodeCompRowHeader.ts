@@ -79,6 +79,17 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
+        const signed = S.props.getClientPropStr(J.NodeProp.CRYPTO_SIG, this.node);
+
+        // only show this icon for admin to verify things. Users don't need to see it yet and maybe never
+        if (signed && state.isAdminUser) {
+            verboseChildren.push(new Icon({
+                // title: youLiked ? "You Liked this Node!" : "Like this Node",
+                title: "Node has Crypto Signature",
+                className: "fa fa-certificate fa-lg signatureIcon"
+            }));
+        }
+
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
         // if (state.isAdminUser) {
         //     // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)

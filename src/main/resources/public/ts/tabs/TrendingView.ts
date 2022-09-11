@@ -41,7 +41,8 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             feed: true,
             getWords: true,
             getTags: true,
-            getMentions: true
+            getMentions: true,
+            signatureVerify: false
         });
 
         dispatch("RenderSearchResults", s => {

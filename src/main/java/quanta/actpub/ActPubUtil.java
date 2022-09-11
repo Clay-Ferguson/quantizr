@@ -827,8 +827,11 @@ public class ActPubUtil extends ServiceBase {
             // iterate up the parent chain or chain of inReplyTo for ActivityPub
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
                 try {
-                    nodes.addFirst(convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
-                            false, true, true, null));
+                    NodeInfo info = convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
+                    false, true, true, null);
+                    if (ok(info)) {
+                        nodes.addFirst(info);
+                    }
 
                     // if inReplyTo exists try to use it first.
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);

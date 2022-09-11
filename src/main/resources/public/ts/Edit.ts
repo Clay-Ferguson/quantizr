@@ -399,6 +399,8 @@ export class Edit {
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
 
+            S.crypto.renderNodeCryptoHook(res);
+
             if (!res || !res.node) {
                 resolve(null);
                 return;

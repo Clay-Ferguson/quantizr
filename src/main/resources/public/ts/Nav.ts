@@ -80,6 +80,7 @@ export class Nav {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
+            S.crypto.renderNodeCryptoHook(res);
             this.upLevelResponse(res, null, true, state);
         }
         catch (e) {
@@ -118,6 +119,7 @@ export class Nav {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
+            S.crypto.renderNodeCryptoHook(res);
 
             if (processingDelete) {
                 S.quanta.refresh(state);
@@ -183,6 +185,7 @@ export class Nav {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
+            S.crypto.renderNodeCryptoHook(res);
             this.navPageNodeResponse(res, state);
         }
         catch (e) {
@@ -288,6 +291,7 @@ export class Nav {
                     singleNode: false,
                     parentCount: state.userPrefs.showParents ? 1 : 0
                 });
+                S.crypto.renderNodeCryptoHook(res);
                 this.navPageNodeResponse(res, state);
             }
             catch (e) {
@@ -374,6 +378,7 @@ export class Nav {
                 singleNode: true,
                 parentCount: 0
             });
+            S.crypto.renderNodeCryptoHook(res);
 
             if (!res.node) return;
 

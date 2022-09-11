@@ -58,14 +58,20 @@ public class UserFeedService extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
-		// todo-0: Is there a faster way to accomplish the filtering we need based on type and WHY are we filtering based on type?
-		//         i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special (system defined) user's nodes.
-		//         but we can probably do some kind of hack/hijack and make those special system nodes hijack the priority value or something which
-		//         we can filter out by saying "not equal to special node priority"...becasue we have a priority index already.
-		//         Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely be ONE MORE index.
-		//   IMPORTANT: this code is in OTHER PLACES in the app too! ...the in(a, b, ...) clause.
-		//   IMPORTANT: Feed queries in general will eventually have a "Comments" checkbox so that in a pure corporate collab
-		//              use case users can view the core document content v.s. the core and comments.
+		// todo-0: Is there a faster way to accomplish the filtering we need based on type and WHY are we
+		// filtering based on type?
+		// i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special
+		// (system defined) user's nodes.
+		// but we can probably do some kind of hack/hijack and make those special system nodes hijack the
+		// priority value or something which
+		// we can filter out by saying "not equal to special node priority"...becasue we have a priority
+		// index already.
+		// Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely
+		// be ONE MORE index.
+		// IMPORTANT: this code is in OTHER PLACES in the app too! ...the in(a, b, ...) clause.
+		// IMPORTANT: Feed queries in general will eventually have a "Comments" checkbox so that in a pure
+		// corporate collab
+		// use case users can view the core document content v.s. the core and comments.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		// DO NOT DELETE (keep as example)
@@ -206,7 +212,7 @@ public class UserFeedService extends ServiceBase {
 		// criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		// }
 
-		// limit to just markdown types (no type), and comments 
+		// limit to just markdown types (no type), and comments
 		// IMPORTANT: see long comment above where we have similar type filtering.
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
@@ -218,7 +224,8 @@ public class UserFeedService extends ServiceBase {
 			allowBadWords = false;
 		}
 
-		// Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so we 
+		// Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so
+		// we
 		// can do this criteria right here and not show those in feeds.
 		crit = crit.and(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null);
 
@@ -427,14 +434,17 @@ public class UserFeedService extends ServiceBase {
 			}
 
 			try {
-				NodeInfo info =
-						convert.convertToNodeInfo(false,sc, ms, node, true, false, counter + 1, false, false, false, false, true, true, boostedNodeVal);
-				searchResults.add(info);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, true, false, counter + 1, false, false, false,
+						false, true, true, boostedNodeVal);
+				if (ok(info)) {
+					searchResults.add(info);
 
-				if (searchResults.size() >= MAX_FEED_ITEMS) {
-					break;
+					if (searchResults.size() >= MAX_FEED_ITEMS) {
+						break;
+					}
 				}
 			} catch (Exception e) {
+				// todo-0: nothing here?
 			}
 		}
 

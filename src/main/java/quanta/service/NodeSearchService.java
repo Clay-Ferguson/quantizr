@@ -96,11 +96,13 @@ public class NodeSearchService extends ServiceBase {
 			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, true, false, counter + 1, false,
 					false, false, false, false, true, null);
 
-			if (truncates.contains(n.getIdStr())) {
-				info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
-			}
+			if (ok(info)) {
+				if (truncates.contains(n.getIdStr())) {
+					info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
+				}
 
-			results.add(info);
+				results.add(info);
+			}
 		}
 		return res;
 	}
@@ -126,7 +128,9 @@ public class NodeSearchService extends ServiceBase {
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false, false, true, null);
-				searchResults.add(info);
+				if (ok(info)) {
+					searchResults.add(info);
+				}
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
 			/* Undocumented Feature: You can find named nodes using format ":userName:nodeName" */
@@ -141,7 +145,9 @@ public class NodeSearchService extends ServiceBase {
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false, false, true, null);
-				searchResults.add(info);
+				if (ok(info)) {
+					searchResults.add(info);
+				}
 			}
 		}
 		// othwerwise we're searching all node properties
@@ -168,7 +174,9 @@ public class NodeSearchService extends ServiceBase {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false,
 								counter + 1, false, false, false, false, false, true, null);
-						searchResults.add(info);
+						if (ok(info)) {
+							searchResults.add(info);
+						}
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
 					}
@@ -232,7 +240,9 @@ public class NodeSearchService extends ServiceBase {
 				try {
 					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1,
 							false, false, false, false, false, false, null);
-					searchResults.add(info);
+					if (ok(info)) {
+						searchResults.add(info);
+					}
 				} catch (Exception e) {
 					ExUtil.error(log, "failed converting user node", e);
 				}
@@ -253,8 +263,9 @@ public class NodeSearchService extends ServiceBase {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, true, false,
 								counter + 1, false, false, false, false, false, false, null);
-
-						searchResults.add(info);
+						if (ok(info)) {
+							searchResults.add(info);
+						}
 					} catch (Exception e) {
 						ExUtil.error(log, "failed converting user node", e);
 					}
@@ -323,7 +334,9 @@ public class NodeSearchService extends ServiceBase {
 
 			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 					false, false, false, false, true, null);
-			searchResults.add(info);
+			if (ok(info)) {
+				searchResults.add(info);
+			}
 		}
 
 		res.setSuccess(true);
@@ -437,10 +450,25 @@ public class NodeSearchService extends ServiceBase {
 		int publicWriteCount = 0;
 		int adminOwnedCount = 0;
 		int userShareCount = 0;
+		int signedNodeCount = 0;
+		int unsignedNodeCount = 0;
+		int failedSigCount = 0;
 		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
 
 		for (SubNode node : iter) {
 			nodeCount++;
+
+			if (req.isSignatureVerify()) {
+				String sig = node.getStr(NodeProp.CRYPTO_SIG);
+				if (ok(sig)) {
+					signedNodeCount++;
+					if (!crypto.nodeSigVerify(node, null)) {
+						failedSigCount++;
+					}
+				} else {
+					unsignedNodeCount++;
+				}
+			}
 
 			// PART 1: Process sharing info
 			HashMap<String, AccessControl> aclEntry = node.getAc();
@@ -452,8 +480,7 @@ public class NodeSearchService extends ServiceBase {
 						if (ok(ac) && ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
 							publicWriteCount++;
 						}
-					}
-					else {
+					} else {
 						userShareCount++;
 						uniqueUsersSharedTo.add(key);
 					}
@@ -576,9 +603,17 @@ public class NodeSearchService extends ServiceBase {
 
 		sb.append("Public: " + publicCount + ", ");
 		sb.append("Public Writable: " + publicWriteCount + ", ");
-		sb.append("Admin Owned: " + adminOwnedCount+ ", ");
+		sb.append("Admin Owned: " + adminOwnedCount + ", ");
 		sb.append("User Shares: " + userShareCount + ", ");
-		sb.append("Unique Users Shared To: "+uniqueUsersSharedTo.size());
+		sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size());
+
+		if (req.isSignatureVerify()) {
+			sb.append(", ");
+			sb.append("Signed: " + signedNodeCount + ", ");
+			sb.append("Unsigned: " + unsignedNodeCount + ", ");
+			sb.append("FAILED SIGS: " + failedSigCount);
+		}
+		
 		res.setStats(sb.toString());
 
 		if (ok(wordList)) {

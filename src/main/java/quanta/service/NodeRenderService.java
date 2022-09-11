@@ -214,8 +214,10 @@ public class NodeRenderService extends ServiceBase {
 					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, true,
 							false, 0, false, false, false, false, true, true, null);
 
-					// each parent up goes on top of list for correct rendering order on client.
-					parentNodes.addFirst(nodeInfo);
+					if (ok(nodeInfo)) {
+						// each parent up goes on top of list for correct rendering order on client.
+						parentNodes.addFirst(nodeInfo);
+					}
 				}
 			} catch (Exception e) {
 				done = true;
@@ -259,6 +261,10 @@ public class NodeRenderService extends ServiceBase {
 		 */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal,
 				level > 0, false, false, false, true, true, null);
+
+		if (no(nodeInfo)) {
+			return null;
+		}
 
 		if (level > 0) {
 			return nodeInfo;

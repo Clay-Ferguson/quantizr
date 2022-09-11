@@ -56,7 +56,7 @@ export class RpcUtil {
                     S.quanta.setOverlay(true);
                 }
 
-                const startTime = new Date().getTime();
+                // const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {
                     method: "POST",
@@ -83,7 +83,7 @@ export class RpcUtil {
                         /* if we did a reject above in the first 'then' we will get here with json undefined
                         so we ignore that */
                         if (json) {
-                            console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
+                            // console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
                             resolve(JSON.parse(json));
                         }
                     })

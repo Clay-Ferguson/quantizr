@@ -236,6 +236,7 @@ export interface GetNodePrivilegesRequest extends RequestBase {
 export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
     trending: boolean;
+    signatureVerify: boolean;
     feed: boolean;
     getWords: boolean;
     getMentions: boolean;
@@ -416,6 +417,10 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
+}
+
+export interface SaveNodeSigsRequest extends RequestBase {
+    sigs: NodeSig[];
 }
 
 export interface SavePublicKeyRequest extends RequestBase {
@@ -795,6 +800,9 @@ export interface SaveNodeResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
 }
 
+export interface SaveNodeSigsResponse extends ResponseBase {
+}
+
 export interface SavePublicKeyResponse extends ResponseBase {
 }
 
@@ -898,6 +906,11 @@ export interface NodeInfo {
     apAvatar: string;
     apImage: string;
     boostedNode: NodeInfo;
+}
+
+export interface NodeSig {
+    nodeId: string;
+    sig: string;
 }
 
 export interface UserPreferences {

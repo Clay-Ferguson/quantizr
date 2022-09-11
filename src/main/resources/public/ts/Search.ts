@@ -236,6 +236,10 @@ export class Search {
             return;
         }
 
+        setTimeout(() => {
+            S.crypto.autoSignNodes(res.searchResults);
+        }, 2000);
+
         dispatch("RenderDocumentResults", s => {
             S.domUtil.focusId(C.TAB_DOCUMENT);
             if (!DocumentTab.inst) return;

@@ -69,13 +69,16 @@ public class PushService extends ServiceBase {
 				// usersSharedToSet.contains("public") ||
 						usersSharedToSet.contains(sc.getUserName())) {
 					/* build our push message payload */
-					NodeInfo nodeInfo = convert.convertToNodeInfo(false,sc, ms, node, true, false, 1, false, false, true, 
-					false, true, true, null);
-					FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, true, false, 1, false, false, true, false,
+							true, true, null);
 
-					// push notification message to browser
-					// log.debug("Pushing to user: " + sc.getUserName());
-					push.sendServerPushInfo(sc, pushInfo);
+					if (ok(info)) {
+						FeedPushInfo pushInfo = new FeedPushInfo(info);
+
+						// push notification message to browser
+						// log.debug("Pushing to user: " + sc.getUserName());
+						push.sendServerPushInfo(sc, pushInfo);
+					}
 				}
 			}
 		});
@@ -103,15 +106,17 @@ public class PushService extends ServiceBase {
 			if (ok(node.getPath()) && ok(sc.getWatchingPath()) && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
-				NodeInfo nodeInfo = convert.convertToNodeInfo(false,sc, ms, node, true, false, 1, false, false, true, false, 
-				true, true, null);
-				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, true, false, 1, false, false, true, false,
+						true, true, null);
+				if (ok(info)) {
+					FeedPushInfo pushInfo = new FeedPushInfo(info);
 
-				// push notification message to browser
-				sendServerPushInfo(sc, pushInfo);
+					// push notification message to browser
+					sendServerPushInfo(sc, pushInfo);
 
-				if (ok(sessionsPushed)) {
-					sessionsPushed.add(sc.hashCode());
+					if (ok(sessionsPushed)) {
+						sessionsPushed.add(sc.hashCode());
+					}
 				}
 			}
 		}

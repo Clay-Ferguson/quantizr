@@ -48,8 +48,25 @@ public class Convert extends ServiceBase {
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
-		// if we know we shold only be including admin node then throw an error if this is not an admin node, but only if
-		// we ourselves are not admin.
+		boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
+
+		// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
+		boolean sigFailed = false;
+		if (signed && !crypto.nodeSigVerify(node, null)) {
+			log.debug("********* SIG FAILED: nodeId=" + node.getIdStr());
+
+			// allow admin to see bad nodes, but we mark them up below.
+			if (sc.isAdmin()) {
+				sigFailed = true;
+			}
+			// if not admin a failed signature hides the node from end users
+			else {
+				return null;
+			}
+		}
+
+		// if we know we shold only be including admin node then throw an error if this is not an admin
+		// node, but only if we ourselves are not admin.
 		if (adminOnly && !acl.isAdminOwned(node) && !sc.isAdmin()) {
 			throw new NodeAuthFailedException();
 		}
@@ -184,12 +201,24 @@ public class Convert extends ServiceBase {
 		// likes = _likes;
 		// }
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(),
-				displayName, owner, ownerId, node.getOrdinal(), //
+		String content = node.getContent();
+
+		// Note: only the admin can ever see this appear on screen, because above it can only get set true if we're admin
+		if (sigFailed) {
+			content = "## ***** SIG FAILED *****\n\n" + content;
+		}
+
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
+				owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, likes, hasChildren, //
 				ok(imageSize) ? imageSize.getWidth() : 0, //
 				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
+
+		if (signed) {
+			// log.debug("sending back SIG prop");
+			nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.CRYPTO_SIG.s(), "y"));
+		}
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
@@ -218,8 +247,11 @@ public class Convert extends ServiceBase {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.safeGetChildren().add(convertToNodeInfo(false, sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++,
-							multiLevel, lastChild, childrenCheck, false, loadLikes, false, null));
+					NodeInfo info = convertToNodeInfo(false, sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++, multiLevel,
+							lastChild, childrenCheck, false, loadLikes, false, null);
+					if (ok(info)) {
+						nodeInfo.safeGetChildren().add(info);
+					}
 				}
 			}
 		}
@@ -239,8 +271,11 @@ public class Convert extends ServiceBase {
 			}
 
 			if (ok(boostedNode)) {
-				nodeInfo.setBoostedNode(convertToNodeInfo(false, sc, ms, boostedNode, false, false, 0, false, false, false, false,
-						false, false, null));
+				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, false, 0, false, false, false, false, false,
+						false, null);
+				if (ok(info)) {
+					nodeInfo.setBoostedNode(info);
+				}
 			}
 		}
 

@@ -113,6 +113,7 @@ export class MenuPanel extends Div {
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", getAppState(null));
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", getAppState(null));
     static nodeStats = () => S.view.getNodeStats(getAppState(null), false, false);
+    static nodeSignatureVerify = () => S.view.getNodeSignatureVerify(getAppState(null));
 
     static readJSONfromURL = () => {
         // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
@@ -430,10 +431,10 @@ export class MenuPanel extends Div {
             // S.edit.fullRepositoryExport();") + //
         ]));
 
-        children.push(new Menu(state, "Encrypt", [
+        children.push(new Menu(state, "Cryptographic", [
             new MenuItem("Show Keys", MenuPanel.showKeys, !appState.isAnonUser), //
             new MenuItem("Generate Keys", MenuPanel.generateKeys, !appState.isAnonUser), //
-            new MenuItem("Publish Public Key", MenuPanel.publishKeys, !appState.isAnonUser), //
+            new MenuItem("Publish Public Keys", MenuPanel.publishKeys, !appState.isAnonUser), //
             new MenuItem("Import Keys", MenuPanel.importKeys, !appState.isAnonUser) //
         ], null, this.makeHelpIcon(":menu-encrypt")));
 
@@ -486,6 +487,7 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu(state, "Admin - DB", [
+                new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //
                 new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null, appState)), //
