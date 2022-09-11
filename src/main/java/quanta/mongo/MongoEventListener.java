@@ -112,6 +112,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			 * and is not yet processing user requests
 			 */
 			if (node.getPath().equals("/" + NodePath.ROOT) && !MongoRepository.fullInit) {
+				ThreadLocals.requireAdminThread();
 				dbObj.put(SubNode.OWNER, id);
 				node.setOwner(id);
 			} else {

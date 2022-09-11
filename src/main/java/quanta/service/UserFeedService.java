@@ -30,6 +30,7 @@ import quanta.request.CheckMessagesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 
@@ -306,7 +307,7 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
-			List<SubNode> friendNodes = user.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
+			List<SubNode> friendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true);
 			if (ok(friendNodes)) {
 				List<ObjectId> friendIds = new LinkedList<>();
 
@@ -444,7 +445,7 @@ public class UserFeedService extends ServiceBase {
 					}
 				}
 			} catch (Exception e) {
-				// todo-0: nothing here?
+				ExUtil.error(log, "convertToNodeInfo", e);
 			}
 		}
 
@@ -463,7 +464,7 @@ public class UserFeedService extends ServiceBase {
 	 */
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		arun.run(as -> {
-			List<SubNode> nodeList = user.getSpecialNodesList(as, NodeType.BLOCKED_USERS.s(), userName, false);
+			List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false);
 			if (no(nodeList))
 				return null;
 

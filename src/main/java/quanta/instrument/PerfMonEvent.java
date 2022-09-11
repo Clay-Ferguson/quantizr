@@ -11,30 +11,43 @@ public class PerfMonEvent {
     public List<PerfMonEvent> subEvents;
 
     // NO GETTERS/SETTERS. Not needed or wanted.
-    public int duration;
+    public long duration;
     public String event;
     public String user;
+    public long lastTime;
 
-    public PerfMonEvent(int duration, String event, String user) {
-        this.duration = duration;
-        this.event = event;
+    // Pass event as 'null' to start a chaining set of event timings, where this constructor
+    // doesn't represent processing done, but the beginning of a set of operations
+    public PerfMonEvent(long duration, String event, String user) {
         this.user = user;
-        
-        Instrument.add(this);
-        PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
+        lastTime = System.currentTimeMillis();
 
-        // if there's no root event for this thread make this one the root.
-        if (no(rootEvent)) {
-            ThreadLocals.setRootEvent(this);
-        }
-        // else add this even to the subevents.
-        else {
-            // create lazily
-            if (no(rootEvent.subEvents)) {
-                rootEvent.subEvents = new LinkedList<>();
+        if (event != null) {
+            this.duration = duration;
+            this.event = event;
+            
+            Instrument.add(this);
+            PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
+
+            // if there's no root event for this thread make this one the root.
+            if (no(rootEvent)) {
+                ThreadLocals.setRootEvent(this);
             }
-            rootEvent.subEvents.add(this);
-            root = rootEvent;
+            // else add this even to the subevents.
+            else {
+                // create lazily
+                if (no(rootEvent.subEvents)) {
+                    rootEvent.subEvents = new LinkedList<>();
+                }
+                rootEvent.subEvents.add(this);
+                root = rootEvent;
+            }
         }
+    }
+
+    public void chain(String event) {
+        long nowTime = System.currentTimeMillis();
+        new PerfMonEvent(nowTime - lastTime, event, this.user);
+        lastTime = nowTime;
     }
 }

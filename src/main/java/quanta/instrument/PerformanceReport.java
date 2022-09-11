@@ -140,13 +140,15 @@ public class PerformanceReport {
 		String table = htmlTr( //
 				htmlTh("Category") + //
 						htmlTh("Count") + //
-						htmlTh("Avg. Time"));
+						htmlTh("Avg. Time") + //
+						htmlTh("Time"));
 
 		for (MethodStat stat : orderedStats) {
 			table += htmlTr( //
 					htmlTd(stat.category) + //
 							htmlTdRt(String.valueOf(stat.totalCount)) + //
-							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)));
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) + //
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
 		}
 
 		return htmlH(3, "Times Per Category") + htmlTable(table);

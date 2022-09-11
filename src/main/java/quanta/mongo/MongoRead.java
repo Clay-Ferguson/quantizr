@@ -26,6 +26,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
+import quanta.instrument.PerfMonEvent;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -44,7 +45,7 @@ import quanta.util.XString;
 @Component
 public class MongoRead extends ServiceBase {
     int MAX_DOC_DEPTH = 7;
-    int MAX_DOC_ITEMS_PER_CALL = 50;
+    int MAX_DOC_ITEMS_PER_CALL = 40;
 
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
@@ -105,6 +106,13 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public long getChildCount(MongoSession ms, String path) {
+        // statistically I think it pays off to always try the faster way and then assume worst case is that
+        // we might have warmed up the MongoDb for what the following query will need.
+        SubNode node = getNode(ms, path, false);
+        if (ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
+            return 0;
+        }
+
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
         crit = auth.addSecurityCriteria(ms, crit);
@@ -112,16 +120,37 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
+    /*
+     * we only update the hasChildren if doAuth is false, because doAuth would be a person-specific
+     * exact query, unlike what the hasChildren represents which is a global
+     * "any children visible to any user" thing.
+     */
     @PerfMon(category = "read(m,n)")
-    public boolean hasChildren(MongoSession ms, SubNode node) {
-        return hasChildren(ms, node.getPath());
+    public boolean hasChildren(MongoSession ms, SubNode node, boolean doAuth, boolean allowUpdate) {
+
+        // cannot both be true
+        if (doAuth && allowUpdate) {
+            throw new RuntimeException("doAuth and allowUpdate are mutually exclusive.");
+        }
+
+        // if the node knows it's children status return that.
+        if (!doAuth && node.getHasChildren() != null) {
+            return node.getHasChildren();
+        }
+        boolean ret = hasChildrenByQuery(ms, node.getPath(), doAuth);
+        if (!doAuth && allowUpdate) {
+            node.setHasChildren(ret);
+        }
+        return ret;
     }
 
     @PerfMon(category = "read(m,pth)")
-    public boolean hasChildren(MongoSession ms, String path) {
+    public boolean hasChildrenByQuery(MongoSession ms, String path, boolean doAuth) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
-        crit = auth.addSecurityCriteria(ms, crit);
+        if (doAuth) {
+            crit = auth.addSecurityCriteria(ms, crit);
+        }
         q.addCriteria(crit);
         return ops.exists(q, SubNode.class);
     }
@@ -136,7 +165,14 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
-    /* Throws an exception if the parent of 'node' does not exist */
+    /*
+     * Throws an exception if the parent of 'node' does not exist
+     * 
+     * todo-0: performance can be gained by memoizing the results of this call into a ThreadLocal
+     * HashMap but we need to be careful that it can never return incorrect value from cache. Perhaps by
+     * also hooking into MongoListener to simply clear the threalocal cache any time any node is
+     * SAVED???
+     */
     public void checkParentExists(MongoSession ms, SubNode node) {
         boolean isRootPath = mongoUtil.isRootPath(node.getPath());
         if (node.isDisableParentCheck() || isRootPath)
@@ -157,8 +193,12 @@ public class MongoRead extends ServiceBase {
         }
 
         SubNode parentNode = read.getNode(ms, parentPath, false);
-        if (ok(parentNode))
+        if (ok(parentNode)) {
+            // a nice efficiency side-effect we can do here is set 'hasChildren' to true on the parent
+            // because we now know it exists. If it's not changing that's fine no DB update will be triggered.
+            parentNode.setHasChildren(true);
             return;
+        }
 
         // log.debug("Verifying parent path exists: " + parentPath);
         Query q = new Query();
@@ -489,6 +529,7 @@ public class MongoRead extends ServiceBase {
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node
      */
+    @PerfMon(category = "read")
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria) {
         auth.auth(ms, node, PrivilegeType.READ);
@@ -615,7 +656,7 @@ public class MongoRead extends ServiceBase {
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
     public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans,
-            boolean publicOnly) {
+            boolean publicOnly, boolean doAuth) {
 
         /*
          * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit')
@@ -624,7 +665,10 @@ public class MongoRead extends ServiceBase {
         if (removeOrphans && limit > 0) {
             throw new RuntimeException("getSubGraph: invalid parameters");
         }
-        auth.auth(ms, node, PrivilegeType.READ);
+
+        if (doAuth) {
+            auth.auth(ms, node, PrivilegeType.READ);
+        }
 
         Query q = new Query();
         /*
@@ -638,7 +682,9 @@ public class MongoRead extends ServiceBase {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
         }
 
-        crit = auth.addSecurityCriteria(ms, crit);
+        if (doAuth) {
+            crit = auth.addSecurityCriteria(ms, crit);
+        }
         q.addCriteria(crit);
 
         if (ok(sort)) {
@@ -650,6 +696,8 @@ public class MongoRead extends ServiceBase {
         }
 
         Iterable<SubNode> iter = mongoUtil.find(q);
+
+        // todo-0: need to review 'filterOutOrphans' with a fresh head!
         return removeOrphans ? mongoUtil.filterOutOrphans(ms, node, iter) : iter;
     }
 
@@ -1204,12 +1252,15 @@ public class MongoRead extends ServiceBase {
     public List<SubNode> genDocList(MongoSession ms, final String rootId, final String nodeId, boolean includeComments,
             HashSet<String> truncates) {
         LinkedList<SubNode> doc = new LinkedList<>();
+        PerfMonEvent perf = new PerfMonEvent(0, null, ms.getUserName());
         SubNode rootNode = read.getNode(ms, new ObjectId(rootId));
+        perf.chain("getDocList:gotRoot");
 
         // get the node we're querying starting at.
         SubNode node = read.getNode(ms, new ObjectId(nodeId));
         if (!ok(node))
             return doc;
+        perf.chain("getDocList:gotScanStart");
 
         int rootSlashCount = StringUtils.countMatches(rootNode.getPath(), "/");
 
@@ -1218,6 +1269,7 @@ public class MongoRead extends ServiceBase {
             // log.debug("Started from root. Found enough");
             return doc;
         }
+        perf.chain("getDocList:initialRecurse");
 
         if (node.getIdStr().equals(rootId)) {
             // log.debug("Started from root. Nothing more to scan");
@@ -1226,6 +1278,7 @@ public class MongoRead extends ServiceBase {
 
         // if we jave enough we're done.
         while (doc.size() < MAX_DOC_ITEMS_PER_CALL) {
+            perf = new PerfMonEvent(0, null, ms.getUserName());
             /*
              * General Algorighm
              * 
@@ -1245,6 +1298,7 @@ public class MongoRead extends ServiceBase {
             }
 
             node = read.getParent(ms, node);
+            perf.chain("docListGotParent");
             if (no(node)) {
                 log.warn("oops, no parent. This should never happen!");
                 break;
@@ -1256,9 +1310,12 @@ public class MongoRead extends ServiceBase {
                     MAX_DOC_ITEMS_PER_CALL, 0, siblingsBelow);
             Iterator<SubNode> iterator = nodeIter.iterator();
 
+            perf.chain("docListGotChildren");
+
             // iterates here for all siblings of 'node' that are below it in ordinal order.
             while (iterator.hasNext()) {
                 SubNode sibling = iterator.next();
+                perf.chain("docListGotNextChild");
                 // log.debug("sibling[" + count + "] " + sibling.getContent() + " ordinal=" + sibling.getOrdinal());
                 if (!recurseDocList(doc, ms, sibling, rootSlashCount, includeComments, truncates)) {
                     break;
@@ -1301,7 +1358,7 @@ public class MongoRead extends ServiceBase {
 
         if (depth >= MAX_DOC_DEPTH) {
             // log.debug("MAX DEPTH (ignoring). " + node.getContent());
-            if (ok(truncates) && hasChildren(ms, node)) {
+            if (ok(truncates) && hasChildren(ms, node, true, false)) {
                 truncates.add(node.getIdStr());
             }
             // return true to keep iterating, although we're ignoring these 'too deep' ones.
@@ -1314,10 +1371,22 @@ public class MongoRead extends ServiceBase {
             return false;
         }
 
+        // The rest of the below is about processing children, so we can try to optimize by getting the
+        // parent of this node, and if it has no children we can bail out here.
+        if (node.getHasChildren() != null && !node.getHasChildren()) {
+            return true;
+        }
+
         Criteria typeCriteria = !includeComments ? Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT) : null;
 
-        for (SubNode n : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), MAX_DOC_ITEMS_PER_CALL, 0,
-                typeCriteria)) {
+        PerfMonEvent perf = new PerfMonEvent(0, null, ms.getUserName());
+
+        Iterable<SubNode> iter =
+                read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), MAX_DOC_ITEMS_PER_CALL, 0, typeCriteria);
+        perf.chain("recurseDocList:query");
+
+        for (SubNode n : iter) {
+            perf.chain("recurseDocList:queryIter");
             if (!recurseDocList(doc, ms, n, rootSlashCount, includeComments, truncates)) {
                 return false;
             }

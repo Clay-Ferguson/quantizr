@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -25,16 +24,13 @@ import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
-import quanta.model.client.NodeMetaIntf;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.GetNodeMetaInfoRequest;
 import quanta.request.InitNodeEditRequest;
 import quanta.request.RenderCalendarRequest;
 import quanta.request.RenderNodeRequest;
-import quanta.response.GetNodeMetaInfoResponse;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
@@ -51,22 +47,6 @@ import quanta.util.XString;
 @Component
 public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
-
-	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
-		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
-		List<NodeMetaIntf> list = new LinkedList<>();
-		res.setNodeIntf(list);
-
-		for (String id : req.getIds()) {
-			SubNode node = read.getNode(ms, new ObjectId(id));
-			if (ok(node)) {
-				boolean hasChildren = read.hasChildren(ms, node);
-				list.add(new NodeMetaIntf(id, hasChildren));
-			}
-		}
-		res.setSuccess(true);
-		return res;
-	}
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
@@ -141,7 +121,8 @@ public class NodeRenderService extends ServiceBase {
 		 */
 		SubNode scanToNode = null;
 
-		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node))) {
+		// we pass doAuth=true because right here we DO care that the hasChildren is considering only based on what WE can access.
+		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node, true, false))) {
 			req.setUpLevel(true);
 		}
 
@@ -245,22 +226,8 @@ public class NodeRenderService extends ServiceBase {
 	@PerfMon(category = "render")
 	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
 			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-		/*
-		 * see also: tag #getNodeMetaInfo
-		 * 
-		 * Note: if you set the hasChildren to true here to update children flag on nodes immediately here,
-		 * then you can also remove the getNodeMetaInfo() call where you see that on the client, and that's
-		 * all you need to do, but for now we're using getNodeMetaInfo to query for all the children
-		 * asynchronously from the page load, after the page renders, to make things perform better (i.e.
-		 * faster diaplay of pages).
-		 * 
-		 * So this means the page first renders *without* knowing of any 'hasChildren' (resulting in no
-		 * expand icons displayed), and then slightly after that the client calls getNodeMetaInfo() to
-		 * retrieve that information asynchronously and then updates the page, showing all the expand icons
-		 * on all the nodes that have children.
-		 */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal,
-				level > 0, false, false, false, true, true, null);
+				level > 0, false, true, false, true, true, null);
 
 		if (no(nodeInfo)) {
 			return null;

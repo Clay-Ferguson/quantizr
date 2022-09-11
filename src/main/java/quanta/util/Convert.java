@@ -42,6 +42,10 @@ public class Convert extends ServiceBase {
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
+	 * 
+	 * Note: childrenCheck=true means that we DO need the correct value for hasChildren (from a global, non-user specific
+	 * point of view) to be set on this node. Node that we do set hasChildren to true if there ARE an children REGARDLESS
+	 * of whether the given user can access those children.
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly,
@@ -53,10 +57,9 @@ public class Convert extends ServiceBase {
 		// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
 		if (signed && !crypto.nodeSigVerify(node, null)) {
 			log.debug("SIG FAILED: nodeId=" + node.getIdStr());
-
-			// wip: only return null here once we have CONFIRMED we can browse all admin data and not see the
-			// SIG FAILED message in the logs at all.
-			// return null;
+			// todo-0: create a global static counter so our server info can show is at a glance
+			// if we're having a potential problem with signatures
+			return null;
 		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
@@ -104,8 +107,8 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		boolean hasChildren = childrenCheck ? read.hasChildren(ms, node) : false;
-		// log.trace("hasNodes=" + hasChildren + " node: "+node.getIdStr());
+		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck); 
+		// log.debug("hasChildren=" + hasChildren + " node: "+node.getIdStr());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);

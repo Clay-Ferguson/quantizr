@@ -79,7 +79,6 @@ import quanta.request.GetFriendsRequest;
 import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
-import quanta.request.GetNodeMetaInfoRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
@@ -536,15 +535,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/getNodeMetaInfo", method = RequestMethod.POST)
-	public @ResponseBody Object getNodeMetaInfo(@RequestBody GetNodeMetaInfoRequest req, //
-			HttpServletRequest httpReq, HttpSession session) {
-		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getNodeMetaInfo", req, session, ms -> {
-			return render.getNodeMetaInfo(ms, req);
-		});
-	}
-
 	@RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
 	public @ResponseBody Object loadActPubObject(@RequestBody GetActPubObjectRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
@@ -879,7 +869,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("deleteNodes", req, session, ms -> {
 			if (req.isBulkDelete()) {
-				return delete.bulkDeleteNodes(ms, req);
+				return delete.bulkDeleteNodes(ms);
 			} else {
 				return delete.deleteNodes(ms, req);
 			}

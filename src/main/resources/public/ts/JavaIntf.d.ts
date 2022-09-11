@@ -28,11 +28,6 @@ export interface MFSDirEntry {
     Hash: string;
 }
 
-export interface NodeMetaIntf {
-    id: string;
-    hasChildren: boolean;
-}
-
 export interface OpenGraph {
     url: string;
     title: string;
@@ -223,10 +218,6 @@ export interface GetIPFSFilesRequest extends RequestBase {
 export interface GetMultiRssRequest extends RequestBase {
     urls: string;
     page: number;
-}
-
-export interface GetNodeMetaInfoRequest extends RequestBase {
-    ids: string[];
 }
 
 export interface GetNodePrivilegesRequest extends RequestBase {
@@ -630,10 +621,6 @@ export interface GetIPFSFilesResponse extends ResponseBase {
 
 export interface GetMultiRssResponse extends ResponseBase {
     feed: RssFeed;
-}
-
-export interface GetNodeMetaInfoResponse extends ResponseBase {
-    nodeIntf: NodeMetaIntf[];
 }
 
 export interface GetNodePrivilegesResponse extends ResponseBase {

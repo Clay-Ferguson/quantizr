@@ -21,11 +21,9 @@ import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
-import { NodeMetaIntf } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
-
 export class Render {
     private debug: boolean = false;
     private markedRenderer: any = null;
@@ -524,9 +522,6 @@ export class Render {
                         this.allowFadeInId = true;
                     }
 
-                    // see also: tag #getNodeMetaInfo
-                    this.getNodeMetaInfo(res.node);
-
                     // only focus the TAB if we're not editing, because if editing the edit field will be focused. In other words,
                     // if we're about to initiate editing a TextArea field will be getting focus
                     // so we don't want to set the MAIN tab as the focus and mess that up.
@@ -553,67 +548,67 @@ export class Render {
     This function will perform well even if called repeatedly. Only does the work once as neccessary so we can call this
     safely after every time we get new data from the server, with no significant performance hit.
     */
-    getNodeMetaInfo = async (node: J.NodeInfo) => {
-        if (node?.children) {
-            // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
-            // haven't yet pulled the metadata yet.
-            const ids: string[] = [];
+    // getNodeMetaInfo = async (node: J.NodeInfo) => {
+    //     if (node?.children) {
+    //         // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
+    //         // haven't yet pulled the metadata yet.
+    //         const ids: string[] = [];
 
-            this.getIncompleteMetaIds(node, ids);
+    //         this.getIncompleteMetaIds(node, ids);
 
-            if (ids.length > 0) {
-                // console.log("MetaQuery idCount=" + ids.length);
-                const res = await S.rpcUtil.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
-                    ids
-                }, true);
+    //         if (ids.length > 0) {
+    //             // console.log("MetaQuery idCount=" + ids.length);
+    //             const res = await S.rpcUtil.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+    //                 ids
+    //             }, true);
 
-                dispatch("updateNodeMetaInfo", s => {
-                    if (s.node && s.node.children) {
-                        s.node.hasChildren = true;
-                        this.updateHasChildren(s.node, res.nodeIntf);
-                    }
-                    return s;
-                });
-            }
-        }
-    }
+    //             dispatch("updateNodeMetaInfo", s => {
+    //                 if (s.node && s.node.children) {
+    //                     s.node.hasChildren = true;
+    //                     this.updateHasChildren(s.node, res.nodeIntf);
+    //                 }
+    //                 return s;
+    //             });
+    //         }
+    //     }
+    // }
 
-    getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
-        if (!node?.children) return;
+    // getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
+    //     if (!node?.children) return;
 
-        for (const child of node.children) {
-            if (!(child as any).metaInfDone) {
-                ids.push(child.id);
-            }
+    //     for (const child of node.children) {
+    //         if (!(child as any).metaInfDone) {
+    //             ids.push(child.id);
+    //         }
 
-            // call recursively to process any sub-children
-            this.getIncompleteMetaIds(child, ids);
-        }
-    }
+    //         // call recursively to process any sub-children
+    //         this.getIncompleteMetaIds(child, ids);
+    //     }
+    // }
 
-    updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]) => {
-        if (!node || !node.children) return;
-        node.hasChildren = true;
+    // updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]) => {
+    //     if (!node || !node.children) return;
+    //     node.hasChildren = true;
 
-        for (const child of node.children) {
+    //     for (const child of node.children) {
 
-            // if this is a child we will have just pulled down
-            if (!(child as any).metaInfDone) {
+    //         // if this is a child we will have just pulled down
+    //         if (!(child as any).metaInfDone) {
 
-                // find the child in what we just pulled down.
-                const inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
+    //             // find the child in what we just pulled down.
+    //             const inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
 
-                // set the hasChildren to the value we just pulled down.
-                if (inf) {
-                    child.hasChildren = inf.hasChildren;
-                }
-                (child as any).metaInfDone = true;
-            }
+    //             // set the hasChildren to the value we just pulled down.
+    //             if (inf) {
+    //                 child.hasChildren = inf.hasChildren;
+    //             }
+    //             (child as any).metaInfDone = true;
+    //         }
 
-            // call recursively to process any sub-children
-            this.updateHasChildren(child, nodeIntf);
-        }
-    }
+    //         // call recursively to process any sub-children
+    //         this.updateHasChildren(child, nodeIntf);
+    //     }
+    // }
 
     renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;

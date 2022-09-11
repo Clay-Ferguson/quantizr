@@ -20,6 +20,8 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
+import quanta.instrument.PerfMonEvent;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Bookmark;
@@ -77,8 +79,10 @@ public class NodeSearchService extends ServiceBase {
 
 	static final int TRENDING_LIMIT = 10000;
 
+	@PerfMon(category = "search")
 	public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
 		RenderDocumentResponse res = new RenderDocumentResponse();
+		PerfMonEvent perf = new PerfMonEvent(0, null, ms.getUserName());
 
 		List<NodeInfo> results = new LinkedList<>();
 		res.setSearchResults(results);
@@ -87,11 +91,17 @@ public class NodeSearchService extends ServiceBase {
 		if (!ok(node)) {
 			return res;
 		}
+
+		perf.chain("rendDoc:GetNode");
+
 		boolean adminOnly = acl.isAdminOwned(node);
 
 		HashSet<String> truncates = new HashSet<>();
 		List<SubNode> nodes = read.genDocList(ms, req.getRootId(), req.getStartNodeId(), req.isIncludeComments(), truncates);
 		int counter = 0;
+
+		perf.chain("rendDoc:getDocList");
+
 		for (SubNode n : nodes) {
 			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, true, false, counter + 1, false,
 					false, false, false, false, true, null);
@@ -103,6 +113,7 @@ public class NodeSearchService extends ServiceBase {
 
 				results.add(info);
 			}
+			perf.chain("rendDoc:converted");
 		}
 		return res;
 	}
@@ -347,7 +358,7 @@ public class NodeSearchService extends ServiceBase {
 	public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
-		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
+		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, null, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (ok(bookmarksNode)) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStr(NodeProp.TARGET_ID);
@@ -443,7 +454,9 @@ public class NodeSearchService extends ServiceBase {
 
 			// We pass true if this is a basic subgraph (not a Trending analysis), so that running Node Stats
 			// has the side effect of cleaning out orphans.
-			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false);
+			// Note doAuth is saying here if there's any potential secrets in the results then use doAuth=true
+			boolean doAuth = ok(wordMap) || ok(tagMap) || ok(mentionMap);
+			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth);
 		}
 
 		int publicCount = 0;
@@ -457,7 +470,6 @@ public class NodeSearchService extends ServiceBase {
 
 		for (SubNode node : iter) {
 			nodeCount++;
-
 			if (req.isSignatureVerify()) {
 				String sig = node.getStr(NodeProp.CRYPTO_SIG);
 				if (ok(sig)) {
@@ -613,7 +625,7 @@ public class NodeSearchService extends ServiceBase {
 			sb.append("Unsigned: " + unsignedNodeCount + ", ");
 			sb.append("FAILED SIGS: " + failedSigCount);
 		}
-		
+
 		res.setStats(sb.toString());
 
 		if (ok(wordList)) {

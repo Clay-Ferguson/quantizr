@@ -59,7 +59,7 @@ public class SystemService extends ServiceBase {
 	 */
 	public String deleteLeavingOrphans(MongoSession ms, String nodeId) {
 		SubNode node = read.getNode(ms, nodeId);
-		delete.delete(node);
+		delete.delete(ms, node);
 		return "Success.";
 	}
 

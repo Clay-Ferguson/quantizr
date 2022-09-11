@@ -787,12 +787,14 @@ public class UserManagerService extends ServiceBase {
 
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
-		List<SubNode> friendNodes = getSpecialNodesList(ms, parentType, null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, true);
 		if (ok(friendNodes)) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 				String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 				if (delUserNodeId.equals(userNodeId)) {
+
+					// we delete with updateHasChildren=false, becasue it's more efficient
 					delete.delete(ms, friendNode, false);
 				}
 			}
@@ -1196,7 +1198,7 @@ public class UserManagerService extends ServiceBase {
 
 	public GetFriendsResponse getFriends(MongoSession ms) {
 		GetFriendsResponse res = new GetFriendsResponse();
-		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true);
 
 		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -1238,7 +1240,8 @@ public class UserManagerService extends ServiceBase {
 	 * Looks in the userName's account under their 'underType' type node and returns all the children.
 	 * If userName is passed as null, then we use the currently logged in user
 	 */
-	public List<SubNode> getSpecialNodesList(MongoSession ms, String underType, String userName, boolean sort) {
+	public List<SubNode> getSpecialNodesList(MongoSession ms, Val<SubNode> parentNodeVal, String underType, String userName,
+			boolean sort) {
 		ms = ThreadLocals.ensure(ms);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(ms, userName);
@@ -1248,6 +1251,10 @@ public class UserManagerService extends ServiceBase {
 		SubNode parentNode = read.findSubNodeByType(ms, userNode, underType);
 		if (no(parentNode))
 			return null;
+
+		if (ok(parentNodeVal)) {
+			parentNodeVal.setVal(parentNode);
+		}
 
 		for (SubNode friendNode : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
 				null, 0)) {

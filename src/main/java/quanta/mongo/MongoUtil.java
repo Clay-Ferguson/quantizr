@@ -8,10 +8,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +35,6 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
-import quanta.service.AclService;
 import quanta.util.Const;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
@@ -411,35 +408,38 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
-	/* DO NOT DELETE
+	/*
+	 * DO NOT DELETE
 	 * 
 	 * Use this for various one-off data conversions.
 	 */
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
-		// Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getPath(), null, 0, 0, null, null);
+		// Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getPath(), null,
+		// 0, 0, null, null);
 
 		// for (SubNode acctNode : accountNodes) {
 
-		// 	// if this is a foreign node ignore it.
-		// 	String userName = acctNode.getStr(NodeProp.USER.s());
-		// 	log.debug("Processing Account: " + acctNode.getIdStr() + " user: " + userName);
+		// // if this is a foreign node ignore it.
+		// String userName = acctNode.getStr(NodeProp.USER.s());
+		// log.debug("Processing Account: " + acctNode.getIdStr() + " user: " + userName);
 
-		// 	if (no(userName) || userName.contains("@")) {
-		// 		// invalid userName or foreign user, ignore.
-		// 	} else {
-		// 		// any node that's a child here and doesn't have ACCOUNT type should be set to account type
-		// 		// Need to signup a new user and make sure it's working to set the account type WITHOUT this stupid
-		// 		// fix.
-		// 		if (!NodeType.ACCOUNT.s().equals(acctNode.getType())) {
-		// 			acctNode.setType(NodeType.ACCOUNT.s());
-		// 		}
-		// 		acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
-		// 	}
+		// if (no(userName) || userName.contains("@")) {
+		// // invalid userName or foreign user, ignore.
+		// } else {
+		// // any node that's a child here and doesn't have ACCOUNT type should be set to account type
+		// // Need to signup a new user and make sure it's working to set the account type WITHOUT this
+		// stupid
+		// // fix.
+		// if (!NodeType.ACCOUNT.s().equals(acctNode.getType())) {
+		// acctNode.setType(NodeType.ACCOUNT.s());
+		// }
+		// acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
+		// }
 
-		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
-		// 		update.saveSession(ms);
-		// 	}
+		// if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// update.saveSession(ms);
+		// }
 		// }
 
 		// // should be unnecessary but let's save here too.
@@ -454,25 +454,25 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void fixSharing(MongoSession ms) {
 		log.debug("Processing fixSharing");
-		
+
 		// WARNING: use 'ops.strea' (findAll will be out of memory error on prod)
 
 		// Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		// int counter = 0;
 
 		// for (SubNode node : nodes) {
-		// 	// essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
-		// 	if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
-		// 		acl.makePublicAppendable(ms, node);
-		// 	}
+		// // essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
+		// if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
+		// acl.makePublicAppendable(ms, node);
+		// }
 
-		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
-		// 		update.saveSession(ms);
-		// 	}
+		// if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// update.saveSession(ms);
+		// }
 
-		// 	if (++counter % 2000 == 0) {
-		// 		log.debug("fixShare: " + String.valueOf(counter));
-		// 	}
+		// if (++counter % 2000 == 0) {
+		// log.debug("fixShare: " + String.valueOf(counter));
+		// }
 		// }
 
 		// log.debug("fixSharing completed.");
@@ -492,23 +492,24 @@ public class MongoUtil extends ServiceBase {
 
 		// for (SubNode node : nodes) {
 
-		// 	// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
-		// 	// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
-		// 	if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ok(node.getParent())) {
-		// 		node.setParent(null);
-		// 		continue;
-		// 	}
+		// // If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
+		// // need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
+		// if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") &&
+		// ok(node.getParent())) {
+		// node.setParent(null);
+		// continue;
+		// }
 
-		// 	// this is what the MongoListener does....
-		// 	mongoUtil.validateParent(node, null);
+		// // this is what the MongoListener does....
+		// mongoUtil.validateParent(node, null);
 
-		// 	if (ThreadLocals.getDirtyNodeCount() > 200) {
-		// 		update.saveSession(ms);
-		// 	}
+		// if (ThreadLocals.getDirtyNodeCount() > 200) {
+		// update.saveSession(ms);
+		// }
 
-		// 	if (++counter % 1000 == 0) {
-		// 		log.debug("SPN: " + String.valueOf(counter));
-		// 	}
+		// if (++counter % 1000 == 0) {
+		// log.debug("SPN: " + String.valueOf(counter));
+		// }
 		// }
 
 		// log.debug("setParentNodes completed.");
@@ -523,53 +524,53 @@ public class MongoUtil extends ServiceBase {
 		// int idx = 0;
 
 		// for (SubNode node : nodes) {
-		// 	StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
+		// StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
 
-		// 	while (t.hasMoreTokens()) {
-		// 		String part = t.nextToken().trim();
-		// 		if (part.length() < lenLimit)
-		// 			continue;
+		// while (t.hasMoreTokens()) {
+		// String part = t.nextToken().trim();
+		// if (part.length() < lenLimit)
+		// continue;
 
-		// 		if (no(set.get(part))) {
-		// 			Integer x = idx++;
-		// 			set.put(part, x);
-		// 		}
-		// 	}
+		// if (no(set.get(part))) {
+		// Integer x = idx++;
+		// set.put(part, x);
+		// }
+		// }
 		// }
 
 		// nodes = ops.findAll(SubNode.class);
 		// int maxPathLen = 0;
 
 		// for (SubNode node : nodes) {
-		// 	StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
-		// 	StringBuilder fullPath = new StringBuilder();
+		// StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
+		// StringBuilder fullPath = new StringBuilder();
 
-		// 	while (t.hasMoreTokens()) {
-		// 		String part = t.nextToken().trim();
+		// while (t.hasMoreTokens()) {
+		// String part = t.nextToken().trim();
 
-		// 		// if delimiter, or short parths, just take them as is
-		// 		if (part.length() < lenLimit) {
-		// 			fullPath.append(part);
-		// 		}
-		// 		// if path part find it's unique integer, and insert
-		// 		else {
-		// 			Integer partIdx = set.get(part);
+		// // if delimiter, or short parths, just take them as is
+		// if (part.length() < lenLimit) {
+		// fullPath.append(part);
+		// }
+		// // if path part find it's unique integer, and insert
+		// else {
+		// Integer partIdx = set.get(part);
 
-		// 			// if the database changed underneath it we just take that as another new path part
-		// 			if (no(partIdx)) {
-		// 				partIdx = idx++;
-		// 				set.put(part, partIdx);
-		// 			}
-		// 			fullPath.append(String.valueOf(partIdx));
-		// 		}
-		// 	}
+		// // if the database changed underneath it we just take that as another new path part
+		// if (no(partIdx)) {
+		// partIdx = idx++;
+		// set.put(part, partIdx);
+		// }
+		// fullPath.append(String.valueOf(partIdx));
+		// }
+		// }
 
-		// 	// log.debug("fullPath: " + fullPath);
-		// 	if (fullPath.length() > maxPathLen) {
-		// 		maxPathLen = fullPath.length();
-		// 	}
-		// 	node.setPath(fullPath.toString());
-		// 	ops.save(node);
+		// // log.debug("fullPath: " + fullPath);
+		// if (fullPath.length() > maxPathLen) {
+		// maxPathLen = fullPath.length();
+		// }
+		// node.setPath(fullPath.toString());
+		// ops.save(node);
 		// }
 		// log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
 	}

@@ -265,7 +265,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				 * trying to get the children for all nodes we encounter, so this will be redundant, but I don't
 				 * want to refactor now to solve this yet. That's almost an optimization that should come later
 				 */
-				boolean hasChildren = read.hasChildren(ms, node);
+				boolean hasChildren = read.hasChildren(ms, node, true, false);
 				if (hasChildren) {
 					String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
 					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");

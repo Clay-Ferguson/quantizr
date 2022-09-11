@@ -100,8 +100,7 @@ public class MongoUpdate extends ServiceBase {
 				}
 
 				for (SubNode node : nodes) {
-					// log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null
-					// (new node?)" : node.getIdStr()));
+					// log.debug("Saving Dirty nodeId=" + (node.getId()==null ? "null (new node?)" : node.getIdStr()));
 					update.save(ms, node, false);
 				}
 
@@ -140,7 +139,8 @@ public class MongoUpdate extends ServiceBase {
 					// if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
 					if (no(ipfsNode)) {
 						// turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
-						// to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that are
+						// to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that
+						// are
 						// 'backing' the MFS file storage don't even appear in the pinning system.
 						// ipfsNode = read.findByCID(as, pin);
 					} else {
@@ -149,8 +149,7 @@ public class MongoUpdate extends ServiceBase {
 
 					if (ok(ipfsNode)) {
 						pinCount++;
-						log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId="
-								+ ipfsNode.getIdStr());
+						log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
 
 						if (attachment && ok(statsMap)) {
 							Long binSize = ipfsNode.getInt(NodeProp.BIN_SIZE);

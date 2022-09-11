@@ -1129,7 +1129,7 @@ export class Edit {
         }
 
         const res = await S.rpcUtil.rpc<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
-            splitType: splitType,
+            splitType,
             nodeId: node.id,
             delimiter
         });

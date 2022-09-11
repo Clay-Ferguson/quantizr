@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.config.SessionContext;
+import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMonEvent;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -85,6 +86,13 @@ public class ThreadLocals {
 	public static void requireAdmin() {
 		if (!getSC().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
+		}
+	}
+
+	public static void requireAdminThread() {
+		MongoSession as = ThreadLocals.getMongoSession();
+		if (no(as) || !as.isAdmin()) {
+			throw new NodeAuthFailedException();
 		}
 	}
 
@@ -206,6 +214,7 @@ public class ThreadLocals {
 	}
 
 	// Since this cache is thread specific there's no thread-sync mutext required here.
+	// todo-0: I think I'm going to remove this completely but only in a separate Git commit, later.
 	private static LinkedHashMap<String, SubNode> getCachedNodes() {
 		if (no(cachedNodes.get())) {
 			// #LRU

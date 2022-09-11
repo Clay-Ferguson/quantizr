@@ -111,7 +111,7 @@ export class AppState {
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
 
-    // UserAccount node ID
+    // UserAccount node ID (todo-0: rename these to 'accnt' not 'home')
     homeNodeId: string;
     homeNodePath: string;
 

@@ -42,6 +42,7 @@ import quanta.util.XString;
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
+	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the reason for "_id"
 	public static final String ID = "_id";
 	@Id
 	@Field(ID)
@@ -50,6 +51,12 @@ public class SubNode {
 	public static final String ORDINAL = "ord";
 	@Field(ORDINAL)
 	private Long ordinal;
+
+	// Holds null if children status unknown. Not yet generated.
+	// wip: create an index for this field
+	public static final String HAS_CHILDREN = "hch";
+	@Field(HAS_CHILDREN)
+	private Boolean hch;
 
 	public static final String PATH = "pth";
 	@Field(PATH)
@@ -139,6 +146,7 @@ public class SubNode {
 			SubNode.NAME, //
 			SubNode.ID, //
 			SubNode.ORDINAL, //
+			SubNode.HAS_CHILDREN, //
 			SubNode.OWNER, //
 			SubNode.CREATE_TIME, //
 			SubNode.MODIFY_TIME, //
@@ -236,6 +244,12 @@ public class SubNode {
 		// updated INCLUDING path
 		String oldPath = this.path;
 		this.path = path;
+
+		// Any time we modify a signature field (path, content, owner) we have to nullify the
+		// signature becasue it will be invalid now.
+		set(NodeProp.CRYPTO_SIG, null);
+
+		// note: this will go away when I remove (soon) cachedNodes stuff.
 		ThreadLocals.pathChanged(oldPath, this);
 	}
 
@@ -252,6 +266,19 @@ public class SubNode {
 		this.ordinal = ordinal;
 	}
 
+	@JsonProperty(HAS_CHILDREN)
+	public Boolean getHasChildren() {
+		return hch;
+	}
+
+	@JsonProperty(HAS_CHILDREN)
+	public void setHasChildren(Boolean hch) {
+		if (Util.equalObjs(hch, this.hch))
+			return;
+		ThreadLocals.dirty(this);
+		this.hch = hch;
+	}
+
 
 	// we don't annotate this because we have a custom getter
 	// @JsonProperty(FIELD_OWNER)
@@ -265,6 +292,10 @@ public class SubNode {
 			return;
 		ThreadLocals.dirty(this);
 		this.owner = owner;
+		
+		// Any time we modify a signature field (path, content, owner) we have to nullify the
+		// signature becasue it will be invalid now.
+		set(NodeProp.CRYPTO_SIG, null);
 	}
 
 	@JsonGetter(OWNER)
@@ -396,6 +427,9 @@ public class SubNode {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			if (no(props)) {
+				// if there are no props currently, and the val is null we do nothing, because
+				// the way we set a null prop anyway is by REMOVING it from the props.
+				if (no(val)) return false;
 				props = props();
 			}
 
@@ -645,6 +679,10 @@ public class SubNode {
 			return;
 		ThreadLocals.dirty(this);
 		this.content = content;
+
+		// Any time we modify a signature field (path, content, owner) we have to nullify the
+		// signature becasue it will be invalid now.
+		set(NodeProp.CRYPTO_SIG, null);
 	}
 
 	@JsonProperty(TAGS)

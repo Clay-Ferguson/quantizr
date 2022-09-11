@@ -104,7 +104,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 			// iterate from root first.
 			docOrderTest(as, rootId, rootId);
 
-			Iterable<SubNode> iter = read.getSubGraph(as, rootNode, null, -1, false, false);
+			Iterable<SubNode> iter = read.getSubGraph(as, rootNode, null, -1, false, false, false);
 
 			// this runs a test to iterate down from every possible starting place in the subgraph
 			for (SubNode n : iter) {

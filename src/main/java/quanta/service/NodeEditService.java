@@ -195,6 +195,8 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		parentNode.setHasChildren(true);
+		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
 		/*
@@ -273,7 +275,10 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		parentNode.setHasChildren(true);
+		update.save(ms, parentNode);
 		update.save(ms, newNode);
+
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false,
 				false, false, false, null));
 
@@ -444,7 +449,7 @@ public class NodeEditService extends ServiceBase {
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
-		log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
+		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
@@ -849,6 +854,8 @@ public class NodeEditService extends ServiceBase {
 	 * When user pastes in a large amount of text and wants to have this text broken out into individual
 	 * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
 	 * will break it all up into individual nodes.
+	 * 
+	 * req.splitType == 'inline' || 'children'
 	 */
 	public SplitNodeResponse splitNode(MongoSession ms, SplitNodeRequest req) {
 		SplitNodeResponse res = new SplitNodeResponse();
@@ -915,6 +922,10 @@ public class NodeEditService extends ServiceBase {
 			idx++;
 		}
 
+		if (req.getSplitType().equalsIgnoreCase("children")) {
+			parentForNewNodes.setHasChildren(true);
+		}
+
 		res.setSuccess(true);
 		return res;
 	}
@@ -952,7 +963,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (no(fromUserNode)) {
 					n.setOwner(toUserNode.getOwner());
@@ -1086,7 +1097,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
 					replacements++;
 				}

@@ -901,11 +901,9 @@ public class ActPubService extends ServiceBase {
 
             // verify the user doing the delete is the owner of the node, before deleting.
             if (apCrypto.ownerHasKey(as, delNode, keyEncoded.getVal())) {
-                delete.delete(delNode);
-
                 // run subgraph delete asynchronously
                 exec.run(() -> {
-                    delete.deleteSubGraphChildren(as, delNode, false);
+                    delete.deleteSubGraphChildren(as, delNode, true);
                 });
             } else {
                 log.debug("key match fail. rejecting attempt to delete node: " + XString.prettyPrint(delNode)

@@ -712,8 +712,7 @@ export class Crypto {
             path = "/r/" + path.substring(5);
         }
 
-        // wip: Need a warning that moving a node removes it's digital signature, and
-        // for now we can just blow away signatures when a node move happens, and make it a future feature
+        // todo-0: see #tag[9-11-22 9:30am]
         let signData: string = path + "-" + node.ownerId;
         if (node.content) {
             signData += "-" + node.content;

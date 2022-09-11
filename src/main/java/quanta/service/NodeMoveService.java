@@ -115,8 +115,11 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	/*
-	 * Note: Browser can send nodes these in any order, in the request, and always the lowest ordinal is
-	 * the one we keep and join to
+	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is
+	 * the one we keep and join to.
+	 * 
+	 * todo-0: need to verify that none of the nodes being joined (except the one we persist) have any attachments
+	 * becasue we can't combine mutiple attachments into a single node.
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
@@ -169,7 +172,9 @@ public class NodeMoveService extends ServiceBase {
 				}
 				/* or else we delete the node */
 				else {
-					delete.deleteNode(ms, n, false);
+					// pass updateParentHasChildren, because we know a 'join nodes' never affects whether the parent 
+					// had children. It DOES have children, and we're joining them.
+					delete.deleteNode(ms, n, false, false);
 				}
 			}
 			counter++;
@@ -201,7 +206,7 @@ public class NodeMoveService extends ServiceBase {
 	 * siblings posted in below it)
 	 */
 	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds) {
-		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
+		// log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = read.getNode(ms, targetId);
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
 
@@ -232,7 +237,6 @@ public class NodeMoveService extends ServiceBase {
 
 		for (String nodeId : nodeIds) {
 			// log.debug("Moving ID: " + nodeId);
-
 			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuth(ms, node);
 			nodesToMove.add(node);
@@ -254,14 +258,10 @@ public class NodeMoveService extends ServiceBase {
 		// make sure nodes to move are in ordinal order.
 		nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
-		// set to true if we're sure at least one node changed ordinal.
-		final Val<Boolean> dirty = new Val<>(Boolean.FALSE);
-
 		for (SubNode node : nodesToMove) {
 			// log.debug("Moving ID: " + nodeId);
-
 			Long _targetOrdinal = curTargetOrdinal;
-			final SubNode _nodeParent = nodeParent;
+			SubNode _nodeParent = nodeParent;
 			arun.run(as -> {
 				/*
 				 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
@@ -269,7 +269,6 @@ public class NodeMoveService extends ServiceBase {
 				 * ordinal will change.
 				 */
 				if (_nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
-
 					/*
 					 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
 					 * so we reject the attempt.
@@ -281,25 +280,37 @@ public class NodeMoveService extends ServiceBase {
 
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
+
+					// we know this tareget node has chilren now.
+					parentToPasteInto.setHasChildren(true);
+
+					// todo-0: IMPORTANT!!!
+					//         there should be other places in the code where we have a node being updated and KNOW it's
+					//         parent exists, and can speed up app by disabling the parent check in the MongoListener,
+					//         by calling setDisableParentCheck on those nodes.
+					//         Look for such places globally.
+					parentToPasteInto.setDisableParentCheck(true);
+					node.setDisableParentCheck(true);
+
+					// only if we get here do we know the original parent (moved FROM) now has an indeterminate
+					// hasChildren status
+					_nodeParent.setHasChildren(null);
 				}
 
-				// if this ordinal somehow is NOT changing (which CAN happen), then do nothing here
+				// do processing for when ordinal has changed.
 				if (!node.getOrdinal().equals(_targetOrdinal)) {
-					dirty.setVal(true);
-
 					node.setOrdinal(_targetOrdinal);
+
+					// optimize by disableing parent check on this node since we know it's not needed.
+					parentToPasteInto.setDisableParentCheck(true);
 					node.setDisableParentCheck(true);
+
+					// we know this tareget node has chilren now.
+					parentToPasteInto.setHasChildren(true);
 				}
 				return null;
 			});
 			curTargetOrdinal++;
-		}
-
-		if (dirty.getVal()) {
-			arun.run(as -> {
-				update.saveSession(as);
-				return null;
-			});
 		}
 	}
 
@@ -308,7 +319,7 @@ public class NodeMoveService extends ServiceBase {
 		// log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true, false)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true, false, false)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
@@ -318,7 +329,7 @@ public class NodeMoveService extends ServiceBase {
 			String newPath = newPathPrefix + "/" + pathSuffix;
 			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
 			newPath = mongoUtil.findAvailablePath(newPath);
-			node.setPath(newPath); 
+			node.setPath(newPath);
 			node.setDisableParentCheck(true);
 		}
 	}

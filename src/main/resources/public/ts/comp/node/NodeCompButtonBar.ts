@@ -129,7 +129,7 @@ export class NodeCompButtonBar extends Div {
 
             if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
-                this.node.id !== state.homeNodeId) {
+                this.node.id !== state.node.id) {
                 selCheckbox = new Checkbox(null, {
                     title: "Select Nodes."
                 }, {

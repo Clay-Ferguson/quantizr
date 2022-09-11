@@ -47,9 +47,10 @@ public class CryptoService extends ServiceBase {
 		String sig = ok(checkSig) ? checkSig : node.getStr(NodeProp.CRYPTO_SIG);
 
 		/*
-		 * if no signature exists, for now we consider this a valid node. todo-wip: Eventually we will lock
-		 * it down so that if it's an ADMIN owned node it WILL require signature, or maybe even ALL users
-		 * some day.
+		 * if no signature exists, for now we consider this a valid node.
+		 * 
+		 * todo-0: Eventually we will lock it down so that if it's an ADMIN owned node it WILL require
+		 * signature. Have to figure out how to sign all of War and Peace first
 		 */
 		if (no(sig)) {
 			return true;

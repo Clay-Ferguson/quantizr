@@ -7,9 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
@@ -36,6 +38,9 @@ import quanta.util.ThreadLocals;
  * For reference: import org.aspectj.lang.annotation.Aspect; import
  * org.springframework.stereotype.Component;
  */
+
+// NOTE : To disable the instrumentation, just comment these two annotations
+//        Adding these annotations is all you need to enable it.
 // @Aspect
 // @Component
 public class Instrument {
