@@ -238,7 +238,7 @@ public class NodeSearchService extends ServiceBase {
 		// Run this as admin because ordinary users don't have access to account nodes.
 		arun.run(as -> {
 			accountNodes.setVal(read.getChildren(as, MongoUtil.allUsersRootNode.getPath(), null, ConstantInt.ROWS_PER_PAGE.val(),
-					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), _textCriteria, _moreCriteria));
+					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), _textCriteria, _moreCriteria, true));
 			return null;
 		});
 

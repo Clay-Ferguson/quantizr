@@ -205,7 +205,7 @@ public class ActPubFollowing extends ServiceBase {
                     } else {
                         // if this is an unfollow delete the friend node
                         if (unFollow) {
-                            delete.deleteNode(as, friendNode, false, true);
+                            delete.deleteNode(as, friendNode, false);
                         }
                     }
 

@@ -115,11 +115,11 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	/*
-	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is
-	 * the one we keep and join to.
+	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
+	 * one we keep and join to.
 	 * 
-	 * todo-0: need to verify that none of the nodes being joined (except the one we persist) have any attachments
-	 * becasue we can't combine mutiple attachments into a single node.
+	 * todo-0: need to verify that none of the nodes being joined (except the one we persist) have any
+	 * attachments becasue we can't combine mutiple attachments into a single node.
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
@@ -172,9 +172,9 @@ public class NodeMoveService extends ServiceBase {
 				}
 				/* or else we delete the node */
 				else {
-					// pass updateParentHasChildren, because we know a 'join nodes' never affects whether the parent 
+					// pass updateParentHasChildren, because we know a 'join nodes' never affects whether the parent
 					// had children. It DOES have children, and we're joining them.
-					delete.deleteNode(ms, n, false, false);
+					delete.deleteNode(ms, n, false);
 				}
 			}
 			counter++;
@@ -285,10 +285,10 @@ public class NodeMoveService extends ServiceBase {
 					parentToPasteInto.setHasChildren(true);
 
 					// todo-0: IMPORTANT!!!
-					//         there should be other places in the code where we have a node being updated and KNOW it's
-					//         parent exists, and can speed up app by disabling the parent check in the MongoListener,
-					//         by calling setDisableParentCheck on those nodes.
-					//         Look for such places globally.
+					// there should be other places in the code where we have a node being updated and KNOW it's
+					// parent exists, and can speed up app by disabling the parent check in the MongoListener,
+					// by calling setDisableParentCheck on those nodes.
+					// Look for such places globally.
 					parentToPasteInto.setDisableParentCheck(true);
 					node.setDisableParentCheck(true);
 
@@ -341,7 +341,9 @@ public class NodeMoveService extends ServiceBase {
 		String nodeId = req.getParentNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		List<String> nodeIds = read.getChildrenIds(ms, node, false, null);
-		res.setNodeIds(nodeIds);
+		if (ok(nodeIds)) {
+			res.setNodeIds(nodeIds);
+		}
 		res.setSuccess(true);
 		return res;
 	}

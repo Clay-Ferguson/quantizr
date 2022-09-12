@@ -42,6 +42,9 @@ import quanta.util.XString;
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
+	// This optimization is optional and we have this flag if we need to turn it off.
+	public static final boolean USE_HAS_CHILDREN = true;
+
 	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the reason for "_id"
 	public static final String ID = "_id";
 	@Id
@@ -53,7 +56,7 @@ public class SubNode {
 	private Long ordinal;
 
 	// Holds null if children status unknown. Not yet generated.
-	// wip: create an index for this field
+	// todo-0: create an index for this field? do we ever query on it?
 	public static final String HAS_CHILDREN = "hch";
 	@Field(HAS_CHILDREN)
 	private Boolean hch;

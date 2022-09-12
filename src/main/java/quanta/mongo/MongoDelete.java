@@ -38,22 +38,13 @@ import quanta.response.DeleteNodesResponse;
 public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
-	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean updateParentHasChildren) {
+	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly) {
 			attach.deleteBinary(ms, "", node, null);
 		}
 
-		SubNode parent = null;
-		if (updateParentHasChildren) {
-			parent = read.getParent(ms, node);
-		}
 		delete(ms, node, childrenOnly);
-
-		if (ok(parent)) {
-			boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath(), false);
-			parent.setHasChildren(hasChildren);
-		}
 	}
 
 	/*

@@ -3,6 +3,7 @@ package quanta.mongo;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -104,14 +105,35 @@ public class MongoRead extends ServiceBase {
         return getChildCount(ms, node.getPath());
     }
 
+    public boolean noChildren(SubNode node) {
+        if (SubNode.USE_HAS_CHILDREN && ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * returns true only if node path is KNOWN (by hasChildren at least), not to have any children.
+     * 
+     * Beware: A false return tells us NOTHING. No gained knowledge.
+     */
+    public boolean noChildren(MongoSession ms, String path) {
+        if (SubNode.USE_HAS_CHILDREN) {
+            SubNode node = getNode(ms, path, false);
+            // using booleanValue for clarity
+            if (ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @PerfMon(category = "read")
     public long getChildCount(MongoSession ms, String path) {
         // statistically I think it pays off to always try the faster way and then assume worst case is that
         // we might have warmed up the MongoDb for what the following query will need.
-        SubNode node = getNode(ms, path, false);
-        if (ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
+        if (noChildren(ms, path))
             return 0;
-        }
 
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
@@ -133,9 +155,10 @@ public class MongoRead extends ServiceBase {
             throw new RuntimeException("doAuth and allowUpdate are mutually exclusive.");
         }
 
-        // if the node knows it's children status return that.
-        if (!doAuth && node.getHasChildren() != null) {
-            return node.getHasChildren();
+        // if the node knows it's children status (non-null value) return that.
+        if (SubNode.USE_HAS_CHILDREN && !doAuth && ok(node.getHasChildren())) {
+            // calling booleanValue for clarity
+            return node.getHasChildren().booleanValue();
         }
         boolean ret = hasChildrenByQuery(ms, node.getPath(), doAuth);
         if (!doAuth && allowUpdate) {
@@ -146,6 +169,10 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read(m,pth)")
     public boolean hasChildrenByQuery(MongoSession ms, String path, boolean doAuth) {
+        // WARNING: Leave this as a note to NOT call this optimization here. It is definitely
+        // counter-productive.
+        // if (noChildren(ms, path)) return false;
+
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
         if (doAuth) {
@@ -425,10 +452,14 @@ public class MongoRead extends ServiceBase {
     }
 
     public List<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         Iterable<SubNode> iter = getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
         return iterateToList(iter);
     }
 
+    // todo-0: I have a feeling we can get rid of this method
     public List<SubNode> iterateToList(Iterable<SubNode> iter) {
         if (!iter.iterator().hasNext()) {
             return null;
@@ -440,6 +471,9 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public List<String> getChildrenIds(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
+        if (noChildren(node)) {
+            return Collections.<String>emptyList();
+        }
         auth.auth(ms, node, PrivilegeType.READ);
 
         Query q = new Query();
@@ -480,7 +514,10 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read(pth)")
     public Iterable<SubNode> getChildren(MongoSession ms, String path, Sort sort, Integer limit, int skip,
-            TextCriteria textCriteria, Criteria moreCriteria) {
+            TextCriteria textCriteria, Criteria moreCriteria, boolean preCheck) {
+        if (preCheck && noChildren(ms, path)) {
+            return Collections.<SubNode>emptyList();
+        }
 
         Query q = new Query();
         if (ok(limit) && limit.intValue() > 0) {
@@ -532,8 +569,11 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read")
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         auth.auth(ms, node, PrivilegeType.READ);
-        return read.getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria);
+        return read.getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria, false);
     }
 
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
@@ -547,6 +587,7 @@ public class MongoRead extends ServiceBase {
      * top one and using that for my MAX operation. AFAIK this might even be the most efficient
      * approach. Who knows.
      */
+    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public Long getMaxChildOrdinal(MongoSession ms, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
@@ -585,6 +626,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public Long getMinChildOrdinal(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
@@ -605,6 +647,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
@@ -629,6 +672,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound;
     }
 
+    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public SubNode getSiblingBelow(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
@@ -657,7 +701,9 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans,
             boolean publicOnly, boolean doAuth) {
-
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         /*
          * The removeOrphans algo REQUIRES all nodes to be returned (no 'limit')
          */
@@ -710,6 +756,9 @@ public class MongoRead extends ServiceBase {
     public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
             boolean requirePriority) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         auth.auth(ms, node, PrivilegeType.READ);
 
         List<CriteriaDefinition> criterias = new LinkedList<>();
@@ -883,6 +932,9 @@ public class MongoRead extends ServiceBase {
      * Special purpose query to get all nodes that have a "date" property.
      */
     public Iterable<SubNode> getCalendar(MongoSession ms, SubNode node) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         auth.auth(ms, node, PrivilegeType.READ);
 
         Query q = new Query();
@@ -905,6 +957,9 @@ public class MongoRead extends ServiceBase {
      * implementing an "All Named Nodes" search would be trivial with this.
      */
     public Iterable<SubNode> getNamedNodes(MongoSession ms, SubNode node) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         auth.auth(ms, node, PrivilegeType.READ);
 
         Query q = new Query();
@@ -1067,6 +1122,9 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read")
     public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, String userName, String type) {
+        if (noChildren(node)) {
+            return null;
+        }
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
@@ -1085,7 +1143,9 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read")
     public SubNode findSubNodeByType(MongoSession ms, SubNode node, String type) {
-
+        if (noChildren(node)) {
+            return null;
+        }
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = Criteria.where(//
@@ -1108,6 +1168,9 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type, boolean recursive, Sort sort,
             Integer limit) {
+        if (noChildren(node)) {
+            return Collections.<SubNode>emptyList();
+        }
         Query q = typedNodesUnderPath_query(ms, node, type, recursive, sort, limit);
         return mongoUtil.find(q);
     }
@@ -1116,6 +1179,9 @@ public class MongoRead extends ServiceBase {
      * Counts nodes matching 'type' under 'path' (recursively)
      */
     public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type, Sort sort, Integer limit) {
+        if (noChildren(node)) {
+            return 0L;
+        }
         Query q = typedNodesUnderPath_query(ms, node, type, true, sort, limit);
         return ops.count(q, SubNode.class);
     }
@@ -1148,11 +1214,14 @@ public class MongoRead extends ServiceBase {
      * propName and propVal
      */
     @PerfMon(category = "read")
-    public SubNode findNodeByProp(MongoSession ms, SubNode parentNode, String propName, String propVal) {
-        // Other wise for ordinary users root is based off their username
+    public SubNode findNodeByProp(MongoSession ms, SubNode node, String propName, String propVal) {
+        if (noChildren(node)) {
+            return null;
+        }
+
         Query q = new Query();
         Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(parentNode.getPath()))//
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
@@ -1166,8 +1235,10 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read")
     public Iterable<SubNode> findNodesByProp(MongoSession ms, String path, String propName, String propVal) {
-
-        // Other wise for ordinary users root is based off their username
+        if (noChildren(ms, path)) {
+            return Collections.<SubNode>emptyList();
+        }
+        
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
@@ -1373,7 +1444,9 @@ public class MongoRead extends ServiceBase {
 
         // The rest of the below is about processing children, so we can try to optimize by getting the
         // parent of this node, and if it has no children we can bail out here.
-        if (node.getHasChildren() != null && !node.getHasChildren()) {
+        // todo-0: Everywhere across the board does it make sense to do this always BEFORE querying for
+        // children?
+        if (SubNode.USE_HAS_CHILDREN && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
             return true;
         }
 
