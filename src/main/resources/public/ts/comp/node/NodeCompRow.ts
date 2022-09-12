@@ -5,6 +5,7 @@ import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
+import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
@@ -165,7 +166,11 @@ export class NodeCompRow extends Div {
         }
 
         if (allowHeader) {
-            header = new NodeCompRowHeader(this.node, true, true, false, false, true, false);
+            // slight special case for now until Document View knows how to delete all the subchilren and not
+            // show orphans on the page when something is deleted. Other panels don't have this problem
+            // todo-0: it would be kind of easy to fix this, and make deleting from doc view work.
+            const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
+            header = new NodeCompRowHeader(this.node, true, true, false, false, true, false, allowDelete);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

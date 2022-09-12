@@ -160,6 +160,5 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     abstract pageChange(delta: number): void;
-
     abstract extraPagingComps(): Comp[];
 }

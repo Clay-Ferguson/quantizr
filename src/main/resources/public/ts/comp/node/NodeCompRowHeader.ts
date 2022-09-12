@@ -20,8 +20,9 @@ import { CollapsiblePanel } from "../core/CollapsiblePanel";
 
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
-        private isBoost: boolean) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
+        private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
+        private isBoost: boolean, private allowDelete: boolean) {
         super(null, {
             className: "row-header"
         });
@@ -263,6 +264,10 @@ export class NodeCompRowHeader extends Div {
                 editableNode = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
                 deleteAllowed = typeHandler.allowAction(NodeActionType.delete, this.node, state);
             }
+        }
+
+        if (!this.allowDelete) {
+            deleteAllowed = false;
         }
 
         let editButton: IconButton = null;

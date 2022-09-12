@@ -92,7 +92,8 @@ export class NodeCompMainNode extends Div {
             }
 
             if (allowHeader) {
-                header = new NodeCompRowHeader(node, true, true, false, false, true, false);
+                const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
+                header = new NodeCompRowHeader(node, true, true, false, false, true, false, allowDelete);
             }
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

@@ -520,9 +520,11 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number, prefix: string,
+    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number,
+        prefix: string,
         isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
-        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string, extraStyle: any, state: AppState): Comp => {
+        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
+        extraStyle: any, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
@@ -550,13 +552,15 @@ export class Search {
             }
         }
 
+        const allowDelete = tabData.id !== C.TAB_DOCUMENT;
+
         let boostComp: Div = null;
         if (node.boostedNode) {
             const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
             // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
             boostComp = new Div(null, { className: "boost-row" }, [
-                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true) : null,
+                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
                 allowFooter ? new NodeCompRowFooter(node.boostedNode, isFeed, showThreadButton) : null,
                 allowFooter ? new Clearfix() : null
@@ -585,7 +589,7 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
             allowFooter ? new NodeCompRowFooter(node, isFeed, showThreadButton) : null,
