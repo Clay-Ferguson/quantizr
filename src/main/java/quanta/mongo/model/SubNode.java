@@ -242,18 +242,11 @@ public class SubNode {
 
 		ServiceBase.auth.ownerAuth(this);
 		ThreadLocals.dirty(this);
-
-		// NOTE: the ordering of these is critical. pathChanged() call needs to have 'this' object already
-		// updated INCLUDING path
-		String oldPath = this.path;
 		this.path = path;
 
 		// Any time we modify a signature field (path, content, owner) we have to nullify the
 		// signature becasue it will be invalid now.
 		set(NodeProp.CRYPTO_SIG, null);
-
-		// note: this will go away when I remove (soon) cachedNodes stuff.
-		ThreadLocals.pathChanged(oldPath, this);
 	}
 
 	@JsonProperty(ORDINAL)

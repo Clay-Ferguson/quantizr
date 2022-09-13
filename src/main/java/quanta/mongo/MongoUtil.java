@@ -154,11 +154,8 @@ public class MongoUtil extends ServiceBase {
 		if (no(objId))
 			return null;
 
-		SubNode node = ThreadLocals.getCachedNode(objId.toHexString());
-		if (no(node)) {
-			// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
-			node = mongoUtil.ops_findById(objId);
-		}
+		// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
+		SubNode node = mongoUtil.ops_findById(objId);
 		return nodeOrDirtyNode(node);
 	}
 

@@ -371,13 +371,9 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read")
     public SubNode findNodeByPath(String path, boolean useCache) {
         path = XString.stripIfEndsWith(path, "/");
-        SubNode ret = useCache ? ThreadLocals.getCachedNode(path) : null;
-        if (no(ret)) {
-            Query q = new Query();
-            q.addCriteria(Criteria.where(SubNode.PATH).is(path));
-            ret = mongoUtil.findOne(q);
-        }
-        return ret;
+        Query q = new Query();
+        q.addCriteria(Criteria.where(SubNode.PATH).is(path));
+        return mongoUtil.findOne(q);
     }
 
     public boolean nodeExists(MongoSession ms, ObjectId id) {
@@ -1068,12 +1064,6 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
-        String cacheKey = "USRNODE-" + user;
-        SubNode ret = ThreadLocals.getCachedNode(cacheKey);
-        if (ok(ret)) {
-            // log.debug("Got Cached Node [key=" + cacheKey + "]: " + XString.prettyPrint(ret));
-            return ret;
-        }
         if (no(user)) {
             user = ThreadLocals.getSC().getUserName();
         }
@@ -1089,7 +1079,7 @@ public class MongoRead extends ServiceBase {
             return getDbRoot();
         }
 
-        // Other wise for ordinary users root is based off their username
+        // Otherwise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
@@ -1099,18 +1089,14 @@ public class MongoRead extends ServiceBase {
 
         q.addCriteria(crit);
 
-        ret = mongoUtil.findOne(q);
+        SubNode ret = mongoUtil.findOne(q);
         if (allowAuth) {
             SubNode _ret = ret;
-
             // we run with 'ms' if it's non-null, or with admin if ms is null
             arun.run(ms, as -> {
                 auth.auth(as, _ret, PrivilegeType.READ);
                 return null;
             });
-        }
-        if (ok(ret)) {
-            ThreadLocals.cacheNode(cacheKey, ret);
         }
         return ret;
     }

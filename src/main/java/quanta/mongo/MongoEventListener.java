@@ -215,9 +215,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
 
-		// update cache objects during save
+		// update cache during save
 		if (ok(node)) {
-			ThreadLocals.cacheNode(node);
 			apCache.saveNotify(node);
 		}
 
@@ -256,8 +255,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// log.error("WARNING: DIRTY READ: " + node.getIdStr());
 		// }
 
-		ThreadLocals.cacheNode(node);
-
 		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
 		// + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
 	}
@@ -276,11 +273,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuth(node);
 					ThreadLocals.clean(node);
-				}
-				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
-				// Actually we could iterate over the cache here, and remove all that start with the 'path'
-				// of the node we just deleted becase only THOSE will now be gone. todo-2
-				ThreadLocals.clearCachedNodes();
+				}	
 
 				publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
 			}

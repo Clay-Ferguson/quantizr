@@ -53,10 +53,6 @@ public class ThreadLocals {
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
 
-	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
-			new ThreadLocal<LinkedHashMap<String, SubNode>>();
-
-	private static int MAX_CACHE_SIZE = 50;
 
 	/*
 	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
@@ -78,7 +74,6 @@ public class ThreadLocals {
 		cryptoSig.remove();
 
 		getDirtyNodes().clear();
-		getCachedNodes().clear();
 		setParentCheckEnabled(true);
 		session.remove();
 	}
@@ -194,10 +189,6 @@ public class ThreadLocals {
 		getDirtyNodes().clear();
 	}
 
-	public static void clearCachedNodes() {
-		getCachedNodes().clear();
-	}
-
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (no(dirtyNodes.get())) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
@@ -207,25 +198,6 @@ public class ThreadLocals {
 
 	public static void setDirtyNodes(HashMap<ObjectId, SubNode> dn) {
 		dirtyNodes.set(dn);
-	}
-
-	public static void setCachedNodes(LinkedHashMap<String, SubNode> cn) {
-		cachedNodes.set(cn);
-	}
-
-	// Since this cache is thread specific there's no thread-sync mutext required here.
-	// todo-0: wip: I think I'm going to remove this completely but only in a separate Git commit, later.
-	private static LinkedHashMap<String, SubNode> getCachedNodes() {
-		if (no(cachedNodes.get())) {
-			// #LRU
-			LinkedHashMap<String, SubNode> cn = new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
-				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
-					return size() > MAX_CACHE_SIZE;
-				}
-			};
-			cachedNodes.set(cn);
-		}
-		return cachedNodes.get();
 	}
 
 	public static boolean hasDirtyNodes() {
@@ -285,42 +257,6 @@ public class ThreadLocals {
 		getDirtyNodes().remove(node.getId());
 	}
 
-	/*
-	 * We cache nodes based on various arbitrary key formats, with this method, but we also call
-	 * cacheNode on each one too because it's always good to have the path-based and ID-based entries in
-	 * the cache too.
-	 */
-	public static void cacheNode(String key, SubNode node) {
-		getCachedNodes().put(key, node);
-		cacheNode(node);
-	}
-
-	public static void pathChanged(String oldPath, SubNode node) {
-		if (StringUtils.isEmpty(oldPath))
-			return;
-		getCachedNodes().remove(oldPath);
-		cacheNode(node);
-	}
-
-	public static void cacheNode(SubNode node) {
-		if (no(node))
-			return;
-
-		LinkedHashMap<String, SubNode> cn = getCachedNodes();
-		if (ok(node.getPath())) {
-			cn.put(node.getPath(), node);
-		}
-
-		if (ok(node.getId())) {
-			cn.put(node.getIdStr(), node);
-		}
-	}
-
-	public static SubNode getCachedNode(String key) {
-		if (StringUtils.isEmpty(key))
-			return null;
-		return getCachedNodes().get(key);
-	}
 
 	public static void setMongoSession(MongoSession ms) {
 		session.set(ms);
