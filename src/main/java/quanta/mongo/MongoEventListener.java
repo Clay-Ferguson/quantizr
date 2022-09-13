@@ -4,6 +4,7 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -30,6 +31,23 @@ import quanta.util.XString;
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
  * persistence (reads/writes) of the MongoDB objects.
+ * 
+ * Listener Lifecycle Events:
+ * 
+ * onBeforeConvert: Called in MongoTemplate insert, insertList, and save operations before the
+ * object is converted to a Document by a MongoConverter.
+ * 
+ * onBeforeSave: Called in MongoTemplate insert, insertList, and save operations before inserting or
+ * saving the Document in the database.
+ * 
+ * onAfterSave: Called in MongoTemplate insert, insertList, and save operations after inserting or
+ * saving the Document in the database.
+ * 
+ * onAfterLoad: Called in MongoTemplate find, findAndRemove, findOne, and getCollection methods
+ * after the Document has been retrieved from the database.
+ * 
+ * onAfterConvert: Called in MongoTemplate find, findAndRemove, findOne, and getCollection methods
+ * after the Document has been retrieved from the database was converted to a POJO.
  */
 @Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -103,7 +121,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// if (StringUtils.isEmpty(node.getName())) {
 		// node.setName(id.toHexString())
 		// }
-	
+
 		/* if no owner is assigned... */
 		if (no(node.getOwner())) {
 			/*
@@ -125,7 +143,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		if (ThreadLocals.getParentCheckEnabled()) {
+		if (ThreadLocals.getParentCheckEnabled() && node.pathDirty) {
 			read.checkParentExists(null, node);
 		}
 
@@ -248,6 +266,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
+		node.pathDirty = StringUtils.isEmpty(node.getPath());
+
 		// NOTE: All resultsets should be wrapped in NodeIterator, which will make sure reading dirty
 		// nodes from the DB will pick up the dirty ones (already in memory) and substitute those
 		// into the result sets.
@@ -273,7 +293,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuth(node);
 					ThreadLocals.clean(node);
-				}	
+				}
 
 				publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
 			}

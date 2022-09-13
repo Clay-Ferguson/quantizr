@@ -207,7 +207,7 @@ public class MongoRead extends ServiceBase {
      */
     public void checkParentExists(MongoSession ms, SubNode node) {
         boolean isRootPath = mongoUtil.isRootPath(node.getPath());
-        if (node.isDisableParentCheck() || isRootPath)
+        if (isRootPath)
             return;
 
         String parentPath = getParentPath(node);

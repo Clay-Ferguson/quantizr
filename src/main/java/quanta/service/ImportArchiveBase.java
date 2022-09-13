@@ -62,6 +62,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
 
 						String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
 						n.setPath(newPath);
+
+						// don't let MongoListener check the path on this. Parent may not yet exist.
+						n.pathDirty = false;
 						oldId.setVal(n.getIdStr());
 
 						/*

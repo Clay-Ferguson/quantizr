@@ -22,7 +22,6 @@ import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
 import quanta.util.ThreadLocals;
-import quanta.util.Val;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -281,17 +280,11 @@ public class NodeMoveService extends ServiceBase {
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
 
+					// special case here we know path is fine.
+					node.pathDirty = false;
+
 					// we know this tareget node has chilren now.
 					parentToPasteInto.setHasChildren(true);
-
-					/*
-					 * todo-0: wip: IMPORTANT!!! there should be other places in the code where we have a node being updated
-					 * and KNOW it's parent exists, and can speed up app by disabling the parent check in the
-					 * MongoListener, by calling setDisableParentCheck on those nodes. Look for such places globally.
-					 */
-					parentToPasteInto.setDisableParentCheck(true);
-					node.setDisableParentCheck(true);
-
 					// only if we get here do we know the original parent (moved FROM) now has an indeterminate
 					// hasChildren status
 					_nodeParent.setHasChildren(null);
@@ -300,10 +293,6 @@ public class NodeMoveService extends ServiceBase {
 				// do processing for when ordinal has changed.
 				if (!node.getOrdinal().equals(_targetOrdinal)) {
 					node.setOrdinal(_targetOrdinal);
-
-					// optimize by disableing parent check on this node since we know it's not needed.
-					parentToPasteInto.setDisableParentCheck(true);
-					node.setDisableParentCheck(true);
 
 					// we know this tareget node has chilren now.
 					parentToPasteInto.setHasChildren(true);
@@ -330,7 +319,7 @@ public class NodeMoveService extends ServiceBase {
 			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
 			newPath = mongoUtil.findAvailablePath(newPath);
 			node.setPath(newPath);
-			node.setDisableParentCheck(true);
+			node.pathDirty = false;
 		}
 	}
 

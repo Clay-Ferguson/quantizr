@@ -45,7 +45,8 @@ public class SubNode {
 	// This optimization is optional and we have this flag if we need to turn it off.
 	public static final boolean USE_HAS_CHILDREN = true;
 
-	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the reason for "_id"
+	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the
+	// reason for "_id"
 	public static final String ID = "_id";
 	@Id
 	@Field(ID)
@@ -157,8 +158,6 @@ public class SubNode {
 			SubNode.PROPS, //
 			SubNode.LIKES};
 
-	private boolean disableParentCheck;
-
 	@Transient
 	@JsonIgnore
 	private int contentLength;
@@ -241,12 +240,30 @@ public class SubNode {
 			return;
 
 		ServiceBase.auth.ownerAuth(this);
+		this.pathDirty = true;
 		ThreadLocals.dirty(this);
 		this.path = path;
 
 		// Any time we modify a signature field (path, content, owner) we have to nullify the
 		// signature becasue it will be invalid now.
 		set(NodeProp.CRYPTO_SIG, null);
+	}
+
+	/*
+	 * Initialized to false in MongoListener if the node has a known path, then all calls to setPath
+	 * trigger it as dirty so that upon final save of a node the MondoListener can check to be sure it
+	 * has a parent, so orphans can never be written. It's just extra precaution for DB integrity and
+	 * theoretically doesn't need to exist.
+	 */
+
+	@Transient
+	@JsonIgnore
+	public boolean pathDirty;
+
+	@Transient
+	@JsonIgnore
+	public void directSetPath(String path) {
+		this.path = path;
 	}
 
 	@JsonProperty(ORDINAL)
@@ -288,7 +305,7 @@ public class SubNode {
 			return;
 		ThreadLocals.dirty(this);
 		this.owner = owner;
-		
+
 		// Any time we modify a signature field (path, content, owner) we have to nullify the
 		// signature becasue it will be invalid now.
 		set(NodeProp.CRYPTO_SIG, null);
@@ -425,7 +442,8 @@ public class SubNode {
 			if (no(props)) {
 				// if there are no props currently, and the val is null we do nothing, because
 				// the way we set a null prop anyway is by REMOVING it from the props.
-				if (no(val)) return false;
+				if (no(val))
+					return false;
 				props = props();
 			}
 
@@ -695,18 +713,6 @@ public class SubNode {
 			tags = null;
 		ThreadLocals.dirty(this);
 		this.tags = tags;
-	}
-
-	@Transient
-	@JsonIgnore
-	public boolean isDisableParentCheck() {
-		return disableParentCheck;
-	}
-
-	@Transient
-	@JsonIgnore
-	public void setDisableParentCheck(boolean disableParentCheck) {
-		this.disableParentCheck = disableParentCheck;
 	}
 
 	public void addProps(HashMap<String, Object> props) {

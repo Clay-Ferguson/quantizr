@@ -74,7 +74,6 @@ public class AclService extends ServiceBase {
 		 * disabling, and yes disabling batch mode makes this code work.
 		 */
 		boolean batchMode = false;
-
 		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
 
 		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
