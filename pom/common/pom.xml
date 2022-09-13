@@ -10,12 +10,12 @@
         <artifactId>spring-boot-starter-parent</artifactId>
 
         <!--
-			Tip: When upgrading this verison it's a good ideal to blow away
+			Tip: When upgrading this verison it's a good idea to blow away
 			the '.m2' hidden folder on your machine (maven cache) and also 
 			enable this line in build.sh: "mvn dependency:sources", so you get
 			all new source AND remove all the old stuff
 		-->
-        <version>2.6.1</version>
+        <version>2.7.3</version>
         <relativePath />
     </parent>
 
@@ -81,13 +81,13 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.3.3</version>
+            <version>1.4</version>
         </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.11</version>
+            <version>1.15</version>
         </dependency>
 
         <dependency>

@@ -81,9 +81,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         const signed = S.props.getClientPropStr(J.NodeProp.CRYPTO_SIG, this.node);
-
-        // only show this icon for admin to verify things. Users don't need to see it yet and maybe never
-        if (signed && state.isAdminUser) {
+        if (signed) {
             verboseChildren.push(new Icon({
                 // title: youLiked ? "You Liked this Node!" : "Like this Node",
                 title: "Node has Crypto Signature",
