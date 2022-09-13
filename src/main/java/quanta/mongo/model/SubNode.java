@@ -45,6 +45,15 @@ public class SubNode {
 	// This optimization is optional and we have this flag if we need to turn it off.
 	public static final boolean USE_HAS_CHILDREN = true;
 
+	/*
+	 * This tells all parts of the code that any changes being made on this node can be accepted without
+	 * further auth checks. important for when a user thread is doing something but that causes us to
+	 * need to modify some node that user is not expected to also own
+	 */
+	@Transient
+	@JsonIgnore
+	public boolean adminUpdate = false;
+
 	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the
 	// reason for "_id"
 	public static final String ID = "_id";

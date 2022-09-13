@@ -282,6 +282,11 @@ public class MongoAuth extends ServiceBase {
 
 	@PerfMon(category = "auth")
 	public void ownerAuth(MongoSession ms, SubNode node) {
+		if (no(node)) {
+			throw new RuntimeEx("Auth Failed. Node did not exist.");
+		}
+		if (node.adminUpdate) return;
+		
 		if (no(ms)) {
 			ms = ThreadLocals.getMongoSession();
 		}
@@ -290,10 +295,6 @@ public class MongoAuth extends ServiceBase {
 			// when we get here it normally means we should've called "arun.exec" to manage
 			// the thread instead of justs passing in an 'ms' or null
 			throw new RuntimeException("ThreadLocals doesn't have session.");
-		}
-
-		if (no(node)) {
-			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
 
 		if (ms.isAdmin()) {
@@ -328,6 +329,10 @@ public class MongoAuth extends ServiceBase {
 		if (no(node) || !MongoRepository.fullInit) {
 			return;
 		}
+
+		// this adminUpdate flag is specifically for the purpose if disabling auth checks
+		if (node.adminUpdate) return;
+
 		if (verbose)
 			log.trace("auth: " + node.getPath());
 

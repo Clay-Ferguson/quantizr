@@ -143,10 +143,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		if (ThreadLocals.getParentCheckEnabled() && node.pathDirty) {
-			read.checkParentExists(null, node);
-		}
-
 		Date now = null;
 
 		/* If no create/mod time has been set, then set it */
@@ -178,6 +174,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.PATH, path);
 			node.setPath(path);
 			isNew = true;
+		}
+
+		// todo-0: verify server ALWAYS ensures /r/p (pending path for pending node edits) exists at startup
+		// and then we can never check parent in here if so.
+		if (!node.getPath().startsWith("/r/p/") && ThreadLocals.getParentCheckEnabled() && (isNew || node.pathDirty)) {
+			read.checkParentExists(null, node);
 		}
 
 		saveAuthByThread(node, isNew);
@@ -306,6 +308,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (!MongoRepository.fullInit) {
 			return;
 		}
+		if (node.adminUpdate) return;
+
 		if (verbose)
 			log.trace("saveAuth in MongoListener");
 
@@ -324,10 +328,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
 				auth.authForChildNodeCreate(ms, parent);
-
-				if (no(acl)) {
-					throw new RuntimeException("acl autowiring failed.");
-				}
 				if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
 					throw new NodeAuthFailedException();
 				}

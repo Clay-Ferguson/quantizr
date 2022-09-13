@@ -230,13 +230,7 @@ public class MongoRead extends ServiceBase {
             // because we now know it exists. If it's not changing that's fine no DB update will be triggered.
             parentNode.setHasChildren(true);
             return;
-        }
-
-        // log.debug("Verifying parent path exists: " + parentPath);
-        Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
-
-        if (!ops.exists(q, SubNode.class)) {
+        } else {
             throw new RuntimeEx("Attempted to add a node before its parent exists:" + parentPath);
         }
     }
@@ -299,7 +293,6 @@ public class MongoRead extends ServiceBase {
                 .and(SubNode.OWNER).is(nodeOwnerId));
 
         SubNode ret = mongoUtil.findOne(q);
-
         if (ok(ret)) {
             // log.debug("Node found: id=" + ret.getIdStr());
         }
@@ -341,6 +334,7 @@ public class MongoRead extends ServiceBase {
         }
         // log.debug("getNode identifier=" + identifier);
         SubNode ret = null;
+        boolean authPending = true;
 
         if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
@@ -352,18 +346,20 @@ public class MongoRead extends ServiceBase {
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
             ret = read.getNodeByName(ms, identifier.substring(1), allowAuth);
+            authPending = false;
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
             ret = read.getNode(ms, new ObjectId(identifier), allowAuth);
+            authPending = false;
         }
         // otherwise this is a path lookup
         else {
             ret = read.findNodeByPath(identifier, true);
         }
 
-        if (allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ);
+        if (authPending && allowAuth) {
+            auth.auth(ms, ret, PrivilegeType.READ); //this can be redundant with the 'getNode' above that already considered allowAuth 
         }
         return ret;
     }

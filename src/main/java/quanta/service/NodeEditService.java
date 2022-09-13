@@ -124,6 +124,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
+		parentNode.adminUpdate = true;
 
 		// note: redundant security
 		if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
@@ -196,7 +197,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		parentNode.setHasChildren(true);
-		update.save(ms, parentNode);
+		update.save(ms, parentNode); 
 		update.save(ms, newNode);
 
 		/*
@@ -231,6 +232,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
+		parentNode.adminUpdate = true;
 
 		// note: redundant security
 		if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
