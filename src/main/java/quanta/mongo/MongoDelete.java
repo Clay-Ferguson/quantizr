@@ -29,9 +29,6 @@ import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
 import quanta.util.Val;
 
-// todo-0: Need to be sure we have TESTED ALL methods in this class by finding one use case for
-// each.
-
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
@@ -89,13 +86,12 @@ public class MongoDelete extends ServiceBase {
 		update.saveSession(ms);
 	}
 
-	// todo-0: this is pending a rewrite to maintain the 'node.hasChildren' on all parents. What we will
-	// do
-	// is scan all the nodes being removed first in a separate pass to accumulate the parent ID of all
-	// parents,
-	// and then we will do a 'parent.hasChildren=null' (unknown) for all those children. The hasChildren
-	// values
-	// will by design get set back to true/false as needed.
+	/*
+	 * todo-0: this is pending a rewrite to maintain the 'node.hasChildren' on all parents. What we will
+	 * do is scan all the nodes being removed first in a separate pass to accumulate the parent ID of
+	 * all parents, and then we will do a 'parent.hasChildren=null' (unknown) for all those children.
+	 * The hasChildren values will by design get set back to true/false as needed.
+	 */
 	public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
 		return 0;
 		// Query q = new Query();
@@ -284,7 +280,8 @@ public class MongoDelete extends ServiceBase {
 
 		if (bops.hasVal()) {
 			BulkWriteResult results = bops.getVal().execute();
-			// log.debug("bulkPropValOnParents PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() + " nodes.");
+			// log.debug("bulkPropValOnParents PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() +
+			// " nodes.");
 		}
 	}
 

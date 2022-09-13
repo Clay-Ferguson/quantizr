@@ -451,22 +451,11 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    public List<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
+    public Iterable<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
-        Iterable<SubNode> iter = getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
-        return iterateToList(iter);
-    }
-
-    // todo-0: I have a feeling we can get rid of this method
-    public List<SubNode> iterateToList(Iterable<SubNode> iter) {
-        if (!iter.iterator().hasNext()) {
-            return null;
-        }
-        List<SubNode> list = new LinkedList<>();
-        iter.forEach(list::add);
-        return list;
+        return getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
     }
 
     @PerfMon(category = "read")

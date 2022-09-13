@@ -159,9 +159,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		/* process the current node */
 		Val<String> fileName = new Val<>();
-
 		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		List<SubNode> children = read.iterateToList(iter);
 
 		/*
 		 * This is the header row at the top of the page. The rest of the page is children of this node
@@ -171,11 +169,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		html.append("</div>\n");
 		String folder = node.getIdStr();
 
-		if (ok(children)) {
+		if (ok(iter)) {
 			/*
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
-			for (SubNode n : children) {
+			for (SubNode n : iter) {
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 
@@ -198,9 +196,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		String relParent = "../" + fileUtil.getShortFileName(htmlFile);
 
-		if (ok(children)) {
+		if (ok(iter)) {
 			/* Second pass over children is the actual recursion down into the tree */
-			for (SubNode n : children) {
+			for (SubNode n : iter) {
 				nodeStack.add(n);
 				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, relParent, n.getIdStr());
 				nodeStack.remove(n);
@@ -210,13 +208,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
 		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		List<SubNode> children = read.iterateToList(iter);
-
-		if (ok(children)) {
+		if (ok(iter)) {
 			/*
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
-			for (SubNode n : children) {
+			for (SubNode n : iter) {
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 				String folder = n.getIdStr();

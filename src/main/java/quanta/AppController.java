@@ -362,11 +362,11 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * DO NOT DELETE: Leave as example for how to render plain HTML directly from a string
 	 */
-	@PerfMon
-	@GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
-	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
-		return "<html><body>My Full Page: " + systemPage + "</body></html>";
-	}
+	// @PerfMon
+	// @GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
+	// public @ResponseBody String systemPage() {
+	// 	return "<html><body>Hi.</body></html>";
+	// }
 
 	@PerfMon
 	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -389,7 +389,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response, //
 			HttpSession session) {
-		SessionContext.checkReqToken();
 		callProc.run("rss", null, session, ms -> {
 			arun.run(as -> {
 				try {

@@ -134,7 +134,7 @@ public class OutboxMgr extends ServiceBase {
 	/*
 	 * Loads only up to mailBatchSize emails at a time
 	 */
-	public List<SubNode> getMailNodes(MongoSession ms) {
+	public Iterable<SubNode> getMailNodes(MongoSession ms) {
 		SubNode outboxNode = getSystemOutbox(ms);
 		// log.debug("outbox id: " + outboxNode.getIdStr());
 

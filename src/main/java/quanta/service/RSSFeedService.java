@@ -27,6 +27,7 @@ import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,7 @@ import com.rometools.rome.io.XmlReader;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
+import quanta.model.client.PrincipalName;
 import quanta.model.client.RssFeed;
 import quanta.model.client.RssFeedEnclosure;
 import quanta.model.client.RssFeedEntry;
@@ -787,11 +789,11 @@ public class RSSFeedService extends ServiceBase {
 		feed.setEntries(entries);
 
 		if (AclService.isPublic(ms, node)) {
-			Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-			List<SubNode> children = read.iterateToList(iter);
+			Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+			Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
 
-			if (ok(children)) {
-				for (SubNode n : children) {
+			if (ok(iter)) {
+				for (SubNode n : iter) {
 					if (!AclService.isPublic(ms, n))
 						continue;
 

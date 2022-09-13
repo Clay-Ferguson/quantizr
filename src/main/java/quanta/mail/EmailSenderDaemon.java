@@ -63,9 +63,8 @@ public class EmailSenderDaemon extends ServiceBase {
 				runCountdown = INTERVAL_SECONDS;
 
 				arun.run((MongoSession ms) -> {
-					List<SubNode> mailNodes = outbox.getMailNodes(ms);
+					Iterable<SubNode> mailNodes = outbox.getMailNodes(ms);
 					if (ok(mailNodes)) {
-						log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
 						sendAllMail(ms, mailNodes);
 					}
 					return null;
@@ -83,13 +82,9 @@ public class EmailSenderDaemon extends ServiceBase {
 		runCountdown = 0;
 	}
 
-	private void sendAllMail(MongoSession ms, List<SubNode> nodes) {
+	private void sendAllMail(MongoSession ms, Iterable<SubNode> nodes) {
 		synchronized (EmailSender.getLock()) {
 			log.debug("MailSender lock obtained.");
-
-			if (CollectionUtils.isEmpty(nodes)) {
-				return;
-			}
 
 			synchronized (EmailSender.getLock()) {
 				try {
