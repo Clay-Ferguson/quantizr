@@ -119,7 +119,7 @@ public class NodeMoveService extends ServiceBase {
 	 * one we keep and join to.
 	 * 
 	 * todo-0: need to verify that none of the nodes being joined (except the one we persist) have any
-	 * attachments becasue we can't combine mutiple attachments into a single node.
+	 * attachments because we can't combine mutiple attachments into a single node.
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
@@ -284,11 +284,11 @@ public class NodeMoveService extends ServiceBase {
 					// we know this tareget node has chilren now.
 					parentToPasteInto.setHasChildren(true);
 
-					// todo-0: IMPORTANT!!!
-					// there should be other places in the code where we have a node being updated and KNOW it's
-					// parent exists, and can speed up app by disabling the parent check in the MongoListener,
-					// by calling setDisableParentCheck on those nodes.
-					// Look for such places globally.
+					/*
+					 * todo-0: wip: IMPORTANT!!! there should be other places in the code where we have a node being updated
+					 * and KNOW it's parent exists, and can speed up app by disabling the parent check in the
+					 * MongoListener, by calling setDisableParentCheck on those nodes. Look for such places globally.
+					 */
 					parentToPasteInto.setDisableParentCheck(true);
 					node.setDisableParentCheck(true);
 

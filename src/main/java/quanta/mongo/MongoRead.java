@@ -105,6 +105,11 @@ public class MongoRead extends ServiceBase {
         return getChildCount(ms, node.getPath());
     }
 
+    /*
+     * returns true only if node path is KNOWN (by hasChildren at least), not to have any children.
+     * 
+     * Beware: A false return tells us NOTHING. No gained knowledge.
+     */
     public boolean noChildren(SubNode node) {
         if (SubNode.USE_HAS_CHILDREN && ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
             return true;
@@ -576,7 +581,6 @@ public class MongoRead extends ServiceBase {
      * top one and using that for my MAX operation. AFAIK this might even be the most efficient
      * approach. Who knows.
      */
-    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public Long getMaxChildOrdinal(MongoSession ms, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
@@ -597,6 +601,9 @@ public class MongoRead extends ServiceBase {
         // SubNode.class);
         // List<SubNode> orderCount = results.getMappedResults();
 
+        if (noChildren(node))
+            return 0L;
+
         auth.auth(ms, node, PrivilegeType.READ);
 
         // todo-2: research if there's a way to query for just one, rather than simply
@@ -615,9 +622,11 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
-    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public Long getMinChildOrdinal(MongoSession ms, SubNode node) {
+        if (noChildren(node))
+            return 0L;
+
         auth.auth(ms, node, PrivilegeType.READ);
 
         // todo-2: research if there's a way to query for just one, rather than simply
@@ -636,9 +645,11 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
-    // todo-0: verify we KNOW there are childen wherever we call this
     @PerfMon(category = "read")
     public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
+        if (noChildren(node))
+            return null;
+
         auth.auth(ms, node, PrivilegeType.READ);
 
         if (no(node.getOrdinal())) {
@@ -657,13 +668,13 @@ public class MongoRead extends ServiceBase {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).lt(node.getOrdinal()));
 
-        SubNode nodeFound = mongoUtil.findOne(q);
-        return nodeFound;
+        return mongoUtil.findOne(q);
     }
 
-    // todo-0: verify we KNOW there are childen wherever we call this
-    @PerfMon(category = "read")
     public SubNode getSiblingBelow(MongoSession ms, SubNode node) {
+        if (noChildren(node))
+            return null;
+
         auth.auth(ms, node, PrivilegeType.READ);
         if (no(node.getOrdinal())) {
             node.setOrdinal(0L);
@@ -681,8 +692,7 @@ public class MongoRead extends ServiceBase {
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).gt(node.getOrdinal()));
 
-        SubNode nodeFound = mongoUtil.findOne(q);
-        return nodeFound;
+        return mongoUtil.findOne(q);
     }
 
     /*
@@ -1227,7 +1237,7 @@ public class MongoRead extends ServiceBase {
         if (noChildren(ms, path)) {
             return Collections.<SubNode>emptyList();
         }
-        
+
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
@@ -1433,9 +1443,7 @@ public class MongoRead extends ServiceBase {
 
         // The rest of the below is about processing children, so we can try to optimize by getting the
         // parent of this node, and if it has no children we can bail out here.
-        // todo-0: Everywhere across the board does it make sense to do this always BEFORE querying for
-        // children?
-        if (SubNode.USE_HAS_CHILDREN && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
+        if (SubNode.USE_HAS_CHILDREN && noChildren(node)) {
             return true;
         }
 

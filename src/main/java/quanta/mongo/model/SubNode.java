@@ -56,7 +56,7 @@ public class SubNode {
 	private Long ordinal;
 
 	// Holds null if children status unknown. Not yet generated.
-	// todo-0: create an index for this field? do we ever query on it?
+	// NOTE: We have no index on this field because we never query on it.
 	public static final String HAS_CHILDREN = "hch";
 	@Field(HAS_CHILDREN)
 	private Boolean hch;

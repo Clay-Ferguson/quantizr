@@ -48,9 +48,6 @@ public class CryptoService extends ServiceBase {
 
 		/*
 		 * if no signature exists, for now we consider this a valid node.
-		 * 
-		 * todo-0: Eventually we will lock it down so that if it's an ADMIN owned node it WILL require
-		 * signature. Have to figure out how to sign all of War and Peace first
 		 */
 		if (no(sig)) {
 			return true;
