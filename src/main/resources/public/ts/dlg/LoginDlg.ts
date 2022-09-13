@@ -34,7 +34,10 @@ export class LoginDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Login", this.login, null, "btn-primary"),
-                new Button("Close", this.close, null, "btn-secondary float-end")
+                new Button("Close", () => {
+                    this.close();
+                    S.util.loadAnonPageHome();
+                }, null, "btn-secondary float-end")
             ], "marginTop")
         ];
     }
@@ -86,7 +89,9 @@ export class LoginDlg extends DialogBase {
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime
-            });
+            }, false, true);
+
+            // console.log("Login Resp: " + S.util.prettyPrint(res));
 
             if (res.success) {
                 S.quanta.authToken = res.authToken;

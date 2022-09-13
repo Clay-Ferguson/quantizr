@@ -126,7 +126,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 			if (appProp.getMongoSecurity()) {
 				log.debug("MongoSecurity enabled.");
-				String password = appProp.getMongoAdminPassword();
+				String password = appProp.getMongoPassword();
 				credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
 			} else {
 				log.debug("MongoSecurity disabled.");

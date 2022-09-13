@@ -931,11 +931,13 @@ export class Util {
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
-                    console.log("can't access anonymous page");
-                    // check we aren't already at origin (no parameters) then set to origin.
-                    if (window.location.href !== window.location.origin) {
-                        window.location.href = window.location.origin;
-                    }
+                    console.log("can't access anonymous page. Has admin user signed all landing page nodes?");
+                    // this scenario should only ever happen on a system where the admin has not yet logged in thru a
+                    // secure browser (https) with crypto enabled in the browser (or you can use Firefox), and therefore
+                    // the admin public landing page nodes are not signed and so we get this error.
+                    // We could maybe send back a message to the user that explains this?...but that message could really only
+                    // say "Server is not fully configured, check back later"
+                    S.user.userLogin();
                     return;
                 }
                 console.log("renderPage for anonymous");

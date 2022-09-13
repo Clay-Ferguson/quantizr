@@ -12,6 +12,7 @@ export devEmail=somebody@someserver.com
 # admin password: login to web app with "admin/password" credentials. Note also that
 # this password is used in the yaml as the root password for MongoDB.
 export adminPassword=password
+export mongoPassword=password
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.

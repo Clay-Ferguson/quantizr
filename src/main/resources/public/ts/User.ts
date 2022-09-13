@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -86,7 +86,7 @@ export class User {
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
                     dst: S.util.daylightSavingsTime
-                });
+                }, false, true);
                 S.quanta.authToken = res.authToken;
 
                 if (res && !res.success) {
@@ -289,7 +289,13 @@ export class User {
         }
     }
 
-    userLogin = () => {
+    userLogin = async () => {
+        // todo-0: this was a hack because failing code was breaking the flow.
+        // need better fix.
+        await promiseDispatch("guiReadyUserLogin", (s) => {
+            s.guiReady = true;
+            return s;
+        })
         new LoginDlg().open();
     }
 

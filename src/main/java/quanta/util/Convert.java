@@ -55,8 +55,10 @@ public class Convert extends ServiceBase {
 		boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
 
 		// if we encounter a non-signed node under public folder, and we aren't the admin, then refuse to show it.
+		// This will block the app from working...until logging in as admin, and visiting the langing page
+		// to cause the signature to be created.
 		if (!signed && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-			// we need a special global counter for when this happens to, so the server info can show it.
+			// todo-0: we need a special global counter for when this happens, so the server info can show it.
 			return null;
 		}
 

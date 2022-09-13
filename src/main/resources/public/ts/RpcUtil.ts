@@ -37,7 +37,7 @@ export class RpcUtil {
 
     // todo-1: put everything related to rpc in an Rpc.ts service
     rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
-        background: boolean = false): Promise<ResponseType> => {
+        background: boolean = false, allowErrorDlg: boolean=true): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
 
@@ -101,7 +101,7 @@ export class RpcUtil {
         }
 
         reqPromise.then((data: any) => this.rpcSuccess(data, background, postName))
-            .catch((error: any) => this.rpcFail(error, background, postName, postData));
+            .catch((error: any) => this.rpcFail(error, background, allowErrorDlg, postName, postData));
         return reqPromise;
     }
 
@@ -143,7 +143,7 @@ export class RpcUtil {
      * We should only reach here when there's an actual failure to call the server, and is completely
      * separete from the server perhaps haveing an exception where it sent back an error.
      */
-    rpcFail = (error: any, background: boolean, postName: string, postData: any) => {
+    rpcFail = (error: any, background: boolean, allowErrorDlg: boolean, postName: string, postData: any) => {
         try {
             if (!background) {
                 this.rpcCounter--;
@@ -172,9 +172,9 @@ export class RpcUtil {
             console.error("Request failed: msg=" + msg);
 
             status = error.response ? error.response.status : "";
+            console.error("Failed: " + status + " " + (error.message || ""));
 
-            if (!background) {
-                console.error("Failed: " + status + " " + (error.message || ""));
+            if (!background && allowErrorDlg) {
                 S.util.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
             }
         } catch (ex) {

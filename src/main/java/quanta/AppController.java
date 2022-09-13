@@ -1688,7 +1688,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "password", required = true) String password) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return (String) callProc.run("shutdown", null, session, ms -> {
-			if (prop.getMongoAdminPassword().equals(password)) {
+			if (prop.getAdminPassword().equals(password)) {
 				gracefulShutdown.initiateShutdown(0);
 			}
 			return null;

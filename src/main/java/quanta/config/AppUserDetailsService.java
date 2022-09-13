@@ -21,7 +21,7 @@ public class AppUserDetailsService extends ServiceBase implements UserDetailsSer
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         if (PrincipalName.ADMIN.s().equals(userName)) {
-            return new AppUserDetails(userName, prop.getMongoAdminPassword());
+            return new AppUserDetails(userName, prop.getAdminPassword());
         } else {
             SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
             if (ok(userNode)) {

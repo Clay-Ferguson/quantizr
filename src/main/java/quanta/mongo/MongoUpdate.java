@@ -16,6 +16,7 @@ import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
 import quanta.util.Cast;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -90,10 +91,10 @@ public class MongoUpdate extends ServiceBase {
 					try {
 						auth.ownerAuth(ms, node);
 					} catch (Exception e) {
+						// todo-0: this IS happening...in some scenarios with 'login' endpoint
 						log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
 						log.debug("Your mongoSession has user: " + ms.getUserName() + //
 								" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
-						throw e;
 					}
 
 					nodes.add(node);
@@ -110,7 +111,12 @@ public class MongoUpdate extends ServiceBase {
 				 */
 				ThreadLocals.clearDirtyNodes();
 			}
-		} finally {
+		} //
+		catch (Exception e) {
+			// don't rethrow any exceptions from in here.
+			ExUtil.error(log, "exception in call processor", e);
+		} //
+		finally {
 			saving.set(false);
 		}
 	}

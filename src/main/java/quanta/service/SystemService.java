@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,15 +7,14 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpSession;
-import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.mongodb.client.MongoDatabase;
 import quanta.AppController;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
@@ -107,7 +105,7 @@ public class SystemService extends ServiceBase {
 				return null;
 			});
 
-			ret += runMongoDbCommand(new Document("compact", "nodes"));
+			ret += runMongoDbCommand(MongoAppConfig.databaseName, new Document("compact", "nodes"));
 			ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
 		}
 		//
@@ -125,9 +123,18 @@ public class SystemService extends ServiceBase {
 		return ret;
 	}
 
+	// https://docs.mongodb.com/manual/reference/command/validate/
+	// db.runCommand(
+	// {
+	// validate: <string>, // Collection name
+	// full: <boolean>, // Optional
+	// repair: <boolean>, // Optional, added in MongoDB 5.0
+	// metadata: <boolean> // Optional, added in MongoDB 5.0.4
+	// })
 	public String validateDb() {
-		// https://docs.mongodb.com/manual/reference/command/validate/
-		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
+		String ret = runMongoDbCommand(MongoAppConfig.databaseName, new Document("validate", "nodes").append("full", true));
+
+		ret += "\n\n" + runMongoDbCommand("admin", new Document("usersInfo", 1));
 
 		if (prop.ipfsEnabled()) {
 			ret += ipfsRepo.verify();
@@ -136,16 +143,12 @@ public class SystemService extends ServiceBase {
 		return ret;
 	}
 
-	public String runMongoDbCommand(Document doc) {
-		MongoDatabase database = mdbf.getMongoDatabase(MongoAppConfig.databaseName);
-		Document result = database.runCommand(doc);
+	public String runMongoDbCommand(String dbName, Document doc) {
 
-		StringBuilder ret = new StringBuilder();
-		ret.append("Results:\n");
-		for (Map.Entry<String, Object> set : result.entrySet()) {
-			ret.append(String.format("%s: %s\n", set.getKey(), set.getValue()));
-		}
-		return ret.toString();
+		// NOTE: Use "admin" as databse name to run admin commands like changeUserPassword
+		MongoDatabase database = mdbf.getMongoDatabase(dbName);
+		Document result = database.runCommand(doc);
+		return XString.prettyPrint(result);
 	}
 
 	public static void logMemory() {

@@ -16,7 +16,7 @@ services:
 
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
+            MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
         # and we don't want that happening unexpectedly
@@ -92,7 +92,8 @@ services:
             XMS: "${XMS}"
             XMX: "${XMX}"
 
-            mongoAdminPassword: "${adminPassword}"
+            adminPassword: "${adminPassword}"
+            mongoPassword: "${mongoPassword}"
             mongoSecurity: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string

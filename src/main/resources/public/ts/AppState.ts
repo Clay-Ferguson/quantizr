@@ -22,7 +22,10 @@ export class AppState {
     config: any = {};
 
     // up until guiReady the main App component will just render "loading..."
+    // todo-0: this can fail to get set on startup if not everything goes well
+    // and we need to be more resilient and not allow that EVER.
     guiReady: boolean = false;
+
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 
     // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile

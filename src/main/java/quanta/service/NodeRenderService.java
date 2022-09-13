@@ -121,7 +121,8 @@ public class NodeRenderService extends ServiceBase {
 		 */
 		SubNode scanToNode = null;
 
-		// we pass doAuth=true because right here we DO care that the hasChildren is considering only based on what WE can access.
+		// we pass doAuth=true because right here we DO care that the hasChildren is considering only based
+		// on what WE can access.
 		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node, true, false))) {
 			req.setUpLevel(true);
 		}
@@ -211,9 +212,14 @@ public class NodeRenderService extends ServiceBase {
 		render.getBreadcrumbs(ms, highestUpParent, breadcrumbs);
 
 		NodeInfo nodeInfo = render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
-		nodeInfo.setParents(parentNodes);
-		res.setNode(nodeInfo);
-		res.setSuccess(true);
+		if (ok(nodeInfo)) {
+			nodeInfo.setParents(parentNodes);
+			res.setNode(nodeInfo);
+			res.setSuccess(true);
+		}
+		else {
+			res.setSuccess(false);
+		}
 
 		// todo-2: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
 		// needs to be reworked.

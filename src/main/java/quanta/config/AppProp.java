@@ -234,8 +234,12 @@ public class AppProp {
 		return APConst.TRUE.equals(env.getProperty("mongoSecurity"));
 	}
 
-	public String getMongoAdminPassword() {
-		return env.getProperty("mongoAdminPassword");
+	public String getMongoPassword() {
+		return env.getProperty("mongoPassword");
+	}
+
+	public String getAdminPassword() {
+		return env.getProperty("adminPassword");
 	}
 
 	public String getTestPassword() {

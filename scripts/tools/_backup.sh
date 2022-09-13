@@ -5,7 +5,7 @@ echo "You should hand-enter the variables used in the command below."
 exit
 
 #The BEST way to export something that can be reimported easy to recreate the actual DB again.
-mongodump --username=root --password=${adminPassword} --authenticationDatabase=admin \
+mongodump --username=root --password=${mongoPassword} --authenticationDatabase=admin \
     --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/dumps/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
 
 #https://docs.mongodb.com/manual/reference/program/mongoexport
