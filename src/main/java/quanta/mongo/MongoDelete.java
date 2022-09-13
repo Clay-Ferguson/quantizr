@@ -27,6 +27,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
+import quanta.util.Val;
 
 // todo-0: Need to be sure we have TESTED ALL methods in this class by finding one use case for
 // each.
@@ -244,7 +245,8 @@ public class MongoDelete extends ServiceBase {
 		crit = auth.addSecurityCriteria(ms, crit);
 		q.addCriteria(crit);
 
-		// since we're deleting all nodes matching the query 'q' we set the parents of all those nodes do unknown children state
+		// since we're deleting all nodes matching the query 'q' we set the parents of all those nodes do
+		// unknown children state
 		bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
 
 		// look for all calls to 'ops.remove' just to doublecheck none of them need the above
@@ -255,13 +257,17 @@ public class MongoDelete extends ServiceBase {
 
 	// iterates over 'q' setting prop=val on ever PARENT node of all those nodes.
 	public void bulkSetPropValOnParents(MongoSession ms, Query q, String prop, Object val) {
-		BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+		Val<BulkOperations> bops = new Val<>(null);
 
 		// this hash set just makes sure we only submit each val set once! No replicated work.
 		HashSet<ObjectId> parentIds = new HashSet<>();
 		long threadId = Thread.currentThread().getId();
 
 		ops.stream(q, SubNode.class).forEachRemaining(node -> {
+			// lazy careate bops
+			if (!bops.hasVal()) {
+				bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+			}
 
 			// since I'm new to ops.stream, I don't trust it to be threadsafe yet.
 			if (threadId != Thread.currentThread().getId()) {
@@ -272,12 +278,14 @@ public class MongoDelete extends ServiceBase {
 			if (ok(parent) && parentIds.add(parent.getId())) {
 				// we have a known 'bops' in this one and don't lazy create so we don't care about the
 				// return value of this call
-				bulkOpSetPropVal(bops, parent.getId(), prop, val);
+				bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
 			}
 		});
 
-		BulkWriteResult results = bops.execute();
-		log.debug("bulkPropValOnParents PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() + " nodes.");
+		if (bops.hasVal()) {
+			BulkWriteResult results = bops.getVal().execute();
+			// log.debug("bulkPropValOnParents PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() + " nodes.");
+		}
 	}
 
 	public void bulkSetPropsByIdObjs(Collection<ObjectId> ids, String prop, Object val) {
@@ -419,7 +427,8 @@ public class MongoDelete extends ServiceBase {
 			// get the parent of the node and add it's id to parentIds
 			SubNode parent = read.getParent(ms, node, false);
 			if (no(parent)) {
-				// if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's essentially
+				// if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's
+				// essentially
 				// already deleted.
 				// todo-1: Could we have a background queue mow thru "Known Orphans" like this one, because any
 				// subnodes
@@ -561,7 +570,8 @@ public class MongoDelete extends ServiceBase {
 				.regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
 		q.addCriteria(crit);
 
-		// we'll be deleting every node in 'q' so we need to set the parents of all those to hasChildren=null (unknown)
+		// we'll be deleting every node in 'q' so we need to set the parents of all those to
+		// hasChildren=null (unknown)
 		bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
 
 		/*

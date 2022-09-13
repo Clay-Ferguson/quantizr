@@ -23,4 +23,8 @@ public class Val<T> {
 	public void setVal(T val) {
 		this.val = val;
 	}
+
+	public boolean hasVal() {
+		return val != null;
+	}
 }
