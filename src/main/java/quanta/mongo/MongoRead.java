@@ -448,13 +448,6 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    public Iterable<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
-        if (noChildren(node)) {
-            return Collections.<SubNode>emptyList();
-        }
-        return getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
-    }
-
     @PerfMon(category = "read")
     public List<String> getChildrenIds(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
         if (noChildren(node)) {

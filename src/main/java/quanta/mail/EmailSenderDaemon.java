@@ -38,7 +38,7 @@ public class EmailSenderDaemon extends ServiceBase {
 	 * 
 	 * Runs immediately at startup, and then every 10 seconds
 	 */
-	@Scheduled(fixedDelay = 1000)
+	@Scheduled(fixedDelay = 10000)
 	public void run() {
 		if (run || !MongoRepository.fullInit)
 			return;
@@ -84,35 +84,31 @@ public class EmailSenderDaemon extends ServiceBase {
 
 	private void sendAllMail(MongoSession ms, Iterable<SubNode> nodes) {
 		synchronized (EmailSender.getLock()) {
-			log.debug("MailSender lock obtained.");
+			try {
+				mail.init();
+				for (SubNode node : nodes) {
+					log.debug("Iterating node to email. nodeId:" + node.getIdStr());
 
-			synchronized (EmailSender.getLock()) {
-				try {
-					mail.init();
-					for (SubNode node : nodes) {
-						log.debug("Iterating node to email. nodeId:" + node.getIdStr());
+					String email = node.getStr(NodeProp.EMAIL_RECIP);
+					String subject = node.getStr(NodeProp.EMAIL_SUBJECT);
+					String content = node.getStr(NodeProp.EMAIL_CONTENT);
 
-						String email = node.getStr(NodeProp.EMAIL_RECIP);
-						String subject = node.getStr(NodeProp.EMAIL_SUBJECT);
-						String content = node.getStr(NodeProp.EMAIL_CONTENT);
+					if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 
-						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
-
-							log.debug("Found mail to send to: " + email);
-							if (delete.delete(ms, node, false) > 0) {
-								// only send mail if we were able to delete the node, because other wise something is wrong
-								// without ability to delete and so we'd go into a loop sending this item multiple times.
-								mail.sendMail(email, null, content, subject);
-							} else {
-								log.debug("Unable to delete queued mail node: " + node.getIdStr());
-							}
+						log.debug("Found mail to send to: " + email);
+						if (delete.delete(ms, node, false) > 0) {
+							// only send mail if we were able to delete the node, because other wise something is wrong
+							// without ability to delete and so we'd go into a loop sending this item multiple times.
+							mail.sendMail(email, null, content, subject);
 						} else {
-							log.debug("not sending email. Missing some properties. email or subject or content");
+							log.debug("Unable to delete queued mail node: " + node.getIdStr());
 						}
+					} else {
+						log.debug("not sending email. Missing some properties. email or subject or content");
 					}
-				} finally {
-					mail.close();
 				}
+			} finally {
+				mail.close();
 			}
 		}
 	}
