@@ -41,6 +41,9 @@ public enum NodeProp {
     ENC_KEY("sn:encKey", "s"), //
     CRYPTO_SIG("sn:sig", "s"), //
 
+    // stands for "[r]ecursive SHA256" of all children of node.
+    SUBGRAPH_HASH("sn:rSHA256", "s"), //
+
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
@@ -180,8 +183,8 @@ public enum NodeProp {
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.
      * 
-     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey" props are the keys used
-     * and only the public key exists on the server for that E2E encryption.
+     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey"
+     * props are the keys used and only the public key exists on the server for that E2E encryption.
      */
     CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //

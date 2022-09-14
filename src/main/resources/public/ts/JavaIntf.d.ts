@@ -467,6 +467,11 @@ export interface SetUnpublishedRequest extends RequestBase {
     unpublished: boolean;
 }
 
+export interface SignNodesRequest extends RequestBase {
+    recursive: boolean;
+    nodeId: string;
+}
+
 export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
@@ -828,6 +833,9 @@ export interface SetNodePositionResponse extends ResponseBase {
 export interface SetUnpublishedResponse extends ResponseBase {
 }
 
+export interface SignNodesResponse extends ResponseBase {
+}
+
 export interface SignupResponse extends ResponseBase {
     userError: string;
     passwordError: string;
@@ -981,6 +989,7 @@ export const enum NodeProp {
     ACT_PUB_TAG = "ap:tag",
     ENC_KEY = "sn:encKey",
     CRYPTO_SIG = "sn:sig",
+    SUBGRAPH_HASH = "sn:rSHA256",
     RSS_FEED_SRC = "sn:rssFeedSrc",
     AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",

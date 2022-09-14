@@ -505,10 +505,11 @@ public class MongoDelete extends ServiceBase {
 			bops = bulkOpSetPropVal(bops, node.getId(), SubNode.HAS_CHILDREN, null);
 		}
 
-		// Now Query the entire subgraph of this deleted 'node'
-		// todo-1: Actually we can do even better here, and just run a single command 'delete' op on the
-		// underlying
-		// query that this getSubGraph ends up using, and not even need a bulk op.
+		/*
+		 * Now Query the entire subgraph of this deleted 'node' todo-1: Actually we can do even better here,
+		 * and just run a single command 'delete' op on the underlying query that this getSubGraph ends up
+		 * using, and not even need a bulk op.
+		 */
 		for (SubNode child : read.getSubGraph(ms, node, null, 0, false, false, false)) {
 			/*
 			 * NOTE: Disabling this ability to recursively delete from foreign servers because I'm not sure they

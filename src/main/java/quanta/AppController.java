@@ -120,6 +120,7 @@ import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetNodePositionRequest;
 import quanta.request.SetUnpublishedRequest;
+import quanta.request.SignNodesRequest;
 import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
@@ -778,6 +779,15 @@ public class AppController extends ServiceBase implements ErrorController {
 				throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
 			}
 			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
+	public @ResponseBody Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("signNodes", req, session, ms -> {
+			ThreadLocals.requireAdmin();
+			return edit.signNodes(ms, req);
 		});
 	}
 

@@ -814,6 +814,29 @@ export class Edit {
         }
     }
 
+    subGraphHash = async () => {
+        const appState = getAppState();
+        const node = S.nodeUtil.getHighlightedNode(appState);
+
+        if (!node) {
+            S.util.showMessage("No node is selected.", "Warning");
+            return;
+        }
+        S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", {
+            nodeId: node.id,
+            recursive: true
+        }).then((res: J.SignNodesResponse) => {
+            if (res.success) {
+                S.util.showMessage(res.message);
+            }
+            else {
+                S.util.showMessage("operation failed.");
+            }
+        });
+
+        S.util.showMessage("Request sumitted. Check the node for property " + J.NodeProp.SUBGRAPH_HASH);
+    }
+
     joinNodes = async (state?: AppState) => {
         state = getAppState(state);
 

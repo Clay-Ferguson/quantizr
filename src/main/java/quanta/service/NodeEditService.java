@@ -2,6 +2,8 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
@@ -41,6 +44,7 @@ import quanta.request.LikeNodeRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SearchAndReplaceRequest;
+import quanta.request.SignNodesRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
@@ -52,6 +56,7 @@ import quanta.response.LikeNodeResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SaveNodeSigsResponse;
 import quanta.response.SearchAndReplaceResponse;
+import quanta.response.SignNodesResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
@@ -197,7 +202,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		parentNode.setHasChildren(true);
-		update.save(ms, parentNode); 
+		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
 		/*
@@ -409,7 +414,8 @@ public class NodeEditService extends ServiceBase {
 
 	/*
 	 * 
-	 * WARNING: Before working to make this method any better remember it's probably only for temporary use by admin
+	 * WARNING: Before working to make this method any better remember it's probably only for temporary
+	 * use by admin
 	 * 
 	 */
 	@PerfMon(category = "edit")
@@ -930,6 +936,87 @@ public class NodeEditService extends ServiceBase {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	/*
+	 * This method will eventually use push+recieve to send node data down to the browser, but I'm
+	 * putting here for now the ability to use it (temporarily) as a SHA-256 hash generator that
+	 * generates the hash of all subnodes, and will just stick thas hash into a property on the top
+	 * parent node (req.nodeId)
+	 */
+	public SignNodesResponse signNodes(MongoSession ms, SignNodesRequest req) {
+		SignNodesResponse res = new SignNodesResponse();
+		String nodeId = req.getNodeId();
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
+		String prevHash = null;
+		String newHash = null;
+
+		try {
+			long totalBytes = 0;
+			long nodeCount = 0;
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+			if (req.isRecursive()) {
+				StringBuilder sb = new StringBuilder();
+				for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, true, false, true)) {
+					nodeCount++;
+					sb.append(n.getPath());
+					sb.append("-");
+					sb.append(n.getOwner().toHexString());
+					sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
+					if (ok(n.getStr(NodeProp.BIN))) {
+						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + n.getStr(NodeProp.BIN));
+					}
+					if (ok(n.getStr(NodeProp.BIN_DATA))) {
+						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + n.getStr(NodeProp.BIN_DATA));
+					}
+					if (ok(n.getStr(NodeProp.BIN_DATA_URL))) {
+						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + n.getStr(NodeProp.BIN_DATA_URL));
+					}
+					if (sb.length() > 4096) {
+						byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
+						totalBytes += b.length;
+						digest.update(b);
+						sb.setLength(0);
+					}
+				}
+				if (sb.length() > 0) {
+					byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
+					totalBytes += b.length;
+					digest.update(b);
+				}
+			}
+			byte[] encodedHash = digest.digest();
+
+			newHash = String.valueOf(nodeCount) + " nodes, " + String.valueOf(totalBytes) + " bytes: " + bytesToHex(encodedHash);
+			prevHash = node.getStr(NodeProp.SUBGRAPH_HASH);
+			node.set(NodeProp.SUBGRAPH_HASH, newHash);
+
+		} catch (Exception e) {
+			res.setMessage("Failed generating hash");
+			res.setSuccess(false);
+			return res;
+		}
+
+		boolean hashChanged = ok(prevHash) && !prevHash.equals(newHash);
+
+		res.setMessage((hashChanged ? "Hash CHANGED: " : (no(prevHash) ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
+		res.setSuccess(true);
+		return res;
+	}
+
+	// todo-0: using baeldung method here. Move to utils class.
+	private static String bytesToHex(byte[] hash) {
+		StringBuilder hexString = new StringBuilder(2 * hash.length);
+		for (int i = 0; i < hash.length; i++) {
+			String hex = Integer.toHexString(0xff & hash[i]);
+			if (hex.length() == 1) {
+				hexString.append('0');
+			}
+			hexString.append(hex);
+		}
+		return hexString.toString();
 	}
 
 	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {

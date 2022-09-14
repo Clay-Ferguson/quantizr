@@ -79,7 +79,8 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static transferNode = () => { new TransferNodeDlg().open(); };
+    static transferNode = () => { S.edit.subGraphHash(); };
+    static subgraphHash = () => { new TransferNodeDlg().open(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
@@ -266,6 +267,8 @@ export class MenuPanel extends Div {
             // works is you can take your own node and create the appearance that someone else authored it simply by
             // transferring the node to them, so we need some better process of acceptance.
             appState.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
+
+            appState.isAdminUser ? new MenuItem("SubGraph SHA256", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
 
             new MenuItem("Update Headings", S.edit.updateHeadings, !appState.isAnonUser && selNodeIsMine), //
             new MenuItem("Search and Replace", MenuPanel.searchAndReplace, !appState.isAnonUser && selNodeIsMine), //
