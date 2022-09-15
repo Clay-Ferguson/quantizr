@@ -52,14 +52,13 @@ public class Convert extends ServiceBase {
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
-		String sig = node.getStr(NodeProp.CRYPTO_SIG);
-
 		// todo-0: this block will come back (not as is, but in some form, once signature signing only by NODE EDIT is done
 		// AND all admin nodes in /r/public/home are signed)
 		// // if we encounter a non-signed node under public folder, and we aren't the admin, then refuse to
 		// // show it.
 		// // This will block the app from working...until logging in as admin, and visiting the langing page
 		// // to cause the signature to be created.
+		// String sig = node.getStr(NodeProp.CRYPTO_SIG);
 		// if (no(sig) && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
 		// 	// todo-0: we need a special global counter for when this happens, so the server info can show it.
 		// 	return null;
@@ -76,6 +75,12 @@ public class Convert extends ServiceBase {
 		// 		}
 		// 	}
 		// }
+
+		boolean sigFail = false;
+		String sig = node.getStr(NodeProp.CRYPTO_SIG);
+		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+			sigFail = true;
+		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
 		// node, but only if we ourselves are not admin.
@@ -125,7 +130,7 @@ public class Convert extends ServiceBase {
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
 		// log.debug("hasChildren=" + hasChildren + " node: "+node.getIdStr());
 
-		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
+		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit, sigFail);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
 		if (no(node.getOwner())) {
@@ -310,12 +315,17 @@ public class Convert extends ServiceBase {
 	}
 
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
-			boolean htmlOnly, boolean initNodeEdit) {
+			boolean htmlOnly, boolean initNodeEdit, boolean sigFail) {
 
 		List<PropertyInfo> props = null;
 		HashMap<String, Object> propMap = node.getProps();
 		if (ok(propMap) && ok(propMap.keySet())) {
 			for (String propName : propMap.keySet()) {
+				// inticate to the client the signature is no good by not even sending the bad signature to client.
+				if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName)) {
+					continue;
+				}
+
 				/* lazy create props */
 				if (no(props)) {
 					props = new LinkedList<>();

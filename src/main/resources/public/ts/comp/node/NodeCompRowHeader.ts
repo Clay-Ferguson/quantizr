@@ -80,11 +80,11 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        const signed = S.props.getClientPropStr(J.NodeProp.CRYPTO_SIG, this.node);
+        const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
         if (signed) {
             verboseChildren.push(new Icon({
                 // title: youLiked ? "You Liked this Node!" : "Like this Node",
-                title: "Node has Crypto Signature",
+                title: "Crypto Signature Verified",
                 className: "fa fa-certificate fa-lg signatureIcon"
             }));
         }

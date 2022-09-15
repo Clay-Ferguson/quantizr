@@ -109,7 +109,6 @@ import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveNodeRequest;
-import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
@@ -231,6 +230,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		thymeleafAttribs.put("brandingAppName", prop.getConfigText("brandingAppName"));
 		thymeleafAttribs.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
 		thymeleafAttribs.put("hostUrl", prop.getProtocolHostAndPort());
+		thymeleafAttribs.put("requireCrypto", prop.isRequireCrypto() ? "true" : "false");
 	}
 
 	/*

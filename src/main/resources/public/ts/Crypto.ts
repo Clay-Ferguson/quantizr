@@ -20,7 +20,7 @@ Original way I had for creating a hashe-based key from a password:
 */
 
 export class Crypto {
-    static readonly avail: boolean = !!(crypto?.subtle);
+    readonly avail: boolean = !!(crypto?.subtle);
 
     // cache the keys here for faster access.
     privateEncKey: CryptoKey = null;
@@ -67,7 +67,7 @@ export class Crypto {
         /* WARNING: Crypto (or at least subtle) will not be available except on Secure Origin, which means a SSL (https)
         web address plus also localhost */
 
-        if (!Crypto.avail) {
+        if (!this.avail) {
             console.log("WebCryptoAPI not available");
             return;
         }
@@ -110,7 +110,7 @@ export class Crypto {
 
     /* Returns hex string representing the signature data */
     sign = async (privateKey: CryptoKey, data: string): Promise<string> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         if (!privateKey) {
             privateKey = await this.getPrivateSigKey();
         }
@@ -123,7 +123,7 @@ export class Crypto {
     }
 
     verify = async (publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         publicKey = publicKey || await this.getPublicSigKey();
 
         return await crypto.subtle.verify(this.SIG_ALGO,
@@ -219,12 +219,12 @@ export class Crypto {
     }
 
     importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         return crypto.subtle.importKey("jwk", key, algos, extractable, keyUsages);
     }
 
     importKeyPair = async (keyPair: string): Promise<boolean> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         const keyPairObj: EncryptionKeyPair = JSON.parse(keyPair);
 
         const publicKey = await crypto.subtle.importKey("jwk", keyPairObj.publicKey, {
@@ -315,7 +315,7 @@ export class Crypto {
     }
 
     initSymetricKey = async (forceUpdate: boolean = false) => {
-        if (!Crypto.avail) return;
+        if (!this.avail) return;
         const val: any = await S.localDB.readObject(this.STORE_SYMKEY);
         if (!val) {
             forceUpdate = true;
@@ -340,7 +340,7 @@ export class Crypto {
     Note: a 'forceUpdate' always triggers the 'republish'
     */
     initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -390,7 +390,7 @@ export class Crypto {
     Note: a 'forceUpdate' always triggers the 'republish'
     */
     initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -435,7 +435,7 @@ export class Crypto {
     }
 
     genSymKey = async (): Promise<CryptoKey> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         const key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,
             length: 256
@@ -449,7 +449,7 @@ export class Crypto {
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */
     exportKeys = async (): Promise<string> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) return null;
         let ret = "";
 
         let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
@@ -707,7 +707,10 @@ export class Crypto {
     }
 
     signNode = async (node: J.NodeInfo): Promise<void> => {
-        if (!Crypto.avail) return null;
+        if (!this.avail) {
+            throw new Error("Crypto not available.");
+        }
+
         let path: string = node.path;
         // convert any 'pending (p)' path to a final verion of the path (no '/p/')
         if (path.startsWith("/r/p/")) {
@@ -723,8 +726,9 @@ export class Crypto {
         // we need to concat the path+content
         try {
             const sig: string = await S.crypto.sign(null, signData);
-            // console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
-
+            console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
+            // const verified = await S.crypto.verify(null, sig, signData);
+            // console.log("local verify: " + verified);
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
         }
         catch (e) {

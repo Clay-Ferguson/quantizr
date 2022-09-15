@@ -1,7 +1,6 @@
 package quanta.service;
 
 import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -17,20 +16,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.Jwk;
 import quanta.model.client.NodeProp;
-import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
-import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
 @Component
 public class CryptoService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(CryptoService.class);
-
-	// This key will be needed so often we cache it.
-	// todo-0: for now a server restart is required if admin changes their keys.
-	private static PublicKey adminPublicSigKey = null;
-
 	public static final ObjectMapper mapper = new ObjectMapper();
 	// NOTE: This didn't allow unknown properties as expected but putting the
 	// following in the JSON classes did:
@@ -41,12 +33,6 @@ public class CryptoService extends ServiceBase {
 
 	public boolean nodeSigVerify(SubNode node, String sig) {
 		PublicKey pubKey = null;
-		MongoSession adminSession = auth.getAdminSession();
-		boolean adminOwned = false;
-		if (ok(adminSession) && adminSession.getUserNodeId().equals(node.getOwner())) {
-			adminOwned = true;
-			pubKey = adminPublicSigKey;
-		}
 
 		try {
 			// if we didn't get this as admin key we'll be generating the key
@@ -71,11 +57,6 @@ public class CryptoService extends ServiceBase {
 				if (no(pubKey)) {
 					log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
 					return false;
-				}
-
-				// cache the admin key if adminOwned
-				if (adminOwned) {
-					adminPublicSigKey = pubKey;
 				}
 			}
 

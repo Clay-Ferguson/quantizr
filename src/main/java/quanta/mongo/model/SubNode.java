@@ -251,15 +251,7 @@ public class SubNode {
 		ServiceBase.auth.ownerAuth(this);
 		this.pathDirty = true;
 		ThreadLocals.dirty(this);
-		log.debug("SIG DEL: Path changed from [" + this.path + "] to [" + path + "]");
 		this.path = path;
-
-		// Any time we modify a signature field (path, content, owner) we have to nullify the
-		// signature becasue it will be invalid now.
-
-		// todo-0: need to make sure during node updating the signature is the last
-		// setter called or it might remain wiped out by this line.
-		set(NodeProp.CRYPTO_SIG, null);
 	}
 
 	/*
@@ -317,14 +309,7 @@ public class SubNode {
 		if (Util.equalObjs(owner, this.owner))
 			return;
 		ThreadLocals.dirty(this);
-		log.debug("SIG DEL: Owner changed from [" + this.owner.toHexString() + "] to [" + owner.toHexString() + "]");
 		this.owner = owner;
-
-		// Any time we modify a signature field (path, content, owner) we have to nullify the
-		// signature becasue it will be invalid now.
-		// todo-0: need to make sure during node updating the signature is the last
-		// setter called or it might remain wiped out by this line.
-		set(NodeProp.CRYPTO_SIG, null);
 	}
 
 	@JsonGetter(OWNER)
@@ -708,14 +693,7 @@ public class SubNode {
 		if (Util.equalObjs(content, this.content))
 			return;
 		ThreadLocals.dirty(this);
-		log.debug("SIG DEL: Content changed from [" + this.content + "] to [" + content + "]");
 		this.content = content;
-
-		// Any time we modify a signature field (path, content, owner) we have to nullify the
-		// signature becasue it will be invalid now.
-		// todo-0: need to make sure during node updating the signature is the last
-		// setter called or it might remain wiped out by this line.
-		set(NodeProp.CRYPTO_SIG, null);
 	}
 
 	@JsonProperty(TAGS)

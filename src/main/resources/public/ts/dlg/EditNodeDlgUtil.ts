@@ -80,6 +80,7 @@ export class EditNodeDlgUtil {
         if (appState.isAdminUser) {
             // Note: this needs to come AFTER the 'savePropsToNode' above becasue we're overriding what was
             // possibly in there.
+            console.log("signing Node to Save");
             await S.crypto.signNode(editNode);
         }
 
