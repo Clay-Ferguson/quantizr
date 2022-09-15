@@ -6,6 +6,8 @@ import quanta.request.base.RequestBase;
 public class LoginRequest extends RequestBase {
     private String userName;
     private String password;
+    private String asymEncKey;
+	private String sigKey;
 
     /* timezone offset */
     @Nullable
@@ -46,4 +48,20 @@ public class LoginRequest extends RequestBase {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getAsymEncKey() {
+		return asymEncKey;
+	}
+
+	public void setAsymEncKey(String asymEncKey) {
+		this.asymEncKey = asymEncKey;
+	}
+
+	public String getSigKey() {
+		return sigKey;
+	}
+    
+	public void setSigKey(String sigKey) {
+		this.sigKey = sigKey;
+	}
 }

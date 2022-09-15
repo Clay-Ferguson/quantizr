@@ -719,7 +719,7 @@ export class Util {
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (dlg.yes) {
-            S.crypto.initKeys(true);
+            await S.crypto.initKeys(S.quanta.userName, true, true, true);
         }
     }
 

@@ -2,6 +2,7 @@ package quanta.config;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import quanta.model.UserPreferences;
+import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
@@ -31,8 +33,8 @@ import quanta.util.Util;
 @Component
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
-
 	private HttpSession session;
+	public PublicKey pubSigKey = null;
 
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
@@ -292,9 +294,39 @@ public class SessionContext extends ServiceBase {
 
 		if (!validToken(bearer, sc.getUserName())) {
 			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
-		} else {
-			// log.debug("Bearer accepted: " + bearer);
 		}
+		log.debug("Bearer accepted: " + bearer);
+
+		// todo-0: put this block in a method
+		if (sc.prop.isRequireCrypto() && !PrincipalName.ANON.s().equals(sc.getUserName())) {
+			String sig = ThreadLocals.getReqSig();
+			if (no(sig)) {
+				throw new RuntimeException("Request failed. No signature.");
+			}
+
+			// if pubSigKey not yet saved in SessionContext then generate it
+			if (no(sc.pubSigKey)) {
+				SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
+				if (no(userNode)) {
+					throw new RuntimeException("Unknown user: " + sc.getUserName());
+				}
+				String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+				if (no(pubKeyJson)) {
+					throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
+				}
+
+				sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
+				if (no(sc.pubSigKey)) {
+					throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
+				}
+			}
+
+			boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes());
+			if (!verified) {
+				throw new RuntimeException("Request Sig Failed");
+			}
+		}
+
 	}
 
 	public String getUserToken() {

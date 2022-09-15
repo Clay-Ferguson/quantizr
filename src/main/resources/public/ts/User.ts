@@ -81,11 +81,14 @@ export class User {
             this.anonInitialRender();
         } else {
             try {
+                await S.crypto.initKeys(callUsr, false, false, false);
                 const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                     userName: callUsr,
                     password: callPwd,
                     tzOffset: new Date().getTimezoneOffset(),
-                    dst: S.util.daylightSavingsTime
+                    dst: S.util.daylightSavingsTime,
+                    sigKey: S.quanta.sigKey,
+                    asymEncKey: S.quanta.asymEncKey
                 }, false, true);
                 S.quanta.authToken = res.authToken;
 

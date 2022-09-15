@@ -43,9 +43,13 @@ export class Quanta {
 
     /* We save userName+password in these vars to pass in every request
     so that we can log back in again silently after any session timeout */
-    userName: string;
+    userName: string = J.PrincipalName.ANON;
     authToken: string;
+    userSignature: string;
     loggingOut: boolean;
+
+    asymEncKey: string;
+    sigKey: string;
 
     // WARNING: Call S.util.ctrlKeyCheck() to check for ctrlKey and NOT just the state of this.
     // (I should've just used a timer to set back to false, but instead for now it's checked by calling ctrlKeyCheck)

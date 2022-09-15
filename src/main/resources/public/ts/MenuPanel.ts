@@ -149,7 +149,7 @@ export class MenuPanel extends Div {
     };
 
     static generateKeys = () => { S.util.generateNewCryptoKeys(getAppState(null)); };
-    static publishKeys = () => { S.crypto.initKeys(false, true, true); };
+    static publishKeys = () => { S.crypto.initKeys(S.quanta.userName, false, true, true); };
     static importKeys = () => { new ImportCryptoKeyDlg().open(); };
     static profile = () => { new UserProfileDlg(null).open(); };
     static accountSettings = () => { new ManageAccountDlg().open(); };

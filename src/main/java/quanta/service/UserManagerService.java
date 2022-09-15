@@ -157,7 +157,7 @@ public class UserManagerService extends ServiceBase {
 
 		if (sc.isAuthenticated()) {
 			MongoSession ms = ThreadLocals.getMongoSession();
-			processLogin(ms, res, sc.getUserName());
+			processLogin(ms, res, sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
 			log.debug("login: user=" + sc.getUserName());
 
 			// ensure we've pre-created this node.
@@ -204,7 +204,16 @@ public class UserManagerService extends ServiceBase {
 		}
 	}
 
-	public void processLogin(MongoSession ms, LoginResponse res, String userName) {
+	/*****
+	 * todo-0: wip:
+	 * WARNING:
+	 * **************************************************************************************
+	 * WHEN ADMIN LOGS IN WITH A DIFFERENT BROWSER THIS WILL SET THEIR KEYS TO THAT BROWSER
+	 * AND IF IT'S NOT THE SAME BROWSER STUFF WAS SIGNED WITH THOSE SIGNATURES WILL NOW ALL 
+	 * LOOK INAUTHENTIC. NEED SPECIAL WAY TO SET ADMIN KEYS!!!!! 
+	 * **************************************************************************************
+	 */
+	public void processLogin(MongoSession ms, LoginResponse res, String userName, String asymEncKey, String sigKey) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
 		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
@@ -239,7 +248,11 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
+		userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
+		userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
+
 		ensureValidCryptoKeys(userNode);
+		// log.debug("SAVING USER NODE: "+XString.prettyPrint(userNode));
 		update.save(ms, userNode);
 	}
 

@@ -19,6 +19,8 @@ Original way I had for creating a hashe-based key from a password:
     let keyPromise = this.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"]);
 */
 
+declare const g_requireCrypto: string;
+
 export class Crypto {
     readonly avail: boolean = !!(crypto?.subtle);
 
@@ -244,20 +246,29 @@ export class Crypto {
         return true;
     }
 
-    initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+    // todo-0: need to make this require the password and username to be more secure.
+    //         And an unsolved design task is users signing data from different browsers.
+    initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+        if (!g_requireCrypto || user === J.PrincipalName.ANON) {
+            console.log("not using crypto: user=" + user);
+            return;
+        }
+
         if (!crypto || !crypto.subtle) {
             console.error("Crypto Not Available.");
             return;
         }
-        const asymEncKey = await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
-        await this.initSymetricKey(forceUpdate);
-        const sigKey = await this.initSigKeys(forceUpdate, republish, showConfirm);
 
-        if (republish && (asymEncKey || sigKey)) {
+        S.quanta.asymEncKey = await this.initAsymetricKeys(forceUpdate);
+        await this.initSymetricKey(forceUpdate);
+        S.quanta.sigKey = await this.initSigKeys(forceUpdate);
+        S.quanta.userSignature = await S.crypto.sign(null, user);
+
+        if (republish && S.quanta.asymEncKey && S.quanta.sigKey) {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-0: I'm not sure I want to keep these as escaped JSON or convert to hex
-                asymEncKey,
-                sigKey
+                asymEncKey: S.quanta.asymEncKey,
+                sigKey: S.quanta.sigKey
             });
 
             if (showConfirm) {
@@ -314,8 +325,12 @@ export class Crypto {
         }
     }
 
+    // todo-0: this method is different from the other two initializers. Need to make it consistent.
     initSymetricKey = async (forceUpdate: boolean = false) => {
-        if (!this.avail) return;
+        if (!this.avail) {
+            return;
+        }
+
         const val: any = await S.localDB.readObject(this.STORE_SYMKEY);
         if (!val) {
             forceUpdate = true;
@@ -339,8 +354,11 @@ export class Crypto {
     Initialize keys for sign/verify.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initSigKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
-        if (!this.avail) return null;
+    initSigKeys = async (forceUpdate: boolean = false): Promise<string> => {
+        if (!this.avail) {
+            console.log("crypto not available.");
+            return null;
+        }
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -352,9 +370,12 @@ export class Crypto {
             if (!val) {
                 forceUpdate = true;
             }
+            else {
+                keyPair = val.val;
+            }
         }
 
-        if (forceUpdate) {
+        if (forceUpdate || !keyPair) {
             // todo-0: need to vet these parameters, this just came from an example online.
             keyPair = await crypto.subtle.generateKey({
                 name: this.SIG_ALGO,
@@ -368,19 +389,16 @@ export class Crypto {
             const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(pubKeyDat);
             // console.log("Exporting key string: " + pubKeyStr);
-            republish = true;
         }
 
-        if (republish) {
-            if (!keyPair) {
-                const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
-                keyPair = val.val;
-            }
+        if (!keyPair) {
+            const val: any = await S.localDB.readObject(this.STORE_SIGKEY);
+            keyPair = val.val;
+        }
 
-            if (!pubKeyStr) {
-                const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-                pubKeyStr = JSON.stringify(publicKeyDat);
-            }
+        if (!pubKeyStr) {
+            const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            pubKeyStr = JSON.stringify(publicKeyDat);
         }
         return pubKeyStr;
     }
@@ -389,8 +407,11 @@ export class Crypto {
     Init keys for encryption.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<string> => {
-        if (!this.avail) return null;
+    initAsymetricKeys = async (forceUpdate: boolean = false): Promise<string> => {
+        if (!this.avail) {
+            console.log("crypto not available.");
+            return null;
+        }
         let keyPair: CryptoKeyPair = null;
         let pubKeyStr: string = null;
 
@@ -402,9 +423,12 @@ export class Crypto {
             if (!val) {
                 forceUpdate = true;
             }
+            else {
+                keyPair = val.val;
+            }
         }
 
-        if (forceUpdate) {
+        if (forceUpdate || !keyPair) {
             keyPair = await crypto.subtle.generateKey({ //
                 name: this.ASYM_ALGO, //
                 modulusLength: 2048, //
@@ -417,20 +441,18 @@ export class Crypto {
             const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(pubKeyDat);
             // console.log("Exporting key string: " + pubKeyStr);
-            republish = true;
         }
 
-        if (republish) {
-            if (!keyPair) {
-                const val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-                keyPair = val.val;
-            }
-
-            if (!pubKeyStr) {
-                const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-                pubKeyStr = JSON.stringify(publicKeyDat);
-            }
+        if (!keyPair) {
+            const val: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+            keyPair = val.val;
         }
+
+        if (!pubKeyStr) {
+            const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            pubKeyStr = JSON.stringify(publicKeyDat);
+        }
+
         return pubKeyStr;
     }
 

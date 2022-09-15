@@ -9,7 +9,7 @@ export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
     logRpc: boolean = false;
-    logRpcShort: boolean = false;
+    logRpcShort: boolean = true;
 
     /*
     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
@@ -37,7 +37,7 @@ export class RpcUtil {
 
     // todo-1: put everything related to rpc in an Rpc.ts service
     rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
-        background: boolean = false, allowErrorDlg: boolean=true): Promise<ResponseType> => {
+        background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
 
@@ -63,7 +63,8 @@ export class RpcUtil {
                     body: JSON.stringify(postData),
                     headers: {
                         "Content-Type": "application/json",
-                        Bearer: S.quanta.authToken || ""
+                        Bearer: S.quanta.authToken || "",
+                        Sig: S.quanta.userSignature || ""
                     },
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

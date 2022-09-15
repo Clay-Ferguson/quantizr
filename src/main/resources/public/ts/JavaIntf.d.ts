@@ -308,6 +308,8 @@ export interface LoadNodeFromIpfsRequest extends RequestBase {
 export interface LoginRequest extends RequestBase {
     userName: string;
     password: string;
+    asymEncKey: string;
+    sigKey: string;
     tzOffset?: number;
     dst?: boolean;
 }
