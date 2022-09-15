@@ -78,7 +78,6 @@ export class View {
                 singleNode: false,
                 parentCount: a.state.userPrefs.showParents ? 1 : 0
             });
-            S.crypto.renderNodeCryptoHook(res);
             if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
@@ -149,7 +148,6 @@ export class View {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
-            S.crypto.renderNodeCryptoHook(res);
 
             if (!res.node) return;
 

@@ -325,7 +325,6 @@ export class EditNodeDlgUtil {
             singleNode: true,
             parentCount: 0
         });
-        S.crypto.renderNodeCryptoHook(res);
 
         if (res.node?.properties) {
             S.props.transferBinaryProps(res.node, node);

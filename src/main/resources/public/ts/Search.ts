@@ -236,12 +236,6 @@ export class Search {
             return;
         }
 
-        if (state.isAdminUser) {
-            setTimeout(() => {
-                S.crypto.autoSignNodes(res.searchResults);
-            }, 100);
-        }
-
         dispatch("RenderDocumentResults", s => {
             S.domUtil.focusId(C.TAB_DOCUMENT);
             if (!DocumentTab.inst) return;

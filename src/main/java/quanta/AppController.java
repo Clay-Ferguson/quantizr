@@ -933,13 +933,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/saveNodeSigs", method = RequestMethod.POST)
-	public @ResponseBody Object saveNodeSigs(@RequestBody SaveNodeSigsRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
-		return callProc.run("saveNodeSigs", req, session, ms -> {
-			return edit.saveNodeSigs(ms, req);
-		});
-	}
+	// todo-0: This will eventually come back but only as part of our server-push feature for doing signing.
+	// @RequestMapping(value = API_PATH + "/saveNodeSigs", method = RequestMethod.POST)
+	// public @ResponseBody Object saveNodeSigs(@RequestBody SaveNodeSigsRequest req, HttpSession session) {
+	// 	SessionContext.checkReqToken();
+	// 	return callProc.run("saveNodeSigs", req, session, ms -> {
+	// 		return edit.saveNodeSigs(ms, req);
+	// 	});
+	// }
 
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
@@ -1319,7 +1320,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
 	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
+
+		// temporarily removing, debugging startup flow (todo-0)
+		// SessionContext.checkReqToken();
+
 		return callProc.run("checkMessages", req, session, ms -> {
 			return userFeed.checkMessages(ms, req);
 		});
@@ -1428,7 +1432,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
 	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
+
+		// temporarily removing, debugging startup flow (todo-0)
+		// SessionContext.checkReqToken();
+
 		return callProc.run("getBookmarks", req, session, ms -> {
 			GetBookmarksResponse res = new GetBookmarksResponse();
 			search.getBookmarks(ms, req, res);

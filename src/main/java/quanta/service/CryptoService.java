@@ -39,20 +39,7 @@ public class CryptoService extends ServiceBase {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-	/*
-	 * Note having NO signature on the node is currently considered 'valid' as an unsigned node, but
-	 * only if there's a signature to we check it for being valid.
-	 */
-	public boolean nodeSigVerify(SubNode node, String checkSig) {
-		String sig = ok(checkSig) ? checkSig : node.getStr(NodeProp.CRYPTO_SIG);
-
-		/*
-		 * if no signature exists, for now we consider this a valid node.
-		 */
-		if (no(sig)) {
-			return true;
-		}
-
+	public boolean nodeSigVerify(SubNode node, String sig) {
 		PublicKey pubKey = null;
 		MongoSession adminSession = auth.getAdminSession();
 		boolean adminOwned = false;
@@ -147,13 +134,7 @@ public class CryptoService extends ServiceBase {
 
 	public boolean sigVerify(PublicKey pubKey, byte[] sigBytes, byte[] dataBytes) {
 		try {
-			// Signature is not threadsafe (afaik) however it can be reused so we hold one on each thread for
-			// reuse
-			Signature verifier = ThreadLocals.getCryptoSig();
-			if (no(verifier)) {
-				verifier = Signature.getInstance("SHA256withRSA");
-				ThreadLocals.setCryptoSig(verifier);
-			}
+			Signature verifier = Signature.getInstance("SHA256withRSA");
 			verifier.initVerify(pubKey);
 			verifier.update(dataBytes);
 			return verifier.verify(sigBytes);

@@ -420,33 +420,44 @@ public class NodeEditService extends ServiceBase {
 	 */
 	@PerfMon(category = "edit")
 	public SaveNodeSigsResponse saveNodeSigs(MongoSession ms, SaveNodeSigsRequest req) {
-		SaveNodeSigsResponse res = new SaveNodeSigsResponse();
+		// todo-0: backing out for now. this WILL come back.
+		return null;
+		// SaveNodeSigsResponse res = new SaveNodeSigsResponse();
 
-		// todo-1: potential optimization, create an 'ownerNode set' local to this method
-		// and use it to lookup parent node of each node, only if not in the set and then have an
-		// optional parameter to nodeSigVerify that can accept the ownerAcct node, and use it to
-		// avoid a call to db to get it.
-		//
-		// todo-1: This is an ideal place to use a MongoDb batch operation.
-		for (NodeSig sig : req.getSigs()) {
-			SubNode node = read.getNode(ms, sig.getNodeId());
-			if (ok(node)) {
-				boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
+		// // todo-1: potential optimization, create an 'ownerNode set' local to this method
+		// // and use it to lookup parent node of each node, only if not in the set and then have an
+		// // optional parameter to nodeSigVerify that can accept the ownerAcct node, and use it to
+		// // avoid a call to db to get it.
+		// //
+		// // todo-0: This is an ideal place to use a MongoDb batch operation.
+		// for (NodeSig sig : req.getSigs()) {
+		// 	SubNode node = read.getNode(ms, sig.getNodeId());
+		// 	if (ok(node)) {
+		// 		// todo-0: WRONG (For now) we need to let admin repair things if admin pushes up new public keys!!!
+		// 		// we should never get here but if we get a sig sent for an already signed node ignore it.
+		// 		// boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
+		// 		// if (signed) {
+		// 		// log.debug("RESIGN rejected " + node.getIdStr());
+		// 		// continue;
+		// 		// }
 
-				// we should never get here but if we get a sig sent for an already signed node ignore it.
-				if (signed) {
-					log.debug("Ignoring attempt to sign already signed node: " + node.getIdStr());
-					continue;
-				}
+		// 		// todo-0: temporarily accepting everything from admin.
+		// 		if (ms.isAdmin()) {
+		// 			log.debug("sig updated from admin: nodeId=" + node.getIdStr() + " sig=" + sig.getSig());
+		// 			node.set(NodeProp.CRYPTO_SIG, sig.getSig());
+		// 			continue;
+		// 		}
 
-				// if signature is valid put it on the node.
-				if (crypto.nodeSigVerify(node, sig.getSig())) {
-					// log.debug("Accepted SIG on nodeId: " + node.getIdStr());
-					node.set(NodeProp.CRYPTO_SIG, sig.getSig());
-				}
-			}
-		}
-		return res;
+		// 		// if signature is valid put it on the node.
+		// 		if (crypto.nodeSigVerify(node, sig.getSig())) {
+		// 			// log.debug("Accepted SIG on nodeId: " + node.getIdStr());
+		// 			node.set(NodeProp.CRYPTO_SIG, sig.getSig());
+		// 		} else {
+		// 			log.debug("Rejecting SENT SIG: " + sig.getSig() + " by user " + ms.getUserName());
+		// 		}
+		// 	}
+		// }
+		// return res;
 	}
 
 	@PerfMon(category = "edit")

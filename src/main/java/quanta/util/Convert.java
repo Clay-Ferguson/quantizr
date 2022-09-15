@@ -43,32 +43,39 @@ public class Convert extends ServiceBase {
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
 	 * 
-	 * Note: childrenCheck=true means that we DO need the correct value for hasChildren (from a global, non-user specific
-	 * point of view) to be set on this node. Node that we do set hasChildren to true if there ARE an children REGARDLESS
-	 * of whether the given user can access those children.
+	 * Note: childrenCheck=true means that we DO need the correct value for hasChildren (from a global,
+	 * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
+	 * if there ARE an children REGARDLESS of whether the given user can access those children.
 	 */
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly,
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
-		boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
+		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
-		// if we encounter a non-signed node under public folder, and we aren't the admin, then refuse to show it.
-		// This will block the app from working...until logging in as admin, and visiting the langing page
-		// to cause the signature to be created.
-		if (!signed && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-			// todo-0: we need a special global counter for when this happens, so the server info can show it.
-			return null;
-		}
-
-		// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
-		if (signed && !crypto.nodeSigVerify(node, null)) {
-			log.debug("SIG FAILED: nodeId=" + node.getIdStr());
-			// todo-0: create a global static counter so our server info can show is at a glance
-			// if we're having a potential problem with signatures
-			return null;
-		}
+		// todo-0: this block will come back (not as is, but in some form, once signature signing only by NODE EDIT is done
+		// AND all admin nodes in /r/public/home are signed)
+		// // if we encounter a non-signed node under public folder, and we aren't the admin, then refuse to
+		// // show it.
+		// // This will block the app from working...until logging in as admin, and visiting the langing page
+		// // to cause the signature to be created.
+		// if (no(sig) && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
+		// 	// todo-0: we need a special global counter for when this happens, so the server info can show it.
+		// 	return null;
+		// }
+		// if (node.getPath().startsWith("/r/public/home")) {
+		// 	// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
+		// 	if (!crypto.nodeSigVerify(node, sig)) {
+		// 		// todo-0: temporarily allowing anything from admin
+		// 		if (!sc.isAdmin()) {
+		// 			log.debug("SIG FAILED: nodeId=" + node.getIdStr());
+		// 			// todo-0: create a global static counter so our server info can show is at a glance
+		// 			// if we're having a potential problem with signatures
+		// 			return null;
+		// 		}
+		// 	}
+		// }
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
 		// node, but only if we ourselves are not admin.
@@ -115,7 +122,7 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck); 
+		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
 		// log.debug("hasChildren=" + hasChildren + " node: "+node.getIdStr());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
@@ -214,10 +221,10 @@ public class Convert extends ServiceBase {
 				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
 
-		if (signed) {
-			// log.debug("sending back SIG prop");
-			nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.CRYPTO_SIG.s(), "y"));
-		}
+		// if (ok(sig)) {
+		// 	// log.debug("sending back SIG prop");
+		// 	nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.CRYPTO_SIG.s(), "y"));
+		// }
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());

@@ -1,4 +1,3 @@
-import { getAppState } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -246,7 +245,10 @@ export class Crypto {
     }
 
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
-        if (!Crypto.avail) return;
+        if (!crypto || !crypto.subtle) {
+            console.error("Crypto Not Available.");
+            return;
+        }
         const asymEncKey = await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
         const sigKey = await this.initSigKeys(forceUpdate, republish, showConfirm);
@@ -729,43 +731,6 @@ export class Crypto {
             S.util.logAndReThrow("Failed to sign data.", e);
         }
         return null;
-    }
-
-    // called after each "renderNode". A temporary hack to update admin signatures.
-    renderNodeCryptoHook = (res: J.RenderNodeResponse) => {
-        if (!Crypto.avail || !getAppState().isAdminUser) return;
-        if (res?.node) {
-            this.autoSignNodes([res.node, ...(res.node.children || [])])
-        }
-    }
-
-    autoSignNodes = async (children: J.NodeInfo[]) => {
-        if (!Crypto.avail || !getAppState().isAdminUser) return;
-        const sigs: J.NodeSig[] = [];
-
-        for (const child of children) {
-            // todo-0: for now only auto-signing admin owned nodes
-            if (child.owner !== J.PrincipalName.ADMIN) {
-                continue;
-            }
-            let sig = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, child);
-            if (!sig) {
-                await this.signNode(child);
-
-                // get the sig that signNode will have just now put on the node.
-                sig = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, child);
-                if (sig) {
-                    // console.log("AutoSigning node: " + child.id); // + " sig: " + sig);
-                    sigs.push({ nodeId: child.id, sig });
-                }
-            }
-        }
-
-        if (sigs.length > 0) {
-            await S.rpcUtil.rpc<J.SaveNodeSigsRequest, J.SaveNodeSigsResponse>("saveNodeSigs", {
-                sigs
-            });
-        }
     }
 
     // ab2str = (buf: ArrayBuffer) => {

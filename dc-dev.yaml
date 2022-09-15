@@ -92,6 +92,7 @@ services:
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"
             mongoSecurity: "true"
+            requireCrypto: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string
             # Using '|' there instead would preserve the newlines after read in

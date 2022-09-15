@@ -474,10 +474,11 @@ public class NodeSearchService extends ServiceBase {
 				String sig = node.getStr(NodeProp.CRYPTO_SIG);
 				if (ok(sig)) {
 					signedNodeCount++;
-					if (!crypto.nodeSigVerify(node, null)) {
+					if (!crypto.nodeSigVerify(node, sig)) {
 						failedSigCount++;
 					}
 				} else {
+					log.debug("UNSIGNED: " + XString.prettyPrint(node));
 					unsignedNodeCount++;
 				}
 			}

@@ -325,10 +325,6 @@ export class Quanta {
 
             Log.log("initApp complete.");
             S.domUtil.enableMouseEffect();
-
-            setTimeout(() => {
-                S.crypto.initKeys();
-            }, 1000);
         }
         catch (e) {
             console.error(e.message);

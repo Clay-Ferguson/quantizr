@@ -43,6 +43,7 @@ export function useAppState(): AppState {
  */
 export function initDispatch(): void {
     [state, dispatcher] = useReducer(reducer, state);
+    console.log("Publishing dispatcherReady event");
     PubSub.pub(C.PUBSUB_dispatcherReady);
     // console.log("****** initDispatch stateId: " + state.stateId);
 }

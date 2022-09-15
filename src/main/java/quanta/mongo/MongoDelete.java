@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
 import quanta.util.Val;
+import quanta.util.XString;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
@@ -311,92 +313,112 @@ public class MongoDelete extends ServiceBase {
 		}
 	}
 
-	// note: Is there a way to leverage the new 'hasChildren' node prop to make this fast?
+	// todo-0: work in progress (not yet passing tests)
 	public void deleteNodeOrphans() {
-		// todo-0: removed due to SubNode.getParent() being deleted
-		// log.debug("deleteNodeOrphans()");
-		// // long nodeCount = read.getNodeCount(null);
-		// // log.debug("initial Node Count: " + nodeCount);
+		log.debug("deleteNodeOrphans()");
 
-		// Val<Integer> orphanCount = new Val<>(0);
-		// int loops = 0;
+		Val<Integer> nodesProcessed = new Val<>(0);
+		Val<BulkOperations> bops = new Val<>(null);
+		Val<Long> opsPending = new Val<>(0L);
+		Val<Long> totalDeleted = new Val<>(0L);
 
-		// /*
-		// * Run this loop up to 3 per call. Note that for large orphaned subgraphs we only end up pruning
-		// off the
-		// * N deepest levels at a time, so running this multiple times will be required, but this is ideal.
-		// * We could raise this N to a larger number larger than any possible tree depth, but there's no
-		// * need. Running this several times has the same effect.
-		// */
-		// while (++loops <= 3) {
-		// log.debug("Delete Orphans. Loop: " + loops);
-		// Val<Integer> nodesProcessed = new Val<>(0);
-		// Val<Integer> deleteCount = new Val<>(0);
-		// Val<Integer> batchSize = new Val<>(0);
+		// map every path to it's ObjectId
+		HashMap<String, ObjectId> allNodes = new HashMap<>();
 
-		// // bulk operations is scoped only to one iteration, just so it itself can't be too large
-		// Val<BulkOperations> bops = new Val<>(null);
+		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+			// print progress every 1000th node
+			nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+			if (nodesProcessed.getVal() % 1000 == 0) {
+				log.debug("SCAN: " + nodesProcessed.getVal());
+			}
 
-		// Query allQuery = new Query().addCriteria(new Criteria(SubNode.PARENT).ne(null));
-		// /*
-		// * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
-		// * the node is an orphan and can be deleted.
-		// */
-		// ops.stream(allQuery, SubNode.class).forEachRemaining(node -> {
-		// // print progress every 1000th node
-		// nodesProcessed.setVal(nodesProcessed.getVal() + 1);
-		// if (nodesProcessed.getVal() % 1000 == 0) {
-		// log.debug("Nodes Processed: " + nodesProcessed.getVal());
-		// }
+			// this replacement is just to save memory, by shortening strings in a harmless way relative to this
+			// algorithm.
+			allNodes.put(node.getPath().replace("/r/public/home/", "/r/*/"), node.getId());
+		});
 
-		// // ignore the root node and any of it's children.
-		// if ("/r".equalsIgnoreCase(node.getPath()) || //
-		// "/r".equalsIgnoreCase(node.getParentPath())) {
-		// return;
-		// }
+		nodesProcessed.setVal(0);
 
-		// /*
-		// * if there's a parent specified (always should be except for root), but we can't find the parent
-		// * then this node is an orphan to be deleted
-		// */
-		// if (no(ops.findById(node.getParent(), SubNode.class))) {
-		// log.debug("DEL ORPHAN id=" + node.getIdStr() + " path=" + node.getPath() + " Content=" +
-		// node.getContent());
-		// orphanCount.setVal(orphanCount.getVal() + 1);
-		// deleteCount.setVal(deleteCount.getVal() + 1);
+		int passes = 0;
+		while (passes++ < 20) {
+			log.debug("Running Orphan Pass: " + passes);
+			Val<Long> deletesInPass = new Val<>(0L);
+			HashMap<String, ObjectId> orphans = new HashMap<>();
+			
+			allNodes.entrySet().stream().forEach(entry -> {
+				nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+				if (nodesProcessed.getVal() % 1000 == 0) {
+					log.debug("FINDER SCAN: " + nodesProcessed.getVal());
+				}
 
-		// // lazily create the bulk ops
-		// if (no(bops.getVal())) {
-		// bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-		// }
+				// log.debug("STRM: " + entry.getKey());
+				if (entry.getKey().equals("/r")) {
+					log.debug("ROOT NODE: " + entry.getValue().toHexString());
+					return;
+				}
 
-		// Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-		// bops.getVal().remove(query);
+				String parent = XString.truncAfterLast(entry.getKey(), "/");
+				if (parent.equalsIgnoreCase("/r")) {
+					log.debug("ROOT CHILD: " + entry.getValue().toHexString());
+					return;
+				}
 
-		// batchSize.setVal(batchSize.getVal() + 1);
-		// if (batchSize.getVal() >= 200) {
-		// batchSize.setVal(0);;
-		// BulkWriteResult results = bops.getVal().execute();
-		// log.debug("Orphans Deleted Batch: " + results.getDeletedCount());
-		// bops.setVal(null);
-		// }
-		// }
-		// });
+				if (!allNodes.containsKey(parent)) {
+					// todo-0: once we hit an orphan we know ALL other nodes that start with the it's PATH+"/" (remember
+					// the slash)
+					// are also orphans but to leverage that we'd have to make each of our orphan delete commands be a
+					// subgraph delete of all below that. This may be a good memory-saving optimization for a different
+					// algo where
+					// we look for some orphans order them by shortest path first, and then do all the subgraph deletes
+					// on them.
+					// but I'm not sure any other algo can beat the one we're currently using where we delete by ID
+					// (fastest lookup
+					// that can possibly exist), and just delete every one without any regex subqueries. Plus this
+					// current algo
+					// is about the simplest there can be.
+					log.debug("Orphan: " + entry.getValue().toHexString());
 
-		// if (ok(bops.getVal())) {
-		// BulkWriteResult results = bops.getVal().execute();
-		// log.debug("Orphans Deleted (batch remainder): " + results.getDeletedCount());
-		// }
+					// put the stuff to delete in a separate map to avoid a concurrent modification exception
+					orphans.put(entry.getKey(), entry.getValue());
+				}
+			});
 
-		// // if no deletes were done, break out of while loop and return.
-		// if (deleteCount.getVal() == 0) {
-		// break;
-		// }
-		// }
+			orphans.entrySet().stream().forEach(entry -> {
+				if (no(bops.getVal())) {
+					bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+				}
 
-		// log.debug("TOTAL ORPHANS DELETED=" + orphanCount.getVal());
-		// // nodeCount = read.getNodeCount(null);
-		// // log.debug("final Node Count: " + nodeCount);
+				allNodes.remove(entry.getKey());
+				bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(entry.getValue())));
+
+				opsPending.setVal(opsPending.getVal() + 1);
+				deletesInPass.setVal(deletesInPass.getVal() + 1);
+
+				if (opsPending.getVal() > 100) {
+					BulkWriteResult results = bops.getVal().execute();
+					totalDeleted.setVal(totalDeleted.getVal() + results.getDeletedCount());
+					log.debug("DEL TOTAL: " + totalDeleted.getVal());
+					bops.setVal(null);
+					opsPending.setVal(0L);
+				}
+			});
+
+			// found no orphans at all then we're done.
+			if (deletesInPass.getVal() == 0) {
+				log.debug("No deletes in pass. Finishing.");
+				break;
+			}
+
+			log.debug("Deletes in Pass: " + deletesInPass.getVal());
+		}
+
+		if (opsPending.getVal() > 0) {
+			BulkWriteResult results = bops.getVal().execute();
+			totalDeleted.setVal(totalDeleted.getVal() + results.getDeletedCount());
+		}
+
+		log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
+
 	}
 
 	/*
