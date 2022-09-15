@@ -52,35 +52,19 @@ public class Convert extends ServiceBase {
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
-		// todo-0: this block will come back (not as is, but in some form, once signature signing only by NODE EDIT is done
-		// AND all admin nodes in /r/public/home are signed)
-		// // if we encounter a non-signed node under public folder, and we aren't the admin, then refuse to
-		// // show it.
-		// // This will block the app from working...until logging in as admin, and visiting the langing page
-		// // to cause the signature to be created.
-		// String sig = node.getStr(NodeProp.CRYPTO_SIG);
-		// if (no(sig) && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-		// 	// todo-0: we need a special global counter for when this happens, so the server info can show it.
-		// 	return null;
-		// }
+		boolean sigFail = false;
+		// if in a secure area
+		// todo-0: wip: this is ready to be uncommented once all thse nodes are indeed signed
 		// if (node.getPath().startsWith("/r/public/home")) {
-		// 	// log.debug("NodeId: " + node.getIdStr() + " signed=" + signed);
+		// 	String sig = node.getStr(NodeProp.CRYPTO_SIG);
 		// 	if (!crypto.nodeSigVerify(node, sig)) {
-		// 		// todo-0: temporarily allowing anything from admin
+		// 		sigFail = true;
 		// 		if (!sc.isAdmin()) {
-		// 			log.debug("SIG FAILED: nodeId=" + node.getIdStr());
-		// 			// todo-0: create a global static counter so our server info can show is at a glance
-		// 			// if we're having a potential problem with signatures
+		// 			// todo-1: we need a special global counter for when this happens, so the server info can show it.
 		// 			return null;
 		// 		}
 		// 	}
 		// }
-
-		boolean sigFail = false;
-		String sig = node.getStr(NodeProp.CRYPTO_SIG);
-		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
-			sigFail = true;
-		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
 		// node, but only if we ourselves are not admin.
@@ -226,10 +210,6 @@ public class Convert extends ServiceBase {
 				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
 
-		// if (ok(sig)) {
-		// 	// log.debug("sending back SIG prop");
-		// 	nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.CRYPTO_SIG.s(), "y"));
-		// }
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());

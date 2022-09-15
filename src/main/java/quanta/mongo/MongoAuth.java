@@ -285,8 +285,9 @@ public class MongoAuth extends ServiceBase {
 		if (no(node)) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
-		if (node.adminUpdate) return;
-		
+		if (node.adminUpdate)
+			return;
+
 		if (no(ms)) {
 			ms = ThreadLocals.getMongoSession();
 		}
@@ -331,7 +332,8 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		// this adminUpdate flag is specifically for the purpose if disabling auth checks
-		if (node.adminUpdate) return;
+		if (node.adminUpdate)
+			return;
 
 		if (verbose)
 			log.trace("auth: " + node.getPath());
@@ -391,6 +393,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		String sessionUserNodeId = ok(ms.getUserNodeId()) ? ms.getUserNodeId().toHexString() : null;
+		// log.debug("nodeAuth userAcctId=" + sessionUserNodeId);
 		if (nodeAuth(node, sessionUserNodeId, priv)) {
 			if (verbose)
 				log.trace("nodeAuth success");
@@ -407,7 +410,7 @@ public class MongoAuth extends ServiceBase {
 	 * check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
-		// log.debug("nodeAuth: nodeId: " + node.getIdStr());
+		// log.debug("nodeAuth on node: " + XString.prettyPrint(node));
 		HashMap<String, AccessControl> acl = node.getAc();
 		if (no(acl)) {
 			// log.debug("no acls.");

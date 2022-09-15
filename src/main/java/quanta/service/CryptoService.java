@@ -32,6 +32,7 @@ public class CryptoService extends ServiceBase {
 	}
 
 	public boolean nodeSigVerify(SubNode node, String sig) {
+		if (no(sig) || no(node)) return false;
 		PublicKey pubKey = null;
 
 		try {

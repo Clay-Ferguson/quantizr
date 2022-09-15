@@ -176,6 +176,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			isNew = true;
 		}
 
+		// make sure root node can never have any sharing.
+		if (node.getPath().equals("/r") && ok(node.getAc())) {
+			dbObj.put(SubNode.AC, null);
+			node.setAc(null);
+		}
+
 		// todo-0: verify server ALWAYS ensures /r/p (pending path for pending node edits) exists at startup
 		// and then we can never check parent in here if so.
 		if (!node.getPath().startsWith("/r/p/") && ThreadLocals.getParentCheckEnabled() && (isNew || node.pathDirty)) {

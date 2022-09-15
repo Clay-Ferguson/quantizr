@@ -10,6 +10,8 @@ import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
+declare const g_requireCrypto: string;
+
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
     mainMenu: MainMenuDlg;
@@ -88,6 +90,10 @@ export class Quanta {
 
     initApp = async () => {
         try {
+            if (g_requireCrypto && (!crypto || !crypto.subtle)) {
+                alert("This server requires browser crypto features");
+                return;
+            }
             Log.log("quanta.initApp()");
 
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "all-users");
