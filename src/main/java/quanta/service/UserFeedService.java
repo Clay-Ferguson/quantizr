@@ -59,7 +59,7 @@ public class UserFeedService extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
-		// todo-0: Is there a faster way to accomplish the filtering we need based on type and WHY are we
+		// todo-1: Is there a faster way to accomplish the filtering we need based on type and WHY are we
 		// filtering based on type?
 		// i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special
 		// (system defined) user's nodes.

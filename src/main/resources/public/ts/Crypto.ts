@@ -246,7 +246,7 @@ export class Crypto {
         return true;
     }
 
-    // todo-0: need to make this require the password and username to be more secure.
+    // todo-1: need to make this require the password and username to be more secure.
     //         And an unsolved design task is users signing data from different browsers.
     initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         if (!g_requireCrypto || user === J.PrincipalName.ANON) {
@@ -266,7 +266,7 @@ export class Crypto {
 
         if (republish && S.quanta.asymEncKey && S.quanta.sigKey) {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
-                // todo-0: I'm not sure I want to keep these as escaped JSON or convert to hex
+                // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: S.quanta.asymEncKey,
                 sigKey: S.quanta.sigKey
             });
@@ -325,7 +325,7 @@ export class Crypto {
         }
     }
 
-    // todo-0: this method is different from the other two initializers. Need to make it consistent.
+    // todo-1: this method is different from the other two initializers. Need to make it consistent.
     initSymetricKey = async (forceUpdate: boolean = false) => {
         if (!this.avail) {
             return;
@@ -376,7 +376,7 @@ export class Crypto {
         }
 
         if (forceUpdate || !keyPair) {
-            // todo-0: need to vet these parameters, this just came from an example online.
+            // todo-1: need to vet these parameters, this just came from an example online.
             keyPair = await crypto.subtle.generateKey({
                 name: this.SIG_ALGO,
                 modulusLength: 2048,
@@ -739,7 +739,6 @@ export class Crypto {
             path = "/r/" + path.substring(5);
         }
 
-        // todo-0: see #tag[9-11-22 9:30am]
         let signData: string = path + "-" + node.ownerId;
         if (node.content) {
             signData += "-" + node.content;

@@ -190,17 +190,13 @@ export class User {
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
-
                 this.queryUserProfile(res.rootNode);
-
-                this.checkMessages();
-                setTimeout(() => {
-                    S.util.loadBookmarks();
-                }, 600);
 
                 // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
                 setTimeout(() => {
+                    this.checkMessages();
+                    S.util.loadBookmarks();
                     S.util.resumeEditingOfAbandoned();
                 }, 1700);
             }
@@ -293,7 +289,7 @@ export class User {
     }
 
     userLogin = async () => {
-        // todo-0: this was a hack because failing code was breaking the flow.
+        // todo-1: this was a hack because failing code was breaking the flow.
         // need better fix.
         await promiseDispatch("guiReadyUserLogin", (s) => {
             s.guiReady = true;

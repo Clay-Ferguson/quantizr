@@ -200,7 +200,7 @@ public class MongoRead extends ServiceBase {
     /*
      * Throws an exception if the parent of 'node' does not exist
      * 
-     * todo-0: performance can be gained by memoizing the results of this call into a ThreadLocal
+     * todo-1: performance can be gained by memoizing the results of this call into a ThreadLocal
      * HashMap but we need to be careful that it can never return incorrect value from cache. Perhaps by
      * also hooking into MongoListener to simply clear the threalocal cache any time any node is
      * SAVED???

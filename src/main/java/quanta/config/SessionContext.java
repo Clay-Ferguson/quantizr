@@ -297,7 +297,7 @@ public class SessionContext extends ServiceBase {
 		}
 		log.debug("Bearer accepted: " + bearer);
 
-		// todo-0: put this block in a method
+		// todo-1: put this block in a method
 		if (sc.prop.isRequireCrypto() && !PrincipalName.ANON.s().equals(sc.getUserName())) {
 			String sig = ThreadLocals.getReqSig();
 			if (no(sig)) {

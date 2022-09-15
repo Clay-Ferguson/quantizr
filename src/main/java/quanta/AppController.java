@@ -1320,10 +1320,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
 	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
-
-		// temporarily removing, debugging startup flow (todo-0)
-		// SessionContext.checkReqToken();
-
+		SessionContext.checkReqToken();
 		return callProc.run("checkMessages", req, session, ms -> {
 			return userFeed.checkMessages(ms, req);
 		});
@@ -1432,10 +1429,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
 	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
-
-		// temporarily removing, debugging startup flow (todo-0)
-		// SessionContext.checkReqToken();
-
+		SessionContext.checkReqToken();
 		return callProc.run("getBookmarks", req, session, ms -> {
 			GetBookmarksResponse res = new GetBookmarksResponse();
 			search.getBookmarks(ms, req, res);

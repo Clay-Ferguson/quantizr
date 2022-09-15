@@ -429,11 +429,11 @@ public class NodeEditService extends ServiceBase {
 		// // optional parameter to nodeSigVerify that can accept the ownerAcct node, and use it to
 		// // avoid a call to db to get it.
 		// //
-		// // todo-0: This is an ideal place to use a MongoDb batch operation.
+		// // todo-1: This is an ideal place to use a MongoDb batch operation.
 		// for (NodeSig sig : req.getSigs()) {
 		// SubNode node = read.getNode(ms, sig.getNodeId());
 		// if (ok(node)) {
-		// // todo-0: WRONG (For now) we need to let admin repair things if admin pushes up new public
+		// // todo-1: WRONG (For now) we need to let admin repair things if admin pushes up new public
 		// keys!!!
 		// // we should never get here but if we get a sig sent for an already signed node ignore it.
 		// // boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
@@ -442,7 +442,7 @@ public class NodeEditService extends ServiceBase {
 		// // continue;
 		// // }
 
-		// // todo-0: temporarily accepting everything from admin.
+		// // todo-1: temporarily accepting everything from admin.
 		// if (ms.isAdmin()) {
 		// log.debug("sig updated from admin: nodeId=" + node.getIdStr() + " sig=" + sig.getSig());
 		// node.set(NodeProp.CRYPTO_SIG, sig.getSig());
@@ -1032,7 +1032,7 @@ public class NodeEditService extends ServiceBase {
 		return res;
 	}
 
-	// todo-0: using baeldung method here. Move to utils class.
+	// todo-1: Move to utils class.
 	private static String bytesToHex(byte[] hash) {
 		StringBuilder hexString = new StringBuilder(2 * hash.length);
 		for (int i = 0; i < hash.length; i++) {

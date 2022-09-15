@@ -242,7 +242,6 @@ public class AppProp {
 		return env.getProperty("adminPassword");
 	}
 
-	// todo-0: use this everywhere 
 	public boolean isRequireCrypto() {
 		return APConst.TRUE.equals(env.getProperty("requireCrypto"));
 	}

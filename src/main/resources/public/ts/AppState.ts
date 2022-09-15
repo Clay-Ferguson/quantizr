@@ -22,7 +22,7 @@ export class AppState {
     config: any = {};
 
     // up until guiReady the main App component will just render "loading..."
-    // todo-0: this can fail to get set on startup if not everything goes well
+    // todo-1: this can fail to get set on startup if not everything goes well
     // and we need to be more resilient and not allow that EVER.
     guiReady: boolean = false;
 
@@ -114,7 +114,7 @@ export class AppState {
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
 
-    // UserAccount node ID (todo-0: rename these to 'accnt' not 'home')
+    // UserAccount node ID (todo-1: rename these to 'accnt' not 'home')
     homeNodeId: string;
     homeNodePath: string;
 
