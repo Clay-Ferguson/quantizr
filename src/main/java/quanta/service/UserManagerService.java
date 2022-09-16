@@ -535,17 +535,14 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			if (ok(userNode)) {
+				//force pubSigKey to regenerate as needed by setting to null
+				ThreadLocals.getSC().pubSigKey = null;
 				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
 				userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
+				res.setSuccess(true);
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}
-			// oops this is coming up when I don't want to see it, when the user logs in,
-			// so we need to be sure to somehow only show the message when the user has
-			// CLICKED
-			// the actual publish keys menu
-			// res.setMessage("Successfully saved public key.");
-			res.setSuccess(true);
 			return null;
 		});
 		return res;

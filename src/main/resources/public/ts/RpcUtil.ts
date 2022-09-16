@@ -56,6 +56,10 @@ export class RpcUtil {
                     S.quanta.setOverlay(true);
                 }
 
+                if (this.logRpc && !S.quanta.userSignature) {
+                    console.warn("Request will have no signature.");
+                }
+
                 // const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {

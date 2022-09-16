@@ -53,18 +53,26 @@ public class Convert extends ServiceBase {
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		boolean sigFail = false;
-		// if in a secure area
-		// todo-0: wip: this is ready to be uncommented once all thse nodes are indeed signed
-		// if (node.getPath().startsWith("/r/public/home")) {
-		// 	String sig = node.getStr(NodeProp.CRYPTO_SIG);
-		// 	if (!crypto.nodeSigVerify(node, sig)) {
-		// 		sigFail = true;
-		// 		if (!sc.isAdmin()) {
-		// 			// todo-1: we need a special global counter for when this happens, so the server info can show it.
-		// 			return null;
-		// 		}
-		// 	}
-		// }
+		String sig = node.getStr(NodeProp.CRYPTO_SIG);
+
+		if (no(sig) && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
+			// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
+			// // todo-1: we need a special global counter for when this happens, so the server info can show
+			// it.
+			// return null;
+			// }
+		}
+
+		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+			sigFail = true;
+
+			// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
+			// if (node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
+			// // todo-1: we need a special global counter for when this happens, so the server info can show
+			// it.
+			// return null;
+			// }
+		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
 		// node, but only if we ourselves are not admin.

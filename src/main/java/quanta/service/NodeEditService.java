@@ -998,7 +998,7 @@ public class NodeEditService extends ServiceBase {
 						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + n.getStr(NodeProp.BIN_DATA));
 					}
 					if (ok(n.getStr(NodeProp.BIN_DATA_URL))) {
-						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + n.getStr(NodeProp.BIN_DATA_URL));
+						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-binurl" + n.getStr(NodeProp.BIN_DATA_URL));
 					}
 					if (sb.length() > 4096) {
 						byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);

@@ -833,6 +833,12 @@ Will come back later and study this more. todo-1 */
     max-height: 650px;
 }
 
+.cryptoKeyTextContent {
+    max-height: 150px;
+    border: 1px solid $gray-700;
+    padding: 1rem;
+}
+
 .centeredTitle {
     width: 500px;
     /* This margin trick causes horizontal centering */

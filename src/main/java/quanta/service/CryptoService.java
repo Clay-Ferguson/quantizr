@@ -1,6 +1,7 @@
 package quanta.service;
 
 import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -32,7 +33,8 @@ public class CryptoService extends ServiceBase {
 	}
 
 	public boolean nodeSigVerify(SubNode node, String sig) {
-		if (no(sig) || no(node)) return false;
+		if (no(sig) || no(node))
+			return false;
 		PublicKey pubKey = null;
 
 		try {
@@ -68,14 +70,28 @@ public class CryptoService extends ServiceBase {
 				path = "/r/" + path.substring(5);
 			}
 
+			// see: #signature-format
 			String strToSign = path + "-" + node.getOwner().toHexString();
 			if (StringUtils.isNotEmpty(node.getContent())) {
 				strToSign += "-" + node.getContent();
 			}
 
+			String bin = node.getStr(NodeProp.BIN);
+			if (ok(bin)) {
+				strToSign += "-" + bin;
+			}
+			String binData = node.getStr(NodeProp.BIN_DATA);
+			if (ok(binData)) {
+				strToSign += "-" + binData;
+			}
+			String binDataUrl = node.getStr(NodeProp.BIN_DATA_URL);
+			if (ok(binDataUrl)) {
+				strToSign += "-" + binDataUrl;
+			}
+
 			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes());
 			if (!verified) {
-				log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
+				// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
 			}
 			return verified;
 		} catch (Exception e) {

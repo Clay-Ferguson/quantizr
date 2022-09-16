@@ -15,6 +15,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
+    // todo-1: isn't this scrollPos technique obsolte and we can do this in base Comp now?
     constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "",
         public calcRows: boolean = false, private scrollPos: ScrollPos = null) {
         // do not pass valState into base class, we want it to have state separately

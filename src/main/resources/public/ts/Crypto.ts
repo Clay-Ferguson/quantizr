@@ -46,6 +46,14 @@ export class Crypto {
 
     SIG_ALGO = "RSASSA-PKCS1-v1_5";
 
+    // todo-1: need to vet these parameters, this just came from an example online.
+    SIG_ALGO_OBJ: any = {
+        name: this.SIG_ALGO,
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: { name: "SHA-256" }
+    };
+
     // Symmetric Algo. We use GCM mode of AES because it detects data corruptions during decryption
     SYM_ALGO = "AES-GCM";
 
@@ -56,8 +64,11 @@ export class Crypto {
         hash: "SHA-256"
     };
 
-    OP_ENC_DEC: KeyUsage[] = ["encrypt", "decrypt"];
     OP_SIGN_VERIFY: KeyUsage[] = ["sign", "verify"];
+    OP_SIGN: KeyUsage[] = ["sign"];
+    OP_VERIFY: KeyUsage[] = ["verify"];
+
+    OP_ENC_DEC: KeyUsage[] = ["encrypt", "decrypt"];
     OP_ENC: KeyUsage[] = ["encrypt"];
     OP_DEC: KeyUsage[] = ["decrypt"];
 
@@ -225,29 +236,30 @@ export class Crypto {
         return crypto.subtle.importKey("jwk", key, algos, extractable, keyUsages);
     }
 
-    importKeyPair = async (keyPair: string): Promise<boolean> => {
-        if (!this.avail) return null;
+    importSigKeyPair = async (keyJson: string): Promise<boolean> => {
+        return this.importKeyPair(keyJson, this.STORE_SIGKEY, this.SIG_ALGO_OBJ,
+            this.OP_VERIFY as KeyUsage[], this.OP_SIGN as KeyUsage[]);
+    }
+
+    importKeyPair = async (keyPair: string, keyName: string, algoObj: any,
+        publicOps: KeyUsage[], privateOps: KeyUsage[]): Promise<boolean> => {
+        if (!this.avail) return false;
         const keyPairObj: EncryptionKeyPair = JSON.parse(keyPair);
 
-        const publicKey = await crypto.subtle.importKey("jwk", keyPairObj.publicKey, {
-            name: this.ASYM_ALGO,
-            hash: this.HASH_ALGO
-        }, true, this.OP_ENC as KeyUsage[]);
-
-        const privateKey = await crypto.subtle.importKey("jwk", keyPairObj.privateKey, {
-            name: this.ASYM_ALGO,
-            hash: this.HASH_ALGO
-        }, true, this.OP_DEC as KeyUsage[]);
+        const publicKey = await crypto.subtle.importKey("jwk", keyPairObj.publicKey, algoObj, true, publicOps);
+        const privateKey = await crypto.subtle.importKey("jwk", keyPairObj.privateKey, algoObj, true, privateOps);
 
         if (publicKey && privateKey) {
             const newKeyPair: EncryptionKeyPair = new EncryptionKeyPair(publicKey, privateKey);
-            await S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: newKeyPair });
+            await S.localDB.writeObject({ name: keyName, val: newKeyPair });
         }
         return true;
     }
 
     // todo-1: need to make this require the password and username to be more secure.
     //         And an unsolved design task is users signing data from different browsers.
+    // todo-0: we needs SEPARATE update+publis method, adn then will remove teh "Generate Keys" from the menu and instead
+    // make thee different update buttons for each text field on the Show Keys dialog.... and rename that dialog to Manage Keys.
     initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         if (!g_requireCrypto || user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
@@ -259,21 +271,39 @@ export class Crypto {
             return;
         }
 
-        S.quanta.asymEncKey = await this.initAsymetricKeys(forceUpdate);
-        await this.initSymetricKey(forceUpdate);
-        S.quanta.sigKey = await this.initSigKeys(forceUpdate);
-        S.quanta.userSignature = await S.crypto.sign(null, user);
+        // todo-0: for now we only support forceUpdate of signature key
+        const newAsymEncKey = await this.initAsymetricKeys(false); // forceUpdate==false
+        await this.initSymetricKey(false); // forceUpdate==false
 
-        if (republish && S.quanta.asymEncKey && S.quanta.sigKey) {
+        const newSigKey = await this.initSigKeys(forceUpdate);
+        const newUserSignature = await S.crypto.sign(null, user);
+
+        if (republish && newAsymEncKey && newSigKey && newUserSignature) {
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
-                asymEncKey: S.quanta.asymEncKey,
-                sigKey: S.quanta.sigKey
+                asymEncKey: newAsymEncKey,
+                sigKey: newSigKey
             });
 
-            if (showConfirm) {
-                S.util.showMessage(res.message, "Published Public Keys");
+            if (res.success) {
+                // note, even though we only update these if successful on the server the client side will still definitely
+                // have the new keys in the LocalDB already
+                S.quanta.asymEncKey = newAsymEncKey;
+                S.quanta.sigKey = newSigKey;
+                S.quanta.userSignature = newUserSignature;
+
+                if (showConfirm) {
+                    S.util.showMessage("Successfully published Public Keys");
+                }
             }
+            else {
+                S.util.showMessage("Failed saving keys to the server." + res.message, "Keys");
+            }
+        }
+        else {
+            S.quanta.asymEncKey = newAsymEncKey;
+            S.quanta.sigKey = newSigKey;
+            S.quanta.userSignature = newUserSignature;
         }
     }
 
@@ -376,13 +406,7 @@ export class Crypto {
         }
 
         if (forceUpdate || !keyPair) {
-            // todo-1: need to vet these parameters, this just came from an example online.
-            keyPair = await crypto.subtle.generateKey({
-                name: this.SIG_ALGO,
-                modulusLength: 2048,
-                publicExponent: new Uint8Array([1, 0, 1]),
-                hash: { name: "SHA-256" }
-            }, true, this.OP_SIGN_VERIFY);
+            keyPair = await crypto.subtle.generateKey(this.SIG_ALGO_OBJ, true, this.OP_SIGN_VERIFY);
 
             await S.localDB.writeObject({ name: this.STORE_SIGKEY, val: keyPair });
 
@@ -465,19 +489,53 @@ export class Crypto {
         return key;
     }
 
+    exportAsymKeys = async (): Promise<string> => {
+        if (!this.avail) return null;
+        let ret = "";
+        const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+        if (obj) {
+            const keyPair: EncryptionKeyPair = obj.val;
+
+            const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
+
+            const privDat = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+            // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
+
+            ret = S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat });
+
+            // yes we export to spki for PEM (not a bug)
+            // const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+            // const pem = this.spkiToPEM(privDatSpki);
+            // ret += "Public Key (PEM Format):\n" + pem + "\n\n";
+        }
+        return ret;
+    }
+
+    exportSymKeys = async (): Promise<string> => {
+        if (!this.avail) return null;
+        let ret = "";
+        const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+        if (obj) {
+            const key: CryptoKey = obj.val;
+            const dat = await crypto.subtle.exportKey("jwk", key);
+            ret = S.util.prettyPrint(dat);
+            // todo-1: no PEM export for Symmetric key?
+        }
+        return ret;
+    }
+
     /**
      * Returns a string the user can save locally containing all encryption keys stored  in the browser.
      *
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */
-    exportKeys = async (): Promise<string> => {
+    exportSigKeys = async (): Promise<string> => {
         if (!this.avail) return null;
         let ret = "";
 
-        let obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+        const obj: any = await S.localDB.readObject(this.STORE_SIGKEY);
         if (obj) {
-            ret += "Encryption Keypair\n";
-            ret += "====================\n"
             const keyPair: EncryptionKeyPair = obj.val;
 
             const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -486,42 +544,12 @@ export class Crypto {
             const privDat = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
             // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
 
-            ret += "Key Pair (JWK Format):\n" + S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
+            ret = S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat });
 
             // yes we export to spki for PEM (not a bug)
-            const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
-            const pem = this.spkiToPEM(privDatSpki);
-            ret += "Public Key (PEM Format):\n" + pem + "\n\n";
-        }
-
-        obj = await S.localDB.readObject(this.STORE_SIGKEY);
-        if (obj) {
-            ret += "Signature Keypair\n";
-            ret += "====================\n"
-            const keyPair: EncryptionKeyPair = obj.val;
-
-            const pubDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
-
-            const privDat = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-            // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
-
-            ret += "Key Pair (JWK Format):\n" + S.util.prettyPrint({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
-
-            // yes we export to spki for PEM (not a bug)
-            const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
-            const pem = this.spkiToPEM(privDatSpki);
-            ret += "Public Key (PEM Format):\n" + pem + "\n\n";
-        }
-
-        obj = await S.localDB.readObject(this.STORE_SYMKEY);
-        if (obj) {
-            ret += "Symmetric Key\n";
-            ret += "====================\n"
-            const key: CryptoKey = obj.val;
-            const dat = await crypto.subtle.exportKey("jwk", key);
-            const keyStr = S.util.prettyPrint(dat);
-            ret += "Symmetric Key (JWK Format):\n" + keyStr + "\n\n";
+            // const privDatSpki = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+            // const pem = this.spkiToPEM(privDatSpki);
+            // ret += "Public Key (PEM Format):\n" + pem + "\n\n";
         }
         return ret;
     }
@@ -739,9 +767,23 @@ export class Crypto {
             path = "/r/" + path.substring(5);
         }
 
+        // see: #signature-format
         let signData: string = path + "-" + node.ownerId;
         if (node.content) {
             signData += "-" + node.content;
+        }
+
+        const bin = S.props.getPropStr(J.NodeProp.BIN, node);
+        if (bin) {
+            signData += "-" + bin;
+        }
+        const binData = S.props.getPropStr(J.NodeProp.BIN_DATA, node);
+        if (binData) {
+            signData += "-" + binData;
+        }
+        const binDataUrl = S.props.getPropStr(J.NodeProp.BIN_DATA_URL, node);
+        if (binDataUrl) {
+            signData += "-" + binDataUrl;
         }
 
         // we need to concat the path+content

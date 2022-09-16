@@ -280,7 +280,7 @@ public class SessionContext extends ServiceBase {
 		return false;
 	}
 
-	public static void checkReqToken() {
+	public static void authReq(boolean checkSig) {
 		SessionContext sc = ThreadLocals.getSC();
 		if (no(sc)) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
@@ -295,38 +295,40 @@ public class SessionContext extends ServiceBase {
 		if (!validToken(bearer, sc.getUserName())) {
 			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
 		}
-		log.debug("Bearer accepted: " + bearer);
+		// log.debug("Bearer accepted: " + bearer);
+		if (checkSig && sc.prop.isRequireCrypto() && !PrincipalName.ANON.s().equals(sc.getUserName())) {
+			authSig();
+		}
+	}
 
-		// todo-1: put this block in a method
-		if (sc.prop.isRequireCrypto() && !PrincipalName.ANON.s().equals(sc.getUserName())) {
-			String sig = ThreadLocals.getReqSig();
-			if (no(sig)) {
-				throw new RuntimeException("Request failed. No signature.");
+	private static void authSig() {
+		SessionContext sc = ThreadLocals.getSC();
+		String sig = ThreadLocals.getReqSig();
+		if (no(sig)) {
+			throw new RuntimeException("Request failed. No signature.");
+		}
+
+		// if pubSigKey not yet saved in SessionContext then generate it
+		if (no(sc.pubSigKey)) {
+			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
+			if (no(userNode)) {
+				throw new RuntimeException("Unknown user: " + sc.getUserName());
+			}
+			String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+			if (no(pubKeyJson)) {
+				throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
 			}
 
-			// if pubSigKey not yet saved in SessionContext then generate it
+			sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
 			if (no(sc.pubSigKey)) {
-				SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
-				if (no(userNode)) {
-					throw new RuntimeException("Unknown user: " + sc.getUserName());
-				}
-				String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-				if (no(pubKeyJson)) {
-					throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
-				}
-
-				sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
-				if (no(sc.pubSigKey)) {
-					throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
-				}
-			}
-
-			boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes());
-			if (!verified) {
-				throw new RuntimeException("Request Sig Failed");
+				throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
 			}
 		}
 
+		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes());
+		if (!verified) {
+			throw new RuntimeException("Request Sig Failed");
+		}
 	}
 
 	public String getUserToken() {
