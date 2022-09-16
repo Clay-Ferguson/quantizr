@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
 import quanta.instrument.Instrument;
@@ -37,9 +38,18 @@ public class CallProcessor extends ServiceBase {
 	 * Wraps the processing of any command by using whatever info is on the session and/or the request
 	 * to perform the login if the user is not logged in, and then call the function to be processed
 	 */
-	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx<Object> runner) {
+	public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
+			MongoRunnableEx<Object> runner) {
 		if (AppServer.isShuttingDown()) {
 			throw ExUtil.wrapEx("Server not available.");
+		}
+
+		if (authBearer) {
+			SessionContext.authBearer();
+		}
+
+		if (authSig) {
+			SessionContext.authSig();
 		}
 
 		logRequest(command, req, httpSession);

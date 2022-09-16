@@ -182,8 +182,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setAc(null);
 		}
 
-		// todo-0: verify server ALWAYS ensures /r/p (pending path for pending node edits) exists at startup
-		// and then we can never check parent in here if so.
 		if (!node.getPath().startsWith("/r/p/") && ThreadLocals.getParentCheckEnabled() && (isNew || node.pathDirty)) {
 			read.checkParentExists(null, node);
 		}

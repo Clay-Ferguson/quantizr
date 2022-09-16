@@ -303,7 +303,8 @@ export class NodeUtil {
         let showMore = "";
         let numShares = 0;
         for (const ac of node.ac) {
-            // todo-0: wip: will come back to this.
+            // todo-0: wip: will come back to this. I think this just happens when there's a share to a user whose
+            // account no longer exists?
             // if (!ac.principalName) {
             //     console.log("missing principalName on acl: " + S.util.prettyPrint(node));
             // }

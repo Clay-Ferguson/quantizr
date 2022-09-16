@@ -999,7 +999,13 @@ public class MongoUtil extends ServiceBase {
 		if (created.getVal()) {
 			acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
+		/////////////////////////////////////////////////////////
+		created = new Val<>(Boolean.FALSE);
 
+		// create home node (admin owned node named 'home').
+		snUtil.ensureNodeExists(ms, NodePath.PENDING_PATH, null, null, "Pending Edits", null, true, null, created);
+
+		/////////////////////////////////////////////////////////
 		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').

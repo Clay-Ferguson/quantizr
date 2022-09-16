@@ -280,7 +280,7 @@ public class SessionContext extends ServiceBase {
 		return false;
 	}
 
-	public static void authReq(boolean checkSig) {
+	public static void authBearer() {
 		SessionContext sc = ThreadLocals.getSC();
 		if (no(sc)) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
@@ -295,14 +295,18 @@ public class SessionContext extends ServiceBase {
 		if (!validToken(bearer, sc.getUserName())) {
 			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
 		}
-		// log.debug("Bearer accepted: " + bearer);
-		if (checkSig && sc.prop.isRequireCrypto() && !PrincipalName.ANON.s().equals(sc.getUserName())) {
-			authSig();
-		}
 	}
 
-	private static void authSig() {
+	public static void authSig() {
 		SessionContext sc = ThreadLocals.getSC();
+		if (no(sc)) {
+			throw new RuntimeException("Unable to get SessionContext to check token.");
+		}
+
+		if (!sc.prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
+			return;
+		}
+
 		String sig = ThreadLocals.getReqSig();
 		if (no(sig)) {
 			throw new RuntimeException("Request failed. No signature.");
@@ -319,7 +323,6 @@ public class SessionContext extends ServiceBase {
 				throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
 			}
 
-			// wip: when user logs in and we accept their key do we reset this pubSigKey then? need to!
 			sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
 			if (no(sc.pubSigKey)) {
 				throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());

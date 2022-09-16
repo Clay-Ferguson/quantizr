@@ -204,14 +204,6 @@ public class UserManagerService extends ServiceBase {
 		}
 	}
 
-	/*****
-	 * todo-0: wip: WARNING:
-	 * ************************************************************************************** WHEN ADMIN
-	 * LOGS IN WITH A DIFFERENT BROWSER THIS WILL SET THEIR KEYS TO THAT BROWSER AND IF IT'S NOT THE
-	 * SAME BROWSER STUFF WAS SIGNED WITH THOSE SIGNATURES WILL NOW ALL LOOK INAUTHENTIC. NEED SPECIAL
-	 * WAY TO SET ADMIN KEYS!!!!!
-	 * **************************************************************************************
-	 */
 	public void processLogin(MongoSession ms, LoginResponse res, String userName, String asymEncKey, String sigKey) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
@@ -247,11 +239,22 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
-			log.debug("USER_PREF_PUBLIC_KEY changed during login");
+		// NOTE: For user to forcably change their public keys, they have to use
+		// the menu option for doing that, it won't happen here, just becasue their current
+		// browser may have different keys than their 'wanted' keys.
+		// only set key of we don't have the key yet (will not overwrite existing key, becasue the user
+		// might just be on a browser they don't normally use or plan to keep useing.)
+		if (no(userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY))) {
+			if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
+				log.debug("USER_PREF_PUBLIC_KEY changed during login");
+			}
 		}
-		if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
-			log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
+
+		// ditto, note just above
+		if (no(userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY))) {
+			if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
+				log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
+			}
 		}
 
 		ensureValidCryptoKeys(userNode);

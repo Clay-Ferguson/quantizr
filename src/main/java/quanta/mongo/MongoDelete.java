@@ -364,7 +364,7 @@ public class MongoDelete extends ServiceBase {
 				}
 
 				if (!allNodes.containsKey(parent)) {
-					// todo-0: once we hit an orphan we know ALL other nodes that start with the it's PATH+"/" (remember
+					// todo-1: once we hit an orphan we know ALL other nodes that start with the it's PATH+"/" (remember
 					// the slash)
 					// are also orphans but to leverage that we'd have to make each of our orphan delete commands be a
 					// subgraph delete of all below that. This may be a good memory-saving optimization for a different

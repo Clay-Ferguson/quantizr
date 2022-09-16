@@ -354,7 +354,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	public String demo(@PathVariable(value = "file", required = false) String file, //
 			Model model) {
 		initThymeleafAttribs();
-
 		model.addAllAttributes(thymeleafAttribs);
 		return "demo/" + file;
 	}
@@ -389,7 +388,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response, //
 			HttpSession session) {
-		callProc.run("rss", null, session, ms -> {
+		callProc.run("rss", false, false, null, session, ms -> {
 			arun.run(as -> {
 				try {
 					rssFeed.getRssFeed(as, nodeId, response.getWriter());
@@ -412,8 +411,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, //
 			HttpSession session, HttpServletResponse response//
 	) {
-		SessionContext.authReq(true);
-		callProc.run("proxyGet", null, session, ms -> {
+		callProc.run("proxyGet", true, true, null, session, ms -> {
 			try {
 				// try to get proxy info from cache.
 				byte[] cacheBytes = null;
@@ -457,7 +455,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
 	public @ResponseBody Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getMultiRssFeed", req, session, ms -> {
+		return callProc.run("getMultiRssFeed", false, false, req, session, ms -> {
 			return arun.run(as -> {
 				// log.debug("getMultiRssFeed: " + XString.prettyPrint(req));
 				return rssFeed.getMultiRssFeed(req);
@@ -468,7 +466,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("signup", req, session, ms -> {
+		return callProc.run("signup", false, false, req, session, ms -> {
 			// This automated flag will bypass the captcha check, and email confirmation, and just immediately
 			// create the user.
 			boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
@@ -479,15 +477,14 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("login", req, session, ms -> {
+		return callProc.run("login", false, false, req, session, ms -> {
 			return user.login(httpReq, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
 	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("closeAccount", req, session, ms -> {
+		return callProc.run("closeAccount", true, true, req, session, ms -> {
 			CloseAccountResponse res = user.closeAccount(req);
 			session.invalidate();
 			return res;
@@ -497,8 +494,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
 	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
 			HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("logout", req, session, ms -> {
+
+		return callProc.run("logout", true, true, req, session, ms -> {
 			ThreadLocals.getSC().forceAnonymous();
 
 			// WARNING: ms will be null here always. Don't use.
@@ -519,8 +516,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/renderCalendar", method = RequestMethod.POST)
 	public @ResponseBody Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("renderCalendar", req, session, ms -> {
+
+		return callProc.run("renderCalendar", true, true, req, session, ms -> {
 			return render.renderCalendar(ms, req);
 		});
 	}
@@ -529,7 +526,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object likeNode(@RequestBody LikeNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("likeNode", req, session, ms -> {
+		return callProc.run("likeNode", false, false, req, session, ms -> {
 			return edit.likeNode(ms, req);
 		});
 	}
@@ -537,8 +534,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
 	public @ResponseBody Object loadActPubObject(@RequestBody GetActPubObjectRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("loadActPubObject", req, session, ms -> {
+
+		return callProc.run("loadActPubObject", true, true, req, session, ms -> {
 			SubNode node = apUtil.loadObject(ms, null, req.getUrl());
 			GetActPubObjectResponse res = new GetActPubObjectResponse();
 			res.setNodeId(ok(node) ? node.getIdStr() : null);
@@ -549,8 +546,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-		// SessionContext.checkReqToken();
-		return callProc.run("getNodeThreadView", req, session, ms -> {
+		
+		return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
 			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
 			return res;
 		});
@@ -560,7 +557,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object renderNode(@RequestBody RenderNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("renderNode", req, session, ms -> {
+		return callProc.run("renderNode", false, false, req, session, ms -> {
 			return render.renderNode(ms, req);
 		});
 	}
@@ -570,7 +567,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getIPFSFiles", req, session, ms -> {
+		return callProc.run("getIPFSFiles", false, false, req, session, ms -> {
 			Val<String> folder = new Val<>();
 			Val<String> cid = new Val<>();
 			List<MFSDirEntry> files = null;
@@ -596,7 +593,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		checkIpfs();
-		return callProc.run("deleteMFSFile", req, session, ms -> {
+		return callProc.run("deleteMFSFile", false, false, req, session, ms -> {
 			ipfsFiles.deleteMFSFile(ms, req);
 			GetIPFSFilesResponse res = new GetIPFSFilesResponse();
 			return res;
@@ -608,7 +605,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 		checkIpfs();
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getIPFSContent", req, session, ms -> {
+		return callProc.run("getIPFSContent", false, false, req, session, ms -> {
 			String content = ipfsFiles.getIPFSContent(ms, req);
 			GetIPFSContentResponse res = new GetIPFSContentResponse();
 			res.setContent(content);
@@ -618,8 +615,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
 	public @ResponseBody Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("initNodeEdit", req, session, ms -> {
+
+		return callProc.run("initNodeEdit", true, true, req, session, ms -> {
 			return render.initNodeEdit(ms, req);
 		});
 	}
@@ -631,8 +628,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
 	public @ResponseBody Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("appDrop", req, session, ms -> {
+
+		return callProc.run("appDrop", true, true, req, session, ms -> {
 			return edit.appDrop(ms, req);
 		});
 	}
@@ -646,64 +643,64 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("getNodePrivileges", req, session, ms -> {
+
+		return callProc.run("getNodePrivileges", true, true, req, session, ms -> {
 			return acl.getNodePrivileges(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("getFriends", req, session, ms -> {
+
+		return callProc.run("getFriends", true, true, req, session, ms -> {
 			return user.getFriends(ms);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("addPrivilege", req, session, ms -> {
+
+		return callProc.run("addPrivilege", true, true, req, session, ms -> {
 			return acl.addPrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setUnpublished", method = RequestMethod.POST)
 	public @ResponseBody Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("setUnpublished", req, session, ms -> {
+
+		return callProc.run("setUnpublished", true, true, req, session, ms -> {
 			return acl.setUnpublished(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/copySharing", method = RequestMethod.POST)
 	public @ResponseBody Object copySharing(@RequestBody CopySharingRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("copySharing", req, session, ms -> {
+
+		return callProc.run("copySharing", true, true, req, session, ms -> {
 			return acl.copySharing(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("removePrivilege", req, session, ms -> {
+
+		return callProc.run("removePrivilege", true, true, req, session, ms -> {
 			return acl.removePrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/savePublicKeys", method = RequestMethod.POST)
 	public @ResponseBody Object savePublicKeys(@RequestBody SavePublicKeyRequest req, HttpSession session) {
-		SessionContext.authReq(false);
-		return callProc.run("savePublicKeys", req, session, ms -> {
+
+		return callProc.run("savePublicKeys", true, false, req, session, ms -> {
 			return user.savePublicKeys(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
 	public @ResponseBody Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("setCipherKey", req, session, ms -> {
+
+		return callProc.run("setCipherKey", true, true, req, session, ms -> {
 			return acl.setCipherKey(ms, req);
 		});
 	}
@@ -713,8 +710,8 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (req.isToIpfs()) {
 			checkIpfs();
 		}
-		SessionContext.authReq(true);
-		return callProc.run("export", req, session, ms -> {
+
+		return callProc.run("export", true, true, req, session, ms -> {
 			ExportResponse res = new ExportResponse();
 
 			/*
@@ -783,8 +780,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
 	public @ResponseBody Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("signNodes", req, session, ms -> {
+
+		return callProc.run("signNodes", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 			return edit.signNodes(ms, req);
 		});
@@ -792,8 +789,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("export", req, session, ms -> {
+
+		return callProc.run("export", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 			return edit.transferNode(ms, req);
 		});
@@ -801,8 +798,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
 	public @ResponseBody Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("searchAndReplace", req, session, ms -> {
+
+		return callProc.run("searchAndReplace", true, true, req, session, ms -> {
 			return edit.searchAndReplace(ms, req);
 		});
 	}
@@ -810,8 +807,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
 		checkIpfs();
-		SessionContext.authReq(true);
-		return callProc.run("publishNodeToIpfs", req, session, ms -> {
+
+		return callProc.run("publishNodeToIpfs", true, true, req, session, ms -> {
 			return ipfs.publishNodeToIpfs(ms, req);
 		});
 	}
@@ -819,8 +816,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
 		checkIpfs();
-		SessionContext.authReq(true);
-		return callProc.run("loadNodeFromIpfs", req, session, ms -> {
+
+		return callProc.run("loadNodeFromIpfs", true, true, req, session, ms -> {
 			return ipfs.loadNodeFromIpfs(ms, req);
 		});
 	}
@@ -829,16 +826,16 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object streamImport(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("upload", null, session, ms -> {
+
+		return callProc.run("upload", true, true, null, session, ms -> {
 			return importService.streamImport(ms, nodeId, uploadFiles);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
 	public @ResponseBody Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("setNodePosition", req, session, ms -> {
+
+		return callProc.run("setNodePosition", true, true, req, session, ms -> {
 			return move.setNodePosition(ms, req);
 		});
 	}
@@ -846,8 +843,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	/* Creates a new node as a child of the specified node */
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
 	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("createSubNode", req, session, ms -> {
+
+		return callProc.run("createSubNode", true, true, req, session, ms -> {
 			return edit.createSubNode(ms, req);
 		});
 	}
@@ -857,16 +854,16 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
 	public @ResponseBody Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("insertNode", req, session, ms -> {
+
+		return callProc.run("insertNode", true, true, req, session, ms -> {
 			return edit.insertNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
 	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("insertBook", req, session, ms -> {
+
+		return callProc.run("insertBook", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 			return importBookService.insertBook(ms, req);
 		});
@@ -874,8 +871,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
 	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("deleteNodes", req, session, ms -> {
+
+		return callProc.run("deleteNodes", true, true, req, session, ms -> {
 			if (req.isBulkDelete()) {
 				return delete.bulkDeleteNodes(ms);
 			} else {
@@ -886,48 +883,48 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
 	public @ResponseBody Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("joinNodes", req, session, ms -> {
+
+		return callProc.run("joinNodes", true, true, req, session, ms -> {
 			return move.joinNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
 	public @ResponseBody Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("selectAllNodes", req, session, ms -> {
+
+		return callProc.run("selectAllNodes", true, true, req, session, ms -> {
 			return move.selectAllNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
 	public @ResponseBody Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("updateHeadings", req, session, ms -> {
+
+		return callProc.run("updateHeadings", true, true, req, session, ms -> {
 			return edit.updateHeadings(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
 	public @ResponseBody Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("moveNodes", req, session, ms -> {
+
+		return callProc.run("moveNodes", true, true, req, session, ms -> {
 			return move.moveNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteProperties", method = RequestMethod.POST)
 	public @ResponseBody Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("deleteProperties", req, session, ms -> {
+
+		return callProc.run("deleteProperties", true, true, req, session, ms -> {
 			return edit.deleteProperties(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
 	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("saveNode", req, session, ms -> {
+
+		return callProc.run("saveNode", true, true, req, session, ms -> {
 			return edit.saveNode(ms, req);
 		});
 	}
@@ -946,7 +943,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("changePassword", req, session, ms -> {
+		return callProc.run("changePassword", false, false, req, session, ms -> {
 			return user.changePassword(ms, req);
 		});
 	}
@@ -954,7 +951,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
 	public @ResponseBody Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("resetPassword", req, session, ms -> {
+		return callProc.run("resetPassword", false, false, req, session, ms -> {
 			return user.resetPassword(req);
 		});
 	}
@@ -1010,7 +1007,8 @@ public class AppController extends ServiceBase implements ErrorController {
 					// This is for
 					// good fediverse interoperability but still with a level of privacy for completely unshared nodes.
 					if (no(node.getAc()) || node.getAc().size() == 0) {
-						SessionContext.authReq(true);
+						SessionContext.authBearer();
+						SessionContext.authSig();
 					}
 
 					String _gid = gid;
@@ -1099,9 +1097,9 @@ public class AppController extends ServiceBase implements ErrorController {
 					return null;
 				});
 			}
-			/* Else if not an avatar request then do a securer acccess */
+			/* Else if not an avatar request then do a secure acccess */
 			else {
-				callProc.run("bin", null, session, ms -> {
+				callProc.run("bin", false, false, null, session, ms -> {
 					if (ok(ipfsCid)) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
@@ -1137,8 +1135,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (!SessionContext.validToken(token)) {
 			throw new RuntimeException("Invalid token.");
 		}
-
-		callProc.run("file", null, session, ms -> {
+		callProc.run("file", false, false, null, session, ms -> {
 			attach.getFile(ms, fileName, disposition, response);
 			return null;
 		});
@@ -1170,7 +1167,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@PathVariable("nodeId") String nodeId, //
 			@RequestParam(name = "disp", required = false) String disposition, //
 			HttpSession session) {
-		return callProc.run("filesys", null, session, ms -> {
+		return callProc.run("filesys", false, false, null, session, ms -> {
 			// return attachmentService.getFileSystemResourceStream(ms, nodeId,
 			// disposition);
 			return null;
@@ -1197,7 +1194,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletResponse response, //
 			HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return (ResponseEntity<ResourceRegion>) callProc.run("stream", null, session, ms -> {
+		return (ResponseEntity<ResourceRegion>) callProc.run("stream", false, false, null, session, ms -> {
 			return attach.getStreamResource(ms, headers, nodeId);
 		});
 	}
@@ -1232,10 +1229,10 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
-		SessionContext.authReq(true);
+
 		final String _binSuffix = no(binSuffix) ? "" : binSuffix;
 
-		return callProc.run("upload", null, session, ms -> {
+		return callProc.run("upload", true, true, null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
 			return attach.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
@@ -1244,24 +1241,24 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
 	public @ResponseBody Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("deleteAttachment", req, session, ms -> {
+
+		return callProc.run("deleteAttachment", true, true, req, session, ms -> {
 			return attach.deleteAttachment(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("uploadFromUrl", req, session, ms -> {
+
+		return callProc.run("uploadFromUrl", true, true, req, session, ms -> {
 			return attach.readFromUrl(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("uploadFromIPFS", req, session, ms -> {
+
+		return callProc.run("uploadFromIPFS", true, true, req, session, ms -> {
 			return attach.attachFromIPFS(ms, req);
 		});
 	}
@@ -1269,7 +1266,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
 	public @ResponseBody Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("anonPageLoad", req, session, ms -> {
+		return callProc.run("anonPageLoad", false, false, req, session, ms -> {
 			return render.anonPageLoad(null, req);
 		});
 	}
@@ -1277,7 +1274,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
-		return callProc.run("nodeSearch", req, session, ms -> {
+		return callProc.run("nodeSearch", false, false, req, session, ms -> {
 			return search.search(ms, req);
 		});
 	}
@@ -1285,7 +1282,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
 	public @ResponseBody Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
-		return callProc.run("renderDocument", req, session, ms -> {
+		return callProc.run("renderDocument", false, false, req, session, ms -> {
 			return search.renderDocument(ms, req);
 		});
 	}
@@ -1293,7 +1290,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getFollowers", req, session, ms -> {
+		return callProc.run("getFollowers", false, false, req, session, ms -> {
 			return apFollower.getFollowers(ms, req);
 		});
 	}
@@ -1306,7 +1303,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getFollowing", req, session, ms -> {
+		return callProc.run("getFollowing", false, false, req, session, ms -> {
 			return apFollowing.getFollowing(ms, req);
 		});
 	}
@@ -1314,30 +1311,30 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("nodeFeed", req, session, ms -> {
+		return callProc.run("nodeFeed", false, false, req, session, ms -> {
 			return userFeed.generateFeed(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
 	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("checkMessages", req, session, ms -> {
+
+		return callProc.run("checkMessages", true, true, req, session, ms -> {
 			return userFeed.checkMessages(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
 	public @ResponseBody Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
-		return callProc.run("getSharedNodes", req, session, ms -> {
+		return callProc.run("getSharedNodes", false, false, req, session, ms -> {
 			return search.getSharedNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("saveUserPreferences", req, session, ms -> {
+
+		return callProc.run("saveUserPreferences", true, true, req, session, ms -> {
 			return user.saveUserPreferences(req);
 		});
 	}
@@ -1345,47 +1342,47 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getUserProfile", req, session, ms -> {
+		return callProc.run("getUserProfile", false, false, req, session, ms -> {
 			return user.getUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("saveUserProfile", req, session, ms -> {
+
+		return callProc.run("saveUserProfile", true, true, req, session, ms -> {
 			return user.saveUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("addFriend", req, session, ms -> {
+
+		return callProc.run("addFriend", true, true, req, session, ms -> {
 			return user.addFriend(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("deleteFriend", req, session, ms -> {
+
+		return callProc.run("deleteFriend", true, true, req, session, ms -> {
 			return user.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
 	public @ResponseBody Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("blockUser", req, session, ms -> {
+		// SessionContext.authReq(true);
+		return callProc.run("blockUser", true, true, req, session, ms -> {
 			return user.blockUser(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
 	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("unblockUser", req, session, ms -> {
+
+		return callProc.run("unblockUser", true, true, req, session, ms -> {
 			return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
 		});
 	}
@@ -1393,7 +1390,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getUserAcccountInfo", req, session, ms -> {
+		return callProc.run("getUserAcccountInfo", false, false, req, session, ms -> {
 			return user.getUserAccountInfo(req);
 		});
 	}
@@ -1430,8 +1427,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
 	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("getBookmarks", req, session, ms -> {
+
+		return callProc.run("getBookmarks", true, true, req, session, ms -> {
 			GetBookmarksResponse res = new GetBookmarksResponse();
 			search.getBookmarks(ms, req, res);
 			return res;
@@ -1441,7 +1438,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("getNodeStats", req, session, ms -> {
+		return callProc.run("getNodeStats", false, false, req, session, ms -> {
 			GetNodeStatsResponse res = new GetNodeStatsResponse();
 			search.getNodeStats(ms, req, res);
 			return res;
@@ -1450,8 +1447,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("getServerInfo", req, session, ms -> {
+
+		return callProc.run("getServerInfo", true, true, req, session, ms -> {
 
 			GetServerInfoResponse res = new GetServerInfoResponse();
 			res.setMessages(new LinkedList<>());
@@ -1558,7 +1555,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
-		return callProc.run("graphNodes", req, session, ms -> {
+		return callProc.run("graphNodes", false, false, req, session, ms -> {
 			GraphResponse res = graphNodes.graphNodes(ms, req);
 			res.setSuccess(true);
 			return res;
@@ -1567,8 +1564,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
 	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("luceneIndex", req, session, ms -> {
+
+		return callProc.run("luceneIndex", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 
 			/*
@@ -1582,8 +1579,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
 	public @ResponseBody Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("luceneSearch", req, session, ms -> {
+
+		return callProc.run("luceneSearch", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 			return lucene.search(ms, req.getNodeId(), req.getText());
 		});
@@ -1595,7 +1592,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 */
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
 	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
-		return callProc.run("ping", req, session, ms -> {
+		return callProc.run("ping", false, false, req, session, ms -> {
 			// log.debug("ping from browser");
 			PingResponse res = new PingResponse();
 			res.setServerInfo("Server: t=" + System.currentTimeMillis());
@@ -1606,8 +1603,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/sendTestEmail", method = RequestMethod.POST)
 	public @ResponseBody Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("sendTestEmail", req, session, ms -> {
+
+		return callProc.run("sendTestEmail", true, true, req, session, ms -> {
 			SendTestEmailResponse res = new SendTestEmailResponse();
 			ThreadLocals.requireAdmin();
 			log.debug("SendEmailTest detected on server.");
@@ -1631,8 +1628,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/sendLogText", method = RequestMethod.POST)
 	public @ResponseBody Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("sendLogText", req, session, ms -> {
+
+		return callProc.run("sendLogText", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
 			SendLogTextResponse res = new SendLogTextResponse();
 			log.debug("DEBUG: " + req.getText());
@@ -1648,8 +1645,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
 	public @ResponseBody Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
-		SessionContext.authReq(true);
-		return callProc.run("splitNode", req, session, ms -> {
+
+		return callProc.run("splitNode", true, true, req, session, ms -> {
 			return edit.splitNode(ms, req);
 		});
 	}
@@ -1670,7 +1667,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
+		return (SseEmitter) callProc.run("serverPush", false, false, null, session, ms -> {
 			synchronized (ThreadLocals.getSC().getPushEmitter()) {
 				return ThreadLocals.getSC().getPushEmitter();
 			}
@@ -1680,7 +1677,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] captcha(HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return (byte[]) callProc.run("captcha", null, session, ms -> {
+		return (byte[]) callProc.run("captcha", false, false, null, session, ms -> {
 			String captcha = CaptchaMaker.createCaptchaString();
 			ThreadLocals.getSC().setCaptcha(captcha);
 			return CaptchaMaker.makeCaptcha(captcha);
@@ -1698,7 +1695,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody String shutdown(HttpSession session,
 			@RequestParam(value = "password", required = true) String password) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return (String) callProc.run("shutdown", null, session, ms -> {
+		return (String) callProc.run("shutdown", false, false, null, session, ms -> {
 			if (prop.getAdminPassword().equals(password)) {
 				gracefulShutdown.initiateShutdown(0);
 			}
