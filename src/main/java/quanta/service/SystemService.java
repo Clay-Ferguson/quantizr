@@ -53,7 +53,8 @@ public class SystemService extends ServiceBase {
 
 	/*
 	 * This was created to make it easier to test the orphan handling functions, so we can intentionally
-	 * create orphans
+	 * create orphans by deleting a node and expecting all it's orphans to stay there and we can test
+	 * if our orphan deleter can delete them.
 	 */
 	public String deleteLeavingOrphans(MongoSession ms, String nodeId) {
 		SubNode node = read.getNode(ms, nodeId);

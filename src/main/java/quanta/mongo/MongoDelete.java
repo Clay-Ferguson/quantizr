@@ -28,6 +28,8 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
+import quanta.util.IntVal;
+import quanta.util.LongVal;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -313,28 +315,26 @@ public class MongoDelete extends ServiceBase {
 		}
 	}
 
-	// todo-0: work in progress (not yet passing tests)
 	public void deleteNodeOrphans() {
 		log.debug("deleteNodeOrphans()");
 
-		Val<Integer> nodesProcessed = new Val<>(0);
 		Val<BulkOperations> bops = new Val<>(null);
-		Val<Long> opsPending = new Val<>(0L);
-		Val<Long> totalDeleted = new Val<>(0L);
+		IntVal nodesProcessed = new IntVal();
+		LongVal opsPending = new LongVal();
+		LongVal totalDeleted = new LongVal();
 
 		// map every path to it's ObjectId
 		HashMap<String, ObjectId> allNodes = new HashMap<>();
 
+		// first all we do is build up the 'allNodes' hashMap.
 		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
 			// print progress every 1000th node
-			nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+			nodesProcessed.inc();
 			if (nodesProcessed.getVal() % 1000 == 0) {
 				log.debug("SCAN: " + nodesProcessed.getVal());
 			}
 
-			// this replacement is just to save memory, by shortening strings in a harmless way relative to this
-			// algorithm.
-			allNodes.put(node.getPath().replace("/r/public/home/", "/r/*/"), node.getId());
+			allNodes.put(node.getPath(), node.getId());
 		});
 
 		nodesProcessed.setVal(0);
@@ -342,48 +342,47 @@ public class MongoDelete extends ServiceBase {
 		int passes = 0;
 		while (passes++ < 20) {
 			log.debug("Running Orphan Pass: " + passes);
-			Val<Long> deletesInPass = new Val<>(0L);
+			LongVal deletesInPass = new LongVal();
 			HashMap<String, ObjectId> orphans = new HashMap<>();
-			
+
+			// scan every node we still have and any whose parent is not also in the map is a known orphan
 			allNodes.entrySet().stream().forEach(entry -> {
-				nodesProcessed.setVal(nodesProcessed.getVal() + 1);
+				nodesProcessed.inc();
 				if (nodesProcessed.getVal() % 1000 == 0) {
 					log.debug("FINDER SCAN: " + nodesProcessed.getVal());
 				}
 
 				// log.debug("STRM: " + entry.getKey());
 				if (entry.getKey().equals("/r")) {
-					log.debug("ROOT NODE: " + entry.getValue().toHexString());
+					// log.debug("ROOT NODE: " + entry.getValue().toHexString());
 					return;
 				}
 
 				String parent = XString.truncAfterLast(entry.getKey(), "/");
 				if (parent.equalsIgnoreCase("/r")) {
-					log.debug("ROOT CHILD: " + entry.getValue().toHexString());
+					// log.debug("ROOT CHILD: " + entry.getValue().toHexString());
 					return;
 				}
 
 				if (!allNodes.containsKey(parent)) {
-					// todo-1: once we hit an orphan we know ALL other nodes that start with the it's PATH+"/" (remember
-					// the slash)
-					// are also orphans but to leverage that we'd have to make each of our orphan delete commands be a
-					// subgraph delete of all below that. This may be a good memory-saving optimization for a different
-					// algo where
-					// we look for some orphans order them by shortest path first, and then do all the subgraph deletes
-					// on them.
-					// but I'm not sure any other algo can beat the one we're currently using where we delete by ID
-					// (fastest lookup
-					// that can possibly exist), and just delete every one without any regex subqueries. Plus this
-					// current algo
-					// is about the simplest there can be.
-					log.debug("Orphan: " + entry.getValue().toHexString());
+					log.debug("ORPH: " + entry.getValue().toHexString());
 
 					// put the stuff to delete in a separate map to avoid a concurrent modification exception
 					orphans.put(entry.getKey(), entry.getValue());
 				}
 			});
 
+			// found no orphans at all then we're done.
+			if (orphans.size() == 0) {
+				log.debug("No more orphans found. Done!");
+
+				// breaks out of while loop of 'passes'
+				break;
+			}
+
+			// delete all orphans identified in this pass
 			orphans.entrySet().stream().forEach(entry -> {
+				// lazy create bops
 				if (no(bops.getVal())) {
 					bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 				}
@@ -391,34 +390,35 @@ public class MongoDelete extends ServiceBase {
 				allNodes.remove(entry.getKey());
 				bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(entry.getValue())));
 
-				opsPending.setVal(opsPending.getVal() + 1);
-				deletesInPass.setVal(deletesInPass.getVal() + 1);
+				opsPending.inc();
+				deletesInPass.inc();
 
 				if (opsPending.getVal() > 100) {
 					BulkWriteResult results = bops.getVal().execute();
-					totalDeleted.setVal(totalDeleted.getVal() + results.getDeletedCount());
+					totalDeleted.add(results.getDeletedCount());
 					log.debug("DEL TOTAL: " + totalDeleted.getVal());
 					bops.setVal(null);
 					opsPending.setVal(0L);
 				}
 			});
 
-			// found no orphans at all then we're done.
-			if (deletesInPass.getVal() == 0) {
-				log.debug("No deletes in pass. Finishing.");
-				break;
+			// since we delete in blocks of 100 at a time, we might have some left pending here so 
+			// finish deleting those
+			if (opsPending.getVal() > 0) {
+				if (no(bops.getVal())) {
+					bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+				}
+				BulkWriteResult results = bops.getVal().execute();
+				totalDeleted.add(results.getDeletedCount());
+				log.debug("remainders. DEL TOTAL: " + totalDeleted.getVal());
+				bops.setVal(null);
+				opsPending.setVal(0L);
 			}
 
 			log.debug("Deletes in Pass: " + deletesInPass.getVal());
 		}
 
-		if (opsPending.getVal() > 0) {
-			BulkWriteResult results = bops.getVal().execute();
-			totalDeleted.setVal(totalDeleted.getVal() + results.getDeletedCount());
-		}
-
 		log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
-
 	}
 
 	/*

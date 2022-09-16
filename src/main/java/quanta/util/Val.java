@@ -8,7 +8,7 @@ package quanta.util;
  * return value from a method call is needed.
  */
 public class Val<T> {
-	private T val;
+	protected T val;
 
 	public Val() {}
 
