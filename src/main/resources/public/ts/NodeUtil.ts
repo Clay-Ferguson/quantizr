@@ -303,9 +303,10 @@ export class NodeUtil {
         let showMore = "";
         let numShares = 0;
         for (const ac of node.ac) {
-            if (!ac.principalName) {
-                console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
-            }
+            // todo-0: wip: will come back to this.
+            // if (!ac.principalName) {
+            //     console.log("missing principalName on acl: " + S.util.prettyPrint(node));
+            // }
 
             // Skip public here we processed that above.
             if (ac.principalName && ac.principalName !== "public") {

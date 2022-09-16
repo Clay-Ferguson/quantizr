@@ -47,10 +47,10 @@ export class Quanta {
     so that we can log back in again silently after any session timeout */
     userName: string = J.PrincipalName.ANON;
     authToken: string;
-    userSignature: string;
     loggingOut: boolean;
-
     asymEncKey: string;
+
+    userSignature: string;
     sigKey: string;
 
     // WARNING: Call S.util.ctrlKeyCheck() to check for ctrlKey and NOT just the state of this.
@@ -90,7 +90,7 @@ export class Quanta {
 
     initApp = async () => {
         try {
-            if (g_requireCrypto && (!crypto || !crypto.subtle)) {
+            if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
                 alert("This server requires browser crypto features");
                 return;
             }

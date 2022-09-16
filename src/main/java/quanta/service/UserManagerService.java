@@ -205,12 +205,11 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	/*****
-	 * todo-0: wip:
-	 * WARNING:
-	 * **************************************************************************************
-	 * WHEN ADMIN LOGS IN WITH A DIFFERENT BROWSER THIS WILL SET THEIR KEYS TO THAT BROWSER
-	 * AND IF IT'S NOT THE SAME BROWSER STUFF WAS SIGNED WITH THOSE SIGNATURES WILL NOW ALL 
-	 * LOOK INAUTHENTIC. NEED SPECIAL WAY TO SET ADMIN KEYS!!!!! 
+	 * todo-0: wip: WARNING:
+	 * ************************************************************************************** WHEN ADMIN
+	 * LOGS IN WITH A DIFFERENT BROWSER THIS WILL SET THEIR KEYS TO THAT BROWSER AND IF IT'S NOT THE
+	 * SAME BROWSER STUFF WAS SIGNED WITH THOSE SIGNATURES WILL NOW ALL LOOK INAUTHENTIC. NEED SPECIAL
+	 * WAY TO SET ADMIN KEYS!!!!!
 	 * **************************************************************************************
 	 */
 	public void processLogin(MongoSession ms, LoginResponse res, String userName, String asymEncKey, String sigKey) {
@@ -248,8 +247,12 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
-		userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
+		if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
+			log.debug("USER_PREF_PUBLIC_KEY changed during login");
+		}
+		if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
+			log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
+		}
 
 		ensureValidCryptoKeys(userNode);
 		// log.debug("SAVING USER NODE: "+XString.prettyPrint(userNode));
@@ -535,7 +538,7 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			if (ok(userNode)) {
-				//force pubSigKey to regenerate as needed by setting to null
+				// force pubSigKey to regenerate as needed by setting to null
 				ThreadLocals.getSC().pubSigKey = null;
 				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
 				userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());

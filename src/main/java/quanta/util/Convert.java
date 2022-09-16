@@ -53,25 +53,26 @@ public class Convert extends ServiceBase {
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		boolean sigFail = false;
-		String sig = node.getStr(NodeProp.CRYPTO_SIG);
+		if (node.getPath().startsWith("/r/public/home")) {
+			String sig = node.getStr(NodeProp.CRYPTO_SIG);
+			if (no(sig) && !sc.isAdmin()) {
+				// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
+				// // todo-1: we need a special global counter for when this happens, so the server info can show
+				// it.
+				// return null;
+				// }
+			}
 
-		if (no(sig) && node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-			// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
-			// // todo-1: we need a special global counter for when this happens, so the server info can show
-			// it.
-			// return null;
-			// }
-		}
+			if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+				sigFail = true;
 
-		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
-			sigFail = true;
-
-			// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
-			// if (node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-			// // todo-1: we need a special global counter for when this happens, so the server info can show
-			// it.
-			// return null;
-			// }
+				// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
+				// if (node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
+				// // todo-1: we need a special global counter for when this happens, so the server info can show
+				// it.
+				// return null;
+				// }
+			}
 		}
 
 		// if we know we shold only be including admin node then throw an error if this is not an admin
@@ -368,6 +369,8 @@ public class Convert extends ServiceBase {
 
 		if (ok(principalId)) {
 			arun.run(s -> {
+				// todo-0: if the actual user account has been delete we can get here and end up with null user name
+				// I think. Look into it.
 				acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
 				acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
 

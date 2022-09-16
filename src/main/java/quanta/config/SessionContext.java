@@ -319,10 +319,12 @@ public class SessionContext extends ServiceBase {
 				throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
 			}
 
+			// wip: when user logs in and we accept their key do we reset this pubSigKey then? need to!
 			sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
 			if (no(sc.pubSigKey)) {
 				throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
 			}
+			// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
 		}
 
 		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes());

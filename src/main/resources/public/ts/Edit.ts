@@ -17,7 +17,7 @@ import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 
-declare const g_requireCrypto: boolean;
+declare const g_requireCrypto: string;
 
 export class Edit {
 
@@ -707,7 +707,7 @@ export class Edit {
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = async (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state?: AppState) => {
-        if (g_requireCrypto && !S.crypto.avail) {
+        if (g_requireCrypto === "true" && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
         }

@@ -613,7 +613,8 @@ public class NodeEditService extends ServiceBase {
 		 */
 		mongoUtil.setPendingPath(node, false);
 
-		if (prop.isRequireCrypto()) {
+		// todo-0: for now only admin user is using signed nodes.
+		if (prop.isRequireCrypto() && ms.isAdmin()) {
 			if (!crypto.nodeSigVerify(node, sig)) {
 				// stop this node from being saved with 'clean'
 				ThreadLocals.clean(node);

@@ -261,7 +261,7 @@ export class Crypto {
     // todo-0: we needs SEPARATE update+publis method, adn then will remove teh "Generate Keys" from the menu and instead
     // make thee different update buttons for each text field on the Show Keys dialog.... and rename that dialog to Manage Keys.
     initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
-        if (!g_requireCrypto || user === J.PrincipalName.ANON) {
+        if (g_requireCrypto !== "true" || user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
             return;
         }
