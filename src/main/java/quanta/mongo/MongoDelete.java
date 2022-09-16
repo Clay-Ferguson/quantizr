@@ -315,6 +315,18 @@ public class MongoDelete extends ServiceBase {
 		}
 	}
 
+	/*
+	 * todo-0: Can add Verify & Repair HAS_CHILDREN in this method.
+	 * 
+	 * Since every node looks for it's parent in this process we could theoretically use this to
+	 * also perfectly verify and/or repair every HAS_CHILDREN in the system. We'd just keep a list if
+	 * which nodes claim they DO have children in a HashSet of those ObjectIds, and then as we encounter
+	 * each one as a parent we "find" in this as we go along remove from the HashSet, as "correct" so
+	 * that whatever's left in said HashSet when the entire process is completed will be nodes that are
+	 * known to claim to have children and don't. Then do we do the 'inverse of that' to fix the nodes
+	 * that claim NOT to have children but DO have children...which would be a separate hash map doing
+	 * the same kind of logic.
+	 */
 	public void deleteNodeOrphans() {
 		log.debug("deleteNodeOrphans()");
 
@@ -402,7 +414,7 @@ public class MongoDelete extends ServiceBase {
 				}
 			});
 
-			// since we delete in blocks of 100 at a time, we might have some left pending here so 
+			// since we delete in blocks of 100 at a time, we might have some left pending here so
 			// finish deleting those
 			if (opsPending.getVal() > 0) {
 				if (no(bops.getVal())) {
