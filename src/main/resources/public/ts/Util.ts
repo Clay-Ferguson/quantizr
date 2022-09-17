@@ -1057,12 +1057,10 @@ export class Util {
     }
 
     resumeEditingOfAbandoned = async () => {
-        const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA, "all");
+        const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
         if (editorData?.nodeId && editorData?.content) {
-            await S.localDB.setVal(C.STORE_EDITOR_DATA, null, "all");
-            S.edit.pendingContent = editorData.content;
-            S.edit.pendingContentId = editorData.nodeId;
-            S.edit.runEditNode(null, editorData.nodeId, true, false, false, null, null);
+            await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
+            S.edit.runEditNode(null, editorData.content, editorData.nodeId, true, false, false, null, null);
         }
     }
 

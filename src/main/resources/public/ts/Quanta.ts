@@ -91,7 +91,7 @@ export class Quanta {
     initApp = async () => {
         try {
             if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
-                alert("This server requires browser crypto features");
+                alert("This server requires browser crypto features.");
                 return;
             }
             Log.log("quanta.initApp()");

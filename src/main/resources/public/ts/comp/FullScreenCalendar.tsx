@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode, createElement } from "react";
@@ -99,7 +98,7 @@ export class FullScreenCalendar extends Main {
     handleEventClick = (clickInfo: EventClickArg) => {
         console.log("eventClick.");
         const state = getAppState();
-        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, state);
+        S.edit.runEditNode(null, null, clickInfo.event.id, true, false, true, null, null, state);
     }
 
     domUpdateEvent = (): void => {

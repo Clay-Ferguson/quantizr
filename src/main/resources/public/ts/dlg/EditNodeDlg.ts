@@ -88,12 +88,6 @@ export class EditNodeDlg extends DialogBase {
             EditNodeDlg.embedInstance = this;
         }
 
-        if (S.edit.pendingContent && appState.editNode.id === S.edit.pendingContentId) {
-            appState.editNode.content = S.edit.pendingContent;
-            S.edit.pendingContent = null;
-            S.edit.pendingContentId = null;
-        }
-
         this.mergeState<LS>({
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
@@ -129,13 +123,9 @@ export class EditNodeDlg extends DialogBase {
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: appState.editNode.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
-                }, "all");
+                });
             }, 6000);
         }
-    }
-
-    domRemoveEvent = () => {
-        this.resetAutoSaver();
     }
 
     resetAutoSaver = async () => {
@@ -143,7 +133,7 @@ export class EditNodeDlg extends DialogBase {
             clearInterval(EditNodeDlg.autoSaveTimer);
             EditNodeDlg.autoSaveTimer = null;
         }
-        S.localDB.setVal(C.STORE_EDITOR_DATA, null, "all");
+        S.localDB.setVal(C.STORE_EDITOR_DATA, null);
     }
 
     createLayoutSelection = (): Selection => {

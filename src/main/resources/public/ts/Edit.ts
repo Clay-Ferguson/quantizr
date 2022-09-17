@@ -22,8 +22,6 @@ declare const g_requireCrypto: string;
 export class Edit {
 
     showReadOnlyProperties: boolean = false;
-    pendingContent: string = null;
-    pendingContentId: string = null;
 
     openImportDlg = (state: AppState): any => {
         const node = S.nodeUtil.getHighlightedNode(state);
@@ -268,7 +266,7 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, state);
-            this.runEditNode(null, res.newNode.id, false, false, false, null, null, state);
+            this.runEditNode(null, null, res.newNode.id, false, false, false, null, null, state);
         }
     }
 
@@ -278,7 +276,7 @@ export class Edit {
                 S.quanta.refresh(state);
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, state);
+                this.runEditNode(null, null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, state);
             }
         }
     }
@@ -697,7 +695,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, null);
+        this.runEditNode(null, null, id, false, false, false, null, null);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -706,7 +704,7 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state?: AppState) => {
+    runEditNode = async (evt: Event, overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state?: AppState) => {
         if (g_requireCrypto === "true" && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -729,6 +727,10 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         });
+
+        if (res.nodeInfo && overrideContent) {
+            res.nodeInfo.content = overrideContent;
+        }
 
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
     }
