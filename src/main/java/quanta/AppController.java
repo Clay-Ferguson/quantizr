@@ -119,7 +119,7 @@ import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetNodePositionRequest;
 import quanta.request.SetUnpublishedRequest;
-import quanta.request.SignNodesRequest;
+import quanta.request.SubGraphHashRequest;
 import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
@@ -778,12 +778,12 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
-	public @ResponseBody Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
+	@RequestMapping(value = API_PATH + "/subGraphHash", method = RequestMethod.POST)
+	public @ResponseBody Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
 
-		return callProc.run("signNodes", true, true, req, session, ms -> {
+		return callProc.run("subGraphHash", true, true, req, session, ms -> {
 			ThreadLocals.requireAdmin();
-			return edit.signNodes(ms, req);
+			return edit.subGraphHash(ms, req);
 		});
 	}
 

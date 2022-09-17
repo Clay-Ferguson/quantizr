@@ -830,10 +830,11 @@ export class Edit {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
-        S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", {
+
+        S.rpcUtil.rpc<J.SubGraphHashRequest, J.SubGraphHashResponse>("subGraphHash", {
             nodeId: node.id,
             recursive: true
-        }).then((res: J.SignNodesResponse) => {
+        }).then((res: J.SubGraphHashResponse) => {
             if (res.success) {
                 S.util.showMessage(res.message);
             }

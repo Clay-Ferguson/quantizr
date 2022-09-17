@@ -44,7 +44,7 @@ import quanta.request.LikeNodeRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SearchAndReplaceRequest;
-import quanta.request.SignNodesRequest;
+import quanta.request.SubGraphHashRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
@@ -56,7 +56,7 @@ import quanta.response.LikeNodeResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SaveNodeSigsResponse;
 import quanta.response.SearchAndReplaceResponse;
-import quanta.response.SignNodesResponse;
+import quanta.response.SubGraphHashResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
@@ -971,8 +971,8 @@ public class NodeEditService extends ServiceBase {
 	 * generates the hash of all subnodes, and will just stick thas hash into a property on the top
 	 * parent node (req.nodeId)
 	 */
-	public SignNodesResponse signNodes(MongoSession ms, SignNodesRequest req) {
-		SignNodesResponse res = new SignNodesResponse();
+	public SubGraphHashResponse subGraphHash(MongoSession ms, SubGraphHashRequest req) {
+		SubGraphHashResponse res = new SubGraphHashResponse();
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);

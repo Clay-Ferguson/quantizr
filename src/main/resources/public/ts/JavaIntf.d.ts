@@ -469,11 +469,6 @@ export interface SetUnpublishedRequest extends RequestBase {
     unpublished: boolean;
 }
 
-export interface SignNodesRequest extends RequestBase {
-    recursive: boolean;
-    nodeId: string;
-}
-
 export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
@@ -485,6 +480,11 @@ export interface SplitNodeRequest extends RequestBase {
     splitType: string;
     nodeId: string;
     delimiter: string;
+}
+
+export interface SubGraphHashRequest extends RequestBase {
+    recursive: boolean;
+    nodeId: string;
 }
 
 export interface TransferNodeRequest extends RequestBase {
@@ -835,9 +835,6 @@ export interface SetNodePositionResponse extends ResponseBase {
 export interface SetUnpublishedResponse extends ResponseBase {
 }
 
-export interface SignNodesResponse extends ResponseBase {
-}
-
 export interface SignupResponse extends ResponseBase {
     userError: string;
     passwordError: string;
@@ -846,6 +843,9 @@ export interface SignupResponse extends ResponseBase {
 }
 
 export interface SplitNodeResponse extends ResponseBase {
+}
+
+export interface SubGraphHashResponse extends ResponseBase {
 }
 
 export interface TransferNodeResponse extends ResponseBase {

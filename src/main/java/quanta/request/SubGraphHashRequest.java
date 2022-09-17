@@ -2,7 +2,7 @@ package quanta.request;
 
 import quanta.request.base.RequestBase;
 
-public class SignNodesRequest extends RequestBase {
+public class SubGraphHashRequest extends RequestBase {
 
 	private boolean recursive;
 	private String nodeId;
