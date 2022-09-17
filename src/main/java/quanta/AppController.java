@@ -1485,6 +1485,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(system.validateDb(), null));
 					break;
 
+				case "repairDb":
+					res.getMessages().add(new InfoMessage(system.repairDb(), null));
+					break;
+
 				case "rebuildIndexes":
 					res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
 					break;

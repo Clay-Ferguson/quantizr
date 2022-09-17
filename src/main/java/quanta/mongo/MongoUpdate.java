@@ -9,6 +9,8 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
@@ -194,12 +196,10 @@ public class MongoUpdate extends ServiceBase {
 		return ret.getVal();
 	}
 
-	public void runRepairs(MongoSession ms) {
-		// not currently used
-		// Query query = new Query();
-		// query.addCriteria(Criteria.where(SubNode.FIELD_TYPE).is("u"));
-		// Iterable<SubNode> iter = util.find(query);
-		// for (SubNode n : iter) {
-		// }
+	public void runRepairs() {
+		Query query = new Query();
+		Update update = new Update();
+		update.set(SubNode.HAS_CHILDREN, null);
+		ops.findAndModify(query, update, SubNode.class);
 	}
 }

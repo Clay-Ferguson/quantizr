@@ -167,6 +167,7 @@ public class MongoRead extends ServiceBase {
         }
         boolean ret = hasChildrenByQuery(ms, node.getPath(), doAuth);
         if (!doAuth && allowUpdate) {
+            // log.debug("Update HAS_CHILDREN: "+node.getIdStr());
             node.setHasChildren(ret);
         }
         return ret;

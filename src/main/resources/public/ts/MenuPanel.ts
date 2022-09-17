@@ -492,6 +492,7 @@ export class MenuPanel extends Div {
             children.push(new Menu(state, "Admin - DB", [
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
+                new MenuItem("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null, appState)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //
                 new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null, appState)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null, appState)), //
