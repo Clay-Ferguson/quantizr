@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -71,10 +72,10 @@ public class EnglishDictionary extends ServiceBase {
 	public void writeStringArrayToFile(ArrayList<String> list, String fileName) {
 		BufferedOutputStream os = null;
 		try {
-			byte[] nl = "\n".getBytes();
+			byte[] nl = "\n".getBytes(StandardCharsets.UTF_8);
 			os = new BufferedOutputStream(new FileOutputStream(fileName));
 			for (String s : list) {
-				os.write(s.getBytes());
+				os.write(s.getBytes(StandardCharsets.UTF_8));
 				os.write(nl);
 			}
 		} catch (Exception e) {

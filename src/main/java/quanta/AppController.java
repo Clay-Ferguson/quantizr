@@ -1554,8 +1554,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-		// SessionContext.checkReqToken();
-		return callProc.run("graphNodes", false, false, req, session, ms -> {
+	
+		return callProc.run("graphNodes", true, true, req, session, ms -> {
 			GraphResponse res = graphNodes.graphNodes(ms, req);
 			res.setSuccess(true);
 			return res;

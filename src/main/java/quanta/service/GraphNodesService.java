@@ -32,7 +32,7 @@ public class GraphNodesService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
-		SubNode node = read.getNode(ms, req.getNodeId(), true);
+		SubNode node = read.getNode(ms, req.getNodeId());
 		GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false);
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");

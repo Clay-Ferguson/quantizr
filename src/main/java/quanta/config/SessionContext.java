@@ -2,6 +2,7 @@ package quanta.config;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -330,7 +331,7 @@ public class SessionContext extends ServiceBase {
 			// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
 		}
 
-		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes());
+		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
 		if (!verified) {
 			throw new RuntimeException("Request Sig Failed");
 		}

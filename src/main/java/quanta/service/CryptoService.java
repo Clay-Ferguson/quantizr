@@ -3,6 +3,7 @@ package quanta.service;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -89,7 +90,7 @@ public class CryptoService extends ServiceBase {
 				strToSign += "-" + binDataUrl;
 			}
 
-			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes());
+			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
 			if (!verified) {
 				// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
 			}
@@ -109,7 +110,7 @@ public class CryptoService extends ServiceBase {
 		PublicKey pubKey = null;
 		try {
 			// log.debug("parsing: " + pubKeyJson);
-			Jwk keyObj = mapper.readValue(jwkJson.getBytes(), Jwk.class);
+			Jwk keyObj = mapper.readValue(jwkJson.getBytes(StandardCharsets.UTF_8), Jwk.class);
 			if (no(keyObj)) {
 				log.error("Unable to parse USER_PREF_PUBLIC_SIG_KEY from accnt " + accntNode.getIdStr());
 				return null;

@@ -758,7 +758,7 @@ public class AttachmentService extends ServiceBase {
 		String mimeType = Util.getMimeFromDataUrl(sourceUrl);
 
 		if (ImageUtil.isImageMime(mimeType)) {
-			InputStream is = new ByteArrayInputStream(sourceUrl.getBytes());
+			InputStream is = new ByteArrayInputStream(sourceUrl.getBytes(StandardCharsets.UTF_8));
 			LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 			// insert 0L for size now, because we don't know it yet
