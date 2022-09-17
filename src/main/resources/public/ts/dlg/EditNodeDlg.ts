@@ -801,26 +801,28 @@ export class EditNodeDlg extends DialogBase {
         const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
-        this.contentEditor.onMount((elm: HTMLElement) => {
-            if (encrypted) {
-                // console.log("decrypting: " + value);
-                const cipherText = value.substring(J.Constant.ENC_TAG.length);
-                (async () => {
-                    const cipherKey = S.props.getCryptoKey(node, getAppState());
-                    if (cipherKey) {
-                        const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
+        if (S.crypto.avail) {
+            this.contentEditor.onMount((elm: HTMLElement) => {
+                if (encrypted) {
+                    // console.log("decrypting: " + value);
+                    const cipherText = value.substring(J.Constant.ENC_TAG.length);
+                    (async () => {
+                        const cipherKey = S.props.getCryptoKey(node, getAppState());
+                        if (cipherKey) {
+                            const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
 
-                        if (!clearText) {
-                            this.contentEditorState.setError("Decryption Failed");
+                            if (!clearText) {
+                                this.contentEditorState.setError("Decryption Failed");
+                            }
+                            else {
+                                // console.log("decrypted to:" + value);
+                                this.contentEditorState.setValue(clearText);
+                            }
                         }
-                        else {
-                            // console.log("decrypted to:" + value);
-                            this.contentEditorState.setValue(clearText);
-                        }
-                    }
-                })();
-            }
-        });
+                    })();
+                }
+            });
+        }
 
         if (allowFocus) {
             this.contentEditor.focus();

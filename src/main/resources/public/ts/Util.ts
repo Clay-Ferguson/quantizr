@@ -710,6 +710,9 @@ export class Util {
     }
 
     generateNewCryptoKeys = async (state: AppState): Promise<any> => {
+        if (!S.crypto.avail) {
+            return;
+        }
         let dlg = new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
             "btn-danger", "alert alert-danger");
         await dlg.open();

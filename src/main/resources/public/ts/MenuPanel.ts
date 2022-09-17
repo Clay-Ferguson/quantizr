@@ -434,10 +434,10 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu(state, "Cryptographic", [
-            new MenuItem("Show Keys", MenuPanel.showKeys, !appState.isAnonUser), //
-            new MenuItem("Generate Keys", MenuPanel.generateKeys, !appState.isAnonUser), //
-            new MenuItem("Publish Public Keys", MenuPanel.publishKeys, !appState.isAnonUser), //
-            new MenuItem("Import Keys", MenuPanel.importKeys, !appState.isAnonUser) //
+            new MenuItem("Show Keys", MenuPanel.showKeys, S.crypto.avail && !appState.isAnonUser), //
+            new MenuItem("Generate Keys", MenuPanel.generateKeys, S.crypto.avail && !appState.isAnonUser), //
+            new MenuItem("Publish Public Keys", MenuPanel.publishKeys, S.crypto.avail && !appState.isAnonUser), //
+            new MenuItem("Import Keys", MenuPanel.importKeys, S.crypto.avail && !appState.isAnonUser) //
         ], null, this.makeHelpIcon(":menu-encrypt")));
 
         // //need to make export safe for end users to use (recarding file sizes)

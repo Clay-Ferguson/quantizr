@@ -157,6 +157,7 @@ export class NodeCompMarkdown extends Html {
     }
 
     decrypt = async () => {
+        if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
         const appState = getAppState();

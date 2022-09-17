@@ -1,6 +1,6 @@
 import { dispatch, getAppState } from "../AppContext";
-import { DialogMode } from "../DialogBase";
 import { SymKeyDataPackage } from "../Crypto";
+import { DialogMode } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
@@ -54,10 +54,13 @@ export class EditNodeDlgUtil {
         let content: string;
         if (dlg.contentEditor) {
             content = dlg.contentEditor.getValue();
-            const cipherKey = S.props.getCryptoKey(editNode, getAppState());
-            if (cipherKey) {
-                content = await S.crypto.symEncryptStringWithCipherKey(cipherKey, content);
-                content = J.Constant.ENC_TAG + content;
+
+            if (S.crypto.avail) {
+                const cipherKey = S.props.getCryptoKey(editNode, getAppState());
+                if (cipherKey) {
+                    content = await S.crypto.symEncryptStringWithCipherKey(cipherKey, content);
+                    content = J.Constant.ENC_TAG + content;
+                }
             }
         }
         if (content) {
@@ -77,7 +80,7 @@ export class EditNodeDlgUtil {
         // Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
         // been encrypted just above.
         // todo-0: Note: signatures is still in beta so we only sign if admin for now
-        if (appState.isAdminUser) {
+        if (appState.isAdminUser && S.crypto.avail) {
             // Note: this needs to come AFTER the 'savePropsToNode' above becasue we're overriding what was
             // possibly in there.
             console.log("signing Node to Save");
@@ -268,7 +271,7 @@ export class EditNodeDlgUtil {
                     /* Else need to ensure node is encrypted */
                     else {
                         // if we need to encrypt and the content is not currently encrypted.
-                        if (!appState.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
+                        if (S.crypto.avail && !appState.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
                             const content = dlg.contentEditor.getValue();
 
                             const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);

@@ -84,7 +84,9 @@ export class LoginDlg extends DialogBase {
 
         const pwd = this.pwdState.getValue();
         if (usr && pwd) {
-            await S.crypto.initKeys(usr, false, false, false);
+            if (S.crypto.avail) {
+                await S.crypto.initKeys(usr, false, false, false);
+            }
             const res = await S.rpcUtil.rpc<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
                 password: pwd,
