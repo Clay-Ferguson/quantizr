@@ -53,26 +53,19 @@ public class Convert extends ServiceBase {
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		boolean sigFail = false;
-		if (prop.isRequireCrypto()) {
-			if (node.getPath().startsWith("/r/public/home")) {
-				String sig = node.getStr(NodeProp.CRYPTO_SIG);
-				if (no(sig) && !sc.isAdmin()) {
-					// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
-					// // todo-1: we need a special global counter for when this happens, so the server info can show
-					// it.
-					// return null;
-					// }
-				}
+		// todo-0: need a config setting that specifies which path is required to be signed so
+		// this can be enabled/disabled easily by admin
+		if (prop.isRequireCrypto() && node.getPath().startsWith("/r/public/")) {
+			String sig = node.getStr(NodeProp.CRYPTO_SIG);
+			if (no(sig) && !sc.isAdmin()) {
+				// todo-1: we need a special global counter for when this happens, so the server info can show it.
+				return null;
+			}
 
-				if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
-					sigFail = true;
-
-					// todo-0: wip: this is ready to be uncommented once all these nodes are known to be signed signed
-					// if (node.getPath().startsWith("/r/public/home") && !sc.isAdmin()) {
-					// // todo-1: we need a special global counter for when this happens, so the server info can show
-					// it.
-					// return null;
-					// }
+			if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+				sigFail = true;
+				if (!sc.isAdmin()) {
+					return null;
 				}
 			}
 		}
