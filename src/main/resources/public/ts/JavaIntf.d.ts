@@ -412,10 +412,6 @@ export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
 }
 
-export interface SaveNodeSigsRequest extends RequestBase {
-    sigs: NodeSig[];
-}
-
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
@@ -813,9 +809,6 @@ export interface SaveNodeResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
 }
 
-export interface SaveNodeSigsResponse extends ResponseBase {
-}
-
 export interface SavePublicKeyResponse extends ResponseBase {
 }
 
@@ -927,11 +920,6 @@ export interface NodeInfo {
     apAvatar: string;
     apImage: string;
     boostedNode: NodeInfo;
-}
-
-export interface NodeSig {
-    nodeId: string;
-    sig: string;
 }
 
 export interface UserPreferences {

@@ -278,7 +278,7 @@ public class MongoDelete extends ServiceBase {
 			if (ok(parent) && parentIds.add(parent.getId())) {
 				// we have a known 'bops' in this one and don't lazy create so we don't care about the
 				// return value of this call
-				bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
+				update.bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
 			}
 		});
 
@@ -293,7 +293,7 @@ public class MongoDelete extends ServiceBase {
 		BulkOperations bops = null;
 
 		for (ObjectId id : ids) {
-			bops = bulkOpSetPropVal(bops, id, prop, null);
+			bops = update.bulkOpSetPropVal(bops, id, prop, null);
 		}
 
 		if (ok(bops)) {
@@ -306,7 +306,7 @@ public class MongoDelete extends ServiceBase {
 		BulkOperations bops = null;
 
 		for (String id : ids) {
-			bops = bulkOpSetPropVal(bops, new ObjectId(id), prop, null);
+			bops = update.bulkOpSetPropVal(bops, new ObjectId(id), prop, null);
 		}
 
 		if (ok(bops)) {
@@ -488,7 +488,7 @@ public class MongoDelete extends ServiceBase {
 			// if 'add' returns true that means this IS the first encounter and so we add to the operations
 			// the call to set it's hasChildren to null
 			if (parentIds.add(parent.getId())) {
-				bops = bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
+				bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
 			}
 
 			/*
@@ -530,13 +530,13 @@ public class MongoDelete extends ServiceBase {
 			// hasChildren for
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
-				bops = bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
+				bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
 			}
 			bops = bulkOpRemoveNode(bops, node.getId());
 		}
 		// if deleting all children and NOT root we know we can just update the node hasChildren to false
 		else {
-			bops = bulkOpSetPropVal(bops, node.getId(), SubNode.HAS_CHILDREN, null);
+			bops = update.bulkOpSetPropVal(bops, node.getId(), SubNode.HAS_CHILDREN, null);
 		}
 
 		/*
@@ -569,18 +569,6 @@ public class MongoDelete extends ServiceBase {
 		}
 		Query query = new Query().addCriteria(new Criteria("id").is(id));
 		bops.remove(query);
-		return bops;
-	}
-
-	// returns a new BulkOps if one not yet existing
-	// todo-0: I'm creating a dupliate of this in MongoUpdate. remove this one.
-	public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val) {
-		if (no(bops)) {
-			bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
-		}
-		Query query = new Query().addCriteria(new Criteria("id").is(id));
-		Update update = new Update().set(prop, val);
-		bops.updateOne(query, update);
 		return bops;
 	}
 

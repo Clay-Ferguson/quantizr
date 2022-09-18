@@ -113,7 +113,7 @@ export class RssTypeHandler extends TypeBase {
                         this.loadFeed(state, feedSrcHash, feedSrc);
                         return s;
                     });
-                }, null, "btn-primary marginLeft marginBottom");
+                }, null, "btn-primary marginAll");
             }
             /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
             else if (state.rssFeedCache[feedSrcHash]) {

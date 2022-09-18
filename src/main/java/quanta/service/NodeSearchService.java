@@ -476,9 +476,6 @@ public class NodeSearchService extends ServiceBase {
 					signedNodeCount++;
 					if (!crypto.nodeSigVerify(node, sig)) {
 						failedSigCount++;
-
-						// todo-0: this is a one-time cleanup. remove it.
-						node.set(NodeProp.CRYPTO_SIG, null);
 					}
 				} else {
 					log.debug("UNSIGNED: " + XString.prettyPrint(node));

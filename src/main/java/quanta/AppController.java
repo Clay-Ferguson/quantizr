@@ -933,17 +933,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	// todo-0: This will eventually come back but only as part of our server-push feature for doing
-	// signing.
-	// @RequestMapping(value = API_PATH + "/saveNodeSigs", method = RequestMethod.POST)
-	// public @ResponseBody Object saveNodeSigs(@RequestBody SaveNodeSigsRequest req, HttpSession
-	// session) {
-	// SessionContext.checkReqToken();
-	// return callProc.run("saveNodeSigs", req, session, ms -> {
-	// return edit.saveNodeSigs(ms, req);
-	// });
-	// }
-
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();

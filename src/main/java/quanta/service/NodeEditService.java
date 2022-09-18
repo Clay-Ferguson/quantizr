@@ -25,7 +25,6 @@ import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
-import quanta.model.NodeSig;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -42,10 +41,9 @@ import quanta.request.DeletePropertyRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.SaveNodeRequest;
-import quanta.request.SaveNodeSigsRequest;
 import quanta.request.SearchAndReplaceRequest;
-import quanta.request.SubGraphHashRequest;
 import quanta.request.SplitNodeRequest;
+import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.response.AppDropResponse;
@@ -54,10 +52,9 @@ import quanta.response.DeletePropertyResponse;
 import quanta.response.InsertNodeResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.SaveNodeResponse;
-import quanta.response.SaveNodeSigsResponse;
 import quanta.response.SearchAndReplaceResponse;
-import quanta.response.SubGraphHashResponse;
 import quanta.response.SplitNodeResponse;
+import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
@@ -410,55 +407,6 @@ public class NodeEditService extends ServiceBase {
 			});
 		});
 		return res;
-	}
-
-	/*
-	 * 
-	 * WARNING: Before working to make this method any better remember it's probably only for temporary
-	 * use by admin
-	 * 
-	 */
-	@PerfMon(category = "edit")
-	public SaveNodeSigsResponse saveNodeSigs(MongoSession ms, SaveNodeSigsRequest req) {
-		// todo-0: backing out for now. this WILL come back.
-		return null;
-		// SaveNodeSigsResponse res = new SaveNodeSigsResponse();
-
-		// // todo-1: potential optimization, create an 'ownerNode set' local to this method
-		// // and use it to lookup parent node of each node, only if not in the set and then have an
-		// // optional parameter to nodeSigVerify that can accept the ownerAcct node, and use it to
-		// // avoid a call to db to get it.
-		// //
-		// // todo-1: This is an ideal place to use a MongoDb batch operation.
-		// for (NodeSig sig : req.getSigs()) {
-		// SubNode node = read.getNode(ms, sig.getNodeId());
-		// if (ok(node)) {
-		// // todo-1: WRONG (For now) we need to let admin repair things if admin pushes up new public
-		// keys!!!
-		// // we should never get here but if we get a sig sent for an already signed node ignore it.
-		// // boolean signed = ok(node.getStr(NodeProp.CRYPTO_SIG));
-		// // if (signed) {
-		// // log.debug("RESIGN rejected " + node.getIdStr());
-		// // continue;
-		// // }
-
-		// // todo-1: temporarily accepting everything from admin.
-		// if (ms.isAdmin()) {
-		// log.debug("sig updated from admin: nodeId=" + node.getIdStr() + " sig=" + sig.getSig());
-		// node.set(NodeProp.CRYPTO_SIG, sig.getSig());
-		// continue;
-		// }
-
-		// // if signature is valid put it on the node.
-		// if (crypto.nodeSigVerify(node, sig.getSig())) {
-		// // log.debug("Accepted SIG on nodeId: " + node.getIdStr());
-		// node.set(NodeProp.CRYPTO_SIG, sig.getSig());
-		// } else {
-		// log.debug("Rejecting SENT SIG: " + sig.getSig() + " by user " + ms.getUserName());
-		// }
-		// }
-		// }
-		// return res;
 	}
 
 	@PerfMon(category = "edit")
