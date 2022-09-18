@@ -106,8 +106,8 @@ public class PushService extends ServiceBase {
 			if (ok(node.getPath()) && ok(sc.getWatchingPath()) && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
-				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, true, false, 1, false, false, true, false,
-						true, true, null);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, true, false, 1, false, false, true, false, true,
+						true, null);
 				if (ok(info)) {
 					FeedPushInfo pushInfo = new FeedPushInfo(info);
 
@@ -151,10 +151,6 @@ public class PushService extends ServiceBase {
 
 		exec.run(() -> {
 			SseEmitter pushEmitter = sc.getPushEmitter();
-			if (no(pushEmitter)) {
-				log.debug("no push emitter.");
-				return;
-			}
 
 			/*
 			 * Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable

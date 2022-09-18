@@ -1701,9 +1701,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public SseEmitter serverPush(HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return (SseEmitter) callProc.run("serverPush", false, false, null, session, ms -> {
-			synchronized (ThreadLocals.getSC().getPushEmitter()) {
-				return ThreadLocals.getSC().getPushEmitter();
-			}
+			return ThreadLocals.getSC().getPushEmitter();
 		});
 	}
 

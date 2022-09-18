@@ -61,6 +61,17 @@ public class CallProcessor extends ServiceBase {
 		 */
 		new ResponseBase();
 
+		boolean useLock = true;
+		// these commands are not subject to mutex, but we will
+		// add parameters to make it cleaner than this switch block hack
+		switch (command) {
+			case "serverPush":
+			case "signNodes":
+				useLock = false;
+			default:
+				break;
+		}
+
 		Object ret = null;
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
 		if (no(mutex)) {
@@ -71,7 +82,7 @@ public class CallProcessor extends ServiceBase {
 		String userName = null;
 
 		try {
-			if (ok(mutex)) {
+			if (useLock && ok(mutex)) {
 				mutex.lockEx();
 			}
 
@@ -127,7 +138,7 @@ public class CallProcessor extends ServiceBase {
 				new PerfMonEvent(duration, "callProc." + command, userName);
 			}
 
-			if (ok(mutex)) {
+			if (useLock && ok(mutex)) {
 				mutex.unlockEx();
 			}
 			// mutexCounter--;

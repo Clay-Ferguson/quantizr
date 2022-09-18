@@ -331,7 +331,8 @@ public class SessionContext extends ServiceBase {
 			// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
 		}
 
-		boolean verified = crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
+		boolean verified =
+				crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
 		if (!verified) {
 			throw new RuntimeException("Request Sig Failed");
 		}
