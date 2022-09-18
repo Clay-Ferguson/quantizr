@@ -167,7 +167,7 @@ public class EnglishDictionary extends ServiceBase {
 		if (no(text))
 			return false;
 
-		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#", false);
+		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim().toLowerCase();
 			if (badWords.contains(token)) {
