@@ -610,24 +610,19 @@ public class NodeSearchService extends ServiceBase {
 			mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("Node count: " + nodeCount + ", ");
-		sb.append("Total Words: " + totalWords + ", ");
+		sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
 
 		if (ok(wordList)) {
-			sb.append("Unique Words: " + wordList.size() + ", ");
+			sb.append("Unique Words: " + wordList.size() + "\n");
 		}
 
 		sb.append("Public: " + publicCount + ", ");
-		sb.append("Public Writable: " + publicWriteCount + ", ");
-		sb.append("Admin Owned: " + adminOwnedCount + ", ");
-		sb.append("User Shares: " + userShareCount + ", ");
-		sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size());
+		sb.append("Public Writable: " + publicWriteCount + "\n");
+		sb.append("Admin Owned: " + adminOwnedCount + "\n");
+		sb.append("User Shares: " + userShareCount + ", Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
 
 		if (req.isSignatureVerify()) {
-			sb.append(", ");
-			sb.append("Signed: " + signedNodeCount + ", ");
-			sb.append("Unsigned: " + unsignedNodeCount + ", ");
-			sb.append("FAILED SIGS: " + failedSigCount);
+			sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: " + failedSigCount);
 		}
 
 		res.setStats(sb.toString());

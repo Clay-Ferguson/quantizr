@@ -1,11 +1,11 @@
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
-/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API
-
-todo-0: I can probably change this back to where it holds the databse open forever.
-*/
+/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
+    readonly KEEP_DB_OPEN = true;
+    db: IDBDatabase = null; // only used if KEEP_DB_OPEN
+
     /* Name of logged in user or 'null' if anonymous user not logged in */
     userName: string;
 
@@ -48,7 +48,20 @@ export class LocalDB {
 
     /* Runs a transaction by first opening the database, and then running the transaction */
     private runTrans = async (access: IDBTransactionMode, runner: (store: IDBObjectStore) => void) => {
-        const db: IDBDatabase = await this.openDB();
+        let db: IDBDatabase = null;
+
+        // if keeping db open and we have it open, then use it.
+        if (this.KEEP_DB_OPEN && this.db) {
+            db = this.db;
+        }
+        else {
+            db = await this.openDB();
+
+            // if we're keeping db open save it.
+            if (this.KEEP_DB_OPEN) {
+                this.db = db;
+            }
+        }
         const tx: IDBTransaction = db.transaction(LocalDB.STORE_NAME, access);
         const store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
 
@@ -62,17 +75,23 @@ export class LocalDB {
         tx.oncomplete = () => {
             // todo-2: need to research best practice for this, and see if we should be closing the DB here or if there's
             // some better pattern for keeping it open for more transactions.
-            db.close();
+            if (!this.KEEP_DB_OPEN) {
+                db.close();
+            }
         };
 
         tx.onabort = () => {
             console.log("tx fail");
-            db.close();
+            if (!this.KEEP_DB_OPEN) {
+                db.close();
+            }
         }
 
         tx.onerror = () => {
             console.log("tx err");
-            db.close();
+            if (!this.KEEP_DB_OPEN) {
+                db.close();
+            }
         }
     }
 

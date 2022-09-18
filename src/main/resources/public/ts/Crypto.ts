@@ -258,7 +258,7 @@ export class Crypto {
 
     // todo-1: need to make this require the password and username to be more secure.
     //         And an unsolved design task is users signing data from different browsers.
-    // todo-0: we need to SEPARATE update+publis method, adn then will remove teh "Generate Keys" from the menu and instead
+    // todo-0: we need to SEPARATE update+public method, and then will remove the "Generate Keys" from the menu and instead
     // make thee different update buttons for each text field on the Show Keys dialog.... and rename that dialog to Manage Keys.
     initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
         if (g_requireCrypto !== "true" || user === J.PrincipalName.ANON) {

@@ -146,10 +146,10 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         children.push(
             this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
             new ButtonBar([
-                new IconButton("fa-refresh", null, {
+                isTopBar ? new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
                     title: "Refresh Search"
-                }),
+                }) : null,
                 this.data.props.page > 1 ? new IconButton("fa-angle-double-left", null, {
                     onClick: () => this.pageChange(0),
                     title: "First Page"

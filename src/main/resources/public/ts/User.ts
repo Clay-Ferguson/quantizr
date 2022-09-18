@@ -267,7 +267,7 @@ export class User {
     }
 
     checkMessages = async () => {
-        const res = await S.rpcUtil.rpc<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
+        const res = await S.rpcUtil.rpc<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", null, true);
         if (res) {
             dispatch("SetNewMessageCount", s => {
                 s.newMessageCount = res.numNew;

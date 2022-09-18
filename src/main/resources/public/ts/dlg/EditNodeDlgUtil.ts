@@ -81,7 +81,7 @@ export class EditNodeDlgUtil {
         // been encrypted just above.
         // todo-0: Note: signatures is still in beta so we only sign if admin for now
         if (appState.isAdminUser && S.crypto.avail) {
-            // Note: this needs to come AFTER the 'savePropsToNode' above becasue we're overriding what was
+            // Note: this needs to come AFTER the 'savePropsToNode' call above because we're overriding what was
             // possibly in there.
             console.log("signing Node to Save");
             await S.crypto.signNode(editNode);

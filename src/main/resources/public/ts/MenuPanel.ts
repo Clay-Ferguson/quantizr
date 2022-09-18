@@ -476,23 +476,27 @@ export class MenuPanel extends Div {
         }
 
         if (appState.isAdminUser) {
-            children.push(new Menu(state, "Admin - Utils", [
+            children.push(new Menu(state, "Admin - Analytic", [
 
-                new MenuItem("Create User", MenuPanel.createUser), //
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null, appState)), //
+                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, appState)), //
+                new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")) //
+            ]));
+            children.push(new Menu(state, "Admin - Utils", [
+
+                // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
+                new MenuItem("Create User", MenuPanel.createUser), //
                 new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null, appState)), //
                 new MenuItem("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null, appState)), //
-                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null, appState)), //
                 new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, appState)), //
-                new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null, appState)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(appState))
             ]));
 
             children.push(new Menu(state, "Admin - DB", [
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify), //
-                new MenuItem("Sign SubGraph", MenuPanel.signSubGraph), //
+                S.crypto.avail ? new MenuItem("Sign SubGraph", MenuPanel.signSubGraph) : null, //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
                 new MenuItem("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null, appState)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //
