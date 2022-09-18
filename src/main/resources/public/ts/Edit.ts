@@ -88,14 +88,21 @@ export class Edit {
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, state);
             if (editingAllowed) {
+
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
-                const editInPopup = forceUsePopup || state.mobileMode ||
+                let editInPopup = forceUsePopup || state.mobileMode ||
                     // node not found on tree.
                     (!S.nodeUtil.displayingOnTree(state, res.nodeInfo.id) &&
                         !S.nodeUtil.displayingOnTree(state, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
                     S.util.fullscreenViewerActive(state);
+
+                if (S.quanta.activeTab === C.TAB_DOCUMENT || //
+                    S.quanta.activeTab === C.TAB_SEARCH || //
+                    S.quanta.activeTab === C.TAB_TIMELINE) {
+                    editInPopup = false;
+                }
 
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */

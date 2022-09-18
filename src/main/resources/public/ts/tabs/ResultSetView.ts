@@ -10,6 +10,8 @@ import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
+import { DialogMode } from "../DialogBase";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
@@ -72,9 +74,14 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
 
         results.forEach((node: J.NodeInfo) => {
-            const c = this.renderItem(node, i, rowCount, jumpButton, state);
-            if (c) {
-                children.push(c);
+            if (state.editNode && state.editNode.id === node.id && state.editNodeOnTab === this.data.id) {
+                children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
+            }
+            else {
+                const c = this.renderItem(node, i, rowCount, jumpButton, state);
+                if (c) {
+                    children.push(c);
+                }
             }
             i++;
             rowCount++;
