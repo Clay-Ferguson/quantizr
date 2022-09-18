@@ -9,6 +9,9 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
@@ -201,5 +204,16 @@ public class MongoUpdate extends ServiceBase {
 		Update update = new Update();
 		update.set(SubNode.HAS_CHILDREN, null);
 		ops.findAndModify(query, update, SubNode.class);
+	}
+
+	// returns a new BulkOps if one not yet existing
+	public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val) {
+		if (no(bops)) {
+			bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+		}
+		Query query = new Query().addCriteria(new Criteria("id").is(id));
+		Update update = new Update().set(prop, val);
+		bops.updateOne(query, update);
+		return bops;
 	}
 }

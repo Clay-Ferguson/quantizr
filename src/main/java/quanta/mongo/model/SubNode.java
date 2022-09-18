@@ -438,7 +438,6 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public boolean set(String key, Object val) {
-		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			if (no(props)) {
 				// if there are no props currently, and the val is null we do nothing, because
@@ -459,6 +458,10 @@ public class SubNode {
 				changed = no(curVal) || !val.equals(curVal);
 				props.put(key, val);
 			}
+
+			if (changed) {
+				ThreadLocals.dirty(this);
+			}
 			return changed;
 		}
 	}
@@ -474,9 +477,11 @@ public class SubNode {
 	public void delete(String key) {
 		if (no(props))
 			return;
-		ThreadLocals.dirty(this);
+
 		synchronized (propLock) {
-			props().remove(key);
+			if (ok(props().remove(key))) {
+				ThreadLocals.dirty(this);
+			}
 		}
 	}
 

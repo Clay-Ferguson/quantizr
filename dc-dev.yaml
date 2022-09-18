@@ -94,7 +94,7 @@ services:
             mongoSecurity: "true"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
-            # requireCrypto: "true"
+            requireCrypto: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string
             # Using '|' there instead would preserve the newlines after read in

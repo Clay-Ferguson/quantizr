@@ -756,6 +756,20 @@ export class Crypto {
         return str;
     }
 
+    /* This method will simply sign all the strings in 'dataToSign' and then send it up to the server when done */
+    generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
+
+        for (const dat of dataToSign.listToSign) {
+            // convert all the data to be signed into the signatures
+            dat.data = await S.crypto.sign(null, dat.data);
+        }
+
+        // then we can send this same object right back up with all signatures.
+        await S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", dataToSign);
+        // console.log("Sent Signatures: "+S.util.prettyPrint(dataToSign));
+        return null;
+    }
+
     signNode = async (node: J.NodeInfo): Promise<void> => {
         if (!this.avail) {
             throw new Error("Crypto not available.");

@@ -119,6 +119,8 @@ import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetNodePositionRequest;
 import quanta.request.SetUnpublishedRequest;
+import quanta.request.SignNodesRequest;
+import quanta.request.SignSubGraphRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
@@ -142,6 +144,8 @@ import quanta.response.LogoutResponse;
 import quanta.response.PingResponse;
 import quanta.response.SendLogTextResponse;
 import quanta.response.SendTestEmailResponse;
+import quanta.response.SignNodesResponse;
+import quanta.response.SignSubGraphResponse;
 import quanta.service.AclService;
 import quanta.service.ExportServiceFlexmark;
 import quanta.service.ExportTarService;
@@ -546,7 +550,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-		
+
 		return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
 			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
 			return res;
@@ -1435,6 +1439,31 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
+	public @ResponseBody Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
+		return callProc.run("signNodes", true, true, req, session, ms -> {
+			SignNodesResponse res = new SignNodesResponse();
+			// log.debug("signNodes: " + req);
+			crypto.signNodes(ms, req, res);
+			res.setSuccess(true);
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/signSubGraph", method = RequestMethod.POST)
+	public @ResponseBody Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
+		return callProc.run("signSubGraph", true, true, req, session, ms -> {
+			SignSubGraphResponse res = new SignSubGraphResponse();
+
+			// run the signing in an async thread, so we can push messages back to browser from it
+			exec.run(() -> {
+				crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
+			});
+			res.setSuccess(true);
+			return res;
+		});
+	}
+
 	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1558,7 +1587,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-	
+
 		return callProc.run("graphNodes", true, true, req, session, ms -> {
 			GraphResponse res = graphNodes.graphNodes(ms, req);
 			res.setSuccess(true);

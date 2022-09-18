@@ -311,6 +311,14 @@ export class View {
         new NodeStatsDlg(res, trending, feed).open();
     }
 
+    signSubGraph = async (state: AppState): Promise<any> => {
+        const node = S.nodeUtil.getHighlightedNode(state);
+        await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
+            nodeId: node ? node.id : null
+        });
+        S.util.showMessage("Signature generation initiated. Leave this browser window opened, until notified signatures are complete.", "Signatures");
+    }
+
     getNodeSignatureVerify = async (state: AppState): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(state);
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {

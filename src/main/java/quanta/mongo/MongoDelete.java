@@ -573,6 +573,7 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	// returns a new BulkOps if one not yet existing
+	// todo-0: I'm creating a dupliate of this in MongoUpdate. remove this one.
 	public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val) {
 		if (no(bops)) {
 			bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);

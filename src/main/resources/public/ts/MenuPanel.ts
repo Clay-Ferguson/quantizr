@@ -115,6 +115,7 @@ export class MenuPanel extends Div {
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", getAppState(null));
     static nodeStats = () => S.view.getNodeStats(getAppState(null), false, false);
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify(getAppState(null));
+    static signSubGraph = () => S.view.signSubGraph(getAppState(null));
 
     static readJSONfromURL = () => {
         // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
@@ -491,6 +492,7 @@ export class MenuPanel extends Div {
 
             children.push(new Menu(state, "Admin - DB", [
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify), //
+                new MenuItem("Sign SubGraph", MenuPanel.signSubGraph), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
                 new MenuItem("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null, appState)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //

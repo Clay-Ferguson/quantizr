@@ -469,6 +469,15 @@ export interface SetUnpublishedRequest extends RequestBase {
     unpublished: boolean;
 }
 
+export interface SignNodesRequest extends RequestBase {
+    workloadId: number;
+    listToSign: NodeSigData[];
+}
+
+export interface SignSubGraphRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
@@ -747,6 +756,16 @@ export interface NodeSearchResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 
+export interface NodeSigData {
+    nodeId: string;
+    data: string;
+}
+
+export interface NodeSigPushInfo extends ServerPushInfo {
+    workloadId: number;
+    listToSign: NodeSigData[];
+}
+
 export interface NotificationMessage extends ServerPushInfo {
     nodeId: string;
     fromUser: string;
@@ -820,7 +839,6 @@ export interface SendTestEmailResponse extends ResponseBase {
 }
 
 export interface ServerPushInfo {
-    type: string;
 }
 
 export interface SessionTimeoutPushInfo extends ServerPushInfo {
@@ -833,6 +851,12 @@ export interface SetNodePositionResponse extends ResponseBase {
 }
 
 export interface SetUnpublishedResponse extends ResponseBase {
+}
+
+export interface SignNodesResponse extends ResponseBase {
+}
+
+export interface SignSubGraphResponse extends ResponseBase {
 }
 
 export interface SignupResponse extends ResponseBase {
