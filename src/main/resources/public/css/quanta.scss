@@ -834,9 +834,14 @@ Will come back later and study this more. todo-1 */
 }
 
 .cryptoKeyTextContent {
-    max-height: 150px;
+    max-height: 300px;
     border: 1px solid $gray-700;
     padding: 1rem;
+}
+
+.selectKeyTypeDropDown {
+    margin-bottom: 12px;
+    max-width: 20rem;
 }
 
 .centeredTitle {

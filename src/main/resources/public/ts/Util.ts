@@ -8,7 +8,6 @@ import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
@@ -707,23 +706,6 @@ export class Util {
     perfEnd = (message: string, startTime: number) => {
         const endTime = performance.now();
         console.log(message + " Time=" + (endTime - startTime));
-    }
-
-    generateNewCryptoKeys = async (state: AppState): Promise<any> => {
-        if (!S.crypto.avail) {
-            return;
-        }
-        let dlg = new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
-            "btn-danger", "alert alert-danger");
-        await dlg.open();
-        if (!dlg.yes) return;
-
-        dlg = new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
-            "btn-danger", "alert alert-danger");
-        await dlg.open();
-        if (dlg.yes) {
-            await S.crypto.initKeys(S.quanta.userName, true, true, true);
-        }
     }
 
     buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {

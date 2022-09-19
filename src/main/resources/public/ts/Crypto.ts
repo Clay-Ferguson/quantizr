@@ -258,9 +258,7 @@ export class Crypto {
 
     // todo-1: need to make this require the password and username to be more secure.
     //         And an unsolved design task is users signing data from different browsers.
-    // todo-0: we need to SEPARATE update+public method, and then will remove the "Generate Keys" from the menu and instead
-    // make thee different update buttons for each text field on the Show Keys dialog.... and rename that dialog to Manage Keys.
-    initKeys = async (user: string, forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+    initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
         if (g_requireCrypto !== "true" || user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
             return;
@@ -271,14 +269,26 @@ export class Crypto {
             return;
         }
 
-        // todo-0: for now we only support forceUpdate of signature key
-        const newAsymEncKey = await this.initAsymetricKeys(false); // forceUpdate==false
-        await this.initSymetricKey(false); // forceUpdate==false
+        let newAsymEncKey = null;
+        let newSigKey = null;
+        let newUserSignature = null;
 
-        const newSigKey = await this.initSigKeys(forceUpdate);
-        const newUserSignature = await S.crypto.sign(null, user);
+        if (keyType === "all" || keyType === "asym") {
+            newAsymEncKey = await this.initAsymetricKeys(forceUpdate);
+        }
 
-        if (republish && newAsymEncKey && newSigKey && newUserSignature) {
+        if (keyType === "all" || keyType === "sym") {
+            await this.initSymetricKey(forceUpdate);
+        }
+
+        if (keyType === "all" || keyType === "sig") {
+            newSigKey = await this.initSigKeys(forceUpdate);
+            newUserSignature = await S.crypto.sign(null, user);
+        }
+
+        if (republish && (newAsymEncKey || newSigKey)) {
+
+            // todo-0: make server side allow either of these to be null to ignore it.
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
@@ -288,9 +298,14 @@ export class Crypto {
             if (res.success) {
                 // note, even though we only update these if successful on the server the client side will still definitely
                 // have the new keys in the LocalDB already
-                S.quanta.asymEncKey = newAsymEncKey;
-                S.quanta.sigKey = newSigKey;
-                S.quanta.userSignature = newUserSignature;
+                if (newAsymEncKey) {
+                    S.quanta.asymEncKey = newAsymEncKey;
+                }
+
+                if (newSigKey) {
+                    S.quanta.sigKey = newSigKey;
+                    S.quanta.userSignature = newUserSignature;
+                }
 
                 if (showConfirm) {
                     S.util.showMessage("Successfully published Public Keys");
@@ -301,9 +316,14 @@ export class Crypto {
             }
         }
         else {
-            S.quanta.asymEncKey = newAsymEncKey;
-            S.quanta.sigKey = newSigKey;
-            S.quanta.userSignature = newUserSignature;
+            if (newAsymEncKey) {
+                S.quanta.asymEncKey = newAsymEncKey;
+            }
+
+            if (newSigKey) {
+                S.quanta.sigKey = newSigKey;
+                S.quanta.userSignature = newUserSignature;
+            }
         }
     }
 

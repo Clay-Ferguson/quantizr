@@ -7,7 +7,6 @@ import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
-import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
@@ -149,9 +148,6 @@ export class MenuPanel extends Div {
         f();
     };
 
-    static generateKeys = () => { S.util.generateNewCryptoKeys(getAppState(null)); };
-    static publishKeys = () => { S.crypto.initKeys(S.quanta.userName, false, true, true); };
-    static importKeys = () => { new ImportCryptoKeyDlg().open(); };
     static profile = () => { new UserProfileDlg(null).open(); };
     static accountSettings = () => { new ManageAccountDlg().open(); };
     static storageSpace = () => { new ManageStorageDlg().open(); };
@@ -421,25 +417,21 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
-
             new MenuItem("Profile", MenuPanel.profile, !appState.isAnonUser), //
             new MenuItem("Account Settings", MenuPanel.accountSettings, !appState.isAnonUser), //
             new MenuItem("Storage Space", MenuPanel.storageSpace, !appState.isAnonUser), //
+            new MenuItem("Security Keys", MenuPanel.showKeys, S.crypto.avail && !appState.isAnonUser), //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Browser Info", MenuPanel.browserInfo), //
+            new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
             !appState.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !appState.isAnonUser) : null, //
             appState.isAnonUser ? new MenuItem("Signup", S.user.userSignup, appState.isAnonUser) : null //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
         ]));
-
-        children.push(new Menu(state, "Cryptographic", [
-            new MenuItem("Show Keys", MenuPanel.showKeys, S.crypto.avail && !appState.isAnonUser), //
-            new MenuItem("Generate Keys", MenuPanel.generateKeys, S.crypto.avail && !appState.isAnonUser), //
-            new MenuItem("Publish Public Keys", MenuPanel.publishKeys, S.crypto.avail && !appState.isAnonUser), //
-            new MenuItem("Import Keys", MenuPanel.importKeys, S.crypto.avail && !appState.isAnonUser) //
-        ], null, this.makeHelpIcon(":menu-encrypt")));
 
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
