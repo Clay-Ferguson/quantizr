@@ -241,6 +241,12 @@ export class Crypto {
             this.OP_VERIFY as KeyUsage[], this.OP_SIGN as KeyUsage[]);
     }
 
+    // todo-0: not tested. Need to test.
+    importAsymKeyPair = async (keyJson: string): Promise<boolean> => {
+        return this.importKeyPair(keyJson, this.STORE_ASYMKEY, this.ASYM_IMPORT_ALGO,
+            this.OP_ENC as KeyUsage[], this.OP_DEC as KeyUsage[]);
+    }
+
     importKeyPair = async (keyPair: string, keyName: string, algoObj: any,
         publicOps: KeyUsage[], privateOps: KeyUsage[]): Promise<boolean> => {
         if (!this.avail) return false;
@@ -287,8 +293,6 @@ export class Crypto {
         }
 
         if (republish && (newAsymEncKey || newSigKey)) {
-
-            // todo-0: make server side allow either of these to be null to ignore it.
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,

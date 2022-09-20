@@ -16,20 +16,22 @@ interface LS { // Local State
 export class ManageCryptoKeysDlg extends DialogBase {
 
     constructor() {
-        super("Encryption Keys");
+        super("Security Keys");
         this.mergeState({ keyType: "sig" });
     }
 
     renderDlg(): CompIntf[] {
         const state: LS = this.getState<LS>();
         return [
-            new Selection(null, "Key Type", [
-                { key: "sig", val: this.getKeyTypeName("sig") },
-                { key: "asym", val: this.getKeyTypeName("asym") },
-                { key: "sym", val: this.getKeyTypeName("sym") }
+            new Selection(null, "Select Key", [
+                { key: "sig", val: this.getKeyTypeName("sig") }, // STORE_SIGKEY
+                { key: "asym", val: this.getKeyTypeName("asym") } // STORE_ASYMKEY
+
+                // currently not sing SYMKEY for anything.
+                // { key: "sym", val: this.getKeyTypeName("sym") } // STORE_SYMKEY
             ], "selectKeyTypeDropDown", null, {
                 setValue: (val: string) => {
-                    console.log("Key Type: " + val);
+                    // console.log("Key Type: " + val);
                     this.mergeState<LS>({ keyType: val, keyJson: "Loading..." });
                     setTimeout(() => { this.preLoad(); }, 500);
                 },

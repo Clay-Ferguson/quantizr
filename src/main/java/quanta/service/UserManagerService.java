@@ -541,10 +541,15 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(as, userName);
 
 			if (ok(userNode)) {
-				// force pubSigKey to regenerate as needed by setting to null
-				ThreadLocals.getSC().pubSigKey = null;
-				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
-				userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
+				if (ok(req.getAsymEncKey())) {
+					userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
+				}
+
+				if (ok(req.getSigKey())) {
+					// force pubSigKey to regenerate as needed by setting to null
+					ThreadLocals.getSC().pubSigKey = null;
+					userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
+				}
 				res.setSuccess(true);
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);

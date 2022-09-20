@@ -40,12 +40,11 @@ export class ImportCryptoKeyDlg extends DialogBase {
                     success = await S.crypto.importSigKeyPair(keyText);
                     break;
                 case "asym":
-                    // todo-0: implement
-                    alert("Feature not available.");
+                    success = await S.crypto.importAsymKeyPair(keyText);
                     break;
                 case "sym":
-                    // todo-0: implement
-                    alert("Feature not available.");
+                    // not currently used
+                    // alert("Feature not available.");
                     break;
                 default: break;
             }
