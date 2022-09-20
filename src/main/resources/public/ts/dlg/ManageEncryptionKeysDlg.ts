@@ -13,7 +13,7 @@ interface LS { // Local State
     keyJson?: string;
 }
 
-export class ManageEncryptionKeysDlg extends DialogBase {
+export class ManageCryptoKeysDlg extends DialogBase {
 
     constructor() {
         super("Encryption Keys");
@@ -92,7 +92,7 @@ export class ManageEncryptionKeysDlg extends DialogBase {
                 this.mergeState<LS>({ keyJson });
                 break;
             case "sym":
-                keyJson = await S.crypto.exportSymKeys();
+                keyJson = await S.crypto.exportSymKey();
                 this.mergeState<LS>({ keyJson });
                 break;
             default:

@@ -8,7 +8,7 @@ import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
-import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+import { ManageCryptoKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
@@ -141,13 +141,7 @@ export class MenuPanel extends Div {
         S.util.saveUserPreferences(state);
     };
 
-    static showKeys = () => {
-        const f = async () => {
-            new ManageEncryptionKeysDlg().open();
-        };
-        f();
-    };
-
+    static showKeys = () => { new ManageCryptoKeysDlg().open(); };
     static profile = () => { new UserProfileDlg(null).open(); };
     static accountSettings = () => { new ManageAccountDlg().open(); };
     static storageSpace = () => { new ManageStorageDlg().open(); };

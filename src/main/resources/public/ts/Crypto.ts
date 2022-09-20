@@ -532,7 +532,7 @@ export class Crypto {
         return ret;
     }
 
-    exportSymKeys = async (): Promise<string> => {
+    exportSymKey = async (): Promise<string> => {
         if (!this.avail) return null;
         let ret = "";
         const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
@@ -673,7 +673,7 @@ export class Crypto {
         return ret;
     }
 
-    /* Inverse of  encryptSharableString() function */
+    /* Inverse of encryptSharableString() function */
     decryptSharableString = async (privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> => {
         let ret: string = null;
 

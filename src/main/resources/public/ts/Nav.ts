@@ -183,6 +183,7 @@ export class Nav {
                 singleNode: false,
                 parentCount: state.userPrefs.showParents ? 1 : 0
             });
+
             this.navPageNodeResponse(res, state);
         }
         catch (e) {
@@ -288,6 +289,7 @@ export class Nav {
                     singleNode: false,
                     parentCount: state.userPrefs.showParents ? 1 : 0
                 });
+
                 this.navPageNodeResponse(res, state);
             }
             catch (e) {
