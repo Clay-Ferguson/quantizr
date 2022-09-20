@@ -355,7 +355,7 @@ export class NodeUtil {
             ret.push(new Span("more...", { className: "sharingName", title: "Also shared to...\n" + showMore }));
         }
 
-        if (numShares > 0) {
+        if (numShares > 0 && editorDlg) {
             // this 'as any' is a temp hack (to avoid circular ref) todo-1
             ret.push(new Span("Add to Content", { className: "marginLeft clickable", onClick: () => (editorDlg as any).addSharingToContentText() }));
         }
