@@ -53,7 +53,7 @@ public class Convert extends ServiceBase {
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		boolean sigFail = false;
-		// todo-0: need a config setting that specifies which path is required to be signed so
+		// todo-0: need a config setting that specifies which path(s) are required to be signed so
 		// this can be enabled/disabled easily by admin
 		if (prop.isRequireCrypto() && node.getPath().startsWith("/r/public/")) {
 			String sig = node.getStr(NodeProp.CRYPTO_SIG);

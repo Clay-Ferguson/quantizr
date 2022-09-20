@@ -123,7 +123,6 @@ public class AclService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 		boolean success = true;
 
-		// todo-0: instead of looping here we should make addPrivileges accept the array of users.
 		for (String principal : req.getPrincipals()) {
 			principal = XString.stripIfStartsWith(principal, "@");
 			if (!addPrivilege(ms, null, node, principal, req.getPrivileges(), res)) {

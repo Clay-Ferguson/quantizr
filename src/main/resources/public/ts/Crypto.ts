@@ -238,7 +238,6 @@ export class Crypto {
             this.OP_VERIFY as KeyUsage[], this.OP_SIGN as KeyUsage[]);
     }
 
-    // todo-0: not tested. Need to test.
     importAsymKeyPair = async (keyJson: string): Promise<boolean> => {
         return this.importKeyPair(keyJson, this.STORE_ASYMKEY, this.ASYM_IMPORT_ALGO,
             this.OP_ENC as KeyUsage[], this.OP_DEC as KeyUsage[]);

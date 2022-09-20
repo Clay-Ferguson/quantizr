@@ -727,8 +727,6 @@ public class MongoRead extends ServiceBase {
         }
 
         Iterable<SubNode> iter = mongoUtil.find(q);
-
-        // todo-0: need to review 'filterOutOrphans' with a fresh head!
         return removeOrphans ? mongoUtil.filterOutOrphans(ms, node, iter) : iter;
     }
 

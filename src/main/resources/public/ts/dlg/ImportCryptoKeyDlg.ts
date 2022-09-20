@@ -58,7 +58,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 await S.crypto.initKeys(S.quanta.userName, false, true, false, this.keyType);
 
                 const dlg = new MessageDlg("Keys imported successfully", "Keys", () => {
-                    // todo-0: need better way than 'reload' to update everything locally
+                    // todo-1: need better way than 'reload' to update everything locally
                     window.location.reload();
                 }, null, false, 0, null);
                 dlg.open();
