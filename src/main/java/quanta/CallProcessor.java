@@ -48,9 +48,13 @@ public class CallProcessor extends ServiceBase {
 			SessionContext.authBearer();
 		}
 
-		if (authSig) {
-			SessionContext.authSig();
-		}
+		// todo-0: this works fine, but I'm disabling for now until there's a better way to inform the user
+		// that this can happen when their key on their browser is different than expected, which CAN even
+		// happen simply from using a different browser. And also all the flow around how this can be encountered
+		// during login/logout needs to be tested and more well thought out.
+		// if (authSig) {
+		// 	SessionContext.authSig();
+		// }
 
 		logRequest(command, req, httpSession);
 
