@@ -12,14 +12,12 @@ to reimport the JSON key text back in at any time, or install the keys in a diff
 At no point in time does the users' Private Key ever leave their own browser storage.
 
 TIP: (Not currenty used)
-Original way I had for creating a hashe-based key from a password:
+Original way I had for creating a hash-based key from a password:
 
     let hashPromise = this.crypto.subtle.digest({ name: "SHA-256" }, this.convertStringToByteArray(password));
     hashPromise.then((hash: any) => {
     let keyPromise = this.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"]);
 */
-
-declare const g_requireCrypto: string;
 
 export class Crypto {
     readonly avail: boolean = !!(crypto?.subtle);
@@ -73,7 +71,6 @@ export class Crypto {
     OP_DEC: KeyUsage[] = ["decrypt"];
 
     vector: Uint8Array = null;
-
     logKeys: boolean = false;
 
     constructor() {
@@ -81,7 +78,7 @@ export class Crypto {
         web address plus also localhost */
 
         if (!this.avail) {
-            console.log("WebCryptoAPI not available");
+            console.log("Crypto API not available");
             return;
         }
 
@@ -265,7 +262,7 @@ export class Crypto {
     // todo-1: need to make this require the password and username to be more secure.
     //         And an unsolved design task is users signing data from different browsers.
     initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
-        if (g_requireCrypto !== "true" || user === J.PrincipalName.ANON) {
+        if (user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
             return;
         }

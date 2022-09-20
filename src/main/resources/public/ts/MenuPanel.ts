@@ -8,7 +8,7 @@ import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
-import { ManageCryptoKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+import { ManageCryptoKeysDlg } from "./dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MultiFollowDlg } from "./dlg/MultiFollowDlg";

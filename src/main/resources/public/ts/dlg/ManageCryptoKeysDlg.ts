@@ -55,10 +55,11 @@ export class ManageCryptoKeysDlg extends DialogBase {
         await dlg.open();
         if (!dlg.yes) return;
         const state: LS = this.getState<LS>();
-        S.crypto.initKeys(S.quanta.userName, true, true, true, state.keyType);
+        await S.crypto.initKeys(S.quanta.userName, true, true, true, state.keyType);
+        this.preLoad();
     }
 
-    publishKey = async () => {
+    publishKey = async (): Promise<void> => {
         const dlg = new ConfirmDlg("Publish Public Crypto Key?", "Warning",
             "btn-danger", "alert alert-danger");
         await dlg.open();
@@ -67,9 +68,11 @@ export class ManageCryptoKeysDlg extends DialogBase {
         S.crypto.initKeys(S.quanta.userName, false, true, false, state.keyType);
     }
 
-    importKey = (): void => {
+    importKey = async (): Promise<void> => {
         const state: LS = this.getState<LS>();
-        new ImportCryptoKeyDlg(state.keyType, this.getKeyTypeName(state.keyType)).open();
+        const dlg = new ImportCryptoKeyDlg(state.keyType, this.getKeyTypeName(state.keyType));
+        await dlg.open();
+        this.preLoad();
     }
 
     getKeyTypeName = (abbrev: string): string => {
