@@ -91,25 +91,23 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
-	 * todo-0: this is pending a rewrite to maintain the 'node.hasChildren' on all parents. What we will
-	 * do is scan all the nodes being removed first in a separate pass to accumulate the parent ID of
-	 * all parents, and then we will do a 'parent.hasChildren=null' (unknown) for all those children.
-	 * The hasChildren values will by design get set back to true/false as needed.
+	 * note: Running this will technically invalidate the 'node.hasChildren' on all parent nodes of the
+	 * deleted nodes, but this is ok, because what we deleted was just cached nodes from foreign servers
+	 * and if there are still any posts left in the foreign user account then actually the
+	 * 'node.hasChildren' will remain correct. So there's no reason to worry about damaging the
+	 * 'correctness' of 'hasChildren' for this scanrio
 	 */
 	public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
-		return 0;
-		// Query q = new Query();
+		Query q = new Query();
+		LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
+		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		// // date 365 days ago. Posts over a year old will be removed
-		// LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
-		// Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null) //
+				.and(SubNode.MODIFY_TIME).lt(date);
 
-		// Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null) //
-		// .and(SubNode.MODIFY_TIME).lt(date);
-
-		// q.addCriteria(crit);
-		// DeleteResult res = ops.remove(q, SubNode.class);
-		// return res.getDeletedCount();
+		q.addCriteria(crit);
+		DeleteResult res = ops.remove(q, SubNode.class);
+		return res.getDeletedCount();
 	}
 
 	/*
@@ -318,14 +316,14 @@ public class MongoDelete extends ServiceBase {
 	/*
 	 * todo-0: Can add Verify & Repair HAS_CHILDREN in this method.
 	 * 
-	 * Since every node looks for it's parent in this process we could theoretically use this to
-	 * also perfectly verify and/or repair every HAS_CHILDREN in the system. We'd just keep a list if
-	 * which nodes claim they DO have children in a HashSet of those ObjectIds, and then as we encounter
-	 * each one as a parent we "find" in this as we go along remove from the HashSet, as "correct" so
-	 * that whatever's left in said HashSet when the entire process is completed will be nodes that are
-	 * known to claim to have children and don't. Then do we do the 'inverse of that' to fix the nodes
-	 * that claim NOT to have children but DO have children...which would be a separate hash map doing
-	 * the same kind of logic.
+	 * Since every node looks for it's parent in this process we could theoretically use this to also
+	 * perfectly verify and/or repair every HAS_CHILDREN in the system. We'd just keep a list if which
+	 * nodes claim they DO have children in a HashSet of those ObjectIds, and then as we encounter each
+	 * one as a parent we "find" in this as we go along remove from the HashSet, as "correct" so that
+	 * whatever's left in said HashSet when the entire process is completed will be nodes that are known
+	 * to claim to have children and don't. Then do we do the 'inverse of that' to fix the nodes that
+	 * claim NOT to have children but DO have children...which would be a separate hash map doing the
+	 * same kind of logic.
 	 */
 	public void deleteNodeOrphans() {
 		log.debug("deleteNodeOrphans()");

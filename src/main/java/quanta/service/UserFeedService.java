@@ -140,7 +140,7 @@ public class UserFeedService extends ServiceBase {
 				// do nothing, for now.
 			}
 			/*
-			 * If chat node is NOT public we try to check out read auth on it and if not this will throw an
+			 * If chat node is NOT public we try to check our read auth on it and if not this will throw an
 			 * exception which is the correct flow here
 			 */
 			else {
