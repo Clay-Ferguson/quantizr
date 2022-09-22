@@ -16,6 +16,7 @@ import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
@@ -153,7 +154,7 @@ public class ActPubFollower extends ServiceBase {
 
     public Long getFollowersCount(String userMakingRequest, String userName) {
         return (Long) arun.run(as -> {
-            Long count = countFollowersOfUser(as, userMakingRequest, userName, null);
+            Long count = countFollowersOfUser(as, userMakingRequest, null, userName, null);
             return count;
         });
     }
@@ -174,7 +175,7 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public Iterable<SubNode> getFriendsByUserName(MongoSession ms, String userName) {
-        Query q = getFriendsByUserName_query(ms, userName);
+        Query q = getFriendsByUserName_query(ms, null, userName);
         if (no(q))
             return null;
         return mongoUtil.find(q);
@@ -184,7 +185,7 @@ public class ActPubFollower extends ServiceBase {
         GetFollowersResponse res = new GetFollowersResponse();
 
         return arun.run(as -> {
-            Query q = getFriendsByUserName_query(as, req.getTargetUserName());
+            Query q = getFriendsByUserName_query(as, null, req.getTargetUserName());
             if (no(q))
                 return null;
 
@@ -208,10 +209,11 @@ public class ActPubFollower extends ServiceBase {
         });
     }
 
-    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, String userName, String actorUrl) {
+    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, SubNode userNode, String userName,
+            String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
-            return countFollowersOfLocalUser(ms, userName);
+            return countFollowersOfLocalUser(ms, userNode, userName);
         }
         // if foreign user
         else {
@@ -233,25 +235,27 @@ public class ActPubFollower extends ServiceBase {
         }
     }
 
-    public long countFollowersOfLocalUser(MongoSession ms, String userName) {
-        Query q = getFriendsByUserName_query(ms, userName);
+    public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
+        Query q = getFriendsByUserName_query(ms, userNode, userName);
         if (no(q))
             return 0L;
         return ops.count(q, SubNode.class);
     }
 
-    public Query getFriendsByUserName_query(MongoSession ms, String userName) {
+    /* caller can pass userName only or else pass userNode if it's already available */
+    public Query getFriendsByUserName_query(MongoSession ms, SubNode userNode, String userName) {
         Query q = new Query();
-        Criteria crit =
-                /*
-                 * Technically we should be querying only user Users Root, but I will assume the admin hasn't
-                 * created any user nodes outside that location so that we can simplify this query and possibly make
-                 * it run faster, by exclulding the subgraph check and just querying the entire DB based only on
-                 * USER and FRIEND type
-                 */
-                // Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS))
-                Criteria.where(SubNode.PROPS + "." + NodeProp.USER.s()).is(userName) //
-                        .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+
+        if (no(userNode)) {
+            userNode = read.getUserNodeByUserName(ms, userName, false);
+            if (no(userNode)) {
+                return null;
+            }
+        }
+
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS))
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()) //
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         q.addCriteria(crit);
         return q;

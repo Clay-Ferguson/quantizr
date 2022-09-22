@@ -779,7 +779,7 @@ public class UserManagerService extends ServiceBase {
 		/*
 		 * lookup to see if this will be a duplicate
 		 */
-		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, req.getUserName(), NodeType.FRIEND.s());
+		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, null, req.getUserName(), NodeType.FRIEND.s());
 		if (no(userNode)) {
 			SubNode accntNode = arun.run(s -> {
 				return read.getUserNodeByUserName(s, req.getUserName());
@@ -914,6 +914,8 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	private void addFriendInternal(MongoSession ms, String userDoingTheFollow, String userToFollow) {
+		SubNode inUserNode = null;
+
 		SubNode followerFriendList =
 				read.getUserNodeByType(ms, userDoingTheFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
@@ -925,7 +927,7 @@ public class UserManagerService extends ServiceBase {
 		/*
 		 * lookup to see if this followerFriendList node already has userToFollow already under it
 		 */
-		SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, userToFollow, NodeType.FRIEND.s());
+		SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, inUserNode, userToFollow, NodeType.FRIEND.s());
 
 		// if friendNode is non-null here it means we were already following the user.
 		if (ok(friendNode))
@@ -1017,7 +1019,7 @@ public class UserManagerService extends ServiceBase {
 						userProfile.setHomeNodeId(userHomeNode.getIdStr());
 					}
 
-					Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, nodeUserName, actorUrl);
+					Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, userNode, nodeUserName, actorUrl);
 					userProfile.setFollowerCount(followerCount.intValue());
 
 					Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
@@ -1028,10 +1030,10 @@ public class UserManagerService extends ServiceBase {
 						 * Only for local users do we attemp to generate followers and following, but theoretically we can
 						 * use the ActPub API to query for this for foreign users also.
 						 */
-						boolean blocked = userIsBlockedByMe(as, nodeUserName);
+						boolean blocked = userIsBlockedByMe(as, userNode, nodeUserName);
 						userProfile.setBlocked(blocked);
 
-						boolean following = userIsFollowedByMe(as, nodeUserName);
+						boolean following = userIsFollowedByMe(as, userNode, nodeUserName);
 						userProfile.setFollowing(following);
 					}
 				}
@@ -1040,19 +1042,19 @@ public class UserManagerService extends ServiceBase {
 		});
 	}
 
-	public boolean userIsFollowedByMe(MongoSession ms, String maybeFollowedUser) {
+	public boolean userIsFollowedByMe(MongoSession ms, SubNode inUserNode, String maybeFollowedUser) {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
-		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
+		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}
 
-	public boolean userIsBlockedByMe(MongoSession ms, String maybeBlockedUser) {
+	public boolean userIsBlockedByMe(MongoSession ms, SubNode inUserNode, String maybeBlockedUser) {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
-		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
+		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, inUserNode, maybeBlockedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}
 

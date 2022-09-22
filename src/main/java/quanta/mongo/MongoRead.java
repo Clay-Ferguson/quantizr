@@ -360,7 +360,7 @@ public class MongoRead extends ServiceBase {
         }
 
         if (authPending && allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ); //this can be redundant with the 'getNode' above that already considered allowAuth 
+            auth.auth(ms, ret, PrivilegeType.READ); 
         }
         return ret;
     }
@@ -1071,9 +1071,9 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
-                // .and(SubNode.PROPS + "." + NodeProp.USER).is(user);
                 // case-insensitive lookup of username:
-                .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
+                .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$") //
+                .and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         q.addCriteria(crit);
 
@@ -1091,19 +1091,27 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Finds and returns the first node matching userName and type under the 'node', or null if not
-     * existing
+     * existing. Caller can pass userNode if its available, or else userName will be used to look it up
      */
     @PerfMon(category = "read")
-    public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, String userName, String type) {
+    public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, SubNode userNode, String userName, String type) {
         if (noChildren(node)) {
             return null;
+        }
+
+        if (no(userNode)) {
+            userNode = read.getUserNodeByUserName(ms, userName, false);
+            if (no(userNode)) {
+                return null;
+            }
         }
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
+                .and(SubNode.TYPE).is(type) //
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
 
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);

@@ -193,7 +193,7 @@ public class ActPubFollowing extends ServiceBase {
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
-                    SubNode friendNode = read.findNodeByUserAndType(as, followerFriendList, userToFollow, NodeType.FRIEND.s());
+                    SubNode friendNode = read.findNodeByUserAndType(as, followerFriendList, null, userToFollow, NodeType.FRIEND.s());
 
                     if (no(friendNode)) {
                         if (!unFollow) {
