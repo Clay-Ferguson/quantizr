@@ -52,7 +52,6 @@ import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
 import quanta.request.GetUserAccountInfoRequest;
-import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SavePublicKeyRequest;
@@ -67,7 +66,6 @@ import quanta.response.DeleteFriendResponse;
 import quanta.response.FriendInfo;
 import quanta.response.GetFriendsResponse;
 import quanta.response.GetUserAccountInfoResponse;
-import quanta.response.GetUserProfileResponse;
 import quanta.response.LoginResponse;
 import quanta.response.PushPageMessage;
 import quanta.response.ResetPasswordResponse;
@@ -109,6 +107,7 @@ public class UserManagerService extends ServiceBase {
 	public LoginResponse login(HttpServletRequest httpReq, LoginRequest req) {
 		LoginResponse res = new LoginResponse();
 		SessionContext sc = ThreadLocals.getSC();
+		SubNode userNode = null;
 		// log.debug("login: " + XString.prettyPrint(req));
 
 		/* Anonymous user */
@@ -128,7 +127,7 @@ public class UserManagerService extends ServiceBase {
 		/* User Login */
 		else {
 			// lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
-			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, req.getUserName()));
+			userNode = arun.run(as -> read.getUserNodeByUserName(as, req.getUserName()));
 			String userName = userNode.getStr(NodeProp.USER);
 
 			String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
@@ -157,15 +156,21 @@ public class UserManagerService extends ServiceBase {
 
 		if (sc.isAuthenticated()) {
 			MongoSession ms = ThreadLocals.getMongoSession();
-			processLogin(ms, res, sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
+			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
 			log.debug("login: user=" + sc.getUserName());
 
-			// ensure we've pre-created this node.
-			SubNode postsNode = read.getUserNodeByType(ms, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
-					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+			/*
+			 * todo-0: need to be sure these are created when USER signup happens, and then we can be safe
+			 * creating here only in async thread, that doesn't block any logins.
+			 */
+			exec.run(() -> {
+				// ensure we've pre-created this node.
+				SubNode postsNode = read.getUserNodeByType(ms, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
+						Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-			ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName() + "'s Node", NodeType.NONE.s(),
-					NodeName.HOME);
+				ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName() + "'s Node", NodeType.NONE.s(),
+						NodeName.HOME);
+			});
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
@@ -204,10 +209,17 @@ public class UserManagerService extends ServiceBase {
 		}
 	}
 
-	public void processLogin(MongoSession ms, LoginResponse res, String userName, String asymEncKey, String sigKey) {
+	/*
+	 * caller can optionally pass userNode if it's already available, or else it will be looked up using
+	 * userName
+	 */
+	public void processLogin(MongoSession ms, LoginResponse res, SubNode userNode, String userName, String asymEncKey,
+			String sigKey) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
-		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
+		if (no(userNode)) {
+			userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
+		}
 
 		if (no(userNode)) {
 			throw new RuntimeEx("User not found: " + userName);
@@ -256,6 +268,8 @@ public class UserManagerService extends ServiceBase {
 				log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
 			}
 		}
+
+		res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
 
 		ensureValidCryptoKeys(userNode);
 		// log.debug("SAVING USER NODE: "+XString.prettyPrint(userNode));
@@ -953,32 +967,36 @@ public class UserManagerService extends ServiceBase {
 		}
 	}
 
-	public GetUserProfileResponse getUserProfile(GetUserProfileRequest req) {
-		GetUserProfileResponse res = new GetUserProfileResponse();
+	/*
+	 * Abbreviated flag means don't get ALL the info for the user but an abbreviated object that's
+	 * faster to generate like what we need when someone is logging in and the login endpoint needs
+	 * their own profile info as fast as possible.
+	 * 
+	 * caller should pass in 'userNode' if it's available or else userId will be used to get it.
+	 */
+	public UserProfile getUserProfile(String userId, SubNode _userNode, boolean abbreviated) {
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		arun.run(as -> {
+		return (UserProfile) arun.run(as -> {
+			UserProfile userProfile = null;
 			SubNode userNode = null;
-
-			if (no(req.getUserId())) {
-				userNode = read.getUserNodeByUserName(as, sessionUserName);
+			if (no(_userNode)) {
+				if (no(userId)) {
+					userNode = read.getUserNodeByUserName(as, sessionUserName);
+				} else {
+					userNode = read.getNode(as, userId, false);
+				}
 			} else {
-				userNode = read.getNode(as, req.getUserId(), false);
+				userNode = _userNode;
 			}
 
 			if (ok(userNode)) {
-				UserProfile userProfile = new UserProfile();
+				userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER);
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-				SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + NodeName.HOME);
 
-				res.setUserProfile(userProfile);
 				userProfile.setUserName(nodeUserName);
 				userProfile.setDisplayName(displayName);
-
-				if (ok(userHomeNode)) {
-					userProfile.setHomeNodeId(userHomeNode.getIdStr());
-				}
 
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
@@ -993,30 +1011,33 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 
-				Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, nodeUserName, actorUrl);
-				userProfile.setFollowerCount(followerCount.intValue());
+				if (!abbreviated) {
+					SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + NodeName.HOME);
+					if (ok(userHomeNode)) {
+						userProfile.setHomeNodeId(userHomeNode.getIdStr());
+					}
 
-				Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
-				userProfile.setFollowingCount(followingCount.intValue());
+					Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, nodeUserName, actorUrl);
+					userProfile.setFollowerCount(followerCount.intValue());
 
-				if (!ThreadLocals.getSC().isAnonUser()) {
-					/*
-					 * Only for local users do we attemp to generate followers and following, but theoretically we can
-					 * use the ActPub API to query for this for foreign users also.
-					 */
-					boolean blocked = userIsBlockedByMe(as, nodeUserName);
-					userProfile.setBlocked(blocked);
+					Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
+					userProfile.setFollowingCount(followingCount.intValue());
 
-					boolean following = userIsFollowedByMe(as, nodeUserName);
-					userProfile.setFollowing(following);
+					if (!ThreadLocals.getSC().isAnonUser()) {
+						/*
+						 * Only for local users do we attemp to generate followers and following, but theoretically we can
+						 * use the ActPub API to query for this for foreign users also.
+						 */
+						boolean blocked = userIsBlockedByMe(as, nodeUserName);
+						userProfile.setBlocked(blocked);
+
+						boolean following = userIsFollowedByMe(as, nodeUserName);
+						userProfile.setFollowing(following);
+					}
 				}
-
-				// todo-2: add ability to know "follows you" state (for display on UserProfileDlg)
-				res.setSuccess(true);
 			}
-			return null;
+			return userProfile;
 		});
-		return res;
 	}
 
 	public boolean userIsFollowedByMe(MongoSession ms, String maybeFollowedUser) {

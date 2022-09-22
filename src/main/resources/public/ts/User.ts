@@ -192,17 +192,16 @@ export class User {
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
-                await this.queryUserProfile(res.rootNode);
 
                 // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
-                setTimeout(() => {
+                setTimeout(async () => {
                     if (usr !== J.PrincipalName.ADMIN) {
-                        this.checkMessages();
+                        await this.checkMessages();
                     }
-                    S.util.loadBookmarks();
-                    S.util.resumeEditingOfAbandoned();
-                }, 1000);
+                    await S.util.loadBookmarks();
+                    await S.util.resumeEditingOfAbandoned();
+                }, 250);
             }
 
             S.util.setStateVarsUsingLoginResponse(res);

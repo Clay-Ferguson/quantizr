@@ -138,6 +138,7 @@ import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
+import quanta.response.GetUserProfileResponse;
 import quanta.response.GraphResponse;
 import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
@@ -1336,7 +1337,10 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getUserProfile", false, false, req, session, ms -> {
-			return user.getUserProfile(req);
+			GetUserProfileResponse res = new GetUserProfileResponse();
+			res.setUserProfile(user.getUserProfile(req.getUserId(), null, false));
+			res.setSuccess(true);
+			return res;
 		});
 	}
 

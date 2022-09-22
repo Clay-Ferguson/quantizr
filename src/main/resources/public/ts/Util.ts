@@ -974,6 +974,7 @@ export class Util {
                 s.homeNodeId = res.rootNode;
                 s.homeNodePath = res.rootNodePath;
             }
+            s.userProfile = res.userProfile;
             s.userName = res.userName;
             s.isAdminUser = res.userName === "admin";
             s.isAnonUser = res.userName === J.PrincipalName.ANON;

@@ -1,9 +1,14 @@
 package quanta.response;
 
 import quanta.model.UserPreferences;
+import quanta.model.client.UserProfile;
 import quanta.response.base.ResponseBase;
 
 public class LoginResponse extends ResponseBase {
+
+	// now that we have userProfile in this object (a new change) some of the other properties
+	// should be redundant and can be removed
+	private UserProfile userProfile;
 
 	// Node Id of user account logged in.
 	private String rootNode;
@@ -52,6 +57,14 @@ public class LoginResponse extends ResponseBase {
 
 	public void setRootNode(String rootNode) {
 		this.rootNode = rootNode;
+	}
+
+	public UserProfile getUserProfile() {
+		return userProfile;
+	}
+
+	public void setUserProfile(UserProfile userProfile) {
+		this.userProfile = userProfile;
 	}
 
 	public String getRootNodePath() {

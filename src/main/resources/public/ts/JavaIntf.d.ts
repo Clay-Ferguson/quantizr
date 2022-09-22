@@ -715,6 +715,7 @@ export interface LoadNodeFromIpfsResponse extends ResponseBase {
 }
 
 export interface LoginResponse extends ResponseBase {
+    userProfile: UserProfile;
     rootNode: string;
     authToken: string;
     rootNodePath: string;
