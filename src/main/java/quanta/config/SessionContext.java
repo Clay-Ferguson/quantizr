@@ -334,7 +334,7 @@ public class SessionContext extends ServiceBase {
 		boolean verified =
 				crypto.sigVerify(sc.pubSigKey, Util.hexStringToBytes(sig), sc.getUserName().getBytes(StandardCharsets.UTF_8));
 		if (!verified) {
-			throw new RuntimeException("Request Sig Failed");
+			throw new RuntimeException("Request Sig Failed. Probably wrong signature key in browser for user "+sc.getUserName());
 		}
 	}
 
