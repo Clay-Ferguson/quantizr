@@ -103,7 +103,7 @@ export class User {
                     // console.log("calling loginResponse()");
                     // Note: If user entered wrong case-sentitivity string on login dialog they can still login
                     // but this res.userName however will have the correct name (case-sensitive) here now.
-                    this.loginResponse(res, res.userName, callPwd, false, state);
+                    this.loginResponse(res, res.userProfile.userName, callPwd, false, state);
                 } else {
                     if (res.success) {
                         S.util.setStateVarsUsingLoginResponse(res);

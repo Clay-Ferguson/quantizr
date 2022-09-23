@@ -175,7 +175,6 @@ public class UserManagerService extends ServiceBase {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
 
-		res.setUserName(sc.getUserName());
 		// note, this is a valid path even for 'anon' user.
 		res.setMessage("login ok.");
 		res.setSuccess(true);
@@ -236,13 +235,7 @@ public class UserManagerService extends ServiceBase {
 		UserPreferences userPreferences = getUserPreferences(userName, userNode);
 		sc.setUserPreferences(userPreferences);
 
-		res.setRootNode(id);
 		res.setRootNodePath(userNode.getPath());
-
-		// be sure to get userName off node so case sensitivity is exact.
-		res.setUserName(userNode.getStr(NodeProp.USER));
-		res.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
-
 		res.setAllowFileSystemSearch(prop.isAllowFileSystemSearch());
 		res.setUserPreferences(userPreferences);
 		res.setAuthToken(sc.getUserToken());

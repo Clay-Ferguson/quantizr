@@ -10,16 +10,8 @@ public class LoginResponse extends ResponseBase {
 	// should be redundant and can be removed
 	private UserProfile userProfile;
 
-	// Node Id of user account logged in.
-	private String rootNode;
-
 	private String authToken;
 	private String rootNodePath;
-
-	/* will be username or 'anonymous' if server rejected login */
-	private String userName;
-	private String displayName;
-
 	private String allowedFeatures;
 
 	private String anonUserLandingPageNode;
@@ -34,30 +26,6 @@ public class LoginResponse extends ResponseBase {
 	private UserPreferences userPreferences;
 
 	private boolean allowFileSystemSearch;
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
-	public String getRootNode() {
-		return rootNode;
-	}
-
-	public void setRootNode(String rootNode) {
-		this.rootNode = rootNode;
-	}
 
 	public UserProfile getUserProfile() {
 		return userProfile;

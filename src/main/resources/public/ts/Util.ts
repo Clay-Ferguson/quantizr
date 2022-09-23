@@ -970,14 +970,14 @@ export class Util {
         if (!res) return;
 
         dispatch("LoginResponse", s => {
-            if (res.rootNode) {
-                s.homeNodeId = res.rootNode;
+            if (res.userProfile.userNodeId) {
+                s.homeNodeId = res.userProfile.userNodeId;
                 s.homeNodePath = res.rootNodePath;
             }
             s.userProfile = res.userProfile;
-            s.userName = res.userName;
-            s.isAdminUser = res.userName === "admin";
-            s.isAnonUser = res.userName === J.PrincipalName.ANON;
+            s.userName = res.userProfile.userName;
+            s.isAdminUser = res.userProfile.userName === "admin";
+            s.isAnonUser = res.userProfile.userName === J.PrincipalName.ANON;
 
             // allow for everyone for now
             s.allowedFeatures = "web3"; // res.allowedFeatures;
@@ -993,7 +993,7 @@ export class Util {
             s.allowFileSystemSearch = res.allowFileSystemSearch;
             s.userPrefs = res.userPreferences;
             // s.title = !s.isAnonUser ? res.userName : "";
-            s.displayName = !s.isAnonUser ? res.displayName : "";
+            s.displayName = !s.isAnonUser ? res.userProfile.displayName : "";
             return s;
         });
     }
