@@ -13,20 +13,9 @@ public class LoginResponse extends ResponseBase {
 	private String authToken;
 	private String rootNodePath;
 	private String allowedFeatures;
-
 	private String anonUserLandingPageNode;
-
-	/*
-	 * we can optionally send back something here to force the client to load the specified node instead
-	 * of whatever other node it would have loaded for whatever series of reasons. This is a hard
-	 * override for anything else.
-	 */
-	private String homeNodeOverride;
-
 	private UserPreferences userPreferences;
-
 	private boolean allowFileSystemSearch;
-
 	private String accessFailMsg;
 
 	public UserProfile getUserProfile() {
@@ -51,14 +40,6 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAnonUserLandingPageNode(String anonUserLandingPageNode) {
 		this.anonUserLandingPageNode = anonUserLandingPageNode;
-	}
-
-	public String getHomeNodeOverride() {
-		return homeNodeOverride;
-	}
-
-	public void setHomeNodeOverride(String homeNodeOverride) {
-		this.homeNodeOverride = homeNodeOverride;
 	}
 
 	public UserPreferences getUserPreferences() {

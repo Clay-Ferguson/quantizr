@@ -219,10 +219,6 @@ public class NodeRenderService extends ServiceBase {
 			res.setSuccess(false);
 		}
 
-		// todo-2: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
-		// needs to be reworked.
-		ThreadLocals.getSC().setUrlId(null);
-
 		// log.debug("renderNode Full Return: " + XString.prettyPrint(res));
 		return res;
 	}
@@ -488,16 +484,18 @@ public class NodeRenderService extends ServiceBase {
 	public RenderNodeResponse anonPageLoad(MongoSession ms, RenderNodeRequest req) {
 		ms = ThreadLocals.ensure(ms);
 
-		String id = prop.getUserLandingPageNode();
-		// log.debug("Anon Render Node ID: " + id);
+		if (no(req.getNodeId())) {
+			String id = prop.getUserLandingPageNode();
+			// log.debug("Anon Render Node ID: " + id);
 
-		if (ok(ThreadLocals.getSC().getUrlId())) {
-			id = ThreadLocals.getSC().getUrlId();
-			ThreadLocals.getSC().setUrlId(null);
+			// if (ok(ThreadLocals.getSC().getUrlId())) {
+			// id = ThreadLocals.getSC().getUrlId();
+			// ThreadLocals.getSC().setUrlId(null);
+			// }
+
+			// log.debug("anonPageLoad id=" + id);
+			req.setNodeId(id);
 		}
-
-		// log.debug("anonPageLoad id=" + id);
-		req.setNodeId(id);
 
 		RenderNodeResponse res = renderNode(ms, req);
 		return res;

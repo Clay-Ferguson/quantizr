@@ -147,14 +147,12 @@ public class UserManagerService extends ServiceBase {
 		sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
 		res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
-		log.debug("Processing Login: urlId=" + (ok(sc.getUrlId()) ? sc.getUrlId() : "null"));
-
 		res.setAccessFailMsg(ThreadLocals.getSC().getUrlIdFailMsg());
 
-		if (ok(sc.getUrlId())) {
-			// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
-			res.setHomeNodeOverride(sc.getUrlId());
-		}
+		// if (ok(sc.getUrlId())) {
+		// 	// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
+		// 	res.setHomeNodeOverride(sc.getUrlId());
+		// }
 
 		if (sc.isAuthenticated()) {
 			MongoSession ms = ThreadLocals.getMongoSession();

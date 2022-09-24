@@ -241,19 +241,12 @@ export class User {
                 return;
             }
 
-            /* if url requested some non-tree initial tab we just select that tab */
-            if (g_initialTab) {
-                S.tabUtil.selectTab(g_initialTab);
-                if (g_initialTab === C.TAB_DOCUMENT && res.homeNodeOverride) {
-                    S.nav.openDocumentView(null, res.homeNodeOverride);
-                }
-                g_initialTab = null;
+            if (this.usingUrlTab()) {
                 return;
             }
 
-            if (res.homeNodeOverride) {
-                id = res.homeNodeOverride;
-                // console.log("homeNodeOverride=" + id);
+            if (g_nodeId) {
+                id = g_nodeId;
                 if (id && id.startsWith("~")) {
                     renderParentIfLeaf = false;
                 }

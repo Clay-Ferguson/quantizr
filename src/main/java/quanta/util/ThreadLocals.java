@@ -2,13 +2,9 @@ package quanta.util;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.security.Signature;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

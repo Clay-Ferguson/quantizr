@@ -304,8 +304,6 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + name;
 			}
 
-			// make sure urlId is defaulted to null
-			ThreadLocals.getSC().setUrlId(null);
 			boolean urlId = false;
 
 			// if we have an ID, try to look it up, to put it in the session and load the Social Card properties
@@ -333,9 +331,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 				if (ok(node)) {
 					if (_urlId) {
-						// if we get in here we have the node AND are authorized to view it, so save in session.
-						ThreadLocals.getSC().setUrlId(_id);
-
 						// todo-0: Everywhere we store ANY info from the URL, put it in "g_" variables
 						// instead of holding in server sessionStorage...
 						thymeleafAttribs.put("nodeId", _id);

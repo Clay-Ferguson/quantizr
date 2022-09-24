@@ -15,6 +15,8 @@ import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
+declare let g_nodeId: string;
+
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
@@ -912,7 +914,18 @@ export class Util {
                 S.nav.messagesFediverse();
             }
             else {
-                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
+                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
+                    nodeId: g_nodeId,
+                    upLevel: false,
+                    siblingOffset: 0,
+                    renderParentIfLeaf: false,
+                    forceRenderParent: false,
+                    offset: 0,
+                    goToLastPage: false,
+                    forceIPFSRefresh: false,
+                    singleNode: true,
+                    parentCount: 0
+                }, true);
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {

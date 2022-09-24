@@ -720,7 +720,6 @@ export interface LoginResponse extends ResponseBase {
     rootNodePath: string;
     allowedFeatures: string;
     anonUserLandingPageNode: string;
-    homeNodeOverride: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
     accessFailMsg: string;

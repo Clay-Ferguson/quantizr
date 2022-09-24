@@ -73,7 +73,7 @@ public class SessionContext extends ServiceBase {
 	private UserPreferences userPreferences;
 
 	/* Initial id param parsed from first URL request */
-	private String urlId;
+	// todo-0: we can probably use purely a "g_" value for this also and not hold in session here.
 	private String urlIdFailMsg;
 
 	public int counter;
@@ -177,7 +177,6 @@ public class SessionContext extends ServiceBase {
 		sc.lastLoginTime = lastLoginTime;
 		sc.lastActiveTime = lastActiveTime;
 		sc.userPreferences = userPreferences;
-		sc.urlId = urlId;
 		sc.urlIdFailMsg = urlIdFailMsg;
 		sc.counter = counter;
 		sc.pushEmitter = pushEmitter;
@@ -444,14 +443,6 @@ public class SessionContext extends ServiceBase {
 
 	public void setPastUserName(String pastUserName) {
 		this.pastUserName = pastUserName;
-	}
-
-	public String getUrlId() {
-		return urlId;
-	}
-
-	public void setUrlId(String urlId) {
-		this.urlId = urlId;
 	}
 
 	public String getUrlIdFailMsg() {
