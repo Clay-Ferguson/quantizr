@@ -85,4 +85,13 @@ public class ExUtil {
 			logger.error("cause:", e);
 		}
 	}
+
+	public static void warn(Logger logger, String msg, Throwable e) {
+		logger.warn(msg, e);
+
+		/* Not showing all sub-causes in the chain, but just the immediate one */
+		if (ok(e.getCause())) {
+			logger.warn("cause:", e);
+		}
+	}
 }

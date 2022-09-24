@@ -478,7 +478,6 @@ export class Nav {
         FeedTab.inst.props.refreshCounter++;
 
         await promiseDispatch("SelectTab", s => {
-            s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
@@ -540,7 +539,6 @@ export class Nav {
         }
 
         dispatch("SelectTab", s => {
-            s.guiReady = true;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING, s);
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
 

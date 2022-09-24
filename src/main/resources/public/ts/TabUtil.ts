@@ -32,8 +32,6 @@ export class TabUtil {
                 S.nav.navHome(s);
             }
             else {
-                s.guiReady = true;
-
                 // todo-1: there are lots of places we set 'activeTab = ?' and we need to combine it all into a function
                 // that does JUST these two lines
                 this.tabChanging(s.activeTab, tabName, s);

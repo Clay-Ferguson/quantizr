@@ -49,7 +49,7 @@ export class TabPanel extends Div {
                 id: "tabPanelContentId"
             }, this.buildTabs(state)),
             !state.mobileMode ? new ButtonBar([
-                S.quanta.activeTab === C.TAB_MAIN && S.nav.parentVisibleToUser(state) ? new IconButton("fa-folder", "Up Level", {
+                S.quanta.activeTab === C.TAB_MAIN && S.nav.parentVisibleToUser(state) && state.node ? new IconButton("fa-folder", "Up Level", {
                     nid: state.node.id,
                     onClick: S.nav.navUpLevelClick,
                     title: "Go to Parent Node"

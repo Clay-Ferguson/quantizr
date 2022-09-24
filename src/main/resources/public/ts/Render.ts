@@ -38,7 +38,7 @@ export class Render {
     allowFadeInId: boolean = false;
 
     constructor() {
-        highlightjs.initHighlightingOnLoad();
+        highlightjs.highlightAll();
     }
 
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
@@ -407,7 +407,6 @@ export class Render {
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 }
 
-                s.guiReady = true;
                 s.pageMessage = null;
 
                 if (MainTab.inst) {
@@ -420,6 +419,7 @@ export class Render {
                 back to false, no matter what */
                 try {
                     if (res) {
+                        if (res.node) s.accessFailMsg = null;
                         s.node = res.node;
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;

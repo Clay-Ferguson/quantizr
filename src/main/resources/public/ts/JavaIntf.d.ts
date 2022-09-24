@@ -723,6 +723,7 @@ export interface LoginResponse extends ResponseBase {
     homeNodeOverride: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
+    accessFailMsg: string;
 }
 
 export interface LogoutResponse extends ResponseBase {

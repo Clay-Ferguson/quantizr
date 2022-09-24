@@ -23,35 +23,28 @@ export class MainTabComp extends AppTab {
     preRender(): void {
         const state = useAppState();
         this.attribs.className = this.getClass(state);
-
-        if (!state.node) {
-            this.setChildren(null);
-            return;
-        }
-
-        // DO NOT DELETE (currently we have the 'show parents' button that ALWAYS needs to be available so we
-        // will always render the BreadcrumbesPanel)
-        // let renderableCrumbs = 0;
-        // if (state.breadcrumbs) {
-        //     state.breadcrumbs.forEach(bc => {
-        //         if (bc.id !== state.node.id && bc.id !== state.homeNodeId) {
-        //             renderableCrumbs++;
-        //         }
-        //     });
-        // }
-
         const widthSizerPanel = S.render.makeWidthSizerPanel();
 
-        this.setChildren([
-            widthSizerPanel,
-            new Div(null, { className: "headingBar" }, [
-                new Div(g_brandingAppName, {
-                    className: "tabTitle",
-                    onClick: () => S.util.loadAnonPageHome(),
-                    title: "Go to Portal Home Node"
-                })
-            ]),
-            new Div(null, {
+        let contentDiv: Div = null;
+        if (state.accessFailMsg) {
+            contentDiv = new Div(state.accessFailMsg);
+        }
+        else if (!state.node) {
+            contentDiv = null;
+        }
+        else {
+            // DO NOT DELETE (currently we have the 'show parents' button that ALWAYS needs to be available so we
+            // will always render the BreadcrumbesPanel)
+            // let renderableCrumbs = 0;
+            // if (state.breadcrumbs) {
+            //     state.breadcrumbs.forEach(bc => {
+            //         if (bc.id !== state.node.id && bc.id !== state.homeNodeId) {
+            //             renderableCrumbs++;
+            //         }
+            //     });
+            // }
+
+            contentDiv = new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: state.rendering ? "compHidden" : "compVisible"
             }, [
@@ -66,7 +59,19 @@ export class MainTabComp extends AppTab {
                     new NodeCompMainNode(state, this.data),
                     new NodeCompMainList(this.data)
                 ])
-            ])
+            ]);
+        }
+
+        this.setChildren([
+            widthSizerPanel,
+            new Div(null, { className: "headingBar" }, [
+                new Div(g_brandingAppName, {
+                    className: "tabTitle",
+                    onClick: () => S.util.loadAnonPageHome(),
+                    title: "Go to Portal Home Node"
+                })
+            ]),
+            contentDiv
         ]);
     }
 }

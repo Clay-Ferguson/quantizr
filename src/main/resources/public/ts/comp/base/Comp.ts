@@ -49,6 +49,9 @@ export abstract class Comp implements CompIntf {
     static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
 
     constructor(attribs?: any, private stateMgr?: State, public scope?: string) {
+        if (this.debug) {
+            console.log("construct: " + this.constructor.name);
+        }
         this.attribs = attribs || {};
 
         // for debugging, shows classname in every dom element as an attribute.
@@ -402,7 +405,7 @@ export abstract class Comp implements CompIntf {
     }
 
     private domAdd = (): void => {
-        // console.log("domAddEvent: " + this.jsClassName);
+        // console.log("domAddEvent: " + this.getCompClass());
         const elm = this.getRef();
         if (!elm) {
             return;

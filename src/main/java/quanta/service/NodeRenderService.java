@@ -2,7 +2,6 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -216,8 +215,7 @@ public class NodeRenderService extends ServiceBase {
 			nodeInfo.setParents(parentNodes);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
-		}
-		else {
+		} else {
 			res.setSuccess(false);
 		}
 

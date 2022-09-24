@@ -220,38 +220,48 @@ export class User {
                 return;
             }
 
-            if (res.homeNodeOverride) {
-                id = res.homeNodeOverride;
-                // console.log("homeNodeOverride=" + id);
-                if (id && id.startsWith("~")) {
-                    renderParentIfLeaf = false;
-                }
-            } //
-            else {
-                const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
-
-                if (lastNode) {
-                    id = lastNode;
-                    // console.log("Node selected from local storage: id=" + id);
-                    childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
-                } else {
-                    // todo-2: note... this path is now untested due to recent refactoring.
-                    id = state.homeNodeId;
-                    // console.log("Node selected from homeNodeId: id=" + id);
-                }
+            if (res.accessFailMsg) {
+                dispatch("setAccessFailed", s => {
+                    s.accessFailMsg = res.accessFailMsg;
+                    s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
+                    return s;
+                });
             }
-            S.view.refreshTree({
-                nodeId: id,
-                zeroOffset: true,
-                renderParentIfLeaf,
-                highlightId: childId,
-                forceIPFSRefresh: false,
-                scrollToTop: false,
-                allowScroll: true,
-                setTab: true,
-                forceRenderParent: false,
-                state
-            });
+            else {
+                if (res.homeNodeOverride) {
+                    id = res.homeNodeOverride;
+                    // console.log("homeNodeOverride=" + id);
+                    if (id && id.startsWith("~")) {
+                        renderParentIfLeaf = false;
+                    }
+                } //
+                else {
+                    const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
+
+                    if (lastNode) {
+                        id = lastNode;
+                        // console.log("Node selected from local storage: id=" + id);
+                        childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
+                    } else {
+                        // todo-2: note... this path is now untested due to recent refactoring.
+                        id = state.homeNodeId;
+                        // console.log("Node selected from homeNodeId: id=" + id);
+                    }
+                }
+
+                S.view.refreshTree({
+                    nodeId: id,
+                    zeroOffset: true,
+                    renderParentIfLeaf,
+                    highlightId: childId,
+                    forceIPFSRefresh: false,
+                    scrollToTop: false,
+                    allowScroll: true,
+                    setTab: true,
+                    forceRenderParent: false,
+                    state
+                });
+            }
         } else {
             console.log("LocalDb login failed.");
 
@@ -292,12 +302,6 @@ export class User {
     }
 
     userLogin = async () => {
-        // todo-1: this was a hack because failing code was breaking the flow.
-        // need better fix.
-        await promiseDispatch("guiReadyUserLogin", (s) => {
-            s.guiReady = true;
-            return s;
-        })
         new LoginDlg().open();
     }
 

@@ -30,12 +30,6 @@ export class App extends Main {
     preRender(): void {
         const state = useAppState();
 
-        if (!state.guiReady) {
-            console.log("gui not ready in App.preRender");
-            this.setChildren(null);
-            return;
-        }
-
         /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
         if (state.mobileMode && state.dialogStack.length > 0) {
             // eventually ONLY mobile will do this 'top-only' display, and desktop mode will have all dialog

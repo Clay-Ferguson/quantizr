@@ -379,7 +379,6 @@ export class Search {
                 s.newMessageCount = 0;
             }
 
-            s.guiReady = true;
             let scrollToTop = true;
 
             if (forceMetadataOn) {

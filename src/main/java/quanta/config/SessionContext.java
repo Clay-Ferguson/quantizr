@@ -74,6 +74,7 @@ public class SessionContext extends ServiceBase {
 
 	/* Initial id param parsed from first URL request */
 	private String urlId;
+	private String urlIdFailMsg;
 
 	public int counter;
 
@@ -177,6 +178,7 @@ public class SessionContext extends ServiceBase {
 		sc.lastActiveTime = lastActiveTime;
 		sc.userPreferences = userPreferences;
 		sc.urlId = urlId;
+		sc.urlIdFailMsg = urlIdFailMsg;
 		sc.counter = counter;
 		sc.pushEmitter = pushEmitter;
 		sc.actionCounters = new HashMap<>();
@@ -450,6 +452,14 @@ public class SessionContext extends ServiceBase {
 
 	public void setUrlId(String urlId) {
 		this.urlId = urlId;
+	}
+
+	public String getUrlIdFailMsg() {
+		return urlIdFailMsg;
+	}
+
+	public void setUrlIdFailMsg(String urlIdFailMsg) {
+		this.urlIdFailMsg = urlIdFailMsg;
 	}
 
 	public String getTimezone() {

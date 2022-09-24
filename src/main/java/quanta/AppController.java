@@ -319,7 +319,13 @@ public class AppController extends ServiceBase implements ErrorController {
 			boolean _urlId = urlId;
 
 			arun.run(as -> {
-				SubNode node = read.getNode(as, _id);
+				SubNode node = null;
+				try {
+					node = read.getNode(as, _id);
+				} catch (Exception e) {
+					ThreadLocals.getSC().setUrlIdFailMsg("Unable to access " + _id);
+					// ExUtil.warn(log, "Unable to access node: " + _id, e);
+				}
 
 				if (ok(node)) {
 					if (_urlId) {

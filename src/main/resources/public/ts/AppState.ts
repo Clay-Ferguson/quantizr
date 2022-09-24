@@ -11,6 +11,7 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
+    accessFailMsg: string;
     tabPanelVisible: boolean = true;
     stateId: number = 0;
     displayFeedSearch: boolean = false;
@@ -20,11 +21,6 @@ export class AppState {
     // only in the place where we load this config value, extract that into the typed property
     // Initialize to empty object so we don't get NPE
     config: any = {};
-
-    // up until guiReady the main App component will just render "loading..."
-    // todo-1: this can fail to get set on startup if not everything goes well
-    // and we need to be more resilient and not allow that EVER.
-    guiReady: boolean = false;
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 

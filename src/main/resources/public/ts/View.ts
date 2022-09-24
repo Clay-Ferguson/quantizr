@@ -38,8 +38,6 @@ export class View {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = async (a: RefreshTreeArgs) => {
-        const appState = getAppState();
-
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
         // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
         if (!a.nodeId && a.state.node) {
@@ -80,12 +78,6 @@ export class View {
                 parentCount: a.state.userPrefs.showParents ? 1 : 0
             });
 
-            // temporary fix (todo-0). Login flow needs much more testing.
-            // if gui has never displayed we go to the login dialog
-            if (!res.node && !appState.guiReady) {
-                S.user.userLogin();
-                return;
-            }
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
             }

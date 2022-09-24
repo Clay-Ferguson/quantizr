@@ -65,7 +65,7 @@ export class LeftNavPanel extends Div {
                 new Img(this.getId("logo_"), {
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
-                    onClick: () => S.util.loadAnonPageHome(),
+                    onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
                 }),
                 // new Span(g_brandingAppName, {
@@ -77,7 +77,7 @@ export class LeftNavPanel extends Div {
                 // which is in a different class.
                 messages ? new Span(messages, {
                     className: "newMessagesNote float-end",
-                    onClick: () => S.nav.showMyNewMessages(),
+                    onClick: S.nav.showMyNewMessages,
                     title: "Show new messages"
                 }) : null
             ]),
