@@ -11,7 +11,6 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
-    accessFailMsg: string;
     tabPanelVisible: boolean = true;
     stateId: number = 0;
     displayFeedSearch: boolean = false;

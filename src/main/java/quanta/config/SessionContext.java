@@ -72,10 +72,6 @@ public class SessionContext extends ServiceBase {
 
 	private UserPreferences userPreferences;
 
-	/* Initial id param parsed from first URL request */
-	// todo-0: we can probably use purely a "g_" value for this also and not hold in session here.
-	private String urlIdFailMsg;
-
 	public int counter;
 
 	/* Emitter for sending push notifications to the client */
@@ -177,7 +173,6 @@ public class SessionContext extends ServiceBase {
 		sc.lastLoginTime = lastLoginTime;
 		sc.lastActiveTime = lastActiveTime;
 		sc.userPreferences = userPreferences;
-		sc.urlIdFailMsg = urlIdFailMsg;
 		sc.counter = counter;
 		sc.pushEmitter = pushEmitter;
 		sc.actionCounters = new HashMap<>();
@@ -443,14 +438,6 @@ public class SessionContext extends ServiceBase {
 
 	public void setPastUserName(String pastUserName) {
 		this.pastUserName = pastUserName;
-	}
-
-	public String getUrlIdFailMsg() {
-		return urlIdFailMsg;
-	}
-
-	public void setUrlIdFailMsg(String urlIdFailMsg) {
-		this.urlIdFailMsg = urlIdFailMsg;
 	}
 
 	public String getTimezone() {

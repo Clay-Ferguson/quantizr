@@ -9,6 +9,7 @@ import { S } from "./Singletons";
 
 declare let g_initialTab: string;
 declare let g_nodeId: string;
+declare let g_urlIdFailMsg: string;
 
 export class User {
     closeAccount = async () => {
@@ -232,9 +233,8 @@ export class User {
 
             /* if we know the server already failed to get the content requested on the url then
             default to main tab (tree) and set it up to display an error */
-            if (res.accessFailMsg) {
+            if (g_urlIdFailMsg) {
                 dispatch("setAccessFailed", s => {
-                    s.accessFailMsg = res.accessFailMsg;
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                     return s;
                 });

@@ -722,7 +722,6 @@ export interface LoginResponse extends ResponseBase {
     anonUserLandingPageNode: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
-    accessFailMsg: string;
 }
 
 export interface LogoutResponse extends ResponseBase {

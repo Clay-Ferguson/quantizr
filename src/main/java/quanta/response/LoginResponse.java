@@ -16,7 +16,6 @@ public class LoginResponse extends ResponseBase {
 	private String anonUserLandingPageNode;
 	private UserPreferences userPreferences;
 	private boolean allowFileSystemSearch;
-	private String accessFailMsg;
 
 	public UserProfile getUserProfile() {
 		return userProfile;
@@ -72,13 +71,5 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowedFeatures(String allowedFeatures) {
 		this.allowedFeatures = allowedFeatures;
-	}
-
-	public String getAccessFailMsg() {
-		return accessFailMsg;
-	}
-
-	public void setAccessFailMsg(String accessFailMsg) {
-		this.accessFailMsg = accessFailMsg;
 	}
 }

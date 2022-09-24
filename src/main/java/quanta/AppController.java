@@ -325,7 +325,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				try {
 					node = read.getNode(as, _id);
 				} catch (Exception e) {
-					ThreadLocals.getSC().setUrlIdFailMsg("Unable to access " + _id);
+					thymeleafAttribs.put("urlIdFailMsg", "Unable to access " + _id);
 					ExUtil.warn(log, "Unable to access node: " + _id, e);
 				}
 

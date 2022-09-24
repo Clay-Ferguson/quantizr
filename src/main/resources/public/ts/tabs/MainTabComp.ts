@@ -11,6 +11,7 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
 declare const g_brandingAppName: string;
+declare const g_urlIdFailMsg: string;
 
 export class MainTabComp extends AppTab {
 
@@ -26,8 +27,8 @@ export class MainTabComp extends AppTab {
         const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         let contentDiv: Div = null;
-        if (state.accessFailMsg) {
-            contentDiv = new Div(state.accessFailMsg);
+        if (g_urlIdFailMsg) {
+            contentDiv = new Div(g_urlIdFailMsg);
         }
         else if (!state.node) {
             contentDiv = null;
