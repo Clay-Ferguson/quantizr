@@ -97,7 +97,6 @@ export class LoginDlg extends DialogBase {
             }, false, true);
 
             // console.log("Login Resp: " + S.util.prettyPrint(res));
-
             if (res.success) {
                 S.quanta.authToken = res.authToken;
                 S.user.loginResponse(res, usr, pwd, true, getAppState());

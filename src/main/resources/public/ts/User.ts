@@ -8,6 +8,8 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 declare let g_initialTab: string;
+declare let g_nodeId: string;
+
 export class User {
     closeAccount = async () => {
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
@@ -45,6 +47,19 @@ export class User {
             lcUserName === "dan";
     }
 
+    // returns true if we already initialized to a tab specified on url
+    usingUrlTab = (): boolean => {
+        if (g_initialTab) {
+            S.tabUtil.selectTab(g_initialTab);
+            if (g_initialTab === C.TAB_DOCUMENT && g_nodeId) {
+                S.nav.openDocumentView(null, g_nodeId);
+            }
+            g_initialTab = null;
+            return true;
+        }
+        return false;
+    }
+
     refreshLogin = async (state: AppState) => {
         console.log("refreshLogin: initialTab=" + g_initialTab);
 
@@ -54,11 +69,7 @@ export class User {
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
             console.log("loginState known as logged out.");
-            if (g_initialTab) {
-                S.tabUtil.selectTab(g_initialTab);
-                g_initialTab = null;
-            }
-            else {
+            if (!this.usingUrlTab()) {
                 S.util.loadAnonPageHome();
             }
             return;
@@ -78,7 +89,9 @@ export class User {
         console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
-            this.anonInitialRender();
+            if (!this.usingUrlTab()) {
+                this.anonInitialRender();
+            }
         } else {
             try {
                 if (S.crypto.avail) {
@@ -108,7 +121,10 @@ export class User {
                     if (res.success) {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
-                    this.anonInitialRender();
+
+                    if (!this.usingUrlTab()) {
+                        this.anonInitialRender();
+                    }
                 }
             }
             catch (e) {
@@ -214,54 +230,60 @@ export class User {
             let childId: string = null;
             let renderParentIfLeaf = true;
 
-            if (g_initialTab) {
-                S.tabUtil.selectTab(g_initialTab);
-                g_initialTab = null;
-                return;
-            }
-
+            /* if we know the server already failed to get the content requested on the url then
+            default to main tab (tree) and set it up to display an error */
             if (res.accessFailMsg) {
                 dispatch("setAccessFailed", s => {
                     s.accessFailMsg = res.accessFailMsg;
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                     return s;
                 });
+                return;
             }
-            else {
-                if (res.homeNodeOverride) {
-                    id = res.homeNodeOverride;
-                    // console.log("homeNodeOverride=" + id);
-                    if (id && id.startsWith("~")) {
-                        renderParentIfLeaf = false;
-                    }
-                } //
-                else {
-                    const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
 
-                    if (lastNode) {
-                        id = lastNode;
-                        // console.log("Node selected from local storage: id=" + id);
-                        childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
-                    } else {
-                        // todo-2: note... this path is now untested due to recent refactoring.
-                        id = state.homeNodeId;
-                        // console.log("Node selected from homeNodeId: id=" + id);
-                    }
+            /* if url requested some non-tree initial tab we just select that tab */
+            if (g_initialTab) {
+                S.tabUtil.selectTab(g_initialTab);
+                if (g_initialTab === C.TAB_DOCUMENT && res.homeNodeOverride) {
+                    S.nav.openDocumentView(null, res.homeNodeOverride);
                 }
-
-                S.view.refreshTree({
-                    nodeId: id,
-                    zeroOffset: true,
-                    renderParentIfLeaf,
-                    highlightId: childId,
-                    forceIPFSRefresh: false,
-                    scrollToTop: false,
-                    allowScroll: true,
-                    setTab: true,
-                    forceRenderParent: false,
-                    state
-                });
+                g_initialTab = null;
+                return;
             }
+
+            if (res.homeNodeOverride) {
+                id = res.homeNodeOverride;
+                // console.log("homeNodeOverride=" + id);
+                if (id && id.startsWith("~")) {
+                    renderParentIfLeaf = false;
+                }
+            } //
+            else {
+                const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
+
+                if (lastNode) {
+                    id = lastNode;
+                    // console.log("Node selected from local storage: id=" + id);
+                    childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
+                } else {
+                    // todo-2: note... this path is now untested due to recent refactoring.
+                    id = state.homeNodeId;
+                    // console.log("Node selected from homeNodeId: id=" + id);
+                }
+            }
+
+            S.view.refreshTree({
+                nodeId: id,
+                zeroOffset: true,
+                renderParentIfLeaf,
+                highlightId: childId,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                state
+            });
         } else {
             console.log("LocalDb login failed.");
 

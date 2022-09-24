@@ -310,17 +310,35 @@ export class Nav {
         }, 500);
     }
 
-    openDocumentView = (evt: Event) => {
-        const id = S.util.allowIdFromEvent(evt, null);
+    openDocumentView = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
         const state = getAppState();
 
-        setTimeout(() => {
-            const node = MainTab.inst?.findNode(state, id);
+        setTimeout(async () => {
+            let node = MainTab.inst?.findNode(state, id);
+
+            // if we don't have this node locally on our tree, get it from the server.
             if (!node) {
-                return;
+                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                    nodeId: id,
+                    upLevel: false,
+                    siblingOffset: 0,
+                    renderParentIfLeaf: false,
+                    forceRenderParent: false,
+                    offset: 0,
+                    goToLastPage: false,
+                    forceIPFSRefresh: false,
+                    singleNode: true,
+                    parentCount: 0
+                });
+                if (!res.node) {
+                    // todo-1: in this code path we should show an error message ON the Document Tab.
+                    return;
+                }
+                node = res.node;
             }
             S.srch.showDocument(node, false, state);
-        }, 500);
+        }, 250);
     }
 
     runTimeline = (evt: Event) => {

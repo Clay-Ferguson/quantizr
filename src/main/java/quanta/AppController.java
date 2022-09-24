@@ -281,7 +281,9 @@ public class AppController extends ServiceBase implements ErrorController {
 			}
 
 			// Conver tab name if short name given
-			if ("feed".equals(initialTab)) {
+			if ("doc".equals(initialTab)) {
+				initialTab = "docRS";
+			} else if ("feed".equals(initialTab)) {
 				initialTab = "feedTab";
 			} else if ("trending".equals(initialTab)) {
 				initialTab = "trendingTab";
@@ -292,7 +294,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
-			model.addAllAttributes(thymeleafAttribs);
 
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -327,13 +328,17 @@ public class AppController extends ServiceBase implements ErrorController {
 					node = read.getNode(as, _id);
 				} catch (Exception e) {
 					ThreadLocals.getSC().setUrlIdFailMsg("Unable to access " + _id);
-					// ExUtil.warn(log, "Unable to access node: " + _id, e);
+					ExUtil.warn(log, "Unable to access node: " + _id, e);
 				}
 
 				if (ok(node)) {
 					if (_urlId) {
 						// if we get in here we have the node AND are authorized to view it, so save in session.
 						ThreadLocals.getSC().setUrlId(_id);
+
+						// todo-0: Everywhere we store ANY info from the URL, put it in "g_" variables
+						// instead of holding in server sessionStorage...
+						thymeleafAttribs.put("nodeId", _id);
 					}
 
 					if (AclService.isPublic(as, node)) {
@@ -352,6 +357,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (ok(signupCode)) {
 			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
 		}
+		model.addAllAttributes(thymeleafAttribs);
 		HitFilter.addHit(uniqueUserIpHits, ThreadLocals.getSC().getUserName());
 		return "index";
 	}

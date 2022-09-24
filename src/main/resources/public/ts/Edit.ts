@@ -591,7 +591,7 @@ export class Edit {
         if (state.activeTab === C.TAB_MAIN) {
             S.quanta.refresh(state);
         }
-        if (state.activeTab === C.TAB_DOCUMENT) {
+        else if (state.activeTab === C.TAB_DOCUMENT) {
             const data: TabIntf = S.tabUtil.getAppTabData(state, C.TAB_DOCUMENT);
             if (data) {
                 S.srch.showDocument(data.props.node, false, getAppState());

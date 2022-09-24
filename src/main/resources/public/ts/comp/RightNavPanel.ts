@@ -76,7 +76,7 @@ export class RightNavPanel extends Div {
             displayName = displayName || state.node.owner;
         }
 
-        const allowEditMode = state.node && !state.isAnonUser;
+        const allowEditMode = !state.isAnonUser;
         const fullScreenViewer = S.util.fullscreenViewerActive(state);
 
         // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
