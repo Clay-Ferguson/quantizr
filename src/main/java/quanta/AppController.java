@@ -271,8 +271,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
+			HttpSession session, //
 			Model model) {
 		try {
+			SessionContext.init(context, session, true);
+
 			if (!MongoRepository.fullInit) {
 				throw new RuntimeException("Server temporarily offline.");
 			}

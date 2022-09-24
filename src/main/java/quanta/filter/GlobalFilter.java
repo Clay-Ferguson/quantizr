@@ -63,7 +63,7 @@ public class GlobalFilter extends GenericFilterBean {
 				// NOTE: this is new logic! We used to create session always here.
 				HttpSession session = sreq.getSession(createSession);
 				if (ok(session)) {
-					SessionContext.init(context, session);
+					SessionContext.init(context, session, false);
 				}
 			}
 			// log.debug("GlobalFilter->doFilter");

@@ -125,12 +125,12 @@ public class SessionContext extends ServiceBase {
 		}
 	}
 
-	public static SessionContext init(ApplicationContext context, HttpSession session) {
+	public static SessionContext init(ApplicationContext context, HttpSession session, boolean forceNew) {
 		// Ensure we have a Quanta Session Context
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
-		if (no(sc) || !sc.isLive()) {
+		if (forceNew || no(sc) || !sc.isLive()) {
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
 			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
