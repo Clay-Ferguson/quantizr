@@ -173,9 +173,13 @@ export class DomUtil {
     /* this supposedly came from mustache codebase */
     escapeHtml = (str: string): string => {
         if (!str) return str;
-        return String(str).replace(/[&<>"'`=\/]/g, function (s) {
-            return this.escapeMap[s];
-        });
+        return String(str).replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
+    }
+
+    // we have this as a separate static function just to avoid the overhead of creating a new function for every call
+    // where this is used.
+    static escapeMapFunc(s: any) {
+        return DomUtil.escapeMap[s];
     }
 
     resetDropHandler = (attribs: any) => {
