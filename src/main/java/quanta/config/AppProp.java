@@ -59,12 +59,10 @@ public class AppProp {
 					configMap = readYamlExternal("config-text.yaml");
 
 					// if we found the external config file in [deploy]/config/ folder then use it's contents
-					if (ok(configMap)) {
-						return configMap;
+					if (no(configMap)) {
+						// otherwise use the internal version (internal to JAR)
+						configMap = readYamlInternal("config-text.yaml");
 					}
-
-					// otherwise use the internal version (internal to JAR)
-					configMap = readYamlInternal("config-text.yaml");
 				} catch (Exception e) {
 					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
@@ -72,6 +70,7 @@ public class AppProp {
 				if (no(configMap)) {
 					configMap = new HashMap<>();
 				}
+				configMap.put("ipfsEnabled", ipfsEnabled());
 				return configMap;
 			}
 		}

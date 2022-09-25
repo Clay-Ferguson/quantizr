@@ -11,6 +11,7 @@ import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
 declare const g_requireCrypto: string;
+declare let g_userMessage: string;
 
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
@@ -325,9 +326,15 @@ export class Quanta {
                     dispatch("configUpdates", s => {
                         s.config = res.config || {};
                         // console.log("CONFIG: " + S.util.prettyPrint(s.config));
-                        if (s.config.userMessage) {
-                            S.util.showMessage(s.config.userMessage, "");
-                        }
+
+                        // we show the user message after the config is set, but there's no reason to do it here
+                        // other than perhaps have the screen updated with the latest based on the config.
+                        setTimeout(() => {
+                            if (g_userMessage) {
+                                S.util.showMessage(g_userMessage, "");
+                                g_userMessage = null;
+                            }
+                        }, 100);
                         return s;
                     });
                 }

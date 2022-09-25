@@ -350,7 +350,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		}
 
 		if (ok(signupCode)) {
-			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
+			thymeleafAttribs.put("userMessage", user.processSignupCode(signupCode));
 		}
 		model.addAllAttributes(thymeleafAttribs);
 		HitFilter.addHit(uniqueUserIpHits, ThreadLocals.getSC().getUserName());
@@ -1406,9 +1406,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		GetConfigResponse res = new GetConfigResponse();
-		HashMap<String, Object> map = prop.getConfig();
-		map.put("ipfsEnabled", prop.ipfsEnabled());
 
 		// Identifier generated once on Browser, can uniquely identify one single session to associate with
 		// the given webpage/tab
@@ -1417,18 +1414,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			log.debug("BrowserGuid: " + req.getAppGuid());
 		}
 
-		// if we have a 'userMessage' on the session send it back now, and then forget it.
-		if (ok(ThreadLocals.getSC()) && ok(ThreadLocals.getSC().getUserMessage())) {
-			/*
-			 * important! If we're going to alter the map we MUST clone it because otherwise we're altering the
-			 * same copy ALL users will see!
-			 */
-			map = (HashMap<String, Object>) map.clone();
-
-			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
-			ThreadLocals.getSC().setUserMessage(null);
-		}
-		res.setConfig(map);
+		GetConfigResponse res = new GetConfigResponse();
+		res.setConfig(prop.getConfig());
 		return res;
 	}
 
