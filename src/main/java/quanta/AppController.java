@@ -331,8 +331,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 				if (ok(node)) {
 					if (_urlId) {
-						// todo-0: Everywhere we store ANY info from the URL, put it in "g_" variables
-						// instead of holding in server sessionStorage...
 						thymeleafAttribs.put("nodeId", _id);
 					}
 

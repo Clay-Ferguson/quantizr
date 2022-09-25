@@ -151,19 +151,6 @@ public class UserManagerService extends ServiceBase {
 			MongoSession ms = ThreadLocals.getMongoSession();
 			processLogin(ms, res, userNode, sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
 			log.debug("login: user=" + sc.getUserName());
-
-			/*
-			 * todo-0: need to be sure these are created when USER signup happens, and then we can be safe
-			 * creating here only in async thread, that doesn't block any logins.
-			 */
-			exec.run(() -> {
-				// ensure we've pre-created this node.
-				SubNode postsNode = read.getUserNodeByType(ms, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
-						Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-
-				ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName() + "'s Node", NodeType.NONE.s(),
-						NodeName.HOME);
-			});
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}

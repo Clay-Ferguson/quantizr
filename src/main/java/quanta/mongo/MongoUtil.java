@@ -917,10 +917,10 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	@PerfMon(category = "mongoUtil")
-	public SubNode createUser(MongoSession ms, String user, String email, String password, boolean automated) {
-		SubNode userNode = read.getUserNodeByUserName(ms, user);
+	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated) {
+		SubNode userNode = read.getUserNodeByUserName(ms, newUserName);
 		if (ok(userNode)) {
-			throw new RuntimeException("User already existed: " + user);
+			throw new RuntimeException("User already existed: " + newUserName);
 		}
 
 		// if (PrincipalName.ADMIN.s().equals(user)) {
@@ -937,7 +937,7 @@ public class MongoUtil extends ServiceBase {
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
-		userNode.set(NodeProp.USER, user);
+		userNode.set(NodeProp.USER, newUserName);
 		userNode.set(NodeProp.EMAIL, email);
 		userNode.set(NodeProp.PWD_HASH, getHashOfPassword(password));
 		userNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
@@ -948,12 +948,18 @@ public class MongoUtil extends ServiceBase {
 		userNode.set(NodeProp.BIN_QUOTA, Const.DEFAULT_USER_QUOTA);
 		userNode.set(NodeProp.ALLOWED_FEATURES, "0");
 
-		userNode.setContent("### Account: " + user);
+		userNode.setContent("### Account: " + newUserName);
 		userNode.touch();
 
 		if (!automated) {
 			userNode.set(NodeProp.SIGNUP_PENDING, true);
 		}
+
+		// ensure we've pre-created this node.
+		SubNode postsNode = read.getUserNodeByType(ms, newUserName, null, "### Posts", NodeType.POSTS.s(),
+				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+
+		user.ensureUserHomeNodeExists(ms, newUserName, "### " + user + "'s Node", NodeType.NONE.s(), NodeName.HOME);
 
 		update.save(ms, userNode);
 		return userNode;
