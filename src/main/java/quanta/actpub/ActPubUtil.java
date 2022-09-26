@@ -923,6 +923,8 @@ public class ActPubUtil extends ServiceBase {
      * Loads the foreign object into Quanta under the foreign account representing that user, and
      * returns it. Returns existing node if found instead. If there's no account created yet for the
      * user we create the account
+     * 
+     * if allowFiltering==false that means allow foreign languages, profanity, etc.
      */
     public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
         // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
@@ -975,13 +977,14 @@ public class ActPubUtil extends ServiceBase {
                             }
 
                             node = apub.saveInboundForeignObj(as, userDoingAction, accountNode, outboxNode, obj, APType.Create,
-                                    null, null);
+                                    null, null, false);
                         }
                         return node;
                     });
                 }
                 break;
             default:
+                // todo-0: in the ThreadViewer logic we need to somehow show to the user this happened 
                 log.debug("Unhandled type in loadObject: " + type);
                 break;
         }

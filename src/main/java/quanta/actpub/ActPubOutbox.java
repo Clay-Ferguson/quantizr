@@ -138,7 +138,7 @@ public class ActPubOutbox extends ServiceBase {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object, APType.Create, null,
-                                            null);
+                                            null, true);
                                     count.setVal(count.getVal() + 1);
                                 } catch (DuplicateKeyException dke) {
                                     log.debug("Record already existed: " + dke.getMessage());

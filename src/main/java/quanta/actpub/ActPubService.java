@@ -861,8 +861,8 @@ public class ActPubService extends ServiceBase {
                     SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                             NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-                    saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce, boostedNode.getIdStr(),
-                            null);
+                    saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce,
+                            boostedNode.getIdStr(), null, true);
                 }
             } else {
                 log.debug("Unable to get node being boosted.");
@@ -988,7 +988,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apLog.trace("foreign actor replying to a quanta node.");
-            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey);
+            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -1004,7 +1004,7 @@ public class ActPubService extends ServiceBase {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
                 SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey);
+                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey, true);
             }
         }
     }
@@ -1022,8 +1022,8 @@ public class ActPubService extends ServiceBase {
      * action will be APType.Create, APType.Update, or APType.Announce
      */
     @PerfMon(category = "apub")
-    public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode, APObj obj,
-            String action, String boostTargetId, String encodedKey) {
+    public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode, SubNode parentNode,
+            APObj obj, String action, String boostTargetId, String encodedKey, boolean allowFiltering) {
         apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
 
         /*
@@ -1078,21 +1078,25 @@ public class ActPubService extends ServiceBase {
 
             if (ok(language)) {
                 lang = language;
-                if (!"en".equalsIgnoreCase(language)) {
+                // let's try allowing 'und' and see if get get a bunch of foreign stuff or not. If so we can go back
+                // to requiring a 'en' only value.
+                if (allowFiltering && !"en".equalsIgnoreCase(language) && !"und".equalsIgnoreCase(language)) {
                     log.debug("Ignore Non-English: " + language);
                     return null;
                 }
             }
         }
 
-        if (ENGLISH_LANGUAGE_CHECK) {
-            if (lang.equals("0")) {
-                if (!english.isEnglish(contentHtml, 0.50f)) {
-                    log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
-                    return null;
-                } else {
-                    // this was an arbitrary meaningless value used to detect/test for correct program flow.
-                    lang = "en-ck3";
+        if (allowFiltering) {
+            if (ENGLISH_LANGUAGE_CHECK) {
+                if (lang.equals("0")) {
+                    if (!english.isEnglish(contentHtml, 0.50f)) {
+                        log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
+                        return null;
+                    } else {
+                        // this was an arbitrary meaningless value used to detect/test for correct program flow.
+                        lang = "en-ck3";
+                    }
                 }
             }
         }
