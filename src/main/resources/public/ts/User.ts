@@ -54,6 +54,7 @@ export class User {
             S.tabUtil.selectTab(g_initialTab);
             if (g_initialTab === C.TAB_DOCUMENT && g_nodeId) {
                 S.nav.openDocumentView(null, g_nodeId);
+                g_nodeId = null;
             }
             g_initialTab = null;
             return true;
@@ -247,6 +248,7 @@ export class User {
 
             if (g_nodeId) {
                 id = g_nodeId;
+                g_nodeId = null;
                 if (id && id.startsWith("~")) {
                     renderParentIfLeaf = false;
                 }
