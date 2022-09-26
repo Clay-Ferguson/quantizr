@@ -61,42 +61,20 @@ export class NodeCompMarkdown extends Html {
         content = content || node.content || "";
         let val = "";
 
-        if (node.type === J.NodeType.PLAIN_TEXT) {
-            const nowrapProp = S.props.getProp(J.NodeProp.NOWRAP, node);
-            const wordWrap = !(nowrapProp && nowrapProp.value === "1");
+        // todo-2: put some more thought into this...
+        // turning this off because when it appears in a url, blows up the link. Need to find some better way.
+        // if (S.srch.searchText) {
+        //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
+        //     search term so it's easy to see them highlighted on the page */
+        //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
+        // }
 
-            if (content) {
-                if (wordWrap) {
-                    let escaped = S.domUtil.escapeHtml(content);
-                    escaped = S.util.replaceAll(escaped, "\n\r", "<br>");
-                    escaped = S.util.replaceAll(escaped, "\n", "<br>");
-                    escaped = S.util.replaceAll(escaped, "\r", "<br>");
-                    val = "<div class='fixedFont'>" + escaped + "</div>";
-                }
-                else {
-                    val = "<pre>" + S.domUtil.escapeHtml(content) + "</pre>";
-                }
-            }
-            else {
-                val = "";
-            }
-        }
-        else {
-            // todo-2: put some more thought into this...
-            // turning this off because when it appears in a url, blows up the link. Need to find some better way.
-            // if (S.srch.searchText) {
-            //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
-            //     search term so it's easy to see them highlighted on the page */
-            //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
-            // }
+        val = S.render.injectSubstitutions(node, content);
+        val = S.util.markdown(val);
+        val = S.util.insertActPubTags(val, node);
 
-            val = S.render.injectSubstitutions(node, content);
-            val = S.util.markdown(val);
-            val = S.util.insertActPubTags(val, node);
-
-            /* parse tags, to build OpenGraph */
-            this.parseAnchorTags(val, content);
-        }
+        /* parse tags, to build OpenGraph */
+        this.parseAnchorTags(val, content);
         return val;
     }
 

@@ -105,6 +105,22 @@ body {
     margin: $smallGap;
 }
 
+.textTypeContent {
+    margin: 12px 0px 12px 12px;
+    padding: 8px;
+    border: 1px solid $nodeBorderBottomColor;
+    background-color: #17202A;
+}
+
+.preWordWrap {
+    // overflow-x: auto; //<--- highly upvoted stack overflow didn't have this.
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
 .markdown-content table,
 th,
 td {
@@ -346,7 +362,7 @@ a {
 .newMessagesNote {
     cursor: pointer;
     padding: 2px 6px 2px 6px;
-    color: var(--bs-green); 
+    color: var(--bs-green);
     border: 2px solid var(--bs-green);
     border-radius: 12px;
 }
@@ -1050,10 +1066,10 @@ Will come back later and study this more. todo-1 */
 
 .markdown-codespan {
     color: var(--bs-green);
-    word-wrap: break-word; 
+    word-wrap: break-word;
     // font-family: var(--bs-font-monospace)
     // font-weight: bold;
-    
+
     // I saw these in browser elements view but not sure if we need them.
     // direction: ltr /* rtl:ignore */;
     // unicode-bidi: bidi-override;

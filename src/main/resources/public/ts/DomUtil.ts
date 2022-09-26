@@ -170,10 +170,7 @@ export class DomUtil {
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* this supposedly came from mustache codebase.
-
-    todo-0: We should be using this probably: StringEscapeUtils.escapeHtml4(content);
-    */
+    /* this supposedly came from mustache codebase. */
     escapeHtml = (str: string): string => {
         if (!str) return str;
         return String(str).replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);

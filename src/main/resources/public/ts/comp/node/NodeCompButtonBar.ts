@@ -258,7 +258,7 @@ export class NodeCompButtonBar extends Div {
 
         if (isPageRootNode && this.node.hasChildren) {
             docIcon = new Icon({
-                className: "fa fa-file-text fa-lg buttonBarIcon",
+                className: "fa fa-align-left fa-lg buttonBarIcon",
                 title: "Show Document View",
                 nid: this.node.id,
                 onClick: S.nav.openDocumentView
