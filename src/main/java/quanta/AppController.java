@@ -249,7 +249,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * Renders with Thymeleaf.
 	 */
 	@PerfMon
-	@RequestMapping(value = {"/", "/tab/{initialTab}", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
+	@RequestMapping(value = {"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// =======================================================================================
 			/* PATH PARAMS */
@@ -259,7 +259,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
 			@PathVariable(value = "userName", required = false) String userName, //
-			@PathVariable(value = "initialTab", required = false) String initialTab, //
 
 			// =======================================================================================
 			/* REQUEST PARAMS */
@@ -271,6 +270,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
+			@RequestParam(value = "view", required = false) String initialTab, //
 			HttpSession session, //
 			Model model) {
 		try {
