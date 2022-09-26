@@ -237,7 +237,7 @@ public class ActPubService extends ServiceBase {
                     apUtil.securePostEx(allInboxes, fromActor, privateKey, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                 }
 
-                // Post message to all foreign usernames found in 'toUserNames', but skip all in userInboxes becasue
+                // Post message to all foreign usernames found in 'toUserNames', but skip all in userInboxes because
                 // we just sent to those above.
                 if (toUserNames.size() > 0) {
                     sendMessageToUsers(ms, toUserNames, fromUser, message, privateMessage, userInboxes);

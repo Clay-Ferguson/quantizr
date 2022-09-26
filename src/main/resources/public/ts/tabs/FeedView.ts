@@ -104,7 +104,10 @@ export class FeedView extends AppTab<FeedViewProps> {
                         title: "Bookmark this Chat Room",
                         onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
                     }) : null,
-
+                    new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
+                        setValue: (checked: boolean) => this.data.props.autoRefresh = checked,
+                        getValue: (): boolean => this.data.props.autoRefresh
+                    }),
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
                     // new HelpButton(() => state.config.help?.fediverse?.feed),
 
@@ -125,14 +128,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         //     (state: boolean) => {
         //         this.data.props.filterExpanded = state;
         //     }, this.data.props.filterExpanded, "", "", "", "span"));
-
-        if (this.data.props.feedFilterRootNode) {
-            topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
-                setValue: (checked: boolean) => this.data.props.autoRefresh = checked,
-                getValue: (): boolean => this.data.props.autoRefresh
-            }));
-        }
-
         // DO NOT DELETE, Leave for future use, but for now this isn't worth the space it takes up and is even to small to easily click.
         // if (!state.userPrefs.nsfw) {
         //     topChildren.push(new Div("[Show Sensitive Content]", {

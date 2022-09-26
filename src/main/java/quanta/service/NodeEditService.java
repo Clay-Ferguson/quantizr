@@ -421,10 +421,6 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		if (no(node)) {
-			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
-		}
-
 		/* Remember the initial ipfs link */
 		String initIpfsLink = node.getStr(NodeProp.IPFS_LINK);
 
@@ -573,7 +569,12 @@ public class NodeEditService extends ServiceBase {
 
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		/* Send notification to local server or to remote server when a node is added */
+		/* Send notification to local server or to remote server when a node is added.
+		 * 
+		 * todo-0: NOTE: we should be able to save a node with just an attachment and no content so this is wrong isn't it?
+		 *         Test this, and be SURE we won't send out TWO messages if we send with blank (for example be sure we
+		 *         don't run thru here until user clicks "save" in the gui)
+		*/
 		if (!StringUtils.isEmpty(node.getContent()) //
 				// don't send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {

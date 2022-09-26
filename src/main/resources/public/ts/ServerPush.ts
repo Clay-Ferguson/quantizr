@@ -135,11 +135,6 @@ export class ServerPush {
             nodeInfo.content = "[Encrypted]";
         }
 
-        /* if the reciept of this server push makes us have new knowledge that one of our nodes
-           that didn't have children before now has children then update the state to have 'hasChildren'
-           on this node so the 'open' button will appear */
-        // S.util.refreshOpenButtonOnNode(nodeInfo, state);
-
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
             // console.log("force*** update existing item!");
@@ -169,10 +164,8 @@ export class ServerPush {
     }
 
     feedPushItem = (nodeInfo: J.NodeInfo, state: AppState) => {
-        if (!nodeInfo) return;
-
+        if (!nodeInfo || !FeedTab.inst) return;
         console.log("feedPushItem: " + nodeInfo.content);
-        if (!FeedTab.inst) return;
 
         const isMine = S.props.isMine(nodeInfo, state);
 
@@ -195,11 +188,6 @@ export class ServerPush {
 
             const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
-
-            /* if the reciept of this server push makes us have new knowledge that one of our nodes
-               that didn't have children before now has children then update the state to have 'hasChildren'
-               on this node so the 'open' button will appear */
-            // S.util.refreshOpenButtonOnNode(nodeInfo, s);
 
             // if updates existing item we refresh it even if autoRefresh is off
             if (updatesExistingItem) {

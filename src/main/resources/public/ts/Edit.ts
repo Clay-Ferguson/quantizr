@@ -295,6 +295,7 @@ export class Edit {
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
+            // todo-0: shouldn't we do this regardless of which tab is active.
             if (state.activeTab === C.TAB_FEED) {
                 if (FeedTab.inst?.props?.feedDirtyList) {
                     for (const node of FeedTab.inst.props.feedDirtyList) {
@@ -303,7 +304,7 @@ export class Edit {
                     }
                     FeedTab.inst.props.feedDirtyList = null;
 
-                    // all the data in feedData will have been updated by forceFeedItem to just force react to render now.
+                    // all the data in feedData will have been updated by forceFeedItem so force react to render now.
                     dispatch("ForceFeedResults", s => {
                         return s;
                     });
