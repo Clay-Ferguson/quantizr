@@ -40,6 +40,7 @@ import quanta.actpub.model.APOWebFinger;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
@@ -252,7 +253,7 @@ public class ActPubUtil extends ServiceBase {
             if (ok(response)) {
                 responseCode = response.getStatusCodeValue();
                 // DO NOT DELETE: Example of how to query with completely unknown class.
-                //    mapper.readValue(response.getBody(), new TypeReference<>() {});
+                // mapper.readValue(response.getBody(), new TypeReference<>() {});
                 ret = (APObj) mapper.readValue(response.getBody(), clazz);
             }
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
@@ -814,96 +815,106 @@ public class ActPubUtil extends ServiceBase {
      * already loaded
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
-        log.debug("getNodeThreadView");
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
-        LinkedList<NodeInfo> others = loadOthers ? new LinkedList<>() : null;
 
         // get node that's going to have it's ancestors gathered
         SubNode node = read.getNode(ms, nodeId);
         boolean topReached = false;
+        ObjectId lastNodeId = null;
 
-        if (ok(node)) {
-            // iterate up the parent chain or chain of inReplyTo for ActivityPub
-            while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
-                try {
-                    NodeInfo info = convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
-                    false, true, true, null);
-                    if (ok(info)) {
-                        nodes.addFirst(info);
-                    }
+        // iterate up the parent chain or chain of inReplyTo for ActivityPub
+        while (ok(node) && nodes.size() < MAX_THREAD_NODES) {
+            try {
+                NodeInfo info = null;
 
-                    // if inReplyTo exists try to use it first.
-                    String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
-                    if (ok(inReplyTo)) {
-                        SubNode parentNode = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
-                        if (ok(parentNode)) {
-                            node = parentNode;
+                // note topNode doesn't necessarily mean we're done iterating becasue it's 'inReplyTo' still may
+                // point to further places 'above' (in this conversation thread)
+                boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS);
 
-                            /*
-                             * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
-                             * consider this a case where there's no conversation to show and bail out here.
-                             */
-                            if (nodes.size() == 1 && (node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS))) {
-                                res.setSuccess(true);
-                                return res;
+                if (!topNode) {
+                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
+                            false, true, true, null);
+
+
+                    // we only collect children at this leve if it's not an account top level post
+                    if (loadOthers) {
+                        Iterable<SubNode> iter =
+                                read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0);
+                        HashSet<String> childIds = new HashSet<>();
+                        List<NodeInfo> children = new LinkedList<>();
+
+                        for (SubNode child : iter) {
+                            if (!child.getId().equals(lastNodeId)) {
+                                childIds.add(child.getIdStr());
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, true, false, -1,
+                                        false, false, false, false, true, true, null));
                             }
-
-                            continue;
                         }
-                    }
-
-                    SubNode parent = read.getParent(ms, node);
-                    // if no database parent, check and see if we can get the node via inReplyTo
-                    if (no(parent)) {
-                        topReached = true;
-                    } else {
-                        node = parent;
 
                         /*
-                         * if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
-                         * consider this a case where there's no conversation to show and bail out here.
+                         * if this node has a NodeProp.ACT_PUB_ID property, we also add in all nodes that have a
+                         * NodeProp.ACT_PUB_OBJ_INREPLYTO pointing to it, because they are also replies
                          */
-                        if (ok(node) && nodes.size() == 1
-                                && (node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS))) {
-                            res.setSuccess(true);
-                            return res;
-                        }
-                    }
-
-                    /*
-                     * if we just got the first parent encountered going up, then show all other replies this user or
-                     * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
-                     * parentt
-                     */
-                    if (loadOthers && nodes.size() == 1 && !node.isType(NodeType.POSTS) && !node.isType(NodeType.ACT_PUB_POSTS)) {
-                        // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them
-                        // all)
-                        Iterable<SubNode> iter =
-                                read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 10, 0);
-                        for (SubNode child : iter) {
-                            // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition.
-                            if (!child.getIdStr().equals(nodeId)) {
-                                others.add(convert.convertToNodeInfo(false,ThreadLocals.getSC(), ms, child, true, false, -1, false,
-                                        false, false, false, true, true, null));
+                        String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
+                        if (ok(actPubId)) {
+                            iter = read.findNodesByProp(ms, NodePath.ROOT_OF_ALL_USERS, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                                    actPubId);
+                            for (SubNode child : iter) {
+                                // if we didn't already add above, add now
+                                if (!childIds.contains(child.getIdStr())) {
+                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, true, false,
+                                            -1, false, false, false, false, true, true, null));
+                                }
                             }
                         }
+
+                        if (children.size() > 0) {
+                            info.setChildren(children);
+                        }
                     }
-                } catch (Exception e) {
-                    node = null;
-                    topReached = true;
-                    /*
-                     * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
-                     * the one above their account, this represents how far up the user is able to read towards the root
-                     * of the tree based on sharing setting of nodes encountered along the way to the root.
-                     */
                 }
+
+                if (ok(info)) {
+                    nodes.addFirst(info);
+                    lastNodeId = node.getId();
+                }
+
+                // if we node id known to be topNode, set parent to null, to trigger the only path up to have to
+                // go thru an inReplyTo, rather than be based on tree structure.
+                SubNode parent = topNode ? null : read.getParent(ms, node);
+                boolean top = ok(parent) && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
+
+                // if we didn't a usable (non root) parent from the tree structure, try using the 'inReplyTo' value
+                if (no(parent) || top) {
+                    String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
+                    // if node has an inReplyTo...
+                    if (ok(inReplyTo)) {
+                        // then loadObject will get it from DB or else resort to getting it from internet
+                        parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
+                    }
+                }
+
+                node = parent;
+                if (no(node)) {
+                    topReached = true;
+                }
+            } catch (Exception e) {
+                node = null;
+                topReached = true;
+                /*
+                 * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
+                 * the one above their account, this represents how far up the user is able to read towards the root
+                 * of the tree based on sharing setting of nodes encountered along the way to the root.
+                 */
             }
+        }
+        if (no(node)) {
+            topReached = true;
         }
 
         res.setTopReached(topReached);
         res.setNodes(nodes);
-        res.setOthers(others);
         res.setSuccess(true);
         return res;
     }
@@ -917,6 +928,16 @@ public class ActPubUtil extends ServiceBase {
         // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
         if (no(url))
             return null;
+
+        if (apUtil.isLocalUrl(url)) {
+            log.debug("is local url.");
+            int lastIdx = url.lastIndexOf("=");
+            if (lastIdx != -1) {
+                String nodeId = url.substring(lastIdx + 1);
+                log.debug("looking up nodeId: " + nodeId);
+                return read.getNode(ms, nodeId);
+            }
+        }
 
         // Try to look up the node first from the DB.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
@@ -953,8 +974,8 @@ public class ActPubUtil extends ServiceBase {
                                 return null;
                             }
 
-                            node = apub.saveInboundForeignObj(as, userDoingAction, accountNode, outboxNode, obj, APType.Create, null,
-                                    null);
+                            node = apub.saveInboundForeignObj(as, userDoingAction, accountNode, outboxNode, obj, APType.Create,
+                                    null, null);
                         }
                         return node;
                     });

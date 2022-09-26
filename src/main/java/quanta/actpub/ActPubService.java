@@ -973,6 +973,7 @@ public class ActPubService extends ServiceBase {
          * Detect if inReplyTo is formatted like this: 'https://domain.com?id=xxxxx' (proprietary URL format
          * for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
          */
+        // todo-0: this kind of logic exists also in the loadObject method and we need to consolildate it.
         if (apUtil.isLocalUrl(inReplyTo)) {
             int lastIdx = inReplyTo.lastIndexOf("=");
             String replyToId = null;
@@ -1965,7 +1966,6 @@ public class ActPubService extends ServiceBase {
             } else {
                 return "Unable to load data.";
             }
-
         } catch (Exception e) {
             log.error("Unable to get JSON from url: " + objUrl);
             return "Error: " + e.getMessage();

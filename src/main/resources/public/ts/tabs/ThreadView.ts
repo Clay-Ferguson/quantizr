@@ -5,7 +5,6 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -35,8 +34,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         children.push(new Div(null, null, [
             new Div(null, { className: "headingBar" }, [
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
-                new Div(this.data.props.endReached ? "Chain of replies going back to original post" //
-                    : "Chain of replies going back towards original post", { className: "float-end" }),
+                !this.data.props.endReached ? new Div("More of this thread can be displayed", { className: "float-end" }) : null,
                 new Clearfix(),
                 !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() },
                     { className: "float-end" }, "btn-primary") : null,
@@ -47,31 +45,26 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
 
-        // NOTE: The current findNode() impl for this tab doesn't take into account the 'data.props.others' yet. probably should.
-        const others: J.NodeInfo[] = this.data.props.others;
-
         results.forEach((node: J.NodeInfo) => {
-            const c = this.renderItem(node, i, rowCount, jumpButton, state);
+            const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem", state);
             if (c) {
                 children.push(c);
             }
+
+            if (node.children) {
+                const subComps: CompIntf[] = [];
+                node.children.forEach((child: J.NodeInfo) => {
+                    const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", state);
+                    if (c) {
+                        subComps.push(c);
+                    }
+                });
+                children.push(new Div(null, null, subComps));
+            }
+
             i++;
             rowCount++;
-            if (i === results.length - 1) {
-                children.push(new Heading(4, "Replies to the Above...", { className: "marginTop" }));
-            }
         });
-
-        if (others) {
-            others.forEach((node: J.NodeInfo) => {
-                const c = this.renderItem(node, i, rowCount, jumpButton, state);
-                if (c) {
-                    children.push(c);
-                }
-                i++;
-                rowCount++;
-            });
-        }
 
         this.setChildren(children);
     }
@@ -84,8 +77,8 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string, state: AppState): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
-            true, jumpButton, true, true, false, "userFeedItem", "userFeedItemHighlight", null, state);
+            true, jumpButton, true, true, false, clazz, "threadFeedItemHighlight", null, state);
     }
 }

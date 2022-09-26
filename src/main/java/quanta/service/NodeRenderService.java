@@ -272,9 +272,13 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		Criteria moreCriteria = null;
-		if (!showReplies) {
-			moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
-		}
+		// todo-0: disabling this for now. Needs more thought regarding how to keep this from accidentally hiding nodes
+		// from users in a way where they don't realize nodes are being hidden simply because of being comment types.
+		// especially with the 'Show Comments' being hidden away in the settings menu instead of like at the top of the
+		// tree view like document view does. 
+		// if (!showReplies) {
+		// 	moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
+		// }
 
 		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria);
 		Iterator<SubNode> iterator = nodeIter.iterator();

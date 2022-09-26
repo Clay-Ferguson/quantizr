@@ -1380,10 +1380,6 @@ Will come back later and study this more. todo-1 */
     padding: $tinyGap;
 }
 
-.threadNodeDivider {
-    width: 100%;
-}
-
 .content-narrow {
     max-width: 50rem;
 }
@@ -1529,6 +1525,41 @@ Will come back later and study this more. todo-1 */
 
 .testHighlight {
     background-color: green;
+}
+
+.threadNodeDivider {
+    width: 100%;
+}
+
+.threadFeedItem {
+    margin-top: 8px;
+    padding-top: 5px;
+    border: 2px solid $nodeBorderBottomColor;
+    padding-bottom: $smallGap;
+    border-radius: $border-radius;
+}
+
+.threadFeedSubItem {
+    padding-top: 5px;
+
+    &:not(:last-child) {
+        border-bottom: 2px solid $nodeBorderBottomColor;
+    }
+
+    &:last-child {
+        margin-bottom: 16px;
+    }
+
+    border-left: 1px solid $nodeBorderBottomColor;
+    margin-left: 4rem;
+}
+
+.threadFeedItemHighlight {
+    margin-top: 5px;
+    padding-top: 5px;
+    border: 2px solid olivedrab;
+    padding-bottom: $smallGap;
+    border-radius: $border-radius;
 }
 
 .userFeedItem {

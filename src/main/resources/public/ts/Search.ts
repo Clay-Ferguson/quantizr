@@ -60,7 +60,7 @@ export class Search {
     showThreadAddMore = async (nodeId: string, state: AppState) => {
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
-            loadOthers: false
+            loadOthers: true
         });
 
         if (res.nodes && res.nodes.length > 0) {
@@ -111,7 +111,6 @@ export class Search {
                 data.openGraphComps = [];
 
                 data.props.results = res.nodes;
-                data.props.others = res.others;
                 data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;

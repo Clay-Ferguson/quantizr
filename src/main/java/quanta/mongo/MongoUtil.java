@@ -591,6 +591,8 @@ public class MongoUtil extends ServiceBase {
 
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
 
+		createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_INREPLYTO.s());
+
 		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
 				NodeType.ACCOUNT.s());
 
@@ -729,6 +731,28 @@ public class MongoUtil extends ServiceBase {
 							.named(name) //
 							// Note: also instead of exists, something like ".gt('')" would probably work too
 							.partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
+			log.debug("Index verified: " + name);
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
+		}
+	}
+
+/*
+	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
+	 * works,
+	 */
+	public void createPartialIndex(MongoSession ms, String name, Class<?> clazz, String property) {
+		log.debug("Ensuring partial index named: " + name);
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
+
+		try {
+			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
+			ops.indexOps(clazz).ensureIndex(//
+					new Index().on(property, Direction.ASC) //
+							.named(name) //
+							// Note: also instead of exists, something like ".gt('')" would probably work too
+							.partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
 			log.debug("Index verified: " + name);
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);

@@ -664,7 +664,6 @@ export interface GetSharedNodesResponse extends ResponseBase {
 
 export interface GetThreadViewResponse extends ResponseBase {
     nodes: NodeInfo[];
-    others: NodeInfo[];
     topReached: boolean;
 }
 
