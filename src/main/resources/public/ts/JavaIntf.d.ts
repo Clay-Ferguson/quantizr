@@ -1054,7 +1054,6 @@ export const enum NodeProp {
     IMG_WIDTH = "sn:imgWidth",
     IMG_HEIGHT = "sn:imgHeight",
     IMG_SIZE = "sn:imgSize",
-    CHILDREN_IMG_SIZES = "sn:childrenImgSizes",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     ALLOWED_FEATURES = "sn:features",

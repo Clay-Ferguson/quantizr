@@ -68,13 +68,6 @@ public class SubNodeUtil extends ServiceBase {
 			ret = true;
 		}
 
-		/* If layout=="v" then remove the property */
-		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES);
-		if ("n".equals(childrenImageSizes)) {
-			node.delete(NodeProp.CHILDREN_IMG_SIZES);
-			ret = true;
-		}
-
 		/* If priority=="0" then remove the property */
 		String priority = node.getStr(NodeProp.PRIORITY);
 		if ("0".equals(priority)) {

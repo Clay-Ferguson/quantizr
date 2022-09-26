@@ -166,7 +166,6 @@ public enum NodeProp {
     IMG_WIDTH("sn:imgWidth", "s"), //
     IMG_HEIGHT("sn:imgHeight", "s"), //
     IMG_SIZE("sn:imgSize", "s"), //
-    CHILDREN_IMG_SIZES("sn:childrenImgSizes", "s"), //
 
     // get how many bytes of storage the user currently holds
     BIN_TOTAL("sn:binTot", "s"), // see isSavableProperty
