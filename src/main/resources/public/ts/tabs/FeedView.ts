@@ -89,7 +89,13 @@ export class FeedView extends AppTab<FeedViewProps> {
                                 });
                             }
                         },
-                        title: "Search this Feed"
+                        title: "Search Feed"
+                    }),
+                    new IconButton("fa-refresh", null, {
+                        onClick: () => {
+                            S.srch.refreshFeed();
+                        },
+                        title: "Refresh Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
@@ -203,7 +209,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 else {
                     // console.log("FEED: node id=" + node.id + " content: " + node.content);
                     children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, "feed", true,
-                    false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, state));
+                        false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, state));
                     i++;
                     rowCount++;
 
