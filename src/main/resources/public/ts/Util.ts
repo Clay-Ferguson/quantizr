@@ -915,7 +915,7 @@ export class Util {
             }
             else {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
-                    nodeId: g_nodeId,
+                    nodeId: g_nodeId || ":home",
                     upLevel: false,
                     siblingOffset: 0,
                     renderParentIfLeaf: false,
@@ -923,9 +923,9 @@ export class Util {
                     offset: 0,
                     goToLastPage: false,
                     forceIPFSRefresh: false,
-                    singleNode: true,
+                    singleNode: false,
                     parentCount: 0
-                }, true);
+                });
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
