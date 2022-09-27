@@ -426,6 +426,8 @@ public class NodeEditService extends ServiceBase {
 
 		/* Remember the initial ipfs link */
 		String initIpfsLink = ok(att) ? att.getIpfsLink() : null;
+		
+		node.setAttachments(req.getNode().getAttachments());
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only

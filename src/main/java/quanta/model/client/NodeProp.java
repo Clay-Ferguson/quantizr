@@ -108,6 +108,8 @@ public enum NodeProp {
 
     JSON_HASH("ipfs:json", "s"), //
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
+
+    // todo-0: is this still used?
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
     // This property indicates that it's data is sourced from IPFS files, and can

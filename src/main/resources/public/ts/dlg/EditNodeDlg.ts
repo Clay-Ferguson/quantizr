@@ -517,9 +517,22 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        // todo-att: imageSizeSelection will have to change based on new Attachments array
-        // const imgSizeSelection = S.props.hasImage(appState.editNode) ? this.createImgSizeSelection("Image Size", false, "float-end", //
-        //     new PropValueHolder(appState.editNode, J.NodeProp.IMG_SIZE, "100%")) : null;
+        const imgSizeSelection = S.props.hasImage(appState.editNode)
+            ? this.createImgSizeSelection("Image Size", false, "float-end", //
+                {
+                    setValue(val: string): void {
+                        const att: J.Attachment = S.props.getAttachment(null, appState.editNode);
+                        if (att) {
+                            att.c = val;
+                            this.binaryDirty = true;
+                        }
+                    },
+
+                    getValue(): string {
+                        const att: J.Attachment = S.props.getAttachment(null, appState.editNode);
+                        return att && att.c;
+                    }
+                }) : null;
 
         const topBinRow = new HorizontalLayout([
             new NodeCompBinary(appState.editNode, true, false),
@@ -534,7 +547,7 @@ export class EditNodeDlg extends DialogBase {
                         title: "Remove this attachment"
                     })
                 ]),
-                // imgSizeSelection, // todo-att: see refactor pending comment above.
+                imgSizeSelection,
                 pinCheckbox
             ])
 

@@ -1156,12 +1156,18 @@ public class AttachmentService extends ServiceBase {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
+						if (no(id)) {
+							// todo-0: does the meta key here really need to be specific to the binSuffix? In other words can't we
+							// just always use nodeId as the meta key for ALL attachments?
+							id = (ObjectId) meta.get("nodeIdh");
+						}
+
 						/*
 						 * If the grid file is not based off 'nodeId' then we still need to check if it's a Header image
 						 * (special case)
 						 */
 						if (no(id)) {
-							// todo-att: will this still work, because it seems like it needs to be nodeIdh now (h replaced Header)
+							// todo-0: we support finding the obsolete key id value also until we know those are all cleaned out.
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 

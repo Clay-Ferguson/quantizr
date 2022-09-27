@@ -1246,8 +1246,8 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode findByIPFSPinned(MongoSession ms, String cid) {
-        // todo-att: pending rewrite based on new Attachments array on SubNode
-        return null;
+        // todo-0: pending rewrite based on new Attachments array on SubNode
+        throw new RuntimeException("findByIPFSPinned not available");
         // Query q = new Query();
 
         // /* Match the PIN to cid */
@@ -1278,8 +1278,8 @@ public class MongoRead extends ServiceBase {
     // This gets all nodes with a pinned attachment on IPFS.
     // (not currently used)
     public Iterable<SubNode> findAllWithIpfsLinks() {
-        // todo-att: pending refactor with new Attachments array
-        return null;
+        // todo-0: pending refactor with new Attachments array
+        throw new RuntimeException("findAllWithIpfsLinks not available");
         // Query q = new Query();
         // Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).ne(null);
 

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -453,7 +454,7 @@ public class SubNode {
 	@JsonIgnore
 	public Attachment getAttachment(String name, boolean create, boolean forceNew) {
 		synchronized (attLock) {
-			if (no(name)) {
+			if (StringUtils.isEmpty(name)) {
 				name = "p"; // p = primary attachment
 			}
 
@@ -488,7 +489,7 @@ public class SubNode {
 	@JsonIgnore
 	public void setAttachment(String name, Attachment att) {
 		synchronized (attLock) {
-			if (no(name)) {
+			if (StringUtils.isEmpty(name)) {
 				name = "p"; // p = primary attachment
 			}
 

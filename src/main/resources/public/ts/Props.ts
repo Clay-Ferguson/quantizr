@@ -24,23 +24,6 @@ export class Props {
         return propsNew;
     }
 
-    /* copies all the binary properties from source node to destination node */
-    // todo-att: this method is obsolete with new Attachments design
-    // transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo) => {
-    //     if (!srcNode.properties) return;
-    //     dstNode.properties = dstNode.properties || [];
-
-    //     this.allBinaryProps.forEach(k => {
-    //         const val = this.getPropStr(k, srcNode);
-    //         if (val) {
-    //             this.setPropVal(k, dstNode, val);
-    //         }
-    //         else {
-    //             this.deleteProp(dstNode, k);
-    //         }
-    //     });
-    // }
-
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
         const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
         if (tagIdx !== -1) {
@@ -281,12 +264,6 @@ export class Props {
 
     // here's the simple mode property hider!
     initConstants = () => {
-        // S.util.addAllToSet(this.allBinaryProps, [ //
-        //     // todo-att: are these still in use?
-        //     J.NodeProp.IPFS_LINK_NAME, //
-        //     J.NodeProp.IPFS_OK
-        // ]);
-
         S.util.addAllToSet(this.readOnlyPropertyList, [ //
             J.NodeProp.JSON_HASH, //
             J.NodeProp.ENC_KEY, //
