@@ -191,8 +191,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	public static final String API_PATH = "/mobile/api";
 
-	private static HashMap<String, String> thymeleafAttribs = null;
-
 	/*
 	 * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
 	 * instance ever
@@ -205,7 +203,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
 		model.addAttribute("hostAndPort", prop.getHostAndPort());
-		model.addAllAttributes(thymeleafAttribs);
+		model.addAllAttributes(getThymeleafAttribs());
 		// pulls up error.html
 		return "error";
 	}
@@ -217,25 +215,16 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (no(context)) {
 			throw new RuntimeException("Failed to autowire ApplicationContext");
 		}
-		initThymeleafAttribs();
 	}
 
-	public void initThymeleafAttribs() {
-		if (prop.getProfileName().equals("dev")) {
-			// force reload of attribs
-			thymeleafAttribs = null;
-		}
-
-		if (ok(thymeleafAttribs))
-			return;
-
-		thymeleafAttribs = new HashMap<>();
-
-		thymeleafAttribs.put("instanceId", prop.getInstanceId());
-		thymeleafAttribs.put("brandingAppName", prop.getConfigText("brandingAppName"));
-		thymeleafAttribs.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
-		thymeleafAttribs.put("hostUrl", prop.getProtocolHostAndPort());
-		thymeleafAttribs.put("requireCrypto", prop.isRequireCrypto() ? "true" : "false");
+	public HashMap<String, String> getThymeleafAttribs() {
+		HashMap<String, String> map = new HashMap<>();
+		map.put("instanceId", prop.getInstanceId());
+		map.put("brandingAppName", prop.getConfigText("brandingAppName"));
+		map.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
+		map.put("hostUrl", prop.getProtocolHostAndPort());
+		map.put("requireCrypto", prop.isRequireCrypto() ? "true" : "false");
+		return map;
 	}
 
 	/*
@@ -273,6 +262,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "view", required = false) String initialTab, //
 			HttpSession session, //
 			Model model) {
+		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
 			SessionContext.init(context, session, true);
 
@@ -289,8 +279,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				initialTab = "trendingTab";
 			}
 
-			initThymeleafAttribs();
-			thymeleafAttribs.put("initialTab", initialTab);
+			attrs.put("initialTab", initialTab);
 
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
@@ -325,13 +314,13 @@ public class AppController extends ServiceBase implements ErrorController {
 				try {
 					node = read.getNode(as, _id);
 				} catch (Exception e) {
-					thymeleafAttribs.put("urlIdFailMsg", "Unable to access " + _id);
+					attrs.put("urlIdFailMsg", "Unable to access " + _id);
 					ExUtil.warn(log, "Unable to access node: " + _id, e);
 				}
 
 				if (ok(node)) {
 					if (_urlId) {
-						thymeleafAttribs.put("nodeId", _id);
+						attrs.put("nodeId", _id);
 					}
 
 					if (AclService.isPublic(as, node)) {
@@ -348,9 +337,9 @@ public class AppController extends ServiceBase implements ErrorController {
 		}
 
 		if (ok(signupCode)) {
-			thymeleafAttribs.put("userMessage", user.processSignupCode(signupCode));
+			attrs.put("userMessage", user.processSignupCode(signupCode));
 		}
-		model.addAllAttributes(thymeleafAttribs);
+		model.addAllAttributes(attrs);
 		HitFilter.addHit(uniqueUserIpHits, ThreadLocals.getSC().getUserName());
 		return "index";
 	}
@@ -366,8 +355,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	@RequestMapping(value = {"/demo/{file}"})
 	public String demo(@PathVariable(value = "file", required = false) String file, //
 			Model model) {
-		initThymeleafAttribs();
-		model.addAllAttributes(thymeleafAttribs);
+		model.addAllAttributes(getThymeleafAttribs());
 		return "demo/" + file;
 	}
 
