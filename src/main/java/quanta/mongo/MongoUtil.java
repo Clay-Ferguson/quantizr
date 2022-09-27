@@ -502,6 +502,8 @@ public class MongoUtil extends ServiceBase {
 
 				boolean updated = false;
 
+				HashMap<String, Object> props = node.getProps();
+
 				String bin = node.getStr("bin");
 				String binData = node.getStr("sn:jcrData");
 				String url = node.getStr("sn:extUrl");
@@ -510,7 +512,9 @@ public class MongoUtil extends ServiceBase {
 				String ipfsRef = node.getStr("ipfs:ref");
 
 				if (ok(bin) || ok(binData) || ok(url) || ok(dataUrl) || ok(ipfsLink) || ok(ipfsRef)) {
+
 					Attachment att = node.getAttachment(null, true, true);
+
 					att.setBin(bin);
 					att.setBinData(binData);
 					att.setUrl(url);
@@ -520,16 +524,30 @@ public class MongoUtil extends ServiceBase {
 					att.setMime(node.getStr("sn:mimeType"));
 					att.setFileName(node.getStr("sn:fileName"));
 					att.setCssSize(node.getStr("sn:imgSize"));
+
 					try {
 						att.setWidth(Integer.parseInt(node.getStr("sn:imgWidth")));
 						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeight")));
 					} catch (Exception e) {
 					}
-					
+
 					try {
 						att.setSize(Long.parseLong(node.getStr("sn:size")));
 					} catch (Exception e) {
 					}
+
+					props.remove("bin");
+					props.remove("sn:jcrData");
+					props.remove("sn:extUrl");
+					props.remove("sn:dataUrl");
+					props.remove("ipfs:link");
+					props.remove("ipfs:ref");
+					props.remove("sn:mimeType");
+					props.remove("sn:fileName");
+					props.remove("sn:imgSize");
+					props.remove("sn:imgWidth");
+					props.remove("sn:imgHeight");
+					props.remove("sn:size");
 
 					if (no(bops.getVal())) {
 						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
@@ -550,7 +568,7 @@ public class MongoUtil extends ServiceBase {
 						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeightHeader")));
 					} catch (Exception e) {
 					}
-					
+
 					try {
 						att.setSize(Long.parseLong(node.getStr("sn:sizeHeader")));
 					} catch (Exception e) {
@@ -559,12 +577,20 @@ public class MongoUtil extends ServiceBase {
 					if (no(bops.getVal())) {
 						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 					}
+
+					props.remove("binHeader");
+					props.remove("sn:mimeTypeHeader");
+					props.remove("sn:fileNameHeader");
+					props.remove("sn:imgSizeHeader");
+					props.remove("sn:imgWidthHeader");
+					props.remove("sn:imgHeightHeader");
+					props.remove("sn:sizeHeader");
 				}
 				// HEADER IMAGES END
 
 				if (updated) {
 					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-					Update update = new Update().set(SubNode.ATTACHMENTS, node.getAttachments());
+					Update update = new Update().set(SubNode.ATTACHMENTS, node.getAttachments()).set(SubNode.PROPS, props);
 					bops.getVal().updateOne(query, update);
 					opsPending.inc();
 
