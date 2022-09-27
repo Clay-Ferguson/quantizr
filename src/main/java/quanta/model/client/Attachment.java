@@ -8,8 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 
-// todo-att: add logic to every dirty() call in here to check to be sure the value DID change before setting dirty.
-// todo-att: configure JSON serializer to leave out NULLs, zeroes, and false, to make object smaller.
 @JsonInclude(Include.NON_NULL)
 public class Attachment {
     private int width;          // IMG_WIDTH	"sn:imgWidth"

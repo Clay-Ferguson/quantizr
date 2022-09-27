@@ -284,7 +284,6 @@ public class AttachmentService extends ServiceBase {
 		return mimeType;
 	}
 
-	// todo-att: binSuffix is not handled yet in the new attachment design.
 	public void saveBinaryStreamToNode(MongoSession ms, String binSuffix, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node, boolean toIpfs, boolean calcImageSize,
 			boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
@@ -298,7 +297,7 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		Attachment 	att = node.getAttachment(null, true, true);
+		Attachment 	att = node.getAttachment(binSuffix, true, true);
 
 		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
 		if (ImageUtil.isImageMime(mimeType)) {
@@ -421,8 +420,6 @@ public class AttachmentService extends ServiceBase {
 	 * of "inline" by omitting it
 	 * 
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
-	 * 
-	 * todo-att: binSuffix needs to be accounted for in new Attachment logic
 	 */
 	@PerfMon(category = "attach")
 	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, boolean download,
@@ -443,7 +440,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			Attachment att = node.getAttachment();
+			Attachment att = node.getAttachment(binSuffix, false, false);
 			if (no(att)) {
 				throw ExUtil.wrapEx("attachment info not found.");
 			}
@@ -922,7 +919,7 @@ public class AttachmentService extends ServiceBase {
 			String mimeType, SubNode userNode) {
 
 		// don't create attachment here, there shuold already be one, but we pass create=true anyway
-		Attachment att = node.getAttachment(null, true, false);
+		Attachment att = node.getAttachment(binSuffix, true, false);
 	
 		auth.ownerAuth(node);
 		DBObject metaData = new BasicDBObject();
@@ -970,7 +967,7 @@ public class AttachmentService extends ServiceBase {
 	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node, InputStream stream, String mimeType,
 			SubNode userNode) {
 		auth.ownerAuth(node);
-		Attachment att = node.getAttachment(null, true, false);
+		Attachment att = node.getAttachment(binSuffix, true, false);
 		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
@@ -983,18 +980,13 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
-	// this method can be written a little better (todo-att)
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
 		if (no(node))
 			return;
 		auth.ownerAuth(node);
-		Attachment att = node.getAttachment();
-		if (no(att))
+		Attachment att = node.getAttachment(binSuffix, false, false);
+		if (no(att) || no(att.getBin()))
 			return;
-		String id = att.getBin();
-		if (no(id)) {
-			return;
-		}
 
 		node.setAttachments(null);
 
@@ -1007,7 +999,7 @@ public class AttachmentService extends ServiceBase {
 			user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 		}
 
-		grid.delete(new Query(Criteria.where("_id").is(id)));
+		grid.delete(new Query(Criteria.where("_id").is(att.getBin())));
 	}
 
 	/*
@@ -1019,7 +1011,7 @@ public class AttachmentService extends ServiceBase {
 			auth.auth(ms, node, PrivilegeType.READ);
 		}
 
-		Attachment att = node.getAttachment();
+		Attachment att = node.getAttachment(binSuffix, false, false);
 		if (no(att))
 			return null;
 
@@ -1038,24 +1030,18 @@ public class AttachmentService extends ServiceBase {
 		return is;
 	}
 
-	// todo-att (can cleanup this method a bit)
 	public InputStream getStreamByNode(SubNode node, String binSuffix) {
 		if (no(node))
 			return null;
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
-		Attachment att = node.getAttachment();
-		if (no(att))
+		Attachment att = node.getAttachment(binSuffix, false, false);
+		if (no(att) || no(att.getBin()))
 			return null;
-
-		String id = att.getBin();
-		if (no(id)) {
-			return null;
-		}
 
 		/* why not an import here? */
-		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
+		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (no(gridFile)) {
 			log.debug("gridfs ID not found");
@@ -1096,7 +1082,6 @@ public class AttachmentService extends ServiceBase {
 		return ret;
 	}
 
-	// todo-att: this method can be cleaned up a bit
 	/* Gets the content of the grid resource by reading it into a string */
 	public String getStringByNodeEx(SubNode node) {
 		if (no(node))
@@ -1104,15 +1089,10 @@ public class AttachmentService extends ServiceBase {
 		log.debug("getStringByNode: " + node.getIdStr());
 
 		Attachment att = node.getAttachment();
-		if (no(att))
+		if (no(att) || no(att.getBin()))
 			return null;
 
-		String id = att.getBin();
-		if (no(id)) {
-			return null;
-		}
-
-		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
+		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
 		if (no(gridFile)) {
 			log.debug("gridfs ID not found");
@@ -1181,13 +1161,7 @@ public class AttachmentService extends ServiceBase {
 						 * (special case)
 						 */
 						if (no(id)) {
-							/*
-							 * todo-2: currently we only have "Header" as a (binSuffix), and it may stay that way forever, as
-							 * the only violation of the one-binary-per-node rule.
-							 * 
-							 * Actually we need a cleaner solution than having 'suffixed' versions of all binary properties.
-							 * That was an ugly hack.
-							 */
+							// todo-att: will this still work, because it seems like it needs to be nodeIdh now (h replaced Header)
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 

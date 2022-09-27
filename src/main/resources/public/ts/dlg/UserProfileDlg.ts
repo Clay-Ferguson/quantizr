@@ -194,8 +194,8 @@ export class UserProfileDlg extends DialogBase {
 
                     appState.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
 
-                        state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
-                        new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
+                    state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
+                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
@@ -404,7 +404,8 @@ export class UserProfileDlg extends DialogBase {
         const onClick = () => {
             if (this.readOnly) return;
 
-            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false,
+            // h = Heading
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "h", false, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                         userId: state.userProfile.userNodeId

@@ -485,8 +485,6 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	// converts from old attachments properties to new Attachments array propery.
-	// todo-att: need to make this also convert the Header? Heading? property suffix types which only 
-	// exist on account nodes.
 	public void convertDBAttachments(MongoSession ms) {
 		log.debug("convertDBAttachments");
 		try {
@@ -501,6 +499,8 @@ public class MongoUtil extends ServiceBase {
 				if (nodesProcessed.getVal() % 1000 == 0) {
 					log.debug("SCAN: " + nodesProcessed.getVal());
 				}
+
+				boolean updated = false;
 
 				String bin = node.getStr("bin");
 				String binData = node.getStr("sn:jcrData");
@@ -534,7 +534,35 @@ public class MongoUtil extends ServiceBase {
 					if (no(bops.getVal())) {
 						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 					}
+				}
 
+				// HEADER IMAGES BEGIN
+				bin = node.getStr("binHeader");
+
+				if (ok(bin)) {
+					Attachment att = node.getAttachment("h", true, true);
+					att.setBin(bin);
+					att.setMime(node.getStr("sn:mimeTypeHeader"));
+					att.setFileName(node.getStr("sn:fileNameHeader"));
+					att.setCssSize(node.getStr("sn:imgSizeHeader"));
+					try {
+						att.setWidth(Integer.parseInt(node.getStr("sn:imgWidthHeader")));
+						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeightHeader")));
+					} catch (Exception e) {
+					}
+					
+					try {
+						att.setSize(Long.parseLong(node.getStr("sn:sizeHeader")));
+					} catch (Exception e) {
+					}
+
+					if (no(bops.getVal())) {
+						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+					}
+				}
+				// HEADER IMAGES END
+
+				if (updated) {
 					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 					Update update = new Update().set(SubNode.ATTACHMENTS, node.getAttachments());
 					bops.getVal().updateOne(query, update);

@@ -1080,11 +1080,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			else if ("profileHeader".equals(binId)) {
 				arun.run(as -> {
 					/*
-					 * Note: the "Header" suffix will be applied to all image-related property names to distinguish them
+					 * Note: the "h" (header) suffix will be applied to all image-related property names to distinguish them
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
-					attach.getBinary(as, "Header", null, nodeId, ok(download), response);
+					attach.getBinary(as, "h", null, nodeId, ok(download), response);
 					return null;
 				});
 			}

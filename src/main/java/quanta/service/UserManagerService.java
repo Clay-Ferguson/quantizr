@@ -982,9 +982,11 @@ public class UserManagerService extends ServiceBase {
 				Attachment att = userNode.getAttachment();
 				if (ok(att)) {
 					userProfile.setAvatarVer(att.getBin());
+				}
 
-					// todo-att: the suffix binaries will instead be identified by filename, in the array.
-					// userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
+				Attachment headerAtt = userNode.getAttachment("h", false, false);
+				if (ok(headerAtt)) {
+					userProfile.setHeaderImageVer(headerAtt.getBin());
 				}
 				userProfile.setUserNodeId(userNode.getIdStr());
 				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
