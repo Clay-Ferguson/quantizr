@@ -27,6 +27,7 @@ import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -372,8 +373,9 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStr(NodeProp.BIN_MIME);
-		return ImageUtil.isImageMime(mime);
+		Attachment att = node.getAttachment(false);
+		if (no(att)) return false;
+		return ImageUtil.isImageMime(att.getMime());
 	}
 
 	public ImageSize getImageSize(SubNode node) {

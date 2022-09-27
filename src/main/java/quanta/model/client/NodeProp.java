@@ -96,9 +96,6 @@ public enum NodeProp {
     // FS_FOLDER("fs:folder"), //
     // FS_LUCENE("fs:lucene"), //
 
-    // for inlining an image or other attachment as a single resource on a node use this (link)
-    IPFS_LINK("ipfs:link", "s"), //
-
     // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
     // type of the node to "sn:ipfsNode" (IPFS_NODE)
     IPFS_CID("ipfs:cid", "s"), //
@@ -108,12 +105,6 @@ public enum NodeProp {
     // the IPFS content will supercede (and take precedence), so that we can always read from IPFS
     // and make that content be the content in our DB with fear of overwriting anything.
     IPFS_SCID("ipfs:scid", "s"),
-
-    // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external
-    // to us
-    // and might not even be pinned on our gateway. REF means reference (external reference, from some
-    // other gateway)
-    IPFS_REF("ipfs:ref", "s"), //
 
     JSON_HASH("ipfs:json", "s"), //
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
@@ -140,32 +131,8 @@ public enum NodeProp {
     EMAIL("sn:email", "s"), //
     CODE("sn:code", "s"), //
 
-    BIN_MIME("sn:mimeType", "s"), //
-    BIN_FILENAME("sn:fileName", "s"), //
-
-    // todo-1: Currently this size doesn't take into account IPFS storage of nodes with SubNode.CID
-    // property, that is.
-    BIN_SIZE("sn:size", "s"), //
-
-    /*
-     * if this is present it indicates we have a "data:" url stored here which means we hava an image
-     * (for example) with data encoded inline, and this data url will be stored as text in the
-     * 'attachment' of the node
-     */
-    BIN_DATA_URL("sn:dataUrl", "s"), //
-
     JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
     NOWRAP("sn:nowrap", "s"), //
-
-    BIN_DATA("sn:jcrData", "s"), //
-    BIN("bin", "s"), // see isSavableProperty
-
-    // Attachments that are not stored locally but by external url use this.
-    BIN_URL("sn:extUrl", "s"),
-
-    IMG_WIDTH("sn:imgWidth", "s"), //
-    IMG_HEIGHT("sn:imgHeight", "s"), //
-    IMG_SIZE("sn:imgSize", "s"), //
 
     // get how many bytes of storage the user currently holds
     BIN_TOTAL("sn:binTot", "s"), // see isSavableProperty

@@ -4,15 +4,15 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.io.InputStream;
 import java.util.HashMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
@@ -71,7 +71,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						 * delete the BIN prop now, because it will have to be added during this import, and the existing
 						 * BIN id will no longer apply
 						 */
-						n.delete(NodeProp.BIN);
+						n.setAttachments(null);
 
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
@@ -132,8 +132,10 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (no(node)) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
-			Long length = node.getInt(NodeProp.BIN_SIZE);
-			String mimeType = node.getStr(NodeProp.BIN_MIME);
+			Attachment att = node.getAttachment(false);
+			if (no(att)) return;
+			Long length = att.getSize();
+			String mimeType = att.getMime();
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getIdStr());

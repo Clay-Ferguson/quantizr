@@ -8,7 +8,6 @@ import { S } from "./Singletons";
 
 export class Props {
     readOnlyPropertyList: Set<string> = new Set<string>();
-    allBinaryProps: Set<string> = new Set<string>();
 
     /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
     that it would never make sense to display an edit field for editing their value in the editor */
@@ -26,20 +25,21 @@ export class Props {
     }
 
     /* copies all the binary properties from source node to destination node */
-    transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo) => {
-        if (!srcNode.properties) return;
-        dstNode.properties = dstNode.properties || [];
+    // todo-att: this method is obsolete with new Attachments design
+    // transferBinaryProps = (srcNode: J.NodeInfo, dstNode: J.NodeInfo) => {
+    //     if (!srcNode.properties) return;
+    //     dstNode.properties = dstNode.properties || [];
 
-        this.allBinaryProps.forEach(k => {
-            const val = this.getPropStr(k, srcNode);
-            if (val) {
-                this.setPropVal(k, dstNode, val);
-            }
-            else {
-                this.deleteProp(dstNode, k);
-            }
-        });
-    }
+    //     this.allBinaryProps.forEach(k => {
+    //         const val = this.getPropStr(k, srcNode);
+    //         if (val) {
+    //             this.setPropVal(k, dstNode, val);
+    //         }
+    //         else {
+    //             this.deleteProp(dstNode, k);
+    //         }
+    //     });
+    // }
 
     moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
         const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
@@ -193,24 +193,24 @@ export class Props {
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        if (!node) return false;
-        return !!this.getPropStr(J.NodeProp.BIN, node) ||
-            !!this.getPropStr(J.NodeProp.BIN_URL, node) ||
-            !!this.getPropStr(J.NodeProp.IPFS_LINK, node);
+        return !!this.getAttachment(node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {
-        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
+        const att = this.getAttachment(node);
+        const target = att ? att.mime : null;
         return (target && target.startsWith("image/"));
     }
 
     hasAudio = (node: J.NodeInfo): boolean => {
-        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
+        const att = this.getAttachment(node);
+        const target = att ? att.mime : null;
         return (target && target.startsWith("audio/"));
     }
 
     hasVideo = (node: J.NodeInfo): boolean => {
-        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
+        const att = this.getAttachment(node);
+        const target = att ? att.mime : null;
         return (target && target.startsWith("video/"));
     }
 
@@ -239,6 +239,10 @@ export class Props {
     getClientPropStr = (propertyName: string, node: J.NodeInfo): string => {
         const prop = this.getClientProp(propertyName, node);
         return prop ? prop.value : null;
+    }
+
+    getAttachment = (node: J.NodeInfo): J.Attachment => {
+        return node && node.attachments && node.attachments.length > 0 ? node.attachments[0] : null;
     }
 
     setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {
@@ -276,32 +280,14 @@ export class Props {
 
     // here's the simple mode property hider!
     initConstants = () => {
-        S.util.addAllToSet(this.allBinaryProps, [ //
-            J.NodeProp.IMG_WIDTH, //
-            J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.IMG_SIZE, //
-            J.NodeProp.BIN_MIME, //
-            J.NodeProp.BIN, //
-            J.NodeProp.BIN_URL, //
-
-            J.NodeProp.BIN_FILENAME, //
-            J.NodeProp.BIN_SIZE, //
-            J.NodeProp.BIN_DATA_URL,
-
-            J.NodeProp.IPFS_LINK, //
-            J.NodeProp.IPFS_LINK_NAME, //
-            J.NodeProp.IPFS_OK
-        ]);
+        // S.util.addAllToSet(this.allBinaryProps, [ //
+        //     // todo-att: are these still in use?
+        //     J.NodeProp.IPFS_LINK_NAME, //
+        //     J.NodeProp.IPFS_OK
+        // ]);
 
         S.util.addAllToSet(this.readOnlyPropertyList, [ //
-            J.NodeProp.IMG_WIDTH, //
-            J.NodeProp.IMG_HEIGHT, //
-            J.NodeProp.BIN, //
-            J.NodeProp.BIN_MIME, //
-            J.NodeProp.BIN_SIZE, //
-            J.NodeProp.BIN_FILENAME, //
             J.NodeProp.JSON_HASH, //
-            J.NodeProp.IPFS_LINK, //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.TYPE_LOCK, //
             J.NodeProp.UNPUBLISHED
@@ -315,7 +301,6 @@ export class Props {
             J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
-            J.NodeProp.IMG_SIZE, //
             J.NodeProp.UNPUBLISHED //
         ]);
     }

@@ -27,8 +27,12 @@ export class NodeCompBinary extends Div {
         this.mergeState<LS>({ node });
     }
 
+    // todo-0: rename to makeImageComp
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
         if (!node) return null;
+        const att = S.props.getAttachment(node);
+        if (!att) return null;
+
         const src: string = S.attachment.getUrlForNodeAttachment(node, false);
 
         let size = "";
@@ -39,7 +43,7 @@ export class NodeCompBinary extends Div {
             size = "150px";
         }
         else {
-            size = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
+            size = att.cssSize;
         }
         const style: any = {};
 
@@ -123,9 +127,10 @@ export class NodeCompBinary extends Div {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            const fileName = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
-            const fileSize = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
-            const fileType = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
+            const att = S.props.getAttachment(node);
+            const fileName = att ? att.fileName : null;
+            const fileSize = att ? att.size : null;
+            const fileType = att ? att.mime : null;
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {

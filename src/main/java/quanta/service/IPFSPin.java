@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -48,6 +48,7 @@ public class IPFSPin extends ServiceBase {
     }
 
     public boolean add(String cid) {
+        if (no(cid)) return false;
         checkIpfs();
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
@@ -85,7 +86,8 @@ public class IPFSPin extends ServiceBase {
 
             if (no(node))
                 return;
-            String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
+            Attachment att = node.getAttachment(true);
+            String ipfsLink = att.getIpfsLink();
             add(ipfsLink);
 
             // always get bytes here from IPFS, and update the node prop with that too.
@@ -93,7 +95,7 @@ public class IPFSPin extends ServiceBase {
 
             // note: the enclosing scope this we're running in will take care of comitting the node change to
             // the db.
-            node.set(NodeProp.BIN_SIZE, stat.getCumulativeSize());
+            att.setSize(stat.getCumulativeSize());
 
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);

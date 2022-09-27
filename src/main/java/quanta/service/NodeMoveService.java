@@ -164,7 +164,7 @@ public class NodeMoveService extends ServiceBase {
 
 			if (counter > 0) {
 				/* If node has an attachment we don't delete the node, but just set it's content to null */
-				if (ok(n.getStr(NodeProp.BIN)) || ok(n.getStr(NodeProp.IPFS_LINK))) {
+				if (ok(n.getAttachment(false))) {
 					n.setContent(null);
 					n.touch();
 					update.save(ms, n);

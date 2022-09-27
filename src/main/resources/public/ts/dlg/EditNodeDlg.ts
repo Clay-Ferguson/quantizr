@@ -495,28 +495,31 @@ export class EditNodeDlg extends DialogBase {
     }
 
     // Generate GUI for handling the display info about any Node Attachments
-    makeAttachmentPanel = (state: LS) => {
+    makeAttachmentPanel = (state: LS): any => {
         const appState = getAppState();
-        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, appState.editNode);
-        const mime = S.props.getPropStr(J.NodeProp.BIN_MIME, appState.editNode);
+        const att = S.props.getAttachment(appState.editNode);
+        if (!att) return null;
+        const ipfsLink = att.ipfsLink;
+        const mime = att.mime;
 
         let pinCheckbox = null;
         if (ipfsLink) {
             pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
                 setValue: (checked: boolean) => {
                     if (checked) {
-                        this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
+                        att.ipfsRef = null;
                     }
                     else {
-                        S.props.setPropVal(J.NodeProp.IPFS_REF, appState.editNode, "1");
+                        att.ipfsRef = "1";
                     }
                 },
-                getValue: (): boolean => S.props.getProp(J.NodeProp.IPFS_REF, appState.editNode) ? false : true
+                getValue: (): boolean => att.ipfsRef ? false : true
             });
         }
 
-        const imgSizeSelection = S.props.hasImage(appState.editNode) ? this.createImgSizeSelection("Image Size", false, "float-end", //
-            new PropValueHolder(appState.editNode, J.NodeProp.IMG_SIZE, "100%")) : null;
+        // todo-att: imageSizeSelection will have to change based on new Attachments array
+        // const imgSizeSelection = S.props.hasImage(appState.editNode) ? this.createImgSizeSelection("Image Size", false, "float-end", //
+        //     new PropValueHolder(appState.editNode, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         const topBinRow = new HorizontalLayout([
             new NodeCompBinary(appState.editNode, true, false),
@@ -531,7 +534,7 @@ export class EditNodeDlg extends DialogBase {
                         title: "Remove this attachment"
                     })
                 ]),
-                imgSizeSelection,
+                // imgSizeSelection, // todo-att: see refactor pending comment above.
                 pinCheckbox
             ])
 

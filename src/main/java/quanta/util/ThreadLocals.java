@@ -225,7 +225,7 @@ public class ThreadLocals {
 	 * request, are guaranteed to be saved to the DB.
 	 */
 	public static void dirty(SubNode node) {
-		if (no(node.getId())) {
+		if (no(node) || no(node.getId())) {
 			return;
 		}
 

@@ -1246,18 +1246,20 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode findByIPFSPinned(MongoSession ms, String cid) {
-        Query q = new Query();
+        // todo-att: pending rewrite based on new Attachments array on SubNode
+        return null;
+        // Query q = new Query();
 
-        /* Match the PIN to cid */
-        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).is(cid);
+        // /* Match the PIN to cid */
+        // Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).is(cid);
 
-        /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
-        crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
+        // /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
+        // crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
 
-        q.addCriteria(crit);
-        SubNode ret = mongoUtil.findOne(q);
-        auth.auth(ms, ret, PrivilegeType.READ);
-        return ret;
+        // q.addCriteria(crit);
+        // SubNode ret = mongoUtil.findOne(q);
+        // auth.auth(ms, ret, PrivilegeType.READ);
+        // return ret;
     }
 
     // (not currently used)
@@ -1276,13 +1278,15 @@ public class MongoRead extends ServiceBase {
     // This gets all nodes with a pinned attachment on IPFS.
     // (not currently used)
     public Iterable<SubNode> findAllWithIpfsLinks() {
-        Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).ne(null);
+        // todo-att: pending refactor with new Attachments array
+        return null;
+        // Query q = new Query();
+        // Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).ne(null);
 
-        /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
-        crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
-        q.addCriteria(crit);
-        return mongoUtil.find(q);
+        // /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
+        // crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
+        // q.addCriteria(crit);
+        // return mongoUtil.find(q);
     }
 
     // (not currently used)

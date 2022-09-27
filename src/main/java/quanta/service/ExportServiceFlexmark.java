@@ -10,6 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.toc.internal.TocOptions;
@@ -18,14 +23,9 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.config.ServiceBase;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.mongo.MongoSession;
@@ -266,14 +266,17 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void writeImage(SubNode node) {
-		String bin = node.getStr(NodeProp.BIN);
-		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
+		Attachment att = node.getAttachment(false);
+		if (no(att)) return;
+
+		String bin = att.getBin();
+		String ipfsLink = att.getIpfsLink();
 		if (no(bin) && no(ipfsLink)) {
 			return;
 		}
 
 		String style = "";
-		String imgSize = node.getStr(NodeProp.IMG_SIZE);
+		String imgSize = att.getCssSize();
 		if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
 			style = " style='width:" + imgSize + "'";
 		}
@@ -281,8 +284,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 		String src = null;
 
 		if (req.isToIpfs() && "html".equals(format)) {
-			String fileName = node.getStr(NodeProp.BIN_FILENAME);
-			String mime = node.getStr(NodeProp.BIN_MIME);
+			String fileName = att.getFileName();
+			String mime = att.getMime();
 
 			if (ok(bin)) {
 				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);

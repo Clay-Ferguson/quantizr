@@ -34,7 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeType;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.CreateNodeLocation;
@@ -109,9 +109,10 @@ public class IPFSService extends ServiceBase {
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         checkIpfs();
+        Attachment att = node.getAttachment(false);
         String cid = null;
-        String mime = node.getStr(NodeProp.BIN_MIME);
-        String fileName = node.getStr(NodeProp.BIN_FILENAME);
+        String mime = ok(att) ? att.getMime() : null;
+        String fileName = ok(att) ? att.getFileName() : null;
 
         InputStream is = attach.getStreamByNode(node, "");
         if (ok(is)) {
@@ -256,7 +257,7 @@ public class IPFSService extends ServiceBase {
      */
     public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
-                checkIpfs();
+        checkIpfs();
         SubNode exportParent =
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
@@ -264,13 +265,17 @@ public class IPFSService extends ServiceBase {
             SubNode node =
                     create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
 
+            Attachment att = node.getAttachment(true);
+
             node.setOwner(exportParent.getOwner());
             // use export filename here
             node.setContent("IPFS Export: " + cid + "\n\nMime: " + mime);
             node.touch();
-            node.set(NodeProp.IPFS_LINK, cid);
-            node.set(NodeProp.BIN_MIME, mime);
-            node.set(NodeProp.BIN_FILENAME, fileName);
+
+            att.setIpfsLink(cid);
+            att.setMime(mime);
+            att.setFileName(fileName);
+
             update.save(ms, node);
 
             if (ok(childrenFiles)) {
@@ -278,13 +283,16 @@ public class IPFSService extends ServiceBase {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
+                    Attachment childAtt = child.getAttachment(true);
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
                     child.touch();
-                    child.set(NodeProp.IPFS_LINK, file.getCid());
-                    child.set(NodeProp.BIN_MIME, file.getMime());
-                    child.set(NodeProp.BIN_FILENAME, file.getFileName());
-                    child.set(NodeProp.IMG_SIZE, "200px");
+
+                    childAtt.setIpfsLink(file.getCid());
+                    childAtt.setMime(file.getMime());
+                    childAtt.setFileName(file.getFileName());
+                    childAtt.setCssSize("200px");
+
                     update.save(ms, child);
                 }
             }

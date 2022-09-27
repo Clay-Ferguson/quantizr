@@ -2,10 +2,12 @@ package quanta.mongo.model;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import quanta.config.ServiceBase;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.util.ExUtil;
@@ -38,7 +41,7 @@ import quanta.util.XString;
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
-		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS})
+		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
@@ -112,6 +115,14 @@ public class SubNode {
 	@JsonIgnore
 	private Object propLock = new Object();
 
+	public static final String ATTACHMENTS = "att";
+	@Field(ATTACHMENTS)
+	private List<Attachment> attachments;
+
+	@Transient
+	@JsonIgnore
+	private Object attLock = new Object();
+
 	public static final String LIKES = "like";
 	@Field(LIKES)
 	private HashSet<String> likes;
@@ -165,6 +176,7 @@ public class SubNode {
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
 			SubNode.PROPS, //
+			SubNode.ATTACHMENTS, //
 			SubNode.LIKES};
 
 	@Transient
@@ -411,6 +423,62 @@ public class SubNode {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			this.props = props;
+		}
+	}
+
+	@JsonProperty(ATTACHMENTS)
+	public List<Attachment> getAttachments() {
+		synchronized (attLock) {
+			return attachments;
+		}
+	}
+
+	@JsonProperty(ATTACHMENTS)
+	public void setAttachments(List<Attachment> attachments) {
+		ThreadLocals.dirty(this);
+		synchronized (attLock) {
+			this.attachments = attachments;
+		}
+	}
+
+	// gets first attachment.
+	// Refactoring stage where we currently assume only one
+	// attachment ever, but this will change.
+	@Transient
+	@JsonIgnore
+	public Attachment getAttachment(boolean create) {
+		synchronized (attLock) {
+			Attachment ret = null;
+			if (ok(attachments) && attachments.size() > 0) {
+				ret = attachments.get(0);
+			}
+
+			if (no(ret) && create) {
+				ret = new Attachment(this);
+				setAttachments(Arrays.asList(ret));
+			}
+			return ret;
+		}
+	}
+
+	@Transient
+	@JsonIgnore
+	public Attachment newAttachment() {
+		synchronized (attLock) {
+			Attachment ret = new Attachment(this);
+			setAttachments(Arrays.asList(ret));
+			return ret;
+		}
+	}
+
+	// Refactoring stage where we currently assume only one
+	// attachment ever, but this will change.
+	@Transient
+	@JsonIgnore
+	public void setAttachment(Attachment att) {
+		synchronized (attLock) {
+			ThreadLocals.dirty(this);
+			setAttachments(Arrays.asList(att));
 		}
 	}
 

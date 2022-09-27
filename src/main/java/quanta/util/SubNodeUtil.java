@@ -3,7 +3,6 @@ package quanta.util;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.CreateNodeLocation;
@@ -328,7 +328,13 @@ public class SubNodeUtil extends ServiceBase {
 		}
 
 		String url = getAttachmentUrl(node);
-		String mime = node.getStr(NodeProp.BIN_MIME);
+
+		String mime = null;
+
+		Attachment att = node.getAttachment(false);
+		if (ok(att)) {
+			mime = att.getMime();
+		}
 
 		if (no(url)) {
 			url = prop.getHostAndPort() + "/branding/logo-200px-tr.jpg";
@@ -342,16 +348,18 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public String getAttachmentUrl(SubNode node) {
-		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
+		Attachment att = node.getAttachment(false);
+		if (no(att)) return null;
+		String ipfsLink = att.getIpfsLink();
 
-		String bin = ok(ipfsLink) ? ipfsLink : node.getStr(NodeProp.BIN);
+		String bin = ok(ipfsLink) ? ipfsLink : att.getBin();
 		if (ok(bin)) {
 			return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
 
 		/* as last resort try to get any extrnally linked binary image */
 		if (no(bin)) {
-			bin = node.getStr(NodeProp.BIN_URL);
+			bin = att.getUrl();
 		}
 
 		// todo-2: will this fail to find "data:" type inline image data?

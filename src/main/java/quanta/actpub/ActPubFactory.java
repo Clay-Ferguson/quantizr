@@ -28,6 +28,7 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -258,8 +259,14 @@ public class ActPubFactory extends ServiceBase {
 
 			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
 			String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
-			String avatarMime = userNode.getStr(NodeProp.BIN_MIME);
-			String avatarVer = userNode.getStr(NodeProp.BIN);
+
+			String avatarMime = null;
+			String avatarVer = null;
+			Attachment att = userNode.getAttachment(false);
+			if (ok(att)) {
+				avatarMime = att.getMime();
+				avatarVer = att.getBin();
+			}
 			String did = userNode.getStr(NodeProp.USER_DID_IPNS);
 			String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
 					+ userNode.getIdStr() + "&v=" + avatarVer;
@@ -278,19 +285,21 @@ public class ActPubFactory extends ServiceBase {
 							.put(APObj.mediaType, avatarMime) //
 							.put(APObj.url, avatarUrl));
 
-			String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
-			if (ok(headerImageMime)) {
-				String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
-				if (ok(headerImageVer)) {
-					String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
-							+ "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
+			// todo-att: header will come from a named attachment
+			// commenting this entire block pending updates for the new Attachment array
+			// String headerImageMime = null; // userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
+			// if (ok(headerImageMime)) {
+			// 	String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
+			// 	if (ok(headerImageVer)) {
+			// 		String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+			// 				+ "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
 
-					actor.put(APObj.image, new APObj() //
-							.put(APObj.type, APType.Image) //
-							.put(APObj.mediaType, headerImageMime) //
-							.put(APObj.url, headerImageUrl));
-				}
-			}
+			// 		actor.put(APObj.image, new APObj() //
+			// 				.put(APObj.type, APType.Image) //
+			// 				.put(APObj.mediaType, headerImageMime) //
+			// 				.put(APObj.url, headerImageUrl));
+			// 	}
+			// }
 
 			actor.put(APObj.summary, userNode.getStr(NodeProp.USER_BIO)) //
 					.put(APObj.inbox, host + APConst.PATH_INBOX + "/" + userName) //

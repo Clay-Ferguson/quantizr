@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
 import quanta.util.Cast;
 import quanta.util.ExUtil;
@@ -146,6 +146,7 @@ public class MongoUpdate extends ServiceBase {
 					boolean attachment = false;
 
 					SubNode ipfsNode = read.findByIPFSPinned(as, pin);
+					Attachment att = ipfsNode.getAttachment(false);
 
 					// if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
 					if (no(ipfsNode)) {
@@ -163,7 +164,7 @@ public class MongoUpdate extends ServiceBase {
 						log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
 
 						if (attachment && ok(statsMap)) {
-							Long binSize = ipfsNode.getInt(NodeProp.BIN_SIZE);
+							Long binSize = ok(att) ? att.getSize() : null;
 							if (no(binSize)) {
 								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above
 								// an call objectStat to put correct amount in.

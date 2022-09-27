@@ -23,6 +23,7 @@ import quanta.model.AccessControlInfo;
 import quanta.model.NodeInfo;
 import quanta.model.PrivilegeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
@@ -85,32 +86,35 @@ public class Convert extends ServiceBase {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
-		String mimeType = node.getStr(NodeProp.BIN_MIME);
-		if (ok(mimeType)) {
-			boolean isImage = mongoUtil.isImageAttached(node);
+		Attachment att = node.getAttachment(false);
+		if (ok(att)) {
+			String mimeType = att.getMime();
+			if (ok(mimeType)) {
+				boolean isImage = mongoUtil.isImageAttached(node);
 
-			if (isImage) {
-				imageSize = mongoUtil.getImageSize(node);
+				if (isImage) {
+					imageSize = mongoUtil.getImageSize(node);
 
-				String dataUrlProp = node.getStr(NodeProp.BIN_DATA_URL);
-				if (ok(dataUrlProp)) {
-					dataUrl = attach.getStringByNode(ms, node);
+					String dataUrlProp = att.getDataUrl();
+					if (ok(dataUrlProp)) {
+						dataUrl = attach.getStringByNode(ms, node);
 
-					// sanity check here.
-					if (!dataUrl.startsWith("data:")) {
-						dataUrl = null;
+						// sanity check here.
+						if (!dataUrl.startsWith("data:")) {
+							dataUrl = null;
+						}
 					}
 				}
 			}
-		}
 
-		// ensure we have the best mimeType we can if not set in the data.
-		if (StringUtils.isEmpty(mimeType)) {
-			String binUrl = node.getStr(NodeProp.BIN_URL);
-			if (!StringUtils.isEmpty(binUrl)) {
-				mimeType = URLConnection.guessContentTypeFromName(binUrl);
-				if (!StringUtils.isEmpty(mimeType)) {
-					node.set(NodeProp.BIN_MIME, mimeType);
+			// ensure we have the best mimeType we can if not set in the data.
+			if (StringUtils.isEmpty(mimeType)) {
+				String binUrl = att.getUrl();
+				if (!StringUtils.isEmpty(binUrl)) {
+					mimeType = URLConnection.guessContentTypeFromName(binUrl);
+					if (!StringUtils.isEmpty(mimeType)) {
+						att.setMime(mimeType);
+					}
 				}
 			}
 		}
@@ -142,7 +146,11 @@ public class Convert extends ServiceBase {
 
 		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER);
-			avatarVer = userNode.getStr(NodeProp.BIN);
+
+			Attachment userAtt = userNode.getAttachment(false);
+			if (ok(userAtt)) {
+				avatarVer = userAtt.getBin();
+			}
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
 			apAvatar = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
 			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
@@ -209,7 +217,7 @@ public class Convert extends ServiceBase {
 		String content = node.getContent();
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
 				owner, ownerId, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, likes, hasChildren, //
+				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //
 				ok(imageSize) ? imageSize.getWidth() : 0, //
 				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
@@ -281,19 +289,22 @@ public class Convert extends ServiceBase {
 	public static ImageSize getImageSize(SubNode node) {
 		ImageSize imageSize = new ImageSize();
 
-		try {
-			Long width = node.getInt(NodeProp.IMG_WIDTH);
-			if (ok(width)) {
-				imageSize.setWidth(width.intValue());
-			}
+		Attachment att = node.getAttachment(false);
+		if (ok(att)) {
+			try {
+				Integer width = att.getWidth();
+				if (ok(width)) {
+					imageSize.setWidth(width.intValue());
+				}
 
-			Long height = node.getInt(NodeProp.IMG_HEIGHT);
-			if (ok(height)) {
-				imageSize.setHeight(height.intValue());
+				Integer height = att.getHeight();
+				if (ok(height)) {
+					imageSize.setHeight(height.intValue());
+				}
+			} catch (Exception e) {
+				imageSize.setWidth(0);
+				imageSize.setHeight(0);
 			}
-		} catch (Exception e) {
-			imageSize.setWidth(0);
-			imageSize.setHeight(0);
 		}
 		return imageSize;
 	}

@@ -807,17 +807,17 @@ export class Crypto {
             signData += "-" + node.content;
         }
 
-        const bin = S.props.getPropStr(J.NodeProp.BIN, node);
-        if (bin) {
-            signData += "-" + bin;
-        }
-        const binData = S.props.getPropStr(J.NodeProp.BIN_DATA, node);
-        if (binData) {
-            signData += "-" + binData;
-        }
-        const binDataUrl = S.props.getPropStr(J.NodeProp.BIN_DATA_URL, node);
-        if (binDataUrl) {
-            signData += "-" + binDataUrl;
+        const att = S.props.getAttachment(node);
+        if (att) {
+            if (att.bin) {
+                signData += "-" + att.bin;
+            }
+            if (att.binData) {
+                signData += "-" + att.binData;
+            }
+            if (att.dataUrl) {
+                signData += "-" + att.dataUrl;
+            }
         }
 
         // we need to concat the path+content

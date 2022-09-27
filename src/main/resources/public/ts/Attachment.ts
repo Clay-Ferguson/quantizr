@@ -68,23 +68,18 @@ export class Attachment {
         return false;
     };
 
-    removeBinaryProperties = (node: J.NodeInfo) => {
-        if (node) {
-            S.props.allBinaryProps.forEach(s => {
-                S.props.deleteProp(node, s);
-            });
-        }
-    };
-
+    // todo-att: don't need att arg here
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
-        const imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
-        if (imgUrl) {
-            return imgUrl;
+        const att = S.props.getAttachment(node);
+        if (!att) return null;
+
+        if (att.url) {
+            return att.url;
         }
 
-        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
-        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
+        const ipfsLink = att.ipfsLink;
+        let bin = att.bin
 
         if (bin || ipfsLink) {
             if (ipfsLink) {
@@ -102,14 +97,7 @@ export class Attachment {
     }
 
     getUrlForNodeAttachment = (node: J.NodeInfo, downloadLink: boolean): string => {
-        let ret = null;
-        if (node.dataUrl) {
-            ret = node.dataUrl;
-        }
-        else {
-            ret = this.getAttachmentUrl("bin", node, downloadLink);
-        }
-        return ret;
+        return node.dataUrl ? node.dataUrl : this.getAttachmentUrl("bin", node, downloadLink);
     }
 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {

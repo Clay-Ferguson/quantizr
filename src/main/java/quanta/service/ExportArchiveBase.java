@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -19,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -243,6 +243,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 			String rowClass = isTopRow ? "" : "class='row-div'";
+			Attachment att = node.getAttachment(false);
 
 			String indenter = "";
 			if (level > 0) {
@@ -279,7 +280,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 
 			String ext = null;
-			String binFileNameProp = node.getStr(NodeProp.BIN_FILENAME);
+			String binFileNameProp = ok(att) ? att.getFileName() : null;
 			if (ok(binFileNameProp)) {
 				ext = FilenameUtils.getExtension(binFileNameProp);
 				if (!StringUtils.isEmpty(ext)) {
@@ -288,7 +289,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 			String binFileNameStr = ok(binFileNameProp) ? binFileNameProp : "binary";
 
-			String mimeType = node.getStr(NodeProp.BIN_MIME);
+			String mimeType = ok(att) ? att.getMime() : null;
 
 			String imgUrl = null;
 			String attachmentUrl = null;
@@ -297,7 +298,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			/*
 			 * if this is a 'data:' encoded image read it from binary storage and put that directly in url src
 			 */
-			String dataUrl = node.getStr(NodeProp.BIN_DATA_URL);
+			String dataUrl = ok(att) ? att.getDataUrl() : null;
 			if ("t".equals(dataUrl)) {
 				imgUrl = attach.getStringByNode(ms, node);
 
@@ -317,7 +318,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				if (no(imgUrl) && mimeType.startsWith("image/")) {
 
 					// If this is an external URL (just a URL to an image on the web)
-					String extUrl = node.getStr(NodeProp.BIN_URL);
+					String extUrl = ok(att) ? att.getUrl() : null;
 					if (ok(extUrl)) {
 						binFileNameStr = "External image";
 						imgUrl = extUrl;
@@ -385,7 +386,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 						is = attach.getStream(ms, "", node, false);
 						if (ok(is)) {
 							BufferedInputStream bis = new BufferedInputStream(is);
-							long length = node.getInt(NodeProp.BIN_SIZE);
+							long length = ok(att) ? att.getSize() : null;
 							String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
 
 							if (length > 0) {

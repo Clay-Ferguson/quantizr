@@ -8,6 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import quanta.model.client.Attachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
@@ -40,6 +41,7 @@ public class NodeInfo {
 	private Long ordinal;
 	private String type;
 	private List<PropertyInfo> properties;
+	private List<Attachment> attachments;
 
 	/*
 	 * Holds information that the server needs to send back to the client to support client features,
@@ -95,7 +97,7 @@ public class NodeInfo {
 	public NodeInfo() {}
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
-			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
+			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
 			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
@@ -110,6 +112,7 @@ public class NodeInfo {
 		this.ordinal = ordinal;
 		this.logicalOrdinal = logicalOrdinal;
 		this.properties = properties;
+		this.attachments = attachments;
 		this.ac = ac;
 		this.likes = likes;
 		this.hasChildren = hasChildren;
@@ -232,6 +235,14 @@ public class NodeInfo {
 
 	public void setProperties(List<PropertyInfo> properties) {
 		this.properties = properties;
+	}
+
+	public List<Attachment> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Attachment> attachments) {
+		this.attachments = attachments;
 	}
 
 	public List<AccessControlInfo> getAc() {

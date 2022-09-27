@@ -197,9 +197,10 @@ export class EditNodeDlgUtil {
         const appState = getAppState();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(appState.editNode.id, "", state.toIpfs, file, false, true, async () => {
-            await this.refreshBinaryPropsFromServer(dlg, appState.editNode);
-            this.initPropStates(dlg, appState.editNode, true);
+            await this.refreshAttachmentsFromServer(dlg, appState.editNode);
             S.edit.updateNode(appState.editNode);
+
+            // is this still needed? (todo-att)
             dlg.binaryDirty = true;
         });
         await uploadDlg.open();
@@ -300,8 +301,8 @@ export class EditNodeDlgUtil {
         const deleted: boolean = await S.attachment.deleteAttachment(appState.editNode, getAppState());
 
         if (deleted) {
-            S.attachment.removeBinaryProperties(appState.editNode);
-            this.initPropStates(dlg, appState.editNode, true);
+            appState.editNode.attachments = null;
+            // this.initPropStates(dlg, appState.editNode, true);
             S.edit.updateNode(appState.editNode);
 
             if (dlg.mode === DialogMode.EMBED) {
@@ -314,8 +315,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
+    refreshAttachmentsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
@@ -329,8 +329,8 @@ export class EditNodeDlgUtil {
             parentCount: 0
         });
 
-        if (res.node?.properties) {
-            S.props.transferBinaryProps(res.node, node);
+        if (res.node) {
+            node.attachments = res.node.attachments;
         }
     }
 
@@ -403,7 +403,10 @@ export class EditNodeDlgUtil {
 
     /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
 the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
-an upload has been added or removed. */
+an upload has been added or removed.
+
+todo-att: onlyBinaries param is obsolete
+*/
     initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
         const typeHandler = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
@@ -412,25 +415,25 @@ an upload has been added or removed. */
 
         /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for
         props that need to be removed */
-        if (onlyBinaries) {
-            S.props.allBinaryProps.forEach(s => {
-                if (dlg.propStates.get(s)) {
-                    dlg.propStates.delete(s);
-                }
-            });
-        }
+        // if (onlyBinaries) {
+        //     S.props.allBinaryProps.forEach(s => {
+        //         if (dlg.propStates.get(s)) {
+        //             dlg.propStates.delete(s);
+        //         }
+        //     });
+        // }
 
         if (node.properties) {
             node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("prop: " + S.util.prettyPrint(prop));
 
                 // if onlyBinaries and this is NOT a binary prop then skip it.
-                if (onlyBinaries) {
-                    if (S.props.allBinaryProps.has(prop.name)) {
-                        this.initPropState(dlg, node, prop);
-                    }
-                    return;
-                }
+                // if (onlyBinaries) {
+                //     if (S.props.allBinaryProps.has(prop.name)) {
+                //         this.initPropState(dlg, node, prop);
+                //     }
+                //     return;
+                // }
 
                 if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAppState())) {
                     // ("Hiding property: " + prop.name);

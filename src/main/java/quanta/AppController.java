@@ -50,8 +50,8 @@ import quanta.filter.HitFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
+import quanta.model.client.Attachment;
 import quanta.model.client.MFSDirEntry;
-import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.model.SubNode;
@@ -121,9 +121,9 @@ import quanta.request.SetNodePositionRequest;
 import quanta.request.SetUnpublishedRequest;
 import quanta.request.SignNodesRequest;
 import quanta.request.SignSubGraphRequest;
-import quanta.request.SubGraphHashRequest;
 import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
+import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.request.UploadFromIPFSRequest;
@@ -1006,9 +1006,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
 					if (no(_gid)) {
-						_gid = node.getStr(NodeProp.IPFS_LINK);
+						Attachment att = node.getAttachment(false);
+						_gid = ok(att) ? att.getIpfsLink() : null;
 						if (no(_gid)) {
-							_gid = node.getStr(NodeProp.BIN);
+							_gid = ok(att) ? att.getBin() : null;
 						}
 
 						if (ok(_gid)) {

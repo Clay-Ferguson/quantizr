@@ -59,6 +59,7 @@ import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -122,9 +123,10 @@ public class AttachmentService extends ServiceBase {
 
 			/*
 			 * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
-			 * UNDERNEATH this current node.
+			 * UNDERNEATH this current node. Pass allowAuth=false here becasue below we check the ownerAuth
+			 * which will be even more strict.
 			 */
-			SubNode node = read.getNode(ms, nodeId);
+			SubNode node = read.getNode(ms, nodeId, false);
 			if (no(node)) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
@@ -282,6 +284,7 @@ public class AttachmentService extends ServiceBase {
 		return mimeType;
 	}
 
+	// todo-att: binSuffix is not handled yet in the new attachment design.
 	public void saveBinaryStreamToNode(MongoSession ms, String binSuffix, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node, boolean toIpfs, boolean calcImageSize,
 			boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
@@ -295,16 +298,13 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		// Clear out any pre-existing binary properties
-		deleteAllBinaryProperties(node, binSuffix);
+		Attachment 	att = node.newAttachment();
 
 		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
-			if (no(node.getStr(NodeProp.IMG_SIZE.s() + binSuffix))) {
-				node.set(NodeProp.IMG_SIZE.s() + binSuffix, "100%");
-			}
+			att.setCssSize("100%");
 
 			if (calcImageSize) {
 				LimitedInputStream is = null;
@@ -315,8 +315,8 @@ public class AttachmentService extends ServiceBase {
 					bufImg = ImageIO.read(isTemp);
 
 					try {
-						node.set(NodeProp.IMG_WIDTH.s() + binSuffix, bufImg.getWidth());
-						node.set(NodeProp.IMG_HEIGHT.s() + binSuffix, bufImg.getHeight());
+						att.setWidth(bufImg.getWidth());
+						att.setHeight(bufImg.getHeight());
 					} catch (Exception e) {
 						/*
 						 * reading files from IPFS caused this exception, and I didn't investigate why yet, because I don't
@@ -334,27 +334,28 @@ public class AttachmentService extends ServiceBase {
 			}
 		}
 
-		node.set(NodeProp.BIN_MIME.s() + binSuffix, mimeType);
+		att.setMime(mimeType);
 
 		if (dataUrl) {
-			node.set(NodeProp.BIN_DATA_URL.s() + binSuffix, "t"); // t=true
+			att.setDataUrl("t"); // <-- todo-0: why this boolean? not a url?
 		}
 
 		SubNode userNode = read.getNode(ms, node.getOwner());
 
 		if (no(imageBytes)) {
 			try {
-				node.set(NodeProp.BIN_SIZE.s() + binSuffix, size);
+				att.setSize(size);
+
 				if (toIpfs) {
 					writeStreamToIpfs(ms, binSuffix, node, inputStream, mimeType, userNode);
 				} else {
 					if (storeLocally) {
 						if (ok(fileName)) {
-							node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+							att.setFileName(fileName);
 						}
 						writeStream(ms, binSuffix, node, inputStream, fileName, mimeType, userNode);
 					} else {
-						node.set(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
+						att.setUrl(sourceUrl);
 					}
 				}
 			} finally {
@@ -365,11 +366,11 @@ public class AttachmentService extends ServiceBase {
 		} else {
 			LimitedInputStreamEx is = null;
 			try {
-				node.set(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
+				att.setSize(imageBytes.length);
 
 				if (storeLocally) {
 					if (ok(fileName)) {
-						node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+						att.setFileName(fileName);
 					}
 					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 					if (toIpfs) {
@@ -378,7 +379,7 @@ public class AttachmentService extends ServiceBase {
 						writeStream(ms, binSuffix, node, is, fileName, mimeType, userNode);
 					}
 				} else {
-					node.set(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
+					att.setUrl(sourceUrl);
 				}
 			} finally {
 				StreamUtil.close(is);
@@ -397,26 +398,9 @@ public class AttachmentService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(node);
 		deleteBinary(ms, "", node, null);
-		deleteAllBinaryProperties(node, "");
 		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
-	}
-
-	/*
-	 * Deletes all the binary-related properties from a node
-	 */
-	public void deleteAllBinaryProperties(SubNode node, String binSuffix) {
-		node.delete(NodeProp.IMG_WIDTH.s() + binSuffix);
-		node.delete(NodeProp.IMG_HEIGHT.s() + binSuffix);
-		node.delete(NodeProp.BIN_MIME.s() + binSuffix);
-		node.delete(NodeProp.BIN_FILENAME.s() + binSuffix);
-		node.delete(NodeProp.BIN_SIZE.s() + binSuffix);
-		node.delete(NodeProp.BIN.s() + binSuffix);
-		node.delete(NodeProp.BIN_URL.s() + binSuffix);
-		node.delete(NodeProp.BIN_DATA_URL.s() + binSuffix);
-		node.delete(NodeProp.IPFS_LINK.s() + binSuffix);
-		node.delete(NodeProp.IPFS_REF.s() + binSuffix);
 	}
 
 	/**
@@ -437,6 +421,8 @@ public class AttachmentService extends ServiceBase {
 	 * of "inline" by omitting it
 	 * 
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
+	 * 
+	 * todo-att: binSuffix needs to be accounted for in new Attachment logic
 	 */
 	@PerfMon(category = "attach")
 	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, boolean download,
@@ -457,7 +443,12 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			boolean ipfs = StringUtils.isNotEmpty(node.getStr(NodeProp.IPFS_LINK.s() + binSuffix));
+			Attachment att = node.getAttachment(false);
+			if (no(att)) {
+				throw ExUtil.wrapEx("attachment info not found.");
+			}
+
+			boolean ipfs = StringUtils.isNotEmpty(att.getIpfsLink());
 
 			// Everyone's account node can publish it's attachment and is assumed to be an
 			// avatar.
@@ -470,18 +461,18 @@ public class AttachmentService extends ServiceBase {
 				auth.auth(ms, node, PrivilegeType.READ);
 			}
 
-			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s() + binSuffix);
+			String mimeTypeProp = att.getMime();
 			if (no(mimeTypeProp)) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStr(NodeProp.BIN_FILENAME.s() + binSuffix);
+			String fileName = att.getFileName();
 			if (no(fileName)) {
 				fileName = "filename";
 			}
 
 			InputStream is = getStream(ms, binSuffix, node, allowAuth);
-			long size = node.getInt(NodeProp.BIN_SIZE.s() + binSuffix);
+			long size = att.getSize();
 			// log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
 			response.setContentType(mimeTypeProp);
@@ -632,14 +623,18 @@ public class AttachmentService extends ServiceBase {
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
 			SubNode node = read.getNode(ms, nodeId, false);
+			Attachment att = node.getAttachment(false);
+			if (no(att))
+			throw ExUtil.wrapEx("no attachment info found");
+
 			auth.auth(ms, node, PrivilegeType.READ);
 
-			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME);
+			String mimeTypeProp = att.getMime();
 			if (no(mimeTypeProp)) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStr(NodeProp.BIN_FILENAME);
+			String fileName = att.getFileName();
 			if (no(fileName)) {
 				fileName = "filename";
 			}
@@ -653,7 +648,7 @@ public class AttachmentService extends ServiceBase {
 			// }
 			// startTime = System.currentTimeMillis();
 
-			long size = node.getInt(NodeProp.BIN_SIZE);
+			long size = att.getSize();
 
 			if (size == 0) {
 				throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
@@ -712,19 +707,20 @@ public class AttachmentService extends ServiceBase {
 		if (no(node)) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
+		Attachment att = node.newAttachment();
 
 		auth.ownerAuth(node);
-		node.set(NodeProp.IPFS_LINK, req.getCid().trim());
+		att.setIpfsLink(req.getCid().trim());
 		String mime = req.getMime().trim().replace(".", "");
 
 		// If an extension was given (not a mime), then use it to make a filename, and
 		// generate the mime from it.
 		if (!mime.contains("/")) {
-			node.set(NodeProp.BIN_FILENAME, "file." + mime);
+			att.setFileName("file." + mime);
 			mime = MimeTypeUtils.getMimeType(mime);
 		}
 
-		node.set(NodeProp.BIN_MIME, mime);
+		att.setMime(mime);
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;
@@ -775,6 +771,7 @@ public class AttachmentService extends ServiceBase {
 
 		if (!storeLocally) {
 			SubNode node = read.getNode(ms, nodeId);
+			Attachment att = node.newAttachment();
 			auth.ownerAuth(node);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
@@ -783,9 +780,9 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			if (ok(mimeType)) {
-				node.set(NodeProp.BIN_MIME.s(), mimeType);
+				att.setMime(mimeType);
 			}
-			node.set(NodeProp.BIN_URL.s(), sourceUrl);
+			att.setUrl(sourceUrl);
 			update.saveSession(ms);
 			return;
 		}
@@ -924,6 +921,9 @@ public class AttachmentService extends ServiceBase {
 	public void writeStream(MongoSession ms, String binSuffix, SubNode node, LimitedInputStreamEx stream, String fileName,
 			String mimeType, SubNode userNode) {
 
+		// don't create attachment here, there shuold already be one, but we pass create=true anyway
+		Attachment att = node.getAttachment(true);
+	
 		auth.ownerAuth(node);
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" + binSuffix, node.getId());
@@ -963,33 +963,40 @@ public class AttachmentService extends ServiceBase {
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
-		node.set(NodeProp.BIN.s() + binSuffix, id);
-		node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamCount);
+		att.setBin(id);
+		att.setSize(streamCount);
 	}
 
 	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node, InputStream stream, String mimeType,
 			SubNode userNode) {
 		auth.ownerAuth(node);
+		Attachment att = node.getAttachment(true);
 		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
 		if (ok(ret)) {
-			node.set(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
-			node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
+			att.setIpfsLink(ret.getHash());
+			att.setSize(streamSize.getVal());
 
 			/* consume user quota space */
 			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
 		}
 	}
 
+	// this method can be written a little better (todo-att)
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
 		if (no(node))
 			return;
 		auth.ownerAuth(node);
-		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
+		Attachment att = node.getAttachment(false);
+		if (no(att))
+			return;
+		String id = att.getBin();
 		if (no(id)) {
 			return;
 		}
+
+		node.setAttachments(null);
 
 		if (!ms.isAdmin()) {
 			/*
@@ -1012,8 +1019,12 @@ public class AttachmentService extends ServiceBase {
 			auth.auth(ms, node, PrivilegeType.READ);
 		}
 
+		Attachment att = node.getAttachment(false);
+		if (no(att))
+			return null;
+
 		InputStream is = null;
-		String ipfsHash = node.getStr(NodeProp.IPFS_LINK.s() + binSuffix);
+		String ipfsHash = att.getIpfsLink();
 		if (ok(ipfsHash)) {
 			/*
 			 * todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
@@ -1027,13 +1038,18 @@ public class AttachmentService extends ServiceBase {
 		return is;
 	}
 
+	// todo-att (can cleanup this method a bit)
 	public InputStream getStreamByNode(SubNode node, String binSuffix) {
 		if (no(node))
 			return null;
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
-		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
+		Attachment att = node.getAttachment(false);
+		if (no(att))
+			return null;
+
+		String id = att.getBin();
 		if (no(id)) {
 			return null;
 		}
@@ -1080,13 +1096,18 @@ public class AttachmentService extends ServiceBase {
 		return ret;
 	}
 
+	// todo-att: this method can be cleaned up a bit
 	/* Gets the content of the grid resource by reading it into a string */
 	public String getStringByNodeEx(SubNode node) {
 		if (no(node))
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
-		String id = node.getStr(NodeProp.BIN);
+		Attachment att = node.getAttachment(false);
+		if (no(att))
+			return null;
+
+		String id = att.getBin();
 		if (no(id)) {
 			return null;
 		}
@@ -1143,7 +1164,8 @@ public class AttachmentService extends ServiceBase {
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		arun.run(as -> {
 			int delCount = 0;
-			// todo-1: do we need to replace this with a 'stream' of some kind to keep from getting out of memory errors?
+			// todo-1: do we need to replace this with a 'stream' of some kind to keep from getting out of
+			// memory errors?
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
@@ -1206,8 +1228,7 @@ public class AttachmentService extends ServiceBase {
 				}
 			}
 
-			Iterable<SubNode> accountNodes =
-					read.getChildren(as, MongoUtil.allUsersRootNode, null, null, 0, null);
+			Iterable<SubNode> accountNodes = read.getChildren(as, MongoUtil.allUsersRootNode, null, null, 0, null);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

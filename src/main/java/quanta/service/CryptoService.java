@@ -26,6 +26,7 @@ import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.Jwk;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -115,17 +116,17 @@ public class CryptoService extends ServiceBase {
 			strToSign += "-" + node.getContent();
 		}
 
-		String bin = node.getStr(NodeProp.BIN);
-		if (ok(bin)) {
-			strToSign += "-" + bin;
-		}
-		String binData = node.getStr(NodeProp.BIN_DATA);
-		if (ok(binData)) {
-			strToSign += "-" + binData;
-		}
-		String binDataUrl = node.getStr(NodeProp.BIN_DATA_URL);
-		if (ok(binDataUrl)) {
-			strToSign += "-" + binDataUrl;
+		Attachment att = node.getAttachment(false);
+		if (ok(att)) {
+			if (ok(att.getBin())) {
+				strToSign += "-" + att.getBin();
+			}
+			if (ok(att.getBinData())) {
+				strToSign += "-" + att.getBinData();
+			}
+			if (ok(att.getDataUrl())) {
+				strToSign += "-" + att.getDataUrl();
+			}
 		}
 
 		return strToSign;

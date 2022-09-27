@@ -37,6 +37,7 @@ import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -317,16 +318,14 @@ public class UserManagerService extends ServiceBase {
 			return;
 		}
 
-		// get the size of the attachment on this node
-		long binSize = node.getInt(NodeProp.BIN_SIZE);
-		if (binSize > 0L) {
-			// log.debug("Will +/- amt: " + binSize);
-
+		Attachment att = node.getAttachment(false);
+		if (ok(att) && att.getSize() > 0L) {
 			if (no(userNode)) {
 				userNode = read.getUserNodeByUserName(null, null);
 			}
 
-			addBytesToUserNodeBytes(ms, binSize, userNode, sign);
+			addBytesToUserNodeBytes(ms, att.getSize(), userNode, sign);
+
 		}
 	}
 
@@ -979,8 +978,14 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
-				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN));
-				userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
+
+				Attachment att = userNode.getAttachment(false);
+				if (ok(att)) {
+					userProfile.setAvatarVer(att.getBin());
+
+					// todo-att: the suffix binaries will instead be identified by filename, in the array.
+					// userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
+				}
 				userProfile.setUserNodeId(userNode.getIdStr());
 				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
@@ -1236,7 +1241,10 @@ public class UserManagerService extends ServiceBase {
 					if (ok(friendAccountNode)) {
 						// if a local user use BIN property on node (account node BIN property is the Avatar)
 						if (userName.indexOf("@") == -1) {
-							fi.setAvatarVer(friendAccountNode.getStr(NodeProp.BIN));
+							Attachment att = friendAccountNode.getAttachment(false);
+							if (ok(att)) {
+								fi.setAvatarVer(att.getBin());
+							}
 						}
 						// Otherwise the avatar will be specified as a remote user's Icon.
 						else {

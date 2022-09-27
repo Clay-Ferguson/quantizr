@@ -46,6 +46,7 @@ import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMon;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -368,17 +369,15 @@ public class ActPubService extends ServiceBase {
 
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-        String bin = node.getStr(NodeProp.BIN);
-        String mime = node.getStr(NodeProp.BIN_MIME);
+        Attachment att = node.getAttachment(false);
 
-        if (ok(bin) && ok(mime)) {
+        if (ok(att) && ok(att.getBin()) && ok(att.getMime())) {
             attachments = new APList().val(//
                     new APObj() //
                             .put(APObj.type, APType.Document) //
-                            .put(APObj.mediaType, mime) //
+                            .put(APObj.mediaType, att.getMime()) //
                             // NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
-                            // sharing
-                            // meaning they can be visible to at least someone other than it's owner.
+                            // sharing meaning they can be visible to at least someone other than it's owner.
                             .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()));
         }
         return attachments;

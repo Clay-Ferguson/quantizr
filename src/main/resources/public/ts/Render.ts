@@ -76,7 +76,8 @@ export class Render {
             val = S.util.replaceAll(val, "{{img}}", "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
         }
 
-        const imgSize = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
+        const att = S.props.getAttachment(node);
+        const imgSize = att ? att.cssSize : null;
         // actual size prop is saved as "0"
         if (imgSize && imgSize !== "0") {
             val = S.util.replaceAll(val, "{{imgSize}}", imgSize);
@@ -297,7 +298,8 @@ export class Render {
                 }
             }));
 
-        const bin = S.props.getPropStr(J.NodeProp.BIN, node);
+        const att = S.props.getAttachment(node);
+        const bin = att ? att.bin : null;
         if (bin) {
             const attachmentComps: Comp[] = [];
             attachmentComps.push(new Heading(3, "Attachment URLs"));
@@ -349,7 +351,7 @@ export class Render {
             }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
         }
 
-        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
+        const ipfsLink = att ? att.ipfsLink : null;
         if (ipfsLink) {
             children.push(new Heading(5, "IPFS LINK"), //
                 new Div("ipfs://" + ipfsLink, {

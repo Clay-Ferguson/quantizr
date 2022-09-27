@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -175,14 +175,13 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void writeImage(SubNode node) {
 		try {
-			String bin = node.getStr(NodeProp.BIN);
-			if (no(bin)) {
-				return;
-			}
-			String mime = node.getStr(NodeProp.BIN_MIME);
-
-			String imgSize = node.getStr(NodeProp.IMG_SIZE);
+			Attachment att = node.getAttachment(false);
+			if (no(att) || no(att.getBin())) return;
+			
+			String mime = att.getMime();
+			String imgSize = att.getCssSize();
 			float sizeFactor = 1f;
+			
 			if (ok(imgSize) && imgSize.endsWith("%")) {
 				imgSize = XString.stripIfEndsWith(imgSize, "%");
 				int size = Integer.parseInt(imgSize);

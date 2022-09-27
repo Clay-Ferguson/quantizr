@@ -22,7 +22,7 @@ import quanta.config.SessionContext;
 import quanta.filter.AuditFilter;
 import quanta.filter.HitFilter;
 import quanta.model.UserStats;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
@@ -170,9 +170,9 @@ public class SystemService extends ServiceBase {
 		if (ok(node)) {
 			String ret = XString.prettyPrint(node);
 
-			String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
-			if (ok(ipfsLink)) {
-				IPFSObjectStat fullStat = ipfsObj.objectStat(ipfsLink, false);
+			Attachment att = node.getAttachment(false);
+			if (ok(att) && ok(att.getIpfsLink())) {
+				IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
 				if (ok(fullStat)) {
 					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
 				}

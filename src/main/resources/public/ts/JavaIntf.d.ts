@@ -1,6 +1,21 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export interface Attachment {
+    width: number;
+    height: number;
+    mime: string;
+    fileName: string;
+    cssSize: string;
+    size: number;
+    bin: string;
+    binData: string;
+    url: string;
+    dataUrl: string;
+    ipfsLink: string;
+    ipfsRef: string;
+}
+
 export interface Bookmark {
     name: string;
     id: string;
@@ -896,6 +911,7 @@ export interface NodeInfo {
     ordinal: number;
     type: string;
     properties: PropertyInfo[];
+    attachments: Attachment[];
     clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;
@@ -1028,11 +1044,9 @@ export const enum NodeProp {
     FILE_SYNC_LINK = "fs:link",
     USER_NODE_ID = "sn:userNodeId",
     NAME = "sn:name",
-    IPFS_LINK = "ipfs:link",
     IPFS_CID = "ipfs:cid",
     IPNS_CID = "ipns:cid",
     IPFS_SCID = "ipfs:scid",
-    IPFS_REF = "ipfs:ref",
     JSON_HASH = "ipfs:json",
     SAVE_TO_IPFS = "sn:saveToIpfs",
     IPFS_LINK_NAME = "ipfs:linkName",
@@ -1042,18 +1056,8 @@ export const enum NodeProp {
     MIME_EXT = "sn:ext",
     EMAIL = "sn:email",
     CODE = "sn:code",
-    BIN_MIME = "sn:mimeType",
-    BIN_FILENAME = "sn:fileName",
-    BIN_SIZE = "sn:size",
-    BIN_DATA_URL = "sn:dataUrl",
     JSON_FILE_SEARCH_RESULT = "sn:json",
     NOWRAP = "sn:nowrap",
-    BIN_DATA = "sn:jcrData",
-    BIN = "bin",
-    BIN_URL = "sn:extUrl",
-    IMG_WIDTH = "sn:imgWidth",
-    IMG_HEIGHT = "sn:imgHeight",
-    IMG_SIZE = "sn:imgSize",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     ALLOWED_FEATURES = "sn:features",

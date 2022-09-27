@@ -26,6 +26,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -421,8 +422,10 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
+		Attachment att = node.getAttachment(false);
+
 		/* Remember the initial ipfs link */
-		String initIpfsLink = node.getStr(NodeProp.IPFS_LINK);
+		String initIpfsLink = ok(att) ? att.getIpfsLink() : null;
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
@@ -519,12 +522,12 @@ public class NodeEditService extends ServiceBase {
 		 * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
 		 * (IPFS_REF means 'referenced' and external to our server).
 		 */
-		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
+		String ipfsLink = ok(att) ? att.getIpfsLink() : null;
 		if (ok(ipfsLink)) {
 
 			// if there's no 'ref' property this is not a foreign reference, which means we
 			// DO pin this.
-			if (no(node.getStr(NodeProp.IPFS_REF))) {
+			if (no(att) || no(att.getIpfsRef())) {
 				/*
 				 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
 				 * user quota
@@ -569,12 +572,13 @@ public class NodeEditService extends ServiceBase {
 
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		/* Send notification to local server or to remote server when a node is added.
+		/*
+		 * Send notification to local server or to remote server when a node is added.
 		 * 
-		 * todo-0: NOTE: we should be able to save a node with just an attachment and no content so this is wrong isn't it?
-		 *         Test this, and be SURE we won't send out TWO messages if we send with blank (for example be sure we
-		 *         don't run thru here until user clicks "save" in the gui)
-		*/
+		 * todo-0: NOTE: we should be able to save a node with just an attachment and no content so this is
+		 * wrong isn't it? Test this, and be SURE we won't send out TWO messages if we send with blank (for
+		 * example be sure we don't run thru here until user clicks "save" in the gui)
+		 */
 		if (!StringUtils.isEmpty(node.getContent()) //
 				// don't send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
@@ -941,14 +945,18 @@ public class NodeEditService extends ServiceBase {
 					sb.append("-");
 					sb.append(n.getOwner().toHexString());
 					sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
-					if (ok(n.getStr(NodeProp.BIN))) {
-						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + n.getStr(NodeProp.BIN));
-					}
-					if (ok(n.getStr(NodeProp.BIN_DATA))) {
-						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + n.getStr(NodeProp.BIN_DATA));
-					}
-					if (ok(n.getStr(NodeProp.BIN_DATA_URL))) {
-						sb.append(StringUtils.isNotEmpty(n.getContent()) + "-binurl" + n.getStr(NodeProp.BIN_DATA_URL));
+
+					Attachment att = n.getAttachment(false);
+					if (ok(att)) {
+						if (ok(att.getBin())) {
+							sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + att.getBin());
+						}
+						if (ok(att.getBinData())) {
+							sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + att.getBinData());
+						}
+						if (ok(att.getDataUrl())) {
+							sb.append(StringUtils.isNotEmpty(n.getContent()) + "-binurl" + att.getDataUrl());
+						}
 					}
 					if (sb.length() > 4096) {
 						byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);

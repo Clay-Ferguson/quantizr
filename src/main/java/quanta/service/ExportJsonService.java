@@ -8,9 +8,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +16,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import quanta.config.ServiceBase;
-import quanta.model.client.NodeProp;
+import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
@@ -81,7 +81,8 @@ public class ExportJsonService extends ServiceBase {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
-					String binFileName = node.getStr(NodeProp.BIN_FILENAME);
+					Attachment att = node.getAttachment(false);
+					String binFileName = ok(att) ? att.getFileName() : null;
 					if (ok(binFileName)) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
@@ -117,7 +118,8 @@ public class ExportJsonService extends ServiceBase {
 	private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
 		boolean ret = false;
 
-		String binMime = node.getStr(NodeProp.BIN_MIME);
+		Attachment att = node.newAttachment();
+		String binMime = ok(att) ? att.getMime() : null;
 		ObjectId oid = node.getId();
 		if (ok(oid)) {
 
@@ -204,7 +206,8 @@ public class ExportJsonService extends ServiceBase {
 					SubNode node = objectMapper.readValue(json, SubNode.class);
 					update.save(ms, node);
 
-					String binFileName = node.getStr(NodeProp.BIN_FILENAME);
+					Attachment att = node.getAttachment(false);
+					String binFileName = ok(att) ? att.getFileName() : null;
 					if (ok(binFileName)) {
 						attach.deleteBinary(ms, "", node, null);
 						readBinaryFromResource(ms, node, binFileName, subFolder);
