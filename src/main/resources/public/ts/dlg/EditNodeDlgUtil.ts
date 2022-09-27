@@ -199,8 +199,6 @@ export class EditNodeDlgUtil {
         const uploadDlg = new UploadFromFileDropzoneDlg(appState.editNode.id, "", state.toIpfs, file, false, true, async () => {
             await this.refreshAttachmentsFromServer(dlg, appState.editNode);
             S.edit.updateNode(appState.editNode);
-
-            // is this still needed? (todo-att)
             dlg.binaryDirty = true;
         });
         await uploadDlg.open();
@@ -398,43 +396,22 @@ export class EditNodeDlgUtil {
         /* Initialize node name state */
         dlg.nameState.setValue(appState.editNode.name);
         dlg.tagsState.setValue(appState.editNode.tags);
-        this.initPropStates(dlg, appState.editNode, false);
+        this.initPropStates(dlg, appState.editNode);
     }
 
     /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
 the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
 an upload has been added or removed.
-
-todo-att: onlyBinaries param is obsolete
 */
-    initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
+    initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo): any => {
         const typeHandler = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
             typeHandler.ensureDefaultProperties(node);
         }
 
-        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for
-        props that need to be removed */
-        // if (onlyBinaries) {
-        //     S.props.allBinaryProps.forEach(s => {
-        //         if (dlg.propStates.get(s)) {
-        //             dlg.propStates.delete(s);
-        //         }
-        //     });
-        // }
-
         if (node.properties) {
             node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("prop: " + S.util.prettyPrint(prop));
-
-                // if onlyBinaries and this is NOT a binary prop then skip it.
-                // if (onlyBinaries) {
-                //     if (S.props.allBinaryProps.has(prop.name)) {
-                //         this.initPropState(dlg, node, prop);
-                //     }
-                //     return;
-                // }
-
                 if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAppState())) {
                     // ("Hiding property: " + prop.name);
                     return;
