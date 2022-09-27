@@ -298,7 +298,7 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		Attachment 	att = node.newAttachment();
+		Attachment 	att = node.getAttachment(null, true, true);
 
 		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
 		if (ImageUtil.isImageMime(mimeType)) {
@@ -443,7 +443,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			Attachment att = node.getAttachment(false);
+			Attachment att = node.getAttachment();
 			if (no(att)) {
 				throw ExUtil.wrapEx("attachment info not found.");
 			}
@@ -623,7 +623,7 @@ public class AttachmentService extends ServiceBase {
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
 			SubNode node = read.getNode(ms, nodeId, false);
-			Attachment att = node.getAttachment(false);
+			Attachment att = node.getAttachment();
 			if (no(att))
 			throw ExUtil.wrapEx("no attachment info found");
 
@@ -707,7 +707,7 @@ public class AttachmentService extends ServiceBase {
 		if (no(node)) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
-		Attachment att = node.newAttachment();
+		Attachment att = node.getAttachment(null, true, true);
 
 		auth.ownerAuth(node);
 		att.setIpfsLink(req.getCid().trim());
@@ -771,7 +771,7 @@ public class AttachmentService extends ServiceBase {
 
 		if (!storeLocally) {
 			SubNode node = read.getNode(ms, nodeId);
-			Attachment att = node.newAttachment();
+			Attachment att = node.getAttachment(null, true, true);
 			auth.ownerAuth(node);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
@@ -922,7 +922,7 @@ public class AttachmentService extends ServiceBase {
 			String mimeType, SubNode userNode) {
 
 		// don't create attachment here, there shuold already be one, but we pass create=true anyway
-		Attachment att = node.getAttachment(true);
+		Attachment att = node.getAttachment(null, true, false);
 	
 		auth.ownerAuth(node);
 		DBObject metaData = new BasicDBObject();
@@ -970,7 +970,7 @@ public class AttachmentService extends ServiceBase {
 	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node, InputStream stream, String mimeType,
 			SubNode userNode) {
 		auth.ownerAuth(node);
-		Attachment att = node.getAttachment(true);
+		Attachment att = node.getAttachment(null, true, false);
 		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
@@ -988,7 +988,7 @@ public class AttachmentService extends ServiceBase {
 		if (no(node))
 			return;
 		auth.ownerAuth(node);
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att))
 			return;
 		String id = att.getBin();
@@ -1019,7 +1019,7 @@ public class AttachmentService extends ServiceBase {
 			auth.auth(ms, node, PrivilegeType.READ);
 		}
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att))
 			return null;
 
@@ -1045,7 +1045,7 @@ public class AttachmentService extends ServiceBase {
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att))
 			return null;
 
@@ -1103,7 +1103,7 @@ public class AttachmentService extends ServiceBase {
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att))
 			return null;
 

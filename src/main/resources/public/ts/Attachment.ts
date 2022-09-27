@@ -68,18 +68,17 @@ export class Attachment {
         return false;
     };
 
-    // todo-att: don't need att arg here
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
-        const att = S.props.getAttachment(node);
+        const att = S.props.getAttachment(null, node);
         if (!att) return null;
 
-        if (att.url) {
-            return att.url;
+        if (att.u) {
+            return att.u;
         }
 
-        const ipfsLink = att.ipfsLink;
-        let bin = att.bin
+        const ipfsLink = att.il;
+        let bin = att.b;
 
         if (bin || ipfsLink) {
             if (ipfsLink) {

@@ -331,7 +331,7 @@ public class SubNodeUtil extends ServiceBase {
 
 		String mime = null;
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			mime = att.getMime();
 		}
@@ -348,7 +348,7 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public String getAttachmentUrl(SubNode node) {
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att)) return null;
 		String ipfsLink = att.getIpfsLink();
 

@@ -86,7 +86,7 @@ public class Convert extends ServiceBase {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			String mimeType = att.getMime();
 			if (ok(mimeType)) {
@@ -147,7 +147,7 @@ public class Convert extends ServiceBase {
 		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER);
 
-			Attachment userAtt = userNode.getAttachment(false);
+			Attachment userAtt = userNode.getAttachment();
 			if (ok(userAtt)) {
 				avatarVer = userAtt.getBin();
 			}
@@ -289,7 +289,7 @@ public class Convert extends ServiceBase {
 	public static ImageSize getImageSize(SubNode node) {
 		ImageSize imageSize = new ImageSize();
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			try {
 				Integer width = att.getWidth();

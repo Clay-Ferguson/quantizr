@@ -2,18 +2,18 @@
 /* eslint-disable */
 
 export interface Attachment {
-    width: number;
-    height: number;
-    mime: string;
-    fileName: string;
-    cssSize: string;
-    size: number;
-    bin: string;
-    binData: string;
-    url: string;
-    dataUrl: string;
-    ipfsLink: string;
-    ipfsRef: string;
+    w: number;
+    h: number;
+    m: string;
+    f: string;
+    c: string;
+    s: number;
+    b: string;
+    d: string;
+    u: string;
+    du: string;
+    il: string;
+    ir: string;
 }
 
 export interface Bookmark {
@@ -911,7 +911,7 @@ export interface NodeInfo {
     ordinal: number;
     type: string;
     properties: PropertyInfo[];
-    attachments: Attachment[];
+    attachments: { [index: string]: Attachment };
     clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;

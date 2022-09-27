@@ -116,7 +116,7 @@ public class CryptoService extends ServiceBase {
 			strToSign += "-" + node.getContent();
 		}
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			if (ok(att.getBin())) {
 				strToSign += "-" + att.getBin();

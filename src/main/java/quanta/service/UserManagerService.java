@@ -318,7 +318,7 @@ public class UserManagerService extends ServiceBase {
 			return;
 		}
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (ok(att) && att.getSize() > 0L) {
 			if (no(userNode)) {
 				userNode = read.getUserNodeByUserName(null, null);
@@ -979,7 +979,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
 
-				Attachment att = userNode.getAttachment(false);
+				Attachment att = userNode.getAttachment();
 				if (ok(att)) {
 					userProfile.setAvatarVer(att.getBin());
 
@@ -1241,7 +1241,7 @@ public class UserManagerService extends ServiceBase {
 					if (ok(friendAccountNode)) {
 						// if a local user use BIN property on node (account node BIN property is the Avatar)
 						if (userName.indexOf("@") == -1) {
-							Attachment att = friendAccountNode.getAttachment(false);
+							Attachment att = friendAccountNode.getAttachment();
 							if (ok(att)) {
 								fi.setAvatarVer(att.getBin());
 							}

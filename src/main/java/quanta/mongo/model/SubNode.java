@@ -2,12 +2,10 @@ package quanta.mongo.model;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,9 +113,11 @@ public class SubNode {
 	@JsonIgnore
 	private Object propLock = new Object();
 
-	public static final String ATTACHMENTS = "att";
+	public static final String ATTACHMENTS = "a";
 	@Field(ATTACHMENTS)
-	private List<Attachment> attachments;
+	// for now the key string can be "p" (primary) or "h" (header). Header is the user's account header
+	// image.
+	private HashMap<String, Attachment> attachments;
 
 	@Transient
 	@JsonIgnore
@@ -427,35 +427,58 @@ public class SubNode {
 	}
 
 	@JsonProperty(ATTACHMENTS)
-	public List<Attachment> getAttachments() {
+	public HashMap<String, Attachment> getAttachments() {
 		synchronized (attLock) {
 			return attachments;
 		}
 	}
 
 	@JsonProperty(ATTACHMENTS)
-	public void setAttachments(List<Attachment> attachments) {
+	public void setAttachments(HashMap<String, Attachment> attachments) {
 		ThreadLocals.dirty(this);
 		synchronized (attLock) {
 			this.attachments = attachments;
 		}
 	}
 
-	// gets first attachment.
-	// Refactoring stage where we currently assume only one
-	// attachment ever, but this will change.
 	@Transient
 	@JsonIgnore
-	public Attachment getAttachment(boolean create) {
+	public Attachment getAttachment() {
+		return getAttachment(null, false, false);
+	}
+
+	// get the named attachment if there is one, and if there isn't and create is true then create it
+	// and return it.
+	@Transient
+	@JsonIgnore
+	public Attachment getAttachment(String name, boolean create, boolean forceNew) {
 		synchronized (attLock) {
+			if (no(name)) {
+				name = "p"; // p = primary attachment
+			}
+
 			Attachment ret = null;
-			if (ok(attachments) && attachments.size() > 0) {
-				ret = attachments.get(0);
-			}
-
-			if (no(ret) && create) {
+			if (ok(attachments)) {
+				if (forceNew) {
+					ret = new Attachment(this);
+					attachments.put(name, ret);
+					ThreadLocals.dirty(this);
+				} else {
+					ret = attachments.get(name);
+					if (ok(ret)) {
+						return ret;
+					}
+					if (create) {
+						ret = new Attachment(this);
+						attachments.put(name, ret);
+						ThreadLocals.dirty(this);
+					}
+				}
+			} else if (create || forceNew) {
 				ret = new Attachment(this);
-				setAttachments(Arrays.asList(ret));
+				attachments = new HashMap<>();
+				attachments.put(name, ret);
+				ThreadLocals.dirty(this);
 			}
 			return ret;
 		}
@@ -463,23 +486,25 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	public Attachment newAttachment() {
+	public void setAttachment(String name, Attachment att) {
 		synchronized (attLock) {
-			Attachment ret = new Attachment(this);
-			setAttachments(Arrays.asList(ret));
-			return ret;
+			if (no(name)) {
+				name = "p"; // p = primary attachment
+			}
+
+			ThreadLocals.dirty(this);
+			if (no(attachments)) {
+				attachments = new HashMap<>();
+			}
+
+			attachments.put(name, att);
 		}
 	}
 
-	// Refactoring stage where we currently assume only one
-	// attachment ever, but this will change.
 	@Transient
 	@JsonIgnore
 	public void setAttachment(Attachment att) {
-		synchronized (attLock) {
-			ThreadLocals.dirty(this);
-			setAttachments(Arrays.asList(att));
-		}
+		setAttachment(null, att);
 	}
 
 	@JsonProperty(LIKES)

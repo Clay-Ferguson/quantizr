@@ -266,7 +266,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void writeImage(SubNode node) {
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 		if (no(att)) return;
 
 		String bin = att.getBin();

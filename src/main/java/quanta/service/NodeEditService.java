@@ -422,7 +422,7 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		Attachment att = node.getAttachment(false);
+		Attachment att = node.getAttachment();
 
 		/* Remember the initial ipfs link */
 		String initIpfsLink = ok(att) ? att.getIpfsLink() : null;
@@ -946,7 +946,7 @@ public class NodeEditService extends ServiceBase {
 					sb.append(n.getOwner().toHexString());
 					sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
 
-					Attachment att = n.getAttachment(false);
+					Attachment att = n.getAttachment();
 					if (ok(att)) {
 						if (ok(att.getBin())) {
 							sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + att.getBin());

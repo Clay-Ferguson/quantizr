@@ -807,16 +807,16 @@ export class Crypto {
             signData += "-" + node.content;
         }
 
-        const att = S.props.getAttachment(node);
+        const att = S.props.getAttachment(null, node);
         if (att) {
-            if (att.bin) {
-                signData += "-" + att.bin;
+            if (att.b) {
+                signData += "-" + att.b;
             }
-            if (att.binData) {
-                signData += "-" + att.binData;
+            if (att.d) {
+                signData += "-" + att.d;
             }
-            if (att.dataUrl) {
-                signData += "-" + att.dataUrl;
+            if (att.du) {
+                signData += "-" + att.du;
             }
         }
 

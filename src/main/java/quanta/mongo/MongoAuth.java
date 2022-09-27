@@ -496,7 +496,7 @@ public class MongoAuth extends ServiceBase {
 			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 
-			Attachment att = principalNode.getAttachment(false);
+			Attachment att = principalNode.getAttachment();
 			avatarVer = ok(att) ? att.getBin() : null;
 		}
 

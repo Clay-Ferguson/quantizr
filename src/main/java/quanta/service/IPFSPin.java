@@ -86,7 +86,7 @@ public class IPFSPin extends ServiceBase {
 
             if (no(node))
                 return;
-            Attachment att = node.getAttachment(true);
+            Attachment att = node.getAttachment(null, true, false);
             String ipfsLink = att.getIpfsLink();
             add(ipfsLink);
 

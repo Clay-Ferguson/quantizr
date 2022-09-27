@@ -1006,7 +1006,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
 					if (no(_gid)) {
-						Attachment att = node.getAttachment(false);
+						Attachment att = node.getAttachment();
 						_gid = ok(att) ? att.getIpfsLink() : null;
 						if (no(_gid)) {
 							_gid = ok(att) ? att.getBin() : null;

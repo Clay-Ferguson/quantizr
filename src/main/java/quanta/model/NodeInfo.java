@@ -3,6 +3,7 @@ package quanta.model;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,7 +42,7 @@ public class NodeInfo {
 	private Long ordinal;
 	private String type;
 	private List<PropertyInfo> properties;
-	private List<Attachment> attachments;
+	private HashMap<String, Attachment> attachments;
 
 	/*
 	 * Holds information that the server needs to send back to the client to support client features,
@@ -97,7 +98,7 @@ public class NodeInfo {
 	public NodeInfo() {}
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
-			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
+			Long ordinal, Date lastModified, List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
 			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
@@ -237,11 +238,11 @@ public class NodeInfo {
 		this.properties = properties;
 	}
 
-	public List<Attachment> getAttachments() {
+	public HashMap<String, Attachment> getAttachments() {
 		return attachments;
 	}
 
-	public void setAttachments(List<Attachment> attachments) {
+	public void setAttachments(HashMap<String, Attachment> attachments) {
 		this.attachments = attachments;
 	}
 

@@ -146,7 +146,7 @@ public class MongoUpdate extends ServiceBase {
 					boolean attachment = false;
 
 					SubNode ipfsNode = read.findByIPFSPinned(as, pin);
-					Attachment att = ipfsNode.getAttachment(false);
+					Attachment att = ipfsNode.getAttachment();
 
 					// if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
 					if (no(ipfsNode)) {

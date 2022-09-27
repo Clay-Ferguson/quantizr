@@ -109,7 +109,7 @@ public class IPFSService extends ServiceBase {
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         checkIpfs();
-        Attachment att = node.getAttachment(false);
+        Attachment att = node.getAttachment();
         String cid = null;
         String mime = ok(att) ? att.getMime() : null;
         String fileName = ok(att) ? att.getFileName() : null;
@@ -265,7 +265,7 @@ public class IPFSService extends ServiceBase {
             SubNode node =
                     create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
 
-            Attachment att = node.getAttachment(true);
+            Attachment att = node.getAttachment(null, true, false);
 
             node.setOwner(exportParent.getOwner());
             // use export filename here
@@ -283,7 +283,7 @@ public class IPFSService extends ServiceBase {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
-                    Attachment childAtt = child.getAttachment(true);
+                    Attachment childAtt = child.getAttachment(null, true, false);
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
                     child.touch();

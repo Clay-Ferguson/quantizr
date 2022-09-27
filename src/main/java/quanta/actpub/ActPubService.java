@@ -369,7 +369,7 @@ public class ActPubService extends ServiceBase {
 
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-        Attachment att = node.getAttachment(false);
+        Attachment att = node.getAttachment();
 
         if (ok(att) && ok(att.getBin()) && ok(att.getMime())) {
             attachments = new APList().val(//

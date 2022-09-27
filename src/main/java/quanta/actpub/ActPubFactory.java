@@ -262,7 +262,7 @@ public class ActPubFactory extends ServiceBase {
 
 			String avatarMime = null;
 			String avatarVer = null;
-			Attachment att = userNode.getAttachment(false);
+			Attachment att = userNode.getAttachment();
 			if (ok(att)) {
 				avatarMime = att.getMime();
 				avatarVer = att.getBin();

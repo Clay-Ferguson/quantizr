@@ -61,7 +61,7 @@ public class FriendType extends TypeBase {
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntId", accountId));
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntUser", accountNode.getStr(NodeProp.USER)));
 
-                Attachment att = accountNode.getAttachment(false);
+                Attachment att = accountNode.getAttachment();
                 if (ok(att) && ok(att.getBin())) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", att.getBin()));
                 }

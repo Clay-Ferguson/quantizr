@@ -497,23 +497,23 @@ export class EditNodeDlg extends DialogBase {
     // Generate GUI for handling the display info about any Node Attachments
     makeAttachmentPanel = (state: LS): any => {
         const appState = getAppState();
-        const att = S.props.getAttachment(appState.editNode);
+        const att = S.props.getAttachment(null, appState.editNode);
         if (!att) return null;
-        const ipfsLink = att.ipfsLink;
-        const mime = att.mime;
+        const ipfsLink = att.il;
+        const mime = att.m;
 
         let pinCheckbox = null;
         if (ipfsLink) {
             pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
                 setValue: (checked: boolean) => {
                     if (checked) {
-                        att.ipfsRef = null;
+                        att.ir = null;
                     }
                     else {
-                        att.ipfsRef = "1";
+                        att.ir = "1";
                     }
                 },
-                getValue: (): boolean => att.ipfsRef ? false : true
+                getValue: (): boolean => att.ir ? false : true
             });
         }
 

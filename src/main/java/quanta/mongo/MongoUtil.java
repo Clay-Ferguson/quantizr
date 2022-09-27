@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.cxf.attachment.AttachmentSerializer;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexField;
 import org.springframework.data.mongodb.core.index.IndexInfo;
@@ -22,7 +25,9 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -41,6 +46,7 @@ import quanta.util.Convert;
 import quanta.util.ExUtil;
 import quanta.util.ImageSize;
 import quanta.util.ImageUtil;
+import quanta.util.IntVal;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -373,8 +379,9 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		Attachment att = node.getAttachment(false);
-		if (no(att)) return false;
+		Attachment att = node.getAttachment(null, false, false);
+		if (no(att))
+			return false;
 		return ImageUtil.isImageMime(att.getMime());
 	}
 
@@ -475,6 +482,83 @@ public class MongoUtil extends ServiceBase {
 		// }
 
 		// log.debug("fixSharing completed.");
+	}
+
+	// converts from old attachments properties to new Attachments array propery.
+	// todo-att: need to make this also convert the Header? Heading? property suffix types which only 
+	// exist on account nodes.
+	public void convertDBAttachments(MongoSession ms) {
+		log.debug("convertDBAttachments");
+		try {
+			prop.setDaemonsEnabled(false);
+
+			Val<BulkOperations> bops = new Val<>(null);
+			IntVal nodesProcessed = new IntVal();
+			IntVal opsPending = new IntVal();
+
+			ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+				nodesProcessed.inc();
+				if (nodesProcessed.getVal() % 1000 == 0) {
+					log.debug("SCAN: " + nodesProcessed.getVal());
+				}
+
+				String bin = node.getStr("bin");
+				String binData = node.getStr("sn:jcrData");
+				String url = node.getStr("sn:extUrl");
+				String dataUrl = node.getStr("sn:dataUrl");
+				String ipfsLink = node.getStr("ipfs:link");
+				String ipfsRef = node.getStr("ipfs:ref");
+
+				if (ok(bin) || ok(binData) || ok(url) || ok(dataUrl) || ok(ipfsLink) || ok(ipfsRef)) {
+					Attachment att = node.getAttachment(null, true, true);
+					att.setBin(bin);
+					att.setBinData(binData);
+					att.setUrl(url);
+					att.setDataUrl(dataUrl);
+					att.setIpfsLink(ipfsLink);
+					att.setIpfsRef(ipfsRef);
+					att.setMime(node.getStr("sn:mimeType"));
+					att.setFileName(node.getStr("sn:fileName"));
+					att.setCssSize(node.getStr("sn:imgSize"));
+					try {
+						att.setWidth(Integer.parseInt(node.getStr("sn:imgWidth")));
+						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeight")));
+					} catch (Exception e) {
+					}
+					
+					try {
+						att.setSize(Long.parseLong(node.getStr("sn:size")));
+					} catch (Exception e) {
+					}
+
+					if (no(bops.getVal())) {
+						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+					}
+
+					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+					Update update = new Update().set(SubNode.ATTACHMENTS, node.getAttachments());
+					bops.getVal().updateOne(query, update);
+					opsPending.inc();
+
+					if (opsPending.getVal() >= 100) {
+						BulkWriteResult results = bops.getVal().execute();
+						bops.setVal(null);
+						opsPending.setVal(0);
+						log.debug("Bulk Att: updated " + results.getModifiedCount() + " nodes.");
+					}
+				}
+			});
+
+			if (opsPending.getVal() > 0) {
+				BulkWriteResult results = bops.getVal().execute();
+				log.debug("Final Att: updated " + results.getModifiedCount() + " nodes.");
+			}
+
+			log.debug("Done converting attachments");
+
+		} finally {
+			prop.setDaemonsEnabled(true);
+		}
 	}
 
 	/*
@@ -739,7 +823,7 @@ public class MongoUtil extends ServiceBase {
 		}
 	}
 
-/*
+	/*
 	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
 	 * works,
 	 */

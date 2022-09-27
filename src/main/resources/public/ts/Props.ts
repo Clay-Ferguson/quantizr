@@ -193,24 +193,24 @@ export class Props {
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        return !!this.getAttachment(node);
+        return !!this.getAttachment(null, node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(node);
-        const target = att ? att.mime : null;
+        const att = this.getAttachment(null, node);
+        const target = att ? att.m : null;
         return (target && target.startsWith("image/"));
     }
 
     hasAudio = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(node);
-        const target = att ? att.mime : null;
+        const att = this.getAttachment(null, node);
+        const target = att ? att.m : null;
         return (target && target.startsWith("audio/"));
     }
 
     hasVideo = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(node);
-        const target = att ? att.mime : null;
+        const att = this.getAttachment(null, node);
+        const target = att ? att.m : null;
         return (target && target.startsWith("video/"));
     }
 
@@ -241,8 +241,9 @@ export class Props {
         return prop ? prop.value : null;
     }
 
-    getAttachment = (node: J.NodeInfo): J.Attachment => {
-        return node && node.attachments && node.attachments.length > 0 ? node.attachments[0] : null;
+    getAttachment = (name: string, node: J.NodeInfo): J.Attachment => {
+        if (!name) name = "p";
+        return node && node.attachments ? node.attachments[name] : null;
     }
 
     setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {

@@ -132,7 +132,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (no(node)) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
-			Attachment att = node.getAttachment(false);
+			Attachment att = node.getAttachment();
 			if (no(att)) return;
 			Long length = att.getSize();
 			String mimeType = att.getMime();

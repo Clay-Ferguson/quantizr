@@ -243,7 +243,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 			String rowClass = isTopRow ? "" : "class='row-div'";
-			Attachment att = node.getAttachment(false);
+			Attachment att = node.getAttachment();
 
 			String indenter = "";
 			if (level > 0) {

@@ -77,12 +77,11 @@ public class MongoRepository extends ServiceBase {
 			// DO NOT DELETE
 			// WARNING: When running this kind of conversion stuff
 			// be sure to disable the deamon processing also, which can be
-			// done with setDaemonsEnabled(false)
+			mongoUtil.convertDBAttachments(as);
 			// mongoUtil.setParentNodes(as);
+			// mongoUtil.processAccounts(as);
 
 			mongoUtil.createAdminUser(as);
-
-			// mongoUtil.processAccounts(as);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())
