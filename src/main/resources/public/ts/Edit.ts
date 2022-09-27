@@ -295,7 +295,7 @@ export class Edit {
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
-            // todo-0: shouldn't we do this regardless of which tab is active.
+            // todo-0: shouldn't we do this regardless of which tab is active?
             if (state.activeTab === C.TAB_FEED) {
                 if (FeedTab.inst?.props?.feedDirtyList) {
                     for (const node of FeedTab.inst.props.feedDirtyList) {

@@ -27,8 +27,7 @@ export class NodeCompBinary extends Div {
         this.mergeState<LS>({ node });
     }
 
-    // todo-0: rename to makeImageComp
-    makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
+    makeImageComp = (node: J.NodeInfo, state: AppState): Img => {
         if (!node) return null;
         const att = S.props.getAttachment(null, node);
         if (!att) return null;
@@ -97,7 +96,7 @@ export class NodeCompBinary extends Div {
 
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node)) {
-            this.setChildren([this.makeImageTag(node, state)]);
+            this.setChildren([this.makeImageComp(node, state)]);
         }
         else if (S.props.hasVideo(node)) {
             this.setChildren([new HorizontalLayout([
