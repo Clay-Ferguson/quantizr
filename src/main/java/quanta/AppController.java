@@ -458,7 +458,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getMultiRssFeed", false, false, req, session, ms -> {
 			return arun.run(as -> {
-				// log.debug("getMultiRssFeed: " + XString.prettyPrint(req));
 				return rssFeed.getMultiRssFeed(req);
 			});
 		});

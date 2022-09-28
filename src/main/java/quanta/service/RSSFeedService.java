@@ -114,9 +114,7 @@ public class RSSFeedService extends ServiceBase {
 				}
 			};
 
-	// NOTE: Same value appears in RSSTypeHandler.ts
-	private static final int MAX_FEED_ITEMS = 50;
-
+	private static final int MAX_FEED_ITEMS = 75;
 	private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
 	static boolean run = false;
 
@@ -418,7 +416,6 @@ public class RSSFeedService extends ServiceBase {
 			List<SyndEntry> entries = new LinkedList<>();
 			feed.setEntries(entries);
 			aggregateFeeds(urlList, entries, req.getPage());
-			// log.debug("Sending back " + entries.size() + " entries.");
 		}
 		/* If not an aggregate return the one external feed itself */
 		else {
