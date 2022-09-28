@@ -485,6 +485,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	// converts from old attachments properties to new Attachments array propery.
+	// Used on 9-27-22, this should never be needed again. I've upgraded all databases.
 	public void convertDBAttachments(MongoSession ms) {
 		log.debug("convertDBAttachments");
 		try {
