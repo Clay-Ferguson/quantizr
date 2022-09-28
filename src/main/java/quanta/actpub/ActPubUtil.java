@@ -932,11 +932,9 @@ public class ActPubUtil extends ServiceBase {
             return null;
 
         if (apUtil.isLocalUrl(url)) {
-            log.debug("is local url.");
             int lastIdx = url.lastIndexOf("=");
             if (lastIdx != -1) {
                 String nodeId = url.substring(lastIdx + 1);
-                log.debug("looking up nodeId: " + nodeId);
                 return read.getNode(ms, nodeId);
             }
         }
@@ -984,7 +982,7 @@ public class ActPubUtil extends ServiceBase {
                 }
                 break;
             default:
-                // todo-0: in the ThreadViewer logic we need to somehow show to the user this happened 
+                // todo-1: in the ThreadViewer logic we need to somehow show to the user this happened 
                 log.debug("Unhandled type in loadObject: " + type);
                 break;
         }

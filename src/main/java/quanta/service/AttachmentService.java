@@ -336,7 +336,7 @@ public class AttachmentService extends ServiceBase {
 		att.setMime(mimeType);
 
 		if (dataUrl) {
-			att.setDataUrl("t"); // <-- todo-0: why this boolean? not a url?
+			att.setDataUrl("t"); // <-- 1: why this boolean? not a url?
 		}
 
 		SubNode userNode = read.getNode(ms, node.getOwner());
@@ -923,7 +923,7 @@ public class AttachmentService extends ServiceBase {
 	
 		auth.ownerAuth(node);
 		DBObject metaData = new BasicDBObject();
-		metaData.put("nodeId" + binSuffix, node.getId());
+		metaData.put("nodeId" /* + binSuffix */, node.getId());
 
 		if (no(userNode)) {
 			userNode = read.getUserNodeByUserName(null, null);
@@ -1156,18 +1156,13 @@ public class AttachmentService extends ServiceBase {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
+						// checking for the obsolete key (we can remove this some day, or clean the db of these)
 						if (no(id)) {
-							// todo-0: does the meta key here really need to be specific to the binSuffix? In other words can't we
-							// just always use nodeId as the meta key for ALL attachments?
 							id = (ObjectId) meta.get("nodeIdh");
 						}
 
-						/*
-						 * If the grid file is not based off 'nodeId' then we still need to check if it's a Header image
-						 * (special case)
-						 */
+						// checking for the obsolete key (we can remove this some day, or clean the db of these)
 						if (no(id)) {
-							// todo-0: we support finding the obsolete key id value also until we know those are all cleaned out.
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 

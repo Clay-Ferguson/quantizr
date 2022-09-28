@@ -1,7 +1,7 @@
 package quanta.config;
 
 public class NodePath {
-	// todo-0: for efficiency in path length each of these reserved names (at least 'usr' and 'public' should use
+	// todo-1: for efficiency in path length each of these reserved names (at least 'usr' and 'public' should use
 	// a single character usr=u, public=c. Will require DB update/conversion.
 	public static final String ROOT = "r";
 	public static final String USER = "usr";

@@ -77,9 +77,11 @@ export class EditNodeDlgUtil {
         this.savePropsToNode(editNode, dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
-        // Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
-        // been encrypted just above.
-        // todo-0: Note: signatures is still in beta so we only sign if admin for now
+        /*
+        Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
+        been encrypted just above.
+
+        todo-0: Note: We only sign if admin for now, by design */
         if (appState.isAdminUser && S.crypto.avail) {
             // Note: this needs to come AFTER the 'savePropsToNode' call above because we're overriding what was
             // possibly in there.
