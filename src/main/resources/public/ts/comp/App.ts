@@ -12,6 +12,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./core/Button";
+import { Heading } from "./core/Heading";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -20,6 +21,9 @@ import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
+
+declare const g_requireCrypto: string;
+declare const g_brandingAppName: string;
 
 export class App extends Main {
 
@@ -53,6 +57,11 @@ export class App extends Main {
             ]);
         }
         else {
+            if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
+                this.setChildren([new Heading(4, g_brandingAppName + " requires a browser with crypto features.")]);
+                return;
+            }
+
             this.setChildren([
                 new Div(null, {
                     className: "row mainAppRow",
