@@ -23,6 +23,7 @@ import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
 import quanta.exception.NodeAuthFailedException;
 import quanta.model.client.Attachment;
+import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
 import quanta.util.SubNodeUtil;
@@ -106,6 +107,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// log.debug("New Node ID generated: " + id);
 		}
 		dbObj.put(SubNode.ID, id);
+
+		// Extra protection to be sure accounts and repo root can't have any sharing
+		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
+			node.setAc(null);
+			dbObj.remove(SubNode.AC);
+		}
 
 		if (no(node.getOrdinal())) {
 			node.setOrdinal(0L);
@@ -271,6 +278,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				node.setOwner(auth.getAdminSession().getUserNodeId());
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
+		}
+
+		// Extra protection to be sure accounts and repo root can't have any sharing
+		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
+			node.setAc(null);
 		}
 
 		if (ok(node.getAttachments())) {
