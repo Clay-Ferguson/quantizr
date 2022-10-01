@@ -23,6 +23,7 @@ import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
 import quanta.exception.NodeAuthFailedException;
 import quanta.model.client.Attachment;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
@@ -112,6 +113,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
 			node.setAc(null);
 			dbObj.remove(SubNode.AC);
+		}
+
+		// home nodes are always unpublished
+		if ("home".equalsIgnoreCase(node.getName())) {
+			node.set(NodeProp.UNPUBLISHED, true);
+			dbObj.put(SubNode.PROPS, node.getProps());
 		}
 
 		if (no(node.getOrdinal())) {
@@ -237,7 +244,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
+		// Since we're saving this node already make sure none of our setters above left it flagged
+		// as dirty or it might unnecessarily get saved twice.
 		ThreadLocals.clean(node);
+		
 		// log.debug(
 		// "MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" +
 		// node.getBool(NodeProp.USER_PREF_EDIT_MODE));
@@ -283,6 +293,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// Extra protection to be sure accounts and repo root can't have any sharing
 		if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
 			node.setAc(null);
+		}
+
+		// home nodes are always unpublished
+		if ("home".equalsIgnoreCase(node.getName())) {
+			node.set(NodeProp.UNPUBLISHED, true);
 		}
 
 		if (ok(node.getAttachments())) {
