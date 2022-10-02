@@ -82,6 +82,7 @@ export class Edit {
 
     public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
+            debugger;
             if (state.mobileMode) forceUsePopup = true;
 
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
@@ -101,7 +102,10 @@ export class Edit {
                 if (S.quanta.activeTab === C.TAB_DOCUMENT || //
                     S.quanta.activeTab === C.TAB_SEARCH || //
                     S.quanta.activeTab === C.TAB_TIMELINE) {
-                    editInPopup = false;
+
+                    // this was setting to FALSE for a while... which fails. Was that just a typo or what?
+                    // todo-0: I do want editing inline in the document to work, but I'll come back to this later
+                    editInPopup = true;
                 }
 
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
