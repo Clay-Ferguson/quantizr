@@ -297,7 +297,7 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		Attachment 	att = node.getAttachment(binSuffix, true, true);
+		Attachment att = node.getAttachment(binSuffix, true, true);
 
 		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
 		if (ImageUtil.isImageMime(mimeType)) {
@@ -622,7 +622,7 @@ public class AttachmentService extends ServiceBase {
 			SubNode node = read.getNode(ms, nodeId, false);
 			Attachment att = node.getAttachment();
 			if (no(att))
-			throw ExUtil.wrapEx("no attachment info found");
+				throw ExUtil.wrapEx("no attachment info found");
 
 			auth.auth(ms, node, PrivilegeType.READ);
 
@@ -689,7 +689,7 @@ public class AttachmentService extends ServiceBase {
 	 */
 	public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
-		readFromUrl(ms, req.getSourceUrl(), req.getNodeId(), null, 0, req.isStoreLocally());
+		readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally());
 		res.setSuccess(true);
 		return res;
 	}
@@ -731,14 +731,16 @@ public class AttachmentService extends ServiceBase {
 	 *        'inputStream' is admittely a retrofit to this function for when we want to just call this
 	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
 	 *        Val is null and not used.
+	 * 
+	 *        NOTE: If 'node' is already available caller should pass it, or elese can pass nodeId.
 	 */
 	@PerfMon(category = "attach")
-	public void readFromUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize,
-			boolean storeLocally) {
+	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
+			int maxFileSize, boolean storeLocally) {
 		if (sourceUrl.startsWith("data:")) {
 			readFromDataUrl(ms, sourceUrl, nodeId, mimeHint, maxFileSize);
 		} else {
-			readFromStandardUrl(ms, sourceUrl, nodeId, mimeHint, maxFileSize, storeLocally);
+			readFromStandardUrl(ms, sourceUrl, node, nodeId, mimeHint, mimeType, maxFileSize, storeLocally);
 		}
 	}
 
@@ -763,24 +765,39 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	// https://tools.ietf.org/html/rfc2397
-	public void readFromStandardUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize,
-			boolean storeLocally) {
+	// caller should pass 'node' of available, otherwise pass nodeId
+	public void readFromStandardUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
+			String mimeType, int maxFileSize, boolean storeLocally) {
 
-		if (!storeLocally) {
-			SubNode node = read.getNode(ms, nodeId);
-			Attachment att = node.getAttachment(null, true, true);
-			auth.ownerAuth(node);
-
-			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
+		if (no(mimeType)) {
+			// todo-0: don't we need to just read from the URL here and check the content type in the response?
+			// log.debug("no MimeType trying to get it.");
+			mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
+			// log.debug("ended up with mimeType: " + mimeType);
+		}
+
+		if (!storeLocally) {
+			if (no(node)) {
+				node = read.getNode(ms, nodeId);
+
+				// only need to auth if we looked up the node.
+				auth.ownerAuth(node);
+			}
+			if (no(node)) {
+				throw new RuntimeException("Node not found: " + nodeId);
+			}
+			Attachment att = node.getAttachment(null, true, true);
 
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
 			}
 			att.setUrl(sourceUrl);
-			update.saveSession(ms);
+
+			// this was a bug in some cases. saving is done at a higher layer (the lambda wrapper)
+			//update.saveSession(ms);
 			return;
 		}
 
@@ -798,12 +815,6 @@ public class AttachmentService extends ServiceBase {
 					.setConnectTimeout(timeout * 1000) //
 					.setConnectionRequestTimeout(timeout * 1000) //
 					.setSocketTimeout(timeout * 1000).build();
-
-			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
-			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
-				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
-			}
-
 			/*
 			 * if this is an image extension, handle it in a special way, mainly to extract the width, height
 			 * from it
@@ -867,7 +878,8 @@ public class AttachmentService extends ServiceBase {
 			StreamUtil.close(limitedIs);
 		}
 
-		update.saveSession(ms);
+		// this was a bug in some cases. saving is done at a higher layer (the lambda wrapper)
+		// update.saveSession(ms);
 	}
 
 	// FYI: Warning: this way of getting content type doesn't work.
@@ -920,7 +932,7 @@ public class AttachmentService extends ServiceBase {
 
 		// don't create attachment here, there shuold already be one, but we pass create=true anyway
 		Attachment att = node.getAttachment(binSuffix, true, false);
-	
+
 		auth.ownerAuth(node);
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" /* + binSuffix */, node.getId());

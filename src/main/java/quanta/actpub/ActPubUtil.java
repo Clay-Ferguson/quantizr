@@ -885,7 +885,8 @@ public class ActPubUtil extends ServiceBase {
                 SubNode parent = topNode ? null : read.getParent(ms, node);
                 boolean top = ok(parent) && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
 
-                // if we didn't a usable (non root) parent from the tree structure, try using the 'inReplyTo' value
+                // if we didn't get a usable (non root) parent from the tree structure, try using the 'inReplyTo'
+                // value
                 if (no(parent) || top) {
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
                     // if node has an inReplyTo...
@@ -982,7 +983,7 @@ public class ActPubUtil extends ServiceBase {
                 }
                 break;
             default:
-                // todo-1: in the ThreadViewer logic we need to somehow show to the user this happened 
+                // todo-1: in the ThreadViewer logic we need to somehow show to the user this happened
                 log.debug("Unhandled type in loadObject: " + type);
                 break;
         }

@@ -1172,14 +1172,17 @@ public class ActPubService extends ServiceBase {
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
 
-        update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
+
+        update.save(ms, newNode, false);
 
         try {
             push.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
+
+        // log.debug("returning newNode: " + XString.prettyPrint(newNode));
         return newNode;
     }
 
@@ -1332,15 +1335,17 @@ public class ActPubService extends ServiceBase {
 
     private void addAttachmentIfExists(MongoSession ms, SubNode node, Object obj) {
         List<?> attachments = apList(obj, APObj.attachment, false);
-        if (no(attachments))
+        if (no(attachments)) {
+            // log.debug("no attachments.");
             return;
+        }
 
         for (Object att : attachments) {
             String mediaType = apStr(att, APObj.mediaType);
             String url = apStr(att, APObj.url);
 
             if (ok(mediaType) && ok(url)) {
-                attach.readFromUrl(ms, url, node.getIdStr(), mediaType, -1, false);
+                attach.readFromUrl(ms, url, node, node.getIdStr(), mediaType, mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
                 break;
