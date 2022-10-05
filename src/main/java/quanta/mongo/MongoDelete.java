@@ -149,7 +149,6 @@ public class MongoDelete extends ServiceBase {
 	 */
 	public long deleteUnderPath(MongoSession ms, String path) {
 		// log.debug("Deleting under path: " + path);
-		update.saveSession(ms);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 

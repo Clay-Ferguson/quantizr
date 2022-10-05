@@ -789,7 +789,6 @@ public class MongoUtil extends ServiceBase {
 	public void createUniqueFriendsIndex(MongoSession ms) {
 		log.debug("Creating unique friends index.");
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 		String indexName = "unique-friends";
 
 		try {
@@ -808,7 +807,6 @@ public class MongoUtil extends ServiceBase {
 	public void createUniqueNodeNameIndex(MongoSession ms) {
 		log.debug("createUniqueNodeNameIndex()");
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 		String indexName = "unique-node-name";
 
 		try {
@@ -825,7 +823,6 @@ public class MongoUtil extends ServiceBase {
 
 	public void dropAllIndexes(MongoSession ms) {
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 		ops.indexOps(SubNode.class).dropAllIndexes();
 	}
 
@@ -833,7 +830,6 @@ public class MongoUtil extends ServiceBase {
 		try {
 			auth.requireAdmin(ms);
 			log.debug("Dropping index: " + indexName);
-			update.saveSession(ms);
 			ops.indexOps(clazz).dropIndex(indexName);
 		} catch (Exception e) {
 			ExUtil.error(log, "exception in dropIndex: " + indexName, e);
@@ -842,7 +838,6 @@ public class MongoUtil extends ServiceBase {
 
 	public void logIndexes(MongoSession ms, Class<?> clazz) {
 		StringBuilder sb = new StringBuilder();
-		update.saveSession(ms);
 		sb.append("INDEXES LIST\n:");
 		List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
 		for (IndexInfo idx : indexes) {
@@ -861,7 +856,6 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1, String property2) {
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 
 		try {
 			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
@@ -885,7 +879,6 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialIndex(MongoSession ms, String name, Class<?> clazz, String property) {
 		log.debug("Ensuring partial index named: " + name);
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
@@ -907,7 +900,6 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
 		log.debug("Ensuring unique partial index named: " + name);
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
@@ -926,7 +918,6 @@ public class MongoUtil extends ServiceBase {
 	public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property, String type) {
 		log.debug("Ensuring unique partial index (for type) named: " + name);
 		auth.requireAdmin(ms);
-		update.saveSession(ms);
 
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
@@ -947,7 +938,6 @@ public class MongoUtil extends ServiceBase {
 		log.debug("Ensuring unique index on: " + property);
 		try {
 			auth.requireAdmin(ms);
-			update.saveSession(ms);
 			ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed in createUniqueIndex: " + property, e);
@@ -958,7 +948,6 @@ public class MongoUtil extends ServiceBase {
 		log.debug("createIndex: " + property);
 		try {
 			auth.requireAdmin(ms);
-			update.saveSession(ms);
 			ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed in createIndex: " + property, e);
@@ -969,7 +958,6 @@ public class MongoUtil extends ServiceBase {
 		log.debug("createIndex: " + property + " dir=" + dir);
 		try {
 			auth.requireAdmin(ms);
-			update.saveSession(ms);
 			ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed in createIndex: " + property + " dir=" + dir, e);
@@ -1021,7 +1009,6 @@ public class MongoUtil extends ServiceBase {
 					// .onField(SubNode.TAGS) //
 					.build();
 
-			update.saveSession(ms);
 			ops.indexOps(clazz).ensureIndex(textIndex);
 			log.debug("createTextIndex successful.");
 		} catch (Exception e) {

@@ -1085,7 +1085,6 @@ public class NodeEditService extends ServiceBase {
 				for (SubNode n : read.getChildren(ms, parent)) {
 					updateHeadingsForNode(ms, n, baseLevel);
 				}
-				update.saveSession(ms);
 			}
 		}
 		return res;
@@ -1152,6 +1151,7 @@ public class NodeEditService extends ServiceBase {
 		}
 	}
 
+	/* todo-1: we should be using a bulk update in here */
 	public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
 		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
 		int replacements = 0;
@@ -1171,10 +1171,6 @@ public class NodeEditService extends ServiceBase {
 					replacements++;
 				}
 			}
-		}
-
-		if (replacements > 0) {
-			update.saveSession(ms);
 		}
 
 		res.setMessage(String.valueOf(replacements) + " nodes were updated.");

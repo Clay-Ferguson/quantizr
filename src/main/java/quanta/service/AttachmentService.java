@@ -397,7 +397,6 @@ public class AttachmentService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(node);
 		deleteBinary(ms, "", node, null);
-		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
 	}

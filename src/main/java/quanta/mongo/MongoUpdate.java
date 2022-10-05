@@ -52,13 +52,16 @@ public class MongoUpdate extends ServiceBase {
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
 
 		// if not doing allowAuth, we need to be sure the thread has admin session
-		// so the MongoEventListener can allow all access.
+		// because the MongoEventListener looks in threadlocals for auth
 		if (!allowAuth) {
 			arun.run(as -> {
 				ops.save(node);
 				return null;
 			});
-		} else {
+		}
+		// otherwise leave same/current threadlocals as is and MongoEventListener will auth based on this
+		// thread.
+		else {
 			ops.save(node);
 		}
 		ThreadLocals.clean(node);
@@ -83,9 +86,9 @@ public class MongoUpdate extends ServiceBase {
 
 			synchronized (ms) {
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification, because calling 'save()' on a node will
-				 * have the side effect of removing it from dirtyNodes, and that can't happen during the loop below
-				 * because we're iterating over dirtyNodes.
+				 * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
+				 * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
+				 * loop below because we're iterating over dirtyNodes.
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 
@@ -96,9 +99,8 @@ public class MongoUpdate extends ServiceBase {
 					try {
 						auth.ownerAuth(ms, node);
 					} catch (Exception e) {
-						// todo-1: this IS happening...in some scenarios with 'login' endpoint
-						log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
-						log.debug("Your mongoSession has user: " + ms.getUserName() + //
+						log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node)
+								+ "\bYour mongoSession has user: " + ms.getUserName() + //
 								" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
 					}
 

@@ -517,7 +517,6 @@ public class MongoAuth extends ServiceBase {
 	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, Sort sort,
 			int limit, ObjectId ownerIdMatch) {
 
-		update.saveSession(ms);
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
 		if (no(q))
 			return null;
@@ -536,7 +535,6 @@ public class MongoAuth extends ServiceBase {
 	 * sharedTo instead
 	 */
 	public long countSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
-		update.saveSession(ms);
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
 		if (no(q))
 			return 0L;
@@ -582,7 +580,6 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch, Sort sort,
 			int limit) {
-		update.saveSession(ms);
 		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 
 		if (ok(sort)) {
@@ -599,7 +596,6 @@ public class MongoAuth extends ServiceBase {
 
 	/* Finds nodes that have any sharing on them at all */
 	public long countSubGraphByAcl(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
-		update.saveSession(ms);
 		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 		return ops.count(q, SubNode.class);
 	}
