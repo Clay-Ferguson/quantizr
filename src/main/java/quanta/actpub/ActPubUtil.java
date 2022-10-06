@@ -858,7 +858,7 @@ public class ActPubUtil extends ServiceBase {
                          */
                         String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
                         if (ok(actPubId)) {
-                            iter = read.findNodesByProp(ms, NodePath.ROOT_OF_ALL_USERS, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                            iter = read.findNodesByProp(ms, NodePath.USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
                                     actPubId);
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now

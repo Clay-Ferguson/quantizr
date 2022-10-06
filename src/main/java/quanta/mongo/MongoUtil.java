@@ -1060,7 +1060,7 @@ public class MongoUtil extends ServiceBase {
 		// }
 
 		auth.requireAdmin(ms);
-		String newUserNodePath = NodePath.ROOT_OF_ALL_USERS + "/?";
+		String newUserNodePath = NodePath.USERS_PATH + "/?";
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 

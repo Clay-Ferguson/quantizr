@@ -212,16 +212,16 @@ public class MongoRead extends ServiceBase {
             return;
 
         String parentPath = getParentPath(node);
-        if (no(parentPath) || parentPath.equals("") || parentPath.equals("/") || parentPath.equals("/r")
+        if (no(parentPath) || parentPath.equals("") || parentPath.equals("/") || parentPath.equals(NodePath.ROOT_PATH)
                 || parentPath.equals(NodePath.PENDING_PATH) || parentPath.equals(NodePath.PENDING_PATH + "/"))
             return;
 
         if (parentPath.startsWith(NodePath.PENDING_PATH + "/")) {
-            parentPath = parentPath.replace(NodePath.PENDING_PATH + "/", "/r/");
+            parentPath = parentPath.replace(NodePath.PENDING_PATH + "/", NodePath.ROOT_PATH + "/");
         }
 
         // no need to check root.
-        if (parentPath.equals("/r") || parentPath.equals("/r/")) {
+        if (parentPath.equals(NodePath.ROOT_PATH) || parentPath.equals(NodePath.ROOT_PATH + "/")) {
             return;
         }
 
@@ -360,7 +360,7 @@ public class MongoRead extends ServiceBase {
         }
 
         if (authPending && allowAuth) {
-            auth.auth(ms, ret, PrivilegeType.READ); 
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
         return ret;
     }
@@ -1070,7 +1070,7 @@ public class MongoRead extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.USERS_PATH)) //
                 // case-insensitive lookup of username:
                 .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$") //
                 .and(SubNode.TYPE).is(NodeType.ACCOUNT.s());

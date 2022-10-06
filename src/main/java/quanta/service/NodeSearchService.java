@@ -409,7 +409,7 @@ public class NodeSearchService extends ServiceBase {
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
 			Criteria crit =
-					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS));
+					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
 
 			// This pattern is what is required when you have multiple conditions added to a
 			// single field.

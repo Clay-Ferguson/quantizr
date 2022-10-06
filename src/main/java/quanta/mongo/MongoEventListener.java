@@ -192,12 +192,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		// make sure root node can never have any sharing.
-		if (node.getPath().equals("/r") && ok(node.getAc())) {
+		if (node.getPath().equals(NodePath.ROOT_PATH) && ok(node.getAc())) {
 			dbObj.put(SubNode.AC, null);
 			node.setAc(null);
 		}
 
-		if (!node.getPath().startsWith("/r/p/") && ThreadLocals.getParentCheckEnabled() && (isNew || node.pathDirty)) {
+		if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
+				&& (isNew || node.pathDirty)) {
 			read.checkParentExists(null, node);
 		}
 
@@ -247,7 +248,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// Since we're saving this node already make sure none of our setters above left it flagged
 		// as dirty or it might unnecessarily get saved twice.
 		ThreadLocals.clean(node);
-		
+
 		// log.debug(
 		// "MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" +
 		// node.getBool(NodeProp.USER_PREF_EDIT_MODE));

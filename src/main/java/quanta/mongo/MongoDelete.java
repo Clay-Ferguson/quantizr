@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -362,13 +363,13 @@ public class MongoDelete extends ServiceBase {
 				}
 
 				// log.debug("STRM: " + entry.getKey());
-				if (entry.getKey().equals("/r")) {
+				if (entry.getKey().equals(NodePath.ROOT_PATH)) {
 					// log.debug("ROOT NODE: " + entry.getValue().toHexString());
 					return;
 				}
 
 				String parent = XString.truncAfterLast(entry.getKey(), "/");
-				if (parent.equalsIgnoreCase("/r")) {
+				if (parent.equalsIgnoreCase(NodePath.ROOT_PATH)) {
 					// log.debug("ROOT CHILD: " + entry.getValue().toHexString());
 					return;
 				}

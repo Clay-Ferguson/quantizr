@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
@@ -56,7 +57,7 @@ public class Convert extends ServiceBase {
 		boolean sigFail = false;
 		// todo-0: need a config setting that specifies which path(s) are required to be signed so
 		// this can be enabled/disabled easily by admin
-		if (prop.isRequireCrypto() && node.getPath().startsWith("/r/public/")) {
+		if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
 			String sig = node.getStr(NodeProp.CRYPTO_SIG);
 			if (no(sig) && !sc.isAdmin()) {
 				// todo-1: we need a special global counter for when this happens, so the server info can show it.

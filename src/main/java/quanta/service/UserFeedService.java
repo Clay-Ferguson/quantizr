@@ -53,7 +53,7 @@ public class UserFeedService extends ServiceBase {
 		if (sc.isAnonUser())
 			return res;
 
-		String pathToSearch = NodePath.ROOT_OF_ALL_USERS;
+		String pathToSearch = NodePath.USERS_PATH;
 
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
@@ -120,7 +120,7 @@ public class UserFeedService extends ServiceBase {
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 
-		String pathToSearch = testQuery ? "/r" : NodePath.ROOT_OF_ALL_USERS;
+		String pathToSearch = testQuery ? NodePath.ROOT_PATH : NodePath.USERS_PATH;
 		boolean doAuth = true;
 
 		/*

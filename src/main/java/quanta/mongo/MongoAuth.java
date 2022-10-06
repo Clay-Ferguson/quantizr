@@ -546,7 +546,7 @@ public class MongoAuth extends ServiceBase {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
 		if (no(pathToSearch)) {
-			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
+			pathToSearch = NodePath.USERS_PATH;
 		}
 
 		Query q = new Query();
@@ -604,7 +604,7 @@ public class MongoAuth extends ServiceBase {
 		Query q = new Query();
 
 		if (no(pathToSearch)) {
-			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
+			pathToSearch = NodePath.USERS_PATH;
 		}
 
 		/*

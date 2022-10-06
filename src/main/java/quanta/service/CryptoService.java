@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.bulk.BulkWriteResult;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.Jwk;
@@ -107,8 +108,8 @@ public class CryptoService extends ServiceBase {
 
 	public String getNodeSigData(SubNode node) {
 		String path = node.getPath();
-		if (path.startsWith("/r/p/")) {
-			path = "/r/" + path.substring(5);
+		if (path.startsWith(NodePath.PENDING_PATH + "/")) {
+			path = NodePath.ROOT_PATH + "/" + path.substring(5);
 		}
 
 		String strToSign = path + "-" + node.getOwner().toHexString();
