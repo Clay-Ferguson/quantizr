@@ -101,7 +101,7 @@ public class EnglishDictionary extends ServiceBase {
 	 * 
 	 * example threshold=0.60f -> 60% english)
 	 */
-	public boolean isEnglish(String text, float threshold) {
+	public boolean isEnglish(String text) {
 		if (dictWords.size() == 0)
 			throw new RuntimeException("called isEnglish before dictionary was loaded.");
 		if (no(text))
@@ -125,7 +125,7 @@ public class EnglishDictionary extends ServiceBase {
 			}
 
 			// only consider words that are all alpha characters
-			if (!StringUtils.isAlpha(token) || token.length() < 3) {
+			if (!StringUtils.isAlpha(token) || token.length() < 4) {
 				// log.debug(" ignoring: " + token);
 				continue;
 			}
@@ -157,8 +157,7 @@ public class EnglishDictionary extends ServiceBase {
 
 		float percent = (float) englishCount / (englishCount + unknownCount);
 		// log.debug("eng=" + englishCount + " nonEng=" + unknownCount + " %=" + percent);
-
-		return percent > threshold;
+		return percent > 0.6f;
 	}
 
 	public boolean hasBadWords(String text) {
@@ -176,10 +175,5 @@ public class EnglishDictionary extends ServiceBase {
 			}
 		}
 		return false;
-	}
-
-
-	public void test() {
-		log.debug("English TEST1=" + isEnglish("ooga booga wooga tooga", 0.60f));
 	}
 }

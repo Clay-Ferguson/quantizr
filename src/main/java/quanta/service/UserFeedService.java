@@ -391,7 +391,7 @@ public class UserFeedService extends ServiceBase {
 			 * counting we're doing could eventually lead to pagination problems if we get to where MOST items
 			 * are skipped and not accepted.
 			 */
-			if (!allowNonEnglish && !english.isEnglish(node.getContent(), 0.50f)) {
+			if (!allowNonEnglish && !english.isEnglish(node.getContent())) {
 				// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
 				skipped++;
 				continue;
@@ -420,7 +420,7 @@ public class UserFeedService extends ServiceBase {
 							continue;
 						}
 
-						if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent(), 0.50f)) {
+						if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
 							// log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
 							skipped++;
 							continue;

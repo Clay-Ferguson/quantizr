@@ -515,7 +515,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 
 			// if strict content filtering ignore non-english or bad words posts completely
-			if (strictFiltering && (!english.isEnglish(content, 0.50f) || english.hasBadWords(content))) {
+			if (strictFiltering && (!english.isEnglish(content) || english.hasBadWords(content))) {
 				continue;
 			}
 

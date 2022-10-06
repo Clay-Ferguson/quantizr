@@ -180,7 +180,7 @@ public class SystemService extends ServiceBase {
 
 			if (ms.isAdmin()) {
 				ret += "\n\n";
-				ret += "English: " + (english.isEnglish(node.getContent(), 0.50f) ? "Yes" : "No") + "\n";
+				ret += "English: " + (english.isEnglish(node.getContent()) ? "Yes" : "No") + "\n";
 				ret += "Profanity: " + (english.hasBadWords(node.getContent()) ? "Yes" : "No") + "\n";
 			}
 
