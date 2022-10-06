@@ -274,10 +274,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// Document dbObj = event.getDocument();
 		// String id = dbObj.getObjectId(SubNode.ID).toHexString();
 		// log.debug("onAfterLoad: id=" + id);
-
-		// if (ThreadLocals.hasDirtyNode(dbObj.getObjectId(SubNode.ID))) {
-		// log.error("WARNING: DIRTY READ: " + id);
-		// }
 	}
 
 	@Override
@@ -309,12 +305,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		node.pathDirty = StringUtils.isEmpty(node.getPath());
 
-		// NOTE: All resultsets should be wrapped in NodeIterator, which will make sure reading dirty
-		// nodes from the DB will pick up the dirty ones (already in memory) and substitute those
-		// into the result sets.
-		// if (ThreadLocals.hasDirtyNode(node.getId())) {
-		// log.error("WARNING: DIRTY READ: " + node.getIdStr());
-		// }
+		if (ThreadLocals.hasDirtyNode(node.getId())) {
+			log.warn("DIRTY READ: " + node.getIdStr());
+		}
 
 		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
 		// + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
