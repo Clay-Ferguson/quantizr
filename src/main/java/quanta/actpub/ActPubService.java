@@ -807,21 +807,10 @@ public class ActPubService extends ServiceBase {
                 node.setLikes(new HashSet<>());
             }
 
-            if (!unlike) {
-                if (node.getLikes().add(activity.getActor())) {
-                    // set node to dirty only if it just changed.
-                    ThreadLocals.dirty(node);
-                }
+            if (unlike) {
+                node.removeLike(activity.getActor());
             } else {
-                if (node.getLikes().remove(activity.getActor())) {
-                    // set node to dirty only if it just changed.
-                    ThreadLocals.dirty(node);
-
-                    // if likes set is now empty make it null.
-                    if (node.getLikes().size() == 0) {
-                        node.setLikes(null);
-                    }
-                }
+                node.addLike(activity.getActor());
             }
             return null;
         });

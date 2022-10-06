@@ -525,6 +525,35 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	public void addLike(String actor) {
+		if (no(getLikes())) {
+			setLikes(new HashSet<>());
+		}
+
+		if (getLikes().add(actor)) {
+			// set node to dirty only if it just changed.
+			ThreadLocals.dirty(this);
+		}
+	}
+
+	@Transient
+	@JsonIgnore
+	public void removeLike(String actor) {
+		if (no(getLikes())) return;
+
+		if (getLikes().remove(actor)) {
+			// set node to dirty only if it just changed.
+			ThreadLocals.dirty(this);
+
+			// if likes set is now empty make it null.
+			if (getLikes().size() == 0) {
+				setLikes(null);
+			}
+		}
+	}
+
+	@Transient
+	@JsonIgnore
 	public boolean set(NodeProp nt, Object val) {
 		return set(nt.s(), val);
 	}
