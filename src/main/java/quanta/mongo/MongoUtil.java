@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.cxf.attachment.AttachmentSerializer;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,6 @@ import quanta.util.ExUtil;
 import quanta.util.ImageSize;
 import quanta.util.ImageUtil;
 import quanta.util.IntVal;
-import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -131,12 +129,8 @@ public class MongoUtil extends ServiceBase {
 	 * 
 	 * NOTE: All security checks are done external to this method.
 	 */
-	public NodeIterable find(Query q) {
-		Iterable<SubNode> iter = ops.find(q, SubNode.class);
-		if (no(iter)) {
-			return null;
-		}
-		return new NodeIterable(iter);
+	public List<SubNode> find(Query q) {
+		return ops.find(q, SubNode.class);
 	}
 
 	/**
@@ -146,8 +140,7 @@ public class MongoUtil extends ServiceBase {
 	 * NOTE: All security checks are done external to this method.
 	 */
 	public SubNode findOne(Query q) {
-		SubNode node = ops.findOne(q, SubNode.class);
-		return nodeOrDirtyNode(node);
+		return ops.findOne(q, SubNode.class);
 	}
 
 	/**
@@ -162,8 +155,7 @@ public class MongoUtil extends ServiceBase {
 			return null;
 
 		// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
-		SubNode node = mongoUtil.ops_findById(objId);
-		return nodeOrDirtyNode(node);
+		return mongoUtil.ops_findById(objId);
 	}
 
 	@PerfMon
@@ -228,19 +220,6 @@ public class MongoUtil extends ServiceBase {
 			}
 			tries++;
 		}
-	}
-
-	public SubNode nodeOrDirtyNode(SubNode node) {
-		if (no(node)) {
-			return null;
-		}
-
-		SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
-		if (ok(dirty)) {
-			return dirty;
-		}
-
-		return node;
 	}
 
 	/*

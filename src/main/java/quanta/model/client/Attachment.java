@@ -10,23 +10,22 @@ import quanta.util.ThreadLocals;
 
 @JsonInclude(Include.NON_NULL)
 public class Attachment {
-    private int width;          // IMG_WIDTH	"sn:imgWidth"
-    private int height;         // IMG_HEIGHT	"sn:imgHeight"
-    private String mime;        // BIN_MIME	    "sn:mimeType"
-    private String fileName;    // BIN_FILENAME	"sn:fileName"
-    private String cssSize;     // IMG_SIZE	    "sn:imgSize"
-    private long size;          // BIN_SIZE	    "sn:size"
-    private String bin;         // BIN		    "bin"
-    private String binData;     // BIN_DATA     "sn:jcrData"
-    private String url;         // BIN_URL		"sn:extUrl"
-    private String dataUrl;     // BIN_DATA_URL	"sn:dataUrl"
-    private String ipfsLink;    // IPFS_LINK 	"ipfs:link"
-    private String ipfsRef;     // IPFS_REF 	"ipfs:ref"
+    private int width;
+    private int height;
+    private String mime;
+    private String fileName;
+    private String cssSize;
+    private long size;
+    private String bin;
+    private String binData;
+    private String url;
+    private String dataUrl;
+    private String ipfsLink;
+    private String ipfsRef;
 
     private SubNode ownerNode;
 
-    public Attachment() {
-    }
+    public Attachment() {}
 
     public Attachment(SubNode ownerNode) {
         this.ownerNode = ownerNode;
@@ -165,13 +164,13 @@ public class Attachment {
     }
 
     @Transient
-	@JsonIgnore
+    @JsonIgnore
     public SubNode getOwnerNode() {
         return ownerNode;
     }
 
     @Transient
-	@JsonIgnore
+    @JsonIgnore
     public void setOwnerNode(SubNode ownerNode) {
         this.ownerNode = ownerNode;
     }
