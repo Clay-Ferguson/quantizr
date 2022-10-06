@@ -20,6 +20,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -107,9 +108,10 @@ public class UserFeedService extends ServiceBase {
 	 * person or that person to us queried in a single list.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
-		// if bidirectional means query for the conversation between me and the other person (both senders),
-		// and we do that
-		// always for now when toUser is present.
+		/*
+		 * if bidirectional means query for the conversation between me and the other person (both senders),
+		 * and we do that always for now when toUser is present.
+		 */
 		boolean bidirectional = StringUtils.isNotEmpty(req.getToUser());
 
 		/*
@@ -400,6 +402,15 @@ public class UserFeedService extends ServiceBase {
 			if (!allowBadWords && english.hasBadWords(node.getContent())) {
 				skipped++;
 				continue;
+			}
+
+			// for the curated feed ignore valueless super short messages that also have no attachment.
+			if (Constant.FEED_PUB.s().equals(req.getName())) {
+				if ((StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) //
+						&& no(node.getAttachments())) {
+					skipped++;
+					continue;
+				}
 			}
 
 			Val<SubNode> boostedNodeVal = null;

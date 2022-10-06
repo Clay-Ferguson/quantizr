@@ -363,6 +363,7 @@ export class Search {
             toUser: FeedTab.inst.props.feedFilterToUser,
             toPublic: FeedTab.inst.props.feedFilterToPublic,
             localOnly: FeedTab.inst.props.feedFilterLocalServer,
+            name: FeedTab.inst.props.name,
             fromFriends: FeedTab.inst.props.feedFilterFriends,
             nsfw: appState.userPrefs.nsfw,
             searchText,

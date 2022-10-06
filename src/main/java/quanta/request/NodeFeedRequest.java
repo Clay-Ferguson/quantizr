@@ -21,6 +21,9 @@ public class NodeFeedRequest extends RequestBase {
 	private String searchText;
 	private boolean applyAdminBlocks;
 
+	// textual representation of what kind of request is being done.
+	private String name;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -107,5 +110,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setApplyAdminBlocks(boolean applyAdminBlocks) {
 		this.applyAdminBlocks = applyAdminBlocks;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

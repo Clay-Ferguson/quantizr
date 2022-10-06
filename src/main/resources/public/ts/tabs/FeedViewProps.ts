@@ -14,6 +14,9 @@ export class FeedViewProps {
     feedFilterLocalServer = false;
     applyAdminBlocks: true;
 
+    // text hint about what kind of filtering is being done
+    name: string;
+
     /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
      for any non-node specific feed query this stays null. */
     feedFilterRootNode: J.NodeInfo = null;

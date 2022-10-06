@@ -273,53 +273,34 @@ export class FeedView extends AppTab<FeedViewProps> {
         if (data.props.feedFilterToUser) {
             subHeading = "Interactions with " + data.props.feedFilterToUser;
         }
-        else if (!data.props.feedFilterFriends && //
-            data.props.feedFilterToMe && //
-            data.props.feedFilterFromMe && //
-            !data.props.feedFilterToPublic && //
-            !data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "To/From Me";
-        }
-        else if (!data.props.feedFilterFriends && //
-            data.props.feedFilterToMe && //
-            !data.props.feedFilterFromMe && //
-            !data.props.feedFilterToPublic && //
-            !data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "To Me";
-        }
-        else if (!data.props.feedFilterFriends && //
-            !data.props.feedFilterToMe && //
-            data.props.feedFilterFromMe && //
-            !data.props.feedFilterToPublic && //
-            !data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "From Me";
-        }
-        else if (data.props.feedFilterFriends && //
-            !data.props.feedFilterToMe && //
-            !data.props.feedFilterFromMe && //
-            !data.props.feedFilterToPublic && //
-            !data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "From Friends";
-        }
-        else if (!data.props.feedFilterFriends && //
-            !data.props.feedFilterToMe && //
-            !data.props.feedFilterFromMe && //
-            data.props.feedFilterToPublic && //
-            data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "From Local Users";
-        }
-        else if (!data.props.feedFilterFriends && //
-            !data.props.feedFilterToMe && //
-            !data.props.feedFilterFromMe && //
-            data.props.feedFilterToPublic && //
-            !data.props.feedFilterLocalServer && //
-            !data.props.feedFilterRootNode) {
-            subHeading = "Federated";
+        else {
+            switch (data.props.name) {
+                case J.Constant.FEED_TOFROMME:
+                    subHeading = "To/From Me";
+                    break;
+
+                case J.Constant.FEED_TOME:
+                    subHeading = "To Me";
+                    break;
+
+                case J.Constant.FEED_FROMME:
+                    subHeading = "From Me";
+                    break;
+
+                case J.Constant.FEED_FROMFRIENDS:
+                    subHeading = "From Friends";
+                    break;
+
+                case J.Constant.FEED_LOCAL:
+                    subHeading = "From Local Users";
+                    break;
+
+                case J.Constant.FEED_PUB:
+                    subHeading = "Federated";
+                    break;
+
+                default: break;
+            }
         }
 
         return subHeading ? ": " + subHeading : "";

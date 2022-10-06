@@ -360,6 +360,7 @@ export interface NodeFeedRequest extends RequestBase {
     nsfw: boolean;
     searchText: string;
     applyAdminBlocks: boolean;
+    name: string;
 }
 
 export interface NodeSearchRequest extends RequestBase {
@@ -985,6 +986,15 @@ export const enum Constant {
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
     ENC_TAG = "<[ENC]>",
+    FEED_NEW = "myNewMessages",
+    FEED_PUB = "publicFediverse",
+    FEED_TOFROMME = "toFromMe",
+    FEED_TOME = "toMe",
+    FEED_FROMMETOUSER = "fromMeToUser",
+    FEED_FROMME = "fromMe",
+    FEED_FROMFRIENDS = "fromFriends",
+    FEED_LOCAL = "local",
+    FEED_NODEFEED = "nodeFeed",
 }
 
 export const enum ConstantInt {
