@@ -314,13 +314,95 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
+	 * This version of deleteNodeOrphans will run slower than the one below, but uses essentially no
+	 * memory
+	 */
+	public void deleteNodeOrphans() {
+		Val<BulkOperations> bops = new Val<>(null);
+
+		LongVal totalDeleted = new LongVal();
+		LongVal opsPending = new LongVal();
+		LongVal deletesInPass = new LongVal();
+		int passes = 0;
+
+		// run up to 5 passes over the whole DB (orphan trees deeper than 5 levels deep
+		// won't all be cleaned but that's ok, they will get pruned off in future runs.
+		while (passes++ < 5) {
+
+			// starting a new pass, so zero deletes so far in this pass
+			deletesInPass.setVal(0L);
+
+			// scan the entire DB
+			ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+
+				// if this node is root node, ignore
+				if (NodePath.ROOT_PATH.equals(node.getPath()))
+					return;
+
+				// if this node's parent is root, also ignore it.
+				String parentPath = node.getParentPath();
+				if (NodePath.ROOT_PATH.equals(parentPath))
+					return;
+
+				// query to see if node's parent exists.
+				Query q = new Query();
+				q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
+				SubNode parent = mongoUtil.findOne(q);
+
+				// if parent node doesn't exist, this is an orphan we can delete.
+				if (no(parent)) {
+					// log.debug("orphan[" + node.getPath() + "]: " + node.getContent());
+
+					// lazy create our bulk ops here.
+					if (no(bops.getVal())) {
+						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+					}
+
+					// add bulk ops command to delete this orphan
+					bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(node.getId())));
+
+					// update counters
+					opsPending.inc();
+					deletesInPass.inc();
+
+					// if we have 100 to delete run the bulk delete on them now
+					if (opsPending.getVal() > 100) {
+						BulkWriteResult results = bops.getVal().execute();
+						totalDeleted.add(results.getDeletedCount());
+						log.debug("DEL TOTAL: " + totalDeleted.getVal());
+						bops.setVal(null);
+						opsPending.setVal(0L);
+					}
+				}
+			});
+
+			// after the DB scan is done delete the remainder left in ops pending
+			if (opsPending.getVal() > 0) {
+				BulkWriteResult results = bops.getVal().execute();
+				totalDeleted.add(results.getDeletedCount());
+				log.debug("remainders. DEL TOTAL: " + totalDeleted.getVal());
+				bops.setVal(null);
+				opsPending.setVal(0L);
+			}
+
+			if (deletesInPass.getVal() == 0L) {
+				log.debug("no orphans found in last pass. done.");
+				break;
+			}
+		}
+
+		log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
+	}
+
+	/*
 	 * Deletes Orphan Nodes.
 	 * 
-	 * Orphan nodes are ones that have a path whose parent path doesn't exist. This version of an 
-	 * implementation requires ALL paths of all nodes to fit into RAM but there's an even simpler approach
-	 * that would be just to scan all nodes and for each one do the 'exist' check on it's parent and
-	 * delete those who don't have an existing parent.
+	 * Orphan nodes are ones that have a path whose parent path doesn't exist. This version of an
+	 * implementation requires ALL paths of all nodes to fit into RAM but there's an even simpler
+	 * approach that would be just to scan all nodes and for each one do the 'exist' check on it's
+	 * parent and delete those who don't have an existing parent.
 	 * ------------------------------------------------------------------------
+	 * 
 	 * todo-0: Can add Verify & Repair HAS_CHILDREN in this method.
 	 * 
 	 * Since every node looks for it's parent in this process we could theoretically use this to also
@@ -332,7 +414,7 @@ public class MongoDelete extends ServiceBase {
 	 * claim NOT to have children but DO have children...which would be a separate hash map doing the
 	 * same kind of logic.
 	 */
-	public void deleteNodeOrphans() {
+	public void deleteNodeOrphans_fast() {
 		log.debug("deleteNodeOrphans()");
 
 		Val<BulkOperations> bops = new Val<>(null);
@@ -422,9 +504,6 @@ public class MongoDelete extends ServiceBase {
 			// since we delete in blocks of 100 at a time, we might have some left pending here so
 			// finish deleting those
 			if (opsPending.getVal() > 0) {
-				if (no(bops.getVal())) {
-					bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-				}
 				BulkWriteResult results = bops.getVal().execute();
 				totalDeleted.add(results.getDeletedCount());
 				log.debug("remainders. DEL TOTAL: " + totalDeleted.getVal());
