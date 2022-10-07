@@ -20,7 +20,7 @@ import quanta.config.SessionContext;
 import quanta.util.ThreadLocals;
 
 /**
- * Global Servlet filter for cross-cutting concerns across all web requests
+ * Global Servlet filter for cross-cutting concerns across all endpoints
  */
 @Component
 @Order(2)

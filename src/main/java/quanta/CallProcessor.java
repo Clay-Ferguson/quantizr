@@ -63,14 +63,15 @@ public class CallProcessor extends ServiceBase {
 
 		/*
 		 * Instantiating this, runs its constructor and ensures our threadlocal at least has response object
-		 * on it, but most (not all) implenentations of methods end up instantiating their own which
+		 * on it, but most (not all) implementations of methods end up instantiating their own which
 		 * overwrites this
 		 */
 		new ResponseBase();
 
 		boolean useLock = true;
-		// todo-0: do this cleaner. these commands are not subject to mutex, but we will
-		// add parameters to make it cleaner than this switch block hack
+		/*
+		 * todo-0: do this cleaner. There should be a way to accomplish this without disabling the mutex here.
+		 */
 		switch (command) {
 			case "serverPush":
 			case "signNodes":
