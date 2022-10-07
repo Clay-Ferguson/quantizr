@@ -468,6 +468,9 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			InputStream is = getStream(ms, binSuffix, node, allowAuth);
+			if (no(is)) {
+				throw new RuntimeException("Image not found.");
+			}
 			long size = att.getSize();
 			// log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 

@@ -314,6 +314,13 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
+	 * Deletes Orphan Nodes.
+	 * 
+	 * Orphan nodes are ones that have a path whose parent path doesn't exist. This version of an 
+	 * implementation requires ALL paths of all nodes to fit into RAM but there's an even simpler approach
+	 * that would be just to scan all nodes and for each one do the 'exist' check on it's parent and
+	 * delete those who don't have an existing parent.
+	 * ------------------------------------------------------------------------
 	 * todo-0: Can add Verify & Repair HAS_CHILDREN in this method.
 	 * 
 	 * Since every node looks for it's parent in this process we could theoretically use this to also

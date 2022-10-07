@@ -393,6 +393,7 @@ public class SubNode {
 
 	@JsonProperty(AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
+		if (no(ac) && no(this.ac)) return;
 		ThreadLocals.dirty(this);
 		synchronized (acLock) {
 			this.ac = ac;
@@ -421,6 +422,7 @@ public class SubNode {
 
 	@JsonProperty(PROPS)
 	public void setProps(HashMap<String, Object> props) {
+		if (no(props) && no(this.props)) return;
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			this.props = props;
@@ -436,6 +438,7 @@ public class SubNode {
 
 	@JsonProperty(ATTACHMENTS)
 	public void setAttachments(HashMap<String, Attachment> attachments) {
+		if (no(attachments) && no(this.attachments)) return;
 		ThreadLocals.dirty(this);
 		synchronized (attLock) {
 			this.attachments = attachments;
@@ -517,6 +520,7 @@ public class SubNode {
 
 	@JsonProperty(LIKES)
 	public void setLikes(HashSet<String> likes) {
+		if (no(likes) && no(this.likes)) return;
 		ThreadLocals.dirty(this);
 		synchronized (likesLock) {
 			this.likes = likes;
