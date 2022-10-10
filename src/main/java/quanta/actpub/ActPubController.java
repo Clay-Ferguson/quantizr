@@ -213,22 +213,25 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-		APObj ret = null;
 
-		if (APConst.TRUE.equals(page)) {
-			ret = apFollower.generateFollowersPage(userName, minId);
-		} else {
-			ret = apFollower.generateFollowers(null, userName);
-		}
+		// todo-0: turning this off until we make it optional for users
+		return new ResponseEntity<String>(HttpStatus.NOT_IMPLEMENTED);
 
-		if (ok(ret)) {
-			apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
-			HttpHeaders hdr = new HttpHeaders();
-			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
-			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}
+		// APObj ret = null;
+		// if (APConst.TRUE.equals(page)) {
+		// ret = apFollower.generateFollowersPage(userName, minId);
+		// } else {
+		// ret = apFollower.generateFollowers(null, userName);
+		// }
+
+		// if (ok(ret)) {
+		// apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
+		// HttpHeaders hdr = new HttpHeaders();
+		// setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+		// return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		// } else {
+		// return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		// }
 	}
 
 	/**
@@ -241,21 +244,25 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
-		APObj ret = null;
-		if (APConst.TRUE.equals(page)) {
-			ret = apFollowing.generateFollowingPage(userName, minId);
-		} else {
-			ret = apFollowing.generateFollowing(null, userName);
-		}
 
-		if (ok(ret)) {
-			apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
-			HttpHeaders hdr = new HttpHeaders();
-			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
-			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}
+		// todo-0: turning this off until we make it optional for users
+		return new ResponseEntity<String>(HttpStatus.NOT_IMPLEMENTED);
+
+		// APObj ret = null;
+		// if (APConst.TRUE.equals(page)) {
+		// 	ret = apFollowing.generateFollowingPage(userName, minId);
+		// } else {
+		// 	ret = apFollowing.generateFollowing(null, userName);
+		// }
+
+		// if (ok(ret)) {
+		// 	apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
+		// 	HttpHeaders hdr = new HttpHeaders();
+		// 	setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+		// 	return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		// } else {
+		// 	return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		// }
 	}
 
 	/*
