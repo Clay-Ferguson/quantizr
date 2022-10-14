@@ -292,7 +292,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     break;
 
                 case J.Constant.FEED_LOCAL:
-                    subHeading = "From Local Users";
+                    subHeading = "Local Users";
                     break;
 
                 case J.Constant.FEED_PUB:
@@ -313,73 +313,74 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
     }
 
-    makeFilterButtonsBar = (state: AppState): Div => {
-        return new Div(null, { className: "marginTop" }, [
-            state.isAnonUser ? null : new Checkbox("Friends", {
-                title: "Include nodes posted by your friends"
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("SetFeedFilterType", s => {
-                        this.data.props.feedFilterFriends = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => this.data.props.feedFilterFriends
-            }),
+    // DO NOT DELETE - may be needed in the future.
+    // makeFilterButtonsBar = (state: AppState): Div => {
+    //     return new Div(null, { className: "marginTop" }, [
+    //         state.isAnonUser ? null : new Checkbox("Friends", {
+    //             title: "Include nodes posted by your friends"
+    //         }, {
+    //             setValue: (checked: boolean) => {
+    //                 dispatch("SetFeedFilterType", s => {
+    //                     this.data.props.feedFilterFriends = checked;
+    //                     return s;
+    //                 });
+    //             },
+    //             getValue: (): boolean => this.data.props.feedFilterFriends
+    //         }),
 
-            state.isAnonUser ? null : new Checkbox("To Me", {
-                title: "Include nodes shares specifically to you (by name)"
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("SetFeedFilterType", s => {
-                        this.data.props.feedFilterToMe = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => this.data.props.feedFilterToMe
-            }),
+    //         state.isAnonUser ? null : new Checkbox("To Me", {
+    //             title: "Include nodes shares specifically to you (by name)"
+    //         }, {
+    //             setValue: (checked: boolean) => {
+    //                 dispatch("SetFeedFilterType", s => {
+    //                     this.data.props.feedFilterToMe = checked;
+    //                     return s;
+    //                 });
+    //             },
+    //             getValue: (): boolean => this.data.props.feedFilterToMe
+    //         }),
 
-            state.isAnonUser ? null : new Checkbox("From Me", {
-                title: "Include nodes created by you"
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("SetFeedFilterType", s => {
-                        this.data.props.feedFilterFromMe = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => this.data.props.feedFilterFromMe
-            }),
+    //         state.isAnonUser ? null : new Checkbox("From Me", {
+    //             title: "Include nodes created by you"
+    //         }, {
+    //             setValue: (checked: boolean) => {
+    //                 dispatch("SetFeedFilterType", s => {
+    //                     this.data.props.feedFilterFromMe = checked;
+    //                     return s;
+    //                 });
+    //             },
+    //             getValue: (): boolean => this.data.props.feedFilterFromMe
+    //         }),
 
-            new Checkbox("Public", {
-                title: "Include nodes shared to 'public' (everyone)"
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("SetFeedFilterType", s => {
-                        this.data.props.feedFilterToPublic = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => this.data.props.feedFilterToPublic
-            }),
+    //         new Checkbox("Public", {
+    //             title: "Include nodes shared to 'public' (everyone)"
+    //         }, {
+    //             setValue: (checked: boolean) => {
+    //                 dispatch("SetFeedFilterType", s => {
+    //                     this.data.props.feedFilterToPublic = checked;
+    //                     return s;
+    //                 });
+    //             },
+    //             getValue: (): boolean => this.data.props.feedFilterToPublic
+    //         }),
 
-            new Checkbox("Local", {
-                title: "Include only nodes from accounts on this server."
-            }, {
-                setValue: (checked: boolean) => {
-                    dispatch("SetFeedFilterType", s => {
-                        this.data.props.feedFilterLocalServer = checked;
+    //         new Checkbox("Local", {
+    //             title: "Include only nodes from accounts on this server."
+    //         }, {
+    //             setValue: (checked: boolean) => {
+    //                 dispatch("SetFeedFilterType", s => {
+    //                     this.data.props.feedFilterLocalServer = checked;
 
-                        /* to help keep users probably get what they want, set 'public' also to true as the default
-                         any time someone clicks 'Local' because that's the likely use case */
-                        if (checked) {
-                            this.data.props.feedFilterToPublic = true;
-                        }
-                        return s;
-                    });
-                },
-                getValue: (): boolean => this.data.props.feedFilterLocalServer
-            })
-        ]);
-    }
+    //                     /* to help keep users probably get what they want, set 'public' also to true as the default
+    //                      any time someone clicks 'Local' because that's the likely use case */
+    //                     if (checked) {
+    //                         this.data.props.feedFilterToPublic = true;
+    //                     }
+    //                     return s;
+    //                 });
+    //             },
+    //             getValue: (): boolean => this.data.props.feedFilterLocalServer
+    //         })
+    //     ]);
+    // }
 }

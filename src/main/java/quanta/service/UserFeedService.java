@@ -333,10 +333,9 @@ public class UserFeedService extends ServiceBase {
 			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
-		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
+		// use ACT_PUB_ID proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
-			// todo-1: should be checking apid property instead?
-			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
+			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s()).is(null);
 		}
 
 		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get
