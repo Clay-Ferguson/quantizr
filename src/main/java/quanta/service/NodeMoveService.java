@@ -67,7 +67,7 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	public void moveNodeUp(MongoSession ms, SubNode node) {
-		SubNode nodeAbove = read.getSiblingAbove(ms, node);
+		SubNode nodeAbove = read.getSiblingAbove(ms, node, null);
 		if (ok(nodeAbove)) {
 			Long saveOrdinal = nodeAbove.getOrdinal();
 			nodeAbove.setOrdinal(node.getOrdinal());
@@ -77,7 +77,7 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	public void moveNodeDown(MongoSession ms, SubNode node) {
-		SubNode nodeBelow = read.getSiblingBelow(ms, node);
+		SubNode nodeBelow = read.getSiblingBelow(ms, node, null);
 		if (ok(nodeBelow)) {
 			Long saveOrdinal = nodeBelow.getOrdinal();
 			nodeBelow.setOrdinal(node.getOrdinal());

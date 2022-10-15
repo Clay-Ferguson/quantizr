@@ -631,9 +631,14 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    // if 'parent' of 'node' is known it should be passed in, or else null passed in, and parent will be
+    // looked up instead
     @PerfMon(category = "read")
-    public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
-        if (noChildren(node))
+    public SubNode getSiblingAbove(MongoSession ms, SubNode node, SubNode parent) {
+        if (no(parent)) {
+            parent = read.getParent(ms, node);
+        }
+        if (no(parent) || noChildren(parent))
             return null;
 
         auth.auth(ms, node, PrivilegeType.READ);
@@ -657,8 +662,13 @@ public class MongoRead extends ServiceBase {
         return mongoUtil.findOne(q);
     }
 
-    public SubNode getSiblingBelow(MongoSession ms, SubNode node) {
-        if (noChildren(node))
+    // if 'parent' of 'node' is known it should be passed in, or else null passed in, and parent will be
+    // looked up instead
+    public SubNode getSiblingBelow(MongoSession ms, SubNode node, SubNode parent) {
+        if (no(parent)) {
+            parent = read.getParent(ms, node);
+        }
+        if (no(parent) || noChildren(parent))
             return null;
 
         auth.auth(ms, node, PrivilegeType.READ);

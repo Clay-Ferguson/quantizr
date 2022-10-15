@@ -133,14 +133,14 @@ public class NodeRenderService extends ServiceBase {
 		if (req.getSiblingOffset() != 0) {
 			SubNode parent = read.getParent(ms, node);
 			if (req.getSiblingOffset() < 0) {
-				SubNode nodeAbove = read.getSiblingAbove(ms, node);
+				SubNode nodeAbove = read.getSiblingAbove(ms, node, parent);
 				if (ok(nodeAbove)) {
 					node = nodeAbove;
 				} else {
 					node = ok(parent) ? parent : node;
 				}
 			} else if (req.getSiblingOffset() > 0) {
-				SubNode nodeBelow = read.getSiblingBelow(ms, node);
+				SubNode nodeBelow = read.getSiblingBelow(ms, node, parent);
 				if (ok(nodeBelow)) {
 					node = nodeBelow;
 				} else {

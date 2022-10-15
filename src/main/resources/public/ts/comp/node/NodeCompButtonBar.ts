@@ -187,7 +187,7 @@ export class NodeCompButtonBar extends Div {
                     if (this.node.logicalOrdinal > 0) {
                         moveNodeUpIcon = new Icon({
                             className: "fa fa-lg fa-arrow-up buttonBarIcon",
-                            title: "Move Node up one position (higher)",
+                            title: "Move Node Up",
                             nid: this.node.id,
                             onClick: S.edit.moveNodeUp
                         });
@@ -196,7 +196,7 @@ export class NodeCompButtonBar extends Div {
                     if (!this.node.lastChild && state.node.children && state.node.children.length > 1) {
                         moveNodeDownIcon = new Icon({
                             className: "fa fa-lg fa-arrow-down buttonBarIcon",
-                            title: "Move Node down one position (lower)",
+                            title: "Move Node Down",
                             nid: this.node.id,
                             onClick: S.edit.moveNodeDown
                         });
