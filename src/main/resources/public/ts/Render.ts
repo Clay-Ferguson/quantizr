@@ -312,7 +312,7 @@ export class Render {
                 att = list[0]
             }
         }
-    
+
         const bin = att ? att.b : null;
         if (bin) {
             const attachmentComps: Comp[] = [];

@@ -271,7 +271,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("saveAsPdf", false); // todo-2: fix (work in progress: Save HTML from clipboard as PDF) #saveAsPdf work in progress:
                         formData.append("ipfs", dlg.toIpfs ? "true" : "false");
-                        formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
+                        formData.append("createAsChildren", "false"); // dlg.numFiles > 1 ? "true" : "false");
                     }
 
                     dlg.zipQuestionAnswered = false;
@@ -303,10 +303,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("queuecomplete", function (arg: any) {
                     if (dlg.sent) {
-                        if (dlg.fileList.length > 1 && !dlg.uploadFailed) {
-                            S.util.showMessage("The " + dlg.fileList.length + " uploads were added as sub-nodes of the current node. Open this node to view them.", "Note");
-                        }
-
                         dlg.close();
                         if (dlg.afterUploadFunc) {
                             dlg.afterUploadFunc();

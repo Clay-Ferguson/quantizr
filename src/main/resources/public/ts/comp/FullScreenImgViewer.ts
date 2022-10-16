@@ -6,7 +6,7 @@ import { Main } from "./Main";
 import * as J from "../JavaIntf";
 
 // todo-0: need to handle multiple images on the same node and do this
-// (INSTEAD OF?) the child node siblings stuff. &&&
+// (INSTEAD OF?) the child node siblings stuff.
 export class FullScreenImgViewer extends Main {
     constructor() {
         super();

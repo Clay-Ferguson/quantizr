@@ -106,6 +106,10 @@ public class AttachmentService extends ServiceBase {
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
+	 * 
+	 * todo-0: For uploading multiple files we should preserve the ability to add as ONE NEW NODE PER image or else
+	 * upload all images onto the single node. Should this be a user choice...eventually? For compatibility with fediverse
+	 * we should default to only the 'all images on one node' approach in for now.
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession ms, String binSuffix, String nodeId, MultipartFile[] uploadFiles,
 			boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
@@ -134,7 +138,6 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			auth.ownerAuth(node);
-
 			int maxFileSize = user.getMaxUploadSize(ms);
 			int imageCount = 0;
 
@@ -222,6 +225,8 @@ public class AttachmentService extends ServiceBase {
 
 		/*
 		 * Multiple file uploads always attach children for each file uploaded
+		 * (correction: addAsChild is currently never sending true ever from client becasue for now
+		 * we always add multiple files to SAME node)
 		 */
 		if (addAsChild) {
 			auth.ownerAuth(ms, node);

@@ -93,8 +93,6 @@ export class NodeCompBinary extends Div {
             return;
         }
 
-        const hasImage = S.props.hasImage(node, this.attName);
-
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node, this.attName)) {
             this.setChildren([this.makeImageComp(node, state)]);
