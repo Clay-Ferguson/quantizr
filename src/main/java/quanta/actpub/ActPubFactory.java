@@ -29,6 +29,7 @@ import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -285,7 +286,7 @@ public class ActPubFactory extends ServiceBase {
 							.put(APObj.mediaType, avatarMime) //
 							.put(APObj.url, avatarUrl));
 
-			Attachment headerAtt = userNode.getAttachment("h", false, false);
+			Attachment headerAtt = userNode.getAttachment(Constant.ATTACHMENT_HEADER.s(), false, false);
 			if (ok(headerAtt)) {
 				String headerImageMime = headerAtt.getMime();
 				if (ok(headerImageMime)) {

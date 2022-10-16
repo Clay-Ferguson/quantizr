@@ -69,7 +69,6 @@ public class Util {
 
 	public static String genStrongToken() {
 		return String.valueOf(Math.abs(++counter + (new Date().getTime()) ^ Math.abs(rand.nextLong())));
-
 	}
 
 	public static boolean equalObjs(Object o1, Object o2) {

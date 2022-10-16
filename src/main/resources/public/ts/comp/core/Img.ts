@@ -3,6 +3,7 @@ import { Comp } from "../base/Comp";
 import { S } from "../../Singletons";
 
 export class Img extends Comp {
+    // todo-0: key not used, can be deleted
     constructor(private key: string, attribs: Object = {}) {
         super(attribs);
     }

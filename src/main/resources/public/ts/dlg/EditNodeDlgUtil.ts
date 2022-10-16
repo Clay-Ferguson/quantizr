@@ -293,16 +293,15 @@ export class EditNodeDlgUtil {
         })();
     }
 
-    deleteUpload = async (dlg: EditNodeDlg) => {
+    deleteUpload = async (dlg: EditNodeDlg, attName: string) => {
         const appState = getAppState();
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
         call has fully completed. */
-        const deleted: boolean = await S.attachment.deleteAttachment(appState.editNode, getAppState());
+        const deleted: boolean = await S.attachment.deleteAttachment(appState.editNode, attName, getAppState());
 
         if (deleted) {
-            appState.editNode.attachments = null;
-            // this.initPropStates(dlg, appState.editNode, true);
+            delete appState.editNode.attachments[attName];
             S.edit.updateNode(appState.editNode);
 
             if (dlg.mode === DialogMode.EMBED) {

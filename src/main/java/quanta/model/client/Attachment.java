@@ -2,6 +2,7 @@ package quanta.model.client;
 
 import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +10,9 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 
 @JsonInclude(Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {
+    private int ordinal;
     private int width;
     private int height;
     private String mime;
@@ -161,6 +164,16 @@ public class Attachment {
     public void setCssSize(String cssSize) {
         ThreadLocals.dirty(ownerNode);
         this.cssSize = cssSize;
+    }
+
+    @JsonProperty("o")
+    public int getOrdinal() {
+        return ordinal;
+    }
+
+    @JsonProperty("o")
+    public void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
     }
 
     @Transient

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.util.ExUtil;
@@ -458,7 +459,7 @@ public class SubNode {
 	public Attachment getAttachment(String name, boolean create, boolean forceNew) {
 		synchronized (attLock) {
 			if (StringUtils.isEmpty(name)) {
-				name = "p"; // p = primary attachment
+				name = Constant.ATTACHMENT_PRIMARY.s();
 			}
 
 			Attachment ret = null;
@@ -493,7 +494,7 @@ public class SubNode {
 	public void setAttachment(String name, Attachment att) {
 		synchronized (attLock) {
 			if (StringUtils.isEmpty(name)) {
-				name = "p"; // p = primary attachment
+				name = Constant.ATTACHMENT_PRIMARY.s();
 			}
 
 			ThreadLocals.dirty(this);

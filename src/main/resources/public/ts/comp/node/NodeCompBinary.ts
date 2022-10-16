@@ -4,7 +4,6 @@ import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
-import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
 import { DialogMode } from "../../DialogBase";
@@ -14,6 +13,7 @@ import { FullScreenType } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { HorizontalLayout } from "../core/HorizontalLayout";
+import { Img } from "../core/Img";
 
 interface LS {
     node: J.NodeInfo;
@@ -22,24 +22,24 @@ interface LS {
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
+    constructor(public node: J.NodeInfo, public attName: string, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
         super();
         this.mergeState<LS>({ node });
     }
 
     makeImageComp = (node: J.NodeInfo, state: AppState): Img => {
         if (!node) return null;
-        const att = S.props.getAttachment(null, node);
+        const att = S.props.getAttachment(this.attName, node);
         if (!att) return null;
 
-        const src: string = S.attachment.getUrlForNodeAttachment(node, false);
+        const src: string = S.attachment.getUrlForNodeAttachment(node, this.attName, false);
 
         let size = "";
         if (this.isFullScreenEmbed) {
             size = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            size = "150px";
+            size = "100px";
         }
         else {
             size = att.c;
@@ -62,7 +62,6 @@ export class NodeCompBinary extends Div {
         }
 
         const className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
-
         return new Img(node.id, {
             src,
             className,
@@ -94,46 +93,48 @@ export class NodeCompBinary extends Div {
             return;
         }
 
+        const hasImage = S.props.hasImage(node, this.attName);
+
         /* If this is an image render the image directly onto the page as a visible image */
-        if (S.props.hasImage(node)) {
+        if (S.props.hasImage(node, this.attName)) {
             this.setChildren([this.makeImageComp(node, state)]);
         }
-        else if (S.props.hasVideo(node)) {
+        else if (S.props.hasVideo(node, this.attName)) {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN).open();
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
                     }
                 }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
-                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
+                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
             ])]);
         }
-        else if (S.props.hasAudio(node)) {
+        else if (S.props.hasAudio(node, this.attName)) {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Audio", {
                     onClick: () => {
-                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node), 0).open();
+                        new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
                     }
                 }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
-                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
+                }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
             ])]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            const att = S.props.getAttachment(null, node);
+            const att = S.props.getAttachment(this.attName, node);
             const fileName = att ? att.f : null;
             const fileSize = att ? att.s : null;
             const fileType = att ? att.m : null;
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
-                viewFileLink = new Anchor(S.attachment.getUrlForNodeAttachment(node, false), "View", {
+                viewFileLink = new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, false), "View", {
                     target: "_blank",
                     className: "downloadLink"
                 });
@@ -150,7 +151,7 @@ export class NodeCompBinary extends Div {
                     className: "normalText marginRight"
                 }),
                 new Div(null, { className: "marginTop" }, [
-                    new Anchor(S.attachment.getUrlForNodeAttachment(node, true), "Download", { className: "downloadLink" }),
+                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { className: "downloadLink" }),
                     viewFileLink
                 ])
             ])]);

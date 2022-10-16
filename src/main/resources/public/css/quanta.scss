@@ -369,7 +369,7 @@ a {
 
 .app-body {
     background-color: $body-bg;
-    font-family: $fontFamily  !important;
+    font-family: $fontFamily !important;
     // font-size: $fontSize;
     width: 100%;
     height: 100%;
@@ -1632,8 +1632,16 @@ Will come back later and study this more. todo-1 */
 .binaryEditorSection {
     margin-left: 2px;
     margin-right: 2px;
-    border: 2px solid $gray-700;
+    border: 1px solid $gray-700;
     border-radius: $border-radius;
+    margin-bottom: $smallGap;
+    margin-top: $tinyGap;
+}
+
+.binaryEditorItem {
+    &:not(:last-child) {
+        border-bottom: 1px solid $gray-700;
+    }
 }
 
 .captchaImage {
@@ -1641,11 +1649,6 @@ Will come back later and study this more. todo-1 */
     margin-right: $smallGap;
     border: 2px solid $gray-700;
     border-radius: $border-radius;
-}
-
-.editBinaryContainer {
-    margin-bottom: $smallGap;
-    margin-top: $tinyGap;
 }
 
 .heading5 {

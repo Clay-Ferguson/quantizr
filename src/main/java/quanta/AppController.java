@@ -51,6 +51,7 @@ import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoRepository;
@@ -948,6 +949,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * An alternative way to get the binary attachment from a node allowing more friendly url format
 	 * (named nodes)
+	 * 
+	 * todo-0: needs to be updated per multiple images we have now.
 	 */
 	@PerfMon
 	@RequestMapping(value = {"/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}"})
@@ -1028,7 +1031,7 @@ public class AppController extends ServiceBase implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attach.getBinary(as, "", node, null, ok(download), response);
+						attach.getBinary(as, "", node, null, null, ok(download), response);
 					}
 					return null;
 				});
@@ -1071,7 +1074,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
 				arun.run(as -> {
-					attach.getBinary(as, "", null, nodeId, ok(download), response);
+					attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, ok(download), response);
 					return null;
 				});
 			}
@@ -1083,7 +1086,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
-					attach.getBinary(as, "h", null, nodeId, ok(download), response);
+					attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, ok(download), response);
 					return null;
 				});
 			}
@@ -1093,7 +1096,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					if (ok(ipfsCid)) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
-						attach.getBinary(null, "", null, nodeId, ok(download), response);
+						attach.getBinary(null, null, null, nodeId, binId, ok(download), response);
 					}
 					return null;
 				});
@@ -1101,7 +1104,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(as -> {
-					attach.getBinary(as, "", null, nodeId, ok(download), response);
+					attach.getBinary(as, null, null, nodeId, binId, ok(download), response);
 					return null;
 				});
 			}

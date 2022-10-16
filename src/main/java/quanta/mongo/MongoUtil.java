@@ -32,6 +32,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -538,7 +539,7 @@ public class MongoUtil extends ServiceBase {
 				bin = node.getStr("binHeader");
 
 				if (ok(bin)) {
-					Attachment att = node.getAttachment("h", true, true);
+					Attachment att = node.getAttachment(Constant.ATTACHMENT_HEADER.s(), true, true);
 					att.setBin(bin);
 					att.setMime(node.getStr("sn:mimeTypeHeader"));
 					att.setFileName(node.getStr("sn:fileNameHeader"));

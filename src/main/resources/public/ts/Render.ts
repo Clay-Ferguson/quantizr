@@ -76,7 +76,9 @@ export class Render {
             val = S.util.replaceAll(val, "{{img}}", "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
         }
 
-        const att = S.props.getAttachment(null, node);
+        // todo-0: for now only a primary attachment can be injected in this way, but eventually this will become
+        // whatever is the FIRST (smallest ordinal), and not using "p"
+        const att = S.props.getAttachment(J.Constant.ATTACHMENT_PRIMARY, node);
         const imgSize = att ? att.c : null;
         // actual size prop is saved as "0"
         if (imgSize && imgSize !== "0") {
@@ -97,7 +99,8 @@ export class Render {
          <div class="clearfix"/>
          */
         if (val.indexOf("{{imgUrl}}")) {
-            val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, false));
+            // todo-0: set this "p" to proper thing.
+            val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, "p", false));
         }
         return val;
     }
@@ -298,7 +301,8 @@ export class Render {
                 }
             }));
 
-        const att = S.props.getAttachment(null, node);
+        // todo-0: for now we only do primary attachment here.
+        const att = S.props.getAttachment(J.Constant.ATTACHMENT_PRIMARY, node);
         const bin = att ? att.b : null;
         if (bin) {
             const attachmentComps: Comp[] = [];

@@ -115,34 +115,35 @@ public class ExportJsonService extends ServiceBase {
 		}
 	}
 
-	private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
-		boolean ret = false;
+	// Not used, but let's keep this code for now.
+	// private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
+	// 	boolean ret = false;
 
-		Attachment att = node.getAttachment(null, true, true);
-		String binMime = ok(att) ? att.getMime() : null;
-		ObjectId oid = node.getId();
-		if (ok(oid)) {
+	// 	Attachment att = node.getAttachment(null, true, true);
+	// 	String binMime = ok(att) ? att.getMime() : null;
+	// 	ObjectId oid = node.getId();
+	// 	if (ok(oid)) {
 
-			InputStream is = null;
-			LimitedInputStreamEx lis = null;
-			try {
-				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
-				Resource resource = context.getResource(resourceName);
-				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, user.getMaxUploadSize(ms));
-				attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
-				update.save(ms, node);
+	// 		InputStream is = null;
+	// 		LimitedInputStreamEx lis = null;
+	// 		try {
+	// 			String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
+	// 			Resource resource = context.getResource(resourceName);
+	// 			is = resource.getInputStream();
+	// 			lis = new LimitedInputStreamEx(is, user.getMaxUploadSize(ms));
+	// 			attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
+	// 			update.save(ms, node);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				StreamUtil.close(lis);
-			}
-		} else {
-			log.debug("unable to get oid");
-		}
-		return ret;
-	}
+	// 		} catch (Exception e) {
+	// 			e.printStackTrace();
+	// 		} finally {
+	// 			StreamUtil.close(lis);
+	// 		}
+	// 	} else {
+	// 		log.debug("unable to get oid");
+	// 	}
+	// 	return ret;
+	// }
 
 	private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
 		boolean ret = false;
@@ -178,49 +179,49 @@ public class ExportJsonService extends ServiceBase {
 	 * NOTE: This code no longer being used, but I want to keep for future reference if we ever need to
 	 * import JSON into the DB again in some automated way.
 	 */
-	public String resetNode(MongoSession ms, String subFolder) {
-		try {
-			ThreadLocals.setParentCheckEnabled(false);
+	// public String resetNode(MongoSession ms, String subFolder) {
+	// 	try {
+	// 		ThreadLocals.setParentCheckEnabled(false);
 
-			String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
-			Resource resource = context.getResource(resourceName);
-			InputStream is = resource.getInputStream();
-			BufferedReader in = new BufferedReader(new InputStreamReader(is));
+	// 		String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
+	// 		Resource resource = context.getResource(resourceName);
+	// 		InputStream is = resource.getInputStream();
+	// 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 
-			try {
-				String line;
-				StringBuilder buf = new StringBuilder();
+	// 		try {
+	// 			String line;
+	// 			StringBuilder buf = new StringBuilder();
 
-				while (ok(line = in.readLine())) {
-					if (!line.equals(",")) {
-						buf.append(line);
-						buf.append("\n"); // not needed right?
-						continue;
-					}
-					String json = buf.toString();
-					buf.setLength(0);
+	// 			while (ok(line = in.readLine())) {
+	// 				if (!line.equals(",")) {
+	// 					buf.append(line);
+	// 					buf.append("\n"); // not needed right?
+	// 					continue;
+	// 				}
+	// 				String json = buf.toString();
+	// 				buf.setLength(0);
 
-					// log.debug("JSON: " + json);
+	// 				// log.debug("JSON: " + json);
 
-					// jsonToNodeService.importJsonContent(json, node);
-					SubNode node = objectMapper.readValue(json, SubNode.class);
-					update.save(ms, node);
+	// 				// jsonToNodeService.importJsonContent(json, node);
+	// 				SubNode node = objectMapper.readValue(json, SubNode.class);
+	// 				update.save(ms, node);
 
-					Attachment att = node.getAttachment();
-					String binFileName = ok(att) ? att.getFileName() : null;
-					if (ok(binFileName)) {
-						attach.deleteBinary(ms, "", node, null);
-						readBinaryFromResource(ms, node, binFileName, subFolder);
-					}
-				}
-			} finally {
-				ThreadLocals.setParentCheckEnabled(true);
-				StreamUtil.close(in);
-			}
-			log.debug("import successful.");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return "success!";
-	}
+	// 				Attachment att = node.getAttachment();
+	// 				String binFileName = ok(att) ? att.getFileName() : null;
+	// 				if (ok(binFileName)) {
+	// 					attach.deleteBinary(ms, "", node, null);
+	// 					readBinaryFromResource(ms, node, binFileName, subFolder);
+	// 				}
+	// 			}
+	// 		} finally {
+	// 			ThreadLocals.setParentCheckEnabled(true);
+	// 			StreamUtil.close(in);
+	// 		}
+	// 		log.debug("import successful.");
+	// 	} catch (Exception ex) {
+	// 		ex.printStackTrace();
+	// 	}
+	// 	return "success!";
+	// }
 }

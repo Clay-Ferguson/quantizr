@@ -53,14 +53,15 @@ export class Attachment {
         new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc).open();
     };
 
-    deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
+    deleteAttachment = async (node: J.NodeInfo, attName: string, state: AppState): Promise<boolean> => {
         node = node || S.nodeUtil.getHighlightedNode(state);
         if (node) {
             const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
             await dlg.open();
             if (dlg.yes) {
                 await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                    nodeId: node.id
+                    nodeId: node.id,
+                    attName
                 });
             }
             return dlg.yes;
@@ -68,9 +69,9 @@ export class Attachment {
         return false;
     };
 
-    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
+    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, attName: string, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
-        const att = S.props.getAttachment(null, node);
+        const att = S.props.getAttachment(attName, node);
         if (!att) return null;
 
         if (att.u) {
@@ -95,11 +96,11 @@ export class Attachment {
         return null;
     }
 
-    getUrlForNodeAttachment = (node: J.NodeInfo, downloadLink: boolean): string => {
-        return node.dataUrl ? node.dataUrl : this.getAttachmentUrl("bin", node, downloadLink);
+    getUrlForNodeAttachment = (node: J.NodeInfo, attName: string, downloadLink: boolean): string => {
+        return node.dataUrl ? node.dataUrl : this.getAttachmentUrl("bin", node, attName, downloadLink);
     }
 
-    getStreamUrlForNodeAttachment = (node: J.NodeInfo): string => {
-        return this.getAttachmentUrl("stream", node, false);
+    getStreamUrlForNodeAttachment = (node: J.NodeInfo, attName: string): string => {
+        return this.getAttachmentUrl("stream", node, attName, false);
     }
 }

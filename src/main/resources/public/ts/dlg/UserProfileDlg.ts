@@ -346,7 +346,7 @@ export class UserProfileDlg extends DialogBase {
         const onClick = async () => {
             if (this.readOnly) return;
 
-            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, async () => {
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_PRIMARY, false, null, false, false, async () => {
                 const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
@@ -405,7 +405,7 @@ export class UserProfileDlg extends DialogBase {
             if (this.readOnly) return;
 
             // h = Heading
-            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "h", false, null, false, false,
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, false, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                         userId: state.userProfile.userNodeId

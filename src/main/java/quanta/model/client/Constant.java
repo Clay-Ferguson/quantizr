@@ -17,7 +17,10 @@ public enum Constant {
     FEED_FROMME("fromMe"),
     FEED_FROMFRIENDS("fromFriends"),
     FEED_LOCAL("local"),  
-    FEED_NODEFEED("nodeFeed");
+    FEED_NODEFEED("nodeFeed"),
+    
+    ATTACHMENT_PRIMARY("p"),
+    ATTACHMENT_HEADER("h");
 
     @JsonValue
     private final String value;

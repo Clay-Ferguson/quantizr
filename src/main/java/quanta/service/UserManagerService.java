@@ -38,6 +38,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -984,7 +985,7 @@ public class UserManagerService extends ServiceBase {
 					userProfile.setAvatarVer(att.getBin());
 				}
 
-				Attachment headerAtt = userNode.getAttachment("h", false, false);
+				Attachment headerAtt = userNode.getAttachment(Constant.ATTACHMENT_HEADER.s(), false, false);
 				if (ok(headerAtt)) {
 					userProfile.setHeaderImageVer(headerAtt.getBin());
 				}

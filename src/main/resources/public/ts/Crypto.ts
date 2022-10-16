@@ -807,46 +807,50 @@ export class Crypto {
             signData += "-" + node.content;
         }
 
-        const att = S.props.getAttachment(null, node);
-        if (att) {
-            if (att.b) {
-                signData += "-" + att.b;
-            }
-            if (att.d) {
-                signData += "-" + att.d;
-            }
-            if (att.du) {
-                signData += "-" + att.du;
-            }
+        if (node.attachments) {
+            // todo-0: This is actually not correct until we have attachments
+            // orderable by an ordinal, and so for now this is actually a bug.
+            Object.keys(node.attachments).forEach(key => {
+                const att = node.attachments[key];
+                if (att.b) {
+                    signData += "-" + att.b;
+                }
+                if (att.d) {
+                    signData += "-" + att.d;
+                }
+                if (att.du) {
+                    signData += "-" + att.du;
+                }
+            });
         }
 
         // we need to concat the path+content
         try {
-            const sig: string = await S.crypto.sign(null, signData);
-            console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
-            // const verified = await S.crypto.verify(null, sig, signData);
-            // console.log("local verify: " + verified);
-            S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
+                const sig: string = await S.crypto.sign(null, signData);
+                console.log("signData: nodeId=" + node.id + " data[" + signData + "] sig: " + sig);
+                // const verified = await S.crypto.verify(null, sig, signData);
+                // console.log("local verify: " + verified);
+                S.props.setPropVal(J.NodeProp.CRYPTO_SIG, node, sig);
+            }
+            catch (e) {
+                S.util.logAndReThrow("Failed to sign data.", e);
+            }
+            return null;
         }
-        catch (e) {
-            S.util.logAndReThrow("Failed to sign data.", e);
-        }
-        return null;
+
+        // ab2str = (buf: ArrayBuffer) => {
+        //     return String.fromCharCode.apply(null, new Uint16Array(buf));
+        // }
+
+        // str2ab = (str) => {
+        //     var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+        //     var bufView = new Uint16Array(buf);
+        //     for (var i = 0, strLen = str.length; i < strLen; i++) {
+        //         bufView[i] = str.charCodeAt(i);
+        //     }
+        //     return buf;
+        // }
     }
-
-    // ab2str = (buf: ArrayBuffer) => {
-    //     return String.fromCharCode.apply(null, new Uint16Array(buf));
-    // }
-
-    // str2ab = (str) => {
-    //     var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-    //     var bufView = new Uint16Array(buf);
-    //     for (var i = 0, strLen = str.length; i < strLen; i++) {
-    //         bufView[i] = str.charCodeAt(i);
-    //     }
-    //     return buf;
-    // }
-}
 
 export interface SymKeyDataPackage {
     cipherText: string;

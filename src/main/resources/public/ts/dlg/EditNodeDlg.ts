@@ -120,6 +120,8 @@ export class EditNodeDlg extends DialogBase {
             // save editor state every 3 seconds so user can recover editing if anything goes wrong.
             // This should be CLEARED upon successful saves only, and have this static var set back to null
             EditNodeDlg.autoSaveTimer = setInterval(async () => {
+                const appState = getAppState();
+                if (!appState || !appState.editNode) return;
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: appState.editNode.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
@@ -320,7 +322,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         this.buildPropsEditing(propsParent, state, typeHandler, customProps);
-        const binarySection = hasAttachment ? this.makeAttachmentPanel(state) : null;
+        const binarySection = hasAttachment ? this.makeAllAttachmentsPanel(state) : null;
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(appState, appState.editNode, this);
         const isPublic = S.props.isPublic(appState.editNode);
 
@@ -494,11 +496,26 @@ export class EditNodeDlg extends DialogBase {
         this.tagsState.setValue(val);
     }
 
-    // Generate GUI for handling the display info about any Node Attachments
-    makeAttachmentPanel = (state: LS): any => {
+    makeAllAttachmentsPanel = (state: LS): Div => {
         const appState = getAppState();
-        const att = S.props.getAttachment(null, appState.editNode);
+        const node: J.NodeInfo = appState.editNode;
+        if (!node.attachments) return null;
+        const children: CompIntf[] = [];
+        S.props.getOrderedAttachments(node).forEach((att: any) => {
+            // having 'att.key' is a client-side only hack, and only generated during the ordering.
+            children.push(this.makeAttachmentPanel(state, att));
+        });
+        // Object.keys(node.attachments).forEach(key => {
+        //     children.push(this.makeAttachmentPanel(state, key, node.attachments[key]));
+        // });
+        return new Div(null, { className: "binaryEditorSection" }, children);
+    }
+
+    // Generate GUI for handling the display info about any Node Attachments
+    makeAttachmentPanel = (state: LS, att: J.Attachment): Div => {
+        const appState = getAppState();
         if (!att) return null;
+        const key = (att as any).key;
         const ipfsLink = att.il;
         const mime = att.m;
 
@@ -517,11 +534,11 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        const imgSizeSelection = S.props.hasImage(appState.editNode)
+        const imgSizeSelection = S.props.hasImage(appState.editNode, key)
             ? this.createImgSizeSelection("Image Size", false, "float-end", //
                 {
                     setValue(val: string): void {
-                        const att: J.Attachment = S.props.getAttachment(null, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
                         if (att) {
                             att.c = val;
                             this.binaryDirty = true;
@@ -529,20 +546,33 @@ export class EditNodeDlg extends DialogBase {
                     },
 
                     getValue(): string {
-                        const att: J.Attachment = S.props.getAttachment(null, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
                         return att && att.c;
                     }
                 }) : null;
 
         const topBinRow = new HorizontalLayout([
-            new NodeCompBinary(appState.editNode, true, false),
+            new NodeCompBinary(appState.editNode, key, true, false),
 
             new HorizontalLayout([
+                // todo-0: WIP (implement)
+                // new Div(null, null, [
+                //     new Icon({
+                //         className: "fa fa-lg fa-arrow-up",
+                //         title: "Move Attachment Up",
+                //         onClick: () => { this.moveAttachmentUp(att, appState.editNode); }
+                //     }),
+                //     new Icon({
+                //         className: "fa fa-lg fa-arrow-down",
+                //         title: "Move Attachment Down",
+                //         onClick: () => { this.moveAttachmentDown(att, appState.editNode); }
+                //     })
+                // ]),
                 new Div(null, { className: "bigPaddingRight" }, [
-                    new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
+                    ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
-                    }),
-                    new Button("Remove", () => this.utl.deleteUpload(this), {
+                    }) : null,
+                    new Button("Remove", () => this.utl.deleteUpload(this, key), {
                         className: "marginRight",
                         title: "Remove this attachment"
                     })
@@ -570,10 +600,17 @@ export class EditNodeDlg extends DialogBase {
             ]);
         }
 
-        return new Div(null, { className: "marginLeft binaryEditorSection editBinaryContainer" }, [
+        return new Div(null, { className: "binaryEditorItem" }, [
             topBinRow, bottomBinRow
         ]);
     }
+
+    // todo-0: WIP (implement)
+    // moveAttachmentUp = (att: J.Attachment, node: J.NodeInfo) => {
+    // }
+
+    // moveAttachmentDown = (att: J.Attachment, node: J.NodeInfo) => {
+    // }
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         const appState = getAppState();

@@ -2,6 +2,7 @@
 /* eslint-disable */
 
 export interface Attachment {
+    o: number;
     w: number;
     h: number;
     m: string;
@@ -159,6 +160,7 @@ export interface CreateSubNodeRequest extends RequestBase {
 
 export interface DeleteAttachmentRequest extends RequestBase {
     nodeId: string;
+    attName: string;
 }
 
 export interface DeleteFriendRequest extends RequestBase {
@@ -995,6 +997,8 @@ export const enum Constant {
     FEED_FROMFRIENDS = "fromFriends",
     FEED_LOCAL = "local",
     FEED_NODEFEED = "nodeFeed",
+    ATTACHMENT_PRIMARY = "p",
+    ATTACHMENT_HEADER = "h",
 }
 
 export const enum ConstantInt {

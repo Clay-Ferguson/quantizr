@@ -60,6 +60,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -83,6 +84,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
+import quanta.util.XString;
 
 /**
  * Service for managing node attachments.
@@ -297,9 +299,15 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		Attachment att = node.getAttachment(binSuffix, true, true);
+		// if no binSuffix given we try to use "primary", but if primary exists, we find a different name
+		if (StringUtils.isEmpty(binSuffix) && ok(node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false))) {
+			binSuffix = getNextAttachmentKey(node);
+		}
 
-		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
+		int maxAttOrdinal = getMaxAttachmentOrdinal(node);
+		Attachment att = node.getAttachment(binSuffix, true, true);
+		att.setOrdinal(maxAttOrdinal+1);
+
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
@@ -380,12 +388,35 @@ public class AttachmentService extends ServiceBase {
 				} else {
 					att.setUrl(sourceUrl);
 				}
+
 			} finally {
 				StreamUtil.close(is);
 			}
 		}
 
+		log.debug("Node to save: " + XString.prettyPrint(node));
 		update.save(ms, node);
+	}
+
+	public String getNextAttachmentKey(SubNode node) {
+		int imgIdx = 1;
+		while (ok(node.getAttachment("img" + String.valueOf(imgIdx), false, false))) {
+			imgIdx++;
+		}
+		return "img" + String.valueOf(imgIdx);
+	}
+
+	public int getMaxAttachmentOrdinal(SubNode node) {
+		int max = -1;
+		if (ok(node.getAttachments())) {
+			for (String key : node.getAttachments().keySet()) {
+				Attachment att = node.getAttachments().get(key);
+				if (att.getOrdinal() > max) {
+					max = att.getOrdinal();
+				}
+			}
+		}
+		return max;
 	}
 
 	/*
@@ -396,7 +427,7 @@ public class AttachmentService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(node);
-		deleteBinary(ms, "", node, null);
+		deleteBinary(ms, req.getAttName(), node, null, false);
 		res.setSuccess(true);
 		return res;
 	}
@@ -421,7 +452,7 @@ public class AttachmentService extends ServiceBase {
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
 	@PerfMon(category = "attach")
-	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, boolean download,
+	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, String binId, boolean download,
 			HttpServletResponse response) {
 		BufferedInputStream inStream = null;
 		BufferedOutputStream outStream = null;
@@ -439,9 +470,24 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			Attachment att = node.getAttachment(binSuffix, false, false);
+			Attachment att = null;
+			// todo-0: put this in a method (finding attachment by binId)
+			if (ok(node.getAttachments())) {
+				for (String key : node.getAttachments().keySet()) {
+					Attachment curAtt = node.getAttachments().get(key);
+					if (ok(curAtt.getBin()) && curAtt.getBin().equals(binId)) {
+						att = curAtt;
+						binSuffix = key;
+						break;
+					}
+				}
+			}
+
 			if (no(att)) {
-				throw ExUtil.wrapEx("attachment info not found.");
+				att = node.getAttachment(binSuffix, false, false);
+				if (no(att)) {
+					throw ExUtil.wrapEx("attachment info not found.");
+				}
 			}
 
 			boolean ipfs = StringUtils.isNotEmpty(att.getIpfsLink());
@@ -799,7 +845,7 @@ public class AttachmentService extends ServiceBase {
 			att.setUrl(sourceUrl);
 
 			// this was a bug in some cases. saving is done at a higher layer (the lambda wrapper)
-			//update.saveSession(ms);
+			// update.saveSession(ms);
 			return;
 		}
 
@@ -946,7 +992,7 @@ public class AttachmentService extends ServiceBase {
 		/*
 		 * Delete any existing grid data stored under this node, before saving new attachment
 		 */
-		deleteBinary(ms, binSuffix, node, userNode);
+		deleteBinary(ms, binSuffix, node, userNode, true);
 
 		// #saveAsPdf work in progress:
 		// todo-2: right here if saveAsPdf is true we need to convert the HTML to PDF
@@ -994,15 +1040,26 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
-	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
+	/*
+	 * Assumes owner 'ms' has already been auth-checked for owning this node. If 'gridOnly' is true that
+	 * means we should only delete from the GRID DB, and not touch any of the properties on the node
+	 * itself
+	 */
+	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode, boolean gridOnly) {
 		if (no(node))
 			return;
-		auth.ownerAuth(node);
-		Attachment att = node.getAttachment(binSuffix, false, false);
-		if (no(att) || no(att.getBin()))
+
+		HashMap<String, Attachment> attachments = node.getAttachments();
+		if (no(attachments))
+			return;
+		Attachment att = attachments.get(binSuffix);
+		if (no(att))
 			return;
 
-		node.setAttachments(null);
+		if (!gridOnly) {
+			attachments.remove(binSuffix);
+			node.setAttachments(attachments);
+		}
 
 		if (!ms.isAdmin()) {
 			/*

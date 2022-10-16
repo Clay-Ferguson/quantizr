@@ -3,7 +3,10 @@ import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
 import { Main } from "./Main";
+import * as J from "../JavaIntf";
 
+// todo-0: need to handle multiple images on the same node and do this
+// (INSTEAD OF?) the child node siblings stuff. &&&
 export class FullScreenImgViewer extends Main {
     constructor() {
         super();
@@ -21,7 +24,7 @@ export class FullScreenImgViewer extends Main {
         const children = [];
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            const binary = new NodeCompBinary(node, false, true);
+            const binary = new NodeCompBinary(node, J.Constant.ATTACHMENT_PRIMARY, false, true);
             children.push(binary);
         }
 

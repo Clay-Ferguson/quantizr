@@ -44,7 +44,9 @@ public class MongoDelete extends ServiceBase {
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly) {
-			attach.deleteBinary(ms, "", node, null);
+			// todo-0: this needs to iterate over ALL binaries, and delete them 
+			// from the grid one by one
+			attach.deleteBinary(ms, "", node, null, false);
 		}
 
 		delete(ms, node, childrenOnly);

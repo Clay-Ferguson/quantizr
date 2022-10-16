@@ -175,24 +175,41 @@ export class Props {
         return !!this.getPropStr(J.NodeProp.ENC_KEY, node);
     }
 
-    hasBinary = (node: J.NodeInfo): boolean => {
-        return !!this.getAttachment(null, node);
+    getOrderedAttachments = (node: J.NodeInfo): J.Attachment[] => {
+        const list: J.Attachment[] = [];
+
+        // put all attachments in 'list', random order
+        if (node.attachments) {
+            Object.keys(node.attachments).forEach(key => {
+                // this is bizarre looking yes, but we need each object returned to know what it's key is
+                (node.attachments[key] as any).key = key;
+                list.push(node.attachments[key]);
+            });
+        }
+
+        // now sort and return the list
+        list.sort((a: J.Attachment, b: J.Attachment) => a.o - b.o);
+        return list;
     }
 
-    hasImage = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(null, node);
+    hasBinary = (node: J.NodeInfo): boolean => {
+        return !!node.attachments;
+    }
+
+    hasImage = (node: J.NodeInfo, attName: string): boolean => {
+        const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return (target && target.startsWith("image/"));
     }
 
-    hasAudio = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(null, node);
+    hasAudio = (node: J.NodeInfo, attName: string): boolean => {
+        const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return (target && target.startsWith("audio/"));
     }
 
-    hasVideo = (node: J.NodeInfo): boolean => {
-        const att = this.getAttachment(null, node);
+    hasVideo = (node: J.NodeInfo, attName: string): boolean => {
+        const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return (target && target.startsWith("video/"));
     }
@@ -225,7 +242,7 @@ export class Props {
     }
 
     getAttachment = (name: string, node: J.NodeInfo): J.Attachment => {
-        if (!name) name = "p";
+        if (!name) name = J.Constant.ATTACHMENT_PRIMARY;
         return node && node.attachments ? node.attachments[name] : null;
     }
 

@@ -61,10 +61,15 @@ export class NodeCompContent extends Div {
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
          showing the normal attachment for this node, because that will the same as the avatar */
-        const isAnAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
+        const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
 
-        if (!embeddedImg && S.props.hasBinary(this.node) && !isAnAccountNode) {
-            children.push(new NodeCompBinary(this.node, false, false));
+        if (!embeddedImg && S.props.hasBinary(this.node) && !isAccountNode) {
+            const attComps: CompIntf[] = [];
+            S.props.getOrderedAttachments(this.node).forEach((att: any) => {
+                // having 'att.key' is a client-side only hack, and only generated during the ordering.
+                attComps.push(new NodeCompBinary(this.node, att.key, false, false));
+            });
+            children.push(new Div(null, null, attComps))
         }
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
