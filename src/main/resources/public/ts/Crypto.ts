@@ -808,10 +808,7 @@ export class Crypto {
         }
 
         if (node.attachments) {
-            // todo-0: This is actually not correct until we have attachments
-            // orderable by an ordinal, and so for now this is actually a bug.
-            Object.keys(node.attachments).forEach(key => {
-                const att = node.attachments[key];
+            S.props.getOrderedAttachments(node).forEach((att: any) => {
                 if (att.b) {
                     signData += "-" + att.b;
                 }
