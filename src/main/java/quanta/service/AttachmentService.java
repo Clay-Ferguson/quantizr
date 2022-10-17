@@ -82,7 +82,6 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.MimeTypeUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.Util;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -264,6 +263,60 @@ public class AttachmentService extends ServiceBase {
 			saveBinaryStreamToNode(ms, binSuffix, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,
 					closeStream, storeLocally, sourceUrl);
 		}
+	}
+
+	public void pinLocalIpfsAttachments(SubNode node) {
+		if (no(node) || no(node.getAttachments()))
+			return;
+
+		node.getAttachments().forEach((String key, Attachment att) -> {
+			/*
+			 * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
+			 * (IPFS_REF means 'referenced' and external to our server).
+			 */
+			if (ok(att.getIpfsLink())) {
+				// if there's no 'ref' property this is not a foreign reference, which means we
+				// DO pin this.
+				if (no(att.getIpfsRef())) {
+					arun.run(sess -> {
+						// don't pass the actual node into here, because it runs in a separate thread and would be
+						// a concurrency problem.
+						ipfsPin.ipfsAsyncPinNode(sess, node.getId());
+						return null;
+					});
+				}
+				// otherwise we don't pin it.
+				else {
+					/*
+					 * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't simply
+					 * remove the CID from our IPFS database because some node stopped using it, because there may be
+					 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
+					 * pins ever get removed, because that method does a safe and correct delete of all pins that are
+					 * truly no longer in use by anyone
+					 */
+					// ipfs.removePin(ipfsLink);
+				}
+			}
+		});
+	}
+
+	public void fixAllAttachmentMimes(SubNode node) {
+		if (no(node) || no(node.getAttachments()))
+			return;
+
+		node.getAttachments().forEach((String key, Attachment att) -> {
+			String mimeType = att.getMime();
+			// ensure we have the best mimeType we can if not set in the data.
+			if (StringUtils.isEmpty(mimeType)) {
+				String binUrl = att.getUrl();
+				if (!StringUtils.isEmpty(binUrl)) {
+					mimeType = URLConnection.guessContentTypeFromName(binUrl);
+					if (!StringUtils.isEmpty(mimeType)) {
+						att.setMime(mimeType);
+					}
+				}
+			}
+		});
 	}
 
 	public String getMimeFromFileType(String fileName) {
@@ -665,7 +718,7 @@ public class AttachmentService extends ServiceBase {
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
 			SubNode node = read.getNode(ms, nodeId, false);
-			Attachment att = node.getAttachment();
+			Attachment att = node.getFirstAttachment();
 			if (no(att))
 				throw ExUtil.wrapEx("no attachment info found");
 
@@ -781,6 +834,7 @@ public class AttachmentService extends ServiceBase {
 	 * 
 	 *        NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
 	 */
+	// todo-000: test uploading file from URL...multiple times as first upload and as non-first upload.
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
@@ -1125,7 +1179,7 @@ public class AttachmentService extends ServiceBase {
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
-		Attachment att = node.getAttachment();
+		Attachment att = node.getFirstAttachment();
 		if (no(att) || no(att.getBin()))
 			return null;
 

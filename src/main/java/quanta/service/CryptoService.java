@@ -10,6 +10,7 @@ import java.security.Signature;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
@@ -117,15 +118,15 @@ public class CryptoService extends ServiceBase {
 			strToSign += "-" + node.getContent();
 		}
 
-		// todo-00: needs to add all attachments, sorted. We HAVE done this already in a similar placle
-		// in the code where this kind of signature data is being constructed.
-		Attachment att = node.getAttachment();
-		if (ok(att)) {
-			if (ok(att.getBin())) {
-				strToSign += "-" + att.getBin();
-			}
-			if (ok(att.getBinData())) {
-				strToSign += "-" + att.getBinData();
+		List<Attachment> atts = node.getOrderedAttachments();
+		if (ok(atts) && atts.size() > 0) {
+			for (Attachment att : atts) {
+				if (ok(att.getBin())) {
+					strToSign += "-" + att.getBin();
+				}
+				if (ok(att.getBinData())) {
+					strToSign += "-" + att.getBinData();
+				}
 			}
 		}
 

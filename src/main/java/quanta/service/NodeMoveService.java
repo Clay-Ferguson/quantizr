@@ -167,7 +167,7 @@ public class NodeMoveService extends ServiceBase {
 				 *  
 				 * todo-0: how will this work with multiple attachments
 				*/
-				if (ok(n.getAttachment())) {
+				if (ok(n.getFirstAttachment())) {
 					n.setContent(null);
 					n.touch();
 					update.save(ms, n);

@@ -86,22 +86,7 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		// todo-00: handle multiple attachments
-		// todo-000: put this in a 'fixMimes' method
-		Attachment att = node.getAttachment();
-		if (ok(att)) {
-			String mimeType = att.getMime();
-			// ensure we have the best mimeType we can if not set in the data.
-			if (StringUtils.isEmpty(mimeType)) {
-				String binUrl = att.getUrl();
-				if (!StringUtils.isEmpty(binUrl)) {
-					mimeType = URLConnection.guessContentTypeFromName(binUrl);
-					if (!StringUtils.isEmpty(mimeType)) {
-						att.setMime(mimeType);
-					}
-				}
-			}
-		}
+		attach.fixAllAttachmentMimes(node);
 
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
 		// log.debug("hasChildren=" + hasChildren + " node: "+node.getIdStr());
@@ -200,8 +185,6 @@ public class Convert extends ServiceBase {
 
 		String content = node.getContent();
 
-		// todo-00: what is impact of this image width+height now that we have multiple image support?
-		// just be ON the attachment object (probably same for width/height)
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
 				owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //

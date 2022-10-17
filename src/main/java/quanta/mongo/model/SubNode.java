@@ -451,11 +451,10 @@ public class SubNode {
 		}
 	}
 
-	// todo-00: make this handle multiple attachments, AND ALL CALLS TO IT.
-	// NOTE: This used to return primary but now returns 'first' so check that everywhere.
+	// check ALL CALLS TO this, per new multi-attachment support.
 	@Transient
 	@JsonIgnore
-	public Attachment getAttachment() {
+	public Attachment getFirstAttachment() {
 		Attachment att = null;
 		synchronized (attLock) {
 			if (ok(attachments)) {

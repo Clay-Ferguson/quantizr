@@ -2,17 +2,13 @@ package quanta.service;
 
 import static quanta.util.Util.ok;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -25,9 +21,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
-import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
-import quanta.util.ThreadLocals;
 import quanta.util.Val;
 
 /**
@@ -81,7 +75,7 @@ public class ExportJsonService extends ServiceBase {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
-					Attachment att = node.getAttachment();
+					Attachment att = node.getFirstAttachment();
 					String binFileName = ok(att) ? att.getFileName() : null;
 					if (ok(binFileName)) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {

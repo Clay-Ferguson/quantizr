@@ -815,9 +815,6 @@ export class Crypto {
                 if (att.d) {
                     signData += "-" + att.d;
                 }
-                if (att.du) {
-                    signData += "-" + att.du;
-                }
             });
         }
 

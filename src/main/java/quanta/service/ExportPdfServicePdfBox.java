@@ -175,7 +175,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void writeImage(SubNode node) {
 		try {
-			Attachment att = node.getAttachment();
+			Attachment att = node.getFirstAttachment();
 			if (no(att) || no(att.getBin())) return;
 			
 			String mime = att.getMime();

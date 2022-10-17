@@ -370,7 +370,7 @@ public class ActPubService extends ServiceBase {
     // todo-0: needs to include all attachments
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-        Attachment att = node.getAttachment();
+        Attachment att = node.getFirstAttachment();
 
         if (ok(att) && ok(att.getBin()) && ok(att.getMime())) {
             attachments = new APList().val(//

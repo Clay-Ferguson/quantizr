@@ -314,20 +314,21 @@ public class UserManagerService extends ServiceBase {
 	 * @param userNode
 	 * @param sign Controls if this is a subtract or an add (should be always 1 or -1)
 	 */
+	// todo-0: all of the storage quota needs to be re-tested
+	// based on having the new multi-attachment support
 	public void addNodeBytesToUserNodeBytes(MongoSession ms, SubNode node, SubNode userNode, int sign) {
 		if (no(node)) {
 			return;
 		}
 
 		// todo-0: handle multiple attachments
-		Attachment att = node.getAttachment();
+		Attachment att = node.getFirstAttachment();
 		if (ok(att) && att.getSize() > 0L) {
 			if (no(userNode)) {
 				userNode = read.getUserNodeByUserName(null, null);
 			}
 
 			addBytesToUserNodeBytes(ms, att.getSize(), userNode, sign);
-
 		}
 	}
 
