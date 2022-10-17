@@ -828,7 +828,7 @@ public class AttachmentService extends ServiceBase {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
-		// todo-0: make this handle multiple attachments, and all calls to it
+		// todo-1: make this handle multiple attachments, and all calls to it
 		Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, true);
 
 		auth.ownerAuth(node);
@@ -859,7 +859,6 @@ public class AttachmentService extends ServiceBase {
 	 * 
 	 *        NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
 	 */
-	// todo-000: test uploading file from URL...multiple times as first upload and as non-first upload.
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
@@ -882,8 +881,8 @@ public class AttachmentService extends ServiceBase {
 				throw new RuntimeException("Node not found: " + nodeId);
 			}
 
-			// todo-00: need to test this for the case of multiple attachments
-			Attachment att = node.getAttachment(null, true, true);
+			String attKey = getNextAttachmentKey(node);
+			Attachment att = node.getAttachment(attKey, true, true);
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
 			}

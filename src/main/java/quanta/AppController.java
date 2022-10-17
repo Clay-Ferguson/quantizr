@@ -949,8 +949,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * An alternative way to get the binary attachment from a node allowing more friendly url format
 	 * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
-	 * 
-	 * todo-0: needs to be updated per multiple images we have now.
 	 */
 	@PerfMon
 	@RequestMapping(value = {"/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}"})
@@ -968,10 +966,17 @@ public class AppController extends ServiceBase implements ErrorController {
 			// gid is used ONLY for cache bustring so it can be the IPFS hash -or- the
 			// gridId, we don't know or care which it is.
 			@RequestParam(value = "gid", required = false) String gid, //
+
+			// attachment name for retrieving from a multiple attachment node, and if omitted
+			// defaults to "p" (primary)
+			@RequestParam(value = "att", required = false) String attName, //
 			HttpSession session, //
 			HttpServletRequest req, //
 			HttpServletResponse response) {
 		try {
+			if (StringUtils.isEmpty(attName)) {
+				attName = Constant.ATTACHMENT_PRIMARY.s();
+			}
 			// NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
 			// but check below
 			// only after knowing whether the node has any sharing on it at all or not.
@@ -986,6 +991,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			if (ok(id)) {
 				String _id = id;
+				String _attName = attName;
 				arun.run(as -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
@@ -1008,7 +1014,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
 					if (no(_gid)) {
-						Attachment att = node.getFirstAttachment();
+						Attachment att = node.getAttachment(_attName, false, false);
 						_gid = ok(att) ? att.getIpfsLink() : null;
 						if (no(_gid)) {
 							_gid = ok(att) ? att.getBin() : null;

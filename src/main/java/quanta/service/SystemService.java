@@ -170,12 +170,13 @@ public class SystemService extends ServiceBase {
 		if (ok(node)) {
 			String ret = XString.prettyPrint(node);
 
-			// todo-0: handle multiple attachments
-			Attachment att = node.getFirstAttachment();
-			if (ok(att) && ok(att.getIpfsLink())) {
-				IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
-				if (ok(fullStat)) {
-					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
+			List<Attachment> atts = node.getOrderedAttachments();
+			for (Attachment att : atts) {
+				if (ok(att.getIpfsLink())) {
+					IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
+					if (ok(fullStat)) {
+						ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
+					}
 				}
 			}
 

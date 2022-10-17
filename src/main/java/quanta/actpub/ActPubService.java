@@ -367,19 +367,25 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    // todo-0: needs to include all attachments
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-        Attachment att = node.getFirstAttachment();
 
-        if (ok(att) && ok(att.getBin()) && ok(att.getMime())) {
-            attachments = new APList().val(//
-                    new APObj() //
+        List<Attachment> atts = node.getOrderedAttachments();
+        if (ok(atts)) {
+            attachments = new APList();
+
+            for (Attachment att : atts) {
+                if (ok(att.getBin()) && ok(att.getMime())) {
+                    attachments.val(new APObj() //
                             .put(APObj.type, APType.Document) //
                             .put(APObj.mediaType, att.getMime()) //
-                            // NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
-                            // sharing meaning they can be visible to at least someone other than it's owner.
-                            .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()));
+                            /*
+                             * NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
+                             * sharing meaning they can be visible to at least someone other than it's owner.
+                             */
+                            .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()) + "?att=" + att.getKey());
+                }
+            }
         }
         return attachments;
     }
@@ -1161,8 +1167,7 @@ public class ActPubService extends ServiceBase {
 
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
-
-        addAttachmentIfExists(ms, newNode, obj);
+        addAttachments(ms, newNode, obj);
 
         update.save(ms, newNode, false);
 
@@ -1323,7 +1328,7 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    private void addAttachmentIfExists(MongoSession ms, SubNode node, Object obj) {
+    private void addAttachments(MongoSession ms, SubNode node, Object obj) {
         List<?> attachments = apList(obj, APObj.attachment, false);
         if (no(attachments)) {
             // log.debug("no attachments.");

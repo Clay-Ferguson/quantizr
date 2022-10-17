@@ -474,6 +474,7 @@ public class SubNode {
 		synchronized (attLock) {
 			if (ok(attachments)) {
 				getAttachments().forEach((String key, Attachment att) -> {
+					att.setKey(key);
 					list.add(att);
 				});
 			}

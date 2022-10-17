@@ -164,10 +164,8 @@ public class NodeMoveService extends ServiceBase {
 
 			if (counter > 0) {
 				/* If node has an attachment we don't delete the node, but just set it's content to null 
-				 *  
-				 * todo-0: how will this work with multiple attachments
 				*/
-				if (ok(n.getFirstAttachment())) {
+				if (ok(n.getAttachments())) {
 					n.setContent(null);
 					n.touch();
 					update.save(ms, n);

@@ -27,6 +27,10 @@ public class Attachment {
 
     private SubNode ownerNode;
 
+    // key in the SubNode hashmap that points to this. May be null unless retrieved
+    // thru certain API cals
+    private String key;
+
     public Attachment() {}
 
     public Attachment(SubNode ownerNode) {
@@ -174,5 +178,17 @@ public class Attachment {
     @JsonIgnore
     public void setOwnerNode(SubNode ownerNode) {
         this.ownerNode = ownerNode;
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getKey() {
+        return key;
+    }
+
+    @Transient
+    @JsonIgnore
+    public void setKey(String key) {
+        this.key = key;
     }
 }
