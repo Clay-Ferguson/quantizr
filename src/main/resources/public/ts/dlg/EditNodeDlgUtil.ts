@@ -302,6 +302,9 @@ export class EditNodeDlgUtil {
 
         if (deleted) {
             delete appState.editNode.attachments[attName];
+            if (S.util.getPropertyCount(appState.editNode.attachments) === 0) {
+                appState.editNode.attachments = null;
+            }
             S.edit.updateNode(appState.editNode);
 
             if (dlg.mode === DialogMode.EMBED) {

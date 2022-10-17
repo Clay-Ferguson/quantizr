@@ -569,10 +569,11 @@ export class EditNodeDlg extends DialogBase {
                     ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
                     }) : null,
-                    new Button("Remove", () => this.utl.deleteUpload(this, key), {
-                        className: "marginRight",
+
+                    new IconButton("fa-trash fa-lg", "", {
+                        onClick: () => this.utl.deleteUpload(this, key),
                         title: "Remove this attachment"
-                    })
+                    }, "marginRight")
                 ]),
                 imgSizeSelection,
                 pinCheckbox

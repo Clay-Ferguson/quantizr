@@ -298,9 +298,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		if (ok(node.getAttachments())) {
-			node.getAttachments().forEach((String key, Attachment att) -> {
-				att.setOwnerNode(node);
-			});
+			if (node.getAttachments().size() == 0) {
+				node.setAttachments(null);
+			} else {
+				node.getAttachments().forEach((String key, Attachment att) -> {
+					att.setOwnerNode(node);
+				});
+			}
 		}
 
 		node.pathDirty = StringUtils.isEmpty(node.getPath());
