@@ -920,8 +920,6 @@ export interface NodeInfo {
     hasChildren: boolean;
     cipherKey: string;
     lastChild: boolean;
-    width: number;
-    height: number;
     parent: NodeInfo;
     children: NodeInfo[];
     parents: NodeInfo[];

@@ -948,7 +948,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	/*
 	 * An alternative way to get the binary attachment from a node allowing more friendly url format
-	 * (named nodes)
+	 * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
 	 * 
 	 * todo-0: needs to be updated per multiple images we have now.
 	 */

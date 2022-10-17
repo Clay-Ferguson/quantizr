@@ -451,7 +451,7 @@ public class SubNode {
 		}
 	}
 
-	// todo-0: make this handle multiple attachments, AND ALL CALLS TO IT.
+	// todo-00: make this handle multiple attachments, AND ALL CALLS TO IT.
 	// NOTE: This used to return primary but now returns 'first' so check that everywhere.
 	@Transient
 	@JsonIgnore
@@ -522,7 +522,7 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	// todo-0: need to find ALL calls to this and verify multiple attachment aspect is correct
+	// todo-00: need to find ALL calls to this and verify multiple attachment aspect is correct
 	public void setAttachment(String name, Attachment att) {
 		synchronized (attLock) {
 			if (StringUtils.isEmpty(name)) {
@@ -540,7 +540,7 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	// todo-0: need to find ALL calls to this and verify multiple attachment aspect is correct
+	// todo-00: need to find ALL calls to this and verify multiple attachment aspect is correct
 	public void setAttachment(Attachment att) {
 		setAttachment(null, att);
 	}

@@ -358,16 +358,8 @@ public class MongoUtil extends ServiceBase {
 		return keysRemoved.getVal();
 	}
 
-	// todo-0: make this handle multiple attachments, and all calls to it
-	public boolean isImageAttached(SubNode node) {
-		Attachment att = node.getAttachment(null, false, false);
-		if (no(att))
-			return false;
-		return ImageUtil.isImageMime(att.getMime());
-	}
-
-	public ImageSize getImageSize(SubNode node) {
-		return Convert.getImageSize(node);
+	public boolean isImageAttachment(Attachment att) {
+		return ok(att) && ImageUtil.isImageMime(att.getMime());
 	}
 
 	public int dump(String message, Iterable<SubNode> iter) {

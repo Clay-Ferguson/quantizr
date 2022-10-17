@@ -22,7 +22,10 @@ public class Attachment {
     private String bin;
     private String binData;
     private String url;
+
+    // todo-00: getting rid of dataUrl completely
     private String dataUrl;
+
     private String ipfsLink;
     private String ipfsRef;
 

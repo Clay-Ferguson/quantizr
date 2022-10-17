@@ -64,9 +64,6 @@ public class NodeInfo {
 	// NOTE: Just a hint for gui enablement (for moveUp, moveDown, etc) in the browser,
 	private boolean lastChild;
 
-	private int width;
-	private int height;
-
 	/*
 	 * This is only populated when generating user "feeds", because we want the feed to be able to show
 	 * the context for the reply of a post, which entails showing the parent of the reply above the
@@ -99,7 +96,7 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
 			Long ordinal, Date lastModified, List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
-			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
+			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
 			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
 		this.path = path;
@@ -118,8 +115,6 @@ public class NodeInfo {
 		this.likes = likes;
 		this.hasChildren = hasChildren;
 		this.lastChild = lastChild;
-		this.width = width;
-		this.height = height;
 		this.type = type;
 		this.logicalOrdinal = logicalOrdinal;
 		this.cipherKey = cipherKey;
@@ -260,22 +255,6 @@ public class NodeInfo {
 
 	public void setHasChildren(boolean hasChildren) {
 		this.hasChildren = hasChildren;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
 	}
 
 	public String getType() {

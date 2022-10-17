@@ -331,7 +331,7 @@ public class SubNodeUtil extends ServiceBase {
 
 		String mime = null;
 
-		// todo-0: handle multiple attachments
+		// todo-00: handle multiple attachments
 		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			mime = att.getMime();

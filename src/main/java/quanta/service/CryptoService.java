@@ -117,7 +117,7 @@ public class CryptoService extends ServiceBase {
 			strToSign += "-" + node.getContent();
 		}
 
-		// todo-0: needs to add all attachments, sorted. We HAVE done this already in a similar placle
+		// todo-00: needs to add all attachments, sorted. We HAVE done this already in a similar placle
 		// in the code where this kind of signature data is being constructed.
 		Attachment att = node.getAttachment();
 		if (ok(att)) {

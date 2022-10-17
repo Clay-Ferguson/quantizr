@@ -779,15 +779,16 @@ public class AttachmentService extends ServiceBase {
 	 *        extension always and in that case we need to get it from the IPFS filename itself and
 	 *        that's what the hint is in that case. Normally however mimeHint is null
 	 * 
-	 *        'inputStream' is admittely a retrofit to this function for when we want to just call this
+	 *        'inputStream' is a retrofit to this function for when we want to just call this
 	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
 	 *        Val is null and not used.
 	 * 
-	 *        NOTE: If 'node' is already available caller should pass it, or elese can pass nodeId.
+	 *        NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
 	 */
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
+		// todo-000: lets stop handling data: urls
 		if (sourceUrl.startsWith("data:")) {
 			readFromDataUrl(ms, sourceUrl, nodeId, mimeHint, maxFileSize);
 		} else {
@@ -795,6 +796,7 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
+	// todo-000: this method will go away completely
 	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize) {
 		if (maxFileSize <= 0) {
 			maxFileSize = user.getMaxUploadSize(ms);
@@ -841,7 +843,7 @@ public class AttachmentService extends ServiceBase {
 				throw new RuntimeException("Node not found: " + nodeId);
 			}
 
-			// todo-0: need to test this for the case of multiple attachments
+			// todo-00: need to test this for the case of multiple attachments
 			Attachment att = node.getAttachment(null, true, true);
 
 			if (ok(mimeType)) {
