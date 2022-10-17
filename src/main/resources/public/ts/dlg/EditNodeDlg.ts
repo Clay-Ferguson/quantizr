@@ -548,23 +548,14 @@ export class EditNodeDlg extends DialogBase {
                     }
                 }) : null;
 
+        const list: J.Attachment[] = S.props.getOrderedAttachments(appState.editNode);
+        const firstAttachment = list[0].o === att.o;
+        const lastAttachment = list[list.length - 1].o === att.o;
+
         const topBinRow = new HorizontalLayout([
             new NodeCompBinary(appState.editNode, key, true, false),
 
             new HorizontalLayout([
-                // todo-0: WIP (implement)
-                // new Div(null, null, [
-                //     new Icon({
-                //         className: "fa fa-lg fa-arrow-up",
-                //         title: "Move Attachment Up",
-                //         onClick: () => { this.moveAttachmentUp(att, appState.editNode); }
-                //     }),
-                //     new Icon({
-                //         className: "fa fa-lg fa-arrow-down",
-                //         title: "Move Attachment Down",
-                //         onClick: () => { this.moveAttachmentDown(att, appState.editNode); }
-                //     })
-                // ]),
                 new Div(null, { className: "bigPaddingRight" }, [
                     ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
@@ -576,7 +567,19 @@ export class EditNodeDlg extends DialogBase {
                     }, "marginRight")
                 ]),
                 imgSizeSelection,
-                pinCheckbox
+                pinCheckbox,
+                new Div(null, { className: "bigMarginLeft" }, [
+                    !firstAttachment ? new Icon({
+                        className: "fa fa-lg fa-arrow-up clickable marginLeft",
+                        title: "Move Attachment Up",
+                        onClick: () => { this.moveAttachmentUp(att, appState.editNode); }
+                    }) : null,
+                    !lastAttachment ? new Icon({
+                        className: "fa fa-lg fa-arrow-down clickable marginLeft",
+                        title: "Move Attachment Down",
+                        onClick: () => { this.moveAttachmentDown(att, appState.editNode); }
+                    }) : null
+                ])
             ])
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
@@ -603,12 +606,56 @@ export class EditNodeDlg extends DialogBase {
         ]);
     }
 
-    // todo-0: WIP (implement)
-    // moveAttachmentUp = (att: J.Attachment, node: J.NodeInfo) => {
-    // }
+    moveAttachmentDown = (att: J.Attachment, node: J.NodeInfo) => {
+        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+        let idx: number = 0;
+        let setNext: number = -1;
+        for (const a of list) {
+            const aObj: J.Attachment = node.attachments[(a as any).key];
+            if (setNext !== -1) {
+                aObj.o = setNext;
+                setNext = -1;
+            }
+            else if (a.o === att.o) {
+                aObj.o = idx + 1;
+                setNext = idx;
+            }
+            else {
+                aObj.o = idx;
+            }
+            idx++;
+        }
 
-    // moveAttachmentDown = (att: J.Attachment, node: J.NodeInfo) => {
-    // }
+        this.binaryDirty = true;
+        dispatch("attachmentMoveUp", s => {
+            return s;
+        });
+    }
+
+    moveAttachmentUp = (att: J.Attachment, node: J.NodeInfo) => {
+        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+        let idx: number = 0;
+        let lastA = null;
+        for (const a of list) {
+            const aObj: J.Attachment = node.attachments[(a as any).key];
+            if (a.o === att.o) {
+                aObj.o = idx - 1;
+                if (lastA) {
+                    lastA.o = idx;
+                }
+            }
+            else {
+                aObj.o = idx;
+            }
+            idx++;
+            lastA = a;
+        }
+
+        this.binaryDirty = true;
+        dispatch("attachmentMoveUp", s => {
+            return s;
+        });
+    }
 
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         const appState = getAppState();
