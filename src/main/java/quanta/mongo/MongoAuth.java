@@ -28,6 +28,7 @@ import quanta.instrument.PerfMon;
 import quanta.model.AccessControlInfo;
 import quanta.model.PrivilegeInfo;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -496,7 +497,7 @@ public class MongoAuth extends ServiceBase {
 			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 
-			Attachment att = principalNode.getAttachment();
+			Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 			avatarVer = ok(att) ? att.getBin() : null;
 		}
 

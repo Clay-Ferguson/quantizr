@@ -25,6 +25,7 @@ import quanta.model.NodeInfo;
 import quanta.model.PrivilegeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
@@ -87,6 +88,7 @@ public class Convert extends ServiceBase {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
+		// todo-0: handle multiple attachments
 		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			String mimeType = att.getMime();
@@ -148,7 +150,7 @@ public class Convert extends ServiceBase {
 		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER);
 
-			Attachment userAtt = userNode.getAttachment();
+			Attachment userAtt = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 			if (ok(userAtt)) {
 				avatarVer = userAtt.getBin();
 			}
@@ -290,6 +292,7 @@ public class Convert extends ServiceBase {
 	public static ImageSize getImageSize(SubNode node) {
 		ImageSize imageSize = new ImageSize();
 
+		// todo-0: handle multiple attachments
 		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			try {

@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -394,7 +396,8 @@ public class SubNode {
 
 	@JsonProperty(AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
-		if (no(ac) && no(this.ac)) return;
+		if (no(ac) && no(this.ac))
+			return;
 		ThreadLocals.dirty(this);
 		synchronized (acLock) {
 			this.ac = ac;
@@ -423,7 +426,8 @@ public class SubNode {
 
 	@JsonProperty(PROPS)
 	public void setProps(HashMap<String, Object> props) {
-		if (no(props) && no(this.props)) return;
+		if (no(props) && no(this.props))
+			return;
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			this.props = props;
@@ -439,17 +443,44 @@ public class SubNode {
 
 	@JsonProperty(ATTACHMENTS)
 	public void setAttachments(HashMap<String, Attachment> attachments) {
-		if (no(attachments) && no(this.attachments)) return;
+		if (no(attachments) && no(this.attachments))
+			return;
 		ThreadLocals.dirty(this);
 		synchronized (attLock) {
 			this.attachments = attachments;
 		}
 	}
 
+	// todo-0: make this handle multiple attachments, AND ALL CALLS TO IT.
+	// NOTE: This used to return primary but now returns 'first' so check that everywhere.
 	@Transient
 	@JsonIgnore
 	public Attachment getAttachment() {
-		return getAttachment(null, false, false);
+		Attachment att = null;
+		synchronized (attLock) {
+			if (ok(attachments)) {
+				List<Attachment> atts = getOrderedAttachments();
+				if (ok(atts) && atts.size() > 0) {
+					att = atts.get(0);
+				}
+			}
+		}
+		return att;
+	}
+
+	@Transient
+	@JsonIgnore
+	public List<Attachment> getOrderedAttachments() {
+		List<Attachment> list = new LinkedList<>();
+		synchronized (attLock) {
+			if (ok(attachments)) {
+				getAttachments().forEach((String key, Attachment att) -> {
+					list.add(att);
+				});
+			}
+		}
+		list.sort((a1, a2) -> (int) (a1.getOrdinal() - a2.getOrdinal()));
+		return list.size() > 0 ? list : null;
 	}
 
 	// get the named attachment if there is one, and if there isn't and create is true then create it
@@ -491,6 +522,7 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	// todo-0: need to find ALL calls to this and verify multiple attachment aspect is correct
 	public void setAttachment(String name, Attachment att) {
 		synchronized (attLock) {
 			if (StringUtils.isEmpty(name)) {
@@ -508,6 +540,7 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	// todo-0: need to find ALL calls to this and verify multiple attachment aspect is correct
 	public void setAttachment(Attachment att) {
 		setAttachment(null, att);
 	}
@@ -521,7 +554,8 @@ public class SubNode {
 
 	@JsonProperty(LIKES)
 	public void setLikes(HashSet<String> likes) {
-		if (no(likes) && no(this.likes)) return;
+		if (no(likes) && no(this.likes))
+			return;
 		ThreadLocals.dirty(this);
 		synchronized (likesLock) {
 			this.likes = likes;
@@ -544,7 +578,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void removeLike(String actor) {
-		if (no(getLikes())) return;
+		if (no(getLikes()))
+			return;
 
 		if (getLikes().remove(actor)) {
 			// set node to dirty only if it just changed.

@@ -367,6 +367,7 @@ public class ActPubService extends ServiceBase {
         }
     }
 
+    // todo-0: needs to include all attachments
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
         Attachment att = node.getAttachment();

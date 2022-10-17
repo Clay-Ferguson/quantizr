@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeType;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.CreateNodeLocation;
@@ -265,7 +266,8 @@ public class IPFSService extends ServiceBase {
             SubNode node =
                     create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
 
-            Attachment att = node.getAttachment(null, true, false);
+            // todo-0: make this handle multiple attachments, and all calls to it
+            Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
 
             node.setOwner(exportParent.getOwner());
             // use export filename here
@@ -283,7 +285,8 @@ public class IPFSService extends ServiceBase {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
-                    Attachment childAtt = child.getAttachment(null, true, false);
+                    // todo-0: make this handle multiple attachments, and all calls to it
+                    Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
                     child.touch();

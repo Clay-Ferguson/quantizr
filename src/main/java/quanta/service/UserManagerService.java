@@ -319,6 +319,7 @@ public class UserManagerService extends ServiceBase {
 			return;
 		}
 
+		// todo-0: handle multiple attachments
 		Attachment att = node.getAttachment();
 		if (ok(att) && att.getSize() > 0L) {
 			if (no(userNode)) {
@@ -980,7 +981,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
 				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
 
-				Attachment att = userNode.getAttachment();
+				Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 				if (ok(att)) {
 					userProfile.setAvatarVer(att.getBin());
 				}
@@ -1249,7 +1250,7 @@ public class UserManagerService extends ServiceBase {
 					if (ok(friendAccountNode)) {
 						// if a local user use BIN property on node (account node BIN property is the Avatar)
 						if (userName.indexOf("@") == -1) {
-							Attachment att = friendAccountNode.getAttachment();
+							Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
 							if (ok(att)) {
 								fi.setAvatarVer(att.getBin());
 							}

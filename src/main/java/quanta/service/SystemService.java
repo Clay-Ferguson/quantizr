@@ -170,6 +170,7 @@ public class SystemService extends ServiceBase {
 		if (ok(node)) {
 			String ret = XString.prettyPrint(node);
 
+			// todo-0: handle multiple attachments
 			Attachment att = node.getAttachment();
 			if (ok(att) && ok(att.getIpfsLink())) {
 				IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);

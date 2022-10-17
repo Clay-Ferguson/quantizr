@@ -572,12 +572,12 @@ export class EditNodeDlg extends DialogBase {
                     !firstAttachment ? new Icon({
                         className: "fa fa-lg fa-arrow-up clickable marginLeft",
                         title: "Move Attachment Up",
-                        onClick: () => { this.moveAttachmentUp(att, appState.editNode); }
+                        onClick: () => this.moveAttachmentUp(att, appState.editNode)
                     }) : null,
                     !lastAttachment ? new Icon({
                         className: "fa fa-lg fa-arrow-down clickable marginLeft",
                         title: "Move Attachment Down",
-                        onClick: () => { this.moveAttachmentDown(att, appState.editNode); }
+                        onClick: () => this.moveAttachmentDown(att, appState.editNode)
                     }) : null
                 ])
             ])

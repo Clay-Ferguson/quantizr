@@ -753,7 +753,9 @@ public class AttachmentService extends ServiceBase {
 		if (no(node)) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
-		Attachment att = node.getAttachment(null, true, true);
+
+		// todo-0: make this handle multiple attachments, and all calls to it
+		Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, true);
 
 		auth.ownerAuth(node);
 		att.setIpfsLink(req.getCid().trim());
@@ -838,15 +840,14 @@ public class AttachmentService extends ServiceBase {
 			if (no(node)) {
 				throw new RuntimeException("Node not found: " + nodeId);
 			}
+
+			// todo-0: need to test this for the case of multiple attachments
 			Attachment att = node.getAttachment(null, true, true);
 
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
 			}
 			att.setUrl(sourceUrl);
-
-			// this was a bug in some cases. saving is done at a higher layer (the lambda wrapper)
-			// update.saveSession(ms);
 			return;
 		}
 

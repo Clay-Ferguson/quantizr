@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -61,7 +62,7 @@ public class FriendType extends TypeBase {
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntId", accountId));
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntUser", accountNode.getStr(NodeProp.USER)));
 
-                Attachment att = accountNode.getAttachment();
+                Attachment att = accountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
                 if (ok(att) && ok(att.getBin())) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", att.getBin()));
                 }

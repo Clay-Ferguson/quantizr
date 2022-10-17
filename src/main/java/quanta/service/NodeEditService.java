@@ -422,6 +422,7 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
+		// todo-0: handle multiple attachments correctly here.
 		Attachment att = node.getAttachment();
 
 		/* Remember the initial ipfs link */
@@ -942,6 +943,7 @@ public class NodeEditService extends ServiceBase {
 					sb.append(n.getOwner().toHexString());
 					sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
 
+					// todo-0: need to append ordered list of attachments here.
 					Attachment att = n.getAttachment();
 					if (ok(att)) {
 						if (ok(att.getBin())) {

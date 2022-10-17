@@ -358,6 +358,7 @@ public class MongoUtil extends ServiceBase {
 		return keysRemoved.getVal();
 	}
 
+	// todo-0: make this handle multiple attachments, and all calls to it
 	public boolean isImageAttached(SubNode node) {
 		Attachment att = node.getAttachment(null, false, false);
 		if (no(att))
@@ -462,138 +463,6 @@ public class MongoUtil extends ServiceBase {
 		// }
 
 		// log.debug("fixSharing completed.");
-	}
-
-	// converts from old attachments properties to new Attachments array propery.
-	// Used on 9-27-22, this should never be needed again. I've upgraded all databases.
-	public void convertDBAttachments(MongoSession ms) {
-		log.debug("convertDBAttachments");
-		try {
-			prop.setDaemonsEnabled(false);
-
-			Val<BulkOperations> bops = new Val<>(null);
-			IntVal nodesProcessed = new IntVal();
-			IntVal opsPending = new IntVal();
-
-			ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
-				nodesProcessed.inc();
-				if (nodesProcessed.getVal() % 1000 == 0) {
-					log.debug("SCAN: " + nodesProcessed.getVal());
-				}
-
-				boolean updated = false;
-
-				HashMap<String, Object> props = node.getProps();
-
-				String bin = node.getStr("bin");
-				String binData = node.getStr("sn:jcrData");
-				String url = node.getStr("sn:extUrl");
-				String dataUrl = node.getStr("sn:dataUrl");
-				String ipfsLink = node.getStr("ipfs:link");
-				String ipfsRef = node.getStr("ipfs:ref");
-
-				if (ok(bin) || ok(binData) || ok(url) || ok(dataUrl) || ok(ipfsLink) || ok(ipfsRef)) {
-
-					Attachment att = node.getAttachment(null, true, true);
-
-					att.setBin(bin);
-					att.setBinData(binData);
-					att.setUrl(url);
-					att.setDataUrl(dataUrl);
-					att.setIpfsLink(ipfsLink);
-					att.setIpfsRef(ipfsRef);
-					att.setMime(node.getStr("sn:mimeType"));
-					att.setFileName(node.getStr("sn:fileName"));
-					att.setCssSize(node.getStr("sn:imgSize"));
-
-					try {
-						att.setWidth(Integer.parseInt(node.getStr("sn:imgWidth")));
-						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeight")));
-					} catch (Exception e) {
-					}
-
-					try {
-						att.setSize(Long.parseLong(node.getStr("sn:size")));
-					} catch (Exception e) {
-					}
-
-					props.remove("bin");
-					props.remove("sn:jcrData");
-					props.remove("sn:extUrl");
-					props.remove("sn:dataUrl");
-					props.remove("ipfs:link");
-					props.remove("ipfs:ref");
-					props.remove("sn:mimeType");
-					props.remove("sn:fileName");
-					props.remove("sn:imgSize");
-					props.remove("sn:imgWidth");
-					props.remove("sn:imgHeight");
-					props.remove("sn:size");
-
-					if (no(bops.getVal())) {
-						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-					}
-				}
-
-				// HEADER IMAGES BEGIN
-				bin = node.getStr("binHeader");
-
-				if (ok(bin)) {
-					Attachment att = node.getAttachment(Constant.ATTACHMENT_HEADER.s(), true, true);
-					att.setBin(bin);
-					att.setMime(node.getStr("sn:mimeTypeHeader"));
-					att.setFileName(node.getStr("sn:fileNameHeader"));
-					att.setCssSize(node.getStr("sn:imgSizeHeader"));
-					try {
-						att.setWidth(Integer.parseInt(node.getStr("sn:imgWidthHeader")));
-						att.setHeight(Integer.parseInt(node.getStr("sn:imgHeightHeader")));
-					} catch (Exception e) {
-					}
-
-					try {
-						att.setSize(Long.parseLong(node.getStr("sn:sizeHeader")));
-					} catch (Exception e) {
-					}
-
-					if (no(bops.getVal())) {
-						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-					}
-
-					props.remove("binHeader");
-					props.remove("sn:mimeTypeHeader");
-					props.remove("sn:fileNameHeader");
-					props.remove("sn:imgSizeHeader");
-					props.remove("sn:imgWidthHeader");
-					props.remove("sn:imgHeightHeader");
-					props.remove("sn:sizeHeader");
-				}
-				// HEADER IMAGES END
-
-				if (updated) {
-					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-					Update update = new Update().set(SubNode.ATTACHMENTS, node.getAttachments()).set(SubNode.PROPS, props);
-					bops.getVal().updateOne(query, update);
-					opsPending.inc();
-
-					if (opsPending.getVal() >= 100) {
-						BulkWriteResult results = bops.getVal().execute();
-						bops.setVal(null);
-						opsPending.setVal(0);
-						log.debug("Bulk Att: updated " + results.getModifiedCount() + " nodes.");
-					}
-				}
-			});
-
-			if (opsPending.getVal() > 0) {
-				BulkWriteResult results = bops.getVal().execute();
-				log.debug("Final Att: updated " + results.getModifiedCount() + " nodes.");
-			}
-
-			log.debug("Done converting attachments");
-
-		} finally {
-			prop.setDaemonsEnabled(true);
-		}
 	}
 
 	/*

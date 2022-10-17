@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -86,7 +87,9 @@ public class IPFSPin extends ServiceBase {
 
             if (no(node))
                 return;
-            Attachment att = node.getAttachment(null, true, false);
+
+            // todo-0: make this handle multiple attachments, and all calls to it
+            Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             String ipfsLink = att.getIpfsLink();
             add(ipfsLink);
 
