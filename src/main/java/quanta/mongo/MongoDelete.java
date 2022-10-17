@@ -33,6 +33,7 @@ import quanta.util.IntVal;
 import quanta.util.LongVal;
 import quanta.util.Val;
 import quanta.util.XString;
+import quanta.model.client.Attachment;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
@@ -44,9 +45,9 @@ public class MongoDelete extends ServiceBase {
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly) {
-			// todo-0: this needs to iterate over ALL binaries, and delete them 
-			// from the grid one by one
-			attach.deleteBinary(ms, "", node, null, false);
+			node.getAttachments().forEach((String key, Attachment att) -> {
+				attach.deleteBinary(ms, key, node, null, true);
+			});
 		}
 
 		delete(ms, node, childrenOnly);
