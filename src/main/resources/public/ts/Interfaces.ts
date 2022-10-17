@@ -10,6 +10,7 @@ export enum FullScreenType {
 export interface FullScreenConfig {
     type: FullScreenType;
     nodeId?: string;
+    ordinal?: number;
 }
 
 export interface ValueIntf {

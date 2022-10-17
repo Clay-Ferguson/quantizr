@@ -67,20 +67,30 @@ export class NodeCompBinary extends Div {
             className,
             style,
             title: "Click image to enlarge/reduce",
-            onClick: this.clickOnImage,
-            nid: node.id
+            onClick: () => { this.clickOnImage(node.id, this.attName); }
         });
     }
 
-    clickOnImage = (evt: Event, id: string) => {
-        id = S.util.allowIdFromEvent(evt, id);
+    clickOnImage = (id: string, attName: string) => {
         if (this.isEditorEmbed) return;
 
         dispatch("ClickImage", s => {
             if (s.fullScreenConfig.type === FullScreenType.IMAGE && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }
-            s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: id };
+            s.fullScreenConfig.type = FullScreenType.IMAGE;
+
+            // if clicking this node first time.
+            if (!s.fullScreenConfig.nodeId) {
+                const node = S.nodeUtil.findNode(s, id);
+                if (node) {
+                    const att = S.props.getAttachment(attName, node);
+                    if (att) {
+                        s.fullScreenConfig.ordinal = att.o;
+                    }
+                }
+            }
+            s.fullScreenConfig.nodeId = id;
             return s;
         });
     }

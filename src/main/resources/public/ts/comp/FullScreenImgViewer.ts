@@ -23,8 +23,16 @@ export class FullScreenImgViewer extends Main {
         const isAnAccountNode = node?.ownerId && node.id === node.ownerId;
         const children = [];
 
+        const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+        let attName = null;
+        list.forEach(att => {
+            if (att.o === state.fullScreenConfig.ordinal) {
+                attName = (att as any).key;
+            }
+        });
+
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            const binary = new NodeCompBinary(node, J.Constant.ATTACHMENT_PRIMARY, false, true);
+            const binary = new NodeCompBinary(node, attName, false, true);
             children.push(binary);
         }
 

@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { FullScreenType } from "../Interfaces";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
+import * as J from "../JavaIntf";
 
 export class FullScreenControlBar extends Div {
 
@@ -22,19 +23,28 @@ export class FullScreenControlBar extends Div {
         const buttons = [];
 
         if (state.fullScreenConfig.type === FullScreenType.IMAGE && state.activeTab === C.TAB_MAIN) {
-            if (S.nav.getAdjacentNode("prev", state)) {
+            const node = S.nodeUtil.findNode(state, state.fullScreenConfig.nodeId);
+            let onFirst = false;
+            let onLast = false;
+            if (node && node.attachments) {
+                const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+                onFirst = list[0].o === state.fullScreenConfig.ordinal;
+                onLast = list[list.length-1].o === state.fullScreenConfig.ordinal;
+            }
+
+            if (!onFirst) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
                         onClick: () => S.nav.prevFullScreenImgViewer(state),
-                        title: "View Previous Node (or left arrow key)"
+                        title: "View Previous Attachment"
                     }, "btn-primary", "off"));
             }
 
-            if (S.nav.getAdjacentNode("next", state)) {
+            if (!onLast) {
                 buttons.push(
                     new IconButton("fa-angle-right fa-lg", "", {
                         onClick: () => S.nav.nextFullScreenImgViewer(state),
-                        title: "View Next Node (or right arrow key)"
+                        title: "View Next Attachment"
                     }, "btn-primary", "off"));
             }
         }

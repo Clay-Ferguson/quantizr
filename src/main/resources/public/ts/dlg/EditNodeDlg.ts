@@ -505,9 +505,6 @@ export class EditNodeDlg extends DialogBase {
             // having 'att.key' is a client-side only hack, and only generated during the ordering.
             children.push(this.makeAttachmentPanel(state, att));
         });
-        // Object.keys(node.attachments).forEach(key => {
-        //     children.push(this.makeAttachmentPanel(state, key, node.attachments[key]));
-        // });
         return new Div(null, { className: "binaryEditorSection" }, children);
     }
 

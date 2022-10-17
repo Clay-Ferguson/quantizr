@@ -423,68 +423,46 @@ export class Nav {
     }
 
     prevFullScreenImgViewer = (appState: AppState) => {
-        const prevNode = this.getAdjacentNode("prev", appState);
+        const node = S.nodeUtil.findNode(appState, appState.fullScreenConfig.nodeId);
+        if (node && node.attachments) {
+            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            let selAtt: J.Attachment = list[0];
+            let lastAtt: J.Attachment = null;
+            list.forEach(att => {
+                if (att.o === appState.fullScreenConfig.ordinal) {
+                    selAtt = lastAtt;
+                }
+                lastAtt = att;
+            });
 
-        if (prevNode) {
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: prevNode.id };
+                s.fullScreenConfig.ordinal = selAtt.o;
                 return s;
             });
         }
     }
 
     nextFullScreenImgViewer = (appState: AppState) => {
-        const nextNode = this.getAdjacentNode("next", appState);
+        const node = S.nodeUtil.findNode(appState, appState.fullScreenConfig.nodeId);
+        if (node && node.attachments) {
+            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            let selAtt: J.Attachment = list[list.length-1];
+            let takeNext = false;
+            list.forEach(att => {
+                if (takeNext) {
+                    selAtt = att;
+                    takeNext = false;
+                }
+                if (att.o === appState.fullScreenConfig.ordinal) {
+                    takeNext = true;
+                }
+            });
 
-        if (nextNode) {
-            dispatch("NextFullScreenImgViewer", s => {
-                s.fullScreenConfig = { type: FullScreenType.IMAGE, nodeId: nextNode.id };
+            dispatch("PrevFullScreenImgViewer", s => {
+                s.fullScreenConfig.ordinal = selAtt.o;
                 return s;
             });
         }
-    }
-
-    // todo-2: need to make view.scrollRelativeToNode use this function instead of embedding all the same logic.
-    getAdjacentNode = (dir: string, state: AppState): J.NodeInfo => {
-        let newNode = null;
-
-        // First detect if page root node is selected, before doing a child search
-        if (state.fullScreenConfig.type === FullScreenType.IMAGE && //
-            state.fullScreenConfig.nodeId === state.node.id) {
-            return null;
-        }
-        else if (state.node.children && state.node.children.length > 0) {
-            let prevChild: J.NodeInfo = null;
-            let nodeFound = false;
-
-            state.node.children.some((child: J.NodeInfo) => {
-                let ret = false;
-                const isAnAccountNode = child.ownerId && child.id === child.ownerId;
-
-                if (S.props.hasBinary(child) && !isAnAccountNode) {
-
-                    if (nodeFound && dir === "next") {
-                        ret = true;
-                        newNode = child;
-                    }
-
-                    if (state.fullScreenConfig.type === FullScreenType.IMAGE &&
-                        state.fullScreenConfig.nodeId === child.id) {
-                        if (dir === "prev") {
-                            if (prevChild) {
-                                ret = true;
-                                newNode = prevChild;
-                            }
-                        }
-                        nodeFound = true;
-                    }
-                    prevChild = child;
-                }
-                // NOTE: returning true stops the iteration.
-                return ret;
-            });
-        }
-        return newNode;
     }
 
     messages = async (props: any) => {

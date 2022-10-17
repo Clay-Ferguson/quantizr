@@ -103,7 +103,7 @@ export class Render {
          <img class="img-upper-left" width="100px" src="{{imgUrl}}">
          <div class="clearfix"/>
          */
-        if (val.indexOf("{{imgUrl}}")) {
+        if (val.indexOf("{{imgUrl}}") && att) {
             val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, (att as any).key, false));
         }
         return val;
