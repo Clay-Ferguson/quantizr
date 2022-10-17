@@ -296,24 +296,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			String attachmentUrl = null;
 			boolean rawDataUrl = false;
 
-			/*
-			 * if this is a 'data:' encoded image read it from binary storage and put that directly in url src
-			 */
-			String dataUrl = ok(att) ? att.getDataUrl() : null;
-			if ("t".equals(dataUrl)) {
-				imgUrl = attach.getStringByNode(ms, node);
-
-				// sanity check here.
-				if (!imgUrl.startsWith("data:")) {
-					imgUrl = null;
-				} else {
-					rawDataUrl = true;
-					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
-							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
-							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
-				}
-			}
-
 			if (!rawDataUrl && ok(mimeType)) {
 				// Otherwise if this is an ordinary binary image, encode the link to it.
 				if (no(imgUrl) && mimeType.startsWith("image/")) {

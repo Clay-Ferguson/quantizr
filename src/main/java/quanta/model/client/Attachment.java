@@ -22,10 +22,6 @@ public class Attachment {
     private String bin;
     private String binData;
     private String url;
-
-    // todo-00: getting rid of dataUrl completely
-    private String dataUrl;
-
     private String ipfsLink;
     private String ipfsRef;
 
@@ -123,17 +119,6 @@ public class Attachment {
     public void setUrl(String url) {
         ThreadLocals.dirty(ownerNode);
         this.url = url;
-    }
-
-    @JsonProperty("du")
-    public String getDataUrl() {
-        return dataUrl;
-    }
-
-    @JsonProperty("du")
-    public void setDataUrl(String dataUrl) {
-        ThreadLocals.dirty(ownerNode);
-        this.dataUrl = dataUrl;
     }
 
     @JsonProperty("il")

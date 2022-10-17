@@ -127,9 +127,6 @@ public class CryptoService extends ServiceBase {
 			if (ok(att.getBinData())) {
 				strToSign += "-" + att.getBinData();
 			}
-			if (ok(att.getDataUrl())) {
-				strToSign += "-" + att.getDataUrl();
-			}
 		}
 
 		return strToSign;

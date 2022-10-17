@@ -181,7 +181,7 @@ public class AttachmentService extends ServiceBase {
 
 					// attaches AND closes the stream.
 					attachBinaryFromStream(ms, binSuffix, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
-							addAsChildren, explodeZips, toIpfs, true, false, true, true, null);
+							addAsChildren, explodeZips, toIpfs, true, true, true, null);
 				}
 			}
 
@@ -210,7 +210,7 @@ public class AttachmentService extends ServiceBase {
 	 */
 	public void attachBinaryFromStream(MongoSession ms, String binSuffix, SubNode node, String nodeId, String fileName, long size,
 			LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild, boolean explodeZips,
-			boolean toIpfs, boolean calcImageSize, boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
+			boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally, String sourceUrl) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
@@ -262,7 +262,7 @@ public class AttachmentService extends ServiceBase {
 			importZipStreamService.importFromStream(ms, is, node, false);
 		} else {
 			saveBinaryStreamToNode(ms, binSuffix, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,
-					dataUrl, closeStream, storeLocally, sourceUrl);
+					closeStream, storeLocally, sourceUrl);
 		}
 	}
 
@@ -289,7 +289,8 @@ public class AttachmentService extends ServiceBase {
 
 	public void saveBinaryStreamToNode(MongoSession ms, String binSuffix, LimitedInputStreamEx inputStream, String mimeType,
 			String fileName, long size, int width, int height, SubNode node, boolean toIpfs, boolean calcImageSize,
-			boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
+			boolean closeStream, boolean storeLocally, String sourceUrl) {
+
 		/*
 		 * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
 		 * everything EXCEPT calculate the image size
@@ -343,11 +344,6 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		att.setMime(mimeType);
-
-		if (dataUrl) {
-			att.setDataUrl("t"); // <-- 1: why this boolean? not a url?
-		}
-
 		SubNode userNode = read.getNode(ms, node.getOwner());
 
 		if (no(imageBytes)) {
@@ -811,7 +807,7 @@ public class AttachmentService extends ServiceBase {
 
 			// insert 0L for size now, because we don't know it yet
 			attachBinaryFromStream(ms, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false, false,
-					true, true, true, sourceUrl);
+					 true, true, sourceUrl);
 		} else {
 			throw new RuntimeEx("Unsupported inline data type.");
 		}
@@ -895,7 +891,7 @@ public class AttachmentService extends ServiceBase {
 
 				// insert 0L for size now, because we don't know it yet
 				attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false, false,
-						true, false, true, storeLocally, sourceUrl);
+						true, true, storeLocally, sourceUrl);
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but we want to try to
@@ -917,7 +913,7 @@ public class AttachmentService extends ServiceBase {
 
 					// insert 0L for size now, because we don't know it yet
 					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false, true,
-							false, true, storeLocally, sourceUrl);
+						 true, storeLocally, sourceUrl);
 				}
 			}
 		} catch (Exception e) {
@@ -965,7 +961,7 @@ public class AttachmentService extends ServiceBase {
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
 					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType, bufImg.getWidth(null),
-							bufImg.getHeight(null), false, false, false, true, false, true, storeLocally, sourceUrl);
+							bufImg.getHeight(null), false, false, false, true, true, storeLocally, sourceUrl);
 
 					return true;
 				}

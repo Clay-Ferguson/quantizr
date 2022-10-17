@@ -140,7 +140,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 
 			// log.debug("Attaching binary to nodeId: " + node.getIdStr());
 			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false, false, false,
-					true, false, false, true, null);
+					true, false, true, null);
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.
 		}

@@ -97,7 +97,7 @@ export class Attachment {
     }
 
     getUrlForNodeAttachment = (node: J.NodeInfo, attName: string, downloadLink: boolean): string => {
-        return node.dataUrl ? node.dataUrl : this.getAttachmentUrl("bin", node, attName, downloadLink);
+        return this.getAttachmentUrl("bin", node, attName, downloadLink);
     }
 
     getStreamUrlForNodeAttachment = (node: J.NodeInfo, attName: string): string => {

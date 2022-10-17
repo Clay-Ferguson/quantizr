@@ -86,30 +86,11 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		// todo-00: imageSize is being removed, so don't waste any cycles here generating that specifically
-		String dataUrl = null;
 		// todo-00: handle multiple attachments
-		// todo-00: put this in a 'fixMimes' method, and the dataUrl junk in here will go away completely
-		// This block sets imageSize & dataUrl, and also updates the mime on 'att' if necessary
+		// todo-000: put this in a 'fixMimes' method
 		Attachment att = node.getAttachment();
 		if (ok(att)) {
 			String mimeType = att.getMime();
-			if (ok(mimeType)) {
-				boolean isImage = mongoUtil.isImageAttachment(att);
-
-				if (isImage) {
-					String dataUrlProp = att.getDataUrl();
-					if (ok(dataUrlProp)) {
-						dataUrl = attach.getStringByNode(ms, node);
-
-						// sanity check here.
-						if (!dataUrl.startsWith("data:")) {
-							dataUrl = null;
-						}
-					}
-				}
-			}
-
 			// ensure we have the best mimeType we can if not set in the data.
 			if (StringUtils.isEmpty(mimeType)) {
 				String binUrl = att.getUrl();
@@ -220,12 +201,11 @@ public class Convert extends ServiceBase {
 		String content = node.getContent();
 
 		// todo-00: what is impact of this image width+height now that we have multiple image support?
-		// todo-00: how can we handle multiple dataUrl values in all NodeInfo objects...and shouldn't it
 		// just be ON the attachment object (probably same for width/height)
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
 				owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //
-				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
+				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 
 
 		// if this node type has a plugin run it's converter to let it contribute

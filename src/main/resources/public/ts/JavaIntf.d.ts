@@ -12,7 +12,6 @@ export interface Attachment {
     b: string;
     d: string;
     u: string;
-    du: string;
     il: string;
     ir: string;
 }
@@ -928,7 +927,6 @@ export interface NodeInfo {
     displayName: string;
     owner: string;
     ownerId: string;
-    dataUrl: string;
     avatarVer: string;
     apAvatar: string;
     apImage: string;

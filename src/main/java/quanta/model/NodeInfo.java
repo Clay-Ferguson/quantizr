@@ -84,7 +84,6 @@ public class NodeInfo {
 	private String owner;
 	private String ownerId;
 
-	private String dataUrl;
 	private String avatarVer;
 	private String apAvatar;
 	private String apImage;
@@ -96,7 +95,7 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
 			Long ordinal, Date lastModified, List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
-			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
+			String type, long logicalOrdinal, boolean lastChild, String cipherKey,
 			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
 		this.path = path;
@@ -118,7 +117,6 @@ public class NodeInfo {
 		this.type = type;
 		this.logicalOrdinal = logicalOrdinal;
 		this.cipherKey = cipherKey;
-		this.dataUrl = dataUrl;
 		this.avatarVer = avatarVer;
 		this.apAvatar = apAvatar;
 		this.apImage = apImage;
@@ -311,14 +309,6 @@ public class NodeInfo {
 
 	public void setLastChild(boolean lastChild) {
 		this.lastChild = lastChild;
-	}
-
-	public String getDataUrl() {
-		return dataUrl;
-	}
-
-	public void setDataUrl(String dataUrl) {
-		this.dataUrl = dataUrl;
 	}
 
 	public String getAvatarVer() {
