@@ -310,7 +310,8 @@ public class AttachmentService extends ServiceBase {
 			if (StringUtils.isEmpty(mimeType)) {
 				String binUrl = att.getUrl();
 				if (!StringUtils.isEmpty(binUrl)) {
-					mimeType = URLConnection.guessContentTypeFromName(binUrl);
+					mimeType = getMimeTypeFromUrl(binUrl);
+
 					if (!StringUtils.isEmpty(mimeType)) {
 						att.setMime(mimeType);
 					}
@@ -319,6 +320,30 @@ public class AttachmentService extends ServiceBase {
 		});
 	}
 
+	public String getMimeTypeFromUrl(String url) {
+		String mimeType = null;
+
+		// try to get mime from name first.
+		mimeType = URLConnection.guessContentTypeFromName(url);
+
+		// if didn't get mime from name, try reading the actual url
+		if (StringUtils.isEmpty(mimeType)) {
+			int timeout = 60; // seconds
+			try {
+				URLConnection conn = new URL(url).openConnection();
+				conn.setConnectTimeout(timeout * 1000);
+				conn.setReadTimeout(timeout * 1000);
+				mimeType = conn.getContentType();
+			} catch (Exception e) {
+			}
+		}
+		return mimeType;
+	}
+
+	// Another way is this (according to baeldung site)
+	// Path path = new File("product.png").toPath();
+	// String mimeType = Files.probeContentType(path);
+	//
 	public String getMimeFromFileType(String fileName) {
 		String mimeType = null;
 
@@ -839,9 +864,7 @@ public class AttachmentService extends ServiceBase {
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
 		if (no(mimeType)) {
-			// todo-0: don't we need to just read from the URL here and check the content type in the response?
-			// log.debug("no MimeType trying to get it.");
-			mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
+			mimeType = getMimeTypeFromUrl(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
@@ -861,7 +884,6 @@ public class AttachmentService extends ServiceBase {
 
 			// todo-00: need to test this for the case of multiple attachments
 			Attachment att = node.getAttachment(null, true, true);
-
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
 			}

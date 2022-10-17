@@ -519,31 +519,6 @@ public class SubNode {
 		}
 	}
 
-	@Transient
-	@JsonIgnore
-	// todo-00: need to find ALL calls to this and verify multiple attachment aspect is correct
-	public void setAttachment(String name, Attachment att) {
-		synchronized (attLock) {
-			if (StringUtils.isEmpty(name)) {
-				name = Constant.ATTACHMENT_PRIMARY.s();
-			}
-
-			ThreadLocals.dirty(this);
-			if (no(attachments)) {
-				attachments = new HashMap<>();
-			}
-
-			attachments.put(name, att);
-		}
-	}
-
-	@Transient
-	@JsonIgnore
-	// todo-00: need to find ALL calls to this and verify multiple attachment aspect is correct
-	public void setAttachment(Attachment att) {
-		setAttachment(null, att);
-	}
-
 	@JsonProperty(LIKES)
 	public HashSet<String> getLikes() {
 		synchronized (likesLock) {

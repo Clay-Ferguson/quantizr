@@ -423,6 +423,7 @@ public class NodeEditService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 
 		node.setAttachments(req.getNode().getAttachments());
+		attach.fixAllAttachmentMimes(node);
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
