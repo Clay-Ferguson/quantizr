@@ -220,9 +220,9 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		/*
-		 * Multiple file uploads always attach children for each file uploaded
-		 * (correction: addAsChild is currently never sending true ever from client becasue for now
-		 * we always add multiple files to SAME node)
+		 * Multiple file uploads always attach children for each file uploaded (correction: addAsChild is
+		 * currently never sending true ever from client becasue for now we always add multiple files to
+		 * SAME node)
 		 */
 		if (addAsChild) {
 			auth.ownerAuth(ms, node);
@@ -308,7 +308,7 @@ public class AttachmentService extends ServiceBase {
 
 		int maxAttOrdinal = getMaxAttachmentOrdinal(node);
 		Attachment att = node.getAttachment(binSuffix, true, true);
-		att.setOrdinal(maxAttOrdinal+1);
+		att.setOrdinal(maxAttOrdinal + 1);
 
 		if (ImageUtil.isImageMime(mimeType)) {
 
@@ -775,49 +775,15 @@ public class AttachmentService extends ServiceBase {
 	 *        extension always and in that case we need to get it from the IPFS filename itself and
 	 *        that's what the hint is in that case. Normally however mimeHint is null
 	 * 
-	 *        'inputStream' is a retrofit to this function for when we want to just call this
-	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
-	 *        Val is null and not used.
+	 *        'inputStream' is a retrofit to this function for when we want to just call this method and
+	 *        get an inputStream handed back that can be read from. Normally the inputStream Val is null
+	 *        and not used.
 	 * 
 	 *        NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
 	 */
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
-		// todo-000: lets stop handling data: urls
-		if (sourceUrl.startsWith("data:")) {
-			readFromDataUrl(ms, sourceUrl, nodeId, mimeHint, maxFileSize);
-		} else {
-			readFromStandardUrl(ms, sourceUrl, node, nodeId, mimeHint, mimeType, maxFileSize, storeLocally);
-		}
-	}
-
-	// todo-000: this method will go away completely
-	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize) {
-		if (maxFileSize <= 0) {
-			maxFileSize = user.getMaxUploadSize(ms);
-		}
-
-		ms = ThreadLocals.ensure(ms);
-		String mimeType = Util.getMimeFromDataUrl(sourceUrl);
-
-		if (ImageUtil.isImageMime(mimeType)) {
-			InputStream is = new ByteArrayInputStream(sourceUrl.getBytes(StandardCharsets.UTF_8));
-			LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, maxFileSize);
-
-			// insert 0L for size now, because we don't know it yet
-			attachBinaryFromStream(ms, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false, false,
-					 true, true, sourceUrl);
-		} else {
-			throw new RuntimeEx("Unsupported inline data type.");
-		}
-	}
-
-	// https://tools.ietf.org/html/rfc2397
-	// caller should pass 'node' of available, otherwise pass nodeId
-	public void readFromStandardUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
-			String mimeType, int maxFileSize, boolean storeLocally) {
-
 		if (no(mimeType)) {
 			// todo-0: don't we need to just read from the URL here and check the content type in the response?
 			// log.debug("no MimeType trying to get it.");
@@ -913,7 +879,7 @@ public class AttachmentService extends ServiceBase {
 
 					// insert 0L for size now, because we don't know it yet
 					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false, true,
-						 true, storeLocally, sourceUrl);
+							true, storeLocally, sourceUrl);
 				}
 			}
 		} catch (Exception e) {
