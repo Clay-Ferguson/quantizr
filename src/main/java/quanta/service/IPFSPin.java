@@ -103,7 +103,7 @@ public class IPFSPin extends ServiceBase {
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
             if (ok(accountNode)) {
-                user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
+                user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode);
             }
         });
     }

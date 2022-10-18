@@ -1051,7 +1051,7 @@ public class AttachmentService extends ServiceBase {
 
 		// update the user quota which enforces their total storage limit
 		if (!ms.isAdmin()) {
-			user.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
+			user.addBytesToUserNodeBytes(ms, streamCount, userNode);
 		}
 
 		if (no(userNode)) {
@@ -1077,7 +1077,7 @@ public class AttachmentService extends ServiceBase {
 			att.setSize(streamSize.getVal());
 
 			/* consume user quota space */
-			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
+			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode);
 		}
 	}
 
@@ -1108,7 +1108,8 @@ public class AttachmentService extends ServiceBase {
 			 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 			 * deducted from
 			 */
-			user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+			long totalBytes = user.getTotalAttachmentBytes(ms, node);
+			user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
 		}
 
 		grid.delete(new Query(Criteria.where("_id").is(att.getBin())));

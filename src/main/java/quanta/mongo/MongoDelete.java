@@ -406,7 +406,7 @@ public class MongoDelete extends ServiceBase {
 	 * parent and delete those who don't have an existing parent.
 	 * ------------------------------------------------------------------------
 	 * 
-	 * todo-0: Can add Verify & Repair HAS_CHILDREN in this method.
+	 * #optimization: Can add Verify & Repair HAS_CHILDREN in this method.
 	 * 
 	 * Since every node looks for it's parent in this process we could theoretically use this to also
 	 * perfectly verify and/or repair every HAS_CHILDREN in the system. We'd just keep a list if which
@@ -564,7 +564,8 @@ public class MongoDelete extends ServiceBase {
 				 * todo-1: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
 				 * grant them back the space, so this would cheat users. Need to fix that.
 				 */
-				user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+				long totalBytes = user.getTotalAttachmentBytes(ms, node);
+				user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
 			}
 
 			// really need a 'hasForeignShares' here to ignore if there aren't any (todo-1)

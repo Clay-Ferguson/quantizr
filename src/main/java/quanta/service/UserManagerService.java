@@ -78,6 +78,7 @@ import quanta.response.SignupResponse;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
+import quanta.util.LongVal;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
@@ -291,9 +292,8 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	/**
-	 * @param ms
-	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats
-	 *        for that user.
+	 * 'userStats' Holds a map of User Root Node (account node) IDs as key mapped to the UserStats for
+	 * that user.
 	 */
 	public void writeUserStats(MongoSession ms, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((ObjectId key, UserStats stat) -> {
@@ -307,36 +307,24 @@ public class UserManagerService extends ServiceBase {
 		});
 	}
 
-	/**
-	 * increments the userNode usasage bytes by adding the bytes the attachment uses on 'node'
-	 * 
-	 * @param node
-	 * @param userNode
-	 * @param sign Controls if this is a subtract or an add (should be always 1 or -1)
-	 */
-	// todo-0: all of the storage quota needs to be re-tested
-	// based on having the new multi-attachment support
-	public void addNodeBytesToUserNodeBytes(MongoSession ms, SubNode node, SubNode userNode, int sign) {
-		if (no(node)) {
-			return;
-		}
+	public long getTotalAttachmentBytes(MongoSession ms, SubNode node) {
+		LongVal totalBytes = new LongVal();
 
-		// todo-0: handle multiple attachments
-		Attachment att = node.getFirstAttachment();
-		if (ok(att) && att.getSize() > 0L) {
-			if (no(userNode)) {
-				userNode = read.getUserNodeByUserName(null, null);
-			}
-
-			addBytesToUserNodeBytes(ms, att.getSize(), userNode, sign);
+		if (ok(node) && ok(node.getAttachments())) {
+			node.getAttachments().forEach((String key, Attachment att) -> {
+				if (att.getSize() > 0L) {
+					totalBytes.add(att.getSize());
+				}
+			});
 		}
+		return totalBytes.getVal();
 	}
 
 	/*
 	 * We have 'sign' so we can use this method to either deduct from or add to the user's total usage
 	 * amount
 	 */
-	public void addBytesToUserNodeBytes(MongoSession ms, long binSize, SubNode userNode, int sign) {
+	public void addBytesToUserNodeBytes(MongoSession ms, long binSize, SubNode userNode) {
 		if (no(userNode)) {
 			userNode = read.getUserNodeByUserName(null, null);
 		}
@@ -348,7 +336,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		// log.debug("before binTotal=" + binTotal);
-		binTotal += sign * binSize;
+		binTotal += binSize;
 		if (binTotal < 0) {
 			binTotal = 0L;
 		}
@@ -1002,7 +990,8 @@ public class UserManagerService extends ServiceBase {
 						userProfile.setHomeNodeId(userHomeNode.getIdStr());
 					}
 
-					// todo-0: for now we're only showing follower/following counts to the user themselves and
+					// #follow-endpoints: for now we're only showing follower/following counts to the user themselves
+					// and
 					// and not making visible to other users.
 					if (sessionUserName.equals(nodeUserName)) {
 						Long followerCount =

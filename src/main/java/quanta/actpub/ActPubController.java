@@ -214,7 +214,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 
-		// todo-0: turning this off until we make it optional for users
+		// #follow-endpoints: turning this off until we make it optional for users
 		return new ResponseEntity<String>(HttpStatus.NOT_IMPLEMENTED);
 
 		// APObj ret = null;
@@ -245,7 +245,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 
-		// todo-0: turning this off until we make it optional for users
+		// #follow-endpoints:: turning this off until we make it optional for users
 		return new ResponseEntity<String>(HttpStatus.NOT_IMPLEMENTED);
 
 		// APObj ret = null;
