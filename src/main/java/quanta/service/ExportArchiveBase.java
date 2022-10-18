@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -244,7 +245,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 			String rowClass = isTopRow ? "" : "class='row-div'";
-			Attachment att = node.getFirstAttachment();
 
 			String indenter = "";
 			if (level > 0) {
@@ -280,55 +280,57 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>");
 			}
 
-			String ext = null;
-			String binFileNameProp = ok(att) ? att.getFileName() : null;
-			if (ok(binFileNameProp)) {
-				ext = FilenameUtils.getExtension(binFileNameProp);
-				if (!StringUtils.isEmpty(ext)) {
-					ext = "." + ext;
-				}
-			}
-			String binFileNameStr = ok(binFileNameProp) ? binFileNameProp : "binary";
-
-			String mimeType = ok(att) ? att.getMime() : null;
-
-			String imgUrl = null;
-			String attachmentUrl = null;
-			boolean rawDataUrl = false;
-
-			if (!rawDataUrl && ok(mimeType)) {
-				// Otherwise if this is an ordinary binary image, encode the link to it.
-				if (no(imgUrl) && mimeType.startsWith("image/")) {
-
-					// If this is an external URL (just a URL to an image on the web)
-					String extUrl = ok(att) ? att.getUrl() : null;
-					if (ok(extUrl)) {
-						binFileNameStr = "External image";
-						imgUrl = extUrl;
+			List<Attachment> atts = node.getOrderedAttachments();
+			if (ok(atts)) {
+				for (Attachment att : atts) {
+					String ext = null;
+					String binFileNameProp = att.getFileName();
+					if (ok(binFileNameProp)) {
+						ext = FilenameUtils.getExtension(binFileNameProp);
+						if (!StringUtils.isEmpty(ext)) {
+							ext = "." + ext;
+						}
 					}
-					// otherwise it's an internal image so get imgUrl that way
-					else {
-						String relImgPath = writeFile ? "" : (fileName + "/");
-						/*
-						 * embeds an image that's 400px wide until you click it which makes it go fullsize
-						 * 
-						 */
+					String binFileNameStr = ok(binFileNameProp) ? binFileNameProp : "binary";
+					String mimeType = att.getMime();
+					String imgUrl = null;
+					String attachmentUrl = null;
 
-						imgUrl = "./" + deeperPath + relImgPath + nodeId + ext;
+					if (ok(mimeType)) {
+						html.append("<div style='margin-top: 12px'>");
+						// Otherwise if this is an ordinary binary image, encode the link to it.
+						if (no(imgUrl) && mimeType.startsWith("image/")) {
+
+							// If this is an external URL (just a URL to an image on the web)
+							String extUrl = att.getUrl();
+							if (ok(extUrl)) {
+								binFileNameStr = "External image";
+								imgUrl = extUrl;
+							}
+							// otherwise it's an internal image so get imgUrl that way
+							else {
+								String relImgPath = writeFile ? "" : (fileName + "/");
+								/*
+								 * embeds an image that's 400px wide until you click it which makes it go fullsize
+								 */
+								imgUrl = "./" + deeperPath + relImgPath + att.getKey() + ext;
+							}
+
+							html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
+									+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
+									+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
+						} else {
+							String relPath = writeFile ? "" : (fileName + "/");
+							/*
+							 * embeds an image that's 400px wide until you click it which makes it go fullsize
+							 */
+							attachmentUrl = "./" + deeperPath + relPath + att.getKey() + ext;
+
+							html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
+									+ binFileNameStr + "</a>");
+						}
+						html.append("</div>");
 					}
-
-					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
-							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
-							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
-				} else {
-					String relPath = writeFile ? "" : (fileName + "/");
-					/*
-					 * embeds an image that's 400px wide until you click it which makes it go fullsize
-					 */
-					attachmentUrl = "./" + deeperPath + relPath + nodeId + ext;
-
-					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: " + binFileNameStr
-							+ "</a>");
 				}
 			}
 
@@ -336,7 +338,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 			if (writeFile) {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
-
 				/*
 				 * Pretty print the node having the relative path, and then restore the node to the full path
 				 */
@@ -358,36 +359,48 @@ public abstract class ExportArchiveBase extends ServiceBase {
 							content.getBytes(StandardCharsets.UTF_8));
 				}
 
-				/*
-				 * If we had a binary property on this node we write the binary file into a separate file, but for
-				 * ipfs links we do NOT do this
-				 */
-				if (!rawDataUrl && ok(mimeType)) {
-
-					InputStream is = null;
-					try {
-						is = attach.getStream(ms, "", node, false);
-						if (ok(is)) {
-							BufferedInputStream bis = new BufferedInputStream(is);
-							long length = ok(att) ? att.getSize() : null;
-							String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
-
-							if (length > 0) {
-								/* NOTE: the archive WILL fail if no length exists in this codepath */
-								addFileEntry(binFileName, bis, length);
-							} else {
-								/*
-								 * This *should* never happen that we fall back to writing as an array from the input stream
-								 * because normally we will always have the length saved on the node. But re are trying to be as
-								 * resilient as possible here falling back to this rather than failing the entire export
-								 */
-								addFileEntry(binFileName, IOUtils.toByteArray(bis));
+				if (ok(atts)) {
+					for (Attachment att : atts) {
+						String ext = null;
+						String binFileNameProp = att.getFileName();
+						if (ok(binFileNameProp)) {
+							ext = FilenameUtils.getExtension(binFileNameProp);
+							if (!StringUtils.isEmpty(ext)) {
+								ext = "." + ext;
 							}
 						}
-					} catch (Exception e) {
-						throw ExUtil.wrapEx(e);
-					} finally {
-						StreamUtil.close(is);
+						/*
+						 * If we had a binary property on this node we write the binary file into a separate file, but for
+						 * ipfs links we do NOT do this
+						 */
+						if (ok(att.getMime())) {
+							InputStream is = null;
+							try {
+								is = attach.getStream(ms, att.getKey(), node, false);
+								if (ok(is)) {
+									BufferedInputStream bis = new BufferedInputStream(is);
+									long length = ok(att) ? att.getSize() : null;
+									String binFileName = parentFolder + "/" + fileName + "/" + att.getKey() + ext;
+
+									if (length > 0) {
+										/* NOTE: the archive WILL fail if no length exists in this codepath */
+										addFileEntry(binFileName, bis, length);
+									} else {
+										/*
+										 * This *should* never happen that we fall back to writing as an array from the input
+										 * stream because normally we will always have the length saved on the node. But re are
+										 * trying to be as resilient as possible here falling back to this rather than failing the
+										 * entire export
+										 */
+										addFileEntry(binFileName, IOUtils.toByteArray(bis));
+									}
+								}
+							} catch (Exception e) {
+								throw ExUtil.wrapEx(e);
+							} finally {
+								StreamUtil.close(is);
+							}
+						}
 					}
 				}
 			}

@@ -67,12 +67,6 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						n.pathDirty = false;
 						oldId.setVal(n.getIdStr());
 
-						/*
-						 * delete the BIN prop now, because it will have to be added during this import, and the existing
-						 * BIN id will no longer apply
-						 */
-						n.setAttachments(null);
-
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
 
@@ -102,7 +96,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			// Or else treat as binary attachment
 			else {
 				/*
-				 * check fo a slash in name to avoide any of our root files, which for the HTML viewing only (of
+				 * check fo a slash in name to avoid any of our root files, which for the HTML viewing only (of
 				 * exploded jars)
 				 */
 				if (lastSlashIdx != -1) {

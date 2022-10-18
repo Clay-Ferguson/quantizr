@@ -171,11 +171,13 @@ public class SystemService extends ServiceBase {
 			String ret = XString.prettyPrint(node);
 
 			List<Attachment> atts = node.getOrderedAttachments();
-			for (Attachment att : atts) {
-				if (ok(att.getIpfsLink())) {
-					IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
-					if (ok(fullStat)) {
-						ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
+			if (ok(atts)) {
+				for (Attachment att : atts) {
+					if (ok(att.getIpfsLink())) {
+						IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
+						if (ok(fullStat)) {
+							ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
+						}
 					}
 				}
 			}

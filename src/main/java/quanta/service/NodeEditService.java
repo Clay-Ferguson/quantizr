@@ -915,6 +915,7 @@ public class NodeEditService extends ServiceBase {
 							}
 						}
 					}
+					
 					if (sb.length() > 4096) {
 						byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
 						totalBytes += b.length;
