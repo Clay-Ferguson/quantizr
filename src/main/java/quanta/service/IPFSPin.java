@@ -98,7 +98,7 @@ public class IPFSPin extends ServiceBase {
 
             // note: the enclosing scope this we're running in will take care of comitting the node change to
             // the db.
-            att.setSize(stat.getCumulativeSize());
+            att.setSize((long)stat.getCumulativeSize());
 
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);

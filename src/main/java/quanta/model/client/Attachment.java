@@ -9,16 +9,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {
-    private int ordinal;
-    private int width;
-    private int height;
+    private Integer ordinal = 0;
+    private Integer width = 0;
+    private Integer height = 0;
     private String mime;
     private String fileName;
     private String cssSize;
-    private long size;
+    private Long size = 0L;
     private String bin;
     private String binData;
     private String url;
@@ -38,23 +38,23 @@ public class Attachment {
     }
 
     @JsonProperty("w")
-    public int getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
     @JsonProperty("w")
-    public void setWidth(int width) {
+    public void setWidth(Integer width) {
         ThreadLocals.dirty(ownerNode);
         this.width = width;
     }
 
     @JsonProperty("h")
-    public int getHeight() {
+    public Integer getHeight() {
         return height;
     }
 
     @JsonProperty("h")
-    public void setHeight(int height) {
+    public void setHeight(Integer height) {
         ThreadLocals.dirty(ownerNode);
         this.height = height;
     }
@@ -82,12 +82,12 @@ public class Attachment {
     }
 
     @JsonProperty("s")
-    public long getSize() {
+    public Long getSize() {
         return size;
     }
 
     @JsonProperty("s")
-    public void setSize(long size) {
+    public void setSize(Long size) {
         ThreadLocals.dirty(ownerNode);
         this.size = size;
     }
@@ -159,12 +159,12 @@ public class Attachment {
     }
 
     @JsonProperty("o")
-    public int getOrdinal() {
+    public Integer getOrdinal() {
         return ordinal;
     }
 
     @JsonProperty("o")
-    public void setOrdinal(int ordinal) {
+    public void setOrdinal(Integer ordinal) {
         this.ordinal = ordinal;
     }
 

@@ -448,7 +448,7 @@ public class AttachmentService extends ServiceBase {
 		} else {
 			LimitedInputStreamEx is = null;
 			try {
-				att.setSize(imageBytes.length);
+				att.setSize((long)imageBytes.length);
 
 				if (storeLocally) {
 					if (ok(fileName)) {
@@ -1074,7 +1074,7 @@ public class AttachmentService extends ServiceBase {
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
 		if (ok(ret)) {
 			att.setIpfsLink(ret.getHash());
-			att.setSize(streamSize.getVal());
+			att.setSize((long)streamSize.getVal());
 
 			/* consume user quota space */
 			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode);
