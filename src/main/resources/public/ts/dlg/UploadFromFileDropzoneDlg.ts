@@ -31,7 +31,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     numFiles: number = 0;
 
     /* We allow either nodeId or 'node' to be passed in here */
-    constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
+    constructor(private nodeId: string, private attName: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File");
 
@@ -267,7 +267,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     // nodeId as a comma delimted list which is wrong.
                     if (!formData.has("nodeId")) {
                         formData.append("nodeId", dlg.nodeId);
-                        formData.append("binSuffix", dlg.binSuffix);
+                        formData.append("attName", dlg.attName);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("saveAsPdf", false); // todo-2: fix (work in progress: Save HTML from clipboard as PDF) #saveAsPdf work in progress:
                         formData.append("ipfs", dlg.toIpfs ? "true" : "false");

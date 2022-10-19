@@ -322,7 +322,6 @@ public class ExportServiceFlexmark extends ServiceBase {
 		 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 		 */
 		else {
-			// todo-0: needs a binSuffix on the new /bin/ format for multi-attachments
 			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
 					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 			src = prop.getHostAndPort() + path;

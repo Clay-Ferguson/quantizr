@@ -1054,7 +1054,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * node depending on which type of attachment it sees on the node
 	 * 
 	 * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
-	 * todo-0: needs a binSuffix on the new /bin/ format for multi-attachments
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
@@ -1088,11 +1087,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
 				arun.run(as -> {
-					/*
-					 * Note: the "h" (header) suffix will be applied to all image-related property names to distinguish them
-					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
-					 * very limites way.
-					 */
 					attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, ok(download), response);
 					return null;
 				});
@@ -1103,7 +1097,6 @@ public class AppController extends ServiceBase implements ErrorController {
 					if (ok(ipfsCid)) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
-						// todo-0: need bin suffix here for multiple attachment support!
 						attach.getBinary(null, null, null, nodeId, binId, ok(download), response);
 					}
 					return null;
@@ -1112,7 +1105,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(as -> {
-					// todo-0: need bin suffix here for multiple attachment support!
 					attach.getBinary(as, null, null, nodeId, binId, ok(download), response);
 					return null;
 				});
@@ -1216,15 +1208,10 @@ public class AppController extends ServiceBase implements ErrorController {
 	// }
 	//
 
-	/*
-	 * binSuffix, will be concatenated to all binary-related properties to distinguish them where
-	 * possible from the normal node attachment. For normal attachments this is an empty string, which
-	 * makes it no suffix (no effect of concatenating)
-	 */
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
-			@RequestParam(value = "binSuffix", required = false) String binSuffix, //
+			@RequestParam(value = "attName", required = false) String attName, //
 			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
 			@RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
 			@RequestParam(value = "ipfs", required = true) String ipfs, //
@@ -1232,11 +1219,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 
-		final String _binSuffix = no(binSuffix) ? "" : binSuffix;
+		final String _attName = no(attName) ? "" : attName;
 
 		return callProc.run("upload", true, true, null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attach.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
+			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
 					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
 		});
 	}

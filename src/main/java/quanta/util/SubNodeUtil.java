@@ -352,7 +352,6 @@ public class SubNodeUtil extends ServiceBase {
 
 		String bin = ok(ipfsLink) ? ipfsLink : att.getBin();
 		if (ok(bin)) {
-			// todo-0: needs a binSuffix on the new /bin/ format for multi-attachments
 			return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
 
