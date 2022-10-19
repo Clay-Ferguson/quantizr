@@ -527,6 +527,7 @@ public class AttachmentService extends ServiceBase {
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
 	@PerfMon(category = "attach")
+	// todo-0: look for all calls to this and check binSuffix
 	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, String binId, boolean download,
 			HttpServletResponse response) {
 		BufferedInputStream inStream = null;
@@ -862,6 +863,8 @@ public class AttachmentService extends ServiceBase {
 	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
+
+		String attKey = getNextAttachmentKey(node);
 		if (no(mimeType)) {
 			mimeType = getMimeTypeFromUrl(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
@@ -881,7 +884,6 @@ public class AttachmentService extends ServiceBase {
 				throw new RuntimeException("Node not found: " + nodeId);
 			}
 
-			String attKey = getNextAttachmentKey(node);
 			Attachment att = node.getAttachment(attKey, true, true);
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
@@ -909,7 +911,6 @@ public class AttachmentService extends ServiceBase {
 			 * from it
 			 */
 			if (ImageUtil.isImageMime(mimeType)) {
-
 				/*
 				 * DO NOT DELETE
 				 *
@@ -931,7 +932,7 @@ public class AttachmentService extends ServiceBase {
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false, false,
+				attachBinaryFromStream(ms, attKey, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false, false,
 						true, true, storeLocally, sourceUrl);
 			}
 			/*
@@ -940,7 +941,7 @@ public class AttachmentService extends ServiceBase {
 			 * handle it as one.
 			 */
 			else {
-				if (!detectAndSaveImage(ms, nodeId, sourceUrl, url, storeLocally)) {
+				if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
 					HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 					HttpGet request = new HttpGet(sourceUrl);
 					request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
@@ -953,7 +954,7 @@ public class AttachmentService extends ServiceBase {
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false, true,
+					attachBinaryFromStream(ms, attKey, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false, true,
 							true, storeLocally, sourceUrl);
 				}
 			}
@@ -966,16 +967,13 @@ public class AttachmentService extends ServiceBase {
 			// here too anyway.
 			StreamUtil.close(limitedIs);
 		}
-
-		// this was a bug in some cases. saving is done at a higher layer (the lambda wrapper)
-		// update.saveSession(ms);
 	}
 
 	// FYI: Warning: this way of getting content type doesn't work.
 	// String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
 	//
 	/* returns true if it was detected AND saved as an image */
-	private boolean detectAndSaveImage(MongoSession ms, String nodeId, String sourceUrl, URL url, boolean storeLocally) {
+	private boolean detectAndSaveImage(MongoSession ms, String nodeId, String attKey, String sourceUrl, URL url, boolean storeLocally) {
 		ImageInputStream is = null;
 		LimitedInputStreamEx is2 = null;
 		ImageReader reader = null;
@@ -1001,7 +999,7 @@ public class AttachmentService extends ServiceBase {
 					byte[] bytes = os.toByteArray();
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
-					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType, bufImg.getWidth(null),
+					attachBinaryFromStream(ms, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType, bufImg.getWidth(null),
 							bufImg.getHeight(null), false, false, false, true, true, storeLocally, sourceUrl);
 
 					return true;

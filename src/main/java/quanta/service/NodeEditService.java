@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+// import org.springframework.data.mongodb.core.query.Criteria;
+// import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
@@ -299,6 +301,7 @@ public class NodeEditService extends ServiceBase {
 
 	public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow) {
 
+		// get userNode of user to follow
 		SubNode userNode = read.getUserNodeByUserName(ms, userToFollow, false);
 		if (ok(userNode)) {
 			List<PropertyInfo> properties = new LinkedList<>();
@@ -319,7 +322,32 @@ public class NodeEditService extends ServiceBase {
 				newNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
 			}
 
-			apLog.trace("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
+			// log.debug("Saving Friend Node (as a Follow): " + XString.prettyPrint(newNode));
+
+			/////////////////////////////////////////////////////////////////////////////////////
+			// Leaving this temporary code here for now.
+			// todo-1: this block was temporary troubleshooting
+			// Criteria crit = Criteria.where(SubNode.OWNER).is(ms.getUserNodeId()) //
+			// 		.and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()) //
+			// 		.and(SubNode.TYPE).is(NodeType.FRIEND.s());
+
+			// Query q = new Query();
+			// q.addCriteria(crit);
+			// SubNode ret = mongoUtil.findOne(q);
+			// if (ok(ret)) {
+			// 	log.debug("oops!! duplicates this existing FRIEND node: " + XString.prettyPrint(ret));
+			// 	throw new RuntimeException("Duplicate Friend: " + userToFollow);
+			// }
+
+			// troubleshooting this constraint violation
+			// ops.indexOps(SubNode.class).ensureIndex(//
+			// new Index().on(SubNode.OWNER, Direction.ASC) //
+			// .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC) //
+			// .unique() //
+			// .named(indexName) //
+			// .partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
+			///////////////////////////////////////////////////////////////////////////////////////////////
+
 			update.save(ms, newNode);
 			return newNode;
 		} else {
@@ -915,7 +943,7 @@ public class NodeEditService extends ServiceBase {
 							}
 						}
 					}
-					
+
 					if (sb.length() > 4096) {
 						byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
 						totalBytes += b.length;

@@ -588,29 +588,21 @@ public class MongoUtil extends ServiceBase {
 		createUniqueFriendsIndex(ms);
 		createUniqueNodeNameIndex(ms);
 
+		// DO NOT DELETE
 		// I had done this temporarily to fix a constraint violation
-		// Leaving for now.
 		// dropIndex(ms, SubNode.class, "unique-friends");
 		// dropIndex(ms, SubNode.class, "unique-node-name");
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
-		 * user. That is, prefixed by their username followed by two dashes
+		 * user. That is, prefixed by their username followed by two dashes. 
+		 * todo-0: need to add rule that usernames aren't allowed to CONTAIN "--"
 		 */
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
 
-		// The pinning cleanup was originally written to look these up, but
-		// I've about concluded that MFS files don't need to be pinned at all.
-		// createIndex(ms, SubNode.class, SubNode.CID);
-
 		createIndex(ms, SubNode.class, SubNode.OWNER);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
-
-		// This blows up in PROD because nodes shared with too many people exceed the size allowed for an
-		// index field.
-		// createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with
-		// random properties)
 
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
 		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
@@ -623,7 +615,7 @@ public class MongoUtil extends ServiceBase {
 
 	/*
 	 * Creates an index which will guarantee no duplicate friends can be created for a given user. Note
-	 * this one index also makes it impossible to have the same user both blocked and followed becasue
+	 * this one index also makes it impossible to have the same user both blocked and followed because
 	 * those are both saved as FRIEND nodes on the tree and therefore would violate this constraint
 	 * which is exactly what we want.
 	 */

@@ -75,6 +75,7 @@ public class ExportJsonService extends ServiceBase {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
+					// todo-0: this is not yet handling multiple images
 					Attachment att = node.getFirstAttachment();
 					String binFileName = ok(att) ? att.getFileName() : null;
 					if (ok(binFileName)) {

@@ -67,8 +67,13 @@ public class MongoDelete extends ServiceBase {
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
 	}
 
-	// DO NOT DELETE (this is referenced elsewhere, and is not currently, used but we DO WANT TO KEEP
-	// IT.)
+	/*
+	 * DO NOT DELETE
+	 *
+	 * (this is referenced elsewhere, and is not currently used but we DO WANT TO KEEP IT.) This assumes
+	 * the constraint violation is not caused by an orphan node being the duplicate, and actually
+	 * running this code is therefore only SAFE after running a full and complete orphan delete process.
+	 */
 	public void removeFriendConstraintViolations(MongoSession ms) {
 		Query q = new Query();
 
@@ -395,6 +400,8 @@ public class MongoDelete extends ServiceBase {
 		}
 
 		log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
+
+		// todo-1: broadcast this back to server as a message push
 	}
 
 	/*

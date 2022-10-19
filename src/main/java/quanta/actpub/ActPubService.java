@@ -383,7 +383,7 @@ public class ActPubService extends ServiceBase {
                              * NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
                              * sharing meaning they can be visible to at least someone other than it's owner.
                              */
-                            .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()) + "?att=" + att.getKey());
+                            .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr() + "?att=" + att.getKey()));
                 }
             }
         }
@@ -1341,9 +1341,6 @@ public class ActPubService extends ServiceBase {
 
             if (ok(mediaType) && ok(url)) {
                 attach.readFromUrl(ms, url, node, node.getIdStr(), mediaType, mediaType, -1, false);
-
-                // for now we only support one attachment so break out after uploading one.
-                break;
             }
         }
     }

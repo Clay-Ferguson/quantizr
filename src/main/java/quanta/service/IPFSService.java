@@ -110,6 +110,7 @@ public class IPFSService extends ServiceBase {
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         checkIpfs();
+        // todo-0: this is not yet handling multiple images
         Attachment att = node.getFirstAttachment();
         String cid = null;
         String mime = ok(att) ? att.getMime() : null;

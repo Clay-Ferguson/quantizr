@@ -1037,7 +1037,7 @@ public class AppController extends ServiceBase implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attach.getBinary(as, "", node, null, null, ok(download), response);
+						attach.getBinary(as, _attName, node, null, null, ok(download), response);
 					}
 					return null;
 				});
@@ -1054,6 +1054,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * node depending on which type of attachment it sees on the node
 	 * 
 	 * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
+	 * todo-0: needs a binSuffix on the new /bin/ format for multi-attachments
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
@@ -1102,6 +1103,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					if (ok(ipfsCid)) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
+						// todo-0: need bin suffix here for multiple attachment support!
 						attach.getBinary(null, null, null, nodeId, binId, ok(download), response);
 					}
 					return null;
@@ -1110,6 +1112,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(as -> {
+					// todo-0: need bin suffix here for multiple attachment support!
 					attach.getBinary(as, null, null, nodeId, binId, ok(download), response);
 					return null;
 				});

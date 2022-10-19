@@ -126,6 +126,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (no(node)) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
+
+			// todo-0: this needs to be updated for multiple attachments support
 			Attachment att = node.getFirstAttachment();
 			if (no(att)) return;
 			Long length = att.getSize();

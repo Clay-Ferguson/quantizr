@@ -451,7 +451,6 @@ public class SubNode {
 		}
 	}
 
-	// check ALL CALLS TO this, per new multi-attachment support.
 	@Transient
 	@JsonIgnore
 	public Attachment getFirstAttachment() {

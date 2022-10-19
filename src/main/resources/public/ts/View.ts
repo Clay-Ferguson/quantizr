@@ -78,6 +78,11 @@ export class View {
                 parentCount: a.state.userPrefs.showParents ? 1 : 0
             });
 
+            if (!res || !res.success) {
+                console.log("Unable to access node: "+a.nodeId);
+                return;
+            }
+
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
             }
