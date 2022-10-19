@@ -24,7 +24,6 @@ import quanta.model.NodeMetaInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.InitNodeEditRequest;

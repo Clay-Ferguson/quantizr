@@ -527,7 +527,6 @@ public class AttachmentService extends ServiceBase {
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
 	@PerfMon(category = "attach")
-	// todo-0: look for all calls to this and check attName
 	public void getBinary(MongoSession ms, String attName, SubNode node, String nodeId, String binId, boolean download,
 			HttpServletResponse response) {
 		BufferedInputStream inStream = null;
@@ -1115,7 +1114,9 @@ public class AttachmentService extends ServiceBase {
 
 	/*
 	 * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
-	 * BIN
+	 * BIN.
+	 * 
+	 * tood-0: search all calls to this and verify attName is correct.
 	 */
 	public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean doAuth) {
 		if (doAuth) {

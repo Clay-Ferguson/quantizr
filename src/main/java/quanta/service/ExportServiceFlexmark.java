@@ -34,6 +34,7 @@ import quanta.request.ExportRequest;
 import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
+import quanta.util.ImageUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -131,9 +132,12 @@ public class ExportServiceFlexmark extends ServiceBase {
 			Parser parser = Parser.builder(options).build();
 			HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 
-			// if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension) as the place where we want the 
-			// table of contents injected so we can click the "Table of Contents" checkbox in the export, or theoretically we
-			// would also insert this [TOC] somewhere else in the text.
+			/*
+			 * if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension) as
+			 * the place where we want the table of contents injected so we can click the "Table of Contents"
+			 * checkbox in the export, or theoretically we would also insert this [TOC] somewhere else in the
+			 * text.
+			 */
 			if ("pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
 				markdown.append("[TOC]");
 			}
@@ -266,71 +270,87 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void writeImage(SubNode node) {
-		// todo-0: this is not yet handling multiple images
-		Attachment att = node.getFirstAttachment();
-		if (no(att)) return;
-
-		String bin = att.getBin();
-		String ipfsLink = att.getIpfsLink();
-		if (no(bin) && no(ipfsLink)) {
+		List<Attachment> atts = node.getOrderedAttachments();
+		if (no(atts))
 			return;
-		}
 
-		String style = "";
-		String imgSize = att.getCssSize();
-		if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
-			style = " style='width:" + imgSize + "'";
-		}
-
-		String src = null;
-
-		if (req.isToIpfs() && "html".equals(format)) {
-			String fileName = att.getFileName();
+		// process all attachments specifically to embed the image ones
+		for (Attachment att : atts) {
 			String mime = att.getMime();
+			if (!ImageUtil.isImageMime(mime))
+				continue;
 
-			if (ok(bin)) {
-				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
-				// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
-				files.add(new ExportIpfsFile(cid, fileName, mime));
-				src = fileName + "?cid=" + cid;
+			String bin = att.getBin();
+			String url = att.getUrl();
+			String ipfsLink = att.getIpfsLink();
+
+			if (no(bin) && no(ipfsLink) && no(url)) {
+				continue;
+			}
+
+			String style = "";
+			String imgSize = att.getCssSize();
+			if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
+				style = " style='width:" + imgSize + "'";
+			}
+
+			String src = null;
+
+			if (req.isToIpfs() && "html".equals(format)) {
+				String fileName = att.getFileName();
+
+				if (ok(bin)) {
+					String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
+					// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
+					files.add(new ExportIpfsFile(cid, fileName, mime));
+					src = fileName + "?cid=" + cid;
+				}
+				/*
+				 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
+				 * so reference it in src
+				 */
+				else if (ok(ipfsLink) && ok(fileName)) {
+					// log.debug("Found IPFS file: " + fileName);
+					files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
+
+					/*
+					 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open
+					 * to the internet we have to use this trick if sticking on the cid parameter so that our
+					 * AppController.getBinary function (which will be called when the user references the resuorce) can
+					 * use that instead of the relative path to locate the file.
+					 * 
+					 * When normal other IPFS gateways are opening this content they'll reference the actual 'fileName'
+					 * and it will work because we do DAG-link that file into the root CID DAG entry for this export!
+					 */
+					src = fileName + "?cid=" + ipfsLink;
+				}
 			}
 			/*
-			 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
-			 * so reference it in src
+			 * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
+			 * kind of reference to the image resource, because ultimately the Flexmark code that converts the
+			 * HTML to the PDF will be calling this image url to extract out the actual image data to embed
+			 * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
+			 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 			 */
-			else if (ok(ipfsLink) && ok(fileName)) {
-				// log.debug("Found IPFS file: " + fileName);
-				files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
-
-				/*
-				 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open
-				 * to the internet we have to use this trick if sticking on the cid parameter so that our
-				 * AppController.getBinary function (which will be called when the user references the resuorce) can
-				 * use that instead of the relative path to locate the file.
-				 * 
-				 * When normal other IPFS gateways are opening this content they'll reference the actual 'fileName'
-				 * and it will work because we do DAG-link that file into the root CID DAG entry for this export!
-				 */
-				src = fileName + "?cid=" + ipfsLink;
+			else if (ok(bin)) {
+				String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
+						+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
+				src = prop.getHostAndPort() + path;
+			} else if (ok(url)) {
+				src = url;
 			}
-		}
-		/*
-		 * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
-		 * kind of reference to the image resource, because ultimately the Flexmark code that converts the
-		 * HTML to the PDF will be calling this image url to extract out the actual image data to embed
-		 * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
-		 * eventually put out on IPFS or simply provided to the user as a downloadable link.
-		 */
-		else {
-			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
-					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
-			src = prop.getHostAndPort() + path;
-		}
 
-		if (no(src))
-			return;
+			if (no(src))
+				continue;
 
-		markdown.append("\n<img src='" + src + "' " + style + "/>\n");
+			/*
+			 * I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
+			 * but the PDF engine seems to be able to smartly insert images in an attractive way arranging small
+			 * images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
+			 * position images, since it seems ok
+			 */
+			markdown.append("\n<img src='" + src + "' " + style + "/>\n");
+		}
 	}
 
 	/**

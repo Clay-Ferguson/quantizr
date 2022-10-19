@@ -5,6 +5,7 @@ import static quanta.util.Util.ok;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -29,14 +30,15 @@ import quanta.request.ExportRequest;
 import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
+import quanta.util.ImageUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
  * Exporter using PDFBox
  * 
- * This was experimental code, and it not currently being used. We are using
- * the flextbox code for exporting to PDF (see ExportServiceFlexmark.java)
+ * This was experimental code, and it not currently being used. We are using the flexbox code for
+ * exporting to PDF (see ExportServiceFlexmark.java)
  */
 
 @Component
@@ -173,47 +175,59 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 		}
 	}
 
+	/*
+	 * todo-1: for images that are referenced by URL (not saved in our DB) we would need to actually
+	 * read those from the web in order to put them in the PDF file which we can easily do using code
+	 * patterns we already have but I haven't gotten around to doing this low priority capability yet.
+	 */
 	private void writeImage(SubNode node) {
 		try {
-			// todo-0: this is not yet handling multiple images
-			Attachment att = node.getFirstAttachment();
-			if (no(att) || no(att.getBin())) return;
-			
-			String mime = att.getMime();
-			String imgSize = att.getCssSize();
-			float sizeFactor = 1f;
-			
-			if (ok(imgSize) && imgSize.endsWith("%")) {
-				imgSize = XString.stripIfEndsWith(imgSize, "%");
-				int size = Integer.parseInt(imgSize);
-				sizeFactor = Float.valueOf(size).floatValue() / 100;
-			}
-
-			InputStream is = attach.getStream(session, "", node, false);
-			if (no(is))
+			List<Attachment> atts = node.getOrderedAttachments();
+			if (no(atts))
 				return;
 
-			PDImageXObject pdImage = null;
-			try {
-				if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
-					pdImage = JPEGFactory.createFromStream(doc, is);
-				} else if ("image/gif".equals(mime) || "image/bmp".equals(mime) || "image/png".equals(mime)) {
-					BufferedImage bim = ImageIO.read(is);
-					pdImage = LosslessFactory.createFromImage(doc, bim);
+			// process all attachments specifically to embed the image ones
+			for (Attachment att : atts) {
+				if (no(att.getBin()))
+					continue;
+
+				String mime = att.getMime();
+				if (!ImageUtil.isImageMime(mime)) continue;
+				String imgSize = att.getCssSize();
+				float sizeFactor = 1f;
+
+				if (ok(imgSize) && imgSize.endsWith("%")) {
+					imgSize = XString.stripIfEndsWith(imgSize, "%");
+					int size = Integer.parseInt(imgSize);
+					sizeFactor = Float.valueOf(size).floatValue() / 100;
 				}
-			} finally {
-				IOUtils.closeQuietly(is);
+
+				InputStream is = attach.getStream(session, att.getKey(), node, false);
+				if (no(is))
+					continue;
+
+				PDImageXObject pdImage = null;
+				try {
+					if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
+						pdImage = JPEGFactory.createFromStream(doc, is);
+					} else if ("image/gif".equals(mime) || "image/bmp".equals(mime) || "image/png".equals(mime)) {
+						BufferedImage bim = ImageIO.read(is);
+						pdImage = LosslessFactory.createFromImage(doc, bim);
+					}
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+
+				if (no(pdImage))
+					continue;
+
+				float imgWidth = width * sizeFactor;
+				float scale = imgWidth / pdImage.getWidth();
+				advanceY(pdImage.getHeight() * scale);
+
+				stream.drawImage(pdImage, startX, startY, imgWidth, pdImage.getHeight() * scale);
+				advanceY(leading);
 			}
-
-			if (no(pdImage))
-				return;
-
-			float imgWidth = width * sizeFactor;
-			float scale = imgWidth / pdImage.getWidth();
-			advanceY(pdImage.getHeight() * scale);
-
-			stream.drawImage(pdImage, startX, startY, imgWidth, pdImage.getHeight() * scale);
-			advanceY(leading);
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
