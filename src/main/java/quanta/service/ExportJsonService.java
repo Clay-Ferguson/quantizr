@@ -69,13 +69,12 @@ public class ExportJsonService extends ServiceBase {
 			q.addCriteria(crit);
 
 			Iterable<SubNode> iter = mongoUtil.find(q);
-
 			BufferedOutputStream os = null;
 			try {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
-					// todo-0: this is not yet handling multiple images
+					// todo-1: this is not yet handling multiple images, but this method isn't currently used.
 					Attachment att = node.getFirstAttachment();
 					String binFileName = ok(att) ? att.getFileName() : null;
 					if (ok(binFileName)) {

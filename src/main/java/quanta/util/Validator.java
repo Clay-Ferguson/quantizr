@@ -18,6 +18,10 @@ public class Validator extends ServiceBase {
 			return "Invalid or illegal user name.";
 		}
 
+		if (userName.contains("--")) {
+			throw ExUtil.wrapEx("Username cannot contain '--'");
+		}
+
 		int len = userName.length();
 		if (len < 3 || len > 100)
 			throw ExUtil.wrapEx("Username must be between 3 and 100 characters long.");

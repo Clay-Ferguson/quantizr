@@ -596,7 +596,6 @@ public class MongoUtil extends ServiceBase {
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
 		 * user. That is, prefixed by their username followed by two dashes. 
-		 * todo-0: need to add rule that usernames aren't allowed to CONTAIN "--"
 		 */
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
