@@ -17,6 +17,7 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
+import quanta.util.Val;
 import quanta.util.XString;
 
 public abstract class ImportArchiveBase extends ServiceBase {
@@ -46,6 +47,30 @@ public abstract class ImportArchiveBase extends ServiceBase {
 
 		log.trace("Import FILE Entry: " + entry.getName());
 		try {
+			Val<Boolean> done = new Val<>(false);
+
+			// First try to attach the file as a binary which will fail gracefully and leave done=false if this
+			// file's filename is not one of the attName(s) of it's attachment list.
+			if (lastSlashIdx != -1) {
+				// log.debug(" isBIN: " + entry.getName());
+				String nodeId = pathToIdMap.get(path);
+				if (ok(nodeId)) {
+					arun.run(as -> {
+						SubNode node = read.getNode(as, nodeId);
+						if (ok(node)) {
+							if (importBinary(entry, node, zis, fileName)) {
+								done.setVal(true);
+							}
+						}
+						return null;
+					});
+				}
+			}
+
+			// if we processed the above as an attachment we're done bail out.
+			if (done.getVal())
+				return;
+
 			// HTML FILE
 			if (mimeUtil.isHtmlTypeFileName(fileName)) {
 				// log.debug(" isHTML: " + fileName);
@@ -61,7 +86,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 				SubNode node = (SubNode) arun.run(as -> {
 					try {
 						SubNode n = jsonMapper.readValue(json, SubNode.class);
-						//log.debug("Raw Marshal ID: " + n.getIdStr() + " content=" + n.getContent());
+						// log.debug("Raw Marshal ID: " + n.getIdStr() + " content=" + n.getContent());
 
 						// this may not be necessary but we definitely don't want this node cached now
 						// with it's currently undetermined id.
@@ -76,7 +101,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
 						n.setPath(newPath);
 
-						// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this 
+						// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
 						// to verify the parent exists upon saving, because we know the path is fine correct.
 						n.verifyParentPath = false;
 
@@ -106,36 +131,13 @@ public abstract class ImportArchiveBase extends ServiceBase {
 					});
 				}
 
-				// NOTE: It's important to save this node and NOT let the 'node' before this save,
-				// ever get set into the dirty cache either, so we can't call any setters on it UNTIL
-				// it's saved here and we get the DB to give us the new ID for it.
+				/*
+				 * NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set into
+				 * the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
+				 * DB to give us the new ID for it.
+				 */
 				update.save(session, node);
 				pathToIdMap.put(path, node.getIdStr());
-			}
-			// Any other TEXT file
-			else if (mimeUtil.isTextTypeFileName(fileName)) {
-				// log.debug(" isTXT: " + fileName);
-				// curContent = IOUtils.toString(zis, "UTF-8");
-			}
-			// Binary files of any kind.
-			else {
-				/*
-				 * check fo a slash in name to avoid any of our root files, which for the HTML viewing only (of
-				 * exploded jars)
-				 */
-				if (lastSlashIdx != -1) {
-					// log.debug("  isBIN: " + entry.getName());
-					String nodeId = pathToIdMap.get(path);
-					if (ok(nodeId)) {
-						arun.run(as -> {
-							SubNode node = read.getNode(as, nodeId);
-							if (ok(node)) {
-								importBinary(entry, node, zis, fileName);
-							}
-							return null;
-						});
-					}
-				}
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
@@ -143,24 +145,25 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	}
 
 	/*
-	 * This method assumes node has already been loaded which technically is depending on a file
-	 * ordering to be correct in the JAR file. Need to be sure the JSON file is always ahead of the
-	 * binaries in the generated JARS (todo-0)
+	 * This method assumes node has already been loaded which means as we process the zip stream we're
+	 * expecting the JSON for the node to be encountered before any of the attachments.
+	 * 
+	 * Returns true only if we imported a file.
 	 */
-	public void importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
-		if (no(node)) {
-			log.debug("Attempted to attach binary before node is known");
-			return;
-		}
-
+	public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
 		String attName = fileUtil.stripExtension(fileName);
 		HashMap<String, Attachment> atts = node.getAttachments();
 		if (no(atts))
-			return;
+			return false;
 
+		/*
+		 * note the filename in the imported JAR is the 'attName', but when we import we name the
+		 * Attachment.name back to what it originally was before the export which is in the JSON, but also
+		 * on the node we have now.
+		 */
 		Attachment att = atts.get(attName);
 		if (no(att))
-			return;
+			return false;
 
 		Long length = att.getSize();
 		String mimeType = att.getMime();
@@ -169,5 +172,6 @@ public abstract class ImportArchiveBase extends ServiceBase {
 		// log.debug("Attaching binary to nodeId: " + node.getIdStr());
 		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false, false,
 				false, true, false, true, null);
+		return true;
 	}
 }

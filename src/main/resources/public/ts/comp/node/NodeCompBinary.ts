@@ -150,15 +150,15 @@ export class NodeCompBinary extends Div {
 
             this.setChildren([new Div("", {
                 className: "binary-link",
-                title: `File Size:${fileSize} Type:${fileType}`
+                title: `File Size:${fileSize}\n\nType:${fileType}`
             }, [
                 new Icon({
                     className: "fa fa-file fa-lg iconMarginRight"
                 }),
                 new Span(fileName, {
-                    className: "normalText marginRight"
+                    className: "normalText"
                 }),
-                new Div(null, { className: "marginTop" }, [
+                new Span(null, null, [
                     new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { className: "downloadLink" }),
                     viewFileLink
                 ])
