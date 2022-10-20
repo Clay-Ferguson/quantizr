@@ -69,7 +69,7 @@ export class NodeCompContent extends Div {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering.
                 attComps.push(new NodeCompBinary(this.node, att.key, false, false));
             });
-            children.push(new Div(null, null, attComps))
+            children.push(new Div(null, { className: "marginTop" }, attComps));
         }
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);

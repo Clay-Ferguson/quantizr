@@ -144,22 +144,23 @@ export class NodeCompBinary extends Div {
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {
                 viewFileLink = new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, false), "View", {
                     target: "_blank",
-                    className: "downloadLink"
+                    className: "downloadLink",
+                    title: "Click to open and view in your browser"
                 });
             }
 
+            const titleSuffix = `File Size:${fileSize}\n\nType:${fileType}`;
             this.setChildren([new Div("", {
-                className: "binary-link",
-                title: `File Size:${fileSize}\n\nType:${fileType}`
+                className: "binary-link"
             }, [
                 new Icon({
-                    className: "fa fa-file fa-lg iconMarginRight"
-                }),
-                new Span(fileName, {
-                    className: "normalText"
+                    className: "fa fa-file fa-lg"
                 }),
                 new Span(null, null, [
-                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { className: "downloadLink" }),
+                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName, {
+                        className: "downloadLink",
+                        title: "Click to download attachment\n\n" + titleSuffix
+                    }),
                     viewFileLink
                 ])
             ])]);
