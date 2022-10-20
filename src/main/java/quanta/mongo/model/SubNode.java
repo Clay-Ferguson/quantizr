@@ -265,7 +265,7 @@ public class SubNode {
 			return;
 
 		ServiceBase.auth.ownerAuth(this);
-		this.pathDirty = true;
+		this.verifyParentPath = true;
 		ThreadLocals.dirty(this);
 		this.path = path;
 	}
@@ -279,7 +279,7 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	public boolean pathDirty;
+	public boolean verifyParentPath;
 
 	@Transient
 	@JsonIgnore

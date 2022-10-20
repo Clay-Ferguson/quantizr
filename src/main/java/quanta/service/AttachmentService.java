@@ -206,9 +206,6 @@ public class AttachmentService extends ServiceBase {
 	/*
 	 * Gets the binary attachment from a supplied stream and loads it into the repository on the node
 	 * specified in 'nodeId'
-	 * 
-	 * todo-0: add argument for 'keepAttachment', which will reuse the same 'att' on the node, and just
-	 * update it's binId only...by passing the param thru to saveBinaryStreamToNode also
 	 */
 	public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
 			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild,

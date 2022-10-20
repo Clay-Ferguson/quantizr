@@ -197,7 +197,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
-				&& (isNew || node.pathDirty)) {
+				&& (isNew || node.verifyParentPath)) {
 			read.checkParentExists(null, node);
 		}
 
@@ -300,8 +300,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		node.assignAttachmentOwners();
-
-		node.pathDirty = StringUtils.isEmpty(node.getPath());
+		node.verifyParentPath = StringUtils.isEmpty(node.getPath());
 
 		if (ThreadLocals.hasDirtyNode(node.getId())) {
 			log.warn("DIRTY READ: " + node.getIdStr());

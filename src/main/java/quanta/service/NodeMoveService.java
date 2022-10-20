@@ -163,8 +163,9 @@ public class NodeMoveService extends ServiceBase {
 			}
 
 			if (counter > 0) {
-				/* If node has an attachment we don't delete the node, but just set it's content to null 
-				*/
+				/*
+				 * If node has an attachment we don't delete the node, but just set it's content to null
+				 */
 				if (ok(n.getAttachments())) {
 					n.setContent(null);
 					n.touch();
@@ -281,8 +282,9 @@ public class NodeMoveService extends ServiceBase {
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
 
-					// special case here we know path is fine.
-					node.pathDirty = false;
+					// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
+					// to verify the parent exists upon saving, because we know the path is fine correct.
+					node.verifyParentPath = false;
 
 					// we know this tareget node has chilren now.
 					parentToPasteInto.setHasChildren(true);
@@ -320,7 +322,7 @@ public class NodeMoveService extends ServiceBase {
 			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
 			newPath = mongoUtil.findAvailablePath(newPath);
 			node.setPath(newPath);
-			node.pathDirty = false;
+			node.verifyParentPath = false;
 		}
 	}
 

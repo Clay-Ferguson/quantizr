@@ -76,9 +76,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
 						n.setPath(newPath);
 
-						// don't let MongoListener check the path on this. Parent may not yet exist.
-						// todo-0: double check this pathDirty. What's it doing?
-						n.pathDirty = false;
+						// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this 
+						// to verify the parent exists upon saving, because we know the path is fine correct.
+						n.verifyParentPath = false;
 
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
