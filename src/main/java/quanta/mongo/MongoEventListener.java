@@ -22,7 +22,6 @@ import quanta.EventPublisher;
 import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
 import quanta.exception.NodeAuthFailedException;
-import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
@@ -267,6 +266,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (dbRoot.equals(node.getPath())) {
 			read.setDbRoot(node);
 		}
+
+		// log.debug("MongoListener SAVED hashCode: " + node.hashCode() + "  " + XString.prettyPrint(node));
+		// "\n" + ExUtil.getStackTrace(null));
 	}
 
 	@Override
@@ -297,15 +299,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.set(NodeProp.UNPUBLISHED, true);
 		}
 
-		if (ok(node.getAttachments())) {
-			if (node.getAttachments().size() == 0) {
-				node.setAttachments(null);
-			} else {
-				node.getAttachments().forEach((String key, Attachment att) -> {
-					att.setOwnerNode(node);
-				});
-			}
-		}
+		node.assignAttachmentOwners();
 
 		node.pathDirty = StringUtils.isEmpty(node.getPath());
 

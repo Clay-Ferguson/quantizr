@@ -519,6 +519,18 @@ public class SubNode {
 		}
 	}
 
+	public void assignAttachmentOwners() {
+		if (ok(getAttachments())) {
+			if (getAttachments().size() == 0) {
+				setAttachments(null);
+			} else {
+				getAttachments().forEach((String key, Attachment att) -> {
+					att.setOwnerNode(this);
+				});
+			}
+		}
+	}
+
 	@JsonProperty(LIKES)
 	public HashSet<String> getLikes() {
 		synchronized (likesLock) {

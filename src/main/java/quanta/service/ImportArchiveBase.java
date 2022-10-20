@@ -11,13 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
-import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
-import quanta.util.Val;
+import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 public abstract class ImportArchiveBase extends ServiceBase {
@@ -35,43 +34,54 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	public String targetPath;
 	public MongoSession session;
 	public SubNode importRootNode;
-	public HashMap<String, String> oldIdToNewIdMap = new HashMap<>();
+
+	// JAR path to new nodeId map.
+	public HashMap<String, String> pathToIdMap = new HashMap<>();
 
 	public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
 		String name = entry.getName();
 		int lastSlashIdx = name.lastIndexOf("/");
 		String fileName = lastSlashIdx == -1 ? name : name.substring(lastSlashIdx + 1);
+		String path = lastSlashIdx == -1 ? name : name.substring(0, lastSlashIdx);
 
 		log.trace("Import FILE Entry: " + entry.getName());
 		try {
-			// JSON FILE
+			// HTML FILE
 			if (mimeUtil.isHtmlTypeFileName(fileName)) {
 				// log.debug(" isHTML: " + fileName);
 				// we ignore the html files during import. Data will be in JSON files
-			} else if (mimeUtil.isJsonFileType(fileName)) {
+			}
+			// JSON FILE
+			else if (mimeUtil.isJsonFileType(fileName)) {
 				log.debug("  isJSON: " + fileName);
 				String json = IOUtils.toString(zis, "UTF-8");
 				// log.debug(" JSON STRING: " + json);
-
-				Val<String> oldId = new Val<>();
 
 				// run unmarshalling as admin (otherwise setPath can bark about user being not same as owner)
 				SubNode node = (SubNode) arun.run(as -> {
 					try {
 						SubNode n = jsonMapper.readValue(json, SubNode.class);
+						//log.debug("Raw Marshal ID: " + n.getIdStr() + " content=" + n.getContent());
+
+						// this may not be necessary but we definitely don't want this node cached now
+						// with it's currently undetermined id.
+						ThreadLocals.clean(n);
+
+						// set nodeId to null right away so that as we start setting property values, it
+						// won't cause the 'dirty' cache to start thinking this node needs to be cached
+						// for the wrong id. We can't do any caching until we save to DB and it gets
+						// it's new imported id value.
+						n.setId(null);
 
 						String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
 						n.setPath(newPath);
 
 						// don't let MongoListener check the path on this. Parent may not yet exist.
+						// todo-0: double check this pathDirty. What's it doing?
 						n.pathDirty = false;
-						oldId.setVal(n.getIdStr());
 
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
-
-						// we must nullify the node ID so that it creates a new node when saved.
-						n.setId(null);
 						n.setOwner(ownerId);
 						log.debug("IMPORT NODE: " + XString.prettyPrint(n));
 						return n;
@@ -85,23 +95,46 @@ public abstract class ImportArchiveBase extends ServiceBase {
 					throw new RuntimeException("import unmarshalling failed.");
 				}
 
+				/*
+				 * when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
+				 * be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
+				 * the obsolete values cannot be reused.
+				 */
+				if (ok(node.getAttachments())) {
+					node.getAttachments().forEach((String key, Attachment att) -> {
+						att.setBin(null);
+					});
+				}
+
+				// NOTE: It's important to save this node and NOT let the 'node' before this save,
+				// ever get set into the dirty cache either, so we can't call any setters on it UNTIL
+				// it's saved here and we get the DB to give us the new ID for it.
 				update.save(session, node);
-				oldIdToNewIdMap.put(oldId.getVal(), node.getIdStr());
+				pathToIdMap.put(path, node.getIdStr());
 			}
 			// Any other TEXT file
 			else if (mimeUtil.isTextTypeFileName(fileName)) {
 				// log.debug(" isTXT: " + fileName);
 				// curContent = IOUtils.toString(zis, "UTF-8");
 			}
-			// Or else treat as binary attachment
+			// Binary files of any kind.
 			else {
 				/*
 				 * check fo a slash in name to avoid any of our root files, which for the HTML viewing only (of
 				 * exploded jars)
 				 */
 				if (lastSlashIdx != -1) {
-					log.debug("  isBIN: " + fileName);
-					storeBinary(entry, zis, fileName);
+					// log.debug("  isBIN: " + entry.getName());
+					String nodeId = pathToIdMap.get(path);
+					if (ok(nodeId)) {
+						arun.run(as -> {
+							SubNode node = read.getNode(as, nodeId);
+							if (ok(node)) {
+								importBinary(entry, node, zis, fileName);
+							}
+							return null;
+						});
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -110,35 +143,31 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	}
 
 	/*
-	 * The part of the file name not including the extension will be the actual nodeId of the node onto
-	 * which we need to attach the binary after translating thru oldIdToNewIdMap however!
+	 * This method assumes node has already been loaded which technically is depending on a file
+	 * ordering to be correct in the JAR file. Need to be sure the JSON file is always ahead of the
+	 * binaries in the generated JARS (todo-0)
 	 */
-	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
-		String nodeId = fileUtil.stripExtension(fileName);
-		/*
-		 * todo-2: it would be nice if there WERE a way for an export to extract data out of IPFS and save
-		 * it in the exported file
-		 */
-		nodeId = oldIdToNewIdMap.get(nodeId);
-
-		if (ok(nodeId)) {
-			SubNode node = read.getNode(session, nodeId);
-			if (no(node)) {
-				throw new RuntimeEx("Unable to find node by id: " + nodeId);
-			}
-
-			// todo-0: this needs to be updated for multiple attachments support
-			Attachment att = node.getFirstAttachment();
-			if (no(att)) return;
-			Long length = att.getSize();
-			String mimeType = att.getMime();
-			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
-
-			// log.debug("Attaching binary to nodeId: " + node.getIdStr());
-			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false, false, false,
-					true, false, true, null);
-		} else {
-			// this is normal to get here and indicates this file is NOT an attachment file.
+	public void importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
+		if (no(node)) {
+			log.debug("Attempted to attach binary before node is known");
+			return;
 		}
+
+		String attName = fileUtil.stripExtension(fileName);
+		HashMap<String, Attachment> atts = node.getAttachments();
+		if (no(atts))
+			return;
+
+		Attachment att = atts.get(attName);
+		if (no(att))
+			return;
+
+		Long length = att.getSize();
+		String mimeType = att.getMime();
+		LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
+
+		// log.debug("Attaching binary to nodeId: " + node.getIdStr());
+		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false, false,
+				false, true, false, true, null);
 	}
 }

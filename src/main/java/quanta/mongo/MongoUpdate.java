@@ -85,6 +85,13 @@ public class MongoUpdate extends ServiceBase {
 			saving.set(true);
 
 			synchronized (ms) {
+				ThreadLocals.getDirtyNodes().forEach((key, value) -> {
+					if (!key.toHexString().equals(value.getIdStr())) {
+						throw new RuntimeException(
+								"Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
+					}
+				});
+
 				/*
 				 * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
 				 * node will have the side effect of removing it from dirtyNodes, and that can't happen during the

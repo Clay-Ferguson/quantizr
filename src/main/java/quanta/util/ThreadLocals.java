@@ -68,7 +68,7 @@ public class ThreadLocals {
 		reqBearerToken.remove();
 		reqSig.remove();
 		rootEvent.remove();
-	
+
 		getDirtyNodes().clear();
 		setParentCheckEnabled(true);
 		session.remove();
@@ -216,6 +216,10 @@ public class ThreadLocals {
 
 		log.debug("Dirty Nodes...");
 		getDirtyNodes().forEach((key, value) -> {
+			if (!key.toHexString().equals(value.getIdStr())) {
+				throw new RuntimeException(
+						"Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
+			}
 			log.debug("    " + key.toHexString());
 		});
 	}
@@ -239,11 +243,14 @@ public class ThreadLocals {
 		 * Normally NodeIterator.java, and all places we ready from the DB should be wrapped in a way as to
 		 * let the dirty nodes be correctly referenced, so this message should never get printed.
 		 */
-		if (ok(nodeFound) && nodeFound.hashCode() != node.hashCode()) {
-			ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+		if (ok(nodeFound)) {
+			if (nodeFound.hashCode() != node.hashCode()) {
+				ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+			}
 			return;
 		}
 
+		// log.debug("Setting Dirty: " + node.getIdStr());
 		getDirtyNodes().put(node.getId(), node);
 	}
 
