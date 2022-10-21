@@ -158,7 +158,7 @@ export class NodeCompRow extends Div {
 
         let allowHeader: boolean = false;
         // special case, if node is owned by admin and we're not admin, never show header
-        if (this.node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && this.node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
             // leave allowHeader false.
         }
         else {
@@ -170,7 +170,8 @@ export class NodeCompRow extends Div {
             // show orphans on the page when something is deleted. Other panels don't have this problem
             // todo-1: it would be kind of easy to fix this, and make deleting from doc view work.
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
-            header = new NodeCompRowHeader(this.node, true, true, false, false, true, false, allowDelete);
+            const showJumpButton = this.tabData.id !== C.TAB_MAIN;
+            header = new NodeCompRowHeader(this.node, true, true, false, showJumpButton, true, false, allowDelete);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

@@ -84,7 +84,7 @@ export class NodeCompMainNode extends Div {
 
             let allowHeader: boolean = false;
             // special case, if node is owned by admin and we're not admin, never show header
-            if (node.owner===J.PrincipalName.ADMIN && state.userName!==J.PrincipalName.ADMIN) {
+            if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
                 // leave allowHeader false
             }
             else {
@@ -93,7 +93,8 @@ export class NodeCompMainNode extends Div {
 
             if (allowHeader) {
                 const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
-                header = new NodeCompRowHeader(node, true, true, false, false, true, false, allowDelete);
+                const showJumpButton = this.tabData.id !== C.TAB_MAIN;
+                header = new NodeCompRowHeader(node, true, true, false, showJumpButton, true, false, allowDelete);
             }
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

@@ -576,8 +576,8 @@ export class Search {
             attrs.style = extraStyle;
         }
 
-        // special case, if node is owned by admin and we're not admin, never show header
-        if (node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+        // special case, if node is owned by admin and we're not admin, never show header, unless the ALLOW flag is true
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
             allowHeader = false;
         }
 
