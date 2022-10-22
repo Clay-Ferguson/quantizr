@@ -66,7 +66,7 @@ export class NodeCompBinary extends Div {
             src,
             className,
             style,
-            title: "Click image to enlarge/reduce",
+            title: this.isEditorEmbed ? "Attached image" : "Click image to enlarge/reduce",
             onClick: () => { this.clickOnImage(node.id, this.attName); }
         });
     }

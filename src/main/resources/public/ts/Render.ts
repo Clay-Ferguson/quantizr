@@ -12,6 +12,8 @@ import { HorizontalLayout } from "./comp/core/HorizontalLayout";
 import { Icon } from "./comp/core/Icon";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
+import { Tag } from "./comp/core/Tag";
+import { NodeCompBinary } from "./comp/node/NodeCompBinary";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
@@ -259,6 +261,11 @@ export class Render {
         });
     }
 
+    showLink = (link: string) => {
+        S.util.copyToClipboard(link);
+        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+    }
+
     showNodeUrl = (node: J.NodeInfo, state: AppState) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
@@ -274,13 +281,12 @@ export class Render {
         const dlgHolder: any = {};
 
         const byIdUrl = window.location.origin + "?id=" + node.id;
+        children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
         children.push(new Heading(5, "By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",
                 title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(byIdUrl);
-                }
+                onClick: () => this.showLink(byIdUrl)
             }));
 
         if (node.name) {
@@ -289,9 +295,7 @@ export class Render {
                 new Div(byNameUrl, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(byNameUrl);
-                    }
+                    onClick: () => this.showLink(byNameUrl)
                 }));
         }
 
@@ -300,81 +304,84 @@ export class Render {
             new Div(rssFeed, {
                 className: "linkDisplay",
                 title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(rssFeed);
-                }
+                onClick: () => this.showLink(rssFeed)
             }));
 
-        let att: J.Attachment = null;
+        const attachmentComps: Comp[] = [];
         if (node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAttachments(node);
-            if (list.length > 0) {
-                att = list[0]
+            const atts: J.Attachment[] = S.props.getOrderedAttachments(node);
+            attachmentComps.push(new Heading(3, "Attachments"));
+            for (const att of atts) {
+                attachmentComps.push(new Tag("hr"));
+                const bin = att ? att.b : null;
+                if (bin) {
+                    attachmentComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false)]));
+                    attachmentComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
+                    const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
+
+                    const attByIdUrl = window.location.origin + "/f/id/" + node.id;
+                    linkGroup.addChildren([
+                        new Heading(5, "View By Id"), //
+                        new Div(attByIdUrl, {
+                            className: "linkDisplay",
+                            title: "Click -> Copy to clipboard",
+                            onClick: () => this.showLink(attByIdUrl)
+                        })
+                    ]);
+
+                    const downloadAttByIdUrl = attByIdUrl + "?download=y";
+                    linkGroup.addChildren([
+                        new Heading(5, "Download By Id"), //
+                        new Div(downloadAttByIdUrl, {
+                            className: "linkDisplay",
+                            title: "Click -> Copy to clipboard",
+                            onClick: () => this.showLink(downloadAttByIdUrl)
+                        })
+                    ]);
+
+                    if (node.name) {
+                        const attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
+                        linkGroup.addChildren([
+                            new Heading(5, "View By Name"), //
+                            new Div(attByNameUrl, {
+                                className: "linkDisplay",
+                                title: "Click -> Copy to clipboard",
+                                onClick: () => this.showLink(attByNameUrl)
+                            })
+                        ]);
+
+                        const downloadAttByNameUrl = attByNameUrl + "?download=y";
+                        linkGroup.addChildren([
+                            new Heading(5, "Download By Name"), //
+                            new Div(downloadAttByNameUrl, {
+                                className: "linkDisplay",
+                                title: "Click -> Copy to clipboard",
+                                onClick: () => this.showLink(downloadAttByNameUrl)
+                            })
+                        ]);
+                    }
+
+                    // il = IpfsLink
+                    if (att.il) {
+                        linkGroup.addChildren([
+                            new Heading(5, "IPFS LINK"), //
+                            new Div("ipfs://" + att.il, {
+                                className: "linkDisplay",
+                                title: "Click -> Copy to clipboard",
+                                onClick: () => this.showLink("ipfs://" + att.il)
+                            })
+                        ]);
+                    }
+
+                    attachmentComps.push(linkGroup);
+                }
             }
-        }
 
-        const bin = att ? att.b : null;
-        if (bin) {
-            const attachmentComps: Comp[] = [];
-            attachmentComps.push(new Heading(3, "Attachment URLs"));
-
-            const attByIdUrl = window.location.origin + "/f/id/" + node.id;
-            attachmentComps.push(new Heading(5, "View By Id"), //
-                new Div(attByIdUrl, {
-                    className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(attByIdUrl);
-                    }
-                }));
-
-            const downloadttByIdUrl = attByIdUrl + "?download=y";
-            attachmentComps.push(new Heading(5, "Download By Id"), //
-                new Div(downloadttByIdUrl, {
-                    className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(downloadttByIdUrl);
-                    }
-                }));
-
-            if (node.name) {
-                const attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
-                attachmentComps.push(new Heading(5, "View By Name"), //
-                    new Div(attByNameUrl, {
-                        className: "linkDisplay",
-                        title: "Click -> Copy to clipboard",
-                        onClick: () => {
-                            S.util.copyToClipboard(attByNameUrl);
-                        }
-                    }));
-
-                const downloadAttByNameUrl = attByNameUrl + "?download=y";
-                attachmentComps.push(new Heading(5, "Download By Name"), //
-                    new Div(downloadAttByNameUrl, {
-                        className: "linkDisplay",
-                        title: "Click -> Copy to clipboard",
-                        onClick: () => {
-                            S.util.copyToClipboard(downloadAttByNameUrl);
-                        }
-                    }));
+            if (attachmentComps.length > 0) {
+                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
+                    state.linksToAttachmentsExpanded = s;
+                }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
-
-            children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
-                state.linksToAttachmentsExpanded = s;
-            }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
-        }
-
-        const ipfsLink = att ? att.il : null;
-        if (ipfsLink) {
-            children.push(new Heading(5, "IPFS LINK"), //
-                new Div("ipfs://" + ipfsLink, {
-                    className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard("ipfs://" + ipfsLink);
-                    }
-                }));
         }
 
         const ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
@@ -383,9 +390,7 @@ export class Render {
                 new Div("ipfs://" + ipfsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard("ipfs://" + ipfsCid);
-                    }
+                    onClick: () => this.showLink(ipfsCid)
                 }));
         }
 
@@ -395,9 +400,7 @@ export class Render {
                 new Div("ipns://" + ipnsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard("ipns://" + ipnsCid);
-                    }
+                    onClick: () => this.showLink("ipns://" + ipnsCid)
                 }));
         }
 
