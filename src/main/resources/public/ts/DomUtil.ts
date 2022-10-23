@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { S } from "./Singletons";
@@ -7,6 +7,9 @@ export class DomUtil {
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
+    mouseCircle: any = null;
+    mouseEffect: boolean = false;
+    mouseEffectDirty: boolean = true;
 
     static escapeMap = {
         "&": "&amp;",
@@ -236,17 +239,33 @@ export class DomUtil {
 
     enableMouseEffect = async () => {
         const mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
-        dispatch("ToggleMouseEffect", s => {
-            s.mouseEffect = mouseEffect === "1";
-            return s;
-        });
+        this.mouseEffect = mouseEffect === "1";
+        this.mouseEffectDirty = true;
+        this.mouseCircle = document.getElementById("mouse-circle");
+        document.onmousemove = this.mouseMoved;
     }
+
+    mouseMoved = (e: any) => {
+        if (this.mouseEffect) {
+            if (this.mouseEffectDirty) {
+                this.mouseCircle.style.display = "block";
+            }
+            this.mouseCircle.style.top = e.pageY + "px";
+            this.mouseCircle.style.left = e.pageX + "px";
+        }
+        else {
+            if (this.mouseEffectDirty) {
+                this.mouseCircle.style.display = "none";
+            }
+        }
+    };
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
         dispatch("ToggleMouseEffect", s => {
-            s.mouseEffect = !s.mouseEffect;
-            S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
+            this.mouseEffect = !this.mouseEffect;
+            this.mouseEffectDirty = true;
+            S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0", "allUsers");
             return s;
         });
     }
@@ -258,10 +277,9 @@ export class DomUtil {
         const clickEffect = (e: MouseEvent) => {
             // use a timeout so we can call 'getState()' without a react error.
             setTimeout(() => {
-                const state = getAppState();
                 /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
                  and is apparently 0, 0, so we just check the sanity of the coordinates here */
-                if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
+                if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
                 this.runClickAnimation(e.clientX, e.clientY);
             }, 10);
         };
@@ -277,13 +295,13 @@ export class DomUtil {
         around the actual mouse click arrow tip location, so we have to use an offset here (only when that Linux OS mouse theme is used)
         to get our expanding circle in CSS to be perfectly centered with the one in the mouse theme, becasue an off center look
         is terrible but the 5 and 12 makes it perfect */
-        d.style.left = `${x + 5}px`;
-        d.style.top = `${y + 12}px`;
+        d.style.left = `${x - 2}px`;
+        d.style.top = `${y - 2}px`;
         document.body.appendChild(d);
 
         setTimeout(() => {
             d.parentElement.removeChild(d);
-        }, 400); // this val is in 3 places. put the TS two in a constants file.
+        }, 300); // this val is in 3 places. put the TS two in a constants file.
     }
 
     addAnnotation = () => {

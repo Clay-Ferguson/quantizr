@@ -1,7 +1,6 @@
 import DOMPurify from "dompurify";
 import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import { renderToString } from "react-dom/server";
-import { getAppState } from "../../AppContext";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -207,7 +206,7 @@ export abstract class Comp implements CompIntf {
     wrapClick = (obj: any) => {
         // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to
         // give the animation time to run.
-        if (obj?.onClick && getAppState().mouseEffect) {
+        if (obj?.onClick && S.domUtil.mouseEffect) {
             obj.onClick = S.util.delayFunc(obj.onClick);
         }
     }

@@ -167,6 +167,7 @@ td {
     margin-left: 0px !important;
     margin-right: 0px !important;
     height: 100vh;
+    overflow: hidden;
 }
 
 .signupLinkText {
@@ -367,12 +368,17 @@ a {
     border-radius: 12px;
 }
 
+#app {
+    overflow: hidden;
+}
+
 .app-body {
     background-color: $body-bg;
     font-family: $fontFamily !important;
     // font-size: $fontSize;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .highlightBorder {
@@ -713,6 +719,7 @@ Will come back later and study this more. todo-1 */
 
 .mainContainer {
     padding: 0px;
+    overflow: hidden;
 }
 
 .mainContainerMobile {

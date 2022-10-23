@@ -364,7 +364,7 @@ export class MenuPanel extends Div {
              that I have to impose an intentional performance lag to let the animation show up, so in order to have the
              absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
              the code in place for future reference. */
-            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => appState.mouseEffect),
+            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => S.domUtil.mouseEffect),
 
             new MenuItem("My GEO Location", S.nav.geoLocation) //
 

@@ -118,8 +118,7 @@ export class Util {
 
     // #mouseEffects (do not delete tag)
     delayFunc = (func: Function): Function => {
-        const state = getAppState();
-        if (!func || !state.mouseEffect) {
+        if (!func || !S.domUtil.mouseEffect) {
             return func;
         }
 
@@ -130,7 +129,7 @@ export class Util {
             },
                 /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
                 and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
-                400);
+                300);
         };
     }
 
