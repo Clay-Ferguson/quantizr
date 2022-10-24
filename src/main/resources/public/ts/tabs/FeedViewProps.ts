@@ -13,9 +13,7 @@ export class FeedViewProps {
     feedFilterToPublic = true;
     feedFilterLocalServer = false;
     applyAdminBlocks: true;
-
-    // text hint about what kind of filtering is being done
-    name: string;
+    name: string = J.Constant.FEED_PUB;
 
     /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
      for any non-node specific feed query this stays null. */

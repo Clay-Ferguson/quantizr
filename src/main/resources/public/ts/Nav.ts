@@ -376,7 +376,8 @@ export class Nav {
                     feedFilterLocalServer: true,
                     feedFilterRootNode: node,
                     feedResults: null,
-                    applyAdminBlocks: false
+                    applyAdminBlocks: false,
+                    name: J.Constant.FEED_PUB
                 });
             }, 500);
         }
@@ -409,7 +410,8 @@ export class Nav {
                 feedFilterLocalServer: true,
                 feedFilterRootNode: res.node,
                 feedResults: null,
-                applyAdminBlocks: false
+                applyAdminBlocks: false,
+                name: J.Constant.FEED_PUB
             });
         }
     }

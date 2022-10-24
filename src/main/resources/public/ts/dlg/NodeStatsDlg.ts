@@ -92,7 +92,8 @@ export class NodeStatsDlg extends DialogBase {
                 feedFilterLocalServer: false,
                 feedFilterRootNode: null,
                 feedResults: null,
-                applyAdminBlocks: true
+                applyAdminBlocks: true,
+                name: J.Constant.FEED_PUB
             });
         }
         else {

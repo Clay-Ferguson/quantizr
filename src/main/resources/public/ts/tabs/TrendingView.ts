@@ -134,7 +134,8 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
             feedResults: null,
-            applyAdminBlocks: true
+            applyAdminBlocks: true,
+            name: J.Constant.FEED_PUB
         });
     }
 }

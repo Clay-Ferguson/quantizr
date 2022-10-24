@@ -78,8 +78,8 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static transferNode = () => { S.edit.subGraphHash(); };
-    static subgraphHash = () => { new TransferNodeDlg().open(); };
+    static transferNode = () => { new TransferNodeDlg().open(); };
+    static subgraphHash = () => { S.edit.subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
@@ -253,10 +253,15 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            // This feature CAN easily work for all users (although currently disabled on server for all but admin), but
-            // we need some sort of "acceptance" feature for the recipient to take control, because for now they way this
-            // works is you can take your own node and create the appearance that someone else authored it simply by
-            // transferring the node to them, so we need some better process of acceptance.
+            /* This feature CAN easily work for all users (although currently disabled on server for all but admin), but
+            we need some sort of "acceptance" feature for the recipient to take control, because for now they way this
+            works is you can take your own node and create the appearance that someone else authored it simply by
+            transferring the node to them, so we need some better process of acceptance.
+
+            In other words, the avatar image, owner and everything else on the node will LOOK like the person recieving
+            the transfer actually wrote the node when they didn't if you transfer it to them, and so that's the confusion
+            we need to eliminate somehow. #transfer-issue #todo-1
+            */
             appState.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
 
             appState.isAdminUser ? new MenuItem("SubGraph SHA256", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
