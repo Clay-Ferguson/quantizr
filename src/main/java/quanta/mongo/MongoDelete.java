@@ -45,9 +45,11 @@ public class MongoDelete extends ServiceBase {
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly) {
-			node.getAttachments().forEach((String key, Attachment att) -> {
-				attach.deleteBinary(ms, key, node, null, true);
-			});
+			if (ok(node.getAttachments())) {
+				node.getAttachments().forEach((String key, Attachment att) -> {
+					attach.deleteBinary(ms, key, node, null, true);
+				});
+			}
 		}
 
 		delete(ms, node, childrenOnly);

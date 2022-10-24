@@ -472,7 +472,7 @@ public class SubNode {
 		List<Attachment> list = new LinkedList<>();
 		synchronized (attLock) {
 			if (ok(attachments)) {
-				getAttachments().forEach((String key, Attachment att) -> {
+				attachments.forEach((String key, Attachment att) -> {
 					att.setKey(key);
 					list.add(att);
 				});
