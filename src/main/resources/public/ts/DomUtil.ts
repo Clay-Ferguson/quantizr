@@ -7,9 +7,7 @@ export class DomUtil {
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
-    mouseCircle: any = null;
     mouseEffect: boolean = false;
-    mouseEffectDirty: boolean = true;
 
     static escapeMap = {
         "&": "&amp;",
@@ -240,31 +238,12 @@ export class DomUtil {
     enableMouseEffect = async () => {
         const mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
         this.mouseEffect = mouseEffect === "1";
-        this.mouseEffectDirty = true;
-        this.mouseCircle = document.getElementById("mouse-circle");
-        document.onmousemove = this.mouseMoved;
     }
-
-    mouseMoved = (e: any) => {
-        if (this.mouseEffect) {
-            if (this.mouseEffectDirty) {
-                this.mouseCircle.style.display = "block";
-            }
-            this.mouseCircle.style.top = e.pageY + "px";
-            this.mouseCircle.style.left = e.pageX + "px";
-        }
-        else {
-            if (this.mouseEffectDirty) {
-                this.mouseCircle.style.display = "none";
-            }
-        }
-    };
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
         dispatch("ToggleMouseEffect", s => {
             this.mouseEffect = !this.mouseEffect;
-            this.mouseEffectDirty = true;
             S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0", "allUsers");
             return s;
         });
