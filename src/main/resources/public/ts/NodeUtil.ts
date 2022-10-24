@@ -172,7 +172,7 @@ export class NodeUtil {
         if (!state.node) return null;
         if (state.node.id === nodeId) return state.node;
         if (!state.node.children) return null;
-        return state.node.children.find(node => node.id === nodeId);
+        return state.node.children.find(node => node?.id === nodeId);
     }
 
     getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {
@@ -180,7 +180,7 @@ export class NodeUtil {
         if (node.name === name) return node;
 
         if (node.children) {
-            return state.node.children.find(node => node.name === name);
+            return state.node.children.find(node => node?.name === name);
         }
         return null;
     }

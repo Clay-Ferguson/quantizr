@@ -37,7 +37,7 @@ export class DocumentTab implements TabIntf<DocumentRSInfo> {
 
     replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
-            return n.id === newNode.id ? newNode : n;
+            return n?.id === newNode?.id ? newNode : n;
         });
     }
 }

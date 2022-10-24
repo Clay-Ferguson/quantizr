@@ -38,7 +38,7 @@ export class SearchTab implements TabIntf<ResultSetInfo> {
         if (!this.props.results) return;
 
         this.props.results = this.props.results?.map(n => {
-            return n.id === newNode.id ? newNode : n;
+            return n?.id === newNode?.id ? newNode : n;
         });
     }
 }

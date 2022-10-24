@@ -56,7 +56,7 @@ export class MainTab implements TabIntf<any> {
         if (!state.node || !state.node.children) return;
 
         state.node.children = state.node.children.map(n => {
-            return n.id === newNode.id ? newNode : n;
+            return n?.id === newNode?.id ? newNode : n;
         });
     }
 

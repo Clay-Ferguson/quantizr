@@ -946,7 +946,7 @@ export class Edit {
             /* Node: state.node can be null if we've never been to the tree view yet */
             if (state.node && S.util.checkSuccess("Delete node", res)) {
                 if (state.node.children) {
-                    state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
+                    state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
                 }
 
                 if (state.activeTab === C.TAB_MAIN && state.node.children.length === 0) {

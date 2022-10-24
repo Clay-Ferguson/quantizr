@@ -36,7 +36,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
 
     replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
         this.props.feedResults = this.props.feedResults?.map(n => {
-            return n.id === newNode.id ? newNode : n;
+            return n?.id === newNode?.id ? newNode : n;
         });
     }
 
