@@ -478,7 +478,11 @@ public class SubNode {
 				});
 			}
 		}
-		list.sort((a1, a2) -> (int) (a1.getOrdinal() - a2.getOrdinal()));
+		list.sort((a1, a2) -> {
+			int a1Idx = ok(a1.getOrdinal()) ? a1.getOrdinal().intValue() : 0;
+			int a2Idx = ok(a2.getOrdinal()) ? a2.getOrdinal().intValue() : 0;
+			return a1Idx - a2Idx;
+		});
 		return list.size() > 0 ? list : null;
 	}
 

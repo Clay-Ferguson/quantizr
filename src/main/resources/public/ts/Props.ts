@@ -183,6 +183,9 @@ export class Props {
             Object.keys(node.attachments).forEach(key => {
                 // this is bizarre looking yes, but we need each object returned to know what it's key is
                 (node.attachments[key] as any).key = key;
+                if (!node.attachments[key].o) {
+                    node.attachments[key].o = 0;
+                }
                 list.push(node.attachments[key]);
             });
         }
