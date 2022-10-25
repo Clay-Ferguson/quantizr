@@ -990,17 +990,11 @@ public class UserManagerService extends ServiceBase {
 						userProfile.setHomeNodeId(userHomeNode.getIdStr());
 					}
 
-					// #follow-endpoints: for now we're only showing follower/following counts to the user themselves
-					// and
-					// and not making visible to other users.
-					if (sessionUserName.equals(nodeUserName)) {
-						Long followerCount =
-								apFollower.countFollowersOfUser(as, sessionUserName, userNode, nodeUserName, actorUrl);
-						userProfile.setFollowerCount(followerCount.intValue());
+					Long followerCount = apFollower.countFollowersOfUser(as, sessionUserName, userNode, nodeUserName, actorUrl);
+					userProfile.setFollowerCount(followerCount.intValue());
 
-						Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
-						userProfile.setFollowingCount(followingCount.intValue());
-					}
+					Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
+					userProfile.setFollowingCount(followingCount.intValue());
 
 					if (!ThreadLocals.getSC().isAnonUser()) {
 						/*
