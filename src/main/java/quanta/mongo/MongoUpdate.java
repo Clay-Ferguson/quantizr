@@ -44,6 +44,17 @@ public class MongoUpdate extends ServiceBase {
 		save(ms, node, true);
 	}
 
+	public void setParentHasChildren(SubNode node) {
+		if (no(node)) return;
+		arun.run(as -> {
+			SubNode parent = read.findNodeByPath(node.getParentPath());
+			if (ok(parent)) {
+				parent.setHasChildren(true);
+			}
+			return null;
+		});
+	}
+
 	@PerfMon(category = "update")
 	public void save(MongoSession ms, SubNode node, boolean allowAuth) {
 		if (allowAuth) {

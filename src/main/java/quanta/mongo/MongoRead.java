@@ -59,7 +59,7 @@ public class MongoRead extends ServiceBase {
     public SubNode getDbRoot() {
         synchronized (dbRootLock) {
             if (no(dbRoot)) {
-                dbRoot = findNodeByPath("/" + NodePath.ROOT, true);
+                dbRoot = findNodeByPath("/" + NodePath.ROOT);
             }
             return dbRoot;
         }
@@ -356,7 +356,7 @@ public class MongoRead extends ServiceBase {
         }
         // otherwise this is a path lookup
         else {
-            ret = read.findNodeByPath(identifier, true);
+            ret = read.findNodeByPath(identifier);
         }
 
         if (authPending && allowAuth) {
@@ -366,7 +366,7 @@ public class MongoRead extends ServiceBase {
     }
 
     @PerfMon(category = "read")
-    public SubNode findNodeByPath(String path, boolean useCache) {
+    public SubNode findNodeByPath(String path) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.PATH).is(path));

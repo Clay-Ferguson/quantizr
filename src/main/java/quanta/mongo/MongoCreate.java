@@ -40,6 +40,7 @@ public class MongoCreate extends ServiceBase {
 
 	public SubNode createNode(MongoSession ms, String path) {
 		SubNode node = new SubNode(ms.getUserNodeId(), path, NodeType.NONE.s(), null);
+		update.setParentHasChildren(node);
 		return node;
 	}
 
@@ -48,6 +49,7 @@ public class MongoCreate extends ServiceBase {
 			type = NodeType.NONE.s();
 		}
 		SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
+		update.setParentHasChildren(node);
 		return node;
 	}
 
@@ -57,6 +59,7 @@ public class MongoCreate extends ServiceBase {
 		}
 		// ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
 		SubNode node = new SubNode(ownerId, path, type, null);
+		update.setParentHasChildren(node);
 		return node;
 	}
 
@@ -105,6 +108,7 @@ public class MongoCreate extends ServiceBase {
 		}
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
+		update.setParentHasChildren(node);
 
 		if (ok(properties)) {
 			for (PropertyInfo propInfo : properties) {
