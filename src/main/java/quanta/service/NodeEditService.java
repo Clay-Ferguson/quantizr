@@ -201,6 +201,7 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		parentNode.setHasChildren(true);
 		update.save(ms, parentNode);
 		update.save(ms, newNode);
 

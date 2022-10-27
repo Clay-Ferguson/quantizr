@@ -10,6 +10,7 @@ export class State {
     }
 
     mergeState<T>(moreState: T): void {
+        this.state = this.stateTranslator({ ...this.state, ...moreState });
         this.setStateEx((state: any) => {
             return this.state = this.stateTranslator({ ...state, ...moreState });
         });
