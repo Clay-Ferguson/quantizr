@@ -1100,7 +1100,7 @@ public class ActPubService extends ServiceBase {
             toAccountNode = getAcctNodeByActorUrl(ms, userDoingAction, objAttributedTo);
         }
         SubNode newNode =
-                create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
+                create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
 
         // If we're updating a node, find what the ID should be and we can just put that ID value into
         // newNode
