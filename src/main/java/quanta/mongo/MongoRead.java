@@ -441,7 +441,7 @@ public class MongoRead extends ServiceBase {
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
 
-        SubNode ret = read.getNode(ms, parentPath);
+        SubNode ret = read.getNode(ms, parentPath, allowAuth);
         if (ok(ret) && allowAuth) {
             auth.auth(ms, ret, PrivilegeType.READ);
         }

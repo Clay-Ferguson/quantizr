@@ -9,6 +9,9 @@ public class TransferNodeRequest extends RequestBase {
 	private String fromUser;
 	private String toUser;
 
+	// transfer, accept, reject
+	private String operation;
+
 	public String getFromUser() {
 		return fromUser;
 	}
@@ -39,5 +42,13 @@ public class TransferNodeRequest extends RequestBase {
 
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
+	}
+
+	public String getOperation() {
+		return operation;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
 	}
 }

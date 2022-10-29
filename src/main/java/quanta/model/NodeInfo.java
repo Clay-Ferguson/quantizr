@@ -74,7 +74,8 @@ public class NodeInfo {
 	private List<NodeInfo> children;
 
 	// This is optional, and will be non-empty whenever we're wanting not just the children of this node
-	// but all the parents up to a certain number of parents, up towards the root, however many levels up.
+	// but all the parents up to a certain number of parents, up towards the root, however many levels
+	// up.
 	private LinkedList<NodeInfo> parents;
 
 	private List<String> likes;
@@ -83,6 +84,7 @@ public class NodeInfo {
 	private String displayName;
 	private String owner;
 	private String ownerId;
+	private String transferFromId;
 
 	private String avatarVer;
 	private String apAvatar;
@@ -93,10 +95,11 @@ public class NodeInfo {
 
 	public NodeInfo() {}
 
-	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
-			Long ordinal, Date lastModified, List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
-			String type, long logicalOrdinal, boolean lastChild, String cipherKey,
-			String avatarVer, String apAvatar, String apImage) {
+	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner,
+			String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
+			HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
+			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String avatarVer, String apAvatar,
+			String apImage) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -106,6 +109,7 @@ public class NodeInfo {
 		this.displayName = displayName;
 		this.owner = owner;
 		this.ownerId = ownerId;
+		this.transferFromId = transferFromId;
 		this.ordinal = ordinal;
 		this.logicalOrdinal = logicalOrdinal;
 		this.properties = properties;
@@ -285,6 +289,14 @@ public class NodeInfo {
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
+	}
+
+	public String getTransferFromId() {
+		return transferFromId;
+	}
+
+	public void setTransferFromId(String transferFromId) {
+		this.transferFromId = transferFromId;
 	}
 
 	public Long getOrdinal() {

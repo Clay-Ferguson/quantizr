@@ -601,6 +601,7 @@ public class MongoUtil extends ServiceBase {
 		createIndex(ms, SubNode.class, SubNode.TYPE);
 
 		createIndex(ms, SubNode.class, SubNode.OWNER);
+		createIndex(ms, SubNode.class, SubNode.XFR);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
 
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);

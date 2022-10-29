@@ -61,6 +61,7 @@ import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
+import quanta.util.IntVal;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -327,15 +328,15 @@ public class NodeEditService extends ServiceBase {
 			// Leaving this temporary code here for now.
 			// todo-1: this block was temporary troubleshooting
 			// Criteria crit = Criteria.where(SubNode.OWNER).is(ms.getUserNodeId()) //
-			// 		.and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()) //
-			// 		.and(SubNode.TYPE).is(NodeType.FRIEND.s());
+			// .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()) //
+			// .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
 			// Query q = new Query();
 			// q.addCriteria(crit);
 			// SubNode ret = mongoUtil.findOne(q);
 			// if (ok(ret)) {
-			// 	log.debug("oops!! duplicates this existing FRIEND node: " + XString.prettyPrint(ret));
-			// 	throw new RuntimeException("Duplicate Friend: " + userToFollow);
+			// log.debug("oops!! duplicates this existing FRIEND node: " + XString.prettyPrint(ret));
+			// throw new RuntimeException("Duplicate Friend: " + userToFollow);
 			// }
 
 			// troubleshooting this constraint violation
@@ -988,20 +989,37 @@ public class NodeEditService extends ServiceBase {
 		return hexString.toString();
 	}
 
+	// todo-0: need to be doing a bulk update in here.
 	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
-		int transfers = 0;
-		String nodeId = req.getNodeId();
 
-		log.debug("Transfer node: " + nodeId);
-		SubNode node = read.getNode(ms, nodeId);
-		auth.ownerAuth(ms, node);
-
-		SubNode toUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getToUser()));
-		if (no(toUserNode)) {
-			throw new RuntimeEx("User not found: " + req.getToUser());
+		// make sure only admin will be allowed to specify some arbitrary "fromUser"
+		if (!ms.isAdmin()) {
+			req.setFromUser(null);
 		}
 
+		IntVal ops = new IntVal(0);
+		String nodeId = req.getNodeId();
+
+		// get and auth node being transfered
+		log.debug("Transfer node: " + nodeId + " operation=" + req.getOperation());
+
+		// we do allowAuth below, not here
+		SubNode node = read.getNode(ms, nodeId, false);
+		if (no(node)) {
+			throw new RuntimeEx("Node not found: " + nodeId);
+		}
+
+		// get user node of person being transfered to
+		SubNode toUserNode = null;
+		if (req.getOperation().equals("transfer")) {
+			toUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getToUser()));
+			if (no(toUserNode)) {
+				throw new RuntimeEx("User not found: " + req.getToUser());
+			}
+		}
+
+		// get account node of person doing the transfer
 		SubNode fromUserNode = null;
 		if (!StringUtils.isEmpty(req.getFromUser())) {
 			fromUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getFromUser()));
@@ -1010,50 +1028,77 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
-		// if user doesn't specify a 'from' then we set ownership of ALL nodes.
-		if (no(fromUserNode)) {
-			node.setOwner(toUserNode.getOwner());
-			transfers++;
-		} else {
-			if (transferNode(ms, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
-				transfers++;
-			}
-		}
+		transferNode(ms, req.getOperation(), node, fromUserNode, toUserNode, ops);
 
 		if (req.isRecursive()) {
+			// todo-0: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
+			// but leave as ALL node for the admin who might specify the 'from'?
 			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
-				if (no(fromUserNode)) {
-					n.setOwner(toUserNode.getOwner());
-					transfers++;
-				} else {
-					if (transferNode(ms, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
-						transfers++;
-					}
-				}
+				transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
 			}
 		}
 
-		if (transfers > 0) {
+		if (ops.getVal() > 0) {
 			arun.run(as -> {
 				update.saveSession(as);
 				return null;
 			});
 		}
 
-		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");
+		// todo-0: don't show this message if there was a failure in any node in 'saveSession' above.
+		res.setMessage(String.valueOf(ops.getVal()) + " nodes were affected.");
 		res.setSuccess(true);
 		return res;
 	}
 
-	/* Returns true if a transfer was done */
-	public boolean transferNode(MongoSession ms, SubNode node, ObjectId fromUserObjId, ObjectId toUserObjId) {
-		/* is this a node we are transferring */
-		if (fromUserObjId.equals(node.getOwner())) {
-			node.setOwner(toUserObjId);
-			return true;
+	public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode, IntVal ops) {
+		/*
+		 * if we're transferring only from a specific user (will only be admin able to do this) then we
+		 * simply return without doing anything if this node in't owned by the person we're transferring
+		 * from
+		 */
+		if (ok(fromUserNode) && !fromUserNode.getOwner().equals(node.getOwner())) {
+			return;
 		}
-		return false;
+
+		if (op.equals("transfer")) {
+			auth.ownerAuth(ms, node);
+			ObjectId fromOwnerId = node.getOwner();
+			node.setOwner(toUserNode.getOwner());
+			node.setTransferFrom(fromOwnerId);
+			node.adminUpdate = true;
+			ops.inc();
+		} //
+		else if (op.equals("accept")) {
+			auth.ownerAuth(ms, node);
+			if (ok(node.getTransferFrom())) {
+				node.setTransferFrom(null);
+				node.adminUpdate = true;
+				ops.inc();
+			}
+		} //
+		else if (op.equals("reject")) {
+			auth.ownerAuth(ms, node);
+			if (ok(node.getTransferFrom())) {
+				node.setOwner(node.getTransferFrom());
+				node.setTransferFrom(null);
+				node.adminUpdate = true;
+				ops.inc();
+			}
+		} //
+		else if (op.equals("reclaim")) {
+			if (ok(node.getTransferFrom())) {
+				// if we're reclaiming just make sure the transferFrom was us
+				if (!ms.getUserNodeId().equals(node.getTransferFrom())) {
+					throw new RuntimeException("You cannot reclaim this node.");
+				}
+				node.setOwner(node.getTransferFrom());
+				node.setTransferFrom(null);
+				node.adminUpdate = true;
+				ops.inc();
+			}
+		}
 	}
 
 	/*

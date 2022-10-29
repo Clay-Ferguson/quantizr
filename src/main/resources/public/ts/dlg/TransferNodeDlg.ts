@@ -22,20 +22,23 @@ export class TransferNodeDlg extends DialogBase {
 
     fromUserState: Validator = new Validator();
 
-    constructor() {
-        super("Transfer Node", "app-modal-content-narrow-width");
+    constructor(private operation: string) {
+        super(TransferNodeDlg.operationName(operation) + " Nodes", "app-modal-content-narrow-width");
         this.mergeState<LS>({ recursive: false });
-        this.validatedStates = [this.toUserState];
+
+        if (operation === "transfer") {
+            this.validatedStates = [this.toUserState];
+        }
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new HorizontalLayout([
+                this.operation === "transfer" ? new HorizontalLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
                     getAppState().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
                     new TextField({ label: "To User", val: this.toUserState })
-                ]),
+                ]) : null,
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
@@ -43,11 +46,26 @@ export class TransferNodeDlg extends DialogBase {
                     })
                 ]),
                 new ButtonBar([
-                    new Button("Transfer", this.transfer, null, "btn-primary"),
+                    new Button(TransferNodeDlg.operationName(this.operation), this.transfer, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
+    }
+
+    static operationName(op: string) {
+        switch (op) {
+            case "transfer":
+                return "Transfer";
+            case "reject":
+                return "Reject";
+            case "accept":
+                return "Accept";
+            case "reclaim":
+                return "Reclaim";
+            default:
+                return "???";
+        }
     }
 
     transfer = async () => {
@@ -65,7 +83,8 @@ export class TransferNodeDlg extends DialogBase {
             recursive: this.getState<LS>().recursive,
             nodeId: node.id,
             fromUser: this.fromUserState.getValue(),
-            toUser: this.toUserState.getValue()
+            toUser: this.toUserState.getValue(),
+            operation: this.operation
         });
 
         S.view.refreshTree({

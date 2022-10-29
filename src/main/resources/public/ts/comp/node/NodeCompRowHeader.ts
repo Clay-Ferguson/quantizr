@@ -56,8 +56,12 @@ export class NodeCompRowHeader extends Div {
             // If user had nothin but ":tags:" in their display name, then display there userName
             displayName = displayName || this.node.owner;
 
+            if (this.node.transferFromId) {
+                displayName = "PENDING XFER -> " + displayName;
+            }
+
             children.push(new Span(displayName, {
-                className: isMine ? "created-by-me" : "created-by-other",
+                className: this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other"),
                 title: "Show Profile:\n\n" + this.node.owner,
                 onClick: () => {
                     new UserProfileDlg(this.node.ownerId).open();

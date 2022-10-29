@@ -78,7 +78,10 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static transferNode = () => { new TransferNodeDlg().open(); };
+    static transferNode = () => { new TransferNodeDlg("transfer").open(); };
+    static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
+    static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
+    static reclaimTransfer = () => { new TransferNodeDlg("reclaim").open(); };
     static subgraphHash = () => { S.edit.subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
@@ -159,6 +162,8 @@ export class MenuPanel extends Div {
 
         const hltNode = S.nodeUtil.getHighlightedNode(appState);
         const selNodeIsMine = !!hltNode && (hltNode.owner === appState.userName || appState.userName === "admin");
+        const transferFromMe = !!hltNode && hltNode.transferFromId === appState.homeNodeId;
+        const transferring = !!hltNode && !!hltNode.transferFromId;
 
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
         const exportFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
@@ -252,17 +257,6 @@ export class MenuPanel extends Div {
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !appState.isAnonUser && !!appState.nodesToMove), //
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
-
-            /* This feature CAN easily work for all users (although currently disabled on server for all but admin), but
-            we need some sort of "acceptance" feature for the recipient to take control, because for now they way this
-            works is you can take your own node and create the appearance that someone else authored it simply by
-            transferring the node to them, so we need some better process of acceptance.
-
-            In other words, the avatar image, owner and everything else on the node will LOOK like the person recieving
-            the transfer actually wrote the node when they didn't if you transfer it to them, and so that's the confusion
-            we need to eliminate somehow. #transfer-issue #todo-1
-            */
-            appState.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
 
             appState.isAdminUser ? new MenuItem("SubGraph SHA256", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
 
@@ -400,6 +394,15 @@ export class MenuPanel extends Div {
             // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
             //     !state.isAnonUser /* state.isAdminUser */) //
         ], null, this.makeHelpIcon(":menu-node-info")));
+
+        children.push(new Menu(state, "Transfer", [
+            new MenuItem("Transfer", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine && !transferring), //
+            new MenuItem("Accept", MenuPanel.acceptTransfer, !appState.isAnonUser && selNodeIsMine && transferring), //
+            new MenuItem("Reject", MenuPanel.rejectTransfer, !appState.isAnonUser && selNodeIsMine && transferring), //
+            new MenuItem("Reclaim", MenuPanel.reclaimTransfer, !appState.isAnonUser && transferFromMe) //
+
+            // todo-0: need "Show Incomming" transfers menu option
+        ]));
 
         children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)

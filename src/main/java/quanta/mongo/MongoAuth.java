@@ -267,6 +267,9 @@ public class MongoAuth extends ServiceBase {
 
 			// or node is OWNED by us
 			orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
+
+			// or node was Transferred by us
+			orCriteria.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
 		}
 
 		if (orCriteria.size() > 0) {
@@ -393,11 +396,20 @@ public class MongoAuth extends ServiceBase {
 			throw new RuntimeEx("node had no owner: " + node.getIdStr());
 		}
 
-		// if this session user is the owner of this node, then they have full power
-		if (ok(ms.getUserNodeId()) && ms.getUserNodeId().equals(node.getOwner())) {
-			if (verbose)
-				log.trace("allow: user " + ms.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
-			return;
+		if (ok(ms.getUserNodeId())) {
+			// if this session user is the owner of this node, then they have full power
+			if (ms.getUserNodeId().equals(node.getOwner())) {
+				if (verbose)
+					log.trace("allow: user " + ms.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
+				return;
+			}
+
+			if (ms.getUserNodeId().equals(node.getTransferFrom())) {
+				if (verbose)
+					log.trace("allow: user " + ms.getUserName() + " is transferring node. accountId: "
+							+ node.getTransferFrom().toHexString());
+				return;
+			}
 		}
 
 		String sessionUserNodeId = ok(ms.getUserNodeId()) ? ms.getUserNodeId().toHexString() : null;

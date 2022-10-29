@@ -675,6 +675,7 @@ export class Render {
         // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
         return new Img(key, {
             src,
+            // For Transfer in Progress need a RED border here.
             className: "avatarImage",
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around

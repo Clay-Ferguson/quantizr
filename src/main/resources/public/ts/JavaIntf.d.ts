@@ -514,6 +514,7 @@ export interface TransferNodeRequest extends RequestBase {
     nodeId: string;
     fromUser: string;
     toUser: string;
+    operation: string;
 }
 
 export interface UpdateHeadingsRequest extends RequestBase {
@@ -927,6 +928,7 @@ export interface NodeInfo {
     displayName: string;
     owner: string;
     ownerId: string;
+    transferFromId: string;
     avatarVer: string;
     apAvatar: string;
     apImage: string;

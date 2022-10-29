@@ -42,7 +42,7 @@ import quanta.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.XFR, SubNode.CREATE_TIME,
 		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
@@ -99,6 +99,11 @@ public class SubNode {
 	public static final String OWNER = "own";
 	@Field(OWNER)
 	private ObjectId owner;
+
+	// OwnerId of person who transfered this node to "owner"
+	public static final String XFR = "xfr";
+	@Field(XFR)
+	private ObjectId transferFrom;
 
 	public static final String CREATE_TIME = "ctm";
 	@Field(CREATE_TIME)
@@ -176,6 +181,7 @@ public class SubNode {
 			SubNode.ORDINAL, //
 			SubNode.HAS_CHILDREN, //
 			SubNode.OWNER, //
+			SubNode.XFR, //
 			SubNode.CREATE_TIME, //
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
@@ -313,7 +319,6 @@ public class SubNode {
 		this.hch = hch;
 	}
 
-
 	// we don't annotate this because we have a custom getter
 	// @JsonProperty(FIELD_OWNER)
 	public ObjectId getOwner() {
@@ -331,6 +336,23 @@ public class SubNode {
 	@JsonGetter(OWNER)
 	public String jsonOwner() {
 		return ok(owner) ? owner.toHexString() : null;
+	}
+
+	public ObjectId getTransferFrom() {
+		return transferFrom;
+	}
+
+	@JsonProperty(XFR)
+	public void setTransferFrom(ObjectId transferFrom) {
+		if (Util.equalObjs(transferFrom, this.transferFrom))
+			return;
+		ThreadLocals.dirty(this);
+		this.transferFrom = transferFrom;
+	}
+
+	@JsonGetter(XFR)
+	public String jsonTransferFrom() {
+		return ok(transferFrom) ? transferFrom.toHexString() : null;
 	}
 
 	@JsonProperty(CREATE_TIME)

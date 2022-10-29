@@ -79,6 +79,16 @@
     margin-left: 0px;
 }
 
+.transfer-pending {
+    @extend .created-by;
+    background: darkkhaki;
+    color: black;
+}
+
+.transfer-pending:first-child {
+    margin-left: 0px;
+}
+
 .created-by-other {
     @extend .created-by;
     background: $createdByAnotherBackgroundColor;

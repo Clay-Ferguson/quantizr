@@ -792,7 +792,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 
 		return callProc.run("export", true, true, req, session, ms -> {
-			ThreadLocals.requireAdmin();
 			return edit.transferNode(ms, req);
 		});
 	}

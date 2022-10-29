@@ -185,8 +185,11 @@ public class Convert extends ServiceBase {
 
 		String content = node.getContent();
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, node.getTags(), displayName,
-				owner, ownerId, node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, //
+				node.getTags(), displayName, //
+				owner, ownerId, //
+				ok(node.getTransferFrom()) ? node.getTransferFrom().toHexString() : null, //
+				node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //
 				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 
