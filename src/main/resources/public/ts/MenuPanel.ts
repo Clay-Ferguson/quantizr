@@ -7,7 +7,7 @@ import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
-import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
+import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ManageCryptoKeysDlg } from "./dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
@@ -145,8 +145,10 @@ export class MenuPanel extends Div {
     };
 
     static showKeys = () => { new ManageCryptoKeysDlg().open(); };
+    static changePassword = () => { new ChangePasswordDlg(null).open(); };
+    static bulkDelete = () => { S.edit.bulkDelete(); };
+    static closeAccount = () => { S.user.closeAccount(); };
     static profile = () => { new UserProfileDlg(null).open(); };
-    static accountSettings = () => { new ManageAccountDlg().open(); };
     static storageSpace = () => { new ManageStorageDlg().open(); };
     static toggleEditMode = () => S.edit.toggleEditMode(getAppState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(getAppState(null));
@@ -258,8 +260,6 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            appState.isAdminUser ? new MenuItem("SubGraph SHA256", MenuPanel.transferNode, !appState.isAnonUser && selNodeIsMine) : null, //
-
             new MenuItem("Update Headings", S.edit.updateHeadings, !appState.isAnonUser && selNodeIsMine), //
             new MenuItem("Search and Replace", MenuPanel.searchAndReplace, !appState.isAnonUser && selNodeIsMine), //
 
@@ -355,6 +355,11 @@ export class MenuPanel extends Div {
             new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
             new MenuItemSeparator(), //
 
+            appState.isAdminUser ? new MenuItem("SHA256 of SubGraph", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) : null, //
+            appState.isAdminUser ? new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify) : null, //
+            appState.isAdminUser && S.crypto.avail ? new MenuItem("Sign SubGraph", MenuPanel.signSubGraph) : null, //
+            appState.isAdminUser ? new MenuItemSeparator() : null, //
+
             new MenuItem("Test Microphone", MenuPanel.testMicrophone, !appState.isAnonUser), //
             new MenuItem("Test Web Cam", MenuPanel.testWebCam, !appState.isAnonUser), //
 
@@ -419,21 +424,25 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Profile", MenuPanel.profile, !appState.isAnonUser), //
-            new MenuItem("Account Settings", MenuPanel.accountSettings, !appState.isAnonUser), //
-            new MenuItem("Storage Space", MenuPanel.storageSpace, !appState.isAnonUser), //
-            new MenuItem("Security Keys", MenuPanel.showKeys, S.crypto.avail && !appState.isAnonUser), //
-
-            new MenuItemSeparator(), //
-
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
-            !appState.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !appState.isAnonUser) : null, //
-            appState.isAnonUser ? new MenuItem("Signup", S.user.userSignup, appState.isAnonUser) : null //
+            new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
         ]));
+
+        children.push(new Menu(state, "Account", [
+            !appState.isAnonUser ? new MenuItem("Logout", S.user.userLogout, !appState.isAnonUser) : null, //
+            appState.isAnonUser ? new MenuItem("Signup", S.user.userSignup, appState.isAnonUser) : null, //
+            new MenuItemSeparator(), //
+            new MenuItem("Profile", MenuPanel.profile, !appState.isAnonUser), //
+            new MenuItem("Storage Space", MenuPanel.storageSpace, !appState.isAnonUser), //
+            new MenuItem("Security Keys", MenuPanel.showKeys, S.crypto.avail && !appState.isAnonUser), //
+            new MenuItem("Change Password", MenuPanel.changePassword, !appState.isAnonUser), //
+            new MenuItemSeparator(), //
+            new MenuItem("Bulk Delete", MenuPanel.bulkDelete, !appState.isAnonUser), //
+            new MenuItem("Close Account", MenuPanel.closeAccount, !appState.isAnonUser) //
+        ], null, this.makeHelpIcon(":account")));
 
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
@@ -489,8 +498,6 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu(state, "Admin - DB", [
-                new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify), //
-                S.crypto.avail ? new MenuItem("Sign SubGraph", MenuPanel.signSubGraph) : null, //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null, appState)), //
                 new MenuItem("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null, appState)), //
                 new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null, appState)), //
