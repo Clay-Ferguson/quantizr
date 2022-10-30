@@ -12,11 +12,12 @@ import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
-    constructor(private publicChangedFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(private shareNodeToUserFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super();
     }
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
+        const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
         const div = new Div(null, { className: "float-end microMarginBottom" });
 
         aclEntry.privileges.forEach(function (privilege, index) {
@@ -24,6 +25,10 @@ export class EditPrivsTableRow extends ListBoxRow {
                 new Div(null, null, [
                     // new Span(privilege.privilegeName), don't need this it's just "rd/wr"
                     new ButtonBar([
+                        new Checkbox("Allow Replies", { className: "marginRight" }, {
+                            setValue: (checked: boolean) => this.shareNodeToUserFunc(this.aclEntry.principalName, checked),
+                            getValue: (): boolean => writable
+                        }),
                         new Button("Remove", () => {
                             this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
                         })
@@ -56,7 +61,6 @@ export class EditPrivsTableRow extends ListBoxRow {
             : ("@" + this.aclEntry.principalName);
 
         const isPublic = this.aclEntry.principalName === "public";
-        const publicWritable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
 
         this.setChildren([
             new Div(null, { className: "microMarginAll" }, [
@@ -66,17 +70,13 @@ export class EditPrivsTableRow extends ListBoxRow {
                     className: "fa fa-globe fa-lg sharingIcon marginAll",
                     title: "Node is Public"
                 }) : null,
-                isPublic ? new Span("Public (Everyone)", { className: "largeFont bigMarginRight" })
+                isPublic ? new Span("Public (Everyone)", { className: "largeFont" })
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),
                         onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
-                    }),
-                isPublic ? new Checkbox("Allow Replies", { className: "marginLeft" }, {
-                    setValue: (checked: boolean) => this.publicChangedFunc(checked),
-                    getValue: (): boolean => publicWritable
-                }) : null
+                    })
             ])
         ]);
     }

@@ -260,14 +260,7 @@ public class AclService extends ServiceBase {
 			ac = new AccessControl();
 		}
 
-		String prvs = ac.getPrvs();
-		/*
-		 * to set from 'rd' to 'rd,rw' back and forth then it's better to set prvs to an empty string here
-		 * any time we detect this is 'public' priv being set.
-		 */
-		if (no(prvs) || isPublic) {
-			prvs = "";
-		}
+		String prvs = "";
 
 		boolean authAdded = false;
 

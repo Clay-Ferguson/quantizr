@@ -33,8 +33,8 @@ export class SharingDlg extends DialogBase {
         return [
             new Div(null, null, [
                 numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
-                new EditPrivsTable((allowAppends: boolean) => {
-                    this.shareNodeToPublic(allowAppends);
+                new EditPrivsTable((userName: string, allowAppends: boolean) => {
+                    this.shareNodeToUser(userName, allowAppends);
                 }, appState.editNode.ac, this.removePrivilege),
                 S.props.isShared(appState.editNode) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
@@ -74,7 +74,7 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(names);
                         }
                     }, null, "btn-primary"),
-                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false), null, "btn-secondary"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(J.PrincipalName.PUBLIC, false), null, "btn-secondary"),
                     new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
@@ -161,7 +161,8 @@ export class SharingDlg extends DialogBase {
         S.edit.updateNode(appState.editNode);
     }
 
-    shareNodeToPublic = async (allowAppends: boolean) => {
+    // userName="public", or a username
+    shareNodeToUser = async (userName: string, allowAppends: boolean) => {
         this.dirty = true;
         const appState = getAppState();
         if (S.props.isEncrypted(appState.editNode)) {
@@ -176,7 +177,7 @@ export class SharingDlg extends DialogBase {
          */
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: appState.editNode.id,
-            principals: ["public"],
+            principals: [userName],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 

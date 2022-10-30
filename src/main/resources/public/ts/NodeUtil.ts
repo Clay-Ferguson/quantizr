@@ -295,7 +295,7 @@ export class NodeUtil {
                         className: "fa fa-globe fa-lg sharingIcon microMarginRight",
                         title: "Node is Public"
                     }),
-                    new Span("Public" + this.getPublicPrivilegesDisplay(node))
+                    new Span("Public" + this.getPublicPrivilegsSuffix(J.PrincipalName.PUBLIC, node))
                 ])
             );
         }
@@ -303,6 +303,7 @@ export class NodeUtil {
         let showMore = "";
         let numShares = 0;
         for (const ac of node.ac) {
+            const suffix = this.getPublicPrivilegsSuffix(ac.principalName, node);
             // todo-1: will come back to this. I think this happens when there's a share to a user whose
             // account no longer exists?
             // if (!ac.principalName) {
@@ -342,10 +343,11 @@ export class NodeUtil {
                     if (ac.displayName) {
                         showMore += " (" + ac.displayName + ")"
                     }
+                    showMore += suffix;
                     showMore += "\n";
                 }
                 else {
-                    ret.push(new Span("@" + ac.principalName, props));
+                    ret.push(new Span("@" + ac.principalName + suffix, props));
                 }
                 numShares++;
             }
@@ -363,21 +365,23 @@ export class NodeUtil {
         return ret;
     }
 
-    getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {
+    // todo-1: this method is way more complicated than it needs to be.
+    getPublicPrivilegsSuffix = (principalName: string, node: J.NodeInfo): string => {
         if (!node || !node.ac) return "";
         let val = "";
         for (const ac of node.ac) {
-            if (ac.principalName === "public") {
+            if (ac.principalName === principalName) {
                 // console.log("AC: " + S.util.prettyPrint(ac));
                 // Note: I'm leaving this loop, but really all this will generate in 'val' is either nothing
-                // at all or "(+Replies)" (for now)
+                // at all or "(+R)" (for now)
                 for (const p of ac.privileges) {
                     if (val) {
                         val += ",";
                     }
 
+                    // +R = replies
                     if (p.privilegeName.indexOf(J.PrivilegeType.WRITE) !== -1) {
-                        val += "+Replies";
+                        val += " +R";
                     }
                     // val += p.privilegeName;
                 }
