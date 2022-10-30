@@ -1063,7 +1063,10 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		if (op.equals("transfer")) {
-			auth.ownerAuth(ms, node);
+			// if we don't happen do own this node, do nothing.
+			if (!ms.getUserNodeId().equals(node.getOwner())) {
+				return;
+			}
 			ObjectId fromOwnerId = node.getOwner();
 			node.setOwner(toUserNode.getOwner());
 			node.setTransferFrom(fromOwnerId);
@@ -1071,7 +1074,10 @@ public class NodeEditService extends ServiceBase {
 			ops.inc();
 		} //
 		else if (op.equals("accept")) {
-			auth.ownerAuth(ms, node);
+			// if we don't happen do own this node, do nothing.
+			if (!ms.getUserNodeId().equals(node.getOwner())) {
+				return;
+			}
 			if (ok(node.getTransferFrom())) {
 				node.setTransferFrom(null);
 				node.adminUpdate = true;
@@ -1079,7 +1085,10 @@ public class NodeEditService extends ServiceBase {
 			}
 		} //
 		else if (op.equals("reject")) {
-			auth.ownerAuth(ms, node);
+			// if we don't happen do own this node, do nothing.
+			if (!ms.getUserNodeId().equals(node.getOwner())) {
+				return;
+			}
 			if (ok(node.getTransferFrom())) {
 				node.setOwner(node.getTransferFrom());
 				node.setTransferFrom(null);
@@ -1091,7 +1100,8 @@ public class NodeEditService extends ServiceBase {
 			if (ok(node.getTransferFrom())) {
 				// if we're reclaiming just make sure the transferFrom was us
 				if (!ms.getUserNodeId().equals(node.getTransferFrom())) {
-					throw new RuntimeException("You cannot reclaim this node.");
+					// skip nodes that don't apply
+					return;
 				}
 				node.setOwner(node.getTransferFrom());
 				node.setTransferFrom(null);
