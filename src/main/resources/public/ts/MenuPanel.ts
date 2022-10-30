@@ -402,7 +402,7 @@ export class MenuPanel extends Div {
             new MenuItem("Reclaim", MenuPanel.reclaimTransfer, !appState.isAnonUser && transferFromMe) //
 
             // todo-0: need "Show Incomming" transfers menu option
-        ]));
+        ], null, this.makeHelpIcon(":transfers")));
 
         children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)

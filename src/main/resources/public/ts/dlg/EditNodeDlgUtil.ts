@@ -371,7 +371,7 @@ export class EditNodeDlgUtil {
     speechRecognition = (dlg: EditNodeDlg) => {
         S.speech.setCallback((transcript: string) => {
             if (dlg.contentEditor && transcript) {
-                dlg.contentEditor.insertTextAtCursor(transcript);
+                dlg.contentEditor.insertTextAtCursor(transcript+". ");
             }
         });
 
