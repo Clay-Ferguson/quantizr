@@ -362,14 +362,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Test Microphone", MenuPanel.testMicrophone, !appState.isAnonUser), //
             new MenuItem("Test Web Cam", MenuPanel.testWebCam, !appState.isAnonUser), //
-
             new MenuItemSeparator(), //
-            /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
-             that I have to impose an intentional performance lag to let the animation show up, so in order to have the
-             absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
-             the code in place for future reference. */
-            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => S.domUtil.mouseEffect),
-
             new MenuItem("My GEO Location", S.nav.geoLocation) //
 
             // Removing for now. Our PostIt node icon makes this easy enough.
@@ -406,7 +399,7 @@ export class MenuPanel extends Div {
             new MenuItem("Reject", MenuPanel.rejectTransfer, !appState.isAnonUser && selNodeIsMine && transferring), //
             new MenuItem("Reclaim", MenuPanel.reclaimTransfer, !appState.isAnonUser && transferFromMe) //
 
-            // todo-0: need "Show Incomming" transfers menu option
+            // todo-1: need "Show Incomming" transfers menu option
         ], null, this.makeHelpIcon(":transfers")));
 
         children.push(new Menu(state, "Settings", [
@@ -423,6 +416,11 @@ export class MenuPanel extends Div {
             // new MenuItem("Preferences", () => {new PrefsDlg().open();}, !state.isAnonUser), // "fa-gear"
 
             new MenuItemSeparator(), //
+            /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
+             that I have to impose an intentional performance lag to let the animation show up, so in order to have the
+             absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
+             the code in place for future reference. */
+             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => S.domUtil.mouseEffect),
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
             new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //

@@ -989,7 +989,7 @@ public class NodeEditService extends ServiceBase {
 		return hexString.toString();
 	}
 
-	// todo-0: need to be doing a bulk update in here.
+	// todo-1: need to be doing a bulk update in here.
 	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
 
@@ -1031,7 +1031,7 @@ public class NodeEditService extends ServiceBase {
 		transferNode(ms, req.getOperation(), node, fromUserNode, toUserNode, ops);
 
 		if (req.isRecursive()) {
-			// todo-0: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
+			// todo-1: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
 			// but leave as ALL node for the admin who might specify the 'from'?
 			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
@@ -1046,7 +1046,6 @@ public class NodeEditService extends ServiceBase {
 			});
 		}
 
-		// todo-0: don't show this message if there was a failure in any node in 'saveSession' above.
 		res.setMessage(String.valueOf(ops.getVal()) + " nodes were affected.");
 		res.setSuccess(true);
 		return res;
