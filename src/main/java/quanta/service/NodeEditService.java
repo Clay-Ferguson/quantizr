@@ -1066,9 +1066,19 @@ public class NodeEditService extends ServiceBase {
 			if (!ms.getUserNodeId().equals(node.getOwner())) {
 				return;
 			}
+			SubNode ownerAccnt = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
+
 			ObjectId fromOwnerId = node.getOwner();
 			node.setOwner(toUserNode.getOwner());
 			node.setTransferFrom(fromOwnerId);
+
+			// now we ensure that the original owner (before the transfer request) is shared to so they can
+			// still see the node
+			if (ok(ownerAccnt)) {
+				String shareToUser = ownerAccnt.getStr(NodeProp.USER.s());
+				acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+						null);
+			}
 			node.adminUpdate = true;
 			ops.inc();
 		} //
@@ -1077,7 +1087,16 @@ public class NodeEditService extends ServiceBase {
 			if (!ms.getUserNodeId().equals(node.getOwner())) {
 				return;
 			}
+
 			if (ok(node.getTransferFrom())) {
+				// get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
+				SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getTransferFrom()));
+				if (ok(frmUsrNode)) {
+					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
+					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+							null);
+				}
+
 				node.setTransferFrom(null);
 				node.adminUpdate = true;
 				ops.inc();
@@ -1088,9 +1107,20 @@ public class NodeEditService extends ServiceBase {
 			if (!ms.getUserNodeId().equals(node.getOwner())) {
 				return;
 			}
+
 			if (ok(node.getTransferFrom())) {
+				// get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
+				SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
+
 				node.setOwner(node.getTransferFrom());
 				node.setTransferFrom(null);
+
+				if (ok(frmUsrNode)) {
+					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
+					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+							null);
+				}
+
 				node.adminUpdate = true;
 				ops.inc();
 			}
@@ -1102,8 +1132,18 @@ public class NodeEditService extends ServiceBase {
 					// skip nodes that don't apply
 					return;
 				}
+
+				SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
+
 				node.setOwner(node.getTransferFrom());
 				node.setTransferFrom(null);
+
+				if (ok(frmUsrNode)) {
+					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
+					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+							null);
+				}
+
 				node.adminUpdate = true;
 				ops.inc();
 			}

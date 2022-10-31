@@ -35,7 +35,7 @@ export class EditNodeDlgUtil {
             if (dlg.allowEditAllProps || (
                 !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
-                if (!dlg.isGuiControlBasedProp(prop)) {
+                if (!S.props.isGuiControlBasedProp(prop)) {
                     numPropsShowing++;
                 }
             }
@@ -424,7 +424,7 @@ an upload has been added or removed.
                 if (dlg.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
-                    if (!dlg.isGuiControlBasedProp(prop)) {
+                    if (!S.props.isGuiControlBasedProp(prop)) {
                         this.initPropState(dlg, node, prop);
                     }
                 }

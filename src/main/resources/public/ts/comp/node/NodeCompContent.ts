@@ -37,26 +37,26 @@ export class NodeCompContent extends Div {
         let typeHandler = S.plugin.getTypeHandler(this.node.type);
         let embeddedImg = false;
 
+        typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
+
+        if (this.node.content && ( //
+            this.node.content.indexOf("{{imgUrl}}") !== -1 ||
+            this.node.content.indexOf("{{img}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
+            this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
+            embeddedImg = true;
+        }
+
+        this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
+        children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
+
         if (state.showProperties) {
             const propTable = S.props.renderProperties(this.node.properties);
             if (propTable) {
                 children.push(propTable);
+                children.push(new Clearfix());
             }
-        }
-        else {
-            typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
-
-            if (this.node.content && ( //
-                this.node.content.indexOf("{{imgUrl}}") !== -1 ||
-                this.node.content.indexOf("{{img}}") !== -1 ||
-                this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
-                this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
-                this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
-                embeddedImg = true;
-            }
-
-            this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
-            children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not

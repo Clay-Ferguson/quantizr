@@ -102,7 +102,7 @@ export class AppState {
     /*
      * toggled by button, and holds if we are going to show properties or not on each node in the main view
      */
-    showProperties: boolean;
+    showProperties: boolean = false;
 
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;

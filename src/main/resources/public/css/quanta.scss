@@ -1431,7 +1431,8 @@ Will come back later and study this more. todo-1 */
 }
 
 .property-table {
-    margin-left: 1rem;
+    margin-left: .5rem;
+    margin-bottom: .5rem;
 }
 
 .prop-table-row {
@@ -1440,6 +1441,7 @@ Will come back later and study this more. todo-1 */
 
 .prop-table-name-col {
     width: 25%;
+    background-color: darkolivegreen;
 }
 
 .prop-table-val-col {

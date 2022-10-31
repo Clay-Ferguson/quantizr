@@ -348,9 +348,6 @@ export class MenuPanel extends Div {
         children.push(new Menu(state, "Tools", [
             // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
-            // for now, we don't need the 'show properties' and it may never be needed again
-            // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
-
             new MenuItem("Import", MenuPanel.import, importFeatureEnabled),
             new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
             new MenuItemSeparator(), //
@@ -411,7 +408,10 @@ export class MenuPanel extends Div {
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => appState.userPrefs.showParents), //
             new MenuItem("Show Comments", MenuPanel.toggleReplies, true, () => appState.userPrefs.showReplies), //
 
+            // for now, we don't need the 'show properties' and it may never be needed again
+            new MenuItem("Show Properties", S.props.propsToggle, true, () => appState.showProperties), //
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
+
             // until we have at least one more preference the preferences dialog is not needed.
             // new MenuItem("Preferences", () => {new PrefsDlg().open();}, !state.isAnonUser), // "fa-gear"
 
@@ -420,7 +420,7 @@ export class MenuPanel extends Div {
              that I have to impose an intentional performance lag to let the animation show up, so in order to have the
              absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
              the code in place for future reference. */
-             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => S.domUtil.mouseEffect),
+            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !appState.isAnonUser && !appState.mobileMode, () => S.domUtil.mouseEffect),
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
             new MenuItem(appState.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //

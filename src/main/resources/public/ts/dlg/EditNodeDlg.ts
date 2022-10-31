@@ -439,7 +439,7 @@ export class EditNodeDlg extends DialogBase {
                 if (this.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
-                    if (!this.isGuiControlBasedProp(prop)) {
+                    if (!S.props.isGuiControlBasedProp(prop)) {
                         const allowSelection = !customProps || !customProps.find(p => p === prop.name);
                         const tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
@@ -781,10 +781,6 @@ export class EditNodeDlg extends DialogBase {
             s.editEncrypt = false;
             return s;
         });
-    }
-
-    isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
-        return !!S.props.controlBasedPropertyList.has(prop.name);
     }
 
     toggleShowReadOnly = () => {

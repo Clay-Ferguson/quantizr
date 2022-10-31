@@ -1,4 +1,4 @@
-import { getAppState } from "./AppContext";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { PropTable } from "./comp/PropTable";
 import { PropTableCell } from "./comp/PropTableCell";
@@ -35,8 +35,11 @@ export class Props {
     /*
      * Toggles display of properties in the gui.
      */
-    propsToggle = async (state: AppState) => {
-        state.showProperties = !state.showProperties;
+    propsToggle = async () => {
+        dispatch("propsToggle", (s) => {
+            s.showProperties = !s.showProperties;
+            return s;
+        });
     }
 
     deleteProp = (node: J.NodeInfo, propertyName: string) => {
@@ -64,12 +67,13 @@ export class Props {
         if (!properties) return null;
 
         const propTable = new PropTable({
-            border: "1",
-            className: "property-table"
+            className: "property-table float-end"
             // "sourceClass" : "[propsTable]"
         });
 
         properties.forEach(function (property: J.PropertyInfo) {
+            if (S.props.isGuiControlBasedProp(property)) return;
+
             // console.log("Render Prop: "+property.name);
             const propNameCell = new PropTableCell(property.name, {
                 className: "prop-table-name-col"
@@ -299,8 +303,15 @@ export class Props {
             J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
-            J.NodeProp.UNPUBLISHED //
+            J.NodeProp.UNPUBLISHED, //
+
+            // this is here just to hide from displaying (for now, todo-1)
+            J.NodeProp.CRYPTO_SIG
         ]);
+    }
+
+    isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
+        return !!S.props.controlBasedPropertyList.has(prop.name);
     }
 
     /* This is kind of a hard-coded hack for the one particular type name

@@ -186,6 +186,9 @@ public class AclService extends ServiceBase {
 	 * or 'public' (when the node is being shared to public)
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation.
+	 * 
+	 * todo-0: Make this method optionally accept the principal's user node ID to send when you happen to have it
+	 * and let this method not have to look it up from the DB.
 	 */
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
@@ -198,14 +201,12 @@ public class AclService extends ServiceBase {
 		String mapKey = null;
 
 		SubNode principalNode = null;
-		boolean isPublic = false;
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			if (ok(cipherKey)) {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
-			isPublic = true;
 		}
 		/*
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
