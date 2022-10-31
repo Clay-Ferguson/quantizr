@@ -85,6 +85,7 @@ public enum NodeProp {
     USER_IPFS_KEY("sn:ipfsKey", "s"), //
     USER_TAGS("sn:tags", "s"), //
     PWD_HASH("sn:pwdHash", "s"), //
+    VOTE("vote", "s"), //
 
     FILE_SYNC_LINK("fs:link", "s"), //
 

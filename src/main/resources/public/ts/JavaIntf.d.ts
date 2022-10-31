@@ -662,6 +662,7 @@ export interface GetNodeStatsResponse extends ResponseBase {
     topWords: string[];
     topTags: string[];
     topMentions: string[];
+    topVotes: string[];
 }
 
 export interface GetOpenGraphResponse extends ResponseBase {

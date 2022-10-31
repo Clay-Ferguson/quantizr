@@ -376,6 +376,8 @@ public class NodeSearchService extends ServiceBase {
 	}
 
 	public void getNodeStats(MongoSession ms, GetNodeStatsRequest req, GetNodeStatsResponse res) {
+		boolean countVotes = !req.isFeed();
+
 		/*
 		 * If this is the 'feed' being queried (i.e. the Trending tab on the app), then get the data from
 		 * trendingFeedInfo (the cache), or else cache it
@@ -394,6 +396,7 @@ public class NodeSearchService extends ServiceBase {
 		HashMap<String, WordStats> wordMap = req.isGetWords() ? new HashMap<>() : null;
 		HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
 		HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
+		HashMap<String, WordStats> voteMap = countVotes ? new HashMap<>() : null;
 
 		long nodeCount = 0;
 		long totalWords = 0;
@@ -408,8 +411,7 @@ public class NodeSearchService extends ServiceBase {
 			strictFiltering = true;
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
-			Criteria crit =
-					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
+			Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
 
 			// This pattern is what is required when you have multiple conditions added to a
 			// single field.
@@ -467,6 +469,7 @@ public class NodeSearchService extends ServiceBase {
 		int unsignedNodeCount = 0;
 		int failedSigCount = 0;
 		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
+		HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
 
 		for (SubNode node : iter) {
 			nodeCount++;
@@ -505,7 +508,6 @@ public class NodeSearchService extends ServiceBase {
 			}
 
 			// PART 2: process 'content' text.
-
 			if (no(node.getContent()))
 				continue;
 
@@ -591,11 +593,27 @@ public class NodeSearchService extends ServiceBase {
 				totalWords++;
 			}
 			extractTagsAndMentions(node, knownTokens, tagMap, mentionMap);
+
+			if (countVotes) {
+				String vote = node.getStr(NodeProp.VOTE.s());
+				if (ok(vote)) {
+					// 'add' returns true if we are encountering this ID for the first time, so we can tally it's vote
+					if (uniqueVoters.add(node.getId())) {
+						WordStats ws = voteMap.get(vote);
+						if (no(ws)) {
+							ws = new WordStats(vote);
+							voteMap.put(vote, ws);
+						}
+						ws.count++;
+					}
+				}
+			}
 		}
 
 		List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
 		List<WordStats> tagList = req.isGetTags() ? new ArrayList<>(tagMap.values()) : null;
 		List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
+		List<WordStats> voteList = countVotes ? new ArrayList<>(voteMap.values()) : null;
 
 		if (ok(wordList))
 			wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
@@ -606,6 +624,9 @@ public class NodeSearchService extends ServiceBase {
 		if (ok(mentionList))
 			mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
+		if (ok(voteList))
+			voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
 
@@ -613,10 +634,15 @@ public class NodeSearchService extends ServiceBase {
 			sb.append("Unique Words: " + wordList.size() + "\n");
 		}
 
+		if (ok(voteList)) {
+			sb.append("Unique Votes: " + voteList.size() + "\n");
+		}
+
 		sb.append("Public: " + publicCount + ", ");
 		sb.append("Public Writable: " + publicWriteCount + "\n");
 		sb.append("Admin Owned: " + adminOwnedCount + "\n");
-		sb.append("User Shares: " + userShareCount + ", Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
+		sb.append("User Shares: " + userShareCount + "\n");
+		sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
 
 		if (req.isSignatureVerify()) {
 			sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: " + failedSigCount);
@@ -630,6 +656,16 @@ public class NodeSearchService extends ServiceBase {
 			for (WordStats ws : wordList) {
 				topWords.add(ws.word); // + "," + ws.count);
 				if (topWords.size() >= 100)
+					break;
+			}
+		}
+
+		if (ok(voteList)) {
+			ArrayList<String> topVotes = new ArrayList<>();
+			res.setTopVotes(topVotes);
+			for (WordStats ws : voteList) {
+				topVotes.add(ws.word + "(" + ws.count + ")");
+				if (topVotes.size() >= 100)
 					break;
 			}
 		}

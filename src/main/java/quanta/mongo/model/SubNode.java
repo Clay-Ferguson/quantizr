@@ -434,6 +434,7 @@ public class SubNode {
 				props.remove(NodeProp.CODE.s());
 				props.remove(NodeProp.ENC_KEY.s());
 				props.remove(NodeProp.PWD_HASH.s());
+				props.remove(NodeProp.VOTE.s());
 				// props.remove(NodeProp.CRYPTO_SIG.s());
 			}
 		}

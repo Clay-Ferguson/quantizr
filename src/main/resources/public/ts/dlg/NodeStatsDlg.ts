@@ -22,6 +22,18 @@ export class NodeStatsDlg extends DialogBase {
         const tagPanel = new Div(null, { className: "wordStatsArea" });
         const state = getAppState();
 
+        if (this.res.topVotes?.length > 0) {
+            tagPanel.addChild(new Heading(4, "Votes"));
+            this.res.topVotes.forEach((word: string) => {
+                tagPanel.addChild(new Span(word, {
+                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    word: "\"" + word + "\""
+                    // todo-1: for now we don't do vote searching like this, but we can (beware the number in the string)
+                    // onClick: this.searchWord
+                }));
+            });
+        }
+
         if (this.res.topTags?.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags"));
             this.res.topTags.forEach((word: string) => {

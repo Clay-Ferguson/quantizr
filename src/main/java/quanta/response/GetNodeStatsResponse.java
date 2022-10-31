@@ -8,6 +8,7 @@ public class GetNodeStatsResponse extends ResponseBase {
     private ArrayList<String> topWords;
     private ArrayList<String> topTags;
     private ArrayList<String> topMentions;
+    private ArrayList<String> topVotes;
 
     public String getStats() {
         return stats;
@@ -39,5 +40,13 @@ public class GetNodeStatsResponse extends ResponseBase {
 
     public void setTopMentions(ArrayList<String> topMentions) {
         this.topMentions = topMentions;
+    }
+
+    public ArrayList<String> getTopVotes() {
+        return topVotes;
+    }
+
+    public void setTopVotes(ArrayList<String> topVotes) {
+        this.topVotes = topVotes;
     }
 }
