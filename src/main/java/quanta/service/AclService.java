@@ -125,7 +125,7 @@ public class AclService extends ServiceBase {
 
 		for (String principal : req.getPrincipals()) {
 			principal = XString.stripIfStartsWith(principal, "@");
-			if (!addPrivilege(ms, null, node, principal, req.getPrivileges(), res)) {
+			if (!addPrivilege(ms, null, node, principal, null, req.getPrivileges(), res)) {
 				success = false;
 			}
 		}
@@ -187,22 +187,24 @@ public class AclService extends ServiceBase {
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation.
 	 * 
-	 * todo-0: Make this method optionally accept the principal's user node ID to send when you happen to have it
-	 * and let this method not have to look it up from the DB.
+	 * todo-0: Make this method optionally accept the principal's user node ID to send when you happen
+	 * to have it and let this method not have to look it up from the DB.
 	 */
-	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
-			AddPrivilegeResponse res) {
+	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, SubNode principalNode,
+			List<String> privileges, AddPrivilegeResponse res) {
 
-		if (no(principal) || no(node))
+		if ((no(principal) && no(principalNode)) || no(node))
 			return false;
-		principal = principal.trim();
+
+		if (ok(principal)) {
+			principal = principal.trim();
+		}
 
 		String cipherKey = node.getStr(NodeProp.ENC_KEY);
 		String mapKey = null;
 
-		SubNode principalNode = null;
 		/* If we are sharing to public, then that's the map key */
-		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
+		if (PrincipalName.PUBLIC.s().equalsIgnoreCase(principal)) {
 			if (ok(cipherKey)) {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
@@ -212,14 +214,20 @@ public class AclService extends ServiceBase {
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
 		 */
 		else {
-			String _principal = principal;
-			principalNode = arun.run(as -> read.getUserNodeByUserName(as, _principal));
+			// if no principal node passed in, then look it up
 			if (no(principalNode)) {
-				if (ok(res)) {
-					res.setMessage("Unknown user name: " + principal);
-					res.setSuccess(false);
+				String _principal = principal;
+				principalNode = arun.run(as -> read.getUserNodeByUserName(as, _principal));
+				if (no(principalNode)) {
+					if (ok(res)) {
+						res.setMessage("Unknown user name: " + principal);
+						res.setSuccess(false);
+					}
+					return false;
 				}
-				return false;
+			}
+			else {
+				principal = principalNode.getStr(NodeProp.USER);
 			}
 			mapKey = principalNode.getIdStr();
 
@@ -237,7 +245,6 @@ public class AclService extends ServiceBase {
 						return false;
 					}
 				}
-				log.debug("principalPublicKey: " + principalPubKey);
 
 				if (ok(res)) {
 					res.setPrincipalPublicKey(principalPubKey);
@@ -285,20 +292,21 @@ public class AclService extends ServiceBase {
 			// with the immediateSave, which may be tricky.
 			// if bulk operation
 			// if (ok(bops)) {
-			// 	/*
-			// 	 * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
-			// 	 * work somehow. Seems like updating collections might not work in batching. Currently there are no
-			// 	 * places we call this method with bops passed in, so this bops branch is not currently being used
-			// 	 * for that reason.
-			// 	 */
-			// 	Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-			// 	Update update = new Update().set(SubNode.AC, acl);
-			// 	bops.updateOne(query, update);
+			// /*
+			// * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
+			// * work somehow. Seems like updating collections might not work in batching. Currently there are
+			// no
+			// * places we call this method with bops passed in, so this bops branch is not currently being used
+			// * for that reason.
+			// */
+			// Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+			// Update update = new Update().set(SubNode.AC, acl);
+			// bops.updateOne(query, update);
 			// }
 			// else non-bulk
 			// else {
-			 	node.setAc(acl);
-			//}
+			node.setAc(acl);
+			// }
 
 			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			// SubNode fromUserNode = read.getNode(session, node.getOwner());

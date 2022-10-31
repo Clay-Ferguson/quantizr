@@ -173,7 +173,7 @@ public class NodeEditService extends ServiceBase {
 			}
 			// else maybe public.
 			else if (makePublicWritable) {
-				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 			}
 			// else add default sharing
@@ -270,7 +270,7 @@ public class NodeEditService extends ServiceBase {
 			// If we're inserting a node under the POSTS it should be public, rather than inherit.
 			// Note: some logic may be common between this insertNode() and the createSubNode()
 			if (parentNode.isType(NodeType.POSTS)) {
-				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 			} else {
 				// we always copy the access controls from the parent for any new nodes
@@ -1075,8 +1075,7 @@ public class NodeEditService extends ServiceBase {
 			// now we ensure that the original owner (before the transfer request) is shared to so they can
 			// still see the node
 			if (ok(ownerAccnt)) {
-				String shareToUser = ownerAccnt.getStr(NodeProp.USER.s());
-				acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+				acl.addPrivilege(ms, null, node, null, ownerAccnt, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
 						null);
 			}
 			node.adminUpdate = true;
@@ -1092,8 +1091,7 @@ public class NodeEditService extends ServiceBase {
 				// get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
 				SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getTransferFrom()));
 				if (ok(frmUsrNode)) {
-					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
-					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
 							null);
 				}
 
@@ -1116,8 +1114,7 @@ public class NodeEditService extends ServiceBase {
 				node.setTransferFrom(null);
 
 				if (ok(frmUsrNode)) {
-					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
-					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
 							null);
 				}
 
@@ -1139,8 +1136,7 @@ public class NodeEditService extends ServiceBase {
 				node.setTransferFrom(null);
 
 				if (ok(frmUsrNode)) {
-					String shareToUser = frmUsrNode.getStr(NodeProp.USER.s());
-					acl.addPrivilege(ms, null, node, shareToUser, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
 							null);
 				}
 
