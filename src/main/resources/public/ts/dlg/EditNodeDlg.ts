@@ -769,6 +769,7 @@ export class EditNodeDlg extends DialogBase {
     super_close = this.close;
     close = () => {
         this.super_close();
+        S.speech.stop();
 
         EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {
@@ -926,7 +927,7 @@ export class EditNodeDlg extends DialogBase {
             new Icon({
                 className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-microphone editorIcon"),
                 title: "Toggle on/off Speech Recognition to input text",
-                onClick: () => this.utl.speechRecognition(this)
+                onClick: () => this.utl.toggleRecognition(this)
             }),
 
             new Icon({

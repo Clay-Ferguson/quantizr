@@ -30,19 +30,20 @@ export class SpeechRecog {
             // console.log("speech onStart.");
         };
 
+        // This gets called basically at the end of every sentence as you're dictating content,
+        // and paused between sentences, so we have to call start() again in here to start recording
+        // another sentence
         this.recognition.onend = () => {
             // console.log("speech onEnd.");
             if (this.speechActive) {
                 setTimeout(() => {
                     this.recognition.start();
-                    // try this with 250 instead of 500
-                }, 500);
+                }, 250);
             }
         };
 
         this.recognition.onspeechend = () => {
             // console.log("speech onSpeechEnd.");
-            // this.recognition.stop();
         };
 
         // This runs when the speech recognition service returns result
@@ -56,15 +57,18 @@ export class SpeechRecog {
         };
     }
 
-    toggleActive = () => {
+    stop = () => {
+        // if never initialized just return
+        if (!this.recognition) return;
         this.init();
-        if (this.speechActive) {
-            this.recognition.stop();
-        }
-        else {
-            this.recognition.start();
-        }
-        this.speechActive = this.speechActive ? false : true;
+        this.recognition.stop();
+        this.speechActive = false;
+    }
+
+    start = () => {
+        this.init();
+        this.recognition.start();
+        this.speechActive = true;
     }
 
     setCallback = (callback: (val: string) => void) => {

@@ -368,15 +368,21 @@ export class EditNodeDlgUtil {
         }
     }
 
-    speechRecognition = (dlg: EditNodeDlg) => {
+    toggleRecognition = (dlg: EditNodeDlg) => {
         S.speech.setCallback((transcript: string) => {
             if (dlg.contentEditor && transcript) {
-                dlg.contentEditor.insertTextAtCursor(transcript+". ");
+                dlg.contentEditor.insertTextAtCursor(transcript + ". ");
             }
         });
 
-        S.speech.toggleActive();
-        dlg.mergeState<LS>({ speechActive: S.speech.speechActive });
+        const speechActive = !dlg.getState().speechActive;
+        if (speechActive) {
+            S.speech.start();
+        }
+        else {
+            S.speech.stop();
+        }
+        dlg.mergeState<LS>({ speechActive });
 
         setTimeout(() => {
             if (dlg.contentEditor) {
