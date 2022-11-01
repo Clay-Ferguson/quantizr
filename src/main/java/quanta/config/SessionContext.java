@@ -108,34 +108,42 @@ public class SessionContext extends ServiceBase {
 	private String watchingPath;
 
 	public SessionContext() {
-		// log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
-
-		synchronized (allSessions) {
-			allSessions.add(this);
-		}
-		synchronized (historicalSessions) {
-			historicalSessions.add(this);
-		}
+		// WARNING: This object might be created on a worker thread so do not assume it's 
+		// an actual HTTP request thread creating this.
+		// log.trace(String.format("SessionContext: object hashCode[%d]", hashCode()));
 	}
 
-	public static SessionContext init(ApplicationContext context, HttpSession session, boolean forceNew) {
-		// Ensure we have a Quanta Session Context
-		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
+	public static SessionContext init(ApplicationContext context, HttpSession session, boolean forceNewBean) {
+		// Get the SessionContext bean off the http session if it exists
+		SessionContext scBean = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
-		if (forceNew || no(sc) || !sc.isLive()) {
+		if (forceNewBean || no(scBean) || !scBean.isLive()) {
+
+			// if we had a bean for this HTTP session, we need to remove it because we're replacing
+			// it with a new one now. 
+			removeSession(scBean);
+
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
 			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
 			 * log.debug("Creating new session at req "+httpReq.getRequestURI());
 			 */
-			sc = (SessionContext) context.getBean(SessionContext.class);
-			session.setAttribute(SessionContext.QSC, sc);
+			scBean = (SessionContext) context.getBean(SessionContext.class);
+			session.setAttribute(SessionContext.QSC, scBean);
+
+			synchronized (allSessions) {
+				allSessions.add(scBean);
+			}
+	
+			synchronized (historicalSessions) {
+				historicalSessions.add(scBean);
+			}
 		}
 		ThreadLocals.setHttpSession(session);
-		ThreadLocals.setSC(sc);
-		sc.setSession(session);
-		return sc;
+		ThreadLocals.setSC(scBean);
+		scBean.setSession(session);
+		return scBean;
 	}
 
 	public HttpSession getSession() {
@@ -332,6 +340,19 @@ public class SessionContext extends ServiceBase {
 
 	public String getUserToken() {
 		return userToken;
+	}
+
+	public static void removeSession(SessionContext sc) {
+		if (no(sc)) return;
+		synchronized (allSessions) {
+			allSessions.remove(sc);
+		}
+	}
+
+	public static int getSessionCount() {
+		synchronized (allSessions) {
+			return allSessions.size();
+		}
 	}
 
 	public static List<SessionContext> getAllSessions(boolean requireToken, boolean requireAppGuid) {

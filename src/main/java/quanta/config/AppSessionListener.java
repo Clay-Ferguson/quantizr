@@ -22,6 +22,8 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionCreated(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 
+		// log.debug("sessionCreated: sessionId=" + se.getSession().getId());
+
 		// Use this to test timeout behavior.
 		// session.setMaxInactiveInterval(10);
 
@@ -42,10 +44,15 @@ public class AppSessionListener implements HttpSessionListener {
 		if (ok(sc)) {
 			session.removeAttribute(SessionContext.QSC);
 			sc.sessionTimeout();
+
+			// this should trigger the removal of SessionContext.allSessions entry too, however we also
+			// try to remove it manually just to be sure, instead of trusting server HTTP layer
+			SessionContext.removeSession(sc);
 		}
 		session.removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
 		sessionCounter--;
-		// log.debug("Session Destroyed: " + se.getSession().getId());
+
+		// log.debug("sessionDestroyed: sessionId=" + se.getSession().getId() + " sessionCount=" + SessionContext.getSessionCount());
 	}
 
 	public static int getSessionCounter() {

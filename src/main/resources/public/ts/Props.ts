@@ -176,7 +176,9 @@ export class Props {
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {
-        return !!this.getPropStr(J.NodeProp.ENC_KEY, node);
+        // ENC_KEY is only going to be present in the owner's browser
+        // NO! --> return !!this.getPropStr(J.NodeProp.ENC_KEY, node);
+        return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
     getOrderedAttachments = (node: J.NodeInfo): J.Attachment[] => {

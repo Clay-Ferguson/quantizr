@@ -265,7 +265,8 @@ public class AppController extends ServiceBase implements ErrorController {
 			Model model) {
 		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
-			SessionContext.init(context, session, true);
+			// we force create a new session bean here, but the http session itself of course may stay unchanged
+			SessionContext.init(context, session, true); 
 
 			if (!MongoRepository.fullInit) {
 				throw new RuntimeException("Server temporarily offline.");

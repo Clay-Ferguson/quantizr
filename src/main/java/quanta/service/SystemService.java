@@ -315,12 +315,12 @@ public class SystemService extends ServiceBase {
 	 */
 	private static String getSessionReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("All Sessions (over 10 hits): " + HitFilter.getHits().size() + "\n");
+		sb.append("All Sessions (over 20 hits)");
 		HashMap<String, Integer> map = HitFilter.getHits();
 		synchronized (map) {
 			for (String key : map.keySet()) {
 				int hits = map.get(key);
-				if (hits > 10) {
+				if (hits > 20) {
 					sb.append("    " + key + " hits=" + hits + "\n");
 				}
 			}

@@ -21,6 +21,7 @@ import quanta.model.BreadcrumbInfo;
 import quanta.model.CalendarItem;
 import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
+import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeProp;
@@ -581,7 +582,7 @@ public class NodeRenderService extends ServiceBase {
 					} else {
 						content = "";
 					}
-				} else if (content.startsWith("<[ENC]>")) {
+				} else if (content.startsWith(Constant.ENC_TAG.s())) {
 					content = "[encrypted]";
 				} else {
 					content = getFirstLineAbbreviation(content, 25);

@@ -29,6 +29,7 @@ import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -1052,6 +1053,11 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode, IntVal ops) {
+		if (ok(node.getContent()) && node.getContent().startsWith(Constant.ENC_TAG.s())) {
+			// for now we silently ignore encrypted nodes during transfers. This needs some more thought (todo-1)
+			return;
+		}
+		
 		/*
 		 * if we're transferring only from a specific user (will only be admin able to do this) then we
 		 * simply return without doing anything if this node in't owned by the person we're transferring
