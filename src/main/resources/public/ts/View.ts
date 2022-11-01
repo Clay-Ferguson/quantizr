@@ -303,13 +303,15 @@ export class View {
 
     getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(state);
+        const isMine = !!node && (node.owner === state.userName || state.userName === "admin");
+
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,
             feed,
-            getWords: true,
-            getTags: true,
-            getMentions: true,
+            getWords: isMine,
+            getTags: isMine,
+            getMentions: isMine,
             signatureVerify: false
         });
         new NodeStatsDlg(res, trending, feed).open();

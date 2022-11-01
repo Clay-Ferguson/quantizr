@@ -1054,6 +1054,7 @@ export const enum NodeProp {
     USER_IPFS_KEY = "sn:ipfsKey",
     USER_TAGS = "sn:tags",
     PWD_HASH = "sn:pwdHash",
+    VOTE = "vote",
     FILE_SYNC_LINK = "fs:link",
     USER_NODE_ID = "sn:userNodeId",
     NAME = "sn:name",
