@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.util.Util;
 
 /**
  * Servlet filter for monitoring load statistics
@@ -23,7 +24,6 @@ import org.springframework.web.filter.GenericFilterBean;
 @Order(4)
 public class HitFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(HitFilter.class);
-
 	private static final HashMap<String, Integer> uniqueHits = new HashMap<>();
 
 	@Override
@@ -42,20 +42,25 @@ public class HitFilter extends GenericFilterBean {
 	private void updateHitCounter(HttpServletRequest httpReq) {
 		HttpSession session = ((HttpServletRequest) httpReq).getSession(false);
 		if (ok(session)) {
-			addHit(uniqueHits, session.getId());
+			addHit(session.getId());
 		}
 	}
 
 	// Identifier can be a username OR a sessionId, depending on which map is being updated
-	public static void addHit(HashMap<String, Integer> hashMap, String id) {
-		synchronized (hashMap) {
-			Integer hitCount = ok(id) ? hashMap.get(id) : null;
+	public static void addHit(String id) {
+		synchronized (uniqueHits) {
+			Integer hitCount = ok(id) ? uniqueHits.get(id) : null;
 
 			if (no(hitCount)) {
-				hashMap.put(id, 1);
+				uniqueHits.put(id, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;
-				hashMap.put(id, hitCount);
+
+				// Throttle heavy users
+				if (hitCount > 20) {
+					Util.sleep(hitCount);
+				}
+				uniqueHits.put(id, hitCount);
 			}
 		}
 	}

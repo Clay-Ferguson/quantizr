@@ -315,7 +315,7 @@ public class SystemService extends ServiceBase {
 	 */
 	private static String getSessionReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("All Sessions (over 20 hits)");
+		sb.append("All Sessions (over 20 hits)\n");
 		HashMap<String, Integer> map = HitFilter.getHits();
 		synchronized (map) {
 			for (String key : map.keySet()) {
@@ -325,7 +325,6 @@ public class SystemService extends ServiceBase {
 				}
 			}
 		}
-		sb.append("User Sessions: " + AppController.uniqueUserIpHits.size() + "\n");
 
 		sb.append("Live Sessions:\n");
 		for (SessionContext sc : SessionContext.getAllSessions(false, true)) {

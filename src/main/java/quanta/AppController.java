@@ -182,7 +182,6 @@ import quanta.util.Val;
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
-	public static final HashMap<String, Integer> uniqueUserIpHits = new HashMap<>();
 
 	@Autowired
 	private ActPubLog apLog;
@@ -342,7 +341,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			attrs.put("userMessage", user.processSignupCode(signupCode));
 		}
 		model.addAllAttributes(attrs);
-		HitFilter.addHit(uniqueUserIpHits, ThreadLocals.getSC().getUserName());
 		return "index";
 	}
 
