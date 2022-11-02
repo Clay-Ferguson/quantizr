@@ -186,9 +186,6 @@ public class AclService extends ServiceBase {
 	 * or 'public' (when the node is being shared to public)
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation.
-	 * 
-	 * todo-0: Make this method optionally accept the principal's user node ID to send when you happen
-	 * to have it and let this method not have to look it up from the DB.
 	 */
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, SubNode principalNode,
 			List<String> privileges, AddPrivilegeResponse res) {

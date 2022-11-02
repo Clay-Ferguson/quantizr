@@ -243,7 +243,7 @@ export class EditNodeDlg extends DialogBase {
         if (S.props.isEncrypted(appState.editNode)) {
             return [
                 new Icon({
-                    className: "fa fa-lock fa-lg iconMarginLeft"
+                    className: "fa fa-lock fa-lg lockIcon iconMarginLeft"
                 })
             ];
         }

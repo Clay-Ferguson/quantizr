@@ -398,9 +398,7 @@ export class MenuPanel extends Div {
             new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, !appState.isAnonUser && selNodeIsMine), //
             new MenuItemSeparator(), //
             new MenuItem("Generate SHA256", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) //
-
-            // todo-0: add this menu to User Guide
-        ], null, this.makeHelpIcon(":cryptographic")));
+        ], null, this.makeHelpIcon(":cryptography")));
 
         children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)
