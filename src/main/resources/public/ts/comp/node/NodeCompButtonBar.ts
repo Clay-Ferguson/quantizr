@@ -34,7 +34,6 @@ export class NodeCompButtonBar extends Div {
             return;
         }
 
-        let encIcon: Icon;
         let sharedIcon: Icon;
         let openButton: Button;
         let selCheckbox: Checkbox;
@@ -75,13 +74,6 @@ export class NodeCompButtonBar extends Div {
         to be deleted WHILE you're looking at it */
         if (isPageRootNode) {
             deleteAllowed = false;
-        }
-
-        if (S.props.isEncrypted(this.node)) {
-            encIcon = new Icon({
-                className: "fa fa-lock fa-lg rowIcon lockIcon",
-                title: "Node is Encrypted."
-            });
         }
 
         /* DO NOT DELETE
@@ -292,7 +284,7 @@ export class NodeCompButtonBar extends Div {
             buttonBar = null;
         }
 
-        this.setChildren([selCheckbox, sharedIcon, buttonBar, encIcon]);
+        this.setChildren([selCheckbox, sharedIcon, buttonBar]);
 
         // this is a workaround for when this component renders empty and consumes space, but we might need to just
         // do this in the base class Comp for ALL components, or have a hidden-if-no-children flag

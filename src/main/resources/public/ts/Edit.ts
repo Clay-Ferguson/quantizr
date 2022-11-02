@@ -129,7 +129,7 @@ export class Edit {
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null, afterEditAction);
                     dlg.open();
                 } else {
-                    dispatch("startEditing", s => {
+                dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
                         s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;

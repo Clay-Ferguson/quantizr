@@ -47,7 +47,6 @@ export class EditNodeDlg extends DialogBase {
     contentEditorState: Validator = new Validator();
     nameState: Validator = new Validator();
     tagsState: Validator = new Validator();
-    signCheckboxVal: boolean;
 
     // holds a map of states by property names.
     // todo-1: it would be good if there were a way to have this state management using the ACTUAL 'appState.editNode'
@@ -76,10 +75,12 @@ export class EditNodeDlg extends DialogBase {
 
         // need a deterministic id here, that can be found across renders, for scrolling.
         this.setId("EditNodeDlg_" + appState.editNode.id);
-
+        let signCheckboxVal = false;
+        let encryptCheckboxVal = false;
         if (S.crypto.avail) {
             // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
-            this.signCheckboxVal = appState.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, appState.editNode);
+            signCheckboxVal = appState.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, appState.editNode);
+            encryptCheckboxVal = appState.editNode?.content?.indexOf(J.Constant.ENC_TAG) === 0;
         }
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
@@ -96,7 +97,9 @@ export class EditNodeDlg extends DialogBase {
 
         this.mergeState<LS>({
             // selected props is used as a set of all 'selected' (via checkbox) property names
-            selectedProps: new Set<string>()
+            selectedProps: new Set<string>(),
+            signCheckboxVal,
+            encryptCheckboxVal
         });
 
         this.allowEditAllProps = getAppState().isAdminUser;
@@ -107,7 +110,7 @@ export class EditNodeDlg extends DialogBase {
         an encrypted node. (i.e. the parent of this node is encrypted) */
         if (encrypt) {
             setTimeout(() => {
-                this.utl.setEncryption(this, true);
+                this.setEncryption(true);
             }, 500);
         }
 
@@ -239,15 +242,25 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getExtraTitleBarComps(): CompIntf[] {
-        const appState = getAppState();
-        if (S.props.isEncrypted(appState.editNode)) {
-            return [
-                new Icon({
-                    className: "fa fa-lock fa-lg lockIcon iconMarginLeft"
-                })
-            ];
+        let comps: CompIntf[] = null;
+
+        if (this.getState().signCheckboxVal) {
+            comps = comps || [];
+            comps.push(new Icon({
+                title: "Crypto Signature Verified",
+                className: "fa fa-certificate fa-lg bigSignatureIcon iconMarginLeft"
+            }));
+            comps.push(new Span("<-Admin"));
         }
-        return null;
+
+        if (this.getState().encryptCheckboxVal) {
+            comps = comps || [];
+            comps.push(new Icon({
+                title: "Node is Encrypted",
+                className: "fa fa-lock fa-lg bigLockIcon iconMarginLeft"
+            }));
+        }
+        return comps;
     }
 
     renderDlg(): CompIntf[] {
@@ -409,8 +422,7 @@ export class EditNodeDlg extends DialogBase {
 
     makePublic = async (state: LS, allowAppends: boolean) => {
         const appState = getAppState();
-        const encrypted = S.props.isEncrypted(appState.editNode);
-        if (encrypted) {
+        if (this.getState().encryptCheckboxVal) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
@@ -663,16 +675,21 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
+    setEncryption = (encrypt: boolean) => {
+        this.mergeState({ encryptCheckboxVal: encrypt });
+        this.utl.setEncryption(this, encrypt);
+    }
+
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         const appState = getAppState();
         const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
-            setValue: (checked: boolean) => this.utl.setEncryption(this, checked),
-            getValue: (): boolean => S.props.isEncrypted(appState.editNode)
+            setValue: (checked: boolean) => this.setEncryption(checked),
+            getValue: (): boolean => this.getState().encryptCheckboxVal
         }) : null;
 
         const signCheckBox = !customProps && S.crypto.avail ? new Checkbox("Sign", null, {
-            setValue: (checked: boolean) => this.signCheckboxVal = checked,
-            getValue: (): boolean => this.signCheckboxVal
+            setValue: (checked: boolean) => this.mergeState({ signCheckboxVal: checked }),
+            getValue: (): boolean => this.getState().signCheckboxVal
         }) : null;
 
         const wordWrapCheckbox = new Checkbox("Word Wrap", null, {

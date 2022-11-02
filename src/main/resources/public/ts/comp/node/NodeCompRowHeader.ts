@@ -92,6 +92,13 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
+        if (S.props.isEncrypted(this.node)) {
+            verboseChildren.push(new Icon({
+                className: "fa fa-lock fa-lg lockIcon",
+                title: "Node is Encrypted."
+            }));
+        }
+
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
         // if (state.isAdminUser) {
         //     // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)

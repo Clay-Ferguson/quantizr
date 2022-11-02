@@ -577,12 +577,22 @@ strong em {
 }
 
 .signatureIcon {
-    color: khaki;
+    color: darkkhaki;
     margin-right: $smallGap;
 }
 
 .lockIcon {
-    color: khaki;
+    color: darkkhaki;
+    margin-right: $smallGap;
+}
+
+.bigSignatureIcon {
+    color: darkkhaki;
+}
+
+.bigLockIcon {
+    color: darkkhaki;
+    margin-right: $smallGap;
 }
 
 .ogBookmarkIcon {

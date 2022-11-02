@@ -8,7 +8,7 @@ declare const __page: any;
 export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
-    logRpc: boolean = true;
+    logRpc: boolean = false;
     logRpcShort: boolean = true;
 
     /*

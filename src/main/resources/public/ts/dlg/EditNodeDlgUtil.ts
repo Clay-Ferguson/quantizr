@@ -82,7 +82,7 @@ export class EditNodeDlgUtil {
         been encrypted just above.
         todo-1: Note: We only sign if admin for now, by design */
 
-        if (dlg.signCheckboxVal) {
+        if (dlg.getState().signCheckboxVal) {
             if (S.crypto.avail) {
                 // Note: this needs to come AFTER the 'savePropsToNode' call above because we're overriding what was
                 // possibly in there.
@@ -251,15 +251,14 @@ export class EditNodeDlgUtil {
     setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
         const state = dlg.getState<LS>();
         const appState = getAppState();
+        if (encrypt && S.props.isPublic(appState.editNode)) {
+            S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
+            return;
+        }
         if (dlg.pendingEncryptionChange) return;
 
         (async () => {
             const encrypted: boolean = S.props.isEncrypted(appState.editNode);
-
-            if (encrypt && S.props.isPublic(appState.editNode)) {
-                S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
-                return;
-            }
 
             /* only if the encryption setting changed do we need to do anything here */
             if (encrypted !== encrypt) {
