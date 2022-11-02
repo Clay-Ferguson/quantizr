@@ -509,7 +509,7 @@ public class NodeEditService extends ServiceBase {
 			for (PropertyInfo property : nodeInfo.getProperties()) {
 				if (NodeProp.CRYPTO_SIG.s().equals(property.getName())) {
 					sig = (String) property.getValue();
-					log.debug("Got Sig in Save: " + sig);
+					// log.debug("Got Sig in Save: " + sig); // &&&
 				}
 
 				if ("[null]".equals(property.getValue())) {
@@ -926,7 +926,7 @@ public class NodeEditService extends ServiceBase {
 
 			if (req.isRecursive()) {
 				StringBuilder sb = new StringBuilder();
-				for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, true, false, true)) {
+				for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, true, false, false)) {
 					nodeCount++;
 					sb.append(n.getPath());
 					sb.append("-");

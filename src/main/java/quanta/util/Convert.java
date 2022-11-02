@@ -55,21 +55,27 @@ public class Convert extends ServiceBase {
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
+		String sig = node.getStr(NodeProp.CRYPTO_SIG);
+
+		// if we have a signature, check it.
 		boolean sigFail = false;
+		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+			sigFail = true;
+		}
+
 		// #sig: need a config setting that specifies which path(s) are required to be signed so
 		// this can be enabled/disabled easily by admin
 		if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
-			String sig = node.getStr(NodeProp.CRYPTO_SIG);
-			if (no(sig) && !sc.isAdmin()) {
+			if ((no(sig) || sigFail) && !sc.isAdmin()) {
 				// todo-1: we need a special global counter for when this happens, so the server info can show it.
+				/*
+				 * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
+				 * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
+				 * of a server DB being potentially hacked so we completely refuse to display this content to the
+				 * user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
+				 * admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
+				 */
 				return null;
-			}
-
-			if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
-				sigFail = true;
-				if (!sc.isAdmin()) {
-					return null;
-				}
 			}
 		}
 

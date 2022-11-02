@@ -352,11 +352,6 @@ export class MenuPanel extends Div {
             new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
             new MenuItemSeparator(), //
 
-            appState.isAdminUser ? new MenuItem("SHA256 of SubGraph", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) : null, //
-            appState.isAdminUser ? new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify) : null, //
-            appState.isAdminUser && S.crypto.avail ? new MenuItem("Sign SubGraph", MenuPanel.signSubGraph) : null, //
-            appState.isAdminUser ? new MenuItemSeparator() : null, //
-
             new MenuItem("Test Microphone", MenuPanel.testMicrophone, !appState.isAnonUser), //
             new MenuItem("Test Web Cam", MenuPanel.testWebCam, !appState.isAnonUser), //
             new MenuItemSeparator(), //
@@ -397,6 +392,15 @@ export class MenuPanel extends Div {
 
             // todo-1: need "Show Incomming" transfers menu option
         ], null, this.makeHelpIcon(":transfers")));
+
+        children.push(new Menu(state, "Cryptography", [
+            S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, !appState.isAnonUser && selNodeIsMine) : null, //
+            new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, !appState.isAnonUser && selNodeIsMine), //
+            new MenuItemSeparator(), //
+            new MenuItem("Generate SHA256", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) //
+
+            // todo-0: add this menu to User Guide
+        ], null, this.makeHelpIcon(":cryptographic")));
 
         children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)

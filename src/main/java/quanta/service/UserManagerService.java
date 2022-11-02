@@ -227,11 +227,12 @@ public class UserManagerService extends ServiceBase {
 		sc.setLastLoginTime(now.getTime());
 		userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
 
-		// NOTE: For user to forcably change their public keys, they have to use
-		// the menu option for doing that, it won't happen here, just becasue their current
-		// browser may have different keys than their 'wanted' keys.
-		// only set key of we don't have the key yet (will not overwrite existing key, becasue the user
-		// might just be on a browser they don't normally use or plan to keep useing.)
+		/*
+		 * NOTE: For user to forcably change their public keys, they have to use the menu option for doing
+		 * that, it won't happen here, just becasue their current browser may have different keys than their
+		 * 'wanted' keys. only set key of we don't have the key yet (will not overwrite existing key,
+		 * becasue the user might just be on a browser they don't normally use or plan to keep useing.)
+		 */
 		if (no(userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY))) {
 			if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
 				log.debug("USER_PREF_PUBLIC_KEY changed during login");

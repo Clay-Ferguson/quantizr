@@ -784,7 +784,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
 
 		return callProc.run("subGraphHash", true, true, req, session, ms -> {
-			ThreadLocals.requireAdmin();
 			return edit.subGraphHash(ms, req);
 		});
 	}

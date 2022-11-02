@@ -47,6 +47,7 @@ export class EditNodeDlg extends DialogBase {
     contentEditorState: Validator = new Validator();
     nameState: Validator = new Validator();
     tagsState: Validator = new Validator();
+    signCheckboxVal: boolean;
 
     // holds a map of states by property names.
     // todo-1: it would be good if there were a way to have this state management using the ACTUAL 'appState.editNode'
@@ -75,6 +76,11 @@ export class EditNodeDlg extends DialogBase {
 
         // need a deterministic id here, that can be found across renders, for scrolling.
         this.setId("EditNodeDlg_" + appState.editNode.id);
+
+        if (S.crypto.avail) {
+            // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
+            this.signCheckboxVal = appState.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, appState.editNode);
+        }
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;
@@ -664,6 +670,11 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => S.props.isEncrypted(appState.editNode)
         }) : null;
 
+        const signCheckBox = !customProps && S.crypto.avail ? new Checkbox("Sign", null, {
+            setValue: (checked: boolean) => this.signCheckboxVal = checked,
+            getValue: (): boolean => this.signCheckboxVal
+        }) : null;
+
         const wordWrapCheckbox = new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
@@ -678,7 +689,7 @@ export class EditNodeDlg extends DialogBase {
         const inlineChildrenCheckbox = appState.editNode.hasChildren ? new Checkbox("Inline Subnodes", null,
             this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
 
-        return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox];
+        return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox, signCheckBox];
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
@@ -893,7 +904,7 @@ export class EditNodeDlg extends DialogBase {
             rows
         }, this.contentEditorState, "font-inherit displayCell", true, this.contentScrollPos);
 
-        const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, getAppState().node) !== "1";
+        const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
         if (S.crypto.avail) {
