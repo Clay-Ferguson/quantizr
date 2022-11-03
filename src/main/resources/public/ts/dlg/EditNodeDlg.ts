@@ -250,7 +250,9 @@ export class EditNodeDlg extends DialogBase {
                 title: "Crypto Signature Verified",
                 className: "fa fa-certificate fa-lg bigSignatureIcon iconMarginLeft"
             }));
-            comps.push(new Span("<-Admin"));
+            if (getAppState().isAdminUser) {
+                comps.push(new Span("<-Admin"));
+            }
         }
 
         if (this.getState().encryptCheckboxVal) {
@@ -683,12 +685,20 @@ export class EditNodeDlg extends DialogBase {
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         const appState = getAppState();
         const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
-            setValue: (checked: boolean) => this.setEncryption(checked),
+            setValue: (checked: boolean) => {
+                if (S.crypto.warnIfEncKeyUnknown()) {
+                    this.setEncryption(checked);
+                }
+            },
             getValue: (): boolean => this.getState().encryptCheckboxVal
         }) : null;
 
         const signCheckBox = !customProps && S.crypto.avail ? new Checkbox("Sign", null, {
-            setValue: (checked: boolean) => this.mergeState({ signCheckboxVal: checked }),
+            setValue: (checked: boolean) => {
+                if (S.crypto.warnIfSigKeyUnknown()) {
+                    this.mergeState({ signCheckboxVal: checked });
+                }
+            },
             getValue: (): boolean => this.getState().signCheckboxVal
         }) : null;
 

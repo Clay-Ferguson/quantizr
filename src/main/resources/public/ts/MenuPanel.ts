@@ -354,8 +354,12 @@ export class MenuPanel extends Div {
 
             new MenuItem("Test Microphone", MenuPanel.testMicrophone, !appState.isAnonUser), //
             new MenuItem("Test Web Cam", MenuPanel.testWebCam, !appState.isAnonUser), //
+            new MenuItem("My GEO Location", S.nav.geoLocation), //
             new MenuItemSeparator(), //
-            new MenuItem("My GEO Location", S.nav.geoLocation) //
+
+            !state.unknownPubSigKey && S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, !appState.isAnonUser && selNodeIsMine) : null, //
+            new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, !appState.isAnonUser && selNodeIsMine), //
+            new MenuItem("Generate SHA256", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) //
 
             // Removing for now. Our PostIt node icon makes this easy enough.
             // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
@@ -392,13 +396,6 @@ export class MenuPanel extends Div {
 
             // todo-1: need "Show Incomming" transfers menu option
         ], null, this.makeHelpIcon(":transfers")));
-
-        children.push(new Menu(state, "Cryptography", [
-            S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, !appState.isAnonUser && selNodeIsMine) : null, //
-            new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, !appState.isAnonUser && selNodeIsMine), //
-            new MenuItemSeparator(), //
-            new MenuItem("Generate SHA256", MenuPanel.subgraphHash, !appState.isAnonUser && selNodeIsMine) //
-        ], null, this.makeHelpIcon(":cryptography")));
 
         children.push(new Menu(state, "Settings", [
             // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)

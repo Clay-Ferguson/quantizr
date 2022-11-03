@@ -279,12 +279,15 @@ export class EditNodeDlgUtil {
                             const content = dlg.contentEditor.getValue();
 
                             const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
-                            appState.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
 
-                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
-                            the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
-                            and so can only be decrypted with their private key. */
-                            S.props.setPropVal(J.NodeProp.ENC_KEY, appState.editNode, skdp.cipherKey);
+                            if (skdp.cipherKey && skdp.cipherKey) {
+                                appState.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
+
+                                /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
+                                the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
+                                and so can only be decrypted with their private key. */
+                                S.props.setPropVal(J.NodeProp.ENC_KEY, appState.editNode, skdp.cipherKey);
+                            }
                         }
                     }
 

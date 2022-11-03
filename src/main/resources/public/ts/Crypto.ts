@@ -1,3 +1,4 @@
+import { getAppState } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -648,6 +649,10 @@ export class Crypto {
      * and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
+        if (getAppState().unknownPubEncKey) {
+            console.warn("Unrecognized key");
+            return { cipherText: null, cipherKey: null }
+        }
         publicKey = publicKey || await this.getPublicEncKey();
 
         // generate random symmetric key
@@ -779,6 +784,11 @@ export class Crypto {
     /* This method will simply sign all the strings in 'dataToSign' and then send it up to the server when done */
     generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
 
+        if (getAppState().unknownPubSigKey) {
+            console.warn("Unrecognized key");
+            return null;
+        }
+
         for (const dat of dataToSign.listToSign) {
             // convert all the data to be signed into the signatures
             dat.data = await S.crypto.sign(null, dat.data);
@@ -791,6 +801,11 @@ export class Crypto {
     }
 
     signNode = async (node: J.NodeInfo): Promise<void> => {
+        if (getAppState().unknownPubSigKey) {
+            console.warn("Unrecognized key");
+            return;
+        }
+
         if (!this.avail) {
             throw new Error("Crypto not available.");
         }
@@ -829,6 +844,40 @@ export class Crypto {
             S.util.logAndReThrow("Failed to sign data.", e);
         }
         return null;
+    }
+
+    // returns true if key is ok to use
+    warnIfEncKeyUnknown = () => {
+        let ret = true;
+        const appState = getAppState();
+        if (appState.unknownPubEncKey) {
+            ret = false;
+            S.util.showMessage("Your Public Encryption Key (Asymmetric) doesn't match what the server has for you: \n\n" +
+                "\nYou need to fix this before you can use encryption fetures.\n" +
+                "Three ways to fix: \n" +
+                "* Use the original browser where your keys got initialized from.\n" +
+                "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from *this* browser.\n" +
+                "* or, Import the key(s) from your original browser into this browser."
+                , "Unknown PublicKeys/Browser", true);
+        }
+        return ret;
+    }
+
+    // returns true of key is ok to use
+    warnIfSigKeyUnknown = () => {
+        let ret = true;
+        const appState = getAppState();
+        if (appState.unknownPubSigKey) {
+            ret = false;
+            S.util.showMessage("Your Public Signature Key doesn't match what the server has for you: \n\n" +
+                "\nYou need to fix this before you can use those Signature fetures.\n" +
+                "Three ways to fix: \n" +
+                "* Use the original browser where your keys got initialized from.\n" +
+                "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from *this* browser.\n" +
+                "* or, Import the key(s) from your original browser into this browser."
+                , "Unknown PublicKeys/Browser", true);
+        }
+        return ret;
     }
 
     // ab2str = (buf: ArrayBuffer) => {

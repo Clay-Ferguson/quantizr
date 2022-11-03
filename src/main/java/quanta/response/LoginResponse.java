@@ -17,6 +17,10 @@ public class LoginResponse extends ResponseBase {
 	private UserPreferences userPreferences;
 	private boolean allowFileSystemSearch;
 
+	// comes back to caller as TRUE if the keys were not the same as the keys stored on the server.
+	private boolean unknownPubEncKey;
+	private boolean unknownPubSigKey;
+
 	public UserProfile getUserProfile() {
 		return userProfile;
 	}
@@ -71,5 +75,21 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowedFeatures(String allowedFeatures) {
 		this.allowedFeatures = allowedFeatures;
+	}
+
+	public boolean isUnknownPubEncKey() {
+		return unknownPubEncKey;
+	}
+
+	public void setUnknownPubEncKey(boolean unknownPubEncKey) {
+		this.unknownPubEncKey = unknownPubEncKey;
+	}
+
+	public boolean isUnknownPubSigKey() {
+		return unknownPubSigKey;
+	}
+
+	public void setUnknownPubSigKey(boolean unknownPubSigKey) {
+		this.unknownPubSigKey = unknownPubSigKey;
 	}
 }

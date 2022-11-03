@@ -187,12 +187,23 @@ export class User {
         ]);
     }
 
+    // todo-0: I think passing 'state' into here is pointless. we get it with a call, because it's being updated too
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,
         state: AppState) => {
         if (S.util.checkSuccess("Login", res)) {
 
             // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
+
+                await promiseDispatch("unknownPubKeys", s => {
+                    s.unknownPubEncKey = res.unknownPubEncKey;
+                    s.unknownPubSigKey = res.unknownPubSigKey;
+                    return s;
+                });
+
+                // we may have just processed a dispatch so we need to get the current state now.
+                state = getAppState();
+
                 S.localDB.userName = usr;
                 if (usr) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
@@ -224,7 +235,7 @@ export class User {
 
             S.util.setStateVarsUsingLoginResponse(res);
 
-            // we just processed a dispatch so we need to get the current state now.
+            // we may have just processed a dispatch so we need to get the current state now.
             state = getAppState();
 
             /* set ID to be the page we want to show user right after login */

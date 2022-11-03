@@ -229,20 +229,39 @@ public class UserManagerService extends ServiceBase {
 
 		/*
 		 * NOTE: For user to forcably change their public keys, they have to use the menu option for doing
-		 * that, it won't happen here, just becasue their current browser may have different keys than their
-		 * 'wanted' keys. only set key of we don't have the key yet (will not overwrite existing key,
-		 * becasue the user might just be on a browser they don't normally use or plan to keep useing.)
+		 * that, it won't happen here, automatically becasue their current browser may have different keys
+		 * than their current keys. In other words we only set keys if we don't have the key yet (i.e. will
+		 * not overwrite existing key here)
+		 * 
+		 * todo-0: We need to detect if a browser publi key IS DIFFERENT from the one on the server right here
+		 * and if this is the case, set a 'wrong key' flag on the SessionContext that, and in the response to the 
+		 * login, indicating this browser session cannot be allowed to Sign OR Encrypt any data.
+		 * 
+		 * todo-0: Also when this happens we could print some kind of "unknown browser" message, and even require
+		 * user to reauth this browser via, email convirmation proving they own the email AND know the password.
 		 */
-		if (no(userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY))) {
+		String pubEncKey = userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
+		if (no(pubEncKey)) {
 			if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
 				log.debug("USER_PREF_PUBLIC_KEY changed during login");
 			}
 		}
+		else {
+			if (!pubEncKey.equals(asymEncKey)) {
+				res.setUnknownPubEncKey(true);
+			}
+		}
 
-		// ditto, note just above
-		if (no(userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY))) {
+		// ditto, note just above, same applies to this key
+		String pubSigKey = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+		if (no(pubSigKey)) {
 			if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
 				log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
+			}
+		}
+		else {
+			if (!pubSigKey.equals(sigKey)) {
+				res.setUnknownPubSigKey(true);
 			}
 		}
 

@@ -137,4 +137,7 @@ export class AppState {
     ipsmActive: boolean = false;
 
     graphData: J.GraphNode;
+
+    unknownPubEncKey: boolean;
+    unknownPubSigKey: boolean;
 }
