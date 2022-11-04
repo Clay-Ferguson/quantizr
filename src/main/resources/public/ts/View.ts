@@ -318,11 +318,14 @@ export class View {
     }
 
     signSubGraph = async (state: AppState): Promise<any> => {
+        if (!S.crypto.warnIfEncKeyUnknown()) {
+            return null;
+        }
         const node = S.nodeUtil.getHighlightedNode(state);
         await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
             nodeId: node ? node.id : null
         });
-        S.util.showMessage("Signature generation initiated. Leave this browser window opened, until notified signatures are complete.", "Signatures");
+        S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
     }
 
     getNodeSignatureVerify = async (state: AppState): Promise<any> => {

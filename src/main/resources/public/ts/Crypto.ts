@@ -852,13 +852,7 @@ export class Crypto {
         const appState = getAppState();
         if (appState.unknownPubEncKey) {
             ret = false;
-            S.util.showMessage("Your Public Encryption Key (Asymmetric) doesn't match what the server has for you: \n\n" +
-                "\nYou need to fix this before you can use encryption fetures.\n" +
-                "Three ways to fix: \n" +
-                "* Use the original browser where your keys got initialized from.\n" +
-                "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from *this* browser.\n" +
-                "* or, Import the key(s) from your original browser into this browser."
-                , "Unknown PublicKeys/Browser", true);
+            this.showEncryptionKeyProblem("Encryption Key (Asymmetric Key)", "Encryption");
         }
         return ret;
     }
@@ -869,15 +863,19 @@ export class Crypto {
         const appState = getAppState();
         if (appState.unknownPubSigKey) {
             ret = false;
-            S.util.showMessage("Your Public Signature Key doesn't match what the server has for you: \n\n" +
-                "\nYou need to fix this before you can use those Signature fetures.\n" +
-                "Three ways to fix: \n" +
-                "* Use the original browser where your keys got initialized from.\n" +
-                "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from *this* browser.\n" +
-                "* or, Import the key(s) from your original browser into this browser."
-                , "Unknown PublicKeys/Browser", true);
+            this.showEncryptionKeyProblem("Signature Key", "Signature")
         }
         return ret;
+    }
+
+    showEncryptionKeyProblem = (keyName: string, featureName: string) => {
+        S.util.showMessage("Your " + keyName + " doesn't match the public key that the server has for you: \n" +
+            "\nYou need to fix this before you can use " + featureName + " features.\n\n" +
+            "Three ways to fix: \n" +
+            "* Use the original browser where your keys got initialized from.\n" +
+            "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from this browser.\n" +
+            "* or, Import the key(s) from your original browser into this browser."
+            , "Unknown PublicKeys/Browser", true);
     }
 
     // ab2str = (buf: ArrayBuffer) => {
