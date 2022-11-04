@@ -1,4 +1,3 @@
-import { getAppState } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -99,7 +98,7 @@ export class LoginDlg extends DialogBase {
             // console.log("Login Resp: " + S.util.prettyPrint(res));
             if (res.success) {
                 S.quanta.authToken = res.authToken;
-                S.user.loginResponse(res, usr, pwd, true, getAppState());
+                S.user.loginResponse(res, usr, pwd, true);
                 this.close();
             }
         }

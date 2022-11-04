@@ -118,7 +118,7 @@ export class User {
                     // console.log("calling loginResponse()");
                     // Note: If user entered wrong case-sentitivity string on login dialog they can still login
                     // but this res.userName however will have the correct name (case-sensitive) here now.
-                    this.loginResponse(res, res.userProfile.userName, callPwd, false, state);
+                    this.loginResponse(res, res.userProfile.userName, callPwd, false);
                 } else {
                     if (res.success) {
                         S.util.setStateVarsUsingLoginResponse(res);
@@ -187,9 +187,7 @@ export class User {
         ]);
     }
 
-    // todo-0: I think passing 'state' into here is pointless. we get it with a call, because it's being updated too
-    loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,
-        state: AppState) => {
+    loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean) => {
         if (S.util.checkSuccess("Login", res)) {
 
             // if login was successful and we're an authenticated user
@@ -200,9 +198,6 @@ export class User {
                     s.unknownPubSigKey = res.unknownPubSigKey;
                     return s;
                 });
-
-                // we may have just processed a dispatch so we need to get the current state now.
-                state = getAppState();
 
                 S.localDB.userName = usr;
                 if (usr) {
@@ -235,9 +230,6 @@ export class User {
 
             S.util.setStateVarsUsingLoginResponse(res);
 
-            // we may have just processed a dispatch so we need to get the current state now.
-            state = getAppState();
-
             /* set ID to be the page we want to show user right after login */
             let id: string = null;
             let childId: string = null;
@@ -256,6 +248,9 @@ export class User {
             if (this.usingUrlTab()) {
                 return;
             }
+
+            // we may have just processed a dispatch so we need to get the current state now.
+            const state = getAppState();
 
             if (g_nodeId) {
                 id = g_nodeId;
