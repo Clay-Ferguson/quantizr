@@ -218,6 +218,7 @@ public class AttachmentService extends ServiceBase {
 		if (no(node) && ok(nodeId)) {
 			node = read.getNode(ms, nodeId);
 		}
+		auth.ownerAuth(ms, node);
 
 		/*
 		 * Multiple file uploads always attach children for each file uploaded (correction: addAsChild is
@@ -225,7 +226,6 @@ public class AttachmentService extends ServiceBase {
 		 * SAME node)
 		 */
 		if (addAsChild) {
-			auth.ownerAuth(ms, node);
 			try {
 				SubNode newNode = create.createNode(ms, node, null, null, null, CreateNodeLocation.LAST, null, null, true);
 				newNode.setContent(fileName);
@@ -245,8 +245,6 @@ public class AttachmentService extends ServiceBase {
 			} catch (Exception ex) {
 				throw ExUtil.wrapEx(ex);
 			}
-		} else {
-			auth.ownerAuth(ms, node);
 		}
 
 		/* mimeType can be passed as null if it's not yet determined */
@@ -868,7 +866,6 @@ public class AttachmentService extends ServiceBase {
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
 
-		String attKey = getNextAttachmentKey(node);
 		if (no(mimeType)) {
 			mimeType = getMimeTypeFromUrl(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
@@ -877,17 +874,14 @@ public class AttachmentService extends ServiceBase {
 			// log.debug("ended up with mimeType: " + mimeType);
 		}
 
+		if (no(node)) {
+			node = read.getNode(ms, nodeId);
+			// only need to auth if we looked up the node.
+		}
+		auth.ownerAuth(node);
+		String attKey = getNextAttachmentKey(node);
+
 		if (!storeLocally) {
-			if (no(node)) {
-				node = read.getNode(ms, nodeId);
-
-				// only need to auth if we looked up the node.
-				auth.ownerAuth(node);
-			}
-			if (no(node)) {
-				throw new RuntimeException("Node not found: " + nodeId);
-			}
-
 			Attachment att = node.getAttachment(attKey, true, true);
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
@@ -936,7 +930,7 @@ public class AttachmentService extends ServiceBase {
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
+				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
 						false, true, true, storeLocally, sourceUrl);
 			}
 			/*
@@ -958,7 +952,7 @@ public class AttachmentService extends ServiceBase {
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
+					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
 							false, true, true, storeLocally, sourceUrl);
 				}
 			}
