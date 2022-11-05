@@ -153,6 +153,7 @@ export class MenuPanel extends Div {
     static toggleEditMode = () => S.edit.toggleEditMode(getAppState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(getAppState(null));
     static toggleNsfw = () => S.edit.toggleNsfw(getAppState(null));
+    static toggleShowProps = () => S.edit.toggleShowProps(getAppState(null));
     static toggleParents = () => S.edit.toggleShowParents(getAppState(null));
     static toggleReplies = () => S.edit.toggleShowReplies(getAppState(null));
     static browserInfo = () => S.util.showBrowserInfo();
@@ -407,7 +408,7 @@ export class MenuPanel extends Div {
             new MenuItem("Show Comments", MenuPanel.toggleReplies, true, () => appState.userPrefs.showReplies), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
-            new MenuItem("Show Properties", S.props.propsToggle, true, () => appState.showProperties), //
+            new MenuItem("Show Properties", MenuPanel.toggleShowProps, true, () => appState.userPrefs.showProps), //
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
 
             // until we have at least one more preference the preferences dialog is not needed.

@@ -567,6 +567,11 @@ export class Edit {
         return S.util.saveUserPreferences(state, true);
     }
 
+    toggleShowProps = async (state: AppState) => {
+        state.userPrefs.showProps = !state.userPrefs.showProps;
+        return S.util.saveUserPreferences(state, true);
+    }
+
     toggleShowParents = (state: AppState) => {
         state.userPrefs.showParents = !state.userPrefs.showParents;
         S.util.saveUserPreferences(state, false);

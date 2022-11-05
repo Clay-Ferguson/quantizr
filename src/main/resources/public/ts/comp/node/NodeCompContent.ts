@@ -5,6 +5,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Clearfix } from "../core/Clearfix";
+import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 export class NodeCompContent extends Div {
@@ -51,12 +52,9 @@ export class NodeCompContent extends Div {
         this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
         children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
 
-        if (state.showProperties) {
-            const propTable = S.props.renderProperties(this.node.properties);
-            if (propTable) {
-                children.push(propTable);
-                children.push(new Clearfix());
-            }
+        if (state.userPrefs.showProps && this.node.properties?.length > 0) {
+            children.push(new PropTable(this.node));
+            children.push(new Clearfix());
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not

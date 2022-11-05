@@ -42,6 +42,7 @@ export class PrefsDlg extends DialogBase {
                     editMode: state.userPrefs.editMode,
                     showMetaData: state.userPrefs.showMetaData,
                     nsfw: state.userPrefs.nsfw,
+                    showProps: state.userPrefs.showProps,
                     showParents: state.userPrefs.showParents,
                     showReplies: state.userPrefs.showReplies,
                     rssHeadlinesOnly: state.userPrefs.rssHeadlinesOnly,

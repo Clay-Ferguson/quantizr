@@ -9,6 +9,7 @@ public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
 	private boolean nsfw;
+	private boolean showProps;
 	private boolean showParents;
 	private boolean showReplies;
 
@@ -98,5 +99,13 @@ public class UserPreferences {
 
 	public void setNsfw(boolean nsfw) {
 		this.nsfw = nsfw;
+	}
+
+	public boolean isShowProps() {
+		return showProps;
+	}
+
+	public void setShowProps(boolean showProps) {
+		this.showProps = showProps;
 	}
 }

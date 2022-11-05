@@ -1,8 +1,5 @@
-import { dispatch, getAppState } from "./AppContext";
+import { getAppState } from "./AppContext";
 import { AppState } from "./AppState";
-import { PropTable } from "./comp/PropTable";
-import { PropTableCell } from "./comp/PropTableCell";
-import { PropTableRow } from "./comp/PropTableRow";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -32,16 +29,6 @@ export class Props {
         return idx;
     }
 
-    /*
-     * Toggles display of properties in the gui.
-     */
-    propsToggle = async () => {
-        dispatch("propsToggle", (s) => {
-            s.showProperties = !s.showProperties;
-            return s;
-        });
-    }
-
     deleteProp = (node: J.NodeInfo, propertyName: string) => {
         if (node.properties) {
             node.properties = node.properties.filter(p => {
@@ -58,38 +45,6 @@ export class Props {
                 S.util.arrayMoveItem(props, tagIdx, props.length);
             }
         }
-    }
-
-    /*
-     * properties will be null or a list of PropertyInfo objects.
-     */
-    renderProperties = (properties: J.PropertyInfo[]): PropTable => {
-        if (!properties) return null;
-
-        const propTable = new PropTable({
-            className: "property-table float-end"
-            // "sourceClass" : "[propsTable]"
-        });
-
-        properties.forEach(function (property: J.PropertyInfo) {
-            if (S.props.isGuiControlBasedProp(property)) return;
-
-            // console.log("Render Prop: "+property.name);
-            const propNameCell = new PropTableCell(property.name, {
-                className: "prop-table-name-col"
-            });
-
-            const valCellAttrs = {
-                className: "prop-table-val-col"
-            };
-            const propValCell: PropTableCell = new PropTableCell(property.value, valCellAttrs);
-
-            const propTableRow = new PropTableRow({
-                className: "prop-table-row"
-            }, [propNameCell, propValCell]);
-            propTable.addChild(propTableRow);
-        });
-        return propTable;
     }
 
     getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {

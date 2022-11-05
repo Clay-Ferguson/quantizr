@@ -616,6 +616,7 @@ public class UserManagerService extends ServiceBase {
 			prefsNode.set(NodeProp.USER_PREF_EDIT_MODE, reqUserPrefs.isEditMode());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA, reqUserPrefs.isShowMetaData());
 			prefsNode.set(NodeProp.USER_PREF_NSFW, reqUserPrefs.isNsfw());
+			prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS, reqUserPrefs.isShowParents());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
 			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
@@ -624,6 +625,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setEditMode(reqUserPrefs.isEditMode());
 			userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
 			userPrefs.setNsfw(reqUserPrefs.isNsfw());
+			userPrefs.setShowProps(reqUserPrefs.isShowProps());
 			userPrefs.setShowParents(reqUserPrefs.isShowParents());
 			userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
@@ -1053,6 +1055,7 @@ public class UserManagerService extends ServiceBase {
 		UserPreferences userPrefs = new UserPreferences();
 		userPrefs.setShowMetaData(true);
 		userPrefs.setNsfw(false);
+		userPrefs.setShowProps(false);
 		return userPrefs;
 	}
 
@@ -1068,6 +1071,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
 			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
+			userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
 			userPrefs.setShowParents(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PARENTS));
 			userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
 			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
