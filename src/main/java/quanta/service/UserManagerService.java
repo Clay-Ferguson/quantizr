@@ -232,13 +232,6 @@ public class UserManagerService extends ServiceBase {
 		 * that, it won't happen here, automatically becasue their current browser may have different keys
 		 * than their current keys. In other words we only set keys if we don't have the key yet (i.e. will
 		 * not overwrite existing key here)
-		 * 
-		 * todo-0: We need to detect if a browser publi key IS DIFFERENT from the one on the server right here
-		 * and if this is the case, set a 'wrong key' flag on the SessionContext that, and in the response to the 
-		 * login, indicating this browser session cannot be allowed to Sign OR Encrypt any data.
-		 * 
-		 * todo-0: Also when this happens we could print some kind of "unknown browser" message, and even require
-		 * user to reauth this browser via, email convirmation proving they own the email AND know the password.
 		 */
 		String pubEncKey = userNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 		if (no(pubEncKey)) {

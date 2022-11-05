@@ -53,10 +53,6 @@ export class EditNodeDlg extends DialogBase {
     // as the holder of the property value so everything is always in sync easier.
     propStates: Map<string, Validator> = new Map<string, Validator>();
 
-    // todo-1: these should be in our local state really
-    static morePanelExpanded: boolean = false;
-    static propsPanelExpanded: boolean = false;
-
     pendingEncryptionChange: boolean = false;
 
     // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
@@ -69,7 +65,7 @@ export class EditNodeDlg extends DialogBase {
     allowEditAllProps: boolean = false;
     contentScrollPos = new ScrollPos();
 
-    constructor(private encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
+    constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
         const appState = getAppState();
 
@@ -375,9 +371,12 @@ export class EditNodeDlg extends DialogBase {
             propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
                 propsTable
             ], false,
-                (state: boolean) => {
-                    EditNodeDlg.propsPanelExpanded = state;
-                }, EditNodeDlg.propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+                (expanded: boolean) => {
+                    dispatch("setPropsPanelExpanded", s => {
+                        s.propsPanelExpanded = expanded;
+                        return s;
+                    });
+                }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
         const tagsEditRow: Div = new Div(null, { className: "marginBottom row align-items-end" }, [
@@ -393,9 +392,12 @@ export class EditNodeDlg extends DialogBase {
             ]),
             flowPanel
         ], false,
-            (state: boolean) => {
-                EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
+            (expanded: boolean) => {
+                dispatch("setMorePanelExpanded", s => {
+                    s.morePanelExpanded = expanded;
+                    return s;
+                });
+            }, getAppState().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
         const morePanel = new Div(null, { className: "marginBottom" }, [
             collapsePanel
@@ -476,7 +478,7 @@ export class EditNodeDlg extends DialogBase {
                 const propsButtonBar: ButtonBar = new ButtonBar([
                     new IconButton("fa-plus-circle", null, {
                         onClick: async () => {
-                            EditNodeDlg.propsPanelExpanded = true;
+                            getAppState().propsPanelExpanded = true;
                             await this.utl.addProperty(this);
                         },
                         title: "Add property"
@@ -776,7 +778,7 @@ export class EditNodeDlg extends DialogBase {
 
             allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
                 onClick: async () => {
-                    EditNodeDlg.propsPanelExpanded = true;
+                    getAppState().propsPanelExpanded = true;
                     await this.utl.addProperty(this);
                 },
                 title: "Add Property"

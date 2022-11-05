@@ -136,4 +136,7 @@ export class AppState {
 
     unknownPubEncKey: boolean;
     unknownPubSigKey: boolean;
+
+    morePanelExpanded: boolean;
+    propsPanelExpanded: boolean;
 }
