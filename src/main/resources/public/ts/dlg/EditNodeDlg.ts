@@ -73,7 +73,7 @@ export class EditNodeDlg extends DialogBase {
         let encryptCheckboxVal = false;
         if (S.crypto.avail) {
             // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
-            signCheckboxVal = !appState.unknownPubSigKey || appState.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, appState.editNode);
+            signCheckboxVal = !appState.unknownPubSigKey && appState.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, appState.editNode);
             encryptCheckboxVal = !appState.unknownPubEncKey && appState.editNode?.content?.indexOf(J.Constant.ENC_TAG) === 0;
         }
 
@@ -104,7 +104,7 @@ export class EditNodeDlg extends DialogBase {
         an encrypted node. (i.e. the parent of this node is encrypted) */
         if (encrypt && !appState.unknownPubEncKey) {
             setTimeout(() => {
-                this.setEncryption(true);
+                this.utl.setEncryption(this, true);
             }, 500);
         }
 
@@ -242,13 +242,13 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
-        let propertyEditFieldContainer: Div = null;
+        let propEditFieldContainer: Div = null;
         const children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Div(null, null, [
                 new Div(null, {
                 }, [
-                    propertyEditFieldContainer = new Div("", {
+                    propEditFieldContainer = new Div("", {
                     })
                 ])
             ])
@@ -266,24 +266,22 @@ export class EditNodeDlg extends DialogBase {
         let propsTable: Comp = null;
         let mainPropsTable: Comp = null;
 
+        const propsParent = new Div(null, {
+            className: "edit-props-table form-group-border marginBottom"
+        });
+
         // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
         if (!customProps) {
-            propsTable = new Div(null, {
-                className: "edit-props-table form-group-border marginBottom"
-            });
+            propsTable = propsParent;
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
             mainPropsTable = new Div(null, {
                 className: "marginBottom"
             });
         }
         else {
-            // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
-            mainPropsTable = new Div(null, {
-                className: "edit-props-table form-group-border marginBottom"
-            });
+            mainPropsTable = propsParent;
         }
 
-        const propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
         const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode);
 
         let nodeNameTextField: TextField = null;
@@ -292,13 +290,13 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (allowContentEdit) {
-            const hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
+            const hasContent = typeHandler?.hasCustomProp("content");
             let rows = getAppState().mobileMode ? "8" : "10";
-            if (customProps && hasContentProp) {
+            if (customProps && hasContent) {
                 rows = "4";
             }
 
-            if (!customProps || hasContentProp) {
+            if (!customProps || hasContent) {
                 mainPropsTable.addChild(this.makeContentEditor(appState.editNode, isWordWrap, rows));
                 this.contentEditor.setWordWrap(isWordWrap);
             }
@@ -384,7 +382,7 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
+        propEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
             this.tagsState.getValue() ? tagsEditRow : null,
             propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
         return children;
@@ -399,7 +397,7 @@ export class EditNodeDlg extends DialogBase {
 
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: appState.editNode.id,
-            principals: ["public"],
+            principals: [J.PrincipalName.PUBLIC],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
@@ -483,17 +481,12 @@ export class EditNodeDlg extends DialogBase {
         this.tagsState.setValue(val);
     }
 
-    setEncryption = (encrypt: boolean) => {
-        this.mergeState({ encryptCheckboxVal: encrypt });
-        this.utl.setEncryption(this, encrypt);
-    }
-
     makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
         const appState = getAppState();
         const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.warnIfEncKeyUnknown()) {
-                    this.setEncryption(checked);
+                    this.utl.setEncryption(this, checked);
                 }
             },
             getValue: (): boolean => this.getState().encryptCheckboxVal
@@ -628,13 +621,6 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    toggleShowReadOnly = () => {
-        // alert("not yet implemented.");
-        // see saveNode for how to iterate all properties, although I wonder why I didn't just use a map/set of
-        // properties elements
-        // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
-    }
-
     openChangeNodeTypeDlg = () => {
         const appState = getAppState();
         new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(this, type)).open();
@@ -743,7 +729,7 @@ export class EditNodeDlg extends DialogBase {
         if (S.crypto.avail) {
             this.contentEditor.onMount((elm: HTMLElement) => {
                 if (encrypted && value.indexOf(J.Constant.ENC_TAG) !== -1) {
-                    console.log("decrypting: " + value);
+                    // console.log("decrypting: " + value);
                     const cipherText = value.substring(J.Constant.ENC_TAG.length);
                     (async () => {
                         const cipherKey = S.props.getCryptoKey(node, getAppState());

@@ -249,6 +249,7 @@ export class EditNodeDlgUtil {
     }
 
     setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
+        dlg.mergeState({ encryptCheckboxVal: encrypt });
         const state = dlg.getState<LS>();
         const appState = getAppState();
         if (encrypt && S.props.isPublic(appState.editNode)) {
