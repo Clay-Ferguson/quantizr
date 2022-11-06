@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.actpub.APConst;
 import quanta.config.SessionContext;
 import quanta.util.ThreadLocals;
 
@@ -54,9 +55,8 @@ public class GlobalFilter extends GenericFilterBean {
 				}
 
 				// Special check for CORS
-				// todo-0: these path parts should be in 'constants' var.
-				if (sreq.getRequestURI().contains("/.well-known/") || //
-						sreq.getRequestURI().contains("/ap/")) {
+				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
+						sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
 					createSession = false;
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
 				}

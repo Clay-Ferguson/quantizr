@@ -9,6 +9,7 @@ import quanta.model.client.PrivilegeType;
  */
 public class APConst {
     public static final String PATH_WEBFINGER = "/.well-known/webfinger";
+    public static final String PATH_AP = "/ap";
     public static final String PATH_INBOX = "/ap/inbox";
     public static final String PATH_OUTBOX = "/ap/outbox";
     public static final String PATH_FOLLOWERS = "/ap/followers";
