@@ -20,6 +20,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import quanta.model.client.PrincipalName;
 
 public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
@@ -199,4 +200,9 @@ public class Util {
 		// }
 	}
 
+	public static void failIfAdmin(String userName) {
+		if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
+			throw new RuntimeException("Admin not allowed");
+		}
+	}
 }

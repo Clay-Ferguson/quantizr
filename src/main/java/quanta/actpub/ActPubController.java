@@ -22,6 +22,7 @@ import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /**
@@ -74,6 +75,7 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
 			HttpServletResponse res) throws Exception {
+		Util.failIfAdmin(userName);
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apLog.trace("Redirecting to: " + url);
 		res.sendRedirect(url);
@@ -87,6 +89,7 @@ public class ActPubController extends ServiceBase {
 			APConst.CTYPE_LD_JSON})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
+		Util.failIfAdmin(userName);
 		apLog.trace("getActor: " + userName);
 		APOPerson ret = apub.generatePersonObj(userName);
 		if (ok(ret)) {
@@ -132,6 +135,7 @@ public class ActPubController extends ServiceBase {
 			@RequestBody byte[] body, //
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
+		Util.failIfAdmin(userName);
 		try {
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, body);
@@ -176,6 +180,7 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
+		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(req, userName, minId);
@@ -214,6 +219,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 
+		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollower.generateFollowersPage(userName, minId);
@@ -242,6 +248,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 
+		Util.failIfAdmin(userName);
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);

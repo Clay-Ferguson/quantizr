@@ -54,6 +54,7 @@ public class GlobalFilter extends GenericFilterBean {
 				}
 
 				// Special check for CORS
+				// todo-0: these path parts should be in 'constants' var.
 				if (sreq.getRequestURI().contains("/.well-known/") || //
 						sreq.getRequestURI().contains("/ap/")) {
 					createSession = false;

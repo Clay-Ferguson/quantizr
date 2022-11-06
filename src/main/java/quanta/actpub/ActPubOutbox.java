@@ -225,8 +225,6 @@ public class ActPubOutbox extends ServiceBase {
     public APList getOutboxItems(HttpServletRequest httpReq, String userName, String minId) {
         log.debug("getOutboxItems for " + userName);
 
-        // it's safe to have this on even before it's 'done'
-        boolean experimental = true;
         /*
          * For now we only support retrieving public nodes here but we need to do the proper thing here
          * eventually to adhere to the ActivityPub spec regarding authenticating what user is calling this
@@ -242,6 +240,7 @@ public class ActPubOutbox extends ServiceBase {
          * private nodes shared to them then we can honor that sharing here, rather than ONLY returning
          * PUBLIC nodes, but this is a work in progress
          */
+        boolean experimental = false;
         if (experimental) {
             Val<String> keyId = new Val<>();
             Val<String> signature = new Val<>();
