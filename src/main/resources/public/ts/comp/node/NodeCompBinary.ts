@@ -34,41 +34,55 @@ export class NodeCompBinary extends Div {
 
         const src: string = S.attachment.getUrlForNodeAttachment(node, this.attName, false);
 
+        const style: any = {};
         let size = "";
         if (this.isFullScreenEmbed) {
             size = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            size = "100px";
+            style.width = "100px";
         }
         else {
             size = att.c;
         }
-        const style: any = {};
 
-        if (!size || size === "0") {
-            style.maxWidth = "";
-            style.width = "";
-        }
-        else {
-            size = size.trim();
-
-            // for backwards compatability if no units are given assume percent
-            if (!size.endsWith("%") && !size.endsWith("px")) {
-                size += "%";
+        if (!this.isEditorEmbed) {
+            if (!size || size === "0") {
+                style.maxWidth = "";
+                style.width = "";
             }
-            style.maxWidth = `calc(${size} - 24px)`;
-            style.width = `calc(${size} - 24px)`;
+            else {
+                size = size.trim();
+
+                // for backwards compatability if no units are given assume percent
+                if (!size.endsWith("%") && !size.endsWith("px")) {
+                    size += "%";
+                }
+
+                // I forgot why I needed the "-24px" here, let's run without it.
+                // style.maxWidth = `calc(${size} - 24px)`;
+                // style.width = `calc(${size} - 24px)`;
+                style.maxWidth = size;
+                style.width = size;
+            }
         }
 
         const className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
-        return new Img(node.id, {
+        const imgAttrs: any = {
             src,
             className,
-            style,
             title: this.isEditorEmbed ? "Attached image" : "Click image to enlarge/reduce",
-            onClick: () => { this.clickOnImage(node.id, this.attName); }
-        });
+            onClick: () => this.clickOnImage(node.id, this.attName)
+        };
+
+        if (this.isFullScreenEmbed) {
+            imgAttrs.style = style;
+        }
+        else {
+            this.attribs.style = style;
+        }
+
+        return new Img(node.id, imgAttrs);
     }
 
     clickOnImage = (id: string, attName: string) => {

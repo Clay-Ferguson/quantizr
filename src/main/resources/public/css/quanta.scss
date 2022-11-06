@@ -1222,6 +1222,11 @@ Will come back later and study this more. todo-1 */
     background-color: $baseBgColor;
 }
 
+.rowImageContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .full-screen-img {
     cursor: pointer;
     margin: 12px;
@@ -1233,6 +1238,7 @@ Will come back later and study this more. todo-1 */
     border: 1px solid $gray-700;
     vertical-align: top;
     border-radius: $border-radius;
+    width: 100px;
 }
 
 .systemFileRow {

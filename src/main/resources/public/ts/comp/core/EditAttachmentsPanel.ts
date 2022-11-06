@@ -1,5 +1,6 @@
 import { dispatch, getAppState } from "../../AppContext";
 import { Selection } from "../../comp/core/Selection";
+import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
@@ -21,13 +22,14 @@ export class EditAttachmentsPanel extends Div {
     preRender(): void {
         if (!this.node.attachments) return null;
         this.setChildren([]);
-        S.props.getOrderedAttachments(this.node).forEach((att: any) => {
-            // having 'att.key' is a client-side only hack, and only generated during the ordering.
-            this.addChild(this.makeAttachmentPanel(att));
+        let isFirst = true;
+        S.props.getOrderedAttachments(this.node).forEach(att => {
+            this.addChild(this.makeAttachmentPanel(att, isFirst));
+            isFirst = false;
         });
     }
 
-    makeAttachmentPanel = (att: J.Attachment): Div => {
+    makeAttachmentPanel = (att: J.Attachment, isFirst: boolean): Div => {
         const appState = getAppState();
         if (!att) return null;
         const key = (att as any).key;
@@ -50,17 +52,20 @@ export class EditAttachmentsPanel extends Div {
         }
 
         const imgSizeSelection = S.props.hasImage(appState.editNode, key)
-            ? this.createImgSizeSelection("Image Size", false, "float-end", //
+            ? this.createImgSizeSelection("Image Width", false, "float-end", //
                 {
-                    setValue(val: string): void {
+                    setValue: (val: string): void => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
                         if (att) {
                             att.c = val;
-                            this.binaryDirty = true;
+                            if (isFirst) {
+                                this.askMakeAllSameSize(appState.editNode, val);
+                            }
+                            this.editorDlg.binaryDirty = true;
                         }
                     },
 
-                    getValue(): string {
+                    getValue: (): string => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
                         return att && att.c;
                     }
@@ -122,6 +127,23 @@ export class EditAttachmentsPanel extends Div {
         return new Div(null, { className: "binaryEditorItem" }, [
             topBinRow, bottomBinRow
         ]);
+    }
+
+    askMakeAllSameSize = async (node: J.NodeInfo, val: string): Promise<void> => {
+        setTimeout(async () => {
+            const dlg = new ConfirmDlg("Make all the images " + val + " width?", "All Images?",
+                "btn-info", "alert alert-info");
+            await dlg.open();
+            if (dlg.yes) {
+                if (!this.node.attachments) return null;
+                S.props.getOrderedAttachments(node).forEach(att => {
+                    att.c = val;
+                });
+                // trick to force screen render
+                this.editorDlg.mergeState({});
+            }
+            return null;
+        }, 250);
     }
 
     moveAttachmentDown = (att: J.Attachment, node: J.NodeInfo) => {
@@ -186,16 +208,15 @@ export class EditAttachmentsPanel extends Div {
 
         options = options.concat([
             { key: "0", val: "Actual" },
-            { key: "15%", val: "15%" },
+            { key: "20%", val: "20%" },
             { key: "25%", val: "25%" },
+            { key: "33%", val: "33%" },
             { key: "50%", val: "50%" },
             { key: "75%", val: "75%" },
-            { key: "90%", val: "90%" },
             { key: "100%", val: "100%" },
             { key: "50px", val: "50px" },
             { key: "100px", val: "100px" },
             { key: "200px", val: "200px" },
-            { key: "300px", val: "300px" },
             { key: "400px", val: "400px" },
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" }
