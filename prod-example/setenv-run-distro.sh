@@ -3,7 +3,7 @@ source ./define-functions.sh
 
 # we make up any prod version we want here. It won't matter. This image is built on and private to the prod instance
 # and ultimtely determined by whatever JAR is present plus all the config settings.
-export QUANTA_VER=2.0.0
+export QUANTA_VER=2.11.6
 export DOCKER_TAG=quanta-${QUANTA_VER}
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
