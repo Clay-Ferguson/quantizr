@@ -142,7 +142,7 @@ export class NodeCompButtonBar extends Div {
             let insertAllowed = true;
 
             // if this is our own account node, we can always leave insertAllowed=true
-            if (state.homeNodeId !== this.node.id) {
+            if (state.userProfile?.userNodeId !== this.node.id) {
                 if (typeHandler) {
                     insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, this.node, state);
                 }
@@ -156,7 +156,7 @@ export class NodeCompButtonBar extends Div {
                 }, null, "fa-plus");
             }
 
-            const userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.homeNodeId;
+            const userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.userProfile?.userNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
@@ -198,7 +198,7 @@ export class NodeCompButtonBar extends Div {
 
             if (deleteAllowed) {
                 // not user's account node!
-                if (this.node.id !== state.homeNodeId) {
+                if (this.node.id !== state.userProfile?.userNodeId) {
                     deleteNodeIcon = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
@@ -213,7 +213,7 @@ export class NodeCompButtonBar extends Div {
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
 
-                    this.node.id !== state.homeNodeId
+                    this.node.id !== state.userProfile?.userNodeId
                         ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }

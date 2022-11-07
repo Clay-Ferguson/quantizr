@@ -86,7 +86,9 @@ export class AppState {
         mainPanelCols: 6
     };
 
+    // todo-0: look for all properties that are in UserProfile which might be accidentally repliated in here.
     userProfile: J.UserProfile = null;
+
     newMessageCount: number = 0;
 
     // ids of selected nodes
@@ -102,10 +104,6 @@ export class AppState {
 
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
-
-    // UserAccount node ID (todo-1: rename these to 'accnt' not 'home')
-    homeNodeId: string;
-    homeNodePath: string;
 
     pendingLocationHash: string;
 

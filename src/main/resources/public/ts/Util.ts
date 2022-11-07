@@ -957,7 +957,7 @@ export class Util {
     saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
         if (!state.isAnonUser) {
             await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: state.homeNodeId,
+                userNodeId: state.userProfile.userNodeId,
                 userPreferences: state.userPrefs
             });
         }
@@ -982,10 +982,6 @@ export class Util {
         if (!res) return;
 
         dispatch("LoginResponse", s => {
-            if (res.userProfile.userNodeId) {
-                s.homeNodeId = res.userProfile.userNodeId;
-                s.homeNodePath = res.rootNodePath;
-            }
             s.userProfile = res.userProfile;
             s.userName = res.userProfile.userName;
             s.isAdminUser = res.userProfile.userName === "admin";

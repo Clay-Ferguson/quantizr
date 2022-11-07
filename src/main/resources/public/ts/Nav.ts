@@ -30,7 +30,7 @@ export class Nav {
         if (state.isAnonUser) {
             return state.node.id === state.anonUserLandingPageNode;
         } else {
-            return state.node.id === state.homeNodeId;
+            return state.node.id === state.userProfile?.homeNodeId;
         }
     }
 
@@ -168,7 +168,6 @@ export class Nav {
 
     openContentNode = async (nodePathOrId: string, state: AppState = null) => {
         state = getAppState(state);
-        // console.log("openContentNode(): " + nodePathOrId);
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -267,7 +266,7 @@ export class Nav {
         S.quanta.mainMenu.open();
     }
 
-    navHome = async (state: AppState = null) => {
+    navToMyAccntRoot = async (state: AppState = null) => {
         state = getAppState(state);
         S.view.scrollActiveToTop(state);
 
@@ -276,9 +275,8 @@ export class Nav {
             S.util.loadAnonPageHome();
         } else {
             try {
-                // console.log("renderNode (navHome): " + state.homeNodeId);
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                    nodeId: state.homeNodeId,
+                    nodeId: state.userProfile?.userNodeId,
                     upLevel: false,
                     siblingOffset: 0,
                     renderParentIfLeaf: false,

@@ -165,11 +165,11 @@ export class MenuPanel extends Div {
 
         const hltNode = S.nodeUtil.getHighlightedNode(appState);
         const selNodeIsMine = !!hltNode && (hltNode.owner === appState.userName || appState.userName === "admin");
-        const transferFromMe = !!hltNode && hltNode.transferFromId === appState.homeNodeId;
+        const transferFromMe = !!hltNode && hltNode.transferFromId === appState.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;
 
-        const importFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
-        const exportFeatureEnabled = selNodeIsMine || (!!hltNode && appState.homeNodeId === hltNode.id);
+        const importFeatureEnabled = selNodeIsMine || (!!hltNode && appState.userProfile?.userNodeId === hltNode.id);
+        const exportFeatureEnabled = selNodeIsMine || (!!hltNode && appState.userProfile?.userNodeId === hltNode.id);
 
         const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.props.isWritableByMe(appState.node);
@@ -205,7 +205,7 @@ export class MenuPanel extends Div {
 
         if (!appState.isAnonUser) {
             children.push(new Menu(state, g_brandingAppName, [
-                new MenuItem("My Account", S.nav.navHome, !appState.isAnonUser),
+                new MenuItem("My Account", S.nav.navToMyAccntRoot, !appState.isAnonUser),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !appState.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !appState.isAnonUser),
                 new MenuItemSeparator(),

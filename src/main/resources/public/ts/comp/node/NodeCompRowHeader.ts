@@ -293,7 +293,7 @@ export class NodeCompRowHeader extends Div {
                 });
             }
 
-            if (deleteAllowed && this.node.id !== state.homeNodeId) {
+            if (deleteAllowed && this.node.id !== state.userProfile?.userNodeId) {
                 floatUpperRightDiv.addChild(new Icon({
                     className: "fa fa-trash fa-lg buttonBarIcon",
                     title: "Delete node(s)",

@@ -62,7 +62,7 @@ export class MainTab implements TabIntf<any> {
 
     getTabSubOptions = (state: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            !state.isAnonUser ? new AppNavLink("My Account", () => S.nav.navHome(state)) : null,
+            !state.isAnonUser ? new AppNavLink("My Account", () => S.nav.navToMyAccntRoot(state)) : null,
             !state.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + state.userName + ":home")) : null,
             !state.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
             ...this.customAnonRHSLinks(state)

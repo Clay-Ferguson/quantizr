@@ -264,12 +264,9 @@ export class User {
 
                 if (lastNode) {
                     id = lastNode;
-                    // console.log("Node selected from local storage: id=" + id);
                     childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                 } else {
-                    // todo-2: note... this path is now untested due to recent refactoring.
-                    id = state.homeNodeId;
-                    // console.log("Node selected from homeNodeId: id=" + id);
+                    id = state.userProfile?.userNodeId;
                 }
             }
 

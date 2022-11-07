@@ -834,7 +834,7 @@ export class Edit {
                 childrenOnly: true,
                 bulkDelete: false
             });
-            S.nav.openContentNode(state.homeNodePath, state);
+            S.nav.openContentNode(state.userProfile.userNodeId, state);
         }
     }
 
@@ -925,7 +925,7 @@ export class Edit {
             return;
         }
 
-        if (selNodesArray.find(id => id === state.homeNodeId)) {
+        if (selNodesArray.find(id => id === state.userProfile?.userNodeId)) {
             S.util.showMessage("You can't delete your account root node!", "Warning");
             return;
         }

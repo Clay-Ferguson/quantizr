@@ -39,7 +39,7 @@ export class MainTabComp extends AppTab {
             // let renderableCrumbs = 0;
             // if (state.breadcrumbs) {
             //     state.breadcrumbs.forEach(bc => {
-            //         if (bc.id !== state.node.id && bc.id !== state.homeNodeId) {
+            //         if (bc.id !== state.node.id && bc.id !== state.userProfile.userNodeId) {
             //             renderableCrumbs++;
             //         }
             //     });

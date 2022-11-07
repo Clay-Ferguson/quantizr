@@ -340,7 +340,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             const avatarVer = state.userProfile.avatarVer;
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, avatarVer);
+            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId, avatarVer);
         }
 
         const onClick = async () => {
@@ -398,7 +398,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             const headerImageVer = state.userProfile.headerImageVer;
-            src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || getAppState().homeNodeId, headerImageVer);
+            src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId, headerImageVer);
         }
 
         const onClick = () => {

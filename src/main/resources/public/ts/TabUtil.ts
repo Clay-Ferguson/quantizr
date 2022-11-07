@@ -29,7 +29,7 @@ export class TabUtil {
         // if (state.activeTab==tabName) return;
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
-                S.nav.navHome(s);
+                S.nav.navToMyAccntRoot(s);
             }
             else {
                 // todo-1: there are lots of places we set 'activeTab = ?' and we need to combine it all into a function
@@ -48,7 +48,7 @@ export class TabUtil {
             // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
             // an error that we did a dispatch in a dispatch.
             setTimeout(() => {
-                S.nav.navHome(null);
+                S.nav.navToMyAccntRoot(null);
             }, 1);
         }
         else {

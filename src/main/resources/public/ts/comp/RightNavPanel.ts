@@ -185,7 +185,7 @@ export class RightNavPanel extends Div {
     makeHeaderDiv = (state: AppState): CompIntf => {
         if (!state.userProfile) return null;
 
-        const src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
+        const src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId, state.userProfile.headerImageVer);
         if (src) {
             const attr: any = {
                 className: "headerImageRHS",
@@ -217,7 +217,7 @@ export class RightNavPanel extends Div {
             src = state.userProfile.apIconUrl;
         }
         else {
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.avatarVer);
+            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId, state.userProfile.avatarVer);
         }
 
         if (src) {

@@ -75,7 +75,12 @@ public class NodeRenderService extends ServiceBase {
 		// log.debug("renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
 		try {
+			// todo-1: should detect someone trying to access their own home node, and send back a note
+			// in the reply that they don't HAVE a node named 'home' but that they can create one.
 			node = read.getNode(ms, targetId);
+			if (no(node) && !sc.isAnonUser()) {
+				node = read.getNode(ms, sc.getRootId());
+			}
 			adminOnly = acl.isAdminOwned(node);
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);

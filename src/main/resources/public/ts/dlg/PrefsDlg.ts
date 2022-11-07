@@ -37,7 +37,7 @@ export class PrefsDlg extends DialogBase {
         const state = getAppState();
         if (!state.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: state.homeNodeId,
+                userNodeId: state.userProfile.userNodeId,
                 userPreferences: {
                     editMode: state.userPrefs.editMode,
                     showMetaData: state.userPrefs.showMetaData,

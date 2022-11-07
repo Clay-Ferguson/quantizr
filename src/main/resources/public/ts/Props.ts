@@ -101,15 +101,14 @@ export class Props {
         // if we are admin
         if (appState.isAdminUser) return true;
 
-        // if it's our home node
-        if (appState.homeNodeId === node.id) {
+        if (appState.userProfile?.userNodeId === node.id) {
             return true;
         }
 
         // writeable by us if there's any kind of share to us or a writable public share.
         return node && node.ac && !!node.ac.find(ace =>
             (ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE)) ||
-            ace.principalNodeId === appState.homeNodeId);
+            ace.principalNodeId === appState.userProfile?.userNodeId);
     }
 
     isPublicReadOnly = (node: J.NodeInfo): boolean => {

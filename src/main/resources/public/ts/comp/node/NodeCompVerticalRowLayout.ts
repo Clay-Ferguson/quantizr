@@ -139,7 +139,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 });
 
                 if (lastNode) {
-                    const userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
+                    const userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.userProfile?.userNodeId;
                     if (!!state.nodesToMove && userCanPaste) {
                         comps.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton marginLeft"));
                     }
