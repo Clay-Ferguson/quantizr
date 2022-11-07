@@ -830,9 +830,10 @@ export class Util {
         }
     }
 
+    // todo-0: had a function () here (non fat arrow) referencing "this" bug. check all other code for this bug.
     showSystemNotification = (title: string, message: string) => {
         if (window.Notification && Notification.permission !== "denied") {
-            Notification.requestPermission(function (status) { // status is "granted", if accepted by user
+            Notification.requestPermission((status) => { // status is "granted", if accepted by user
                 message = this.removeHtmlTags(message);
 
                 // eslint-disable-next-line no-unused-vars

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
-import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.JoinNodesRequest;
@@ -237,9 +236,10 @@ public class NodeMoveService extends ServiceBase {
 		SubNode nodeParent = null;
 
 		for (String nodeId : nodeIds) {
-			// log.debug("Moving ID: " + nodeId);
 			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuth(ms, node);
+
+			// log.debug("Will be Moving ID: " + nodeId + " path: " + node.getPath());
 			nodesToMove.add(node);
 
 			/*
@@ -259,8 +259,10 @@ public class NodeMoveService extends ServiceBase {
 		// make sure nodes to move are in ordinal order.
 		nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
+		// process all nodes being moved.
 		for (SubNode node : nodesToMove) {
-			// log.debug("Moving ID: " + nodeId);
+			// log.debug("MovingID: " + node.getIdStr() + "[" + node.getContent() + "] path: " +
+			// node.getPath());
 			Long _targetOrdinal = curTargetOrdinal;
 			SubNode _nodeParent = nodeParent;
 			arun.run(as -> {
@@ -270,6 +272,7 @@ public class NodeMoveService extends ServiceBase {
 				 * ordinal will change.
 				 */
 				if (_nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
+					// log.debug("going into new parent: " + parentToPasteInto.getPath());
 					/*
 					 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
 					 * so we reject the attempt.
@@ -277,13 +280,16 @@ public class NodeMoveService extends ServiceBase {
 					if (parentToPasteInto.getPath().startsWith(node.getPath())) {
 						throw new RuntimeException("Impossible node move requested.");
 					}
+
+					// todo-0: should this come AFTER the 'node.setPath' below? I have a hunch this is a bug.
 					changePathOfSubGraph(as, node, parentPath);
 
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
+					// log.debug("Final AvailPath on MovingID node: " + newPath);
 
 					// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
-					// to verify the parent exists upon saving, because we know the path is fine correct.
+					// to verify the parent exists upon saving, because we know the path is fine.
 					node.verifyParentPath = false;
 
 					// we know this tareget node has chilren now.
@@ -308,19 +314,37 @@ public class NodeMoveService extends ServiceBase {
 
 	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix) {
 		String originalPath = graphRoot.getPath();
-		// log.debug("originalPath (graphRoot.path): " + originalPath);
+		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
 		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true, false, false)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
-			// log.debug("PROCESSING MOVE: oldPath: " + node.getPath());
+			// log.debug(" PROCESSING oldPath: " + node.getPath());
 
 			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
 			String newPath = newPathPrefix + "/" + pathSuffix;
 			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
-			newPath = mongoUtil.findAvailablePath(newPath);
+
+			int idx = pathSuffix.indexOf("/");
+			if (idx != -1) {
+				/*
+				 * we get here if we're pasting in a subgraph and we need to be sure the top root of this particular
+				 * subgraph is not duplicating an already existing node path, so we have to do the findAvailablePath
+				 * logic on just the path plus that root piece only, to get the target root of the pasted subgraph.
+				 */
+				String newPathPart = pathSuffix.substring(0, idx);
+				String restOfNewPath = pathSuffix.substring(idx + 1);
+				String newPathParent = newPathPrefix + "/" + newPathPart;
+				newPathParent = mongoUtil.findAvailablePath(newPathParent);
+				newPath = newPathParent + "/" + restOfNewPath;
+			} else {
+				// else we're moving a leaf and can just find the newPath this simpler way.
+				newPath = mongoUtil.findAvailablePath(newPath);
+			}
+
+			// log.debug(" finalAvailablePathFound: " + newPath);
 			node.setPath(newPath);
 			node.verifyParentPath = false;
 		}

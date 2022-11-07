@@ -420,7 +420,10 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 
-		log.error("Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user: " + ms.getUserName());
+		// Don't log this. It happens in normal flow cases.
+		// log.error("Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user: " + ms.getUserName()
+		// 		+ "\n" + ExUtil.getStackTrace(null));
+
 		throw new NodeAuthFailedException();
 	}
 

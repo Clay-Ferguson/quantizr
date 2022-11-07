@@ -96,12 +96,11 @@ public class CryptoService extends ServiceBase {
 
 			boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
 			if (!verified) {
-				// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " +
-				// sig);
+				// log.debug("SIG FAIL nodeId: " + node.getIdStr() + "\nsigData: [" + strToSign + "] signature: " + sig);
 			}
 			return verified;
 		} catch (Exception e) {
-			ExUtil.error(log, "crypto sig failed", e);
+			ExUtil.error(log, "crypto sig failed on " + node.getIdStr(), e);
 		}
 
 		return false;
