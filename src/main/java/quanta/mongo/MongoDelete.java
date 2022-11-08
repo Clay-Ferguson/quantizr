@@ -17,13 +17,13 @@ import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
@@ -33,7 +33,6 @@ import quanta.util.IntVal;
 import quanta.util.LongVal;
 import quanta.util.Val;
 import quanta.util.XString;
-import quanta.model.client.Attachment;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB

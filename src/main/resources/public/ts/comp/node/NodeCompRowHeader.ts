@@ -100,11 +100,9 @@ export class NodeCompRowHeader extends Div {
         }
 
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
-        // if (state.isAdminUser) {
-        //     // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
-        //     const ordinal = this.node.logicalOrdinal === -1 ? "" : this.node.logicalOrdinal;
-        //     verboseChildren.push(new Span(ordinal + " [" + this.node.ordinal + "] " + this.node.type, { className: "marginRight" }));
-        // }
+        if (state.isAdminUser) {
+            verboseChildren.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
+        }
 
         if (showInfo) {
             verboseChildren.push(new Icon({

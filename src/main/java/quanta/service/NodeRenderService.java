@@ -9,7 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import quanta.config.ServiceBase;
@@ -261,7 +265,6 @@ public class NodeRenderService extends ServiceBase {
 		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
 		int queryLimit = ok(scanToNode) ? -1 : limit + 1;
-
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode=" + scanToNode);
 
 		String orderBy = node.getStr(NodeProp.ORDER_BY);
@@ -271,18 +274,23 @@ public class NodeRenderService extends ServiceBase {
 			sort = parseOrderBy(orderBy);
 		}
 
+		boolean isOrdinalOrder = false;
 		if (no(sort)) {
 			// log.debug("processRenderNode querying by ordinal.");
 			sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
+			isOrdinalOrder = true;
 		}
 
 		Criteria moreCriteria = null;
-		// #optional-show-replies: disabling this for now. Needs more thought regarding how to keep this from accidentally hiding nodes
-		// from users in a way where they don't realize nodes are being hidden simply because of being comment types.
-		// especially with the 'Show Comments' being hidden away in the settings menu instead of like at the top of the
-		// tree view like document view does. 
+		// #optional-show-replies: disabling this for now. Needs more thought regarding how to keep this
+		// from accidentally hiding nodes
+		// from users in a way where they don't realize nodes are being hidden simply because of being
+		// comment types.
+		// especially with the 'Show Comments' being hidden away in the settings menu instead of like at the
+		// top of the
+		// tree view like document view does.
 		// if (!showReplies) {
-		// 	moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
+		// moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
 		// }
 
 		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria);
@@ -310,6 +318,10 @@ public class NodeRenderService extends ServiceBase {
 		List<SubNode> slidingWindow = null;
 		NodeInfo ninfo = null;
 
+		// -1 means "no last ordinal known" (i.e. first iteration)
+		long lastOrdinal = -1;
+		BulkOperations bops = null;
+
 		/*
 		 * Main loop to keep reading nodes from the database until we have enough to render the page
 		 */
@@ -320,6 +332,27 @@ public class NodeRenderService extends ServiceBase {
 				break;
 			}
 			SubNode n = iterator.next();
+
+			// Side Effect: Fixing Duplicate Ordinals
+			//
+			// we do the side effect of repairing ordinals here just because it's really only an issue if it's rendered
+			// and here's where we're rendering. It would be 'possible' but less performant to just detect when
+			// a node's children have dupliate ordinals, and fix the entire list of children
+			if (isOrdinalOrder) {
+				if (lastOrdinal != -1 && lastOrdinal == n.getOrdinal()) {
+					lastOrdinal++;
+					// add to bulk ops this: n.ordinal = lastOrdinal + 1;
+					if (no(bops)) {
+						bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+					}
+					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+					Update update = new Update().set(SubNode.ORDINAL, lastOrdinal);
+					bops.updateOne(query, update);
+				} else {
+					lastOrdinal = n.getOrdinal();
+				}
+			}
+
 			idx++;
 			// log.debug("Iterate [" + idx + "]: nodeId" + n.getIdStr() + "scanToNode=" +
 			// scanToNode);
@@ -435,6 +468,11 @@ public class NodeRenderService extends ServiceBase {
 
 		// log.debug("Setting endReached="+endReached);
 		res.setEndReached(endReached);
+
+		if (ok(bops)) {
+			bops.execute();
+		}
+
 		return nodeInfo;
 	}
 
