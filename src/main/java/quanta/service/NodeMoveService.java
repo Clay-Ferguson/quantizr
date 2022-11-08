@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.JoinNodesRequest;
@@ -194,7 +195,7 @@ public class NodeMoveService extends ServiceBase {
 		MoveNodesResponse res = new MoveNodesResponse();
 		ms = ThreadLocals.ensure(ms);
 
-		moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds());
+		moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), res);
 		res.setSuccess(true);
 		return res;
 	}
@@ -205,7 +206,8 @@ public class NodeMoveService extends ServiceBase {
 	 * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
 	 * siblings posted in below it)
 	 */
-	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds) {
+	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
+			MoveNodesResponse res) {
 		// log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = read.getNode(ms, targetId);
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
@@ -281,11 +283,18 @@ public class NodeMoveService extends ServiceBase {
 						throw new RuntimeException("Impossible node move requested.");
 					}
 
-					// todo-0: should this come AFTER the 'node.setPath' below? I have a hunch this is a bug.
-					changePathOfSubGraph(as, node, parentPath);
+					changePathOfSubGraph(as, node, parentPath, res);
 
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
+
+					// crypto sig uses path as part of it, so we just invalidated the signature.
+					if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+						node.delete(NodeProp.CRYPTO_SIG);
+						if (ok(res)) {
+							res.setSignaturesRemoved(true);
+						}
+					}
 					// log.debug("Final AvailPath on MovingID node: " + newPath);
 
 					// verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
@@ -312,7 +321,7 @@ public class NodeMoveService extends ServiceBase {
 		}
 	}
 
-	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix) {
+	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res) {
 		String originalPath = graphRoot.getPath();
 		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
@@ -346,6 +355,14 @@ public class NodeMoveService extends ServiceBase {
 
 			// log.debug(" finalAvailablePathFound: " + newPath);
 			node.setPath(newPath);
+
+			// crypto sig uses path as part of it, so we just invalidated the signature.
+			if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+				node.delete(NodeProp.CRYPTO_SIG);
+				if (ok(res)) {
+					res.setSignaturesRemoved(true);
+				}
+			}
 			node.verifyParentPath = false;
 		}
 	}

@@ -754,6 +754,7 @@ export interface LuceneSearchResponse extends ResponseBase {
 }
 
 export interface MoveNodesResponse extends ResponseBase {
+    signaturesRemoved: boolean;
 }
 
 export interface NodeEditedPushInfo extends ServerPushInfo {

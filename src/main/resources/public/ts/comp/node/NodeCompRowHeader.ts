@@ -156,7 +156,7 @@ export class NodeCompRowHeader extends Div {
                 className: "fa fa-retweet fa-lg marginRight",
                 onClick: () => {
                     if (state.isAnonUser) {
-                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+                        S.util.showMessage("Login to boost nodes.", "Login!");
                     }
                     else {
                         S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, state)

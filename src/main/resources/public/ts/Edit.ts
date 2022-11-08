@@ -129,7 +129,7 @@ export class Edit {
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null, afterEditAction);
                     dlg.open();
                 } else {
-                dispatch("startEditing", s => {
+                    dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
                         s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;
@@ -146,6 +146,11 @@ export class Edit {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState) => {
         if (S.util.checkSuccess("Move nodes", res)) {
+            if (res.signaturesRemoved) {
+                setTimeout(() => {
+                    S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
+                }, 1000);
+            }
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
                 return s;
@@ -1277,7 +1282,7 @@ export class Edit {
             this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
         }
         else {
-            S.util.showPageMessage("Node boosted!");
+            S.util.flashMessageQuick("Post was boosted!", "Boost");
         }
     }
 
