@@ -250,14 +250,6 @@ export class View {
             activeTabComp.setScrollTop(0);
             // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
         }
-
-        // todo-1: For some reason in mobile mode we're scrolling lots of times TO the element even when it's the top
-        // element and we want to scroll to ZERO instead, but I can't get that to work and i'm giving up the
-        // battle for now after 2 hrs trying to locate the issue. Existing functionality is not what I really
-        // want but is still fine.
-        // S.domUtil.getElm(C.ID_TAB, (elm: HTMLElement) => {
-        //     elm.scrollTop = 0;
-        // });
     }
 
     scrollToNode = (state: AppState, node: J.NodeInfo = null, delay: number = 100) => {

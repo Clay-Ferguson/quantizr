@@ -122,7 +122,6 @@ export class NodeCompVerticalRowLayout extends Div {
                     }, "btn-secondary plusButtonFloatRight", "fa-plus")
                 ]));
 
-                // todo-1: document this in tips and tricks
                 S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         if (item.kind === "file") {

@@ -14,7 +14,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { SelectTagsDlg } from "./SelectTagsDlg";
+import { LS as SelectTagsDlgState, SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
     sortField?: string;
@@ -137,10 +137,9 @@ export class SearchContentDlg extends DialogBase {
         ], "col-2");
     }
 
-    /* todo-1: put typesafety here on dlgState */
     addTagsToSearchField = (dlg: SelectTagsDlg) => {
         let val = ""; // this.searchTextState.getValue();
-        dlg.getState().selectedTags.forEach((tag: string) => {
+        dlg.getState<SelectTagsDlgState>().selectedTags.forEach((tag: string) => {
             // if (val.indexOf(tag) !== -1) return;
             if (val) val += " ";
             if (dlg.matchAny) {

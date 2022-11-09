@@ -47,8 +47,6 @@ export class EditNodeDlg extends DialogBase {
     tagsState: Validator = new Validator();
 
     // holds a map of states by property names.
-    // todo-1: it would be good if there were a way to have this state management using the ACTUAL 'appState.editNode'
-    // as the holder of the property value so everything is always in sync easier.
     propStates: Map<string, Validator> = new Map<string, Validator>();
 
     pendingEncryptionChange: boolean = false;

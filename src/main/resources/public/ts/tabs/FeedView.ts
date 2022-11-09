@@ -266,7 +266,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
-    // todo-1: this can be modified and used to show indicator on Feed Sub items about which thing is active.
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
         let subHeading = null;
 

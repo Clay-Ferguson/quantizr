@@ -28,8 +28,6 @@ export class NodeStatsDlg extends DialogBase {
                 tagPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\""
-                    // todo-1: for now we don't do vote searching like this, but we can (beware the number in the string)
-                    // onClick: this.searchWord
                 }));
             });
         }

@@ -94,7 +94,6 @@ export class NodeCompRow extends Div {
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
                 ]);
 
-                // todo-1: Need to document this in "Tips and Tricks"
                 S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);

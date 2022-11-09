@@ -10,7 +10,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { EditTagsDlg } from "./EditTagsDlg";
 
-interface LS { // Local State
+export interface LS { // Local State
     tags: Tag[];
     suggestedTags: Tag[];
 

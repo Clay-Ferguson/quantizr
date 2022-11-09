@@ -418,13 +418,6 @@ export class Search {
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
                 S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
-
-                // Tentatively removing this, becuase we were getting a 'double scroll' effect, but oddly, even with
-                // the tabScrollTop above (two lines up) we still (on mobile anyway) don't get a scrolling to the VERY top
-                // but only to just where the title of the feed is showing. This is low priority. It works good enough as is. todo-1
-                // setTimeout(() => {
-                //     S.view.scrollAllTop(s);
-                // }, 1000);
             }
 
             S.domUtil.focusId(C.TAB_FEED);

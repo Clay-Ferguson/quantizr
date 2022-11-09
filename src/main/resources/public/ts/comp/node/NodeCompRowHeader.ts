@@ -14,10 +14,6 @@ import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
 import { CollapsiblePanel } from "../core/CollapsiblePanel";
 
-// todo-1: need to switch to the more efficient way of using nid attribute
-// on elements (search for "nid:" in code), to avoid creating new functions
-// every time this component renders (and same for entire app!)
-
 export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
