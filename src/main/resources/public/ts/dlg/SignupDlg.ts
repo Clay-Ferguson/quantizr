@@ -48,7 +48,7 @@ export class SignupDlg extends DialogBase {
                 new TextField({ label: "Email", val: this.emailState }),
 
                 this.adminCreatingUser ? null : new HorizontalLayout([
-                    new Img(null, {
+                    new Img({
                         src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
                     }),

@@ -82,7 +82,7 @@ export class NodeCompBinary extends Div {
             this.attribs.style = style;
         }
 
-        return new Img(node.id, imgAttrs);
+        return new Img(imgAttrs);
     }
 
     clickOnImage = (id: string, attName: string) => {

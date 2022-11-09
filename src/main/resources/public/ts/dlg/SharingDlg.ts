@@ -10,7 +10,8 @@ import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { FriendsDlg, LS as FriendsDlgLS } from "./FriendsDlg";
+import { FriendsDlg } from "./FriendsDlg";
+import { FriendsDlgState } from "./FriendsDlgState";
 
 interface LS { // Local State
     recursive?: boolean;
@@ -67,10 +68,10 @@ export class SharingDlg extends DialogBase {
                     new Button("Choose People", async () => {
                         const friendsDlg: FriendsDlg = new FriendsDlg();
                         await friendsDlg.open();
-                        if (friendsDlg.getState<FriendsDlgLS>().selections?.size > 0) {
+                        if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {
                             this.dirty = true;
                             const names: string[] = [];
-                            friendsDlg.getState<FriendsDlgLS>().selections.forEach(n => names.push(n));
+                            friendsDlg.getState<FriendsDlgState>().selections.forEach(n => names.push(n));
                             this.shareImmediate(names);
                         }
                     }, null, "btn-primary"),

@@ -205,7 +205,7 @@ export class RssTypeHandler extends TypeBase {
 
         /* Main Feed Image */
         if (feed.image) {
-            feedOut.push(new Img(null, {
+            feedOut.push(new Img({
                 className: "rss-feed-image",
                 src: feed.image
                 // align: "left" // causes text to flow around
@@ -373,7 +373,7 @@ export class RssTypeHandler extends TypeBase {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("image/") !== -1) {
                     imageShown = true;
-                    children.push(new Img(null, {
+                    children.push(new Img({
                         className: "rss-feed-image",
                         src: enc.url
                     }));
@@ -383,14 +383,14 @@ export class RssTypeHandler extends TypeBase {
 
         if (entry.image) {
             imageShown = true;
-            children.push(new Img(null, {
+            children.push(new Img({
                 className: "rss-feed-image",
                 src: entry.image
             }));
         }
         else if (entry.thumbnail) {
             imageShown = true;
-            children.push(new Img(null, {
+            children.push(new Img({
                 className: "rss-feed-image",
                 src: entry.thumbnail
             }));
@@ -404,7 +404,7 @@ export class RssTypeHandler extends TypeBase {
                     use imageAdded to keep it from appearing twice */
                 if (mc.medium === "image" && !imageAdded) {
                     imageAdded = true;
-                    children.push(new Img(null, {
+                    children.push(new Img({
                         className: "rss-feed-image",
                         src: mc.url
                     }));

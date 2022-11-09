@@ -567,7 +567,6 @@ export class Search {
         const attrs: any = {
             // yes the 'tabData.id' looks odd here as a class, and it's only used for lookups for scrolling logic.
             className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
-            // todo-1: this 'tabData.id' can be a bit long and eat some memory but not that much.
             id: tabData.id + "_" + node.id,
             nid: node.id
         };

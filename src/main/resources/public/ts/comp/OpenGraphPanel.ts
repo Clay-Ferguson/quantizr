@@ -155,7 +155,7 @@ export class OpenGraphPanel extends Div {
             // if mobile portrait mode render image above (not beside) description
             if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
-                    new Img(null, {
+                    new Img({
                         className: "openGraphImageVert",
                         src: state.og.image
                     }),
@@ -166,7 +166,7 @@ export class OpenGraphPanel extends Div {
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new HorizontalLayout([
                     !S.quanta.brokenImages.has(state.og.image) ? new Div(null, { className: "openGraphLhs" }, [
-                        new Img(null, {
+                        new Img({
                             className: this.imageClass,
                             src: state.og.image
                         })

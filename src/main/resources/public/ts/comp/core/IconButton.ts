@@ -46,7 +46,7 @@ export class IconButton extends Comp {
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
         return this.tag("button", null, [
-            this.imageUrl ? new Img(null, {
+            this.imageUrl ? new Img({
                 key: this.getId("img_"),
                 src: this.imageUrl
             }) : null,

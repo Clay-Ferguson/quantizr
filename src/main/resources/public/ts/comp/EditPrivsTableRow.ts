@@ -47,7 +47,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         let img: Img = null;
 
         if (src) {
-            img = new Img(null, {
+            img = new Img({
                 className: "friendListImage",
                 src: src,
                 onClick: () => {

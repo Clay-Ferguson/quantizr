@@ -16,8 +16,6 @@ export class AppState {
     displayFeedSearch: boolean = false;
     docIndent: boolean = true;
 
-    // todo-1: need to assign something like 'config.props' as an actual TYPED thing, for type safety, and then
-    // only in the place where we load this config value, extract that into the typed property
     // Initialize to empty object so we don't get NPE
     config: any = {};
 
@@ -86,7 +84,6 @@ export class AppState {
         mainPanelCols: 6
     };
 
-    // todo-0: look for all properties that are in UserProfile which might be accidentally repliated in here.
     userProfile: J.UserProfile = null;
 
     newMessageCount: number = 0;

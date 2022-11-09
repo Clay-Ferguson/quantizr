@@ -142,7 +142,7 @@ export class NodeUtil {
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
     getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;
-        // todo-1: this was lazy coding. I really just need the FIRST one of the set, and no need to iterate all.
+        // note: Set doesn't have a 'findFirst' so we can just use forEach instead
         state.selectedNodes.forEach(id => {
             ret = MainTab.inst?.findNode(state, id);
         });

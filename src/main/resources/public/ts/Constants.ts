@@ -2,8 +2,6 @@ console.log("entering Constants.ts");
 export class Constants {
 
     // max rows to allow to scroll in via infinite scroll capability before we reset back to 25 rows.
-    // todo-1: Infinite scrolling needs more testing. When we exceed this MAX_DYNAMIC_ROWS, and the more button pulls in
-    // the next set of results.
     static MAX_DYNAMIC_ROWS = 500;
 
     static TREE_INFINITE_SCROLL = true;
@@ -53,7 +51,6 @@ export class Constants {
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 
-    // make an enum for these (todo-1)
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";

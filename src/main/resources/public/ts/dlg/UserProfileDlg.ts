@@ -373,7 +373,7 @@ export class UserProfileDlg extends DialogBase {
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("profile-img", att);
+            return new Img(att);
         }
         else {
             if (this.readOnly) {
@@ -433,7 +433,7 @@ export class UserProfileDlg extends DialogBase {
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("profile-img", att);
+            return new Img(att);
         }
         else {
             if (this.readOnly) {

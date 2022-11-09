@@ -1,6 +1,7 @@
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
+import { FriendsDlgState } from "../dlg/FriendsDlgState";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
@@ -31,7 +32,7 @@ export class FriendsTableRow extends ListBoxRow {
 
         let img: Img = null;
         if (src) {
-            img = new Img(null, {
+            img = new Img({
                 className: "friendListImage",
                 src: src,
                 onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
@@ -46,8 +47,7 @@ export class FriendsTableRow extends ListBoxRow {
             new Div(null, null, [
                 new Checkbox(null, { className: "marginLeft" }, {
                     setValue: (checked: boolean) => {
-                        // todo-1: add typesafety here (would need FriendsDlg LS to be in separate interfaces, to avoid circular ref)
-                        const state: any = this.dlg.getState();
+                        const state: FriendsDlgState = this.dlg.getState();
                         if (checked) {
                             state.selections.add(this.friend.userName);
                         }

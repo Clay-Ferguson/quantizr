@@ -62,7 +62,7 @@ export class LeftNavPanel extends Div {
 
         this.setChildren([
             new Div(null, { id: "appLHSHeaderPanelId" }, [
-                new Img(this.getId("logo_"), {
+                new Img({
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: S.util.loadAnonPageHome,

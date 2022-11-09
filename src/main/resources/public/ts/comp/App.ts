@@ -139,7 +139,7 @@ export class App extends Main {
                 className: "menuButton"
             }, "btn-primary") : null;
 
-            const logo = new Img(this.getId("logo_"), {
+            const logo = new Img({
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
                 onClick: () => S.nav.navPublicHome(),

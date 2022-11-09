@@ -45,7 +45,7 @@ export class Crypto {
 
     SIG_ALGO = "RSASSA-PKCS1-v1_5";
 
-    // todo-1: need to vet these parameters, this just came from an example online.
+    // todo-1: need to vet these parameters
     SIG_ALGO_OBJ: any = {
         name: this.SIG_ALGO,
         modulusLength: 2048,
@@ -260,7 +260,6 @@ export class Crypto {
     }
 
     // todo-1: need to make this require the password and username to be more secure.
-    //         And an unsolved design task is users signing data from different browsers.
     initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
         if (user === J.PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
@@ -376,7 +375,6 @@ export class Crypto {
         }
     }
 
-    // todo-1: this method is different from the other two initializers. Need to make it consistent.
     initSymetricKey = async (forceUpdate: boolean = false) => {
         if (!this.avail) {
             return;

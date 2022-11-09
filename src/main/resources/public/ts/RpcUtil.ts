@@ -35,7 +35,6 @@ export class RpcUtil {
         return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/mobile/api/");
     }
 
-    // todo-1: put everything related to rpc in an Rpc.ts service
     rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
         background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
         postData = postData || {} as RequestType;

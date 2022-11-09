@@ -201,7 +201,7 @@ export class RightNavPanel extends Div {
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("header-img-rhs", attr);
+            return new Img(attr);
         }
         else {
             return null;
@@ -235,7 +235,7 @@ export class RightNavPanel extends Div {
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("profile-img-rhs", attr);
+            return new Img(attr);
         }
         else {
             return null;

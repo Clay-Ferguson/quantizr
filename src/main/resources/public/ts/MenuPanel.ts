@@ -219,7 +219,6 @@ export class MenuPanel extends Div {
         //     ? " (" + state.newMessageCount + " new)" : "";
         // These options will appear on the RHS for desktop mode
         // No longer needed now that we have RHS as popup (NavDlg)
-        // todo-1: eventually we can delete this code but leaving for now.
         // if (state.mobileMode) {
         //     children.push(new Menu(localState, "Feed" + messagesSuffix, [
         //         new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),

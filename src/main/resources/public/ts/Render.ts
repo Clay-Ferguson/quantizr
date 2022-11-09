@@ -670,10 +670,9 @@ export class Render {
         if (!src) {
             return null;
         }
-        const key = "avatar-" + node.id;
 
         // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-        return new Img(key, {
+        return new Img({
             src,
             // For Transfer in Progress need a RED border here.
             className: "avatarImage",
@@ -734,7 +733,7 @@ export class Render {
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
         const img: Img = imgSrc
-            ? new Img(null, {
+            ? new Img({
                 className: iconClass,
                 src: imgSrc,
                 onClick

@@ -3,9 +3,7 @@ import { Comp } from "../base/Comp";
 import { S } from "../../Singletons";
 
 export class Img extends Comp {
-    // todo-1: key not being used currently. Should it be set as attribs.id here before calling super?, becasue if so
-    // we should just remove the argument and allow it to be passed IN here as attribs.id
-    constructor(private key: string, attribs: Object = {}) {
+    constructor(attribs: Object = {}) {
         super(attribs);
     }
 
