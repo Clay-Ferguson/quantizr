@@ -129,7 +129,8 @@ export class NodeCompRowHeader extends Div {
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        if (showInfo && (editInsertAllowed || actPubId)) {
+        // Also we don't allow admin user to do any replies
+        if (!state.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
@@ -144,7 +145,7 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        if (showInfo) {
+        if (!state.isAdminUser && showInfo) {
             verboseChildren.push(new Icon({
                 title: "Boost this Node",
                 className: "fa fa-retweet fa-lg marginRight",
@@ -157,9 +158,7 @@ export class NodeCompRowHeader extends Div {
                     }
                 }
             }));
-        }
 
-        if (showInfo) {
             let youLiked: boolean = false;
             let likeNames: string = null;
             if (this.node.likes) {

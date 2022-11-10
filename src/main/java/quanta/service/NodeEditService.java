@@ -128,6 +128,15 @@ public class NodeEditService extends ServiceBase {
 			throw new RuntimeException("unable to locate parent for insert");
 		}
 
+		/*
+		 * We don't allow the admin user to create nodes under someone elses account. This is mainly being
+		 * done as a last resort catch because I sometimes forget I'm logged in as 'admin' and start to
+		 * reply to something when I meant to be in as a normal user.
+		 */
+		if (ms.isAdmin() && !acl.isAdminOwned(parentNode)) {
+			throw new RuntimeException("Admin not allowed to create nodes under non-admin nodes.");
+		}
+
 		auth.authForChildNodeCreate(ms, parentNode);
 		parentNode.adminUpdate = true;
 
@@ -234,6 +243,15 @@ public class NodeEditService extends ServiceBase {
 		SubNode parentNode = read.getNode(ms, parentNodeId);
 		if (no(parentNode)) {
 			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
+		}
+
+		/*
+		 * We don't allow the admin user to create nodes under someone elses account. This is mainly being
+		 * done as a last resort catch because I sometimes forget I'm logged in as 'admin' and start to
+		 * reply to something when I meant to be in as a normal user.
+		 */
+		if (ms.isAdmin() && !acl.isAdminOwned(parentNode)) {
+			throw new RuntimeException("Admin not allowed to create nodes under non-admin nodes.");
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
@@ -1052,10 +1070,11 @@ public class NodeEditService extends ServiceBase {
 
 	public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode, IntVal ops) {
 		if (ok(node.getContent()) && node.getContent().startsWith(Constant.ENC_TAG.s())) {
-			// for now we silently ignore encrypted nodes during transfers. This needs some more thought (todo-1)
+			// for now we silently ignore encrypted nodes during transfers. This needs some more thought
+			// (todo-1)
 			return;
 		}
-		
+
 		/*
 		 * if we're transferring only from a specific user (will only be admin able to do this) then we
 		 * simply return without doing anything if this node in't owned by the person we're transferring
@@ -1095,8 +1114,8 @@ public class NodeEditService extends ServiceBase {
 				// get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
 				SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getTransferFrom()));
 				if (ok(frmUsrNode)) {
-					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-							null);
+					acl.addPrivilege(ms, null, node, null, frmUsrNode,
+							Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 				}
 
 				node.setTransferFrom(null);
@@ -1118,8 +1137,8 @@ public class NodeEditService extends ServiceBase {
 				node.setTransferFrom(null);
 
 				if (ok(frmUsrNode)) {
-					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-							null);
+					acl.addPrivilege(ms, null, node, null, frmUsrNode,
+							Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 				}
 
 				node.adminUpdate = true;
@@ -1140,8 +1159,8 @@ public class NodeEditService extends ServiceBase {
 				node.setTransferFrom(null);
 
 				if (ok(frmUsrNode)) {
-					acl.addPrivilege(ms, null, node, null, frmUsrNode, Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-							null);
+					acl.addPrivilege(ms, null, node, null, frmUsrNode,
+							Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 				}
 
 				node.adminUpdate = true;
