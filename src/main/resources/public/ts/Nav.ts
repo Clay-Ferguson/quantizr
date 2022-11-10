@@ -84,7 +84,6 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            // this.navHome(state);
         }
     }
 
@@ -128,7 +127,6 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            // this.navHome(state);
         }
     }
 
@@ -160,7 +158,6 @@ export class Nav {
             else {
                 console.error("Node not found: " + id);
             }
-            // console.log("nodeClickRow. Focusing Main tab");
             S.domUtil.focusId(C.TAB_MAIN);
             resolve();
         });
@@ -187,7 +184,6 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            // this.navHome(state);
         }
     }
 
@@ -203,7 +199,6 @@ export class Nav {
                 console.log("openNodeById");
             }
             S.nodeUtil.highlightNode(node, false, state);
-            // NOTE: Passing true for "scrollToTop" is new on 11/6/21
             S.view.refreshTree({
                 nodeId: node.id,
                 zeroOffset: true,
@@ -305,7 +300,7 @@ export class Nav {
         this.clickTreeNode(null, id);
         setTimeout(() => {
             new SearchContentDlg().open();
-        }, 500);
+        }, 250);
     }
 
     openDocumentView = (evt: Event, id: string) => {
@@ -350,14 +345,12 @@ export class Nav {
                 return;
             }
             S.srch.timeline(node, "mtm", state, null, "Rev-chron by Modify Time", 0, true);
-        }, 500);
+        }, 250);
     }
 
     openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = getAppState();
-
-        // Try to get node from local memory...
         const node = MainTab.inst?.findNode(state, id);
         if (node) {
             setTimeout(() => {
@@ -377,7 +370,7 @@ export class Nav {
                     applyAdminBlocks: false,
                     name: J.Constant.FEED_PUB
                 });
-            }, 500);
+            }, 250);
         }
         // if node not in local memory, then we have to get it from the server first...
         else {
@@ -479,8 +472,6 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             FeedTab.inst.props = { ...FeedTab.inst.props, ...props };
-
-            // console.log("feedData.props=" + S.util.prettyPrint(feedData.props));
             return s;
         });
 

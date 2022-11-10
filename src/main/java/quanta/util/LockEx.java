@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;

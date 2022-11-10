@@ -352,9 +352,6 @@ export class Search {
             return;
         }
 
-        // console.log("feedData.props (at call time)=" + S.util.prettyPrint(feedData.props));
-
-        // console.log("Getting results page=" + page + " growResults=" + growResults);
         const res = await S.rpcUtil.rpc<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
@@ -398,17 +395,14 @@ export class Search {
 
                     scrollToTop = false;
                     FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
-                    // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                 }
                 else {
                     FeedTab.inst.props.feedResults = res.searchResults;
-                    // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                 }
             }
             // else we have a fresh array (reset the array)
             else {
                 FeedTab.inst.props.feedResults = res.searchResults;
-                // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
             }
 
             FeedTab.inst.props.feedEndReached = res.endReached;
@@ -543,7 +537,6 @@ export class Search {
         let boostComp: Div = null;
         if (node.boostedNode) {
             const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
-            // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
 
             boostComp = new Div(null, { className: "boost-row" }, [
                 allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,

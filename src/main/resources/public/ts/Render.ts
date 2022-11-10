@@ -198,7 +198,6 @@ export class Render {
 
     setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState) => {
         if (!node) return;
-        // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
         S.domUtil.setDropHandler(attribs, false, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
@@ -422,7 +421,6 @@ export class Render {
             if (C.DEBUG_SCROLLING) {
                 console.log("renderPage: scrollToTop=" + scrollToTop + " allowScroll=" + allowScroll);
             }
-            // console.log("Data:" + S.util.prettyPrint(res));
 
             dispatch("RenderPage", s => {
                 if (!s.activeTab || clickTab) {
@@ -560,78 +558,6 @@ export class Render {
             console.error("render failed: " + S.util.prettyPrint(err));
         }
     }
-
-    /* Get information for each node. Namely for now just the 'hasChildren' state because it takes an actual query
-    per node to find that out.
-
-    Note: Users will be able to see the fading in fadeInRowBkgClz class for the length of time it takes
-    the getNodeMetaInfo, this is ok and is the current design. The fading now works kind of like a progress indicator
-    by keeping user busy watching something.
-
-    This function will perform well even if called repeatedly. Only does the work once as neccessary so we can call this
-    safely after every time we get new data from the server, with no significant performance hit.
-    */
-    // getNodeMetaInfo = async (node: J.NodeInfo) => {
-    //     if (node?.children) {
-    //         // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
-    //         // haven't yet pulled the metadata yet.
-    //         const ids: string[] = [];
-
-    //         this.getIncompleteMetaIds(node, ids);
-
-    //         if (ids.length > 0) {
-    //             // console.log("MetaQuery idCount=" + ids.length);
-    //             const res = await S.rpcUtil.rpc<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
-    //                 ids
-    //             }, true);
-
-    //             dispatch("updateNodeMetaInfo", s => {
-    //                 if (s.node && s.node.children) {
-    //                     s.node.hasChildren = true;
-    //                     this.updateHasChildren(s.node, res.nodeIntf);
-    //                 }
-    //                 return s;
-    //             });
-    //         }
-    //     }
-    // }
-
-    // getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]) => {
-    //     if (!node?.children) return;
-
-    //     for (const child of node.children) {
-    //         if (!(child as any).metaInfDone) {
-    //             ids.push(child.id);
-    //         }
-
-    //         // call recursively to process any sub-children
-    //         this.getIncompleteMetaIds(child, ids);
-    //     }
-    // }
-
-    // updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]) => {
-    //     if (!node || !node.children) return;
-    //     node.hasChildren = true;
-
-    //     for (const child of node.children) {
-
-    //         // if this is a child we will have just pulled down
-    //         if (!(child as any).metaInfDone) {
-
-    //             // find the child in what we just pulled down.
-    //             const inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
-
-    //             // set the hasChildren to the value we just pulled down.
-    //             if (inf) {
-    //                 child.hasChildren = inf.hasChildren;
-    //             }
-    //             (child as any).metaInfDone = true;
-    //         }
-
-    //         // call recursively to process any sub-children
-    //         this.updateHasChildren(child, nodeIntf);
-    //     }
-    // }
 
     renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;

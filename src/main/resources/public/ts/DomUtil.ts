@@ -253,7 +253,7 @@ export class DomUtil {
     The other part of this is contained in click-effects.scss
     */
     initClickEffect = () => {
-        const clickEffect = (e: MouseEvent) => {
+        document.addEventListener("click", (e: MouseEvent) => {
             // use a timeout so we can call 'getState()' without a react error.
             setTimeout(() => {
                 /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
@@ -261,8 +261,7 @@ export class DomUtil {
                 if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
                 this.runClickAnimation(e.clientX, e.clientY);
             }, 10);
-        };
-        document.addEventListener("click", clickEffect);
+        });
     }
 
     runClickAnimation = (x: number, y: number) => {

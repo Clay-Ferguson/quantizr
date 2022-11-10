@@ -81,14 +81,12 @@ export class NodeUtil {
 
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
-        // Log.log("highlightRowById: " + id);
         let node = MainTab.inst?.findNode(state, id);
         let ret = true;
 
         /* If node not known, resort to taking the best, previous node we had */
         if (!node) {
             node = this.getHighlightedNode(state);
-            // console.log("state.idToNodeMap missing: " + id);
         }
 
         if (node) {
@@ -99,13 +97,11 @@ export class NodeUtil {
                 S.view.scrollToTop();
             }
             ret = false;
-            // Log.log("highlightRowById failed to find id: " + id);
         }
         return ret;
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState) => {
-        // console.log("highlightNode: " + node.id);
         if (!node || !state.node) {
             return;
         }
@@ -371,7 +367,6 @@ export class NodeUtil {
         let val = "";
         for (const ac of node.ac) {
             if (ac.principalName === principalName) {
-                // console.log("AC: " + S.util.prettyPrint(ac));
                 // Note: I'm leaving this loop, but really all this will generate in 'val' is either nothing
                 // at all or "(+R)" (for now)
                 for (const p of ac.privileges) {

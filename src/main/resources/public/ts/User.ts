@@ -63,21 +63,16 @@ export class User {
     }
 
     refreshLogin = async (state: AppState) => {
-        console.log("refreshLogin: initialTab=" + g_initialTab);
-
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
-        // console.log("got loginState");
 
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState && loginState === "0") {
-            console.log("loginState known as logged out.");
             if (!this.usingUrlTab()) {
                 S.util.loadAnonPageHome();
             }
             return;
         }
 
-        console.log("checking for credentials");
         const usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
         const usingCredentials: boolean = usr && pwd;
@@ -87,8 +82,6 @@ export class User {
          */
         const callUsr: string = usr || "";
         const callPwd: string = pwd || "";
-
-        console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
             if (!this.usingUrlTab()) {
@@ -157,8 +150,6 @@ export class User {
 
         if (updateLocalDb) {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-
-            /* Setting logged in state for non-user also */
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
         }
 
@@ -180,7 +171,6 @@ export class User {
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {
         return Promise.all([
-            // S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0"),
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON)
@@ -312,7 +302,6 @@ export class User {
             userId
         });
 
-        // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
         if (res?.userProfile) {
             await promiseDispatch("SetUserProfile", s => {
                 s.userProfile = res.userProfile;

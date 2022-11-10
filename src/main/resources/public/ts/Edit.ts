@@ -20,7 +20,6 @@ import { MainTab } from "./tabs/data/MainTab";
 declare const g_requireCrypto: string;
 
 export class Edit {
-
     showReadOnlyProperties: boolean = false;
 
     openImportDlg = (state: AppState): any => {
@@ -399,7 +398,6 @@ export class Edit {
 
     refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
         return new Promise<J.NodeInfo>(async (resolve, reject) => {
-            // console.log("refreshNodeFromServer: " + nodeId);
             const state = getAppState();
 
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -450,10 +448,8 @@ export class Edit {
         }
 
         for (const ac of aclEntries) {
-            // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
             await this.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
         }
-        // console.log("Key distribution complete.");
     }
 
     setRssHeadlinesOnly = async (state: AppState, val: boolean) => {
@@ -533,7 +529,6 @@ export class Edit {
     // WARNING: This func is expected to NOT alter that the active tab is!
     runScrollAffectingOp = async (state: AppState, func: Function) => {
         const doScrolling = await this.saveTabsTopmostVisible(state);
-
         if (doScrolling) {
             // turn off Comp stuff so it doesn't interfere with what we're about to do with scrolling.
             Comp.allowScrollSets = false;

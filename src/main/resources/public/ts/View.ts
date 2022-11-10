@@ -15,7 +15,6 @@ export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
-        // console.log("jumpToId: " + id);
         const state = getAppState();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
@@ -38,8 +37,6 @@ export class View {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = async (a: RefreshTreeArgs) => {
-        // let childCount = state.node && state.node.children ? state.node.children.length : 0;
-        // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
         if (!a.nodeId && a.state.node) {
             a.nodeId = a.state.node.id;
         }
@@ -54,8 +51,6 @@ export class View {
             const firstChild = S.edit.getFirstChildNode(a.state);
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
-
-        // console.log("refreshTree: nodeId=" + nodeId);
 
         /* named nodes aren't persisting in url without this and i may decide to just get rid
          of 'renderParentIfLeaf' altogether (todo-2) but for now i'm just fixing the case when we are
@@ -90,7 +85,6 @@ export class View {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            // S.nav.navHome(state);
         }
     }
 
@@ -127,7 +121,6 @@ export class View {
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
     growPage = (state: AppState) => {
-        // console.log("growPage");
         const lastChildNode = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             const targetOffset = lastChildNode.logicalOrdinal + 1;
@@ -137,8 +130,6 @@ export class View {
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
     private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState) => {
-        console.log("loadPage nodeId=" + state.node.id);
-
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: state.node.id,
@@ -183,7 +174,6 @@ export class View {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            // S.nav.navHome(state);
         }
     }
 
@@ -248,7 +238,6 @@ export class View {
         const activeTabComp = S.tabUtil.getActiveTabComp(state);
         if (activeTabComp?.getRef()) {
             activeTabComp.setScrollTop(0);
-            // console.log("Scrolled comp to top: " + activeTabComp.getRef().id);
         }
     }
 
@@ -266,12 +255,10 @@ export class View {
                  a case where the user is editing a node and we KNOW we don't need to scroll after editing,
                  so this is where we detect and reset that scenario. */
                 if (!node || node.id === S.quanta.noScrollToId) {
-                    // console.log("noScrollToId flag");
                     return;
                 }
 
                 if (state.node.id === node.id) {
-                    // console.log("is root, scroll to top");
                     this.scrollActiveToTop(state);
                     return;
                 }
@@ -282,7 +269,6 @@ export class View {
         };
 
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToNode");
             func();
         });
     }

@@ -1,6 +1,5 @@
 package quanta.util;
 
-import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;

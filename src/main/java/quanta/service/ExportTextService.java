@@ -22,7 +22,6 @@ import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-
 @Component
 @Scope("prototype")
 public class ExportTextService extends ServiceBase {

@@ -42,16 +42,9 @@ export class ServerPush {
         };
 
         this.eventSource.addEventListener("sessionTimeout", async (e: any) => {
-            // console.log("event: sessionTimeout.");
             S.quanta.authToken = null;
             S.quanta.userName = null;
             if (S.quanta.loggingOut) return;
-
-            // this might work ok, but for now, let's just force a page repload
-            // let state = getAppState();
-            // S.nav.login(state);
-            // window.location.href = window.location.origin;
-
             let message = "";
             const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
             if (editorData?.nodeId && editorData?.content) {
@@ -95,20 +88,17 @@ export class ServerPush {
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
             const state = getAppState();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
-            // console.log("IPSM: " + data.payload);
             this.ipsmPushItem(data.payload, state);
         }, false);
 
         // This is where we recieve signing requests pushed from the server to be signed by the browser and pushed back up.
         this.eventSource.addEventListener("sigPush", async (e: any) => {
             const data: J.NodeSigPushInfo = JSON.parse(e.data);
-            // console.log("sigPush: " + S.util.prettyPrint(data));
             await S.crypto.generateAndSendSigs(data);
         }, false);
 
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {
             const data: J.PushPageMessage = JSON.parse(e.data);
-            // console.log("pagePushMessage: " + data.payload);
             if (data.usePopup) {
                 S.util.showMessage(data.payload, "Admin Message");
             }
@@ -165,8 +155,6 @@ export class ServerPush {
 
     feedPushItem = (nodeInfo: J.NodeInfo, state: AppState) => {
         if (!nodeInfo || !FeedTab.inst) return;
-        console.log("feedPushItem: " + nodeInfo.content);
-
         const isMine = S.props.isMine(nodeInfo, state);
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
@@ -177,7 +165,6 @@ export class ServerPush {
          which will be fine because in this case when we are done editing we always
          process all the accumulated feedDirtyList items. */
         if (state.activeTab === C.TAB_FEED && state.editNode) {
-            // console.log("editing, so adding to feedDirty");
             FeedTab.inst.props.feedDirtyList = FeedTab.inst.props.feedDirtyList || [];
             FeedTab.inst.props.feedDirtyList.push(nodeInfo);
             return;
@@ -185,13 +172,11 @@ export class ServerPush {
 
         dispatch("RenderFeedResults", s => {
             FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
-
             const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
 
             // if updates existing item we refresh it even if autoRefresh is off
             if (updatesExistingItem) {
-                // console.log("update existing item!");
                 S.render.fadeInId = nodeInfo.id;
                 FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }

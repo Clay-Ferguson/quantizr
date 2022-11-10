@@ -26,7 +26,6 @@ export class TabUtil {
         to cause the dispatch/update, even when tab isn't changing, so need
         to find all those before we can optimize here to ignore setting to same tab.
         */
-        // if (state.activeTab==tabName) return;
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
                 S.nav.navToMyAccntRoot(s);
@@ -151,10 +150,6 @@ export class TabUtil {
         if (prevTab && newTab && prevTab === newTab) {
             return;
         }
-
-        // console.log("Sending tabChange event: " + newTab);
-
-        // Log.log("Changing from tab: " + prevTab + " to " + newTab);
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }
 }

@@ -20,11 +20,6 @@ export class Attachment {
         new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, () => {
             S.view.jumpToId(node.id);
         }).open();
-
-        /* Note: To run legacy uploader just put this version of the dialog here, and
-        nothing else is required. Server side processing is still in place for it
-        (new UploadFromFileDlg()).open();
-        */
     };
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState) => {

@@ -124,7 +124,6 @@ export class Util {
 
         return (evt: any) => {
             setTimeout(() => {
-                // func.apply(this, arguments);
                 func(evt);
             },
                 /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
@@ -218,9 +217,6 @@ export class Util {
     }
 
     buf2hex = (arr: Uint8Array): string => {
-        // return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
-
-        // Diferent Algorithm:
         let hexStr = "";
         if (arr) {
             for (const a of arr) {
@@ -308,7 +304,6 @@ export class Util {
     // add with sign=1, subtract with sign=-1
     addTimezoneOffset = (date: Date, sign: number): Date => {
         const tzOffsetMinutes = date.getTimezoneOffset();
-        // console.log("offset: " + tzOffsetMinutes);
 
         // make the time value in our current local timezone
         const adjustedTime = date.getTime() + sign * tzOffsetMinutes * 1000 * 60;
@@ -776,7 +771,6 @@ export class Util {
 
     showBrowserInfo = () => {
         let info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
-
         info += "\n\nType: ";
         if (clientInfo.isMobileOrTablet) {
             info += "Mobile or Tablet";
@@ -802,7 +796,6 @@ export class Util {
 
     // Queries the url for 'Open Graph' data and sendes it back using the callback.
     loadOpenGraph = async (url: string, callback: Function) => {
-        // console.log("loadOpenGraph: " + url);
         try {
             const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
@@ -869,7 +862,6 @@ export class Util {
         if (!state.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
-            // Log.log("bookmark count=" + count);
             dispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
 
@@ -906,8 +898,6 @@ export class Util {
     }
 
     loadAnonPageHome = async () => {
-        console.log("loadAnonPageHome()");
-
         try {
             if (this.sendAnonUsersToFeed) {
                 S.nav.messagesFediverse();
@@ -937,7 +927,6 @@ export class Util {
                     S.user.userLogin();
                     return;
                 }
-                console.log("renderPage for anonymous");
                 S.render.renderPage(res, false, null, true, true);
             }
         }
