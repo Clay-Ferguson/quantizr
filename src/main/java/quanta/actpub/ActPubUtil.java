@@ -833,7 +833,7 @@ public class ActPubUtil extends ServiceBase {
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS);
 
                 if (!topNode) {
-                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
+                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, false,
                             false, true, true, null);
 
 
@@ -847,7 +847,7 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, true, false, -1,
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
                                         false, false, false, false, true, true, null));
                             }
                         }
@@ -858,12 +858,11 @@ public class ActPubUtil extends ServiceBase {
                          */
                         String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
                         if (ok(actPubId)) {
-                            iter = read.findNodesByProp(ms, NodePath.USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
-                                    actPubId);
+                            iter = read.findNodesByProp(ms, NodePath.USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), actPubId);
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, true, false,
+                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
                                             -1, false, false, false, false, true, true, null));
                                 }
                             }

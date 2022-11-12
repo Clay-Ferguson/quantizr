@@ -2,6 +2,8 @@ package quanta.util;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,10 +11,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
+import quanta.actpub.model.APOTag;
+import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -49,9 +55,9 @@ public class Convert extends ServiceBase {
 	 * if there ARE an children REGARDLESS of whether the given user can access those children.
 	 */
 	@PerfMon(category = "convert")
-	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly,
-			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
-			boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
+	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
+			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
+			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
 
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
@@ -93,9 +99,7 @@ public class Convert extends ServiceBase {
 		attach.fixAllAttachmentMimes(node);
 
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
-		// log.debug("hasChildren=" + hasChildren + " node: "+node.getIdStr());
-
-		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit, sigFail);
+		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
 		if (no(node.getOwner())) {
@@ -188,15 +192,15 @@ public class Convert extends ServiceBase {
 		// }
 
 		String content = node.getContent();
+		String renderContent = insertExplicitTags(node);
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
 				owner, ownerId, //
 				ok(node.getTransferFrom()) ? node.getTransferFrom().toHexString() : null, //
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //
 				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
-
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
@@ -225,8 +229,8 @@ public class Convert extends ServiceBase {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					NodeInfo info = convertToNodeInfo(false, sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++, multiLevel,
-							lastChild, childrenCheck, false, loadLikes, false, null);
+					NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel, lastChild,
+							childrenCheck, false, loadLikes, false, null);
 					if (ok(info)) {
 						nodeInfo.safeGetChildren().add(info);
 					}
@@ -249,8 +253,8 @@ public class Convert extends ServiceBase {
 			}
 
 			if (ok(boostedNode)) {
-				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, false, 0, false, false, false, false, false,
-						false, null);
+				NodeInfo info =
+						convertToNodeInfo(false, sc, ms, boostedNode, false, 0, false, false, false, false, false, false, null);
 				if (ok(info)) {
 					nodeInfo.setBoostedNode(info);
 				}
@@ -259,6 +263,50 @@ public class Convert extends ServiceBase {
 
 		// log.debug("NODEINFO: " + XString.prettyPrint(nodeInfo));
 		return nodeInfo;
+	}
+
+	/*
+	 * reads thru 'content' of node and if there are any "@mentions" that we can render as HTML links
+	 * then we insert all those links into the text and return the resultant markdown with the HTML
+	 * anchors in it.
+	 */
+	public static String insertExplicitTags(SubNode node) {
+
+		// don't process foreign-created nodes!
+		if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
+			return null;
+		}
+
+		HashMap<String, APOTag> mentions = auth.parseMentionsFromNodeProp(node);
+
+		// sending back null for renderContent if no tags were inserted (no special HTML to send back, but
+		// just markdown)
+		if (no(mentions) || mentions.size() == 0)
+			return null;
+
+		StringBuilder sb = new StringBuilder();
+		StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
+
+		/*
+		 * build the new comma-delimited privs list by adding all that aren't in the setToRemove
+		 */
+		while (t.hasMoreTokens()) {
+			String tok = t.nextToken();
+			if (tok.startsWith("@")) {
+				APOTag tag = mentions.get(tok);
+				if (ok(tag)) {
+					// NOTE: The client knows not to render any openGraph panels for anchor tags that have classes
+					// 'mention' or 'hashtag' on them
+					String href = (String) tag.get(APObj.href);
+					if (ok(href)) {
+						sb.append("<a class='mention' href='" + href + "'>" + tok + "</a>");
+					}
+				}
+			} else {
+				sb.append(tok);
+			}
+		}
+		return sb.toString();
 	}
 
 	public static ImageSize getImageSize(Attachment att) {
@@ -283,7 +331,7 @@ public class Convert extends ServiceBase {
 	}
 
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
-			boolean htmlOnly, boolean initNodeEdit, boolean sigFail) {
+			boolean initNodeEdit, boolean sigFail) {
 
 		List<PropertyInfo> props = null;
 		HashMap<String, Object> propMap = node.getProps();
@@ -299,7 +347,7 @@ public class Convert extends ServiceBase {
 					props = new LinkedList<>();
 				}
 
-				PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, propMap.get(propName), htmlOnly, initNodeEdit);
+				PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, propMap.get(propName), initNodeEdit);
 				// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
 
 				props.add(propInfo);
@@ -367,13 +415,13 @@ public class Convert extends ServiceBase {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop, boolean htmlOnly,
+	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
 			boolean initNodeEdit) {
 		try {
 			Object value = null;
 			switch (propName) {
 				case "content":
-					value = formatValue(sc, prop, false, initNodeEdit);
+					value = formatValue(sc, prop, /* false, */ initNodeEdit);
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
@@ -401,7 +449,7 @@ public class Convert extends ServiceBase {
 		return val;
 	}
 
-	public String formatValue(SessionContext sc, Object value, boolean convertToHtml, boolean initNodeEdit) {
+	public String formatValue(SessionContext sc, Object value, /* boolean convertToHtml, */ boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
 				return DateUtil.formatTimeForUserTimezone((Date) value, sc.getTimezone(), sc.getTimeZoneAbbrev());

@@ -115,7 +115,7 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, -1, false,
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false,
 					false, true, false, true, true, null);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
@@ -201,7 +201,7 @@ public class NodeRenderService extends ServiceBase {
 			try {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (ok(highestUpParent)) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, true,
+					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent,
 							false, 0, false, false, false, false, true, true, null);
 
 					if (ok(nodeInfo)) {
@@ -235,7 +235,7 @@ public class NodeRenderService extends ServiceBase {
 	@PerfMon(category = "render")
 	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
 			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
 				level > 0, false, true, false, true, true, null);
 
 		if (no(nodeInfo)) {
@@ -516,7 +516,7 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, -1, false, false, true,
 				false, false, false, null);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);

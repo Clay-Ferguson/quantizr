@@ -103,7 +103,7 @@ public class NodeSearchService extends ServiceBase {
 		perf.chain("rendDoc:getDocList");
 
 		for (SubNode n : nodes) {
-			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, true, false, counter + 1, false,
+			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false,
 					false, false, false, false, true, null);
 
 			if (ok(info)) {
@@ -137,7 +137,7 @@ public class NodeSearchService extends ServiceBase {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 						false, false, false, false, true, null);
 				if (ok(info)) {
 					searchResults.add(info);
@@ -154,7 +154,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 						false, false, false, false, true, null);
 				if (ok(info)) {
 					searchResults.add(info);
@@ -183,7 +183,7 @@ public class NodeSearchService extends ServiceBase {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, true, false,
+						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
 								counter + 1, false, false, false, false, false, true, null);
 						if (ok(info)) {
 							searchResults.add(info);
@@ -249,7 +249,7 @@ public class NodeSearchService extends ServiceBase {
 			 */
 			for (SubNode node : accountNodes.getVal()) {
 				try {
-					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1,
+					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
 							false, false, false, false, false, false, null);
 					if (ok(info)) {
 						searchResults.add(info);
@@ -272,7 +272,7 @@ public class NodeSearchService extends ServiceBase {
 				SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
 				if (ok(userNode)) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, true, false,
+						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false,
 								counter + 1, false, false, false, false, false, false, null);
 						if (ok(info)) {
 							searchResults.add(info);
@@ -343,7 +343,7 @@ public class NodeSearchService extends ServiceBase {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 					false, false, false, false, true, null);
 			if (ok(info)) {
 				searchResults.add(info);
@@ -702,6 +702,7 @@ public class NodeSearchService extends ServiceBase {
 		}
 	}
 
+	// #tag-array
 	private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
 			HashMap<String, WordStats> mentionMap) {
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);

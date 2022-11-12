@@ -26,6 +26,10 @@ public class NodeInfo {
 	private String path;
 	private String name;
 	private String content;
+	
+	// This is the markdown to RENDER and MAY be different from 'content'
+	private String renderContent;
+
 	private String tags;
 
 	private Date lastModified;
@@ -95,7 +99,7 @@ public class NodeInfo {
 
 	public NodeInfo() {}
 
-	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner,
+	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName, String owner,
 			String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
 			HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
 			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String avatarVer, String apAvatar,
@@ -104,6 +108,7 @@ public class NodeInfo {
 		this.path = path;
 		this.name = name;
 		this.content = content;
+		this.renderContent = renderContent;
 		this.tags = tags;
 		this.lastModified = lastModified;
 		this.displayName = displayName;
@@ -165,6 +170,14 @@ public class NodeInfo {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getRenderContent() {
+		return renderContent;
+	}
+
+	public void setRenderContent(String renderContent) {
+		this.renderContent = renderContent;
 	}
 
 	public String getTags() {

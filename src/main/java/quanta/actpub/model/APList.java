@@ -12,6 +12,10 @@ public class APList extends LinkedList<Object> {
     public APList() {
     }
 
+    public APList(List<?> val) {
+        super.addAll(val);
+    }
+
     public APList val(Object val) {
         super.add(val);
         return this;

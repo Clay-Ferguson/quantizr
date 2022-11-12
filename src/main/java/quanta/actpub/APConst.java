@@ -23,6 +23,7 @@ public class APConst {
     public static final String CHARSET = "charset=utf-8";
     public static final String APS_PROFILE = "profile=\"https://www.w3.org/ns/activitystreams\"";
 
+    public static final String CTYPE_HTML = "text/html";
     public static final String CTYPE_ACT_JSON = "application/activity+json";
     public static final String CTYPE_LD_JSON = "application/ld+json";
     public static final String CTYPE_JRD_JSON = "application/jrd+json";
@@ -47,4 +48,7 @@ public class APConst {
     public static final String TRUE = "true";
 
     public static final String RDWR = PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s();
+
+    // Don't include @ or #, because this tokenizer is for finding tags and mentions.
+    public static final String TAGS_TOKENIZER = " \n\r\t,;!<>?()/\\+";
 }

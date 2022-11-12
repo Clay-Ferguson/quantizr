@@ -11,6 +11,10 @@ interface LS {
 
 export class NodeCompMarkdown extends Html {
 
+    // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
+    // but is ok named as 'cont'
+    cont: string;
+
     /* This makes the encrypted text visible without editing the node which is important to have
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
@@ -20,13 +24,14 @@ export class NodeCompMarkdown extends Html {
 
     constructor(public node: J.NodeInfo, extraContainerClass: string, appState: AppState) {
         super(null, { key: "ncmkd_" + node.id });
+        this.cont = node.renderContent || node.content;
 
         // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
         this.purifyHtml = node.owner !== "admin";
 
         if (!appState.mobileMode) {
-            const widthStyle = node.content && node.content.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
+            const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
             this.attribs.className = "markdown-content " + widthStyle;
         }
         else {
@@ -37,7 +42,7 @@ export class NodeCompMarkdown extends Html {
             this.attribs.className += " " + extraContainerClass;
         }
 
-        const content = node.content || "";
+        const content = this.cont || "";
         const att: LS = {
             content: null
         };
@@ -58,7 +63,7 @@ export class NodeCompMarkdown extends Html {
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
     renderRawMarkdown(node: J.NodeInfo, content: string = null): string {
-        content = content || node.content || "";
+        content = content || this.cont || "";
         let val = "";
 
         // todo-2: put some more thought into this...

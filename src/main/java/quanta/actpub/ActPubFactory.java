@@ -33,6 +33,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.Convert;
 import quanta.util.DateUtil;
 
 /**
@@ -151,6 +152,7 @@ public class ActPubFactory extends ServiceBase {
 
 				if (ok(tagList)) {
 					// prepend character to make it like '@user@server.com'
+					// todo-0: oops this replicates APOTag (I'm using APOTag to hold mentions too!)
 					tagList.val(new APOMention(actorUrl, "@" + userName));
 				}
 			}
@@ -202,7 +204,12 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+		String content = Convert.insertExplicitTags(child);
+		if (no(content)) {
+			content = child.getContent();
+		}
+
+		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 
@@ -232,7 +239,12 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+		String content = Convert.insertExplicitTags(child);
+		if (no(content)) {
+			content = child.getContent();
+		}
+
+		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 		if (ok(parent)) {

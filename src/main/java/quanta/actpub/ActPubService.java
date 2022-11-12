@@ -39,6 +39,7 @@ import quanta.actpub.model.APODelete;
 import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APOPerson;
+import quanta.actpub.model.APOTag;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -59,6 +60,7 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.service.NodeSearchService;
+import quanta.util.Convert;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -214,8 +216,12 @@ public class ActPubService extends ServiceBase {
                     }
                     // else send out as a note.
                     else {
-                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType,
-                                node.getContent(), objUrl, privateMessage, attachments);
+                        String content = Convert.insertExplicitTags(node);
+                        if (no(content)) {
+                            content = node.getContent();
+                        }
+                        message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
+                                objUrl, privateMessage, attachments);
 
                         // log.debug("Outbound Note: " + XString.prettyPrint(message));
                     }
@@ -529,7 +535,7 @@ public class ActPubService extends ServiceBase {
         }
 
         if (preferDbNode) {
-            acctNode = read.getUserNodeByUserName(ms, apUserName);
+            acctNode = read.getUserNodeByUserName(ms, apUserName, false);
         }
 
         if (no(acctNode) && allowImport) {
@@ -1099,8 +1105,8 @@ public class ActPubService extends ServiceBase {
         if (no(toAccountNode)) {
             toAccountNode = getAcctNodeByActorUrl(ms, userDoingAction, objAttributedTo);
         }
-        SubNode newNode =
-                create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
+        SubNode newNode = create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST, null,
+                toAccountNode.getId(), true);
 
         // If we're updating a node, find what the ID should be and we can just put that ID value into
         // newNode
@@ -1138,10 +1144,11 @@ public class ActPubService extends ServiceBase {
          * todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
          * but we at least know other instances of Quanta will have these extractable this way.
          */
-        HashSet<String> mentionsSet = auth.parseMentions(null, contentHtml);
-        importUsers(ms, mentionsSet);
+        HashMap<String, APOTag> mentionsSet = auth.parseMentions(contentHtml);
+        importUsers(ms, mentionsSet, null);
+
         if (ok(mentionsSet)) {
-            for (String mentionName : mentionsSet) {
+            for (String mentionName : mentionsSet.keySet()) {
                 saveFediverseName(mentionName);
             }
         }
@@ -1181,21 +1188,39 @@ public class ActPubService extends ServiceBase {
         return newNode;
     }
 
-    // imports the list of foreign users into the system
-    public void importUsers(MongoSession ms, HashSet<String> users) {
+    // imports the list of foreign users into the system, and performs the side-effect, of ensuring
+    // both local users and foreign users have the 'href' set on the APOTag
+    public void importUsers(MongoSession ms, HashMap<String, APOTag> users, String userDoingAction) {
         if (no(users))
             return;
 
-        users.forEach(user -> {
-            // clean user if it's in '@mention' format
-            user = XString.stripIfStartsWith(user, "@");
+        users.forEach((user, tag) -> {
+            try {
+                // remove '@' prefix
+                user = XString.stripIfStartsWith(user, "@");
 
-            // make sure username contains @ making it a foreign user.
-            if (user.contains("@")) {
-                SubNode userNode = getAcctNodeByForeignUserName(ms, null, user, true, true);
-                if (!ok(userNode)) {
-                    log.debug("Unable to import user: " + user);
+                // if username contains @ making it a foreign user.
+                if (user.contains("@")) {
+                    if (prop.isActPubEnabled()) {
+                        SubNode userNode = getAcctNodeByForeignUserName(ms, userDoingAction, user, true, true);
+                        if (no(userNode)) {
+                            log.debug("Unable to import user: " + user);
+                            return;
+                        }
+
+                        String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
+                        if (ok(actorUrl)) {
+                            tag.put(APObj.href, actorUrl);
+                        }
+                    }
                 }
+                // else if this is a local user, still need actor ID
+                else {
+                    String actorUrl = apUtil.makeActorUrlForUserName(user);
+                    tag.put(APObj.href, actorUrl);
+                }
+            } catch (Exception e) {
+                log.error("unable to get href for user: " + user, e);
             }
         });
     }

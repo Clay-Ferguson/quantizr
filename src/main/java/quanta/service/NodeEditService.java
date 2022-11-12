@@ -19,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
+import quanta.actpub.model.APList;
+import quanta.actpub.model.APOTag;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -225,8 +227,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, newNode);
 		}
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false,
-				false, false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false,
+				false, false, false, false, null));
 		res.setSuccess(true);
 		return res;
 	}
@@ -303,8 +305,8 @@ public class NodeEditService extends ServiceBase {
 		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false,
-				false, false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false,
+				false, false, false, false, null));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -588,8 +590,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, false, -1, false, false,
-				true, false, true, true, null);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false,
+				false, true, false, true, true, null);
 		if (ok(newNodeInfo)) {
 			res.setNode(newNodeInfo);
 		}
@@ -605,7 +607,6 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	public void processAfterSave(MongoSession ms, SubNode node) {
-
 		// never do any of this logic if this is an admin-owned node being saved.
 		if (acl.isAdminOwned(node)) {
 			return;
@@ -623,7 +624,15 @@ public class NodeEditService extends ServiceBase {
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
 				if (!isAccnt) {
-					auth.saveMentionsToACL(s, node);
+					HashMap<String, APOTag> mentions = auth.parseMentions(node.getContent());
+
+					if (ok(mentions) && mentions.size() > 0) {
+						String userDoingAction = ThreadLocals.getSC().getUserName();
+						apub.importUsers(ms, mentions, userDoingAction);
+						auth.saveMentionsToACL(mentions, s, node);
+						node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(mentions.values())));
+						update.save(ms, node);
+					}
 				}
 
 				// if this is an account type then don't expect it to have any ACL but we still want to broadcast

@@ -27,6 +27,11 @@ import quanta.util.XString;
 
 /**
  * Main REST Controller endpoint for AP
+ * 
+ * Actor URLs: ${host}/u/clay/home
+ * 
+ * Actor IDs: ${host}/ap/u/clay
+ * 
  */
 @Controller
 // @CrossOrigin is done by AppFilter.
@@ -72,6 +77,19 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
 	public void mastodonGetUser(//
+			@PathVariable(value = "userName", required = true) String userName, //
+			HttpServletRequest req, //
+			HttpServletResponse res) throws Exception {
+		Util.failIfAdmin(userName);
+		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
+		apLog.trace("Redirecting to: " + url);
+		res.sendRedirect(url);
+	}
+
+	/* This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page */
+	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_HTML})
+	public void getHTMLForUserId(//
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
 			HttpServletResponse res) throws Exception {
