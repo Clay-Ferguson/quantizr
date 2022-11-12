@@ -6,8 +6,10 @@ import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { TrendingView } from "./tabs/TrendingView";
 
 declare let g_initialTab: string;
+declare let g_tagSearch: string;
 declare let g_nodeId: string;
 declare let g_urlIdFailMsg: string;
 
@@ -51,10 +53,16 @@ export class User {
     // returns true if we already initialized to a tab specified on url
     usingUrlTab = (): boolean => {
         if (g_initialTab) {
-            S.tabUtil.selectTab(g_initialTab);
-            if (g_initialTab === C.TAB_DOCUMENT && g_nodeId) {
-                S.nav.openDocumentView(null, g_nodeId);
-                g_nodeId = null;
+            if (g_initialTab === C.TAB_FEED && g_tagSearch) {
+                TrendingView.searchWord(null, "#" + g_tagSearch);
+                g_tagSearch = null;
+            }
+            else {
+                S.tabUtil.selectTab(g_initialTab);
+                if (g_initialTab === C.TAB_DOCUMENT && g_nodeId) {
+                    S.nav.openDocumentView(null, g_nodeId);
+                    g_nodeId = null;
+                }
             }
             g_initialTab = null;
             return true;

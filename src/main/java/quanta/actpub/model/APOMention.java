@@ -1,5 +1,27 @@
 package quanta.actpub.model;
 
+/** 
+ <pre>
+{
+    "@context": "https://www.w3.org/ns/activitystreams",
+    "name": "A thank-you note",
+    "type": "Note",
+    "content": "Thank you @sally for all your hard work! #givingthanks",
+    "tag": [
+      {
+        "type": "Mention",
+        "href": "http://example.org/people/sally",
+        "name": "@sally"
+      },
+      {
+        // note that if there's no type it's assumed to be a hashtag
+        "id": "http://example.org/tags/givingthanks",
+        "name": "#givingthanks"
+      }
+    ]
+</pre>
+*/
+
 public class APOMention extends APObj {
     public APOMention() {
         put(type, APType.Mention);

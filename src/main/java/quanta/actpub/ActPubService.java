@@ -36,10 +36,10 @@ import quanta.actpub.model.APOActivity;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
 import quanta.actpub.model.APODelete;
+import quanta.actpub.model.APOHashtag;
 import quanta.actpub.model.APOLike;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APOPerson;
-import quanta.actpub.model.APOTag;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
@@ -216,7 +216,7 @@ public class ActPubService extends ServiceBase {
                     }
                     // else send out as a note.
                     else {
-                        String content = Convert.insertExplicitTags(node);
+                        String content = Convert.replaceTagsWithHtml(node);
                         if (no(content)) {
                             content = node.getContent();
                         }
@@ -1055,7 +1055,7 @@ public class ActPubService extends ServiceBase {
         String objUrl = apStr(obj, APObj.url);
         String objAttributedTo = apStr(obj, APObj.attributedTo);
         Boolean sensitive = apBool(obj, APObj.sensitive);
-        Object tagArray = apList(obj, APObj.tag, false);
+        List<?> tagArray = (List<?>) apList(obj, APObj.tag, false);
 
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
@@ -1135,23 +1135,27 @@ public class ActPubService extends ServiceBase {
         // '```'
         newNode.setContent(contentHtml);
 
-        // If we have a tagArray object save it on the node properties.
-        if (tagArray != null) {
+        // this block needs to be moved into ActPub utils and named 'parseTagArray'
+        HashMap<String, APObj> tags = null;
+        if (ok(tagArray)) {
+            // If we have a tagArray object save it on the node properties.
             newNode.set(NodeProp.ACT_PUB_TAG, tagArray);
-        }
+            tags = parseTagArray(tagArray);
 
-        /*
-         * todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
-         * but we at least know other instances of Quanta will have these extractable this way.
-         */
-        HashMap<String, APOTag> mentionsSet = auth.parseMentions(contentHtml);
-        importUsers(ms, mentionsSet, null);
+            // DO NOT DELETE
+            // NOTE: LEAVE HERE, in case we ever need to parse contentHtml into the tagArray
+            // HashMap<String, APObj> tags = auth.parseTags(contentHtml, true, false);
 
-        if (ok(mentionsSet)) {
-            for (String mentionName : mentionsSet.keySet()) {
-                saveFediverseName(mentionName);
+            if (ok(tags)) {
+                importUsers(ms, tags, null);
+                for (String mentionName : tags.keySet()) {
+                    if (mentionName.startsWith("@")) {
+                        saveFediverseName(mentionName);
+                    }
+                }
             }
         }
+
         newNode.setModifyTime(published);
         newNode.setCreateTime(published);
 
@@ -1188,18 +1192,42 @@ public class ActPubService extends ServiceBase {
         return newNode;
     }
 
+    private HashMap<String, APObj> parseTagArray(List<?> tagArray) {
+        HashMap<String, APObj> tags = new HashMap<>();
+
+        // now build our own stronger typed APObj-derived objects for the array into tags
+        for (Object tag : tagArray) {
+
+            String type = apStr(tag, APObj.type);
+            String name = apStr(tag, APObj.name);
+            String href = apStr(tag, APObj.href);
+
+            if ("Mention".equalsIgnoreCase(type)) {
+                tags.put(name, new APOMention(href, name));
+            } else if ("Hashtag".equalsIgnoreCase(type)) {
+                tags.put(name, new APOHashtag(href, name));
+            }
+        }
+        return tags;
+    }
+
     // imports the list of foreign users into the system, and performs the side-effect, of ensuring
     // both local users and foreign users have the 'href' set on the APOTag
-    public void importUsers(MongoSession ms, HashMap<String, APOTag> users, String userDoingAction) {
+    public void importUsers(MongoSession ms, HashMap<String, APObj> users, String userDoingAction) {
         if (no(users))
             return;
 
         users.forEach((user, tag) -> {
+
+            // ignore of this is something else like a Hashtag
+            if (!(tag instanceof APOMention))
+                return;
+
             try {
                 // remove '@' prefix
                 user = XString.stripIfStartsWith(user, "@");
 
-                // if username contains @ making it a foreign user.
+                // if username contains @ (after sripping off any first char) making it a foreign user.
                 if (user.contains("@")) {
                     if (prop.isActPubEnabled()) {
                         SubNode userNode = getAcctNodeByForeignUserName(ms, userDoingAction, user, true, true);

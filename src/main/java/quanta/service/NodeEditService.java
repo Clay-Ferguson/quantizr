@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APList;
-import quanta.actpub.model.APOTag;
+import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
@@ -624,13 +624,13 @@ public class NodeEditService extends ServiceBase {
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
 				if (!isAccnt) {
-					HashMap<String, APOTag> mentions = auth.parseMentions(node.getContent());
+					HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
 
-					if (ok(mentions) && mentions.size() > 0) {
+					if (ok(tags) && tags.size() > 0) {
 						String userDoingAction = ThreadLocals.getSC().getUserName();
-						apub.importUsers(ms, mentions, userDoingAction);
-						auth.saveMentionsToACL(mentions, s, node);
-						node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(mentions.values())));
+						apub.importUsers(ms, tags, userDoingAction);
+						auth.saveMentionsToACL(tags, s, node);
+						node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(tags.values())));
 						update.save(ms, node);
 					}
 				}

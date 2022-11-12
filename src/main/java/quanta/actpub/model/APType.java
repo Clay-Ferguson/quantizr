@@ -15,6 +15,7 @@ public class APType {
     public static final String Undo = "Undo";
     public static final String Delete = "Delete";
     public static final String Mention = "Mention";
+    public static final String Hashtag = "Hashtag";
     public static final String Document = "Document";
     public static final String Person = "Person";
     public static final String Image = "Image";

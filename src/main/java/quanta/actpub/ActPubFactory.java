@@ -152,7 +152,6 @@ public class ActPubFactory extends ServiceBase {
 
 				if (ok(tagList)) {
 					// prepend character to make it like '@user@server.com'
-					// todo-0: oops this replicates APOTag (I'm using APOTag to hold mentions too!)
 					tagList.val(new APOMention(actorUrl, "@" + userName));
 				}
 			}
@@ -204,7 +203,7 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		String content = Convert.insertExplicitTags(child);
+		String content = Convert.replaceTagsWithHtml(child);
 		if (no(content)) {
 			content = child.getContent();
 		}
@@ -239,7 +238,7 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		String content = Convert.insertExplicitTags(child);
+		String content = Convert.replaceTagsWithHtml(child);
 		if (no(content)) {
 			content = child.getContent();
 		}

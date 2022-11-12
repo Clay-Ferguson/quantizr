@@ -19,7 +19,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.actpub.model.APOTag;
+import quanta.actpub.model.APOMention;
+import quanta.actpub.model.APOHashtag;
+import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -203,7 +205,7 @@ public class MongoAuth extends ServiceBase {
 			 * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
 			 * mentioned in the tags array
 			 */
-			HashMap<String, APOTag> mentions = auth.parseMentionsFromNodeProp(parent);
+			HashMap<String, APObj> tags = auth.parseTags(parent);
 
 			// if no content, and the parent isn't our own node
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
@@ -216,15 +218,16 @@ public class MongoAuth extends ServiceBase {
 						url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
 					}
 
-					APOTag tagObj = new APOTag("Mention", url, "@" + user);
-					mentions.put("@" + user, tagObj);
+					tags.put("@" + user, new APOMention(url, "@" + user));
 				}
 			}
 
-			if (mentions.size() > 0) {
+			if (tags.size() > 0) {
 				String content = "";
-				for (String key : mentions.keySet()) {
-					content += key + " ";
+				for (String key : tags.keySet()) {
+					if (key.startsWith("@")) {
+						content += key + " ";
+					}
 				}
 
 				/*
@@ -655,55 +658,50 @@ public class MongoAuth extends ServiceBase {
 		return q;
 	}
 
-	// todo-0: we will eventually make this find hashtags too, and then rename it 'parseMentionsAndTags' (or similar)
-	public HashMap<String, APOTag> parseMentions(String message) {
-		if (no(message))
+	/*
+	 * Returns map of of APOHashtag and/or APOMention objects, where the keys are the hashtag or mention
+	 * including the # or @ as first char of the key.
+	 */
+	public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
+		if (no(content))
 			return null;
 
-		HashMap<String, APOTag> namesSet = new HashMap<>();
-		StringTokenizer t = new StringTokenizer(message, APConst.TAGS_TOKENIZER, false);
+		HashMap<String, APObj> tags = new HashMap<>();
+		StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
 
-		/*
-		 * build the new comma-delimited privs list by adding all that aren't in the setToRemove
-		 */
 		while (t.hasMoreTokens()) {
-			String word = t.nextToken();
-			// detect the pattern @name@server.com or @name
-			if (word.length() > 1 && word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
-				word = word.substring(1);
+			String tok = t.nextToken();
 
-				// This second 'startsWith' check ensures we ignore patterns that start with
-				// "@@"
-				if (!word.startsWith("@")) {
-					namesSet.put(word, new APOTag("Mention", null, "@" + word));
+			if (tok.length() > 1) {
+				// Mention (@name@server.com or @name)
+				if (tok.startsWith("@") && StringUtils.countMatches(tok, "@") <= 2) {
+					if (parseMentions) {
+						// NOTE: href added as null here, but gets set during the importUsers call that happens
+						// after we return these tags.
+						tags.put(tok, new APOMention(null, tok));
+					}
+				}
+				// Hashtag
+				else if (tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
+					if (parseHashtags) {
+						String shortTok = XString.stripIfStartsWith(tok, "#");
+						tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
+					}
 				}
 			}
 		}
 
-		return namesSet;
+		return tags;
 	}
 
 	/**
-	 * Uses the ACT_PUB_TAG property on the node to build a list of foreign user names in the namesSet.
-	 * If you pass a non-null namesSet then that set will be appended to and returned or else it creates
-	 * a new set to return. Posts comming form Mastodon at least will have Mentions in this format on
-	 * them. I'm not sure how standardized this is (per ActPub Spec, etc)
-	 * 
-	 * Example...
-	 * 
-	 * <pre>
-			"ap:tag" : [ {
-			"type" : "Mention",
-			"href" : "https://fosstodon.org/users/atoponce", (this is ap:actorId)
-			"name" : "@atoponce"
-			} ],
-	 * </pre>
+	 * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
 	 */
-	public HashMap<String, APOTag> parseMentionsFromNodeProp(SubNode node) {
+	public HashMap<String, APObj> parseTags(SubNode node) {
 		if (no(node))
 			return null;
 
-		HashMap<String, APOTag> namesSet = new HashMap<>();
+		HashMap<String, APObj> tagSet = new HashMap<>();
 
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
 		if (ok(tags)) {
@@ -715,34 +713,43 @@ public class MongoAuth extends ServiceBase {
 						Object href = m.get("href");
 						Object name = m.get("name");
 
+						// ActPub spec originally didn't have Hashtag here, so default to that if no type
+						if (no(type)) {
+							type = "Hashtag";
+						}
+
 						// skip if not all strings
 						if (!(type instanceof String) || !(href instanceof String) || !(name instanceof String)) {
 							continue;
 						}
 
-						// skip if not a mention
 						String typeStr = (String) type;
-						if (!typeStr.equalsIgnoreCase("Mention"))
-							continue;
 
-						APOTag tagObj = new APOTag((String) type, (String) href, (String) name);
-
-						// add a string like host@username
-						URL hrefUrl = new URL((String) href);
-
-						// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
-						// or else we end up with "user@server.com@server.com"
-						String longName = (String) name;
-						if (!longName.contains("@" + hrefUrl.getHost())) {
-							longName += "@" + hrefUrl.getHost();
+						if (typeStr.equalsIgnoreCase("Hashtag")) {
+							tagSet.put((String) name, new APOHashtag((String) href, (String) name));
 						}
+						// Process Mention
+						else if (typeStr.equalsIgnoreCase("Mention")) {
 
-						// build this name without host part if it's a local user, otherwise full fediverse name
-						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name : longName;
+							APOMention tagObj = new APOMention((String) href, (String) name);
 
-						// add the name if it's not the current user. No need to self-mention in a reply?
-						if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
-							namesSet.put(user, tagObj);
+							// add a string like host@username
+							URL hrefUrl = new URL((String) href);
+
+							// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
+							// or else we end up with "user@server.com@server.com"
+							String longName = (String) name;
+							if (!longName.contains("@" + hrefUrl.getHost())) {
+								longName += "@" + hrefUrl.getHost();
+							}
+
+							// build this name without host part if it's a local user, otherwise full fediverse name
+							String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name : longName;
+
+							// add the name if it's not the current user. No need to self-mention in a reply?
+							if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
+								tagSet.put(user, tagObj);
+							}
 						}
 					} else {
 						log.debug("Failed to parse tag on nodeId " + node.getIdStr() + " because it was type="
@@ -754,7 +761,7 @@ public class MongoAuth extends ServiceBase {
 				}
 			}
 		}
-		return namesSet;
+		return tagSet;
 	}
 
 	/*
@@ -762,15 +769,22 @@ public class MongoAuth extends ServiceBase {
 	 * and adds them (if not existing) to the node sharing on the node, which ensures the person
 	 * mentioned has visibility of this node and that it will also appear in their FEED.
 	 */
-	public void saveMentionsToACL(HashMap<String, APOTag> mentionsSet, MongoSession ms, SubNode node) {
-		if (no(mentionsSet)) {
+	public void saveMentionsToACL(HashMap<String, APObj> tags, MongoSession ms, SubNode node) {
+		if (no(tags)) {
 			return;
 		}
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();
 
 		// make sure all parsed toUserNamesSet user names are saved into the node acl */
-		for (String userName : mentionsSet.keySet()) {
+		for (String userName : tags.keySet()) {
+			APObj val = tags.get(userName);
+
+			// ignore of this is something else like a Hashtag
+			if (!(val instanceof APOMention))
+				continue;
+
+			userName = XString.stripIfStartsWith(userName, "@");
 			SubNode acctNode = read.getUserNodeByUserName(ms, userName);
 
 			/*
@@ -810,7 +824,8 @@ public class MongoAuth extends ServiceBase {
 		if (acChanged) {
 			node.setAc(ac);
 
-			// for now this saving is being done at a higher layer up (method that calls this one), and is always run.
+			// for now this saving is being done at a higher layer up (method that calls this one), and is
+			// always run.
 			// update.save(ms, node);
 		}
 	}

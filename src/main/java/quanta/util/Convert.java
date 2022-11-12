@@ -17,7 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.actpub.model.APOTag;
+import quanta.actpub.model.APOHashtag;
+import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -192,7 +193,7 @@ public class Convert extends ServiceBase {
 		// }
 
 		String content = node.getContent();
-		String renderContent = insertExplicitTags(node);
+		String renderContent = replaceTagsWithHtml(node);
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
@@ -269,19 +270,22 @@ public class Convert extends ServiceBase {
 	 * reads thru 'content' of node and if there are any "@mentions" that we can render as HTML links
 	 * then we insert all those links into the text and return the resultant markdown with the HTML
 	 * anchors in it.
+	 * 
+	 * NOTE: The client knows not to render any openGraph panels for anchor tags that have classes
+	 * 'mention' or 'hashtag' on them
 	 */
-	public static String insertExplicitTags(SubNode node) {
+	public static String replaceTagsWithHtml(SubNode node) {
 
 		// don't process foreign-created nodes!
 		if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
 			return null;
 		}
 
-		HashMap<String, APOTag> mentions = auth.parseMentionsFromNodeProp(node);
+		HashMap<String, APObj> tags = auth.parseTags(node);
 
 		// sending back null for renderContent if no tags were inserted (no special HTML to send back, but
 		// just markdown)
-		if (no(mentions) || mentions.size() == 0)
+		if (no(tags) || tags.size() == 0)
 			return null;
 
 		StringBuilder sb = new StringBuilder();
@@ -292,11 +296,22 @@ public class Convert extends ServiceBase {
 		 */
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken();
-			if (tok.startsWith("@")) {
-				APOTag tag = mentions.get(tok);
-				if (ok(tag)) {
-					// NOTE: The client knows not to render any openGraph panels for anchor tags that have classes
-					// 'mention' or 'hashtag' on them
+
+			// Hashtag
+			if (tok.startsWith("#")) {
+				APObj tag = tags.get(tok);
+				if (tag instanceof APOHashtag) {
+					String href = (String) tag.get(APObj.href);
+					if (ok(href)) {
+						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
+						sb.append("<a class='mention hashtag' href='" + href + "'>" + tok + "</a>");
+					}
+				}
+			}
+			// Mention
+			else if (tok.startsWith("@")) {
+				APObj tag = tags.get(tok);
+				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
 					if (ok(href)) {
 						sb.append("<a class='mention' href='" + href + "'>" + tok + "</a>");

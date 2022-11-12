@@ -71,7 +71,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
                 tagPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
-                    onClick: this.searchWord
+                    onClick: TrendingView.searchWord
                 }));
             });
         }
@@ -83,7 +83,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
                 mentionPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
-                    onClick: this.searchWord
+                    onClick: TrendingView.searchWord
                 }));
             });
         }
@@ -95,7 +95,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
                 wordPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
-                    onClick: this.searchWord
+                    onClick: TrendingView.searchWord
                 }));
             });
         }
@@ -115,8 +115,10 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         ]);
     }
 
-    searchWord = (evt: Event) => {
-        const word = S.domUtil.getPropFromDom(evt, "word");
+    static searchWord = (evt: Event, word: string) => {
+        if (!word) {
+            word = S.domUtil.getPropFromDom(evt, "word");
+        }
         if (!word) return;
 
         // expand so users can see what's going on with the search string and know they can clear it.
