@@ -170,29 +170,6 @@ public class Convert extends ServiceBase {
 			likes = new ArrayList<String>(node.getLikes());
 		}
 
-		// todo-0: enable this some day...
-		// LinkedList<String> likes = null;
-		// if (loadLikes && ok(node.getLikes())) {
-		// final LinkedList<String> _likes = new LinkedList<>();
-		// node.getLikes().forEach(like -> {
-		// // I decided not to risk the performance hit this could cause, and will probably load this
-		// asynchronously
-		// // whenver I do enable this capability in the future. Also for this special case of loading a
-		// property
-		// // that we might have on a UserNode alrady the we need a way to check first the cache, and THEN
-		// the MongoDb
-		// // node, BEFORE resorting to making an HTTP REST call like the getActorByUrl currently does.
-		// // if (like.startsWith("http://") || like.startsWith("https://")) {
-		// // APObj actor = apUtil.getActorByUrl(like);
-		// // if (ok(actor)) {
-		// // like = apStr(actor, APObj.preferredUsername);
-		// // }
-		// // }
-		// _likes.add(like);
-		// });
-		// likes = _likes;
-		// }
-
 		String content = node.getContent();
 		String renderContent = replaceTagsWithHtml(node);
 

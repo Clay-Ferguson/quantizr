@@ -160,23 +160,17 @@ export class NodeCompRowHeader extends Div {
             }));
 
             let youLiked: boolean = false;
-            let likeNames: string = null;
+            let likeDisplay: string = null;
             if (this.node.likes) {
                 youLiked = !!this.node.likes.find(u => u === state.userName);
-                likeNames = "Liked by:";
+                likeDisplay = "Liked by "+this.node.likes.length;
                 if (youLiked) {
-                    likeNames += "\nYou";
+                    likeDisplay += " (including You)";
                 }
-                this.node.likes.forEach(u => {
-                    if (u !== state.userName) {
-                        likeNames += "\n" + u;
-                    }
-                });
             }
 
             verboseChildren.push(new Icon({
-                // title: youLiked ? "You Liked this Node!" : "Like this Node",
-                title: likeNames ? likeNames : "Like this Node",
+                title: likeDisplay ? likeDisplay : "Like this Node",
                 className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
                 onClick: () => {
                     if (state.isAnonUser) {
