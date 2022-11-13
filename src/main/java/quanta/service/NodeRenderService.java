@@ -59,6 +59,9 @@ public class NodeRenderService extends ServiceBase {
 	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
 		RenderNodeResponse res = new RenderNodeResponse();
 
+		// todo-0: implement nodeMap key=id, val=SubNode, to pass into converter, so it 
+		// will only lookup parent once, and then keep cached.
+
 		// by default we do showReplies
 		boolean showReplies = true;
 		boolean adminOnly = false;

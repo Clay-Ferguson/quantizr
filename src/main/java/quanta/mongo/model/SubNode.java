@@ -42,8 +42,8 @@ import quanta.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.XFR, SubNode.CREATE_TIME,
-		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.XFR,
+		SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
@@ -59,7 +59,7 @@ public class SubNode {
 	@JsonIgnore
 	public boolean adminUpdate = false;
 
-	// todo-1: I have all my bulk ops using "id" when the value here is "_id". I can't remember the
+	// note: All bulk ops using "id" when the value here is "_id". I can't remember the
 	// reason for "_id"
 	public static final String ID = "_id";
 	@Id
@@ -624,10 +624,7 @@ public class SubNode {
 
 			boolean changed = false;
 			if (no(val)) {
-				changed = props.containsKey(key);
-
-				// todo-1: we can use the return value of 'remove' to set 'changed'.
-				props.remove(key);
+				changed = ok(props.remove(key));
 			} else {
 				Object curVal = props.get(key);
 				changed = no(curVal) || !val.equals(curVal);

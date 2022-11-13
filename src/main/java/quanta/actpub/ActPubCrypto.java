@@ -124,7 +124,7 @@ public class ActPubCrypto extends ServiceBase {
             throw new RuntimeException("digest is not in signed headers");
     }
 
-    // todo-1: need a version of this method that wraps the logic of going and getting the publickey
+    // todo-2: need a version of this method that wraps the logic of going and getting the publickey
     // off the original server and updating it into our local db if necessary, and then trying THAT
     // key before finally failing.
     public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey, byte[] bodyBytes) {
@@ -334,7 +334,7 @@ public class ActPubCrypto extends ServiceBase {
             byte[] signature = sig.sign();
 
             /*
-             * todo-1: Pleroma is including content-length in this headers list but we don't. I should probably
+             * note: leroma is including content-length in this headers list but we don't. I should probably
              * add it but be sure not to break compatability when doing so.
              */
             String headerSig = headerPair("keyId", actor + "#main-key") + "," + //

@@ -70,8 +70,8 @@ public class AclService extends ServiceBase {
 		BulkOperations bops = null;
 
 		/*
-		 * todo-1: It seems like maybe batching can't update a collection property? so for now I'm
-		 * disabling, and yes disabling batch mode makes this code work.
+		 * todo-2: It seems like maybe batching can't update a collection property? so for now I'm
+		 * disabling batch mode which makes this code work.
 		 */
 		boolean batchMode = false;
 		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);

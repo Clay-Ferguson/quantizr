@@ -188,7 +188,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 		}
 
-		// todo-1: these are obsolete right ?
+		// todo-1: be sure these files are in place and up to date.
 		html.append("<script src='" + rootPath + "marked.min.js'></script>");
 		html.append("<script src='" + rootPath + "exported.js'></script>");
 

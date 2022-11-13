@@ -254,7 +254,7 @@ public class ActPubFactory extends ServiceBase {
 		}
 
 		return new APOCreate(
-				// todo-1: what is the create=t here? That was part of my own temporary test right?
+				// todo-2: what is the create=t here? That was part of my own temporary test right?
 				nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 	}
 

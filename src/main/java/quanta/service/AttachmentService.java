@@ -549,7 +549,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			Attachment att = null;
-			// todo-1: put this in a method (finding attachment by binId)
+			// todo-2: put this in a method (finding attachment by binId)
 			if (ok(node.getAttachments())) {
 				for (String key : node.getAttachments().keySet()) {
 					Attachment curAtt = node.getAttachments().get(key);
@@ -1264,8 +1264,7 @@ public class AttachmentService extends ServiceBase {
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		arun.run(as -> {
 			int delCount = 0;
-			// todo-1: do we need to replace this with a 'stream' of some kind to keep from getting out of
-			// memory errors?
+			// todo-1: do we need to replace this with a 'stream' of some kind to ensure we won't run out of memory?
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */

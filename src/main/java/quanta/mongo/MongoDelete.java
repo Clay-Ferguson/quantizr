@@ -400,9 +400,8 @@ public class MongoDelete extends ServiceBase {
 			}
 		}
 
+		// todo-2: broadcast this back to server as a message push
 		log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
-
-		// todo-1: broadcast this back to server as a message push
 	}
 
 	/*
@@ -570,13 +569,13 @@ public class MongoDelete extends ServiceBase {
 				 * deducted from.
 				 * 
 				 * todo-1: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
-				 * grant them back the space, so this would cheat users. Need to fix that.
+				 * grant them back the space, so this would rob users of some space. Need to fix that.
 				 */
 				long totalBytes = user.getTotalAttachmentBytes(ms, node);
 				user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
 			}
 
-			// really need a 'hasForeignShares' here to ignore if there aren't any (todo-1)
+			// really need a 'hasForeignShares' here to ignore if there aren't any (todo-2)
 			if (ok(node.getAc())) {
 				nodes.add(node);
 			}

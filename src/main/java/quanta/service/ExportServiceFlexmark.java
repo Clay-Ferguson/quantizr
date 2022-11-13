@@ -156,7 +156,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 					wroteFile = true;
 				}
 			} else if ("pdf".equals(format)) {
-				// todo-1: We should have an OPTION to export ONLY and DIRECTLY to IPFS here, and
+				// todo-2: We should have an OPTION to export ONLY and DIRECTLY to IPFS here, and
 				// not even write to a file.
 				out = new FileOutputStream(new File(fullFileName));
 

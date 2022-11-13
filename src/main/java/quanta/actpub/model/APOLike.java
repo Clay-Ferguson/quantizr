@@ -6,9 +6,6 @@ import java.util.Map;
 import quanta.actpub.APConst;
 
 /**
- * todo-1: we have @context but not "context" in this (might need research), I think 
- * @context is some kind of identification of "conversations"
- * 
  * Like object
  */
 public class APOLike extends APOActivity {

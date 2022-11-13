@@ -88,7 +88,7 @@ public class IPFSPin extends ServiceBase {
             if (no(node))
                 return;
 
-            // todo-1: make this handle multiple attachments, and all calls to it
+            // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             String ipfsLink = att.getIpfsLink();
             add(ipfsLink);

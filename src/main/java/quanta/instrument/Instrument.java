@@ -26,7 +26,7 @@ import quanta.util.ThreadLocals;
  * internally in the app rather than more complex approaches, since we were able to implement this
  * letting AOP do all the work, and since perfMonAdvice() method below is so trivial.
  * 
- * todo-1: Does instrumentation ONLY work on PUBLIC methods?? I think I noticed that happening but
+ * todo-2: Does instrumentation ONLY work on PUBLIC methods?? I think I noticed that happening but
  * didn't prove it yet or look into it yet. If this is true it might be that only public methods are
  * proxied by spring which would make sense, but I don't kow if that's the case.
  * 

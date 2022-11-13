@@ -76,10 +76,9 @@ public class ActPubCache extends ServiceBase {
     public final HashSet<String> followedUsers = new HashSet<>();
 
     /*
-     * Update cache, when nodes chagne. Yes, this is a bit of a tight-coupling to be calling this from
+     * Update cache, when nodes change. Yes, this is a bit of a tight-coupling to be calling this from
      * the MongoEventListener, when we could be using more of a pub-sub mode.
      */
-    // need to put performance logging in here and see what this is costing us in CPU (todo-1)
     public void saveNotify(SubNode node) {
         final ObjectId objId = node.getId();
 

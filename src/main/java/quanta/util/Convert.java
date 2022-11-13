@@ -116,9 +116,13 @@ public class Convert extends ServiceBase {
 		String owner = PrincipalName.ADMIN.s();
 
 		/*
-		 * todo-1: for endpoints like 'renderNode' we can optimize these calls to get owner nodes all as the
+		 * todo-0: for endpoints like 'renderNode' we can optimize these calls to get owner nodes all as the
 		 * LAST step and get them all (will only be up to 25 at a time) in one single MongoDb "in clause"
 		 * type query! But for now this doesn't appear to be a bottleneck so we won't bother.
+		 * 
+		 * todo-0: another optimization is to store a map of the these owner nodes keyed by node.owner 
+		 * so we can consult that during renders, because a normal page render will often be the same owner
+		 * on all nodes.
 		 */
 		SubNode userNode = read.getOwner(ms, node, false);
 

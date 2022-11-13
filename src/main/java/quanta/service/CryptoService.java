@@ -83,8 +83,6 @@ public class CryptoService extends ServiceBase {
 					return false;
 				}
 
-				// todo-1: eventually we can cache each user's key, but this will require work for
-				// a multi-node (load balanced) system
 				pubKey = parseJWK(pubKeyJson, ownerAccntNode);
 				if (no(pubKey)) {
 					log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
@@ -149,7 +147,6 @@ public class CryptoService extends ServiceBase {
 			BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(keyObj.getN()));
 			BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(keyObj.getE()));
 
-			// figure out if we can reuse the same instance or if we always need a new one (todo-1)
 			pubKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent));
 			if (no(keyObj)) {
 				log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + accntNode.getIdStr());
@@ -266,8 +263,7 @@ public class CryptoService extends ServiceBase {
 		sigPendingQueue.put(pushInfo.getWorkloadId(), pushInfo);
 		push.sendServerPushInfo(sc, pushInfo);
 
-		// todo-1: for now we're using pooling. Will use thread concurrent api later, and will also have
-		// a timeout in case browser isn't sending
+		// todo-0: for now we're using polling. This could hang the thread. 
 		while (sigPendingQueue.contains(pushInfo.getWorkloadId())) {
 			Util.sleep(100);
 		}

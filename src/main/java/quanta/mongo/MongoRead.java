@@ -49,9 +49,6 @@ public class MongoRead extends ServiceBase {
     int MAX_DOC_ITEMS_PER_CALL = 40;
 
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
-
-    // todo-1: All cached nodes like this will NOT work once we have a multi-instance load-balanced web
-    // app. (I think this may be the ONLY place where we have a globally cached node)
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
 
@@ -201,10 +198,10 @@ public class MongoRead extends ServiceBase {
     /*
      * Throws an exception if the parent of 'node' does not exist
      * 
-     * todo-1: performance can be gained by memoizing the results of this call into a ThreadLocal
+     * todo-0: performance can be gained by memoizing the results of this call into a ThreadLocal
      * HashMap but we need to be careful that it can never return incorrect value from cache. Perhaps by
-     * also hooking into MongoListener to simply clear the threalocal cache any time any node is
-     * SAVED???
+     * also hooking into MongoListener to simply clear the ThreadLocal cache any time any node is
+     * SAVED?
      */
     public void checkParentExists(MongoSession ms, SubNode node) {
         boolean isRootPath = mongoUtil.isRootPath(node.getPath());

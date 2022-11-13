@@ -117,8 +117,8 @@ public class NodeMoveService extends ServiceBase {
 	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
 	 * one we keep and join to.
 	 * 
-	 * todo-1: need to verify that none of the nodes being joined (except the one we persist) have any
-	 * attachments because we can't combine mutiple attachments into a single node.
+	 * todo-0: need to merge all attachments from all nodes being joined into the node actually
+	 * being joined which should be simple and just a safe merger of attachment objects.
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();

@@ -189,9 +189,6 @@ public class ActPubOutbox extends ServiceBase {
     /*
      * userName represents the person whose outbox is being QUERIED, and the identity of the user DOING
      * the querying will come from the http header:
-     * 
-     * todo-1: For now we just query the PUBLIC shares from the outbox, and verify that public query
-     * works before we try to figure out how to do private auth comming from specific user(s)
      */
     public Long getOutboxItemCount(String userName, String sharedTo) {
         Long totalItems = arun.run(as -> {
@@ -408,7 +405,7 @@ public class ActPubOutbox extends ServiceBase {
             // leaving this turned on, for now just to collect info into the logs about how things work.
             if (experimental) {
                 /*
-                 * todo-1: A basic 'search' for an object by URL in mastodon calls into here with a generic
+                 * todo-2: A basic 'search' for an object by URL in mastodon calls into here with a generic
                  * non-user-specific keyId so I currently don't know how to exercise this code 'in the wild', but
                  * want to keep it for now.
                  * 

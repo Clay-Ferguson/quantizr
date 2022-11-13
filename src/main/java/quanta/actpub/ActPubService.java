@@ -193,7 +193,7 @@ public class ActPubService extends ServiceBase {
                     /*
                      * if this node has a boostTarget, we know it's an Announce so we send out the announce
                      * 
-                     * todo-1: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
+                     * todo-2: we should probably rely on if there's an ActPub TYPE itself that's "Announce" (we save
                      * that right?) UPDATE: Yes we do like this: on our node: "p" : {"ap:objType" : "Announce",
                      */
                     if (!StringUtils.isEmpty(boostTarget)) {
@@ -1129,10 +1129,6 @@ public class ActPubService extends ServiceBase {
             ThreadLocals.clean(newNode);
         }
 
-        // todo-1: need a new node prop type that is just 'html' and tells us to render
-        // content as raw html if set, or for now
-        // we could be clever and just detect if it DOES have tags and does NOT have
-        // '```'
         newNode.setContent(contentHtml);
 
         // this block needs to be moved into ActPub utils and named 'parseTagArray'
@@ -1614,7 +1610,6 @@ public class ActPubService extends ServiceBase {
                             }
                         }
                     } catch (Exception e) {
-                        // todo-1: eating this for now.
                         log.debug("Failed getting actor: " + url);
                     }
 
@@ -1740,8 +1735,7 @@ public class ActPubService extends ServiceBase {
                     List<String> following =
                             apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
 
-                    // todo-1: this info should be saved so we can dump it out in a "server info" printout for admin
-                    log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
+                    // log.debug("FOLLOW_COUNT: " + userName + " = " + following.size());
                     synchronized (apCache.followedUsers) {
                         apCache.followedUsers.addAll(following);
                     }
@@ -1754,7 +1748,7 @@ public class ActPubService extends ServiceBase {
                     });
                 }
                 // need a 'server info' query that can dump these out for the admin user to see in browser.
-                log.debug("FOLLOWED USERS: " + sb.toString());
+                // log.debug("FOLLOWED USERS: " + sb.toString());
             } finally {
                 scanningForeignUsers = false;
             }

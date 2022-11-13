@@ -175,11 +175,6 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 		}
 	}
 
-	/*
-	 * todo-1: for images that are referenced by URL (not saved in our DB) we would need to actually
-	 * read those from the web in order to put them in the PDF file which we can easily do using code
-	 * patterns we already have but I haven't gotten around to doing this low priority capability yet.
-	 */
 	private void writeImage(SubNode node) {
 		try {
 			List<Attachment> atts = node.getOrderedAttachments();

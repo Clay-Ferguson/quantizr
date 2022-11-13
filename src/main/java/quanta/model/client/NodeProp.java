@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
     // Activity Pub Properties
-    ACT_PUB_ID("apid", "s"), // todo-1: should renmae to "ap:id"
+    ACT_PUB_ID("apid", "s"), // todo-2: should rename to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
@@ -111,7 +111,7 @@ public enum NodeProp {
     JSON_HASH("ipfs:json", "s"), //
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
 
-    // todo-1: is this still used?
+    // todo-2: is this still used?
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
     // This property indicates that it's data is sourced from IPFS files, and can

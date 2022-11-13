@@ -303,12 +303,7 @@ public class ActPubFollowing extends ServiceBase {
 
                 if (obj instanceof String) {
                     String followingActorUrl = (String) obj;
-
-                    // for now just add the url for future crawling. todo-1: later we can do something more meaningful
-                    // with each actor url.
-                    if (apub.saveFediverseName(followingActorUrl)) {
-                        // log.debug("following: " + followingActorUrl);
-                    }
+                    apub.saveFediverseName(followingActorUrl);
                 } else {
                     log.debug("Unexpected following item class: " + obj.getClass().getName());
                 }

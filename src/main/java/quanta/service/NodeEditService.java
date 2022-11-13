@@ -571,7 +571,7 @@ public class NodeEditService extends ServiceBase {
 		 */
 		mongoUtil.setPendingPath(node, false);
 
-		// todo-1: for now only admin user is using signed nodes.
+		// todo-2: for now only admin user is REQUIRED to have signed nodes.
 		if (prop.isRequireCrypto() && ms.isAdmin()) {
 			if (!crypto.nodeSigVerify(node, sig)) {
 				// stop this node from being saved with 'clean'
@@ -1002,7 +1002,7 @@ public class NodeEditService extends ServiceBase {
 		return res;
 	}
 
-	// todo-1: Move to utils class.
+	// todo-2: Move to utils class.
 	private static String bytesToHex(byte[] hash) {
 		StringBuilder hexString = new StringBuilder(2 * hash.length);
 		for (int i = 0; i < hash.length; i++) {
@@ -1015,7 +1015,7 @@ public class NodeEditService extends ServiceBase {
 		return hexString.toString();
 	}
 
-	// todo-1: need to be doing a bulk update in here.
+	// todo-2: need to be doing a bulk update in here.
 	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
 
