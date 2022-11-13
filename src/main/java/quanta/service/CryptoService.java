@@ -38,6 +38,7 @@ import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
 import quanta.response.SignNodesResponse;
+import quanta.util.BooleanVal;
 import quanta.util.ExUtil;
 import quanta.util.IntVal;
 import quanta.util.ThreadLocals;
@@ -52,7 +53,7 @@ public class CryptoService extends ServiceBase {
 	public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
 	private static final Random rand = new Random();
 
-	int SIGN_BLOCK_SIZE = 200;
+	int SIGN_BLOCK_SIZE = 100;
 
 	// NOTE: This didn't allow unknown properties as expected but putting the
 	// following in the JSON classes did:
@@ -227,7 +228,11 @@ public class CryptoService extends ServiceBase {
 		pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), getNodeSigData(parent)));
 		count.inc();
 
+		BooleanVal failed = new BooleanVal();
+
 		ops.stream(query, SubNode.class).forEachRemaining(node -> {
+			// make sure session is still alive
+			if (failed.getVal() || !sc.isLive()) return;
 
 			// create new push object lazily
 			if (no(pushInfo.getVal())) {
@@ -242,16 +247,26 @@ public class CryptoService extends ServiceBase {
 			// if we have enough to send a block send it.
 			if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
 				// log.debug("BLOCK: " + XString.prettyPrint(pushInfo));
-				waitForBrowserSentSigs(sc, pushInfo.getVal());
+				if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+					failed.setVal(true);
+				}
 				// reset the push object.
 				pushInfo.setVal(null);
 			}
 		});
 
+		// make sure session is still alive
+		if (failed.getVal() || !sc.isLive()) return;
+
 		// send the accumulated remainder
 		if (ok(pushInfo.getVal()) && pushInfo.getVal().getListToSign().size() > 0) {
 			// log.debug("REMAIN: " + XString.prettyPrint(pushInfo));
-			waitForBrowserSentSigs(sc, pushInfo.getVal());
+			if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+				failed.setVal(true);
+			}
+
+			// make sure session is still alive
+			if (failed.getVal() || !sc.isLive()) return;
 		}
 
 		push.sendServerPushInfo(sc, new PushPageMessage(
@@ -259,13 +274,21 @@ public class CryptoService extends ServiceBase {
 	}
 
 	// This method pushes data down to the browser to be signed and waits for the reply here.
-	private void waitForBrowserSentSigs(SessionContext sc, NodeSigPushInfo pushInfo) {
+	private boolean waitForBrowserSentSigs(SessionContext sc, NodeSigPushInfo pushInfo) {
 		sigPendingQueue.put(pushInfo.getWorkloadId(), pushInfo);
 		push.sendServerPushInfo(sc, pushInfo);
 
-		// todo-0: for now we're using polling. This could hang the thread. 
-		while (sigPendingQueue.contains(pushInfo.getWorkloadId())) {
-			Util.sleep(100);
+		Util.sleep(10);
+		long totalTime = 0;
+		long sleepTime = 100;
+
+		// we wait for up to 30 seconds for the browser to sign the nodes, before we will give up and 
+		// return false;
+		while (totalTime < 30000 && sc.isLive() && sigPendingQueue.contains(pushInfo.getWorkloadId())) {
+			Util.sleep(sleepTime);
+			totalTime += sleepTime;
 		}
+
+		return totalTime < 30000;
 	}
 }

@@ -338,8 +338,6 @@ public class MongoAuth extends ServiceBase {
 	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
 		try {
 			auth(ms, node, PrivilegeType.WRITE);
-			// optimization: todo-0: once we do an auth on a node, save it's PATH in a ThreadLocal set so we can
-			// detect it in other places (namely MongoEventListener)
 		} catch (RuntimeException e) {
 			log.debug("session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr()
 					+ " and was refused.");
