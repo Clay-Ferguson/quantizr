@@ -65,20 +65,25 @@ export class MainTab implements TabIntf<any> {
             !state.isAnonUser ? new AppNavLink("My Account", () => S.nav.navToMyAccntRoot(state)) : null,
             !state.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + state.userName + ":home")) : null,
             !state.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
-            ...this.customAnonRHSLinks(state)
+            ...this.customAnonRHSLinks(state),
+            ...this.buildCustomLinks(state, state.config.rhsLinks)
         ]);
     };
 
     // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
     customAnonRHSLinks = (state: AppState): CompIntf[] => {
+        // if not anon user return empty items
+        if (!state.isAnonUser) return [];
+
+        return this.buildCustomLinks(state, state.config.rhsAnonLinks);
+    }
+
+    buildCustomLinks = (state: AppState, configArray: any): CompIntf[] => {
         const items: CompIntf[] = [];
 
-        // if not anon user return empty items
-        if (!state.isAnonUser) return items;
-
-        if (state.config.rhsAnonLinks) {
-            for (const menuItem of state.config.rhsAnonLinks) {
+        if (configArray) {
+            for (const menuItem of configArray) {
                 if (menuItem.name === "separator") {
                     // items.push(new MenuItemSeparator());
                 }

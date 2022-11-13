@@ -160,7 +160,7 @@ export class RightNavPanel extends Div {
                     //     ])
                     // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
-                        className: "clickable",
+                        className: "clickable float-end marginRight",
                         onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             new UserProfileDlg(null).open();

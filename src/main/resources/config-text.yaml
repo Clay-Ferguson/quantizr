@@ -12,6 +12,12 @@ rhsAnonLinks:
   - name: "Explore Features"
     link: ":features"
 
+rhsLinks:
+  - name: "separator"
+    link: ""
+  - name: "News"
+    link: ":quanta-news"
+
 menu:
   help:
     - name: "About Quanta"
@@ -25,18 +31,6 @@ menu:
     - name: "Demo Content"
       link: ":demo-data"
       
-    # - name: "separator"
-    #   link: ""
-    # - name: "News"
-    #   link: ":news"
-    # - name: "Podcasts"
-    #   link: ":podcasts"
-    # welp. This list went back to nothing, for now.
-    # - name: "separator"
-    #   link: ""
-    # - name: "Fediverse"
-    #   link: "tab:feedTab"
-
 help:
   menu:
     account: |

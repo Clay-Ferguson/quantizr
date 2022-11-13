@@ -244,9 +244,10 @@ public class ThreadLocals {
 		 * let the dirty nodes be correctly referenced, so this message should never get printed.
 		 */
 		if (ok(nodeFound)) {
-			if (nodeFound.hashCode() != node.hashCode()) {
-				ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
-			}
+			// Not checking this, becasue it can happen in normal code flow
+			// if (nodeFound.hashCode() != node.hashCode()) {
+			// 	ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+			// }
 			return;
 		}
 
