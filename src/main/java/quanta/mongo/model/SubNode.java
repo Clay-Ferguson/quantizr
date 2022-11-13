@@ -490,6 +490,18 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	public void addAttachment(Attachment att) {
+		synchronized (attLock) {
+			if (no(attachments)) {
+				attachments = new HashMap<>();
+			}
+			attachments.put(att.getKey(), att);
+			ThreadLocals.dirty(this);
+		}
+	}
+
+	@Transient
+	@JsonIgnore
 	public List<Attachment> getOrderedAttachments() {
 		List<Attachment> list = new LinkedList<>();
 		synchronized (attLock) {

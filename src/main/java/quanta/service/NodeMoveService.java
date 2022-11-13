@@ -115,18 +115,17 @@ public class NodeMoveService extends ServiceBase {
 
 	/*
 	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
-	 * one we keep and join to.
-	 * 
-	 * todo-0: need to merge all attachments from all nodes being joined into the node actually
-	 * being joined which should be simple and just a safe merger of attachment objects.
+	 * one we keep and join to. 
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
 
-		// add to list becasue we will sort
+		// add to list because we will sort
 		ArrayList<SubNode> nodes = new ArrayList<SubNode>();
-
 		String parentPath = null;
+
+		// scan all nodes to verify we own them all, and they're all under same parent, and load all into
+		// 'nodes'
 		for (String nodeId : req.getNodeIds()) {
 			SubNode node = read.getNode(ms, nodeId);
 
@@ -139,6 +138,13 @@ public class NodeMoveService extends ServiceBase {
 			}
 
 			auth.ownerAuth(ms, node);
+
+			if (read.hasChildren(ms, node, false, false)) {
+				res.setMessage("Failed. Nodes to be joined cannot have any children/subnodes");
+				res.setSuccess(false);
+				return res;
+			}
+
 			nodes.add(node);
 		}
 
@@ -162,21 +168,10 @@ public class NodeMoveService extends ServiceBase {
 				sb.append("\n");
 			}
 
+			// counter > 0 means we have a firstNode but are NOT now processing first node.
 			if (counter > 0) {
-				/*
-				 * If node has an attachment we don't delete the node, but just set it's content to null
-				 */
-				if (ok(n.getAttachments())) {
-					n.setContent(null);
-					n.touch();
-					update.save(ms, n);
-				}
-				/* or else we delete the node */
-				else {
-					// pass updateParentHasChildren, because we know a 'join nodes' never affects whether the parent
-					// had children. It DOES have children, and we're joining them.
-					delete.deleteNode(ms, n, false);
-				}
+				attach.mergeAttachments(n, firstNode);
+				delete.deleteNode(ms, n, false, false);
 			}
 			counter++;
 		}

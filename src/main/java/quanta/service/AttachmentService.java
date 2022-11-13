@@ -16,6 +16,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -482,6 +483,20 @@ public class AttachmentService extends ServiceBase {
 			imgIdx++;
 		}
 		return "img" + String.valueOf(imgIdx);
+	}
+
+	/* appends all the attachments from sourceNode onto targetNode, leaving targetNode as is */
+	public void mergeAttachments(SubNode sourceNode, SubNode targetNode) {
+		if (no(sourceNode) || no(targetNode)) return;
+
+		List<Attachment> atts = sourceNode.getOrderedAttachments();
+        if (ok(atts)) {
+            for (Attachment att : atts) {
+				String newKey = getNextAttachmentKey(targetNode);
+				att.setKey(newKey);
+				targetNode.addAttachment(att);
+			}
+		}
 	}
 
 	public int getMaxAttachmentOrdinal(SubNode node) {

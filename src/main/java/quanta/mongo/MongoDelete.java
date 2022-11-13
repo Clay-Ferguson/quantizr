@@ -41,9 +41,9 @@ import quanta.util.XString;
 public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
-	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
+	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
 		auth.ownerAuth(ms, node);
-		if (!childrenOnly) {
+		if (!childrenOnly && deleteAttachments) {
 			if (ok(node.getAttachments())) {
 				node.getAttachments().forEach((String key, Attachment att) -> {
 					attach.deleteBinary(ms, key, node, null, true);
