@@ -193,6 +193,12 @@ td {
     margin: 10px;
 }
 
+.fullScreenViewer {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+}
+
 .calcOutputArea {
     font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
     font-size: 120%;
@@ -374,6 +380,8 @@ a {
 
 #app {
     overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 .app-body {
@@ -382,7 +390,9 @@ a {
     // font-size: $fontSize;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+
+    // 'app' class takes care of 'hidden' don't need it twice.
+    // overflow: hidden;
 }
 
 .highlightBorder {

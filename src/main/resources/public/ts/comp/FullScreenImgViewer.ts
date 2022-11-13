@@ -8,6 +8,9 @@ import * as J from "../JavaIntf";
 export class FullScreenImgViewer extends Main {
     constructor() {
         super();
+        // todo-2: for some reason the 'customScrollBar' isn't having any effect here, but we do have
+        // a scrollbar that works.
+        this.attribs.className = "fullScreenViewer customScrollBar"
     }
 
     preRender(): void {
