@@ -110,7 +110,7 @@ export class RssTypeHandler extends TypeBase {
                 feedContent = new Button("Load Feed", () => {
                     dispatch("LoadingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
-                        this.loadFeed(state, feedSrcHash, feedSrc);
+                        RssTypeHandler.loadFeed(state, feedSrcHash, feedSrc);
                         return s;
                     });
                 }, null, "btn-primary marginAll");
@@ -131,8 +131,7 @@ export class RssTypeHandler extends TypeBase {
         ]);
     }
 
-    // otherwise read from the server
-    loadFeed = async (state: AppState, feedSrcHash: string, feedSrc: string) => {
+    static loadFeed = async (state: AppState, feedSrcHash: string, feedSrc: string) => {
         /* warning: paging here is not zero offset. First page is number 1 */
         let page: number = state.rssFeedPage[feedSrcHash];
         if (!page) {
@@ -299,7 +298,7 @@ export class RssTypeHandler extends TypeBase {
             // deleting will force a requery from the server
             s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
-            this.loadFeed(state, feedSrcHash, feedSrc);
+            RssTypeHandler.loadFeed(state, feedSrcHash, feedSrc);
             return s;
         });
     }

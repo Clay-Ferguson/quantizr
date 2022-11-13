@@ -23,6 +23,7 @@ import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
+import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
@@ -444,6 +445,23 @@ export class Render {
                         s.node = res.node;
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
+
+                        // if the rendered node has one child and it's an RSS node then render it right away.
+                        if (s.node.children && s.node.children.length === 1 && s.node.children[0].type === J.NodeType.RSS_FEED) {
+                            const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, s.node.children[0]);
+                            if (feedSrc) {
+                                const feedSrcHash = S.util.hashOfString(feedSrc);
+
+                                setTimeout(() => {
+                                    dispatch("AutoRSSUpdate", s => {
+                                        s.rssFeedCache[feedSrcHash] = "loading";
+                                        s.rssFeedPage[feedSrcHash] = 1;
+                                        RssTypeHandler.loadFeed(s, feedSrcHash, feedSrc);
+                                        return s;
+                                    });
+                                }, 250);
+                            }
+                        }
 
                         /* Slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
                         if (s.node.type === J.NodeType.POSTS ||
