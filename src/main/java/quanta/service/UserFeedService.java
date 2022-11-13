@@ -59,21 +59,10 @@ public class UserFeedService extends ServiceBase {
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
-		// limit to just markdown types (no type)
-		// todo-1: Is there a faster way to accomplish the filtering we need based on type and WHY are we
-		// filtering based on type?
-		// i guess the reason was becasue we're searching ROOT_OF_ALL_USERS and need to avoid special
-		// (system defined) user's nodes.
-		// but we can probably do some kind of hack/hijack and make those special system nodes hijack the
-		// priority value or something which
-		// we can filter out by saying "not equal to special node priority"...becasue we have a priority
-		// index already.
-		// Will it hurt performance to have a "system=true" node prop to detect these? ...would definitely
-		// be ONE MORE index.
-		// IMPORTANT: this code is in OTHER PLACES in the app too! ...the in(a, b, ...) clause.
-		// IMPORTANT: Feed queries in general will eventually have a "Comments" checkbox so that in a pure
-		// corporate collab
-		// use case users can view the core document content v.s. the core and comments.
+		/*
+		 * limit to just markdown types and comments, becasue we need to avoid everything else since we are
+		 * searching from the root of all user accounts.
+		 */
 		crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
 
 		// DO NOT DELETE (keep as example)
@@ -194,8 +183,6 @@ public class UserFeedService extends ServiceBase {
 					 * setting last active time to this current time, will stop the GUI from showing the user an
 					 * indication that they have new messages, because we know they're querying messages NOW, so this is
 					 * a way to reset
-					 * 
-					 * todo-1: don't do this? It's better to just have a 'read' button like Pleroma does?
 					 */
 					_myAcntNode.set(NodeProp.LAST_ACTIVE_TIME, lastActiveTime);
 					update.save(_s, _myAcntNode);
@@ -383,7 +370,7 @@ public class UserFeedService extends ServiceBase {
 		int skipped = 0;
 		for (SubNode node : iter) {
 			/*
-			 * todo-1: We could theoretically pre-calculate the 'isEnglish' and 'hasBadWords' state at the time
+			 * todo-2: We could theoretically pre-calculate the 'isEnglish' and 'hasBadWords' state at the time
 			 * the node is saved, and ONLY set properties when they are NOT english or are bad. This way we
 			 * could avoid the hack of checking the isEnglish and hasBadWords here, and we'd be able to write a
 			 * query that can do this filtering based on property existence.
@@ -445,8 +432,8 @@ public class UserFeedService extends ServiceBase {
 			}
 
 			try {
-				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false,
-						false, true, true, boostedNodeVal);
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, false,
+						true, true, boostedNodeVal);
 				if (ok(info)) {
 					searchResults.add(info);
 

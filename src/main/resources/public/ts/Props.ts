@@ -260,8 +260,6 @@ export class Props {
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
             J.NodeProp.UNPUBLISHED, //
-
-            // this is here just to hide from displaying (for now, todo-1)
             J.NodeProp.CRYPTO_SIG
         ]);
     }

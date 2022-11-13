@@ -144,8 +144,7 @@ export class Render {
         this.markedRenderer.link = function (href: string, title: string, text: string) {
             // console.log(`marked.link [${href}][${title}][${text}]`);
             if (href.indexOf("mailto:") === 0) {
-                // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that. Eventually we could
-                // make these usernames clickable to do something, like auto-import into the system and short their profile dialog
+                // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that.
                 return `<span class="userNameInContent">${text}</span>`;
             }
 

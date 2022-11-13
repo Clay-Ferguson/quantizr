@@ -189,10 +189,10 @@ export class AudioPlayerDlg extends DialogBase {
     updatePlayButton = () => {
         if (!this.player) return;
 
-        // todo-1: this is very bad practice if modifying DOM without react state. fix it
         this.playButton.onMount((elm: HTMLElement) => {
             elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
         });
+
         this.pauseButton.onMount((elm: HTMLElement) => {
             elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
         });

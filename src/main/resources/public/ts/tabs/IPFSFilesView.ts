@@ -203,7 +203,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                                     if (entry.Name.endsWith(".txt") || entry.Name.endsWith(".json")) {
                                         this.openFile(fullName, entry.Name, entry.Hash);
                                     }
-                                    // otherwise instead if a download option (which we CAN do (todo-1), we just let users try it in ipfs.io if they want, to cross
+                                    // otherwise instead if a download option (which we CAN do (todo-3), we just let users try it in ipfs.io if they want, to cross
                                     // their fingers and hope for the best with the ProtocolLabs server.
                                     else {
                                         const dlg = new ConfirmDlg("Not a text file. View in external Browser Tab from external Gateway?", "Open in Tag", null, null);

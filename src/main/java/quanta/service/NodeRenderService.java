@@ -59,9 +59,6 @@ public class NodeRenderService extends ServiceBase {
 	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
 		RenderNodeResponse res = new RenderNodeResponse();
 
-		// todo-0: implement nodeMap key=id, val=SubNode, to pass into converter, so it 
-		// will only lookup parent once, and then keep cached.
-
 		// by default we do showReplies
 		boolean showReplies = true;
 		boolean adminOnly = false;
@@ -118,8 +115,8 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false,
-					false, true, false, true, true, null);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false, false,
+					true, false, true, true, null);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -170,12 +167,11 @@ public class NodeRenderService extends ServiceBase {
 						node = parent;
 					}
 				} catch (Exception e) {
-					// failing to get parent is only an "auth" problem if this was an ACTUAL uplevel
-					// request, and not
-					// something
-					// we decided to to inside this method based on trying not to render a page with
-					// no children
-					// showing.
+					/*
+					 * failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
+					 * something we decided to to inside this method based on trying not to render a page with no
+					 * children showing.
+					 */
 					if (isActualUplevelRequest) {
 						res.setErrorType(ErrorType.AUTH.s());
 						res.setSuccess(true);
@@ -204,8 +200,8 @@ public class NodeRenderService extends ServiceBase {
 			try {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (ok(highestUpParent)) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent,
-							false, 0, false, false, false, false, true, true, null);
+					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false, 0,
+							false, false, false, false, true, true, null);
 
 					if (ok(nodeInfo)) {
 						// each parent up goes on top of list for correct rendering order on client.
@@ -238,8 +234,8 @@ public class NodeRenderService extends ServiceBase {
 	@PerfMon(category = "render")
 	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
 			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
-				level > 0, false, true, false, true, true, null);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal, level > 0,
+				false, true, false, true, true, null);
 
 		if (no(nodeInfo)) {
 			return null;
@@ -338,7 +334,8 @@ public class NodeRenderService extends ServiceBase {
 
 			// Side Effect: Fixing Duplicate Ordinals
 			//
-			// we do the side effect of repairing ordinals here just because it's really only an issue if it's rendered
+			// we do the side effect of repairing ordinals here just because it's really only an issue if it's
+			// rendered
 			// and here's where we're rendering. It would be 'possible' but less performant to just detect when
 			// a node's children have dupliate ordinals, and fix the entire list of children
 			if (isOrdinalOrder) {
@@ -519,8 +516,8 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, -1, false, false, true,
-				false, false, false, null);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, -1, false, false, true, false,
+				false, false, null);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

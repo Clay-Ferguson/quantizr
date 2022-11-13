@@ -72,7 +72,7 @@ public class Convert extends ServiceBase {
 		// this can be enabled/disabled easily by admin
 		if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
 			if ((no(sig) || sigFail) && !sc.isAdmin()) {
-				// todo-1: we need a special global counter for when this happens, so the server info can show it.
+				// todo-2: we need a special global counter for when this happens, so the server info can show it.
 				/*
 				 * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
 				 * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
@@ -170,7 +170,7 @@ public class Convert extends ServiceBase {
 			likes = new ArrayList<String>(node.getLikes());
 		}
 
-		// todo-1: enable this some day....
+		// todo-0: enable this some day...
 		// LinkedList<String> likes = null;
 		// if (loadLikes && ok(node.getLikes())) {
 		// final LinkedList<String> _likes = new LinkedList<>();
@@ -412,19 +412,10 @@ public class Convert extends ServiceBase {
 
 		if (ok(principalId)) {
 			arun.run(s -> {
-				// todo-1: if the actual user account has been delete we can get here and end up with null user name
+				// todo-2: if the actual user account has been delete we can get here and end up with null user name
 				// I think. Look into it.
 				acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
 				acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
-
-				// currently don't ever need this info for displaying rows, so don't waste the
-				// CPU cycles to get it.
-				// if (!"public".equals(principalId)) {
-				// SubNode accountNode = read.getNode(s, principalId);
-				// if (ok(accountNode )) {
-				// acInfo.setAvatarVer(accountNode.getStrProp(NodeProp.BIN));
-				// }
-				// }
 				return null;
 			});
 		}

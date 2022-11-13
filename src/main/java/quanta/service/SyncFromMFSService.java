@@ -115,7 +115,7 @@ public class SyncFromMFSService extends ServiceBase {
 
 		log.debug(indent + "DagGet CID: " + cid);
 
-		//todo-1: I think IPFS has changed format and this will fail nowadays.
+		//todo-2: I think IPFS has changed format and this will fail nowadays.
 		// disabling this code until the return value from ipfsDAg is updated
 		// MerkleNode dag = ipfsDag.getNode(cid);
 		// if (ok(dag)) {

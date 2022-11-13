@@ -68,6 +68,7 @@ export class MenuPanel extends Div {
     // which can be slow in JS.
 
     // todo-1: Need to include in instance setup docs, the fact that these nodes need to be defined.
+    //         and don't forget also ":quanta-news" which is referenced in the config-text.json
     static aboutQuanta = () => S.nav.openContentNode(":home");
     static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openFeatures = () => S.nav.openContentNode(":features");
@@ -327,7 +328,6 @@ export class MenuPanel extends Div {
         ], null, this.makeHelpIcon(":menu-search")));
 
         children.push(new Menu(state, "Timeline", [
-            // todo-1: need to see if this is easy to turn on for non-logged in users.
             new MenuItem("Live Rev-Chron (Chat Room)", () => S.nav.messagesNodeFeed(appState), !appState.isAnonUser && hltNode?.id != null),
             new MenuItemSeparator(), //
             new MenuItem("Created", MenuPanel.timelineByCreated, !appState.isAnonUser && !!hltNode), //

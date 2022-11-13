@@ -40,7 +40,7 @@ export class NodeCompParentNodes extends Div {
                 onClick: () => S.edit.toggleShowParents(state)
             }) : null,
 
-            // todo-1: hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,
+            // hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,
             // so not worried about that here, for now.
             new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null)
         ]);

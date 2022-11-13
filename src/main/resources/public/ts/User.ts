@@ -223,7 +223,7 @@ export class User {
                     }
                     await S.util.loadBookmarks();
                     await S.util.resumeEditingOfAbandoned();
-                }, 250);
+                }, 500);
             }
 
             S.util.setStateVarsUsingLoginResponse(res);

@@ -110,7 +110,7 @@ public class IPFSService extends ServiceBase {
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         checkIpfs();
-        // todo-1: this is not yet handling multiple images. It's ok IPFS is on the back burner right now.
+        // todo-2: this is not yet handling multiple images. It's ok IPFS is on the back burner right now.
         Attachment att = node.getFirstAttachment();
         String cid = null;
         String mime = ok(att) ? att.getMime() : null;
@@ -286,7 +286,7 @@ public class IPFSService extends ServiceBase {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
-                    // todo-1: make this handle multiple attachments, and all calls to it
+                    // todo-2: make this handle multiple attachments, and all calls to it
                     Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());

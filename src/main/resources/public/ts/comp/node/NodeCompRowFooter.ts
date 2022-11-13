@@ -73,7 +73,7 @@ export class NodeCompRowFooter extends Div {
 
                 if (objUrl) {
                     // check to see if it's a link to our server, and don't show 'foreign link' link if so.
-                    // todo-1: we should make a util.ts method for this.
+                    // todo-3: we should make a util.ts method for this.
                     if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
                         children.push(new Anchor(objUrl, "Link", {
                             className: "footerLink",

@@ -58,12 +58,6 @@ export class SelectTagsDlg extends DialogBase {
             switch (this.modeOption) {
                 case "search":
                     buttons = [
-                        // todo-1: Match Any is currently broken for tag searches because MongoDb will treat
-                        // a search for "#tag1 #tag2" as just "tag1 tag2" and find anything containing the words.
-                        // This appears to be a MongoDb with no viable workaround, so doing "any" matches will
-                        // consider NON-tags as well as TAGS in the results.
-                        // update: I think this note may be obsolete, and it works ok now?
-
                         new Button("Match All", () => {
                             this.matchAll = true;
                             this.select();

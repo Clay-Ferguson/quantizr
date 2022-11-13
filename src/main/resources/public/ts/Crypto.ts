@@ -539,7 +539,7 @@ export class Crypto {
             const key: CryptoKey = obj.val;
             const dat = await crypto.subtle.exportKey("jwk", key);
             ret = S.util.prettyPrint(dat);
-            // todo-1: no PEM export for Symmetric key?
+            // todo-3: no PEM export for Symmetric key?
         }
         return ret;
     }

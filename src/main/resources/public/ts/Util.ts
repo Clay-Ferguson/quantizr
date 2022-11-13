@@ -685,7 +685,7 @@ export class Util {
     }
 
     getBrowserMemoryInfo = (): string => {
-        // todo-1: research this. According to TypeScript typings there shouldn't even be a 'memory' attribute so this
+        // todo-2: research this. According to TypeScript typings there shouldn't even be a 'memory' attribute so this
         // must be some undocumented feature of Chrome?
         if ((performance as any).memory) {
             return "<br>HeapSizeLimit: " + this.formatMemory((performance as any).memory.jsHeapSizeLimit) +
@@ -733,9 +733,8 @@ export class Util {
 
     // External Emojis!
     insertActPubTags = (val: string, node: J.NodeInfo) => {
-        // todo-1: need some typesafety here. what if 'forEach' doesn't even exist?
         let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
-        if (tags && tags.forEach) {
+        if (tags?.forEach) {
             tags.forEach((t: any) => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {
                     const img = `<img src='${t.icon.url}'">`;

@@ -83,7 +83,7 @@ export class RightNavPanel extends Div {
         //     className: "fa fa-clipboard fa-lg marginRight clickable",
         //     onClick: () => {
         //         PubSub.pub(C.PUBSUB_closeNavPanel);
-        //         // todo-1: would be nice if this detected an image and saved as attachment.
+        //         // todo-3: would be nice if this detected an image and save as attachment.
         //         S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
         //     },
         //     title: "Save clipboard"

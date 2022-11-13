@@ -100,9 +100,6 @@ export class Edit {
                 if (S.quanta.activeTab === C.TAB_DOCUMENT || //
                     S.quanta.activeTab === C.TAB_SEARCH || //
                     S.quanta.activeTab === C.TAB_TIMELINE) {
-
-                    // this was setting to FALSE for a while... which fails. Was that just a typo or what?
-                    // todo-1: I do want editing inline in the document to work, but I'll come back to this later
                     editInPopup = true;
                 }
 
@@ -302,7 +299,7 @@ export class Edit {
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
-            // todo-1: shouldn't we do this regardless of which tab is active?
+            // todo-2: shouldn't we do this regardless of which tab is active?
             if (state.activeTab === C.TAB_FEED) {
                 if (FeedTab.inst?.props?.feedDirtyList) {
                     for (const node of FeedTab.inst.props.feedDirtyList) {

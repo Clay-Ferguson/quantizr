@@ -776,6 +776,7 @@ export class EditNodeDlg extends DialogBase {
         return new Div(null, null, editItems);
     }
 
+    // NOTE: Be careful renaming this method. It's referenced in an "as any" way in one place.
     addSharingToContentText = () => {
         const appState = getAppState();
         if (appState.editNode.ac?.length > 0) {
