@@ -49,6 +49,9 @@ public class ThreadLocals {
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
 
+	// We judiciously add only *some* nodes to this cache that we know are safe to cache because 
+	// they're able to be treated as readonly during the context of the thread.
+	private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
 
 	/*
 	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
@@ -70,6 +73,7 @@ public class ThreadLocals {
 		rootEvent.remove();
 
 		getDirtyNodes().clear();
+		getCachedNodes().clear();
 		setParentCheckEnabled(true);
 		session.remove();
 	}
@@ -194,6 +198,29 @@ public class ThreadLocals {
 
 	public static void setDirtyNodes(HashMap<ObjectId, SubNode> dn) {
 		dirtyNodes.set(dn);
+	}
+
+	public static void cacheNode(SubNode node) {
+		if (no(node) || no(node.getId())) {
+			return;
+		}
+
+		getCachedNodes().put(node.getId(), node);
+	}
+
+	public static SubNode getCachedNode(ObjectId id) {
+		return getCachedNodes().get(id);
+	}
+
+	public static HashMap<ObjectId, SubNode> getCachedNodes() {
+		if (no(cachedNodes.get())) {
+			cachedNodes.set(new HashMap<ObjectId, SubNode>());
+		}
+		return cachedNodes.get();
+	}
+
+	public static void setCachedNodes(HashMap<ObjectId, SubNode> cn) {
+		cachedNodes.set(cn);
 	}
 
 	public static boolean hasDirtyNodes() {
