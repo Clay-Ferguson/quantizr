@@ -49,6 +49,9 @@ export class EditNodeDlg extends DialogBase {
     // holds a map of states by property names.
     propStates: Map<string, Validator> = new Map<string, Validator>();
 
+    // Holds all the filenames for attachments
+    attFileNames: Map<string, Validator> = new Map<string, Validator>();
+
     pendingEncryptionChange: boolean = false;
 
     // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.

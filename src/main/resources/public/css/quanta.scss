@@ -153,6 +153,11 @@ td {
     height: $mobileHeaderBarHeight;
 }
 
+.fileNameField {
+    width: 15em;
+    min-width: 3em;
+}
+
 .displayNameTextField {
     max-width: 40rem;
 }
@@ -1338,6 +1343,10 @@ Will come back later and study this more. todo-3 */
 
 .validationErrorBorder {
     border: 2px solid #E74C3C;
+}
+
+.txtFieldLabelShort {
+    margin-right: .25rem;
 }
 
 .txtFieldLabel {

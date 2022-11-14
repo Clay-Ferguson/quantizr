@@ -75,6 +75,7 @@ export class EditNodeDlgUtil {
             (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(editNode, dlg);
+        this.saveAttFileNamesToNode(editNode, dlg);
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
         /*
@@ -149,6 +150,16 @@ export class EditNodeDlgUtil {
                 }
             }
         });
+    }
+
+    saveAttFileNamesToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
+        const list: J.Attachment[] = S.props.getOrderedAttachments(editNode);
+        for (const att of list) {
+            const propState = dlg.attFileNames.get((att as any).key);
+            if (propState) {
+                att.f = propState.getValue();
+            }
+        }
     }
 
     addProperty = async (dlg: EditNodeDlg): Promise<void> => {

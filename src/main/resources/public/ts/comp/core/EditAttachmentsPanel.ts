@@ -5,12 +5,14 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Validator } from "../../Validator";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
+import { TextField } from "./TextField";
 
 export class EditAttachmentsPanel extends Div {
 
@@ -88,6 +90,14 @@ export class EditAttachmentsPanel extends Div {
                     }
                 }) : null;
 
+        let fileNameFieldState: Validator = this.editorDlg.attFileNames.get((att as any).key);
+        if (!fileNameFieldState) {
+            fileNameFieldState = new Validator(att.f);
+            this.editorDlg.attFileNames.set((att as any).key, fileNameFieldState);
+        }
+
+        const fileNameField = new TextField({ labelClass: "txtFieldLabelShort", outterClass: "fileNameField", label: "File Name", val: fileNameFieldState });
+
         const list: J.Attachment[] = S.props.getOrderedAttachments(appState.editNode);
         const firstAttachment = list[0].o === att.o;
         const lastAttachment = list[list.length - 1].o === att.o;
@@ -96,7 +106,7 @@ export class EditAttachmentsPanel extends Div {
             new NodeCompBinary(appState.editNode, key, true, false),
 
             new HorizontalLayout([
-                new Div(null, { className: "bigPaddingRight" }, [
+                new Div(null, null, [
                     ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
                     }) : null,
@@ -108,6 +118,7 @@ export class EditAttachmentsPanel extends Div {
                 ]),
                 imgSizeSelection,
                 imgPositionSelection,
+                fileNameField,
                 pinCheckbox,
                 new Div(null, { className: "bigMarginLeft" }, [
                     !firstAttachment ? new Icon({

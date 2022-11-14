@@ -18,6 +18,7 @@ export interface TextFieldConfig {
     enter?: () => void;
     inputClass?: string;
     labelLeft?: boolean;
+    labelClass?: string;
     val?: Validator;
     outterClass?: string;
     placeholder?: string;
@@ -78,7 +79,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         const label = this.cfg.label ? new Label(this.cfg.label, {
             key: this.getId("label_"),
-            className: "txtFieldLabel",
+            className: this.cfg.labelClass || "txtFieldLabel",
             htmlFor: this.getId("inputId_")
         }) : null;
 
