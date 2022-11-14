@@ -5,6 +5,7 @@ export interface Attachment {
     o: number;
     w: number;
     h: number;
+    p: string;
     m: string;
     f: string;
     c: string;

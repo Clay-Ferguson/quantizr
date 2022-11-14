@@ -52,7 +52,7 @@ export class EditAttachmentsPanel extends Div {
         }
 
         const imgSizeSelection = S.props.hasImage(appState.editNode, key)
-            ? this.createImgSizeSelection("Image Width", false, "float-end", //
+            ? this.createImgSizeSelection("Width", false, "editorDropDownInline", //
                 {
                     setValue: (val: string): void => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
@@ -64,10 +64,27 @@ export class EditAttachmentsPanel extends Div {
                             this.editorDlg.binaryDirty = true;
                         }
                     },
-
                     getValue: (): string => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
                         return att && att.c;
+                    }
+                }) : null;
+
+        const imgPositionSelection = S.props.hasImage(appState.editNode, key)
+            ? this.createImgPositionSelection("Position", "editorDropDownInline", //
+                {
+                    setValue: (val: string): void => {
+                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        if (att) {
+                            att.p = val === "auto" ? null : val;
+                            this.editorDlg.binaryDirty = true;
+                        }
+                    },
+                    getValue: (): string => {
+                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        let ret = att && att.p;
+                        if (!ret) ret = "auto";
+                        return ret;
                     }
                 }) : null;
 
@@ -90,6 +107,7 @@ export class EditAttachmentsPanel extends Div {
                     }, "marginRight")
                 ]),
                 imgSizeSelection,
+                imgPositionSelection,
                 pinCheckbox,
                 new Div(null, { className: "bigMarginLeft" }, [
                     !firstAttachment ? new Icon({
@@ -133,7 +151,7 @@ export class EditAttachmentsPanel extends Div {
         setTimeout(async () => {
             const attachments = S.props.getOrderedAttachments(node);
             if (attachments?.length > 1) {
-                const dlg = new ConfirmDlg("Make all the images " + val + " width?", "All Images?",
+                const dlg = new ConfirmDlg("Display all images at " + (val === "0" ? "their actual" : val) + " width?", "All Images?",
                     "btn-info", "alert alert-info");
                 await dlg.open();
                 if (dlg.yes) {
@@ -198,6 +216,7 @@ export class EditAttachmentsPanel extends Div {
         });
     }
 
+    // todo-0" get rid of allowNone and simplify the assignment of options to a single statement.
     createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
         let options = [];
 
@@ -225,4 +244,17 @@ export class EditAttachmentsPanel extends Div {
 
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
+
+    createImgPositionSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
+        const options = [
+            { key: "auto", val: "Automatic" },
+            { key: "c", val: "Center" },
+            { key: "ul", val: "Upper Left" },
+            { key: "ur", val: "Upper Right" },
+            { key: "ft", val: "File Tag" }
+        ];
+
+        return new Selection(null, label, options, null, extraClasses, valueIntf);
+    }
+
 }

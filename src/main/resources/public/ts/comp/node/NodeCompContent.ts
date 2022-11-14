@@ -36,18 +36,7 @@ export class NodeCompContent extends Div {
 
         const children: CompIntf[] = [];
         let typeHandler = S.plugin.getTypeHandler(this.node.type);
-        let embeddedImg = false;
-
         typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
-
-        if (this.node.content && ( //
-            this.node.content.indexOf("{{imgUrl}}") !== -1 ||
-            this.node.content.indexOf("{{img}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperRight}}") !== -1 ||
-            this.node.content.indexOf("{{imgUpperCenter}}") !== -1)) {
-            embeddedImg = true;
-        }
 
         this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
         children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
@@ -61,12 +50,17 @@ export class NodeCompContent extends Div {
          showing the normal attachment for this node, because that will the same as the avatar */
         const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
 
-        if (!embeddedImg && S.props.hasBinary(this.node) && !isAccountNode) {
+        if (S.props.hasBinary(this.node) && !isAccountNode) {
             const attComps: CompIntf[] = [];
             S.props.getOrderedAttachments(this.node).forEach(att => {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
                 // so we break a bit of type safety here.
-                attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false));
+
+                // show it here only if there's no "position(p)" for it, becasue the positioned ones are layed out
+                // via html in 'render.injectSubstitutions'
+                if (!att.p || att.p === "auto") {
+                    attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false));
+                }
             });
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));
         }

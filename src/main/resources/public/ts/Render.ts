@@ -63,52 +63,36 @@ export class Render {
         val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
 
-        if (val.indexOf("{{imgUpperCenter}}") !== -1) {
-            val = S.util.replaceAll(val, "{{imgUpperCenter}}", "<img class=\"img-center-top\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
-        }
-
-        if (val.indexOf("{{imgUpperLeft}}") !== -1) {
-            val = S.util.replaceAll(val, "{{imgUpperLeft}}", "<img class=\"img-upper-left\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>");
-        }
-
-        if (val.indexOf("{{imgUpperRight}}") !== -1) {
-            val = S.util.replaceAll(val, "{{imgUpperRight}}", "<img class=\"img-upper-right\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>");
-        }
-
-        if (val.indexOf("{{img}}") !== -1) {
-            val = S.util.replaceAll(val, "{{img}}", "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">");
-        }
-
-        let att: J.Attachment = null;
         if (node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
-            if (list.length > 0) {
-                att = list[0]
+            for (const a of list) {
+                let imgSize = a ? a.c : null;
+                // 'actual size' designation is stored as prop val == "0"
+                if (!imgSize || imgSize === "0") {
+                    imgSize = "";
+                }
+
+                const imgUrl = S.attachment.getUrlForNodeAttachment(node, (a as any).key, false)
+
+                // Center Top
+                if (a.p === "c") {
+                    val = `<img class="img-center-top" width="${imgSize}" src="${imgUrl}">` + val;
+                }
+                // Upper Left
+                else if (a.p === "ul") {
+                    val = `<img class="img-upper-left" width="${imgSize}" src="${imgUrl}"><div class=\"clearfix\"/>` + val;
+                }
+                // Upper Right
+                else if (a.p === "ur") {
+                    val = `<img class="img-upper-right" width="${imgSize}" src="${imgUrl}"><div class=\"clearfix\"/>` + val;
+                }
+                // ft=at file tag
+                else if (a.p === "ft") {
+                    val = S.util.replaceAll(val, `{{${a.f}}}`, `<img class="img-block" width="${imgSize}" src="${imgUrl}">`);
+                }
             }
         }
 
-        const imgSize = att ? att.c : null;
-        // actual size prop is saved as "0"
-        if (imgSize && imgSize !== "0") {
-            val = S.util.replaceAll(val, "{{imgSize}}", imgSize);
-        }
-        else {
-            val = S.util.replaceAll(val, "{{imgSize}}", "");
-        }
-
-        /* Allow the <img> tag to be supported inside the markdown for any node and let {{imgUrl}}, be able to be used in
-         that to reference the url of any attached image.
-
-         This allows the following type of thing to be put inside the markdown at the beginning of the text:,
-         whenever you want to make the text flow around an image. This text currently has to be entered
-         manually but in the future we'll have a way to generate this more 'automatically' based on editor options.
-
-         <img class="img-upper-left" width="100px" src="{{imgUrl}}">
-         <div class="clearfix"/>
-         */
-        if (val.indexOf("{{imgUrl}}") && att) {
-            val = val.replace("{{imgUrl}}", S.attachment.getUrlForNodeAttachment(node, (att as any).key, false));
-        }
         return val;
     }
 

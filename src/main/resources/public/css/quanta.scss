@@ -952,7 +952,7 @@ Will come back later and study this more. todo-3 */
 
 .img-upper-left {
     margin-right: 24px;
-    margin-bottom: 12px;
+    margin-bottom: $smallGap;
     float: left !important;
     border: 1px solid $gray-700;
     vertical-align: top;
@@ -961,7 +961,7 @@ Will come back later and study this more. todo-3 */
 
 .img-upper-right {
     margin-left: 24px;
-    margin-bottom: 12px;
+    margin-bottom: $smallGap;
     float: right !important;
     border: 1px solid $gray-700;
     vertical-align: top;
@@ -972,6 +972,7 @@ Will come back later and study this more. todo-3 */
     display: block;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: $smallGap;
     border: 1px solid $gray-700;
     border-radius: $border-radius;
 }
@@ -1676,6 +1677,11 @@ Will come back later and study this more. todo-3 */
 .selectLabel {
     margin-bottom: 3px;
     margin-right: 6px;
+}
+
+.editorDropDownInline {
+    display: inline-block;
+    margin-right: $smallGap;
 }
 
 .binaryEditorSection {

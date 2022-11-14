@@ -650,10 +650,6 @@ public class NodeRenderService extends ServiceBase {
 	public String stripRenderTags(String content) {
 		if (no(content))
 			return null;
-		content = content.replace("{{imgUpperRight}}", "");
-		content = content.replace("{{imgUpperLeft}}", "");
-		content = content.replace("{{imgUpperCenter}}", "");
-		content = content.replace("{{img}}", "");
 		content = content.trim();
 
 		while (content.startsWith("#")) {

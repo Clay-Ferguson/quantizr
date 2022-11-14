@@ -127,14 +127,7 @@ help:
   editor:
     dialog: |
       Node Editing Tips
-      #### Images
-      
-      To display the node's attached image at a specific location in the content (rather than below the content, which is the default) you
-      can embed `{{img}}` anywhere in the text, to mark where you want the image to appear.
-      
-      To make your attached image appear at upper left corner of the node with text wrapped around it, make your first line of 
-      content text be {{imgUpperLeft}}. Similarly, to make your image at upper right of the node enter `{{imgUpperRight}}` as the first line.
-      
+     
       #### URL Previews
       
       To disable preview rendering for URLs either prefix them with an asterisk or surround in parenthesis like the following:

@@ -15,6 +15,7 @@ public class Attachment {
     private Integer ordinal = 0;
     private Integer width = 0;
     private Integer height = 0;
+    private String position;
     private String mime;
     private String fileName;
     private String cssSize;
@@ -57,6 +58,16 @@ public class Attachment {
     public void setHeight(Integer height) {
         ThreadLocals.dirty(ownerNode);
         this.height = height;
+    }
+
+    @JsonProperty("p")
+    public String getPosition() {
+        return position;
+    }
+
+    @JsonProperty("p")
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     @JsonProperty("m")
