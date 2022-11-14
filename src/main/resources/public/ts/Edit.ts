@@ -1250,7 +1250,7 @@ export class Edit {
         state = getAppState(state);
 
         // auto-enable edit mode
-        if (!state.userPrefs.editMode) {
+        if (!boostTarget && !state.userPrefs.editMode) {
             await this.toggleEditMode(state);
         }
 
