@@ -65,6 +65,8 @@ export class Render {
 
         if (node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
+            let imgHtml = "";
+
             for (const a of list) {
                 let imgSize = a ? a.c : null;
                 // 'actual size' designation is stored as prop val == "0"
@@ -72,24 +74,40 @@ export class Render {
                     imgSize = "";
                 }
 
-                const imgUrl = S.attachment.getUrlForNodeAttachment(node, (a as any).key, false)
+                const key = (a as any).key;
+                const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
+                let topClass = null;
+                let suffix = "";
 
                 // Center Top
                 if (a.p === "c") {
-                    val = `<img class="img-center-top" width="${imgSize}" src="${imgUrl}">` + val;
+                    topClass = "img-upper-center";
                 }
                 // Upper Left
                 else if (a.p === "ul") {
-                    val = `<img class="img-upper-left" width="${imgSize}" src="${imgUrl}"><div class=\"clearfix\"/>` + val;
+                    topClass = "img-upper-left";
+                    suffix = "<div class=\"clearfix\"/>";
                 }
                 // Upper Right
                 else if (a.p === "ur") {
-                    val = `<img class="img-upper-right" width="${imgSize}" src="${imgUrl}"><div class=\"clearfix\"/>` + val;
+                    topClass = "img-upper-right";
+                    suffix = "<div class=\"clearfix\"/>";
                 }
+
+                if (topClass) {
+                    imgHtml += `<img class="${topClass} enlargable-img" width="${imgSize}" src="${imgUrl}" nodeid="${node.id}" attkey="${key}">` + suffix;
+                }
+
                 // ft=at file tag
                 else if (a.p === "ft") {
-                    val = S.util.replaceAll(val, `{{${a.f}}}`, `<img class="img-block" width="${imgSize}" src="${imgUrl}">`);
+                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="img-block enlargable-img" width="${imgSize}" src="${imgUrl}" nodeid="${node.id}" attkey="${key}">\n\n`);
                 }
+            }
+
+            // we have to insert a double space or else we can have the end of the image
+            // tag so close to markdown headings (###) that the rendering enging won't translate the headings.
+            if (imgHtml) {
+                val = imgHtml + "\n\n" + val;
             }
         }
 

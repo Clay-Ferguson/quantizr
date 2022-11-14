@@ -950,9 +950,16 @@ Will come back later and study this more. todo-3 */
     border-radius: $border-radius;
 }
 
+// WARNING: This class is used for finding in the DOM also, and isn't just for styling.
+// Without this class some images won't be clickable to enlarge
+.enlargable-img {
+    cursor: pointer;
+}
+
 .img-upper-left {
     margin-right: 24px;
     margin-bottom: $smallGap;
+    margin-top: $smallGap;
     float: left !important;
     border: 1px solid $gray-700;
     vertical-align: top;
@@ -962,17 +969,19 @@ Will come back later and study this more. todo-3 */
 .img-upper-right {
     margin-left: 24px;
     margin-bottom: $smallGap;
+    margin-top: $smallGap;
     float: right !important;
     border: 1px solid $gray-700;
     vertical-align: top;
     border-radius: $border-radius;
 }
 
-.img-center-top {
+.img-upper-center {
     display: block;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: $smallGap;
+    margin-top: $smallGap;
     border: 1px solid $gray-700;
     border-radius: $border-radius;
 }
@@ -1444,16 +1453,17 @@ Will come back later and study this more. todo-3 */
     padding: $tinyGap;
 }
 
+// todo-0: once I'm certain about it I can remove these
 .content-narrow {
-    max-width: 50rem;
+    // max-width: 50rem;
 }
 
 .content-medium {
-    max-width: 60rem;
+    // max-width: 60rem;
 }
 
 .content-wide {
-    max-width: 70rem;
+    // max-width: 70rem;
 }
 
 .mousePointer {

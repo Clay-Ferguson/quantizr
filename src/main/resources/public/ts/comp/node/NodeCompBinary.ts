@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../../AppContext";
+import { dispatch, getAppState, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
@@ -73,7 +73,7 @@ export class NodeCompBinary extends Div {
             src,
             className,
             title: this.isEditorEmbed ? "Attached image\n\n" + titleSuffix : "Click image to enlarge/reduce\n\n" + titleSuffix,
-            onClick: () => this.clickOnImage(node.id, this.attName)
+            onClick: () => NodeCompBinary.clickOnImage(node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed)
         };
 
         if (this.isFullScreenEmbed) {
@@ -86,23 +86,29 @@ export class NodeCompBinary extends Div {
         return new Img(imgAttrs);
     }
 
-    clickOnImage = (id: string, attName: string) => {
-        if (this.isEditorEmbed) return;
+    /* This method needs to be called statically and we cannot use 'this' in it,
+    because it's referenced by the plain HTML text that's used when positioned images are inserted in the content */
+    static clickOnImage = (id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
+        const appState = getAppState();
+        const node = S.nodeUtil.findNode(appState, id);
+        const att = S.props.getAttachment(attName, node);
+
+        if (isEditorEmbed) {
+            S.util.copyToClipboard(att.f);
+            S.util.flashMessage("Copied to Clipboard: " + att.f, "Clipboard", true);
+            return;
+        }
 
         dispatch("ClickImage", s => {
-            if (s.fullScreenConfig.type === FullScreenType.IMAGE && this.isFullScreenEmbed) {
+            if (s.fullScreenConfig.type === FullScreenType.IMAGE && isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }
             s.fullScreenConfig.type = FullScreenType.IMAGE;
 
             // if clicking this node first time.
             if (!s.fullScreenConfig.nodeId) {
-                const node = S.nodeUtil.findNode(s, id);
                 if (node) {
-                    const att = S.props.getAttachment(attName, node);
-                    if (att) {
-                        s.fullScreenConfig.ordinal = att.o;
-                    }
+                    s.fullScreenConfig.ordinal = att.o;
                 }
             }
             s.fullScreenConfig.nodeId = id;
