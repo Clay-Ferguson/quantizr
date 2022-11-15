@@ -224,7 +224,7 @@ public class ActPubFollowing extends ServiceBase {
                                 new APOFollow();
 
                         /*
-                         * todo-1: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
+                         * todo-2: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
                          * unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta
                          * users and see what the format of the message is sent from those).
                          */

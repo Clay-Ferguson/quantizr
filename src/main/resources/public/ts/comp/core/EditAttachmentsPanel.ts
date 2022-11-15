@@ -80,7 +80,7 @@ export class EditAttachmentsPanel extends Div {
         }, "delAttCheckbox");
 
         const imgSizeSelection = S.props.hasImage(appState.editNode, key)
-            ? this.createImgSizeSelection("Width", false, "widthDropDown", //
+            ? this.createImgSizeSelection("Width", "widthDropDown", //
                 {
                     setValue: (val: string): void => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
@@ -256,17 +256,8 @@ export class EditAttachmentsPanel extends Div {
         });
     }
 
-    // todo-0" get rid of allowNone and simplify the assignment of options to a single statement.
-    createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
-        let options = [];
-
-        if (allowNone) {
-            // none means we would ignore the option during rendering, slightly different from "Actual" in cases
-            // where this is an override that we don't want to override with. 'none' means don't override.
-            options.push({ key: "n", val: "None" });
-        }
-
-        options = options.concat([
+    createImgSizeSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
+        const options = [
             { key: "0", val: "Actual" },
             { key: "20%", val: "20%" },
             { key: "25%", val: "25%" },
@@ -280,7 +271,7 @@ export class EditAttachmentsPanel extends Div {
             { key: "400px", val: "400px" },
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" }
-        ]);
+        ];
 
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }

@@ -137,7 +137,7 @@ public class ActPubCrypto extends ServiceBase {
 
         parseHttpHeaderSig(httpReq, keyId, signature, ok(bodyBytes), headers);
 
-        // todo-1: currently not validating time
+        // todo-2: currently not validating time
         // String date = httpReq.getHeader("date");
         // apUtil.validateRequestTime(date);
 

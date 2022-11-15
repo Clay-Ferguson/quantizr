@@ -233,7 +233,7 @@ public class ActPubOutbox extends ServiceBase {
         String nodeIdBase = host + "?id=";
 
         /*
-         * todo-1: I'm trying to be able to return content based on if the user accessing this has some
+         * todo-2: I'm trying to be able to return content based on if the user accessing this has some
          * private nodes shared to them then we can honor that sharing here, rather than ONLY returning
          * PUBLIC nodes, but this is a work in progress
          */

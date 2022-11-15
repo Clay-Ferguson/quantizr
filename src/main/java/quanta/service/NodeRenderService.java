@@ -182,15 +182,7 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
-		if (ok(node)) {
-			// add pageSize hack to docs and admin part of user guide.
-			// todo-1: is this still needed/wanted?
-			Long pageSize = node.getInt("pageSize");
-			if (ok(pageSize) && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
-				limit = pageSize.intValue();
-			}
-		}
-
+		
 		// Collect all the parents we need to based on parentCount
 		LinkedList<NodeInfo> parentNodes = new LinkedList<>();
 		SubNode highestUpParent = node;
