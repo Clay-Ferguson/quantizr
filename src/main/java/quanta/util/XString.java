@@ -99,6 +99,20 @@ public class XString {
 		return val;
 	}
 
+	public static List<String> tokenizeWithDelims(String val, String delimiter) {
+		if (no(val))
+			return null;
+		List<String> list = null;
+		StringTokenizer t = new StringTokenizer(val, delimiter, true);
+		while (t.hasMoreTokens()) {
+			if (no(list)) {
+				list = new LinkedList<>();
+			}
+			list.add(t.nextToken());
+		}
+		return list;
+	}
+
 	public static List<String> tokenize(String val, String delimiter, boolean trim) {
 		if (no(val))
 			return null;

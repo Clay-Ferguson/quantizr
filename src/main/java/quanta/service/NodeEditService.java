@@ -587,6 +587,11 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
+		if (ok(plugin)) {
+			plugin.beforeSaveNode(ms, node);
+		}
+
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
 		/*
