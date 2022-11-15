@@ -632,9 +632,13 @@ public class NodeEditService extends ServiceBase {
 			}
 		});
 
-		for (String key : toDelete) {
-			attach.deleteBinary(ms, key, node, null, false);
-		}
+		// run these actual deletes in a separate async thread
+		arun.run(as -> {
+			for (String key : toDelete) {
+				attach.deleteBinary(ms, key, node, null, false);
+			}
+			return null;
+		});
 	}
 
 	public void processAfterSave(MongoSession ms, SubNode node) {
