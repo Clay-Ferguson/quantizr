@@ -289,7 +289,6 @@ export class EditNodeDlgUtil {
                         // if we need to encrypt and the content is not currently encrypted.
                         if (S.crypto.avail && !appState.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
                             const content = dlg.contentEditor.getValue();
-
                             const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
 
                             if (skdp.cipherKey && skdp.cipherKey) {
@@ -312,15 +311,33 @@ export class EditNodeDlgUtil {
         })();
     }
 
-    deleteUpload = async (dlg: EditNodeDlg, attName: string) => {
-        const appState = getAppState();
+    deleteUploads = async (dlg: EditNodeDlg) => {
+        if (dlg.getState<LS>().selectedAttachments?.size === 0) return;
 
-        /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
-        call has fully completed. */
-        const deleted: boolean = await S.attachment.deleteAttachment(appState.editNode, attName, getAppState());
+        const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",
+            "btn-danger", "alert alert-danger");
+        await confirmDlg.open();
 
-        if (deleted) {
-            delete appState.editNode.attachments[attName];
+        if (confirmDlg.yes) {
+            const appState = getAppState();
+
+            let delAttKeys = "";
+            dlg.getState<LS>().selectedAttachments?.forEach(prop => {
+                delete appState.editNode.attachments[prop];
+
+                if (delAttKeys) {
+                    delAttKeys += ",";
+                }
+                delAttKeys = prop;
+            });
+
+            if (delAttKeys) {
+                await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                    nodeId: appState.editNode.id,
+                    attName: delAttKeys
+                });
+            }
+
             if (S.util.getPropertyCount(appState.editNode.attachments) === 0) {
                 appState.editNode.attachments = null;
             }
@@ -413,14 +430,9 @@ export class EditNodeDlgUtil {
     initStates = (dlg: EditNodeDlg) => {
         const appState = getAppState();
 
-        /* Init main content text on node */
-        const value = appState.editNode.content || "";
-        if (!value.startsWith(J.Constant.ENC_TAG)) {
-            dlg.contentEditorState.setValue(value);
-        }
-        else {
-            dlg.contentEditorState.setValue("");
-        }
+        dlg.onMount((elm: HTMLElement) => {
+            dlg.initContent();
+        });
 
         /* Initialize node name state */
         dlg.nameState.setValue(appState.editNode.name);

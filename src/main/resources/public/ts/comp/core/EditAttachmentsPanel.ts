@@ -2,11 +2,13 @@ import { dispatch, getAppState } from "../../AppContext";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
+import { LS } from "../../dlg/EditNodeDlgState";
 import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Validator } from "../../Validator";
+import { Validator, ValidatorRuleName } from "../../Validator";
 import { NodeCompBinary } from "../node/NodeCompBinary";
+import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
@@ -18,13 +20,22 @@ export class EditAttachmentsPanel extends Div {
 
     constructor(private node: J.NodeInfo, private editorDlg: EditNodeDlg) {
         super(null, { className: "binaryEditorSection" });
-        console.log("new EditAttachmentsPanel");
     }
 
     preRender(): void {
         if (!this.node.attachments) return null;
         this.setChildren([]);
         let isFirst = true;
+
+        if (this.editorDlg.getState<LS>().selectedAttachments?.size > 0) {
+            this.addChild(new ButtonBar([
+                new IconButton("fa-trash fa-lg", "", {
+                    onClick: () => this.editorDlg.utl.deleteUploads(this.editorDlg),
+                    title: "Delete selected Attachments"
+                }, "delAttachmentButton")
+            ], "float-end"));
+        }
+
         S.props.getOrderedAttachments(this.node).forEach(att => {
             this.addChild(this.makeAttachmentPanel(att, isFirst));
             isFirst = false;
@@ -53,8 +64,23 @@ export class EditAttachmentsPanel extends Div {
             });
         }
 
+        const attCheckbox = new Checkbox(null, null, {
+            setValue: (checked: boolean) => {
+                const state = this.editorDlg.getState<LS>();
+                if (checked) {
+                    state.selectedAttachments.add((att as any).key);
+                }
+                else {
+                    state.selectedAttachments.delete((att as any).key);
+                }
+
+                this.editorDlg.mergeState<LS>({});
+            },
+            getValue: (): boolean => this.editorDlg.getState<LS>().selectedAttachments.has((att as any).key)
+        }, "delAttCheckbox");
+
         const imgSizeSelection = S.props.hasImage(appState.editNode, key)
-            ? this.createImgSizeSelection("Width", false, "editorDropDownInline", //
+            ? this.createImgSizeSelection("Width", false, "widthDropDown", //
                 {
                     setValue: (val: string): void => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
@@ -73,7 +99,7 @@ export class EditAttachmentsPanel extends Div {
                 }) : null;
 
         const imgPositionSelection = S.props.hasImage(appState.editNode, key)
-            ? this.createImgPositionSelection("Position", "editorDropDownInline", //
+            ? this.createImgPositionSelection("Position", "positionDropDown", //
                 {
                     setValue: (val: string): void => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
@@ -81,6 +107,7 @@ export class EditAttachmentsPanel extends Div {
                             att.p = val === "auto" ? null : val;
                             this.editorDlg.binaryDirty = true;
                         }
+                        this.editorDlg.mergeState({});
                     },
                     getValue: (): string => {
                         const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
@@ -92,7 +119,7 @@ export class EditAttachmentsPanel extends Div {
 
         let fileNameFieldState: Validator = this.editorDlg.attFileNames.get((att as any).key);
         if (!fileNameFieldState) {
-            fileNameFieldState = new Validator(att.f);
+            fileNameFieldState = new Validator(att.f, [{ name: ValidatorRuleName.REQUIRED }]);
             this.editorDlg.attFileNames.set((att as any).key, fileNameFieldState);
         }
 
@@ -103,18 +130,14 @@ export class EditAttachmentsPanel extends Div {
         const lastAttachment = list[list.length - 1].o === att.o;
 
         const topBinRow = new HorizontalLayout([
+            attCheckbox,
             new NodeCompBinary(appState.editNode, key, true, false),
 
             new HorizontalLayout([
                 new Div(null, null, [
                     ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
-                    }) : null,
-
-                    new IconButton("fa-trash fa-lg", "", {
-                        onClick: () => this.editorDlg.utl.deleteUpload(this.editorDlg, key),
-                        title: "Remove this attachment"
-                    }, "marginRight")
+                    }) : null
                 ]),
                 imgSizeSelection,
                 imgPositionSelection,
@@ -153,8 +176,14 @@ export class EditAttachmentsPanel extends Div {
             ]);
         }
 
+        let fileNameTagTip = null;
+        if (att.p === "ft") {
+            const fileName = fileNameFieldState.getValue();
+            fileNameTagTip = new Div(`File Tag: Image goes where you type {{${fileName}}}`, { className: "marginLeft tinyMarginBottom" });
+        }
+
         return new Div(null, { className: "binaryEditorItem" }, [
-            topBinRow, bottomBinRow
+            topBinRow, fileNameTagTip, bottomBinRow
         ]);
     }
 
@@ -258,7 +287,7 @@ export class EditAttachmentsPanel extends Div {
 
     createImgPositionSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
         const options = [
-            { key: "auto", val: "Automatic" },
+            { key: "auto", val: "Auto" },
             { key: "c", val: "Center" },
             { key: "ul", val: "Upper Left" },
             { key: "ur", val: "Upper Right" },

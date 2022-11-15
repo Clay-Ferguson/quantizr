@@ -40,7 +40,8 @@ export class NodeCompBinary extends Div {
             size = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            style.width = "100px";
+            // same as 'img-in-editor' class width
+            style.width = "75px";
         }
         else {
             size = att.c;

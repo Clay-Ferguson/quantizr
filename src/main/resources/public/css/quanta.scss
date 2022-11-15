@@ -1042,6 +1042,15 @@ Will come back later and study this more. todo-3 */
     cursor: pointer;
 }
 
+.delAttachmentButton {
+    margin-top: $tinyGap;
+    margin-right: $tinyGap;
+}
+
+.delAttCheckbox {
+    margin-right: 0px !important;
+}
+
 .attachmentLinkGroup {
     margin-left: 20px;
 }
@@ -1264,10 +1273,10 @@ Will come back later and study this more. todo-3 */
 
 .img-in-editor {
     cursor: pointer;
-    border: 1px solid $gray-700;
+    border: 1px solid gray;
     vertical-align: top;
     border-radius: $border-radius;
-    width: 100px;
+    width: 75px;
 }
 
 .systemFileRow {
@@ -1698,15 +1707,20 @@ Will come back later and study this more. todo-3 */
     margin-right: 6px;
 }
 
-.editorDropDownInline {
+.widthDropDown {
     display: inline-block;
     margin-right: $smallGap;
+    width: 6rem;
+}
+
+.positionDropDown {
+    display: inline-block;
+    margin-right: $smallGap;
+    width: 8rem;
 }
 
 .binaryEditorSection {
-    margin-left: 2px;
-    margin-right: 2px;
-    border: 1px solid $gray-700;
+    border: 1px solid gray;
     border-radius: $border-radius;
     margin-bottom: $smallGap;
     margin-top: $tinyGap;

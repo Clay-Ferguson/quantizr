@@ -1,6 +1,5 @@
 import { getAppState } from "./AppContext";
 import { AppState } from "./AppState";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
@@ -46,22 +45,6 @@ export class Attachment {
         }
 
         new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc).open();
-    };
-
-    deleteAttachment = async (node: J.NodeInfo, attName: string, state: AppState): Promise<boolean> => {
-        node = node || S.nodeUtil.getHighlightedNode(state);
-        if (node) {
-            const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger");
-            await dlg.open();
-            if (dlg.yes) {
-                await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                    nodeId: node.id,
-                    attName
-                });
-            }
-            return dlg.yes;
-        }
-        return false;
     };
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, attName: string, downloadLink: boolean): string => {

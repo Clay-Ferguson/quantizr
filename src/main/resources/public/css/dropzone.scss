@@ -1,8 +1,10 @@
 .dropzone {
     background-color: $modal-content-bg;
-    border: 4px dashed lightGray;
+    border: 3px dashed gray;
     height: 420px;
     padding: 10px;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;

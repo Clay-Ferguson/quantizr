@@ -93,6 +93,7 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState<LS>({
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>(),
+            selectedAttachments: new Set<string>(),
             signCheckboxVal,
             encryptCheckboxVal
         });
@@ -709,11 +710,43 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
+    async initContent(): Promise<void> {
+        const appState = getAppState();
+        const value = appState.editNode.content || "";
+        const encrypted = value.startsWith(J.Constant.ENC_TAG);
+        if (!encrypted) {
+            this.contentEditorState.setValue(value);
+        }
+        else {
+            if (S.crypto.avail) {
+                // console.log("decrypting: " + value);
+                const cipherText = value.substring(J.Constant.ENC_TAG.length);
+                const cipherKey = S.props.getCryptoKey(appState.editNode, appState);
+                if (cipherKey) {
+                    const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
+
+                    // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
+                    if (clearText === null) {
+                        this.contentEditorState.setError("Decryption Failed");
+                    }
+                    else {
+                        // console.log("decrypted to:" + value);
+                        this.contentEditorState.setValue(clearText);
+                    }
+                }
+                else {
+                    this.contentEditorState.setError("Decryption Failed. No Key available.");
+                }
+            }
+            else {
+                this.contentEditorState.setError("Decryption Failed (Crypto not available)");
+            }
+        }
+    }
+
     makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
         const appState = getAppState();
-        const value = node.content || "";
         const editItems: Comp[] = [];
-        const encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
         const allowFocus = !this.contentEditor;
@@ -726,30 +759,6 @@ export class EditNodeDlg extends DialogBase {
 
         const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode) !== "1";
         this.contentEditor.setWordWrap(wrap);
-
-        if (S.crypto.avail) {
-            this.contentEditor.onMount((elm: HTMLElement) => {
-                if (encrypted && value.indexOf(J.Constant.ENC_TAG) !== -1) {
-                    // console.log("decrypting: " + value);
-                    const cipherText = value.substring(J.Constant.ENC_TAG.length);
-                    (async () => {
-                        const cipherKey = S.props.getCryptoKey(node, getAppState());
-                        if (cipherKey) {
-                            const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
-
-                            // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
-                            if (clearText === null) {
-                                this.contentEditorState.setError("Decryption Failed");
-                            }
-                            else {
-                                // console.log("decrypted to:" + value);
-                                this.contentEditorState.setValue(clearText);
-                            }
-                        }
-                    })();
-                }
-            });
-        }
 
         if (allowFocus) {
             this.contentEditor.focus();

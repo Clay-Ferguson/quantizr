@@ -487,11 +487,12 @@ public class AttachmentService extends ServiceBase {
 
 	/* appends all the attachments from sourceNode onto targetNode, leaving targetNode as is */
 	public void mergeAttachments(SubNode sourceNode, SubNode targetNode) {
-		if (no(sourceNode) || no(targetNode)) return;
+		if (no(sourceNode) || no(targetNode))
+			return;
 
 		List<Attachment> atts = sourceNode.getOrderedAttachments();
-        if (ok(atts)) {
-            for (Attachment att : atts) {
+		if (ok(atts)) {
+			for (Attachment att : atts) {
 				String newKey = getNextAttachmentKey(targetNode);
 				att.setKey(newKey);
 				targetNode.addAttachment(att);
@@ -520,7 +521,13 @@ public class AttachmentService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(node);
-		deleteBinary(ms, req.getAttName(), node, null, false);
+
+		final List<String> attKeys = XString.tokenize(req.getAttName(), ",", true);
+		if (ok(attKeys)) {
+			for (String attKey : attKeys) {
+				deleteBinary(ms, attKey, node, null, false);
+			}
+		}
 		res.setSuccess(true);
 		return res;
 	}
@@ -1279,7 +1286,8 @@ public class AttachmentService extends ServiceBase {
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		arun.run(as -> {
 			int delCount = 0;
-			// todo-1: do we need to replace this with a 'stream' of some kind to ensure we won't run out of memory?
+			// todo-1: do we need to replace this with a 'stream' of some kind to ensure we won't run out of
+			// memory?
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */

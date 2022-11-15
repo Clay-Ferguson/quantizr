@@ -227,8 +227,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, newNode);
 		}
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false,
-				false, false, false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
+				false, false, null));
 		res.setSuccess(true);
 		return res;
 	}
@@ -305,8 +305,8 @@ public class NodeEditService extends ServiceBase {
 		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false,
-				false, false, false, false, null));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
+				false, false, null));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -460,8 +460,6 @@ public class NodeEditService extends ServiceBase {
 	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
-		// log.debug("Controller saveNode");
-
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
@@ -469,6 +467,10 @@ public class NodeEditService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
+		// remove orphaned attachments
+		removeDeletedAttachments(ms, node, req.getNode().getAttachments());
+
+		// set new attachments
 		node.setAttachments(req.getNode().getAttachments());
 		attach.fixAllAttachmentMimes(node);
 
@@ -487,7 +489,6 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		node.setContent(nodeInfo.getContent());
-
 		node.setTags(nodeInfo.getTags());
 		node.touch();
 		node.setType(nodeInfo.getType());
@@ -553,6 +554,11 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		// if not encrypted remove ENC_KEY too. It won't be doing anything in this case.
+		if (ok(nodeInfo.getContent()) && !nodeInfo.getContent().startsWith(Constant.ENC_TAG.s())) {
+			node.delete(NodeProp.ENC_KEY);
+		}
+
 		// If removing encryption, remove it from all the ACL entries too.
 		String encKey = node.getStr(NodeProp.ENC_KEY);
 		if (no(encKey)) {
@@ -590,8 +596,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node);
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false,
-				false, true, false, true, true, null);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, true,
+				false, true, true, null);
 		if (ok(newNodeInfo)) {
 			res.setNode(newNodeInfo);
 		}
@@ -604,6 +610,26 @@ public class NodeEditService extends ServiceBase {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	// Removes all attachments from 'node' that are not on 'newAttrs'
+	public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
+		if (no(node.getAttachments()))
+			return;
+
+		// we need toDelete as separate list to avoid "concurrent modification exception" by deleting
+		// from the attachments set during iterating it.
+		List<String> toDelete = new LinkedList<>();
+
+		node.getAttachments().forEach((key, att) -> {
+			if (no(newAtts) || !newAtts.containsKey(key)) {
+				toDelete.add(key);
+			}
+		});
+
+		for (String key : toDelete) {
+			attach.deleteBinary(ms, key, node, null, false);
+		}
 	}
 
 	public void processAfterSave(MongoSession ms, SubNode node) {
