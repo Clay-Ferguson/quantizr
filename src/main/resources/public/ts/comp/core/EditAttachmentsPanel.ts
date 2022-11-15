@@ -289,8 +289,8 @@ export class EditAttachmentsPanel extends Div {
         const options = [
             { key: "auto", val: "Auto" },
             { key: "c", val: "Center" },
-            { key: "ul", val: "Upper Left" },
-            { key: "ur", val: "Upper Right" },
+            { key: "ul", val: "Top Left" },
+            { key: "ur", val: "Top Right" },
             { key: "ft", val: "File Tag" }
         ];
 
