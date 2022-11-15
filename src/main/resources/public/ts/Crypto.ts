@@ -714,7 +714,7 @@ export class Crypto {
         catch (ex) {
             // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
             // retest encryption
-            S.util.logAndReThrow("decryptSharableString failed", ex);
+            S.util.logErr("decryptSharableString failed", ex);
             return null;
         }
     }

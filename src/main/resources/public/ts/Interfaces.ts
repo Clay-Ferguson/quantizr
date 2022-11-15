@@ -37,6 +37,7 @@ export interface TextEditorIntf {
     getSelStart(): number;
     getValue(): string;
     setValue(val: string): void;
+    setEnabled(val: boolean): void;
     focus(): void;
     onMount(func: Function): void;
     setError(error: string): void;

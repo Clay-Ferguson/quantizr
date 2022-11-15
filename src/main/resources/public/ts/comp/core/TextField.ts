@@ -63,6 +63,9 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     setWordWrap(wordWrap: boolean): void {
     }
 
+    setEnabled(enabled: boolean): void {
+    }
+
     setMode(mode: string): void {
     }
 

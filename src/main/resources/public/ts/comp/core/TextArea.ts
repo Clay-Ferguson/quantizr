@@ -8,7 +8,8 @@ import { Span } from "./Span";
 import { TextareaTag } from "./TextareaTag";
 
 interface LS { // Local State
-    wordWrap: boolean;
+    wordWrap?: boolean;
+    enabled?: boolean;
 }
 
 export class TextArea extends Span implements I.TextEditorIntf {
@@ -31,6 +32,11 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
         this.textareaAttribs.rows = this.textareaAttribs.rows || "1";
         this.setWordWrap(true);
+        this.setEnabled(true);
+    }
+
+    setEnabled(enabled: boolean): void {
+        this.mergeState<LS>({ enabled });
     }
 
     setError(error: string): void {
@@ -97,6 +103,10 @@ export class TextArea extends Span implements I.TextEditorIntf {
                 whiteSpace: "nowrap",
                 overflow: "auto"
             };
+        }
+
+        if (!state.enabled) {
+            att.disabled = "disabled";
         }
 
         att.style = att.style || {};

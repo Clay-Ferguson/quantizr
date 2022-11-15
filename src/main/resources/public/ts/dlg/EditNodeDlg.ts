@@ -43,6 +43,7 @@ export class EditNodeDlg extends DialogBase {
     editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: Validator = new Validator();
+    decryptFailed: boolean = false;
     nameState: Validator = new Validator();
     tagsState: Validator = new Validator();
 
@@ -716,6 +717,7 @@ export class EditNodeDlg extends DialogBase {
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
         if (!encrypted) {
             this.contentEditorState.setValue(value);
+            this.decryptFailed = false;
         }
         else {
             if (S.crypto.avail) {
@@ -728,6 +730,7 @@ export class EditNodeDlg extends DialogBase {
                     // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
                     if (clearText === null) {
                         this.contentEditorState.setError("Decryption Failed");
+                        this.decryptFail();
                     }
                     else {
                         // console.log("decrypted to:" + value);
@@ -736,11 +739,20 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     this.contentEditorState.setError("Decryption Failed. No Key available.");
+                    this.decryptFail();
                 }
             }
             else {
                 this.contentEditorState.setError("Decryption Failed (Crypto not available)");
+                this.decryptFail();
             }
+        }
+    }
+
+    decryptFail = (): void => {
+        this.decryptFailed = true;
+        if (this.contentEditor) {
+            this.contentEditor.setEnabled(false);
         }
     }
 
@@ -756,6 +768,9 @@ export class EditNodeDlg extends DialogBase {
             id: C.ID_PREFIX_EDIT + appState.editNode.id,
             rows
         }, this.contentEditorState, "font-inherit displayCell", true, this.contentScrollPos);
+        if (this.decryptFailed) {
+            this.contentEditor.setEnabled(false);
+        }
 
         const wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode) !== "1";
         this.contentEditor.setWordWrap(wrap);

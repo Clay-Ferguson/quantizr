@@ -382,6 +382,15 @@ export class Util {
         throw exception;
     }
 
+    logErr = (message: string, exception: any) => {
+        let stack = "[stack, not supported]";
+        try {
+            stack = (<any>new Error()).stack;
+        }
+        catch (e) { }
+        console.error(message + ": " + exception.message + "\nSTACK: " + stack);
+    }
+
     isElmVisible = (elm: HTMLElement) => {
         return elm?.offsetHeight > 0;
     }
