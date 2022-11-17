@@ -386,22 +386,23 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * This was sort of experimental, but I need to document how it works and put in the User Guide
 	 */
-	@GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
-	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
-			HttpServletResponse response, //
-			HttpSession session) {
-		callProc.run("rss", false, false, null, session, ms -> {
-			arun.run(as -> {
-				try {
-					rssFeed.getRssFeed(as, nodeId, response.getWriter());
-				} catch (Exception e) {
-					throw new RuntimeException("internal server error");
-				}
-				return null;
-			});
-			return null;
-		});
-	}
+	// #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
+	// @GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+	// public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
+	// 		HttpServletResponse response, //
+	// 		HttpSession session) {
+	// 	callProc.run("rss", false, false, null, session, ms -> {
+	// 		arun.run(as -> {
+	// 			try {
+	// 				rssFeed.getRssFeed(as, nodeId, response.getWriter());
+	// 			} catch (Exception e) {
+	// 				throw new RuntimeException("internal server error");
+	// 			}
+	// 			return null;
+	// 		});
+	// 		return null;
+	// 	});
+	// }
 
 	/*
 	 * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when retrieving RSS

@@ -444,7 +444,7 @@ export class RssTypeHandler extends TypeBase {
         }) : null;
 
         const bookmarkIcon = !state.isAnonUser ? new Icon({
-            className: "fa fa-bookmark fa-lg rssLinkIcon",
+            className: "fa fa-bookmark fa-lg rssBookmarkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
                 let content = "#### " + feed.title + ": " + entry.title + "\n\n" + entry.link;

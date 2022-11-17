@@ -300,13 +300,14 @@ export class Render {
                 }));
         }
 
-        const rssFeed = window.location.origin + "/rss?id=" + node.id;
-        children.push(new Heading(5, "Node RSS Feed"), //
-            new Div(rssFeed, {
-                className: "linkDisplay",
-                title: "Click -> Copy to clipboard",
-                onClick: () => this.showLink(rssFeed)
-            }));
+        // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
+        // const rssFeed = window.location.origin + "/rss?id=" + node.id;
+        // children.push(new Heading(5, "Node RSS Feed"), //
+        //     new Div(rssFeed, {
+        //         className: "linkDisplay",
+        //         title: "Click -> Copy to clipboard",
+        //         onClick: () => this.showLink(rssFeed)
+        //     }));
 
         const attachmentComps: Comp[] = [];
         if (node.attachments) {
