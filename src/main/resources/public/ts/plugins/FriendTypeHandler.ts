@@ -1,6 +1,7 @@
 import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
+import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeHandlerIntf";
@@ -27,6 +28,7 @@ export class FriendTypeHandler extends TypeBase {
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case NodeActionType.delete:
+            case NodeActionType.editNode:
                 return true;
             default:
                 return false;
@@ -53,12 +55,22 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        // USER_NODE_ID is generated and maintained by the server, and we can ignore it in the editor.
-        return propName === J.NodeProp.USER;
+        return false;
+    }
+
+    editTagsAtTop = (): boolean => {
+        return true;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.USER);
+        this.ensureStringPropExists(node, J.NodeProp.USER_TAGS);
+    }
+
+    // todo-0: make this have a pretty border.
+    renderEditorSubPanel = (node: J.NodeInfo): Comp => {
+        const user: string = S.props.getPropStr(J.NodeProp.USER, node);
+        return new Heading(3, user);
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {

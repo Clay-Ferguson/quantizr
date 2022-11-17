@@ -23,6 +23,10 @@ export class TypeBase implements TypeHandlerIntf {
         return this.allowUserSelect;
     }
 
+    renderEditorSubPanel = (node: J.NodeInfo): Comp => {
+        return null;
+    }
+
     getEditLabelForProp(propName: string): string {
         if (propName === J.NodeProp.DATE) {
             return "Date";
@@ -31,6 +35,10 @@ export class TypeBase implements TypeHandlerIntf {
             return "Duration (HH:MM)";
         }
         return propName;
+    }
+
+    editTagsAtTop = (): boolean => {
+        return false;
     }
 
     getEditorRowsForProp(propName: string): number {

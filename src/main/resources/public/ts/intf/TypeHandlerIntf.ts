@@ -27,6 +27,8 @@ export interface TypeHandlerIntf {
 
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;
+    editTagsAtTop(): boolean;
+    renderEditorSubPanel(node: J.NodeInfo): Comp;
 }
 
 export enum NodeActionType {

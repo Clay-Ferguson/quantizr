@@ -292,6 +292,7 @@ export class EditNodeDlg extends DialogBase {
             nodeNameTextField = new TextField({ label: "Node Name", outterClass: "col-9", val: this.nameState });
         }
 
+        let propsVisible: boolean = false;
         if (allowContentEdit) {
             const hasContent = typeHandler?.hasCustomProp("content");
             let rows = getAppState().mobileMode ? "8" : "10";
@@ -302,10 +303,18 @@ export class EditNodeDlg extends DialogBase {
             if (!customProps || hasContent) {
                 mainPropsTable.addChild(this.makeContentEditor(appState.editNode, isWordWrap, rows));
                 this.contentEditor.setWordWrap(isWordWrap);
+                propsVisible = true;
             }
         }
 
-        this.buildPropsEditing(propsParent, state, typeHandler, customProps);
+        if (this.buildPropsEditing(propsParent, state, typeHandler, customProps)) {
+            propsVisible = true;
+        }
+
+        if (!propsVisible) {
+            mainPropsTable = null;
+        }
+
         const binarySection = hasAttachment ? new EditAttachmentsPanel(appState.editNode, this) : null;
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(appState, appState.editNode, this);
         const isPublic = S.props.isPublic(appState.editNode);
@@ -351,8 +360,16 @@ export class EditNodeDlg extends DialogBase {
             this.createTagsIconButtons()
         ]);
 
-        const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
-            this.tagsState.getValue() ? null : tagsEditRow,
+        let editorSubPanel: Comp = null;
+        if (typeHandler) {
+            editorSubPanel = typeHandler.renderEditorSubPanel(appState.editNode);
+        }
+
+        // todo-0: instead of editorSubPanel we need a "getAllowThing" for each of the "things" that can go in it,
+        // because right now the only time it's triggered is when we have a Friend Type Node, and we want their tag
+        // to show up.
+        const collapsePanel = !customProps || editorSubPanel ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+            tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
                 this.createPrioritySelection()
@@ -385,9 +402,9 @@ export class EditNodeDlg extends DialogBase {
             }
         });
 
-        propEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
-            this.tagsState.getValue() ? tagsEditRow : null,
+        propEditFieldContainer.setChildren([editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
             propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
+
         return children;
     }
 
@@ -412,8 +429,10 @@ export class EditNodeDlg extends DialogBase {
         S.edit.updateNode(appState.editNode);
     }
 
-    buildPropsEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]) => {
+    /* returns true if props table is not empty */
+    buildPropsEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): boolean => {
         let numPropsShowing: number = 0;
+        let ret = false;
         const appState = getAppState();
         if (appState.editNode.properties) {
             // This loop creates all the editor input fields for all the properties
@@ -433,6 +452,7 @@ export class EditNodeDlg extends DialogBase {
                         const tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                         propsParent.addChild(tableRow);
+                        ret = true;
                     }
                 }
             });
@@ -458,8 +478,10 @@ export class EditNodeDlg extends DialogBase {
 
                 // adds the button bar to the top of the list of children.
                 propsParent.insertFirstChild(propsButtonBar);
+                ret = true;
             }
         }
+        return ret;
     }
 
     createTagsIconButtons = (): Comp => {
