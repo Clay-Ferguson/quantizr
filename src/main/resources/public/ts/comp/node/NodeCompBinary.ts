@@ -68,12 +68,12 @@ export class NodeCompBinary extends Div {
             }
         }
 
-        const titleSuffix = att.f + "\n(" + att.m + ")";
+        const imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
         const className = this.isFullScreenEmbed ? "full-screen-img" : (this.isEditorEmbed ? "img-in-editor" : "img-in-row")
         const imgAttrs: any = {
             src,
             className,
-            title: this.isEditorEmbed ? "Attached image\n\n" + titleSuffix : "Click image to enlarge/reduce\n\n" + titleSuffix,
+            title: this.isEditorEmbed ? "Attached image" + imgTitleSuffix : "Click image to enlarge/reduce" + imgTitleSuffix,
             onClick: () => NodeCompBinary.clickOnImage(node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed)
         };
 
