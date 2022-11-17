@@ -49,21 +49,32 @@ public class MongoRead extends ServiceBase {
     int MAX_DOC_ITEMS_PER_CALL = 40;
 
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
-    private static final Object dbRootLock = new Object();
+
+    private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;
+    private SubNode userRoot;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
-        synchronized (dbRootLock) {
+        synchronized (dbRootsLock) {
             if (no(dbRoot)) {
-                dbRoot = findNodeByPath("/" + NodePath.ROOT);
+                dbRoot = findNodeByPath(NodePath.ROOT_PATH);
             }
             return dbRoot;
         }
     }
 
+    public SubNode getUserRoot() {
+        synchronized (dbRootsLock) {
+            if (no(userRoot)) {
+                userRoot = findNodeByPath(NodePath.USERS_PATH);
+            }
+            return userRoot;
+        }
+    }
+
     public SubNode setDbRoot(SubNode node) {
-        synchronized (dbRootLock) {
+        synchronized (dbRootsLock) {
             dbRoot = node;
             return dbRoot;
         }

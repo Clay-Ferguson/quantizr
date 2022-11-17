@@ -906,11 +906,10 @@ public class MongoUtil extends ServiceBase {
 		// }
 
 		auth.requireAdmin(ms);
-		String newUserNodePath = NodePath.USERS_PATH + "/?";
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
+		userNode = create.createNode(ms, read.getUserRoot(), NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true); 
 
-		userNode = create.createNode(ms, newUserNodePath, NodeType.ACCOUNT.s());
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
@@ -951,6 +950,9 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void createAdminUser(MongoSession ms) {
 		String adminUser = prop.getMongoAdminUserName();
+
+		// I'm throwing this in here, but it's not necessary.
+		read.getUserRoot();
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (no(adminNode)) {

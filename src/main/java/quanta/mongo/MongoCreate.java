@@ -33,6 +33,7 @@ public class MongoCreate extends ServiceBase {
 
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
+	// todo-0: is updateParentOrdinals still the correct varible name based on what it currently does?
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {
 		return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals);
@@ -49,16 +50,6 @@ public class MongoCreate extends ServiceBase {
 			type = NodeType.NONE.s();
 		}
 		SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
-		update.setParentHasChildren(node);
-		return node;
-	}
-
-	public SubNode createNodeAsOwner(MongoSession ms, String path, String type, ObjectId ownerId) {
-		if (no(type)) {
-			type = NodeType.NONE.s();
-		}
-		// ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
-		SubNode node = new SubNode(ownerId, path, type, null);
 		update.setParentHasChildren(node);
 		return node;
 	}
@@ -100,7 +91,6 @@ public class MongoCreate extends ServiceBase {
 				}
 
 				Long _ordinal = ordinal;
-				// this updates the parent so we run as admin.
 				ordinal = (Long) arun.run(as -> {
 					return create.prepOrdinalForLocation(as, location, parent, _ordinal);
 				});
@@ -108,7 +98,7 @@ public class MongoCreate extends ServiceBase {
 		}
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
-		update.setParentHasChildren(node);
+		parent.setHasChildren(true);
 
 		if (ok(properties)) {
 			for (PropertyInfo propInfo : properties) {

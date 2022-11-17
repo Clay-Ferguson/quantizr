@@ -302,17 +302,11 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
-		// todo-0: this is for testing. remove it.
-		// newNode.set(NodeProp.ACT_PUB_OBJ_URLS, Arrays.asList(//
-		// 		new APOUrl("Link", "text/html", "https://drudge.com"), 
-		// 		new APOUrl("Link", "text/html", "https://cnn.com")));
-		// newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, Arrays.asList(//
-		// 		new APOIcon("Icon", "image/png", "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"), 
-		// 		new APOIcon("Icon", "image/jpg", "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
-		// newNode.set(NodeProp.ACT_PUB_OBJ_NAME, "Test Name");
+		// createNode might have altered 'hasChildren', so we save if dirty
+		update.saveIfDirty(ms, parentNode);
 
-		// todo-0: is this parentNode save ALWAYS required.
-		update.save(ms, parentNode);
+		// We save this right away, before calling convertToNodeInfo in case that method does any Db related stuff
+		// where it's expecting the node to exist.
 		update.save(ms, newNode);
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,

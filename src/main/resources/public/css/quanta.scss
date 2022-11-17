@@ -1298,8 +1298,7 @@ Will come back later and study this more. todo-3 */
 
 .specialAccountNodesPanel {
     border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    padding-left: $smallGap;
+    margin-left: $smallGap;
 }
 
 .vert-space {
@@ -1467,7 +1466,7 @@ Will come back later and study this more. todo-3 */
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     background-color: #17202A;
-    margin: $tinyGap;
+    margin: $tinyGap 0 $tinyGap $tinyGap;
     padding: $tinyGap;
 }
 

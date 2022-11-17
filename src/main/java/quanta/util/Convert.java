@@ -100,6 +100,7 @@ public class Convert extends ServiceBase {
 		attach.fixAllAttachmentMimes(node);
 
 		boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
+
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
@@ -408,7 +409,7 @@ public class Convert extends ServiceBase {
 			Object value = null;
 			switch (propName) {
 
-				// todo-0: this is super ugly. Hard coded strings is wrong, and also the special types
+				// todo-0: Fix this temporary hack. Hard coded strings is bad, and also the special types
 				// tag, urls, icons need to have a type designation on them like "o" instead of "s" for string
 				// or maybe even "a" for array/list. Right now this one hack here does work, but it's not good
 				// for the long term, becasue we need to start USING the type system on our PropertyInfo everywhere
@@ -418,7 +419,7 @@ public class Convert extends ServiceBase {
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
-				case "ap:tag": // NodeProp.ACT_PUB_TAG
+				case "ap:tag": 
 				case "ap:objUrls":
 				case "ap:objIcons":
 					value = prop;

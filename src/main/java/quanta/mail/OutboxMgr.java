@@ -120,6 +120,9 @@ public class OutboxMgr extends ServiceBase {
 
 	private void queueMail(MongoSession ms, String recipients, String subject, String content) {
 		SubNode outboxNode = getSystemOutbox(ms);
+
+		// todo-0: we should be passing outboxNode to 'createNode' (or create that kind of createNode of one doesn't exist)
+		// to avoid a lookup by path on the DB.
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
 		outboundEmailNode.setOwner(ms.getUserNodeId());
