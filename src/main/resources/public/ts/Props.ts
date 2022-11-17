@@ -260,7 +260,9 @@ export class Props {
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
             J.NodeProp.UNPUBLISHED, //
-            J.NodeProp.CRYPTO_SIG
+            J.NodeProp.CRYPTO_SIG, //
+            J.NodeProp.ACT_PUB_OBJ_URLS, //
+            J.NodeProp.ACT_PUB_OBJ_ICONS //
         ]);
     }
 

@@ -92,6 +92,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		SubNode node = event.getSource();
 		log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
 
+		// log.debug("onBeforeSave: "+XString.prettyPrint(node));
+
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
 		boolean isNew = false;
@@ -308,6 +310,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
 		// + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
+
+		// log.debug("onAfterConvert: "+XString.prettyPrint(node));
 	}
 
 	@Override

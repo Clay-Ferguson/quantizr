@@ -121,7 +121,7 @@ public class Convert extends ServiceBase {
 			if (ok(userNode)) {
 				ThreadLocals.cacheNode(userNode);
 			}
-		} 
+		}
 
 		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER);
@@ -326,6 +326,8 @@ public class Convert extends ServiceBase {
 	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
 			boolean initNodeEdit, boolean sigFail) {
 
+		// log.debug("buildProp node=" + XString.prettyPrint(node));
+
 		List<PropertyInfo> props = null;
 		HashMap<String, Object> propMap = node.getProps();
 		if (ok(propMap) && ok(propMap.keySet())) {
@@ -401,15 +403,24 @@ public class Convert extends ServiceBase {
 
 	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
 			boolean initNodeEdit) {
+		// log.debug("propName=" + propName + " propClass=" + prop.getClass().getName() + " val=" + prop);
 		try {
 			Object value = null;
 			switch (propName) {
+
+				// todo-0: this is super ugly. Hard coded strings is wrong, and also the special types
+				// tag, urls, icons need to have a type designation on them like "o" instead of "s" for string
+				// or maybe even "a" for array/list. Right now this one hack here does work, but it's not good
+				// for the long term, becasue we need to start USING the type system on our PropertyInfo everywhere
+				// instead of assuming everything is always a string most places.
 				case "content":
 					value = formatValue(sc, prop, /* false, */ initNodeEdit);
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
 				case "ap:tag": // NodeProp.ACT_PUB_TAG
+				case "ap:objUrls":
+				case "ap:objIcons":
 					value = prop;
 					break;
 

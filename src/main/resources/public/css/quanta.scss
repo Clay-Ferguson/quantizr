@@ -1947,6 +1947,28 @@ audio::-webkit-media-controls-play-button {
     border-radius: 8px;
 }
 
+.apObjIconContainer {
+    margin-left: $smallGap;
+}
+
+.apObjIcon {
+    display: inline;
+    vertical-align: top;
+    max-width: 32%;
+    min-width: 200px;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.apObjLinksContainer {
+    margin-bottom: $smallGap;
+    margin-left: $smallGap;
+}
+
+.apUrlLink {
+    margin-bottom: $tinyGap;
+}
+
 .rhsLink {
     margin-top: 25px;
     margin-right: 55px;

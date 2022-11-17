@@ -2,7 +2,6 @@ package quanta.actpub.model;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -66,9 +65,10 @@ public class AP {
                 return null;
             } else if (val.getVal() instanceof String) {
                 return (String) val.getVal();
-            } else if (val.getVal() instanceof ArrayList) {
-                ExUtil.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
-                        + XString.prettyPrint(obj));
+            } else if (val.getVal() instanceof List) {
+                // this can happen in normal flow now so I need a 'silent' argument to hide this when we need to.
+                // ExUtil.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
+                //         + XString.prettyPrint(obj));
                 return null;
             } else {
                 if (warnIfMissing) {
@@ -193,7 +193,7 @@ public class AP {
         return null;
     }
 
-    private static Val<Object> getFromMap(Object obj, String prop) {
+    public static Val<Object> getFromMap(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             return new Val<Object>(((Map<?, ?>) obj).get(prop));
         }
@@ -204,40 +204,50 @@ public class AP {
      * Returns a specific APObj-derived concrete class if we can, or else returns the same APObj passed
      * in.
      */
-    public static APObj typeFromFactory(APObj obj) {
-        APObj ret = obj;
+    public static APObj typeFromFactory(Object obj) {
+        if (no(obj))
+            return null;
+
+        APObj ret = null;
+        if (obj instanceof APObj) {
+            ret = (APObj) obj;
+        } else if (obj instanceof Map<?, ?>) {
+            ret = new APObj((Map<?, ?>) obj);
+        } else {
+            throw new RuntimeException("Unable to convert type: " + obj.getClass().getName() + " to an APObj");
+        }
 
         /* Parse "Activity" Objects */
-        switch (obj.getType()) {
+        switch (ret.getType()) {
             case APType.Create:
-                return new APOCreate(obj);
+                return new APOCreate(ret);
 
             case APType.Update:
-                return new APOUpdate(obj);
+                return new APOUpdate(ret);
 
             case APType.Follow:
-                return new APOFollow(obj);
+                return new APOFollow(ret);
 
             case APType.Undo:
-                return new APOUndo(obj);
+                return new APOUndo(ret);
 
             case APType.Delete:
-                return new APODelete(obj);
+                return new APODelete(ret);
 
             case APType.Accept:
-                return new APOAccept(obj);
+                return new APOAccept(ret);
 
             case APType.Like:
-                return new APOLike(obj);
+                return new APOLike(ret);
 
             case APType.Announce:
-                return new APOAnnounce(obj);
+                return new APOAnnounce(ret);
 
             case APType.Person:
-                return new APOPerson(obj);
+                return new APOPerson(ret);
 
             case APType.Note:
-                return new APONote(obj);
+                return new APONote(ret);
 
             default:
                 // log.debug("using APObj for type: " + obj.getType());

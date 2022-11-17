@@ -302,6 +302,16 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		// todo-0: this is for testing. remove it.
+		// newNode.set(NodeProp.ACT_PUB_OBJ_URLS, Arrays.asList(//
+		// 		new APOUrl("Link", "text/html", "https://drudge.com"), 
+		// 		new APOUrl("Link", "text/html", "https://cnn.com")));
+		// newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, Arrays.asList(//
+		// 		new APOIcon("Icon", "image/png", "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"), 
+		// 		new APOIcon("Icon", "image/jpg", "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
+		// newNode.set(NodeProp.ACT_PUB_OBJ_NAME, "Test Name");
+
+		// todo-0: is this parentNode save ALWAYS required.
 		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
@@ -315,6 +325,8 @@ public class NodeEditService extends ServiceBase {
 		// }
 
 		res.setSuccess(true);
+
+		// log.debug("SAVE NODE: " + XString.prettyPrint(newNode));
 		return res;
 	}
 

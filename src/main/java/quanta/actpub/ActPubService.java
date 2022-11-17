@@ -30,6 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAccept;
 import quanta.actpub.model.APOActivity;
@@ -62,6 +63,7 @@ import quanta.mongo.model.SubNode;
 import quanta.service.NodeSearchService;
 import quanta.util.Convert;
 import quanta.util.DateUtil;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
@@ -660,9 +662,6 @@ public class ActPubService extends ServiceBase {
         apLog.trace("INBOX: " + XString.prettyPrint(payload));
         if (no(payload.getType()))
             return;
-
-        apLog.trace("inbox type: " + payload.getType());
-
         /*
          * todo-1: verify that for follow types the actorUrl can be obtained also from payload, rather than
          * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
@@ -768,8 +767,9 @@ public class ActPubService extends ServiceBase {
             apLog.trace("create type: " + object.getType());
 
             switch (object.getType()) {
+                case APType.Video:
                 case APType.Note:
-                    processCreateOrUpdateNote(as, activity, keyEncoded.getVal());
+                    createOrUpdateObj(as, activity, keyEncoded.getVal());
                     break;
 
                 case APType.Person:
@@ -948,16 +948,13 @@ public class ActPubService extends ServiceBase {
         }
     }
 
-    /*
-     * obj is the 'Note' object.
-     * 
-     * action will be APType.Create or APType.Update
-     */
     @PerfMon(category = "apub")
-    public void processCreateOrUpdateNote(MongoSession as, APOActivity activity, String encodedKey) {
+    public void createOrUpdateObj(MongoSession as, APOActivity activity, String encodedKey) {
         if (!as.isAdmin())
             throw new NodeAuthFailedException();
-        apLog.trace("processCreateOrUpdateNote");
+        apLog.trace("createOrUpdateObj");
+
+        // obj is the 'Note' or 'Video' object, or other payload type.
         APObj obj = activity.getAPObj();
 
         /*
@@ -1052,8 +1049,18 @@ public class ActPubService extends ServiceBase {
         Date published = apDate(obj, APObj.published);
         String inReplyTo = apStr(obj, APObj.inReplyTo);
         String contentHtml = APType.Announce.equals(action) ? "" : apStr(obj, APObj.content);
+
         String objUrl = apStr(obj, APObj.url);
-        String objAttributedTo = apStr(obj, APObj.attributedTo);
+        List<?> objUrls = null;
+        if (no(objUrl)) {
+            objUrls = apList(obj, APObj.url, false);
+        }
+
+        List<?> icons = apList(obj, APObj.icon, true);
+        String name = apStr(obj, APObj.name);
+
+        String objAttributedTo = getSingleAttributedTo(obj, true);
+
         Boolean sensitive = apBool(obj, APObj.sensitive);
         List<?> tagArray = (List<?>) apList(obj, APObj.tag, false);
 
@@ -1160,7 +1167,22 @@ public class ActPubService extends ServiceBase {
         }
 
         newNode.set(NodeProp.ACT_PUB_ID, obj.getId());
-        newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
+
+        if (ok(objUrl)) {
+            newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
+        } else if (ok(objUrls)) {
+            apLog.trace("Got muli urls: " + XString.prettyPrint(objUrls));
+            newNode.set(NodeProp.ACT_PUB_OBJ_URLS, objUrls);
+        }
+
+        if (ok(icons)) {
+            newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, icons);
+        }
+
+        if (ok(name)) {
+            newNode.set(NodeProp.ACT_PUB_OBJ_NAME, name);
+        }
+
         newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, inReplyTo);
         newNode.set(NodeProp.ACT_PUB_OBJ_TYPE, obj.getType());
         newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, objAttributedTo);
@@ -1184,8 +1206,58 @@ public class ActPubService extends ServiceBase {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
 
-        // log.debug("returning newNode: " + XString.prettyPrint(newNode));
+        apLog.trace("newAPNode: " + XString.prettyPrint(newNode));
         return newNode;
+    }
+
+    /*
+     * If we can get a plai string attributedTo property off the obj we return that, but if the
+     * attributedTo is an array then we search it for a Person type object in the array and then return
+     * the 'id' property of said person object.
+     */
+    private String getSingleAttributedTo(APObj obj, boolean warnIfMissing) {
+        Val<Object> val = null;
+
+        if (ok(val = AP.getFromMap(obj, APObj.attributedTo))) {
+            if (no(val.getVal())) {
+                return null;
+            }
+            // if we have a plain string prop return it.
+            else if (val.getVal() instanceof String) {
+                apLog.trace("attributed to found as string: " + (String) val.getVal());
+                return (String) val.getVal();
+            }
+            // else if this is a list we scan it.
+            else if (val.getVal() instanceof List) {
+                List<?> attribsList = (List<?>) val.getVal();
+                for (Object attribItem : attribsList) {
+
+                    // get a concrete class instance from the factory for 'attribItem'
+                    attribItem = AP.typeFromFactory(attribItem);
+
+                    // once we find a person in the obj, we consider that out attributedTo string
+                    // and return that.
+                    if (attribItem instanceof APOPerson) {
+                        String ret = apStr(attribItem, APObj.id);
+                        apLog.trace("attributed to found as id on Person: " + ret);
+                        return ret;
+                    }
+                }
+            } else {
+                if (warnIfMissing) {
+                    ExUtil.warn("unhandled type on getSingleAttributedTo() return val: "
+                            + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object")
+                            + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
+                }
+                return null;
+            }
+        }
+
+        if (warnIfMissing) {
+            ExUtil.warn("unhandled type on getSingleAttributedTo(): " + (ok(obj) ? obj.getClass().getName() : "null")
+                    + "\nUnable to get property " + APObj.attributedTo + " from obj " + XString.prettyPrint(obj));
+        }
+        return null;
     }
 
     private HashMap<String, APObj> parseTagArray(List<?> tagArray) {

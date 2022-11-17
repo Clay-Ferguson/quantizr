@@ -4,7 +4,10 @@ import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Anchor } from "../core/Anchor";
 import { Clearfix } from "../core/Clearfix";
+import { Heading } from "../core/Heading";
+import { Img } from "../core/Img";
 import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 
@@ -39,6 +42,12 @@ export class NodeCompContent extends Div {
         typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
 
         this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
+
+        const name: string = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_NAME, this.node);
+        if (name) {
+            children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
+        }
+
         children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
 
         if (state.userPrefs.showProps && this.node.properties?.length > 0) {
@@ -65,8 +74,52 @@ export class NodeCompContent extends Div {
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));
         }
 
+        this.renderActPubUrls(children, this.node);
+        this.renderActPubIcons(children, this.node);
+
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.setChildren(children);
+    }
+
+    renderActPubUrls = (children: CompIntf[], node: J.NodeInfo) => {
+        const urls: any = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
+        let div: Div = null;
+        if (urls?.forEach) {
+            // todo-0: add type safety for url
+            urls.forEach((url: any) => {
+                if (url.type === "Link") {
+                    // lazy create div
+                    div = div || new Div(null, { className: "apObjLinksContainer float-end" });
+                    div.addChild(new Div(null, { className: "apUrlLink" }, [
+                        new Anchor(url.href, url.mediaType, { target: "_blank" })
+                    ]));
+                }
+            });
+        }
+
+        if (div) {
+            children.push(new Clearfix());
+            children.push(div);
+        }
+    }
+
+    renderActPubIcons = (children: CompIntf[], node: J.NodeInfo) => {
+        const icons: any = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
+        let div: Div = null;
+        if (icons?.forEach) {
+            // todo-0: add type safety for icon
+            icons.forEach((icon: any) => {
+                if (icon.type === "Icon") {
+                    // lazy create div
+                    div = div || new Div(null, { className: "apObjIconContainer" });
+                    div.addChild(new Img({ src: icon.url, className: "apObjIcon" }));
+                }
+            });
+        }
+
+        if (div) {
+            children.push(div);
+        }
     }
 
     maybeRenderDateTime = (children: CompIntf[], propName: string, node: J.NodeInfo) => {

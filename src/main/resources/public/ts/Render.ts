@@ -447,6 +447,8 @@ export class Render {
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
 
+                        // console.log("RENDER NODE: " + S.util.prettyPrint(s.node));
+
                         // if the rendered node has one child and it's an RSS node then render it right away.
                         if (s.node.children && s.node.children.length === 1 && s.node.children[0].type === J.NodeType.RSS_FEED) {
                             const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, s.node.children[0]);

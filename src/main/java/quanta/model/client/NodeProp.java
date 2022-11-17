@@ -15,6 +15,16 @@ public enum NodeProp {
     // For "AP Note" Objects (per spec) this is the "url" property on the node.
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
 
+    // when an object has an array as urls we put them here.
+    ACT_PUB_OBJ_URLS("ap:objUrls", "s"), //
+
+    // when an object has an array of icons (like a "Video" type object we hold them here)
+    // todo-0: we should probably support also the case where just ONE (not an array) is arriving from a
+    // foreign server object, but ourselves always use this array
+    ACT_PUB_OBJ_ICONS("ap:objIcons", "s"), //
+
+    ACT_PUB_OBJ_NAME("ap:objName", "s"), //
+
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
     ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
