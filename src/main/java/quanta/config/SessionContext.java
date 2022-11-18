@@ -91,6 +91,9 @@ public class SessionContext extends ServiceBase {
 
 	private boolean enableIPSM;
 
+	// this gets set to true, to trigger a refresh when needed again.
+	private boolean friendsTagsDirty;
+
 	public boolean isEnableIPSM() {
 		return enableIPSM;
 	}
@@ -592,5 +595,13 @@ public class SessionContext extends ServiceBase {
 
 	public void setAppGuid(String appGuid) {
 		this.appGuid = appGuid;
+	}
+
+	public boolean isFriendsTagsDirty() {
+		return friendsTagsDirty;
+	}
+
+	public void setFriendsTagsDirty(boolean friendsTagsDirty) {
+		this.friendsTagsDirty = friendsTagsDirty;
 	}
 }

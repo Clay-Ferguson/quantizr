@@ -4,7 +4,7 @@ import quanta.request.base.RequestBase;
 
 public class NodeFeedRequest extends RequestBase {
 
-	//zero offset page of results (page=0 is first page)
+	// zero offset page of results (page=0 is first page)
 	private Integer page;
 
 	/* Note one of the other of these should be non-null, but not both */
@@ -19,6 +19,12 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean nsfw;
 
 	private String searchText;
+
+	// users can add hashtags to each Friend Node, and those are passed in to filter to show
+	// only friends tagged with this tag
+	private String friendsTagSearch;
+	private Boolean loadFriendsTags;
+
 	private boolean applyAdminBlocks;
 
 	// textual representation of what kind of request is being done.
@@ -86,6 +92,22 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setSearchText(String searchText) {
 		this.searchText = searchText;
+	}
+
+	public String getFriendsTagSearch() {
+		return friendsTagSearch;
+	}
+
+	public void setFriendsTagSearch(String friendsTagSearch) {
+		this.friendsTagSearch = friendsTagSearch;
+	}
+
+	public Boolean getLoadFriendsTags() {
+		return loadFriendsTags;
+	}
+
+	public void setLoadFriendsTags(Boolean loadFriendsTags) {
+		this.loadFriendsTags = loadFriendsTags;
 	}
 
 	public Boolean getLocalOnly() {

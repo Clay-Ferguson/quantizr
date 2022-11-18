@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -238,8 +239,7 @@ public class UserManagerService extends ServiceBase {
 			if (userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey)) {
 				log.debug("USER_PREF_PUBLIC_KEY changed during login");
 			}
-		}
-		else {
+		} else {
 			if (!pubEncKey.equals(asymEncKey)) {
 				res.setUnknownPubEncKey(true);
 			}
@@ -251,8 +251,7 @@ public class UserManagerService extends ServiceBase {
 			if (userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey)) {
 				log.debug("USER_PREF_PUBLIC_SIG_KEY changed during login: " + sigKey);
 			}
-		}
-		else {
+		} else {
 			if (!pubSigKey.equals(sigKey)) {
 				res.setUnknownPubSigKey(true);
 			}
@@ -800,7 +799,7 @@ public class UserManagerService extends ServiceBase {
 
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, true, null);
 		if (ok(friendNodes)) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
@@ -1230,7 +1229,7 @@ public class UserManagerService extends ServiceBase {
 
 	public GetFriendsResponse getFriends(MongoSession ms) {
 		GetFriendsResponse res = new GetFriendsResponse();
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
 
 		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -1276,7 +1275,7 @@ public class UserManagerService extends ServiceBase {
 	 * If userName is passed as null, then we use the currently logged in user
 	 */
 	public List<SubNode> getSpecialNodesList(MongoSession ms, Val<SubNode> parentNodeVal, String underType, String userName,
-			boolean sort) {
+			boolean sort, String tagFilter) {
 		ms = ThreadLocals.ensure(ms);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(ms, userName);
@@ -1291,8 +1290,13 @@ public class UserManagerService extends ServiceBase {
 			parentNodeVal.setVal(parentNode);
 		}
 
+		Criteria moreCriteria = null;
+		if (!StringUtils.isEmpty(tagFilter)) {
+            moreCriteria = Criteria.where(SubNode.TAGS).regex(tagFilter);
+        }
+
 		for (SubNode friendNode : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
-				null, 0)) {
+				null, 0, moreCriteria)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

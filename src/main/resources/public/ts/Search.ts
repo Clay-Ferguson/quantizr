@@ -352,6 +352,8 @@ export class Search {
             return;
         }
 
+        const loadFriendsTags: boolean = appState.friendHashTags === null;
+
         const res = await S.rpcUtil.rpc<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
@@ -364,6 +366,8 @@ export class Search {
             fromFriends: FeedTab.inst.props.feedFilterFriends,
             nsfw: appState.userPrefs.nsfw,
             searchText,
+            friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
+            loadFriendsTags,
             applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks
         });
 
@@ -408,6 +412,10 @@ export class Search {
             FeedTab.inst.props.feedEndReached = res.endReached;
             FeedTab.inst.props.feedDirty = false;
             FeedTab.inst.props.feedLoading = false;
+
+            if (res.friendHashTags) {
+                s.friendHashTags = res.friendHashTags;
+            }
 
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);

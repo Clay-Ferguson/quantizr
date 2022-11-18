@@ -34,6 +34,7 @@ import quanta.response.NodeFeedResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
+import quanta.util.XString;
 
 @Component
 public class UserFeedService extends ServiceBase {
@@ -296,23 +297,69 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
-			List<SubNode> friendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true);
-			if (ok(friendNodes)) {
-				List<ObjectId> friendIds = new LinkedList<>();
+			List<ObjectId> friendIds = new LinkedList<>();
+			boolean friendsProcessed = false;
 
-				for (SubNode friendNode : friendNodes) {
-					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
-					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
+			if (req.getLoadFriendsTags() || ThreadLocals.getSC().isFriendsTagsDirty()) {
+				// if we're going to be scanning ALL friends then the block below that would scan for friends
+				// can be bypassed, because we will have already loaded friendIds
+				friendsProcessed = true;
 
-					// if we have a userNodeId and they aren't in the blocked list.
-					if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
-						friendIds.add(new ObjectId(userNodeId));
+				ThreadLocals.getSC().setFriendsTagsDirty(false);
+				HashSet<String> friendsHashTagsSet = new HashSet<>();
+				List<SubNode> allFriendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
+				if (ok(allFriendNodes)) {
+					for (SubNode friendNode : allFriendNodes) {
+						List<String> hashTags = XString.tokenize(friendNode.getTags(), " ,", false);
+						if (ok(hashTags)) {
+							for (String hashTag : hashTags) {
+								// ignore anything that happens not to be a tag
+								if (hashTag.startsWith("#")) {
+									friendsHashTagsSet.add(hashTag);
+								}
+							}
+						}
+
+						// since we're processing ALL friends we can go ahead and update friendIds here
+						// but also only do that if we're not filtering for tags, or the filter is a match
+						if (StringUtils.isEmpty(req.getFriendsTagSearch())
+								|| (StringUtils.isNotEmpty(friendNode.getTags()) && friendNode.getTags().contains(req.getFriendsTagSearch()))) {
+							String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
+
+							// if we have a userNodeId and they aren't in the blocked list.
+							if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
+								friendIds.add(new ObjectId(userNodeId));
+							}
+						}
+					}
+
+					// returning an empty list when there are no tags is a meaningful result and will trigger
+					// the client to update that there are no hashtags
+					// if (friendsHashTagsSet.size() > 0) {
+						res.setFriendHashTags(new LinkedList<String>(friendsHashTagsSet));
+					// }
+				}
+			}
+
+			// if we already processed friends above, then we know we don't need to do it here. It's done.
+			if (!friendsProcessed) {
+				List<SubNode> friendNodes =
+						user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, req.getFriendsTagSearch());
+				if (ok(friendNodes)) {
+					for (SubNode friendNode : friendNodes) {
+						// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
+						String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
+
+						// if we have a userNodeId and they aren't in the blocked list.
+						if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
+							friendIds.add(new ObjectId(userNodeId));
+						}
 					}
 				}
+			}
 
-				if (friendIds.size() > 0) {
-					orCriteria.add(Criteria.where(SubNode.OWNER).in(friendIds));
-				}
+			if (friendIds.size() > 0) {
+				orCriteria.add(Criteria.where(SubNode.OWNER).in(friendIds));
 			}
 		}
 
@@ -461,7 +508,7 @@ public class UserFeedService extends ServiceBase {
 	 */
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		arun.run(as -> {
-			List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false);
+			List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false, null);
 			if (no(nodeList))
 				return null;
 

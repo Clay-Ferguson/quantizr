@@ -58,6 +58,9 @@ export class AppState {
     /* data for each tab, which we DO want to keep separate from the GUI view components themselves */
     tabData: TabIntf[] = [];
 
+    // null means we haven't read the yet and the server will get them as needed.
+    friendHashTags: string[] = null;
+
     // This determines what thing is being displayed fullscreen, and can only be one thing at a time.
     fullScreenConfig: FullScreenConfig = { type: FullScreenType.NONE };
 

@@ -1718,6 +1718,14 @@ Will come back later and study this more. todo-3 */
     width: 7rem;
 }
 
+.friendsTagPickerDropdown {
+    display: inline-block;
+    margin-right: $smallGap;
+    width: 15rem;
+    min-width: 10rem;
+    margin-left: $bigGap;
+}
+
 .binaryEditorSection {
     border: 1px solid gray;
     border-radius: $border-radius;

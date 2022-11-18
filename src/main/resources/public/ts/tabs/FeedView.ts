@@ -11,6 +11,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
+import { Selection } from "../comp/core/Selection";
 import { Spinner } from "../comp/core/Spinner";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
@@ -54,6 +55,29 @@ export class FeedView extends AppTab<FeedViewProps> {
             newItems = new Icon({
                 className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
                 title: "New content available. Refresh!"
+            });
+        }
+
+        /* If the user has 'tagged' one or more of their Friends Nodes (by setting a tag value in the editor)
+        by editing one of their friends nodes, then we show a dropdown letting the user quickly choose which
+        tag/category of friends they want to see the feed of */
+        let friendsTagDropDown: Selection = null;
+        if (state.friendHashTags && state.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
+            const items: any[] = [
+                { key: "", val: "All Tags" }
+            ];
+            for (const tag of state.friendHashTags) {
+                items.push({ key: tag, val: tag });
+            }
+
+            friendsTagDropDown = new Selection(null, "Filter By Tag",
+                items,
+                null, "friendsTagPickerDropdown", {
+                setValue: (val: string) => {
+                    this.data.props.friendsTagSearch = val;
+                    S.srch.refreshFeed();
+                },
+                getValue: (): string => this.data.props.friendsTagSearch
             });
         }
 
@@ -108,6 +132,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         setValue: (checked: boolean) => this.data.props.autoRefresh = checked,
                         getValue: (): boolean => this.data.props.autoRefresh
                     }),
+                    friendsTagDropDown,
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
                     // new HelpButton(() => state.config.help?.fediverse?.feed),
 
@@ -215,7 +240,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 }
             });
 
-            // only show "More" button if we aren't currently editing. Wouldn't make sense to navigage while editing.
+            // only show "More" button if we aren't currently editing. Wouldn't make sense to navigate while editing.
             if (!state.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
                 const moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event: Event) => {

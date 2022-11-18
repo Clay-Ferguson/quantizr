@@ -677,7 +677,7 @@ export class Render {
         return newValue;
     };
 
-    renderUser(nodeId: string, user: string, userBio: string, imgSrc: string, actorUrl: string,
+    renderUser(node: J.NodeInfo, user: string, userBio: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
         const img: Img = imgSrc
@@ -689,6 +689,8 @@ export class Render {
 
         const attribs: any = {};
         if (className) attribs.className = className;
+
+        const tagsDiv = node.tags ? new Div(node.tags, { className: "nodeTags float-end " }) : null;
 
         return new Div(null, attribs, [
             new HorizontalLayout([
@@ -721,7 +723,8 @@ export class Render {
                             className: (displayName ? "" : "userName ") + "clickable",
                             onClick
                         })
-                    ])
+                    ]),
+                    tagsDiv
 
                     // The page just looks cleaner with the username only. We can click them to see their bio text.
                     // userBio ? new Html(userBio, {

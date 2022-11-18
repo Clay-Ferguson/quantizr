@@ -657,6 +657,10 @@ public class NodeEditService extends ServiceBase {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
 			boolean isAccnt = node.isType(NodeType.ACCOUNT);
 
+			if (node.isType(NodeType.FRIEND)) {
+				ThreadLocals.getSC().setFriendsTagsDirty(true);
+			}
+
 			// push any chat messages that need to go out.
 			if (!isAccnt) {
 				push.pushNodeToBrowsers(s, sessionsPushed, node);

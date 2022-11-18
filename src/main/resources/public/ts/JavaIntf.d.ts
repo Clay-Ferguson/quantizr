@@ -361,6 +361,8 @@ export interface NodeFeedRequest extends RequestBase {
     localOnly: boolean;
     nsfw: boolean;
     searchText: string;
+    friendsTagSearch: string;
+    loadFriendsTags: boolean;
     applyAdminBlocks: boolean;
     name: string;
 }
@@ -765,6 +767,7 @@ export interface NodeEditedPushInfo extends ServerPushInfo {
 export interface NodeFeedResponse extends ResponseBase {
     endReached: boolean;
     searchResults: NodeInfo[];
+    friendHashTags: string[];
 }
 
 export interface NodeSearchResponse extends ResponseBase {

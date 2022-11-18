@@ -614,6 +614,7 @@ export class Nav {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
+
         this.messages({
             feedFilterFriends: true,
             feedFilterToMe: false,

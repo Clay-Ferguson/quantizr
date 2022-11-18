@@ -11,12 +11,6 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { FriendsDlgState as LS } from "./FriendsDlgState";
 
-// export interface LS { // Local State
-//     selections?: Set<string>;
-//     loading?: boolean;
-//     friends?: J.FriendInfo[];
-// }
-
 export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");
 
