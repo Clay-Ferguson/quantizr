@@ -33,7 +33,6 @@ public class MongoCreate extends ServiceBase {
 
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
-	// todo-0: is updateParentOrdinals still the correct varible name based on what it currently does?
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {
 		return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals);

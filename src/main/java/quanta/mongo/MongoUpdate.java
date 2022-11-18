@@ -52,8 +52,6 @@ public class MongoUpdate extends ServiceBase {
 	public void setParentHasChildren(SubNode node) {
 		if (no(node)) return;
 		arun.run(as -> {
-			// todo-0: need ThreadLocals to cache by path ? Check how many places we call 'findNodeByPath' from 
-			// before deciding on that.
 			SubNode parent = read.findNodeByPath(node.getParentPath());
 			if (ok(parent)) {
 				parent.setHasChildren(true);

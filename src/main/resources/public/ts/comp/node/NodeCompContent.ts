@@ -82,11 +82,10 @@ export class NodeCompContent extends Div {
     }
 
     renderActPubUrls = (children: CompIntf[], node: J.NodeInfo) => {
-        const urls: any = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
+        const urls: J.APObjUrl[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
         let div: Div = null;
         if (urls?.forEach) {
-            // todo-0: add type safety for url
-            urls.forEach((url: any) => {
+            urls.forEach((url: J.APObjUrl) => {
                 if (url.type === "Link") {
                     // lazy create div
                     div = div || new Div(null, { className: "apObjLinksContainer float-end" });
@@ -104,11 +103,10 @@ export class NodeCompContent extends Div {
     }
 
     renderActPubIcons = (children: CompIntf[], node: J.NodeInfo) => {
-        const icons: any = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
+        const icons: J.APObjIcon[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
         let div: Div = null;
         if (icons?.forEach) {
-            // todo-0: add type safety for icon
-            icons.forEach((icon: any) => {
+            icons.forEach((icon: J.APObjIcon) => {
                 if (icon.type === "Icon") {
                     // lazy create div
                     div = div || new Div(null, { className: "apObjIconContainer" });

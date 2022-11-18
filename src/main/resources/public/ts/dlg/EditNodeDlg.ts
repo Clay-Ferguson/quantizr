@@ -365,7 +365,7 @@ export class EditNodeDlg extends DialogBase {
             editorSubPanel = typeHandler.renderEditorSubPanel(appState.editNode);
         }
 
-        // todo-0: instead of editorSubPanel we need a "getAllowThing" for each of the "things" that can go in it,
+        // todo-0: instead of editorSubPanel check here we need a "getAllowThing" for each of the "things" that can go in it,
         // because right now the only time it's triggered is when we have a Friend Type Node, and we want their tag
         // to show up.
         const collapsePanel = !customProps || editorSubPanel ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [

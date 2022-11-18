@@ -67,7 +67,6 @@ export class FriendTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.USER_TAGS);
     }
 
-    // todo-0: make this have a pretty border.
     renderEditorSubPanel = (node: J.NodeInfo): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         return new Heading(3, user);
