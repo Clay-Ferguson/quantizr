@@ -136,7 +136,7 @@ public class MongoCreate extends ServiceBase {
 	 * Example: Inserting at top will normally send the ordinal in that's the same as the current TOP
 	 * ordinal, so the new node will occupy that slot and everythnig else shifts down.
 	 * 
-	 * Returns the ordinal we actually ended up freeing up for use.
+	 * Returns the first ordinal in the range we actually ended up freeing up for use.
 	 */
 	@PerfMon(category = "create")
 	public long insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
@@ -158,8 +158,14 @@ public class MongoCreate extends ServiceBase {
 			if (ordinal <= minOrdinal) {
 				// if we have space below the current minimum we can just use it
 				if (minOrdinal > 0) {
-					log.debug("Found good ordinal: " + (minOrdinal - 1));
-					return minOrdinal - 1;
+					long ret =  minOrdinal - 1;
+
+					// always grab the index at halfway to zero so we can leave room for for future inserts to
+					// get lucky and have a place to land without cusing a multi record node renumbering.
+					if (ret > 0) {
+						ret = ret / 2;
+					}
+					return ret;
 				}
 				// else minOrdinal is already at zero so we insert a new block, and then let
 				// "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now
@@ -176,14 +182,6 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
-
-		// DO NOT DELETE
-		// (this is the equivalent non-bulk way to perform the operations)
-		// for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC,
-		// SubNode.ORDINAL), null, 0, null,
-		// crit)) {
-		// child.setOrdinal(maxOrdinal++);
-		// }
 
 		BulkOperations bops = null;
 

@@ -127,9 +127,6 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	/**
-	 * Runs the mongo 'findOne' but if it finds a node that's already in memory we return the memory
-	 * object.
-	 * 
 	 * NOTE: All security checks are done external to this method.
 	 */
 	public SubNode findOne(Query q) {

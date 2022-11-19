@@ -940,12 +940,14 @@ public class NodeEditService extends ServiceBase {
 		 */
 		else {
 			parentForNewNodes = node;
+
+			// todo-0: ordinal 0 is a 'slower' insert than an append, because it might update ordinals. can we insert at end instead? 
 			firstOrdinal = 0L;
 		}
 
 		int numNewSlots = contentParts.length - 1;
 		if (numNewSlots > 0) {
-			create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots);
+			firstOrdinal = create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots);
 			update.save(ms, parentForNewNodes);
 		}
 
@@ -955,6 +957,7 @@ public class NodeEditService extends ServiceBase {
 			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);
+				node.setOrdinal(firstOrdinal);
 				node.touch();
 				update.save(ms, node);
 			} else {

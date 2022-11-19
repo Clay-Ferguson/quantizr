@@ -690,7 +690,7 @@ export class Render {
         const attribs: any = {};
         if (className) attribs.className = className;
 
-        const tagsDiv = node.tags ? new Div(node.tags, { className: "nodeTags float-end " }) : null;
+        const tagsDiv = node?.tags ? new Div(node.tags, { className: "nodeTags float-end " }) : null;
 
         return new Div(null, attribs, [
             new HorizontalLayout([

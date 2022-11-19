@@ -2,8 +2,6 @@ package quanta.util;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -275,9 +274,11 @@ public class Convert extends ServiceBase {
 		 */
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken();
+			int tokLen = tok.length();
 
 			// Hashtag
-			if (tok.startsWith("#")) {
+			if (tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 //
+					&& Character.isLetter(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOHashtag) {
 					String href = (String) tag.get(APObj.href);
@@ -288,7 +289,8 @@ public class Convert extends ServiceBase {
 				}
 			}
 			// Mention
-			else if (tok.startsWith("@")) {
+			else if (tokLen > 1 && tok.startsWith("@") && StringUtils.countMatches(tok, "@") == 1 //
+					&& Character.isLetter(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
@@ -419,7 +421,7 @@ public class Convert extends ServiceBase {
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
-				case "ap:tag": 
+				case "ap:tag":
 				case "ap:objUrls":
 				case "ap:objIcons":
 					value = prop;

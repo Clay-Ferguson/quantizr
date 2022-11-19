@@ -601,9 +601,8 @@ public class MongoRead extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
+        q.limit(1);
 
-        // for 'findOne' is it also advantageous to also setup the query criteria with
-        // something like LIMIT=1 (sql)?
         SubNode nodeFound = mongoUtil.findOne(q);
         if (no(nodeFound)) {
             return 0L;
@@ -611,6 +610,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    // this is NOT returning the first node with the least ordinal!!!
     @PerfMon(category = "read")
     public Long getMinChildOrdinal(MongoSession ms, SubNode node) {
         if (noChildren(node))
@@ -618,15 +618,12 @@ public class MongoRead extends ServiceBase {
 
         auth.auth(ms, node, PrivilegeType.READ);
 
-        // todo-2: research if there's a way to query for just one, rather than simply
-        // calling findOne at the end? What's best practice here?
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
+        q.limit(1);
 
-        // for 'findOne' is it also advantageous to also setup the query criteria with
-        // something like LIMIT=1 (sql)?
         SubNode nodeFound = mongoUtil.findOne(q);
         if (no(nodeFound)) {
             return 0L;
@@ -661,6 +658,7 @@ public class MongoRead extends ServiceBase {
         // leave this example. you can do a RANGE like this.
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).lt(node.getOrdinal()));
+        q.limit(1);
 
         return mongoUtil.findOne(q);
     }
@@ -690,6 +688,7 @@ public class MongoRead extends ServiceBase {
         // leave this example. you can do a RANGE like this.
         // query.addCriteria(Criteria.where(SubNode.FIELD_ORDINAL).lt(50).gt(20));
         q.addCriteria(Criteria.where(SubNode.ORDINAL).gt(node.getOrdinal()));
+        q.limit(1);
 
         return mongoUtil.findOne(q);
     }
