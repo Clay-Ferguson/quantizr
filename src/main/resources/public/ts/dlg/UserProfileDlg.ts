@@ -186,6 +186,9 @@ export class UserProfileDlg extends DialogBase {
                     !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
+                    !appState.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                        ? new Button("Friend Settings", this.editFriendNode) : null,
+
                     !appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Follow", this.addFriend) : null,
 
@@ -282,6 +285,11 @@ export class UserProfileDlg extends DialogBase {
                 userProfile: state.userProfile
             });
         }
+    }
+
+    editFriendNode = async () => {
+        // WIP
+        // S.edit.runEditNode(null, this.userNodeId, true, false, true, null, null, getAppState());
     }
 
     sendMessage = () => {
