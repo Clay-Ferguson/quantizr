@@ -288,8 +288,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     editFriendNode = async () => {
-        // WIP
-        // S.edit.runEditNode(null, this.userNodeId, true, false, true, null, null, getAppState());
+        S.edit.runEditNode(null, this.userNodeId, true, false, true, null, null, true);
     }
 
     sendMessage = () => {

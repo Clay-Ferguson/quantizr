@@ -29,6 +29,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.InitNodeEditRequest;
@@ -182,7 +183,7 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
-		
+
 		// Collect all the parents we need to based on parentCount
 		LinkedList<NodeInfo> parentNodes = new LinkedList<>();
 		SubNode highestUpParent = node;
@@ -499,6 +500,26 @@ public class NodeRenderService extends ServiceBase {
 	public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
 		String nodeId = req.getNodeId();
+
+		/*
+		 * IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
+		 * wanting to edit his Friend node representing this user.
+		 */
+		if (req.getEditMyFriendNode()) {
+			String _nodeId = nodeId;
+			nodeId = arun.run(as -> {
+				Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId); //
+				// we query as a list, but there should only be ONE result.
+				List<SubNode> friendNodes = user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
+				if (ok(friendNodes)) {
+					for (SubNode friendNode : friendNodes) {
+						return friendNode.getIdStr();
+					}
+				}
+				return null;
+			});
+		}
+
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 

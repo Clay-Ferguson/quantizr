@@ -1,7 +1,7 @@
 import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode, createElement } from "react";
-import { dispatch, getAppState, useAppState } from "../AppContext";
+import { dispatch, useAppState } from "../AppContext";
 
 /* ========= WARNING =========
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
@@ -96,9 +96,7 @@ export class FullScreenCalendar extends Main {
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
-        console.log("eventClick.");
-        const state = getAppState();
-        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, state);
+        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, false);
     }
 
     domUpdateEvent = (): void => {

@@ -322,8 +322,8 @@ public class UserFeedService extends ServiceBase {
 
 						// since we're processing ALL friends we can go ahead and update friendIds here
 						// but also only do that if we're not filtering for tags, or the filter is a match
-						if (StringUtils.isEmpty(req.getFriendsTagSearch())
-								|| (StringUtils.isNotEmpty(friendNode.getTags()) && friendNode.getTags().contains(req.getFriendsTagSearch()))) {
+						if (StringUtils.isEmpty(req.getFriendsTagSearch()) || (StringUtils.isNotEmpty(friendNode.getTags())
+								&& friendNode.getTags().contains(req.getFriendsTagSearch()))) {
 							String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 							// if we have a userNodeId and they aren't in the blocked list.
@@ -335,16 +335,18 @@ public class UserFeedService extends ServiceBase {
 
 					// returning an empty list when there are no tags is a meaningful result and will trigger
 					// the client to update that there are no hashtags
-					// if (friendsHashTagsSet.size() > 0) {
-						res.setFriendHashTags(new LinkedList<String>(friendsHashTagsSet));
-					// }
+					res.setFriendHashTags(new LinkedList<String>(friendsHashTagsSet));
 				}
 			}
 
 			// if we already processed friends above, then we know we don't need to do it here. It's done.
 			if (!friendsProcessed) {
-				List<SubNode> friendNodes =
-						user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, req.getFriendsTagSearch());
+				Criteria tagCriteria = null;
+				if (!StringUtils.isEmpty(req.getFriendsTagSearch())) {
+					tagCriteria = Criteria.where(SubNode.TAGS).regex(req.getFriendsTagSearch());
+				}
+
+				List<SubNode> friendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, tagCriteria);
 				if (ok(friendNodes)) {
 					for (SubNode friendNode : friendNodes) {
 						// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.

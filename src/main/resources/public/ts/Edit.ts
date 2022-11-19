@@ -277,7 +277,7 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, state);
-            this.runEditNode(null, res.newNode.id, false, false, false, null, null, state);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, null, false);
         }
     }
 
@@ -287,7 +287,7 @@ export class Edit {
                 S.quanta.refresh(state);
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, state);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, false);
             }
         }
     }
@@ -708,7 +708,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, null);
+        this.runEditNode(null, id, false, false, false, null, null, false);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -717,15 +717,15 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state?: AppState) => {
+    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, editMyFriendNode: boolean) => {
         if (g_requireCrypto === "true" && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
         }
 
-        state = getAppState(state);
+        const appState: AppState = getAppState();
         if (!id) {
-            const node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(appState);
             if (node) {
                 id = node.id;
             }
@@ -737,14 +737,15 @@ export class Edit {
         }
 
         const res = await S.rpcUtil.rpc<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
-            nodeId: id
+            nodeId: id,
+            editMyFriendNode
         });
 
         if (res.nodeInfo && overrideContent) {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, state);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, appState);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {

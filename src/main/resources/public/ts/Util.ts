@@ -1051,7 +1051,7 @@ export class Util {
         const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
         if (editorData?.nodeId && editorData?.content) {
             await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
-            S.edit.runEditNode(editorData.content, editorData.nodeId, true, false, false, null, null);
+            S.edit.runEditNode(editorData.content, editorData.nodeId, true, false, false, null, null, false);
         }
     }
 

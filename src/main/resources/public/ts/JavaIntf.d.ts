@@ -304,6 +304,7 @@ export interface ImportRequest extends RequestBase {
 
 export interface InitNodeEditRequest extends RequestBase {
     nodeId: string;
+    editMyFriendNode: boolean;
 }
 
 export interface InsertBookRequest extends RequestBase {

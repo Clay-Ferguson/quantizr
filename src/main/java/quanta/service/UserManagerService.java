@@ -765,7 +765,7 @@ public class UserManagerService extends ServiceBase {
 			if (no(accntNode))
 				throw new RuntimeException("User not found.");
 
-			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constring on
+			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
 			// the DB enforcing this.
 			deleteFriend(ms, accntNode.getIdStr(), NodeType.FRIEND_LIST.s());
 			update.saveSession(ms);
@@ -797,6 +797,7 @@ public class UserManagerService extends ServiceBase {
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
 
+		// todo-0: this is super inefficient.
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
 		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, true, null);
@@ -1275,7 +1276,7 @@ public class UserManagerService extends ServiceBase {
 	 * If userName is passed as null, then we use the currently logged in user
 	 */
 	public List<SubNode> getSpecialNodesList(MongoSession ms, Val<SubNode> parentNodeVal, String underType, String userName,
-			boolean sort, String tagFilter) {
+			boolean sort, Criteria moreCriteria) {
 		ms = ThreadLocals.ensure(ms);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(ms, userName);
@@ -1290,14 +1291,9 @@ public class UserManagerService extends ServiceBase {
 			parentNodeVal.setVal(parentNode);
 		}
 
-		Criteria moreCriteria = null;
-		if (!StringUtils.isEmpty(tagFilter)) {
-            moreCriteria = Criteria.where(SubNode.TAGS).regex(tagFilter);
-        }
-
-		for (SubNode friendNode : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
+		for (SubNode node : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
 				null, 0, moreCriteria)) {
-			nodeList.add(friendNode);
+			nodeList.add(node);
 		}
 		return nodeList;
 	}
