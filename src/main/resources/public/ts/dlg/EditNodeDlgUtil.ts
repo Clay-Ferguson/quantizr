@@ -204,7 +204,7 @@ export class EditNodeDlgUtil {
         dlg.mergeState<LS>(state);
     }
 
-    share = async (dlg: EditNodeDlg) => {
+    share = async () => {
         const appState = getAppState();
         await S.edit.editNodeSharing(getAppState(), appState.editNode);
         S.edit.updateNode(appState.editNode);
@@ -215,14 +215,14 @@ export class EditNodeDlgUtil {
         const appState = getAppState();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(appState.editNode.id, "", state.toIpfs, file, false, true, async () => {
-            await this.refreshAttachmentsFromServer(dlg, appState.editNode);
+            await this.refreshAttachmentsFromServer(appState.editNode);
             S.edit.updateNode(appState.editNode);
             dlg.binaryDirty = true;
         });
         await uploadDlg.open();
     }
 
-    setNodeType = (dlg: EditNodeDlg, newType: string) => {
+    setNodeType = (newType: string) => {
         const appState = getAppState();
         appState.editNode.type = newType;
         S.edit.updateNode(appState.editNode);
@@ -353,7 +353,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    refreshAttachmentsFromServer = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
+    refreshAttachmentsFromServer = async (node: J.NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,

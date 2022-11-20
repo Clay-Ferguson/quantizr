@@ -14,6 +14,9 @@ export interface TypeHandlerIntf {
     getAllowRowHeader(): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getDomPreUpdateFunction(parent: CompIntf): void;
+
+    // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND
+    // they will all be put outside the collapsible panel if they'd normally be inside he collapse panel
     getCustomProperties(): string[];
     ensureDefaultProperties(node: J.NodeInfo): void;
     getAllowPropertyAdd(): boolean;
@@ -27,7 +30,6 @@ export interface TypeHandlerIntf {
 
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;
-    editTagsAtTop(): boolean;
     renderEditorSubPanel(node: J.NodeInfo): Comp;
 }
 

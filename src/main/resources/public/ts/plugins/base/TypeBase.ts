@@ -37,10 +37,6 @@ export class TypeBase implements TypeHandlerIntf {
         return propName;
     }
 
-    editTagsAtTop = (): boolean => {
-        return false;
-    }
-
     getEditorRowsForProp(propName: string): number {
         return 1;
     }
@@ -69,7 +65,8 @@ export class TypeBase implements TypeHandlerIntf {
 
     /* If this returns non-null the editor dialog is expected to show only the enumerated properties for editing
 
-    note: adding 'content' to this (not a genuine property like the rest, is allowed)
+    note: adding NodeProps.CONTENT ('cont') to this (not a genuine property like the rest, is allowed, and it
+        means we will be allowing edit of the main node content text
     */
     getCustomProperties(): string[] {
         return null;
@@ -127,7 +124,7 @@ export class TypeBase implements TypeHandlerIntf {
                 // allow max of 10 urls.
                 if (count++ < 10) {
                     const og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url,
-                    isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
+                        isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {

@@ -263,7 +263,7 @@ export class EditNodeDlg extends DialogBase {
             flowPanel.addChild(this.createLayoutSelection());
         }
 
-        flowPanel.addChildren(this.makeCheckboxesRow(state, customProps));
+        flowPanel.addChildren(this.makeCheckboxesRow(customProps));
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -294,14 +294,14 @@ export class EditNodeDlg extends DialogBase {
 
         let propsVisible: boolean = false;
         if (allowContentEdit) {
-            const hasContent = typeHandler?.hasCustomProp("content");
+            const hasContent = typeHandler?.hasCustomProp(J.NodeProp.CONTENT);
             let rows = getAppState().mobileMode ? "8" : "10";
             if (customProps && hasContent) {
                 rows = "4";
             }
 
             if (!customProps || hasContent) {
-                mainPropsTable.addChild(this.makeContentEditor(appState.editNode, isWordWrap, rows));
+                mainPropsTable.addChild(this.makeContentEditor(rows));
                 this.contentEditor.setWordWrap(isWordWrap);
                 propsVisible = true;
             }
@@ -326,9 +326,9 @@ export class EditNodeDlg extends DialogBase {
             sharingDiv = new Div(null, {
                 className: "float-end clickable marginBottom"
             }, [
-                new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
+                new Span("Shared to: ", { onClick: () => this.utl.share() }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => { this.makePublic(state, true); }, { className: "marginLeft" }) : null,
+                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft",
                     title: "Node is Unpublished\n\nWill not appear in feed"
@@ -366,7 +366,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         // todo-0: instead of editorSubPanel check here we need a "getAllowThing" for each of the "things" that can go in it,
-        // because right now the only time it's triggered is when we have a Friend Type Node, and we want their tag
+        // because right now the only time it's triggered is when we have a Friend Type Node, and we want their tags field
         // to show up.
         const collapsePanel = !customProps || editorSubPanel ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             tagsEditRow,
@@ -408,7 +408,7 @@ export class EditNodeDlg extends DialogBase {
         return children;
     }
 
-    makePublic = async (state: LS, allowAppends: boolean) => {
+    makePublic = async (allowAppends: boolean) => {
         const appState = getAppState();
         if (this.getState().encryptCheckboxVal) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
@@ -506,7 +506,7 @@ export class EditNodeDlg extends DialogBase {
         this.tagsState.setValue(val);
     }
 
-    makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
+    makeCheckboxesRow = (customProps: string[]): Comp[] => {
         const appState = getAppState();
         const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
@@ -594,7 +594,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             allowShare ? new IconButton("fa-share-alt", "Share", {
-                onClick: () => this.utl.share(this),
+                onClick: () => this.utl.share(),
                 title: "Share Node"
             }) : null,
 
@@ -648,7 +648,7 @@ export class EditNodeDlg extends DialogBase {
 
     openChangeNodeTypeDlg = () => {
         const appState = getAppState();
-        new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(this, type)).open();
+        new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
@@ -778,7 +778,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
+    makeContentEditor = (rows: string): Div => {
         const appState = getAppState();
         const editItems: Comp[] = [];
 

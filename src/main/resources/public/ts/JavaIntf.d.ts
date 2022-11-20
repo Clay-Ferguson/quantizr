@@ -1051,7 +1051,7 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
     ACT_PUB_SENSITIVE = "ap:nsfw",
     ACT_PUB_TAG = "ap:tag",
-    CONTENT = "content",
+    CONTENT = "cont",
     ENC_KEY = "sn:encKey",
     CRYPTO_SIG = "sn:sig",
     SUBGRAPH_HASH = "sn:rSHA256",

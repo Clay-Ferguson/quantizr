@@ -606,7 +606,7 @@ export class Util {
             // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
         }
 
-        this.updateNodeHistory(node, childNode, appState);
+        this.updateNodeHistory(node, childNode);
     }
 
     removeHistorySubItem = (nodeId: string) => {
@@ -621,7 +621,7 @@ export class Util {
         });
     }
 
-    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState) => {
+    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null) => {
         if (S.quanta.nodeHistoryLocked) return;
         let subItems: NodeHistoryItem[] = null;
 

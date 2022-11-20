@@ -1199,7 +1199,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	//
 	// logRequest("view", null);
 	//
-	// model.addAttribute("content", attachmentService.getFileContent(null,
+	// model.addAttribute("content ", attachmentService.getFileContent(null,
 	// fileName));
 	//
 	// // tag: view.html

@@ -58,10 +58,6 @@ export class FriendTypeHandler extends TypeBase {
         return false;
     }
 
-    editTagsAtTop = (): boolean => {
-        return true;
-    }
-
     ensureDefaultProperties(node: J.NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.USER);
         this.ensureStringPropExists(node, J.NodeProp.USER_TAGS);

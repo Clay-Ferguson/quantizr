@@ -50,7 +50,7 @@ public class GraphNodesService extends ServiceBase {
 			// If search text provided run subgraph search.
 			else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(ms, node, "content", req.getSearchText(), null, null, limit, 0, true, false, null,
+				results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false, null,
 						true, false);
 			}
 

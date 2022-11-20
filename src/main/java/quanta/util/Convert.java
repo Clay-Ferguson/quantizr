@@ -411,17 +411,12 @@ public class Convert extends ServiceBase {
 		try {
 			Object value = null;
 
-			// todo-1: I think this content prop is obsolete (no longer used?)
-			if (NodeProp.CONTENT.s().equals(propName)) {
-				value = formatValue(sc, prop, initNodeEdit);
-			}
-			else {
-				if (prop instanceof Collection) {
-					value = prop;
-				}
-				else {
-					value = prop.toString();
-				}
+			if (prop instanceof Date) {
+				value = DateUtil.formatTimeForUserTimezone((Date) prop, sc.getTimezone(), sc.getTimeZoneAbbrev());
+			} else if (prop instanceof Collection) {
+				value = prop;
+			} else {
+				value = prop.toString();
 			}
 
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
@@ -439,73 +434,54 @@ public class Convert extends ServiceBase {
 		return val;
 	}
 
-	public String formatValue(SessionContext sc, Object value, boolean initNodeEdit) {
-		try {
-			if (value instanceof Date) {
-				return DateUtil.formatTimeForUserTimezone((Date) value, sc.getTimezone(), sc.getTimeZoneAbbrev());
-			} else {
-				/*
-				 * If we are doing an initNodeEdit we don't do this, because we want the text to render to the user
-				 * exactly as they had typed it and not with links converted.
-				 */
-				if (!initNodeEdit) {
-					return convertLinksToMarkdown(value.toString());
-				}
-				else {
-					return value.toString();
-				}
-			}
-		} catch (Exception e) {
-			return "";
-		}
-	}
-
 	/**
 	 * Searches in 'val' anywhere there is a line that begins with http:// (or https), and replaces that
 	 * with the normal way of doing a link in markdown. So we are injecting a snippet of markdown (not
 	 * html)
+	 * 
+	 * Not currently used, but I'm leaving it just in case.
 	 */
-	public static String convertLinksToMarkdown(String val) {
-		while (true) {
-			/* find http after newline character */
-			int startOfLink = val.indexOf("\nhttp://");
+	// public static String convertLinksToMarkdown(String val) {
+	// while (true) {
+	// /* find http after newline character */
+	// int startOfLink = val.indexOf("\nhttp://");
 
-			/* or else find one after return char */
-			if (startOfLink == -1) {
-				startOfLink = val.indexOf("\rhttp://");
-			}
+	// /* or else find one after return char */
+	// if (startOfLink == -1) {
+	// startOfLink = val.indexOf("\rhttp://");
+	// }
 
-			/* or else find one after return char */
-			if (startOfLink == -1) {
-				startOfLink = val.indexOf("\nhttps://");
-			}
+	// /* or else find one after return char */
+	// if (startOfLink == -1) {
+	// startOfLink = val.indexOf("\nhttps://");
+	// }
 
-			/* or else find one after return char */
-			if (startOfLink == -1) {
-				startOfLink = val.indexOf("\rhttps://");
-			}
+	// /* or else find one after return char */
+	// if (startOfLink == -1) {
+	// startOfLink = val.indexOf("\rhttps://");
+	// }
 
-			/* nothing found we're all done here */
-			if (startOfLink == -1)
-				break;
+	// /* nothing found we're all done here */
+	// if (startOfLink == -1)
+	// break;
 
-			/*
-			 * locate end of link via \n or \r
-			 */
-			int endOfLink = val.indexOf("\n", startOfLink + 1);
-			if (endOfLink == -1) {
-				endOfLink = val.indexOf("\r", startOfLink + 1);
-			}
-			if (endOfLink == -1) {
-				endOfLink = val.length();
-			}
+	// /*
+	// * locate end of link via \n or \r
+	// */
+	// int endOfLink = val.indexOf("\n", startOfLink + 1);
+	// if (endOfLink == -1) {
+	// endOfLink = val.indexOf("\r", startOfLink + 1);
+	// }
+	// if (endOfLink == -1) {
+	// endOfLink = val.length();
+	// }
 
-			String link = val.substring(startOfLink + 1, endOfLink);
+	// String link = val.substring(startOfLink + 1, endOfLink);
 
-			String left = val.substring(0, startOfLink + 1);
-			String right = val.substring(endOfLink);
-			val = left + "[" + link + "](" + link + ")" + right;
-		}
-		return val;
-	}
+	// String left = val.substring(0, startOfLink + 1);
+	// String right = val.substring(endOfLink);
+	// val = left + "[" + link + "](" + link + ")" + right;
+	// }
+	// return val;
+	// }
 }

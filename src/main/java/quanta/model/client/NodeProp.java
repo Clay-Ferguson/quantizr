@@ -40,7 +40,7 @@ public enum NodeProp {
     // this 's' probably needs to change to JSON or Object ? (todo-1)
     ACT_PUB_TAG("ap:tag"), //
 
-    CONTENT("content"), //
+    CONTENT("cont"), //
 
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of

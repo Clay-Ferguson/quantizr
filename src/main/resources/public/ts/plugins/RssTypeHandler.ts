@@ -66,9 +66,9 @@ export class RssTypeHandler extends TypeBase {
     }
 
     getCustomProperties(): string[] {
-        // 'content' is not a prop actually (it's a field on SubNode), but we need to return it here to allow editing
+        // Note: 'CONTENT' is not a prop actually (it's a field on SubNode), but we need to return it here to allow editing
         // of it when we also have custom properties.
-        return [J.NodeProp.RSS_FEED_SRC, "content"];
+        return [J.NodeProp.RSS_FEED_SRC, J.NodeProp.CONTENT];
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {
@@ -242,11 +242,10 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Div(feed.author));
         }
 
-        const feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
+        const feedOutDiv = new Div(null, { className: "marginBottom marginLeft" }, feedOut);
         feedList.addChild(feedOutDiv);
 
         for (const item of feed.entries) {
-            // console.log("FEED ITEM: " + S.util.prettyPrint(item));
             feedList.addChild(this.buildFeedItem(feed, item, state));
         }
 
