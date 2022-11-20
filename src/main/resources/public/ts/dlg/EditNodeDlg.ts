@@ -29,7 +29,7 @@ import { Validator } from "../Validator";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
-import { SelectTagsDlg } from "./SelectTagsDlg";
+import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
 /**
  * Node Editor Dialog
@@ -499,8 +499,7 @@ export class EditNodeDlg extends DialogBase {
 
     addTagsToTextField = (dlg: SelectTagsDlg) => {
         let val = "";
-        // todo-0: why not typesafe here. no 'any'.
-        dlg.getState().selectedTags.forEach((tag: any) => {
+        dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
             if (val) val += " ";
             val += tag;
         });

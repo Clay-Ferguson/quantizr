@@ -204,7 +204,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
         const url = action;
 
-        // todo-0: we can switch to fat arrow functions and get rid of 'dlg' var.
+        // we assign 'dlg' as 'this' because the 'this' below is controlled and called by 3rd party
+        // code expecting 'this' to be what the dropzoned lib needs.
         const dlg = this;
 
         const config: Object = {

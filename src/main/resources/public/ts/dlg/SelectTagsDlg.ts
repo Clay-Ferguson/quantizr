@@ -25,7 +25,6 @@ interface Tag {
     description: string;
 }
 
-// need to disable this for anonymous
 export class SelectTagsDlg extends DialogBase {
     matchAny = false;
     matchAll = false;
@@ -35,8 +34,12 @@ export class SelectTagsDlg extends DialogBase {
     constructor(private modeOption: string, private curTags: string) {
         super("Select Hashtags", "app-modal-content-medium-width");
 
-        const tags = this.parseTags();
-        this.mergeState({ selectedTags: this.makeDefaultSelectedTags(), tags, suggestedTags: [], suggestTags: false });
+        this.mergeState<LS>({
+            selectedTags: this.makeDefaultSelectedTags(),
+            tags: this.parseTags(),
+            suggestedTags: [],
+            suggestTags: false
+        });
     }
 
     makeDefaultSelectedTags = (): Set<string> => {
