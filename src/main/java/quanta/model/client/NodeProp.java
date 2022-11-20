@@ -4,41 +4,43 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
     // Activity Pub Properties
-    ACT_PUB_ID("apid", "s"), // todo-2: should rename to "ap:id"
-    ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
+    ACT_PUB_ID("apid"), // todo-2: should rename to "ap:id"
+    ACT_PUB_OBJ_TYPE("ap:objType"), //
 
-    ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
+    ACT_PUB_OBJ_CONTENT("ap:objContent"), //
 
     // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
-    ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
+    ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo"), //
 
     // For "AP Note" Objects (per spec) this is the "url" property on the node.
-    ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
+    ACT_PUB_OBJ_URL("ap:objUrl"), //
 
     // when an object has an array as urls we put them here.
-    ACT_PUB_OBJ_URLS("ap:objUrls", "s"), //
+    ACT_PUB_OBJ_URLS("ap:objUrls"), //
 
     // when an object has an array of icons (like a "Video" type object we hold them here)
-    ACT_PUB_OBJ_ICONS("ap:objIcons", "s"), //
+    ACT_PUB_OBJ_ICONS("ap:objIcons"), //
 
-    ACT_PUB_OBJ_NAME("ap:objName", "s"), //
+    ACT_PUB_OBJ_NAME("ap:objName"), //
 
-    ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
-    ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
-    ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
-    ACT_PUB_USER_IMAGE_URL("ap:userImage", "s"), //
-    ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
+    ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo"), //
+    ACT_PUB_USER_ICON_URL("ap:userIcon"), //
+    ACT_PUB_SHARED_INBOX("ap:sharedInbox"), //
+    ACT_PUB_USER_IMAGE_URL("ap:userImage"), //
+    ACT_PUB_ACTOR_ID("ap:actorId"), //
 
     // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)
-    ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
+    ACT_PUB_ACTOR_URL("ap:actorUrl"), //
 
-    ACT_PUB_KEYPEM("ap:keyPem", "s"), //
+    ACT_PUB_KEYPEM("ap:keyPem"), //
 
-    ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
-    ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
+    ACT_PUB_ACTOR_INBOX("ap:actorInbox"), //
+    ACT_PUB_SENSITIVE("ap:nsfw"), //
 
     // this 's' probably needs to change to JSON or Object ? (todo-1)
-    ACT_PUB_TAG("ap:tag", "s"), //
+    ACT_PUB_TAG("ap:tag"), //
+
+    CONTENT("content"), //
 
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of
@@ -46,61 +48,61 @@ public enum NodeProp {
      * encrypted with the public key of the user it's being shared to so that user can use their private
      * key to decrypt this key and gain access to the actual data.
      */
-    ENC_KEY("sn:encKey", "s"), //
-    CRYPTO_SIG("sn:sig", "s"), //
+    ENC_KEY("sn:encKey"), //
+    CRYPTO_SIG("sn:sig"), //
 
     // stands for "[r]ecursive SHA256" of all children of node.
-    SUBGRAPH_HASH("sn:rSHA256", "s"), //
+    SUBGRAPH_HASH("sn:rSHA256"), //
 
     /*
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc", "s"), AUDIO_URL("sn:audioUrl", "s"),
+    RSS_FEED_SRC("sn:rssFeedSrc"), AUDIO_URL("sn:audioUrl"),
 
-    USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
-    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey", "s"), //
+    USER_PREF_PUBLIC_KEY("sn:publicKey"), //
+    USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //
 
-    USER_PREF_EDIT_MODE("sn:editMode", "s"), //
-    USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
-    USER_PREF_NSFW("sn:nsfw", "s"), //
-    USER_PREF_SHOW_PROPS("sn:showProps", "s"), //
-    USER_PREF_SHOW_PARENTS("sn:showParents", "s"), //
-    USER_PREF_SHOW_REPLIES("sn:showReplies", "s"), //
-    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
-    USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", "s"), //
-    USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols", "s"), //
-    SIGNUP_PENDING("sn:signupPending", "s"), //
+    USER_PREF_EDIT_MODE("sn:editMode"), //
+    USER_PREF_SHOW_METADATA("sn:showMetaData"), //
+    USER_PREF_NSFW("sn:nsfw"), //
+    USER_PREF_SHOW_PROPS("sn:showProps"), //
+    USER_PREF_SHOW_PARENTS("sn:showParents"), //
+    USER_PREF_SHOW_REPLIES("sn:showReplies"), //
+    USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
+    USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly"), //
+    USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols"), //
+    SIGNUP_PENDING("sn:signupPending"), //
 
-    EMAIL_CONTENT("sn:content", "s"), //
-    EMAIL_RECIP("sn:recip", "s"), //
-    EMAIL_SUBJECT("sn:subject", "s"), //
+    EMAIL_CONTENT("sn:content"), //
+    EMAIL_RECIP("sn:recip"), //
+    EMAIL_SUBJECT("sn:subject"), //
 
     /*
      * when a node id pointing to some other node, we set it's target id to the node it points to. For
      * now used only for inbox to point to nodes
      */
-    TARGET_ID("sn:target_id", "s"), //
+    TARGET_ID("sn:target_id"), //
 
     /*
      * WARNING: Only the User Account Root nodes have this property of the actual user name. All other
      * nodes reference their OWNER as an OwnerId that points to these nodes.
      */
-    USER("sn:user", "s"), //
-    DISPLAY_NAME("sn:displayName", "s"), //
-    MFS_ENABLE("sn:mfsEnable", "s"), // Mutable File System enabled (user can set this, independend of their admin authorization)
-    USER_BIO("sn:userBio", "s"), //
-    USER_DID_IPNS("sn:didIPNS", "s"), //
-    USER_IPFS_KEY("sn:ipfsKey", "s"), //
-    USER_TAGS("sn:tags", "s"), //
-    PWD_HASH("sn:pwdHash", "s"), //
-    VOTE("vote", "s"), //
+    USER("sn:user"), //
+    DISPLAY_NAME("sn:displayName"), //
+    MFS_ENABLE("sn:mfsEnable"), // Mutable File System enabled (user can set this, independend of their admin authorization)
+    USER_BIO("sn:userBio"), //
+    USER_DID_IPNS("sn:didIPNS"), //
+    USER_IPFS_KEY("sn:ipfsKey"), //
+    USER_TAGS("sn:tags"), //
+    PWD_HASH("sn:pwdHash"), //
+    VOTE("vote"), //
 
-    FILE_SYNC_LINK("fs:link", "s"), //
+    FILE_SYNC_LINK("fs:link"), //
 
     // Goes on 'Friend' nodes, and is added automatically by server (not user)
-    USER_NODE_ID("sn:userNodeId", "s"), //
-    NAME("sn:name", "s"), //
+    USER_NODE_ID("sn:userNodeId"), //
+    NAME("sn:name"), //
 
     // FS_FILE("fs:file"), //
     // FS_FOLDER("fs:folder"), //
@@ -108,55 +110,55 @@ public enum NodeProp {
 
     // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
     // type of the node to "sn:ipfsNode" (IPFS_NODE)
-    IPFS_CID("ipfs:cid", "s"), //
-    IPNS_CID("ipns:cid", "s"), //
+    IPFS_CID("ipfs:cid"), //
+    IPNS_CID("ipns:cid"), //
 
     // Represents an IPFS CID that is aht "Source" for the data in such a way that we assume
     // the IPFS content will supercede (and take precedence), so that we can always read from IPFS
     // and make that content be the content in our DB with fear of overwriting anything.
-    IPFS_SCID("ipfs:scid", "s"),
+    IPFS_SCID("ipfs:scid"),
 
-    JSON_HASH("ipfs:json", "s"), //
-    SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
+    JSON_HASH("ipfs:json"), //
+    SAVE_TO_IPFS("sn:saveToIpfs"), //
 
     // todo-2: is this still used?
-    IPFS_LINK_NAME("ipfs:linkName", "s"), //
+    IPFS_LINK_NAME("ipfs:linkName"), //
 
     // This property indicates that it's data is sourced from IPFS files, and can
     // come from another server
-    IPFS_SOURCE("ipfs:source", "s"), //
+    IPFS_SOURCE("ipfs:source"), //
 
-    FS_LINK("fs:link", "s"), //
+    FS_LINK("fs:link"), //
 
     /*
      * property used to indicate we should not query the IPFS network again for this conten becasue we
      * have already loaded it
      */
-    IPFS_OK("ipfs:ok", "s"), //
+    IPFS_OK("ipfs:ok"), //
 
     /*
      * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
      * metadata rendering
      */
-    MIME_EXT("sn:ext", "s"), //
+    MIME_EXT("sn:ext"), //
 
-    EMAIL("sn:email", "s"), //
-    CODE("sn:code", "s"), //
+    EMAIL("sn:email"), //
+    CODE("sn:code"), //
 
-    JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
-    NOWRAP("sn:nowrap", "s"), //
+    JSON_FILE_SEARCH_RESULT("sn:json"), //
+    NOWRAP("sn:nowrap"), //
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot", "s"), // see isSavableProperty
+    BIN_TOTAL("sn:binTot"), // see isSavableProperty
 
     // amount of bytes the user is ALLOWED to save.
-    BIN_QUOTA("sn:binQuota", "s"), // see isSavableProperty
+    BIN_QUOTA("sn:binQuota"), // see isSavableProperty
 
     // if this contains web3, then web3 active, etc.
-    ALLOWED_FEATURES("sn:features", "s"), //
+    ALLOWED_FEATURES("sn:features"), //
 
-    LAST_LOGIN_TIME("sn:lastLogin", "s"), //
-    LAST_ACTIVE_TIME("sn:lastActive", "s"), //
+    LAST_LOGIN_TIME("sn:lastLogin"), //
+    LAST_ACTIVE_TIME("sn:lastActive"), //
 
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.
@@ -164,41 +166,39 @@ public enum NodeProp {
      * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey"
      * props are the keys used and only the public key exists on the server for that E2E encryption.
      */
-    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
-    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
+    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic"), //
+    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate"), //
 
-    INLINE_CHILDREN("inlineChildren", "s"), //
+    INLINE_CHILDREN("inlineChildren"), //
 
-    PRIORITY("priority", "s"), //
-    PRIORITY_FULL("p.priority", "s"), //
+    PRIORITY("priority"), //
+    PRIORITY_FULL("p.priority"), //
 
-    LAYOUT("layout", "s"), //
-    ORDER_BY("orderBy", "s"), NO_OPEN_GRAPH("noOpenGraph", "s"), //
+    LAYOUT("layout"), //
+    ORDER_BY("orderBy"), //
+    NO_OPEN_GRAPH("noOpenGraph"), //
 
-    TYPE_LOCK("sn:typLoc", "s"), //
+    TYPE_LOCK("sn:typLoc"), //
 
-    DATE("date", "s"), //
-    DATE_FULL("p.date", "s"), //
+    DATE("date"), //
+    DATE_FULL("p.date"), //
 
     // nodes that contain this property are not published to ActPub servers and not allowed to show up
     // in feeds.
-    UNPUBLISHED("unpub", "s"), //
+    UNPUBLISHED("unpub"), //
 
     // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the
     // node is s boost.
-    BOOST("boost", "s"), //
-    DURATION("duration", "s"), //
+    BOOST("boost"), //
+    DURATION("duration"), //
 
-    TRUNCATED("trunc", "s");
+    TRUNCATED("trunc");
 
     @JsonValue
     private final String value;
 
-    private final String type;
-
-    private NodeProp(String value, String type) {
+    private NodeProp(String value) {
         this.value = value;
-        this.type = type;
     }
 
     public String toString() {
@@ -207,9 +207,5 @@ public enum NodeProp {
 
     public String s() {
         return value;
-    }
-
-    public String getType() {
-        return type;
     }
 }

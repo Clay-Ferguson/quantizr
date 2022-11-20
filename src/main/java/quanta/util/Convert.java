@@ -3,6 +3,7 @@ package quanta.util;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -409,27 +410,18 @@ public class Convert extends ServiceBase {
 		// log.debug("propName=" + propName + " propClass=" + prop.getClass().getName() + " val=" + prop);
 		try {
 			Object value = null;
-			switch (propName) {
 
-				// todo-0: Fix this temporary hack. Hard coded strings is bad, and also the special types
-				// tag, urls, icons need to have a type designation on them like "o" instead of "s" for string
-				// or maybe even "a" for array/list. Right now this one hack here does work, but it's not good
-				// for the long term, becasue we need to start USING the type system on our PropertyInfo everywhere
-				// instead of assuming everything is always a string most places.
-				case "content":
-					value = formatValue(sc, prop, /* false, */ initNodeEdit);
-					break;
-
-				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
-				case "ap:tag":
-				case "ap:objUrls":
-				case "ap:objIcons":
+			// todo-1: I think this content prop is obsolete (no longer used?)
+			if (NodeProp.CONTENT.s().equals(propName)) {
+				value = formatValue(sc, prop, initNodeEdit);
+			}
+			else {
+				if (prop instanceof Collection) {
 					value = prop;
-					break;
-
-				default:
+				}
+				else {
 					value = prop.toString();
-					break;
+				}
 			}
 
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
@@ -447,22 +439,21 @@ public class Convert extends ServiceBase {
 		return val;
 	}
 
-	public String formatValue(SessionContext sc, Object value, /* boolean convertToHtml, */ boolean initNodeEdit) {
+	public String formatValue(SessionContext sc, Object value, boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
 				return DateUtil.formatTimeForUserTimezone((Date) value, sc.getTimezone(), sc.getTimeZoneAbbrev());
 			} else {
-				String ret = value.toString();
-
 				/*
 				 * If we are doing an initNodeEdit we don't do this, because we want the text to render to the user
 				 * exactly as they had typed it and not with links converted.
 				 */
 				if (!initNodeEdit) {
-					ret = convertLinksToMarkdown(ret);
+					return convertLinksToMarkdown(value.toString());
 				}
-
-				return ret;
+				else {
+					return value.toString();
+				}
 			}
 		} catch (Exception e) {
 			return "";

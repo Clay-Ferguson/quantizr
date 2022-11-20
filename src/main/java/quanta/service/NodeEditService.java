@@ -302,6 +302,15 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
+		// use this is for testing non string types
+		// newNode.set(NodeProp.ACT_PUB_OBJ_URLS, Arrays.asList(//
+		//		new APOUrl("Link", "text/html", "https://drudgereport.com"), 
+		//		new APOUrl("Link", "text/html", "https://cnn.com")));
+		// newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, Arrays.asList(//
+		// 		new APOIcon("Icon", "image/png", "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"), 
+		// 		new APOIcon("Icon", "image/jpg", "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
+		// newNode.set(NodeProp.ACT_PUB_OBJ_NAME, "Test Name");
+
 		// createNode might have altered 'hasChildren', so we save if dirty
 		update.saveIfDirty(ms, parentNode);
 
@@ -940,8 +949,6 @@ public class NodeEditService extends ServiceBase {
 		 */
 		else {
 			parentForNewNodes = node;
-
-			// todo-0: ordinal 0 is a 'slower' insert than an append, because it might update ordinals. can we insert at end instead? 
 			firstOrdinal = 0L;
 		}
 
