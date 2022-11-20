@@ -24,7 +24,7 @@ export class NodeStatsDlg extends DialogBase {
 
         if (this.res.topVotes?.length > 0) {
             tagPanel.addChild(new Heading(4, "Votes"));
-            this.res.topVotes.forEach((word: string) => {
+            this.res.topVotes.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\""
@@ -34,7 +34,7 @@ export class NodeStatsDlg extends DialogBase {
 
         if (this.res.topTags?.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags"));
-            this.res.topTags.forEach((word: string) => {
+            this.res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
@@ -46,7 +46,7 @@ export class NodeStatsDlg extends DialogBase {
         const mentionPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topMentions?.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions"));
-            this.res.topMentions.forEach((word: string) => {
+            this.res.topMentions.forEach(word => {
                 mentionPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
@@ -58,7 +58,7 @@ export class NodeStatsDlg extends DialogBase {
         const wordPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topWords?.length > 0) {
             wordPanel.addChild(new Heading(4, "Words"));
-            this.res.topWords.forEach((word: string) => {
+            this.res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
                     className: state.mobileMode ? "statsWordMobile" : "statsWord",
                     word,

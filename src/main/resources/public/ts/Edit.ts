@@ -12,7 +12,6 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
@@ -316,9 +315,7 @@ export class Edit {
             }
 
             // find and update the history item if it exists.
-            const histItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
-                return h.id === node.id;
-            });
+            const histItem = S.quanta.nodeHistory.find(h => h.id === node.id);
 
             if (histItem) {
                 histItem.content = S.nodeUtil.getShortContent(node);
@@ -429,9 +426,7 @@ export class Edit {
                     }
 
                     // make all tabs update their copy of the node of they have it
-                    state.tabData.forEach((td: TabIntf) => {
-                        td.replaceNode(s, res.node);
-                    });
+                    state.tabData.forEach(td => td.replaceNode(s, res.node));
 
                     return s;
                 });
@@ -987,18 +982,14 @@ export class Edit {
     /* Updates 'nodeHistory' when nodes are deleted */
     removeNodesFromHistory = (selNodesArray: string[], appState: AppState) => {
         if (!selNodesArray) return;
-        selNodesArray.forEach((id: string) => {
+        selNodesArray.forEach(id => {
             // remove any top level history item that matches 'id'
-            S.quanta.nodeHistory = S.quanta.nodeHistory.filter(function (h: NodeHistoryItem) {
-                return h.id !== id;
-            });
+            S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== id);
 
             // scan all top level history items, and remove 'id' from any subItems
-            S.quanta.nodeHistory.forEach(function (h: NodeHistoryItem) {
+            S.quanta.nodeHistory.forEach(h => {
                 if (h.subItems) {
-                    h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
-                        return hi.id !== id;
-                    });
+                    h.subItems = h.subItems.filter(hi => hi.id !== id);
                 }
             });
         });
@@ -1007,7 +998,7 @@ export class Edit {
     removeNodesFromCalendarData = (selNodesArray: string[], appState: AppState) => {
         if (!appState.calendarData) return;
 
-        selNodesArray.forEach((id: string) => {
+        selNodesArray.forEach(id => {
             appState.calendarData = appState.calendarData.filter((item: EventInput) => item.id !== id);
         });
 

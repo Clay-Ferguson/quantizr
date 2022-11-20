@@ -75,7 +75,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
-        devices.forEach((device: MediaDeviceInfo) => {
+        devices.forEach(device => {
             // console.log("Device Kind: " + device.kind);
             if (device.kind === "audioinput") {
                 // take the first one here
@@ -316,11 +316,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     closeStream = () => {
-        if (this.stream) {
-            this.stream.getTracks().forEach(function (track: any) {
-                track.stop();
-            });
-        }
+        this.stream?.getTracks().forEach((track: any) => track.stop());
     }
 
     cancel = async () => {

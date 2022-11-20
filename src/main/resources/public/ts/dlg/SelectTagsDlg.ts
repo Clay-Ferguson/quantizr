@@ -117,9 +117,7 @@ export class SelectTagsDlg extends DialogBase {
 
         if (res.topTags?.length > 0) {
             const suggestedTags: Tag[] = [];
-            res.topTags.forEach(tag => {
-                suggestedTags.push({ tag, description: null });
-            });
+            res.topTags.forEach(tag => suggestedTags.push({ tag, description: null }));
             this.mergeState({ suggestedTags });
         }
     }
@@ -165,9 +163,7 @@ export class SelectTagsDlg extends DialogBase {
         if (state.tags?.length > 0) {
             div = new Div();
 
-            state.tags.forEach(tagObj => {
-                this.processAddCheckboxOrHeading(div, tagObj);
-            });
+            state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 
             if (state.suggestTags && state.suggestedTags.length > 0) {
                 div.addChild(new Heading(4, "Suggestions", { className: "marginTop" }));

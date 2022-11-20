@@ -143,7 +143,7 @@ export class Render {
 
         // From Stack Overflow
         // https://github.com/markedjs/marked/issues/882
-        this.markedRenderer.link = function (href: string, title: string, text: string) {
+        this.markedRenderer.link = (href: string, title: string, text: string) => {
             // console.log(`marked.link [${href}][${title}][${text}]`);
             if (href.indexOf("mailto:") === 0) {
                 // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that.

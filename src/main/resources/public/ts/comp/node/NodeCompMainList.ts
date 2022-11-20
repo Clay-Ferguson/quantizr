@@ -79,7 +79,7 @@ export class NodeCompMainList extends Div {
                         const state = getAppState();
 
                         if (!state.editNode) {
-                            entries.forEach((entry: any) => {
+                            entries.forEach(entry => {
                                 if (entry.isIntersecting) {
                                     // if this button comes into visibility within 2 seconds of it being created
                                     // that means it was rendered visible without user scrolling so in this case

@@ -16,7 +16,7 @@ export class PropTable extends Comp {
     compRender = (): ReactNode => {
         this.setChildren([]);
         if (this.node.properties) {
-            this.node.properties.forEach((property: J.PropertyInfo) => {
+            this.node.properties.forEach(property => {
                 if (S.props.isGuiControlBasedProp(property)) return;
 
                 // console.log("Render Prop: "+property.name);

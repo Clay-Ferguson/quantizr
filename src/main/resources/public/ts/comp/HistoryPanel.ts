@@ -34,7 +34,7 @@ export class HistoryPanel extends Div {
             }, "form-switch form-check-inline")
         ]));
 
-        S.quanta.nodeHistory.forEach((h: NodeHistoryItem) => {
+        S.quanta.nodeHistory.forEach(h => {
             if (!h.content) return;
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
@@ -83,7 +83,7 @@ export class HistoryPanel extends Div {
                 // ever able to be duplilcated, because that throws a warning in React.
                 const topLevelId = h.id;
 
-                h.subItems.forEach((h: NodeHistoryItem) => {
+                h.subItems.forEach(h => {
                     if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
                         let dropTarg: Div;

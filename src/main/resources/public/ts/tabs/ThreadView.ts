@@ -45,7 +45,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
         const jumpButton = state.isAdminUser || !this.data.props.searchType;
 
-        results.forEach((node: J.NodeInfo) => {
+        results.forEach(node => {
             const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem", state);
             if (c) {
                 children.push(c);
@@ -53,7 +53,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
             if (node.children) {
                 const subComps: CompIntf[] = [];
-                node.children.forEach((child: J.NodeInfo) => {
+                node.children.forEach(child => {
                     const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", state);
                     if (c) {
                         subComps.push(c);

@@ -15,13 +15,13 @@ export class EditPrivsTable extends ListBox {
 
         if (this.acl) {
             // first add public, so it's at the top
-            this.acl.forEach((aclEntry: J.AccessControlInfo) => {
+            this.acl.forEach(aclEntry => {
                 if (aclEntry.principalName?.toLowerCase() === "public") {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }
             });
 
-            this.acl.forEach((aclEntry: J.AccessControlInfo) => {
+            this.acl.forEach(aclEntry => {
                 if (aclEntry.principalName?.toLowerCase() !== "public") {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }

@@ -17,13 +17,12 @@ export class NodeTypeListBox extends ListBox {
         const children: Comp[] = [];
         const typeHandlers = S.plugin.getAllTypeHandlers();
 
-        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
+        typeHandlers.forEach((typeHandler, k) => {
             if (getAppState().isAdminUser || typeHandler.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(typeHandler, () => {
                     this.updateVal(typeHandler.getTypeName());
                 }, this.valueIntf.getValue() === typeHandler.getTypeName()));
             }
-            return true;
         });
 
         this.setChildren(children);

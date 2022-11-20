@@ -46,7 +46,7 @@ export class NodeCompTableRowLayout extends Div {
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
 
-        this.node.children?.forEach((n: J.NodeInfo) => {
+        this.node.children?.forEach(n => {
             if (!n) return;
             const comps: Comp[] = [];
 

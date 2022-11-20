@@ -32,7 +32,7 @@ export class NodeCompVerticalRowLayout extends Div {
         let inVerticalSpace = false;
         const isMine = S.props.isMine(state.node, state);
 
-        this.node.children?.forEach((n: J.NodeInfo) => {
+        this.node.children?.forEach(n => {
             if (!n) return;
             if (!(state.nodesToMove?.find(id => id === n.id))) {
                 // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);

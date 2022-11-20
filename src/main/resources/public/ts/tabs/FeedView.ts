@@ -208,14 +208,14 @@ export class FeedView extends AppTab<FeedViewProps> {
             const boosts: Set<string> = new Set<string>();
 
             // scan all 'feedResults' to build up boosts set of IDs
-            this.data.props.feedResults.forEach((node: J.NodeInfo) => {
+            this.data.props.feedResults.forEach(node => {
                 if (node.boostedNode) {
                     boosts.add(node.boostedNode.id);
                 }
             });
 
             // finally here's where we render the feed items
-            this.data.props.feedResults.forEach((node: J.NodeInfo) => {
+            this.data.props.feedResults.forEach(node => {
                 // if this node will be showing up as a boost don't display it on the page, skip it.
                 if (boosts.has(node.id)) {
                     return;

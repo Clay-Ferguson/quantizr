@@ -203,6 +203,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             action = S.rpcUtil.getRpcPath() + "upload";
         }
         const url = action;
+
+        // todo-0: we can switch to fat arrow functions and get rid of 'dlg' var.
         const dlg = this;
 
         const config: Object = {

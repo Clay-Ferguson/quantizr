@@ -155,9 +155,7 @@ export class View {
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    state.node.children.forEach(child => {
-                        idSet.add(child.id);
-                    });
+                    state.node.children.forEach(child => idSet.add(child.id));
 
                     // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
                     res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));

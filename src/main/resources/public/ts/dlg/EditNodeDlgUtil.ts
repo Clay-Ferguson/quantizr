@@ -24,7 +24,7 @@ export class EditNodeDlgUtil {
         let numPropsShowing: number = 0;
 
         // This loop creates all the editor input fields for all the properties
-        appState.editNode.properties?.forEach((prop: J.PropertyInfo) => {
+        appState.editNode.properties?.forEach(prop => {
             // console.log("prop=" + S.util.prettyPrint(prop));
 
             if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(appState.editNode, prop.name, getAppState())) {
@@ -132,7 +132,7 @@ export class EditNodeDlgUtil {
 
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
-        editNode.properties?.forEach((prop: J.PropertyInfo) => {
+        editNode.properties?.forEach(prop => {
             // console.log("Save prop iterator: name=" + prop.name);
             const propState = dlg.propStates.get(prop.name);
             if (propState) {
@@ -237,9 +237,7 @@ export class EditNodeDlgUtil {
 
         if (S.util.checkSuccess("Delete property", res)) {
             const state = dlg.getState<LS>();
-            propNames.forEach(propName => {
-                S.props.deleteProp(appState.editNode, propName);
-            });
+            propNames.forEach(propName => S.props.deleteProp(appState.editNode, propName));
             dlg.mergeState<LS>(state);
         }
     }
@@ -451,7 +449,7 @@ an upload has been added or removed.
         }
 
         if (node.properties) {
-            node.properties.forEach((prop: J.PropertyInfo) => {
+            node.properties.forEach(prop => {
                 // console.log("prop: " + S.util.prettyPrint(prop));
                 if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAppState())) {
                     // ("Hiding property: " + prop.name);

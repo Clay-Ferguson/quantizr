@@ -436,7 +436,7 @@ export class EditNodeDlg extends DialogBase {
         const appState = getAppState();
         if (appState.editNode.properties) {
             // This loop creates all the editor input fields for all the properties
-            appState.editNode.properties.forEach((prop: J.PropertyInfo) => {
+            appState.editNode.properties.forEach(prop => {
                 // console.log("prop=" + S.util.prettyPrint(prop));
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(appState.editNode, prop.name, getAppState())) {
@@ -499,7 +499,8 @@ export class EditNodeDlg extends DialogBase {
 
     addTagsToTextField = (dlg: SelectTagsDlg) => {
         let val = "";
-        dlg.getState().selectedTags.forEach((tag: string) => {
+        // todo-0: why not typesafe here. no 'any'.
+        dlg.getState().selectedTags.forEach((tag: any) => {
             if (val) val += " ";
             val += tag;
         });

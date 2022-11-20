@@ -149,7 +149,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     renderItems = (propTable: FilesTable, mfsFiles: J.MFSDirEntry[], mfsFolder: any, mfsMode: boolean, foldersOnly: boolean) => {
-        mfsFiles.forEach((entry: J.MFSDirEntry) => {
+        mfsFiles.forEach(entry => {
             let iconClass: string = null;
             let isFile: boolean = false;
 

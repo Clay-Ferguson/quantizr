@@ -312,9 +312,7 @@ export class Search {
     }
 
     removeNodeById = (id: string, state: AppState) => {
-        state.tabData.forEach((td: TabIntf) => {
-            td.nodeDeleted(state, id);
-        });
+        state.tabData.forEach(td => td.nodeDeleted(state, id));
     }
 
     /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
@@ -393,9 +391,7 @@ export class Search {
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    FeedTab.inst.props.feedResults.forEach((child: any) => {
-                        idSet.add(child.id);
-                    });
+                    FeedTab.inst.props.feedResults.forEach(child => idSet.add(child.id));
 
                     scrollToTop = false;
                     FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));

@@ -13,10 +13,7 @@ import { MainTab } from "./tabs/data/MainTab";
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {
         const sels: string[] = [];
-        state.selectedNodes.forEach(id => {
-            sels.push(id);
-            return true;
-        });
+        state.selectedNodes.forEach(id => sels.push(id));
         return sels;
     }
 
@@ -46,7 +43,6 @@ export class NodeUtil {
             if (node) {
                 selArray.push(node);
             }
-            return true;
         });
         return selArray;
     }
@@ -154,11 +150,11 @@ export class NodeUtil {
         let ret = false;
         if (node.children) {
             // for now we do ONE level, and this would fail for
-            node.children.forEach((n: any) => {
+            node.children.forEach(n => {
                 if (this.nodeIdIsVisible(n, nodeId, parentPath, state)) {
                     ret = true;
                 }
-            }, this);
+            });
         }
         return ret;
     }

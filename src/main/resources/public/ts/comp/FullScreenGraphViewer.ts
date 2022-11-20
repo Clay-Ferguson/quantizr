@@ -29,6 +29,8 @@ export class FullScreenGraphViewer extends Main {
     }
 
     forceDirectedTree = () => {
+
+        // todo-0: use fat arrows on functions and get rid if 'thiz'
         const thiz = this;
         const appState = getAppState();
         const nodeId = appState.fullScreenConfig.nodeId;

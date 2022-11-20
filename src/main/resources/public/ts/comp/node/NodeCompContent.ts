@@ -85,7 +85,7 @@ export class NodeCompContent extends Div {
         const urls: J.APObjUrl[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
         let div: Div = null;
         if (urls?.forEach) {
-            urls.forEach((url: J.APObjUrl) => {
+            urls.forEach(url => {
                 if (url.type === "Link") {
                     // lazy create div
                     div = div || new Div(null, { className: "apObjLinksContainer float-end" });
@@ -106,7 +106,7 @@ export class NodeCompContent extends Div {
         const icons: J.APObjIcon[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
         let div: Div = null;
         if (icons?.forEach) {
-            icons.forEach((icon: J.APObjIcon) => {
+            icons.forEach(icon => {
                 if (icon.type === "Icon") {
                     // lazy create div
                     div = div || new Div(null, { className: "apObjIconContainer" });

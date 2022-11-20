@@ -20,7 +20,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
         const div = new Div(null, { className: "float-end microMarginBottom" });
 
-        aclEntry.privileges.forEach((privilege) => {
+        aclEntry.privileges.forEach(privilege => {
             div.addChild(
                 new Div(null, null, [
                     // new Span(privilege.privilegeName), don't need this it's just "rd/wr"

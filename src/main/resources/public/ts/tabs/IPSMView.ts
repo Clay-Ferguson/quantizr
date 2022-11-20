@@ -32,9 +32,7 @@ export class IPSMView extends AppTab {
         ]));
 
         if (this.data.props?.events) {
-            this.data.props.events.forEach((e: string) => {
-                children.push(new Div(e, { className: "ipsmFeedItem" }));
-            });
+            this.data.props.events.forEach((e: string) => children.push(new Div(e, { className: "ipsmFeedItem" })));
         }
 
         this.setChildren([new Div(null, { className: "feedView" }, children)]);

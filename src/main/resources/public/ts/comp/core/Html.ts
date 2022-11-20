@@ -58,12 +58,10 @@ export class Html extends Comp {
 
     domPreUpdateEvent = (): void => {
         // make all "a" tags inside this div to have a target=_blank
-        this.getRef()?.querySelectorAll("a").forEach((e: HTMLAnchorElement) => {
-            e.setAttribute("target", "_blank");
-        });
+        this.getRef()?.querySelectorAll("a").forEach(e => e.setAttribute("target", "_blank"));
 
         // adds the click handler function to all .enlargable-img images
-        this.getRef()?.querySelectorAll(".enlargable-img").forEach((e: HTMLAnchorElement) => {
+        this.getRef()?.querySelectorAll(".enlargable-img").forEach(e => {
             e.addEventListener("click", (evt: MouseEvent) => {
                 NodeCompBinary.clickOnImage(e.getAttribute("nodeid"), e.getAttribute("attkey"), false, false);
             });

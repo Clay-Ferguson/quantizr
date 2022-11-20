@@ -183,9 +183,8 @@ export class MenuPanel extends Div {
         const bookmarkItems = [];
         if (!appState.isAnonUser) {
             if (appState.bookmarks) {
-                appState.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
+                appState.bookmarks.forEach(bookmark => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null));
-                    return true;
                 });
             }
 
@@ -288,12 +287,11 @@ export class MenuPanel extends Div {
 
         const createMenuItems: CompIntf[] = [];
         const typeHandlers = S.plugin.getAllTypeHandlers();
-        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
+        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string) => {
             if (appState.isAdminUser || typeHandler.getAllowUserSelect()) {
                 createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, appState), //
                     !appState.isAnonUser && !!hltNode));
             }
-            return true;
         });
 
         children.push(new Menu(state, "Create", createMenuItems, null, this.makeHelpIcon(":menu-create")));

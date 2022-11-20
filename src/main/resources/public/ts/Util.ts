@@ -467,10 +467,10 @@ export class Util {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
         if (names) {
-            names.forEach(function (prop) {
+            names.forEach(prop => {
                 /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
                 if (callback(prop, obj[prop]) === false) return;
-            }, this);
+            });
         }
     }
 
@@ -631,16 +631,12 @@ export class Util {
          subItems that exist, because any top level item doesn't need to also exist as a subItem */
         S.quanta.nodeHistory.forEach(h => {
             if (h.subItems) {
-                h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
-                    return hi.id !== node.id;
-                });
+                h.subItems = h.subItems.filter(hi => hi.id !== node.id);
             }
         });
 
         // Lookup this history item so we can update the subIds first.
-        const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
-            return h.id === node.id;
-        });
+        const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(h => h.id === node.id);
 
         // if we found the histItem we need to update subIds
         if (histItem) {
@@ -649,18 +645,14 @@ export class Util {
             if (childNode) {
                 if (subItems) {
                     // remove id if it exists in history (so we can add to top)
-                    subItems = subItems.filter(function (item: NodeHistoryItem) {
-                        return item.id !== childNode.id && item.id !== node.id;
-                    });
+                    subItems = subItems.filter(item => item.id !== childNode.id && item.id !== node.id);
                 }
                 else {
                     subItems = [];
                 }
 
                 if (childNode.id !== node.id) {
-                    const childFound = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
-                        return h.id === childNode.id;
-                    });
+                    const childFound = S.quanta.nodeHistory.find(h => h.id === childNode.id);
 
                     // if this child at at a top level now, don't let it be appended as a child second level item.
                     if (!childFound) {
@@ -677,9 +669,7 @@ export class Util {
         }
 
         // remove node if it exists in history (so we can add to top)
-        S.quanta.nodeHistory = S.quanta.nodeHistory.filter(function (h: NodeHistoryItem) {
-            return h.id !== node.id;
-        });
+        S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== node.id);
 
         // now add to top.
         S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node), subItems });
@@ -717,7 +707,7 @@ export class Util {
         if (!items) return [];
         const ret: EventInput[] = [];
 
-        items.forEach((v: J.CalendarItem) => {
+        items.forEach(v => {
             ret.push({
                 id: v.id,
                 title: v.title,
@@ -1009,7 +999,7 @@ export class Util {
 
         // first build teh set of ids that that are in 'ni.parent.id'
         const idSet: Set<string> = new Set<string>();
-        feedRes.forEach((ni: J.NodeInfo) => {
+        feedRes.forEach(ni => {
             if (ni.parent) {
                 idSet.add(ni.parent.id);
             }
