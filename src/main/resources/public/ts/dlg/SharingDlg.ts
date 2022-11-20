@@ -31,13 +31,12 @@ export class SharingDlg extends DialogBase {
         const state: LS = this.getState<LS>();
         const numShares: number = appState.editNode.ac?.length;
 
-        // todo-0: is this.removePrivilege still used?
         return [
             new Div(null, null, [
                 numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
                 new EditPrivsTable((userName: string, allowAppends: boolean) => {
                     this.shareNodeToUser(userName, allowAppends);
-                }, appState.editNode.ac),
+                }, appState.editNode.ac, this.removePrivilege),
                 S.props.isShared(appState.editNode) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges

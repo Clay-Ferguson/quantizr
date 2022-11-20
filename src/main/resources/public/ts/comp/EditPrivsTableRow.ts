@@ -12,7 +12,7 @@ import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
-    constructor(public aclEntry: J.AccessControlInfo) {
+    constructor(private shareNodeToUserFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super();
     }
 
@@ -20,7 +20,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
         const div = new Div(null, { className: "float-end microMarginBottom" });
 
-        aclEntry.privileges.forEach(function (privilege, index) {
+        aclEntry.privileges.forEach((privilege) => {
             div.addChild(
                 new Div(null, null, [
                     // new Span(privilege.privilegeName), don't need this it's just "rd/wr"
@@ -35,7 +35,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     ], "marginLeft")
                 ])
             );
-        }, this);
+        });
         return div;
     }
 
