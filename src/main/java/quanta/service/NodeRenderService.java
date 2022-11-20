@@ -508,7 +508,7 @@ public class NodeRenderService extends ServiceBase {
 		if (req.getEditMyFriendNode()) {
 			String _nodeId = nodeId;
 			nodeId = arun.run(as -> {
-				Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId); //
+				Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId); 
 				// we query as a list, but there should only be ONE result.
 				List<SubNode> friendNodes = user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
 				if (ok(friendNodes)) {

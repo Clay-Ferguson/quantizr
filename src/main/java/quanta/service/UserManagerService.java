@@ -797,19 +797,14 @@ public class UserManagerService extends ServiceBase {
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
 
-		// todo-0: this is super inefficient.
-		// This loop over friendNodes could be done all in a single delete query command, but for now let's
-		// just do the delete this way using our existing methods.
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, true, null);
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(delUserNodeId); //
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, false, crit);
 		if (ok(friendNodes)) {
-			for (SubNode friendNode : friendNodes) {
-				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
-				String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-				if (delUserNodeId.equals(userNodeId)) {
 
-					// we delete with updateHasChildren=false, becasue it's more efficient
-					delete.delete(ms, friendNode, false);
-				}
+			// we run a for loop but there will only be only up to one friend node in this result set.
+			for (SubNode friendNode : friendNodes) {
+				// we delete with updateHasChildren=false, becasue it's more efficient
+				delete.delete(ms, friendNode, false);
 			}
 		}
 		res.setSuccess(true);
@@ -1291,8 +1286,8 @@ public class UserManagerService extends ServiceBase {
 			parentNodeVal.setVal(parentNode);
 		}
 
-		for (SubNode node : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
-				null, 0, moreCriteria)) {
+		for (SubNode node : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, null, 0,
+				moreCriteria)) {
 			nodeList.add(node);
 		}
 		return nodeList;
