@@ -694,8 +694,8 @@ public class NodeEditService extends ServiceBase {
 				boolean forceSendToPublic = isAccnt;
 
 				if (forceSendToPublic || ok(node.getAc())) {
-					// if there's an unpublished property (and true) then we don't send out over ActPub
-					if (!node.getBool(NodeProp.UNPUBLISHED)) {
+					// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
+					if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
 						apub.sendObjOutbound(s, parent, node, forceSendToPublic);
 					}
