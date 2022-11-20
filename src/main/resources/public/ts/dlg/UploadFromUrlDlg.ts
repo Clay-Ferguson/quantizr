@@ -18,7 +18,7 @@ export class UploadFromUrlDlg extends DialogBase {
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    constructor(private nodeId: string, private url: string, private onUploadFunc: Function) {
+    constructor(private nodeId: string, private onUploadFunc: Function) {
         super("Upload File");
         this.validatedStates = [this.urlState];
     }

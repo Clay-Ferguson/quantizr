@@ -46,7 +46,7 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(private customTitle: string, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number) {
+    constructor(customTitle: string, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number) {
         super(customTitle || "Audio Player");
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];

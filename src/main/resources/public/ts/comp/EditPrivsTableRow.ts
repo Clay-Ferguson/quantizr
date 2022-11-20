@@ -12,7 +12,7 @@ import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
-    constructor(private shareNodeToUserFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(public aclEntry: J.AccessControlInfo) {
         super();
     }
 

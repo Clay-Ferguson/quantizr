@@ -9,7 +9,7 @@ import { DialogBase, DialogMode } from "../DialogBase";
 export class VideoPlayerDlg extends DialogBase {
     videoPlayer: VideoPlayer;
 
-    constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, dialogMode: DialogMode) {
+    constructor(private domId: string, private sourceUrl: string, mediaTitle: string, dialogMode: DialogMode) {
         super(mediaTitle || "Video", null, false, dialogMode);
     }
 

@@ -41,7 +41,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                     const typeHandler = S.plugin.getTypeHandler(n.boostedNode.type);
-                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, true, null, state);
+                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, state);
                 }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
@@ -69,14 +69,14 @@ export class NodeCompVerticalRowLayout extends Div {
                          without doing any collapsedComps. */
                         if (typeHandler && typeHandler.isSpecialAccountNode()) {
                             if (NodeCompVerticalRowLayout.showSpecialNodes) {
-                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, true, false, null, state);
+                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null, state);
 
                                 // I'm gonna be evil here and do this object without a type.
                                 collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
                             }
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, true, false, boostComp, state);
+                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, state);
                             comps.push(row);
                         }
                         inVerticalSpace = false;

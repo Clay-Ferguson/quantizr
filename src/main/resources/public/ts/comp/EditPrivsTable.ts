@@ -6,7 +6,8 @@ import { ListBox } from "./ListBox";
 
 export class EditPrivsTable extends ListBox {
 
-    constructor(public shareNodeToUserFunc: Function, public acl: AccessControlInfo[], private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    // todo-0: shareNodeToUserFunc not used?
+    constructor(public shareNodeToUserFunc: Function, public acl: AccessControlInfo[]) {
         super(null);
     }
 
@@ -17,13 +18,13 @@ export class EditPrivsTable extends ListBox {
             // first add public, so it's at the top
             this.acl.forEach((aclEntry: J.AccessControlInfo) => {
                 if (aclEntry.principalName?.toLowerCase() === "public") {
-                    children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
+                    children.push(new EditPrivsTableRow(aclEntry));
                 }
             }, this);
 
             this.acl.forEach((aclEntry: J.AccessControlInfo) => {
                 if (aclEntry.principalName?.toLowerCase() !== "public") {
-                    children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
+                    children.push(new EditPrivsTableRow(aclEntry));
                 }
             }, this);
         }

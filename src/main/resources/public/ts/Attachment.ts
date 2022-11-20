@@ -31,7 +31,7 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc).open();
+        new UploadFromUrlDlg(nodeId, onUploadFunc).open();
     };
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState) => {
@@ -44,7 +44,7 @@ export class Attachment {
             nodeId = node.id;
         }
 
-        new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc).open();
+        new UploadFromIPFSDlg(nodeId, onUploadFunc).open();
     };
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, attName: string, downloadLink: boolean): string => {

@@ -20,9 +20,7 @@
 
         "noEmitOnError": true,
         "allowJs": true,
-        
-        // todo-0: will be going with this soon!
-        // "noUnusedLocals": true
+        "noUnusedLocals": true
 
         // "traceResolution": true (for tracing module loading, for diagnostics)
     },

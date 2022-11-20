@@ -5,7 +5,7 @@ import { S } from "../../Singletons";
 
 export class NodeCompRowFooter extends Div {
 
-    constructor(private node: J.NodeInfo, private isFeed: boolean, private allowShowThread: boolean) {
+    constructor(private node: J.NodeInfo) {
         super(null, {
             className: "row-footer float-end"
         });

@@ -26,7 +26,7 @@ export class NodeCompRow extends Div {
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
     constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private allowShowThread: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
+        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -109,7 +109,7 @@ export class NodeCompRow extends Div {
 
         let buttonBar = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
-            buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, null);
+            buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
@@ -207,7 +207,7 @@ export class NodeCompRow extends Div {
             jumpButton,
             new NodeCompContent(this.node, this.tabData, true, true, null, null, true, this.isLinkedNode, null),
             this.internalComp,
-            this.allowHeaders ? new NodeCompRowFooter(this.node, false, this.allowShowThread) : null,
+            this.allowHeaders ? new NodeCompRowFooter(this.node) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
     }

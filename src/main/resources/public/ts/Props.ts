@@ -38,14 +38,15 @@ export class Props {
     }
 
     /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
-    private movePropsToEnd = (propsList: string[], props: J.PropertyInfo[]) => {
-        for (const prop of propsList) {
-            const tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
-            if (tagIdx !== -1) {
-                S.util.arrayMoveItem(props, tagIdx, props.length);
-            }
-        }
-    }
+    // todo-0: unused ?
+    // private movePropsToEnd = (propsList: string[], props: J.PropertyInfo[]) => {
+    //     for (const prop of propsList) {
+    //         const tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
+    //         if (tagIdx !== -1) {
+    //             S.util.arrayMoveItem(props, tagIdx, props.length);
+    //         }
+    //     }
+    // }
 
     getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
         if (!node || !node.clientProps) {

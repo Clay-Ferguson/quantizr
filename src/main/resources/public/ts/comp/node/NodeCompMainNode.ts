@@ -110,17 +110,17 @@ export class NodeCompMainNode extends Div {
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 const typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, true, false, true, true, null, state);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, true, false, true, null, state);
             }
 
             this.setChildren([
                 header,
-                !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, null) : null,
+                !state.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
                 new Clearfix(),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),
                 boostComp,
-                new NodeCompRowFooter(node, false, true),
+                new NodeCompRowFooter(node),
                 new Clearfix()
             ]);
         }

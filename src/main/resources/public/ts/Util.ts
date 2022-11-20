@@ -836,8 +836,8 @@ export class Util {
             Notification.requestPermission((status) => { // status is "granted", if accepted by user
                 message = this.removeHtmlTags(message);
 
-                // eslint-disable-next-line no-unused-vars
-                const n = new Notification(title, {
+                // eslint-disable-next-line no-new
+                new Notification(title, {
                     body: message,
 
                     /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried

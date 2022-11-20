@@ -549,7 +549,7 @@ export class Search {
             boostComp = new Div(null, { className: "boost-row" }, [
                 allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
-                allowFooter ? new NodeCompRowFooter(node.boostedNode, isFeed, showThreadButton) : null,
+                allowFooter ? new NodeCompRowFooter(node.boostedNode) : null,
                 allowFooter ? new Clearfix() : null
             ])
         }
@@ -578,7 +578,7 @@ export class Search {
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
-            allowFooter ? new NodeCompRowFooter(node, isFeed, showThreadButton) : null,
+            allowFooter ? new NodeCompRowFooter(node) : null,
             allowFooter ? new Clearfix() : null
         ]);
 
