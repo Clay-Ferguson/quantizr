@@ -288,13 +288,13 @@ export class EditNodeDlg extends DialogBase {
         const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode);
 
         let nodeNameTextField: TextField = null;
-        if (!customProps) {
+        if (!customProps || typeHandler?.hasCustomProp(J.NodeProp.NODE_PROP_NAME)) {
             nodeNameTextField = new TextField({ label: "Node Name", outterClass: "col-9", val: this.nameState });
         }
 
         let propsVisible: boolean = false;
         if (allowContentEdit) {
-            const hasContent = typeHandler?.hasCustomProp(J.NodeProp.CONTENT);
+            const hasContent = typeHandler?.hasCustomProp(J.NodeProp.NODE_PROP_CONTENT);
             let rows = getAppState().mobileMode ? "8" : "10";
             if (customProps && hasContent) {
                 rows = "4";
@@ -365,10 +365,7 @@ export class EditNodeDlg extends DialogBase {
             editorSubPanel = typeHandler.renderEditorSubPanel(appState.editNode);
         }
 
-        // todo-0: instead of editorSubPanel check here we need a "getAllowThing" for each of the "things" that can go in it,
-        // because right now the only time it's triggered is when we have a Friend Type Node, and we want their tags field
-        // to show up.
-        const collapsePanel = !customProps || editorSubPanel ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+        const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
@@ -448,7 +445,7 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
-                        const allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        const allowSelection = !customProps || typeHandler?.hasSelectableProp(prop.name);
                         const tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                         propsParent.addChild(tableRow);

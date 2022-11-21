@@ -66,9 +66,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     getCustomProperties(): string[] {
-        // Note: 'CONTENT' is not a prop actually (it's a field on SubNode), but we need to return it here to allow editing
-        // of it when we also have custom properties.
-        return [J.NodeProp.RSS_FEED_SRC, J.NodeProp.CONTENT];
+        return [J.NodeProp.RSS_FEED_SRC, J.NodeProp.NODE_PROP_CONTENT];
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {

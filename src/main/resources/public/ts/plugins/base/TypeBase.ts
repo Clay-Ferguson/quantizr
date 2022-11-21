@@ -72,10 +72,20 @@ export class TypeBase implements TypeHandlerIntf {
         return null;
     }
 
+    getSelectableProperties(): string[] {
+        return null;
+    }
+
     hasCustomProp = (prop: string): boolean => {
-        const customProps = this.getCustomProperties();
-        if (!customProps) return false;
-        return !!customProps.find(p => p === prop);
+        const props = this.getCustomProperties();
+        if (!props) return false;
+        return !!props.find(p => p === prop);
+    }
+
+    hasSelectableProp = (prop: string): boolean => {
+        const props = this.getSelectableProperties();
+        if (!props) return false;
+        return !!props.find(p => p === prop);
     }
 
     /* Types can override this to ensure that during node editing there is a hook to prefill and create any properties that are

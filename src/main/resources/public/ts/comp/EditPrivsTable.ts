@@ -1,5 +1,4 @@
 import { Div } from "../comp/core/Div";
-import * as J from "../JavaIntf";
 import { AccessControlInfo } from "../JavaIntf";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";

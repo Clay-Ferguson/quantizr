@@ -4,7 +4,6 @@ import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
-import { NodeHistoryItem } from "../NodeHistoryItem";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";

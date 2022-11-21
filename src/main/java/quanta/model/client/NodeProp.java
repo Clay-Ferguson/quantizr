@@ -3,6 +3,12 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
+    // NODE_PROP_* props are ones that are native on SubNode.java class and not references
+    // thru the properties ("p") array of properties on SubNode, but an actual getter/setter
+    // directly on SubNode.
+    NODE_PROP_CONTENT("cont"), //
+    NODE_PROP_NAME("name"), //
+
     // Activity Pub Properties
     ACT_PUB_ID("apid"), // todo-2: should rename to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType"), //
@@ -39,8 +45,6 @@ public enum NodeProp {
 
     // this 's' probably needs to change to JSON or Object ? (todo-1)
     ACT_PUB_TAG("ap:tag"), //
-
-    CONTENT("cont"), //
 
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of

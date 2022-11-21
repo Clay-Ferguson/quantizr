@@ -36,8 +36,8 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getEditLabelForProp(propName: string): string {
-        if (propName === J.NodeProp.USER) {
-            return "User Name";
+        if (propName === J.NodeProp.USER_TAGS) {
+            return "Hashtags (Categories for this User)";
         }
         return propName;
     }
@@ -51,10 +51,13 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getCustomProperties(): string[] {
-        return [J.NodeProp.USER];
+        return [J.NodeProp.USER_TAGS];
     }
 
+    // todo-0: to be consistent this should return an array like 'getCustomProperties' called 'getEditableProperties'
+    // and if we need a helper to do this method then add one.
     allowPropertyEdit(propName: string, state: AppState): boolean {
+        if (propName === J.NodeProp.USER_TAGS) return true;
         return false;
     }
 
