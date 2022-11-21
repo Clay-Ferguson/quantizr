@@ -609,6 +609,7 @@ public class UserManagerService extends ServiceBase {
 			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA, reqUserPrefs.isShowMetaData());
 			prefsNode.set(NodeProp.USER_PREF_NSFW, reqUserPrefs.isNsfw());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
+			prefsNode.set(NodeProp.USER_PREF_AUTO_REFRESH_FEED, reqUserPrefs.isAutoRefreshFeed()); // #add-prop
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS, reqUserPrefs.isShowParents());
 			prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
 			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
@@ -1060,6 +1061,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
 			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
 			userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
+			userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop
 			userPrefs.setShowParents(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PARENTS));
 			userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
 			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));

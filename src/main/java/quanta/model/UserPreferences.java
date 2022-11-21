@@ -10,6 +10,7 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean nsfw;
 	private boolean showProps;
+	private boolean autoRefreshFeed; // #add-prop
 	private boolean showParents;
 	private boolean showReplies;
 
@@ -107,5 +108,13 @@ public class UserPreferences {
 
 	public void setShowProps(boolean showProps) {
 		this.showProps = showProps;
+	}
+
+	public boolean isAutoRefreshFeed() {
+		return autoRefreshFeed;
+	}
+
+	public void setAutoRefreshFeed(boolean autoRefreshFeed) {
+		this.autoRefreshFeed = autoRefreshFeed;
 	}
 }

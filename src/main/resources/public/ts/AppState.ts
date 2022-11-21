@@ -79,6 +79,7 @@ export class AppState {
         showMetaData: false,
         nsfw: false,
         showProps: false,
+        autoRefreshFeed: false, // #add-prop
         showParents: false,
         showReplies: true,
         rssHeadlinesOnly: true,

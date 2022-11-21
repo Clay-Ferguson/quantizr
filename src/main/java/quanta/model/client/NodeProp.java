@@ -71,6 +71,7 @@ public enum NodeProp {
     USER_PREF_SHOW_METADATA("sn:showMetaData"), //
     USER_PREF_NSFW("sn:nsfw"), //
     USER_PREF_SHOW_PROPS("sn:showProps"), //
+    USER_PREF_AUTO_REFRESH_FEED("sn:autoRefreshFeed"), // #add-prop
     USER_PREF_SHOW_PARENTS("sn:showParents"), //
     USER_PREF_SHOW_REPLIES("sn:showReplies"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //

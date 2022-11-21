@@ -4,7 +4,6 @@ import * as J from "../JavaIntf";
 export class FeedViewProps {
     page = 0;
     refreshCounter = 0;
-    autoRefresh = true;
     searchTextState = new Validator();
     feedFilterFriends = false;
     feedFilterToMe = false;

@@ -962,6 +962,7 @@ export interface UserPreferences {
     showMetaData: boolean;
     nsfw: boolean;
     showProps: boolean;
+    autoRefreshFeed: boolean; // #add-prop
     showParents: boolean;
     showReplies: boolean;
     rssHeadlinesOnly: boolean;
@@ -1033,6 +1034,8 @@ export const enum ErrorType {
 }
 
 export const enum NodeProp {
+    NODE_PROP_CONTENT = "cont",
+    NODE_PROP_NAME = "name",
     ACT_PUB_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
@@ -1051,8 +1054,6 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
     ACT_PUB_SENSITIVE = "ap:nsfw",
     ACT_PUB_TAG = "ap:tag",
-    NODE_PROP_CONTENT = "cont",
-    NODE_PROP_NAME = "name",
     ENC_KEY = "sn:encKey",
     CRYPTO_SIG = "sn:sig",
     SUBGRAPH_HASH = "sn:rSHA256",
@@ -1064,6 +1065,7 @@ export const enum NodeProp {
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_NSFW = "sn:nsfw",
     USER_PREF_SHOW_PROPS = "sn:showProps",
+    USER_PREF_AUTO_REFRESH_FEED = "sn:autoRefreshFeed", // #add-prop
     USER_PREF_SHOW_PARENTS = "sn:showParents",
     USER_PREF_SHOW_REPLIES = "sn:showReplies",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",

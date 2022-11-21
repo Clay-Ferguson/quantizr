@@ -559,6 +559,12 @@ export class Edit {
         return S.util.saveUserPreferences(state, true);
     }
 
+    // #add-prop
+    setAutoRefreshFeed = async (autoRefreshFeed: boolean) => {
+        getAppState().userPrefs.autoRefreshFeed = autoRefreshFeed;
+        return S.util.saveUserPreferences(getAppState(), true);
+    }
+
     toggleShowProps = async (state: AppState) => {
         state.userPrefs.showProps = !state.userPrefs.showProps;
         return S.util.saveUserPreferences(state, true);

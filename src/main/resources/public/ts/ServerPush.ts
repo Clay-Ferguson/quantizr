@@ -180,10 +180,7 @@ export class ServerPush {
                 S.render.fadeInId = nodeInfo.id;
                 FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }
-            // else if autoRefresh is on we can add this node to the display, or if autoRefresh is off
-            // we still want to display it if we owned it. Otherwise we tried to do a post and it didn't show up
-            // and that will seem odd to the user.
-            else if (FeedTab.inst.props.autoRefresh || nodeInfo.owner === s.userName) {
+            else if (s.userPrefs.autoRefreshFeed) {
                 // console.log("adding in new item.");
 
                 // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now

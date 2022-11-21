@@ -54,8 +54,6 @@ export class FriendTypeHandler extends TypeBase {
         return [J.NodeProp.USER_TAGS];
     }
 
-    // todo-0: to be consistent this should return an array like 'getCustomProperties' called 'getEditableProperties'
-    // and if we need a helper to do this method then add one.
     allowPropertyEdit(propName: string, state: AppState): boolean {
         if (propName === J.NodeProp.USER_TAGS) return true;
         return false;
