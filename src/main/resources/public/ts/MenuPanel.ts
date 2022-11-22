@@ -400,12 +400,12 @@ export class MenuPanel extends Div {
             // new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
             // new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
 
-            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => appState.userPrefs.nsfw), //
-            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => appState.userPrefs.showParents), //
-            new MenuItem("Show Comments", MenuPanel.toggleReplies, true, () => appState.userPrefs.showReplies), //
+            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, !appState.isAnonUser, () => appState.userPrefs.nsfw), //
+            new MenuItem("Show Parent", MenuPanel.toggleParents, !appState.isAnonUser, () => appState.userPrefs.showParents), //
+            new MenuItem("Show Comments", MenuPanel.toggleReplies, !appState.isAnonUser, () => appState.userPrefs.showReplies), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
-            new MenuItem("Show Properties", MenuPanel.toggleShowProps, true, () => appState.userPrefs.showProps), //
+            new MenuItem("Show Properties", MenuPanel.toggleShowProps, !appState.isAnonUser, () => appState.userPrefs.showProps), //
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
 
             // until we have at least one more preference the preferences dialog is not needed.

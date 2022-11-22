@@ -362,7 +362,9 @@ export class Search {
             localOnly: FeedTab.inst.props.feedFilterLocalServer,
             name: FeedTab.inst.props.name,
             fromFriends: FeedTab.inst.props.feedFilterFriends,
-            nsfw: appState.userPrefs.nsfw,
+
+            // never show anonymous users NSFW content.
+            nsfw: appState.isAnonUser ? false : appState.userPrefs.nsfw,
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,

@@ -235,9 +235,7 @@ public class UserFeedService extends ServiceBase {
 			 */
 			if (req.getToPublic() && req.isApplyAdminBlocks()) {
 				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-
 				allowNonEnglish = false;
-				allowBadWords = false;
 			}
 
 			// Add criteria for blocking users using the 'not in' list (nin)
@@ -434,7 +432,9 @@ public class UserFeedService extends ServiceBase {
 				continue;
 			}
 
-			if (!allowBadWords && english.hasBadWords(node.getContent())) {
+			// only do the badWords blocking if it's NOT a node we own. We can never have this filter block
+			// our own content.
+			if (!allowBadWords && !auth.ownedByThreadUser(node) && english.hasBadWords(node.getContent())) {
 				skipped++;
 				continue;
 			}
@@ -472,7 +472,7 @@ public class UserFeedService extends ServiceBase {
 							continue;
 						}
 
-						if (!allowBadWords && english.hasBadWords(boostedNode.getContent())) {
+						if (!allowBadWords && !auth.ownedByThreadUser(boostedNode) && english.hasBadWords(boostedNode.getContent())) {
 							skipped++;
 							continue;
 						}
