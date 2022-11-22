@@ -7,6 +7,17 @@ export enum FullScreenType {
     NONE, IMAGE, GRAPH, CALENDAR
 }
 
+export interface EditorOptions {
+    tags?: boolean;
+    nodeName?: boolean;
+    priority?: boolean;
+    wordWrap?: boolean;
+    encrypt?: boolean;
+    sign?: boolean;
+    inlineChildren?: boolean;
+    contentEditorRows?: string;
+}
+
 export interface FullScreenConfig {
     type: FullScreenType;
     nodeId?: string;

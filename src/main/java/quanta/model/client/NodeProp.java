@@ -3,12 +3,6 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
-    // NODE_PROP_* props are ones that are native on SubNode.java class and not references
-    // thru the properties ("p") array of properties on SubNode, but an actual getter/setter
-    // directly on SubNode.
-    NODE_PROP_CONTENT("cont"), //
-    NODE_PROP_NAME("name"), //
-
     // Activity Pub Properties
     ACT_PUB_ID("apid"), // todo-2: should rename to "ap:id"
     ACT_PUB_OBJ_TYPE("ap:objType"), //
@@ -99,7 +93,10 @@ public enum NodeProp {
     USER_BIO("sn:userBio"), //
     USER_DID_IPNS("sn:didIPNS"), //
     USER_IPFS_KEY("sn:ipfsKey"), //
+
+    // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their account node.
     USER_TAGS("sn:tags"), //
+    
     PWD_HASH("sn:pwdHash"), //
     VOTE("vote"), //
 

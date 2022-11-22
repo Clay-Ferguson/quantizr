@@ -305,7 +305,7 @@ public class ActPubUtil extends ServiceBase {
             apCrypto.loadSignatureHeaderVals(headers, privateKey, url, actor, bodyBytes, "post");
             postJson(url, body, headers, postType);
         } catch (Exception e) {
-            log.error("ALL secure http post failed to: " + url, e);
+            // don't log, the postJson will have logged any exception.
             throw new RuntimeException(e);
         }
     }

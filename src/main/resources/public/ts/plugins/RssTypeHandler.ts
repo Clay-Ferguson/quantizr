@@ -66,7 +66,7 @@ export class RssTypeHandler extends TypeBase {
     }
 
     getCustomProperties(): string[] {
-        return [J.NodeProp.RSS_FEED_SRC, J.NodeProp.NODE_PROP_CONTENT];
+        return [J.NodeProp.RSS_FEED_SRC];
     }
 
     allowPropertyEdit(propName: string, state: AppState): boolean {

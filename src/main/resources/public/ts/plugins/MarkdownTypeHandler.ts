@@ -1,4 +1,5 @@
 import { getAppState } from "../AppContext";
+import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
@@ -12,5 +13,17 @@ export class MarkdownTypeHandler extends TypeBase {
     getEditorHelp(): string {
         const state = getAppState();
         return state.config.help?.editor?.dialog;
+    }
+
+    getEditorOptions(): EditorOptions {
+        return {
+            tags: true,
+            nodeName: true,
+            priority: true,
+            wordWrap: true,
+            encrypt: true,
+            sign: true,
+            inlineChildren: true
+        };
     }
 }

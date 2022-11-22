@@ -21,6 +21,7 @@ import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { DialogBase, DialogMode } from "../DialogBase";
 import * as I from "../Interfaces";
+import { EditorOptions } from "../Interfaces";
 import { NodeActionType, TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
@@ -238,7 +239,9 @@ export class EditNodeDlg extends DialogBase {
         this.editorHelp = null;
         const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
         let customProps: string[] = null;
+        let editorOpts: EditorOptions = {};
         if (typeHandler) {
+            editorOpts = typeHandler.getEditorOptions();
             customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(appState.editNode);
             this.editorHelp = typeHandler.getEditorHelp();
@@ -263,7 +266,7 @@ export class EditNodeDlg extends DialogBase {
             flowPanel.addChild(this.createLayoutSelection());
         }
 
-        flowPanel.addChildren(this.makeCheckboxesRow(customProps));
+        flowPanel.addChildren(this.makeCheckboxesRow(editorOpts));
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -288,23 +291,19 @@ export class EditNodeDlg extends DialogBase {
         const isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode);
 
         let nodeNameTextField: TextField = null;
-        if (!customProps || typeHandler?.hasCustomProp(J.NodeProp.NODE_PROP_NAME)) {
+        if (editorOpts.nodeName) {
             nodeNameTextField = new TextField({ label: "Node Name", outterClass: "col-9", val: this.nameState });
         }
 
         let propsVisible: boolean = false;
         if (allowContentEdit) {
-            const hasContent = typeHandler?.hasCustomProp(J.NodeProp.NODE_PROP_CONTENT);
-            let rows = getAppState().mobileMode ? "8" : "10";
-            if (customProps && hasContent) {
-                rows = "4";
-            }
+            const rows = editorOpts.contentEditorRows || (getAppState().mobileMode ? "8" : "10");
 
-            if (!customProps || hasContent) {
+            // if (!customProps) {
                 mainPropsTable.addChild(this.makeContentEditor(rows));
                 this.contentEditor.setWordWrap(isWordWrap);
                 propsVisible = true;
-            }
+            // }
         }
 
         if (this.buildPropsEditing(propsParent, state, typeHandler, customProps)) {
@@ -355,10 +354,10 @@ export class EditNodeDlg extends DialogBase {
                 }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
-        const tagsEditRow: Div = new Div(null, { className: "marginBottom row align-items-end" }, [
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "marginBottom row align-items-end" }, [
             new TextField({ label: "Tags", outterClass: "col-10", val: this.tagsState }),
             this.createTagsIconButtons()
-        ]);
+        ]) : null;
 
         let editorSubPanel: Comp = null;
         if (typeHandler) {
@@ -368,8 +367,8 @@ export class EditNodeDlg extends DialogBase {
         const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             tagsEditRow,
             new Div(null, { className: "row align-items-end" }, [
-                nodeNameTextField,
-                this.createPrioritySelection()
+                editorOpts.nodeName ? nodeNameTextField : null,
+                editorOpts.priority ? this.createPrioritySelection() : null
             ]),
             flowPanel
         ], false,
@@ -503,9 +502,9 @@ export class EditNodeDlg extends DialogBase {
         this.tagsState.setValue(val);
     }
 
-    makeCheckboxesRow = (customProps: string[]): Comp[] => {
+    makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
         const appState = getAppState();
-        const encryptCheckBox = !customProps ? new Checkbox("Encrypt", null, {
+        const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.warnIfEncKeyUnknown()) {
                     this.utl.setEncryption(this, checked);
@@ -514,7 +513,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState().encryptCheckboxVal
         }) : null;
 
-        const signCheckBox = !customProps && S.crypto.avail ? new Checkbox("Sign", null, {
+        const signCheckBox = advancedOpts.sign && S.crypto.avail ? new Checkbox("Sign", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.warnIfSigKeyUnknown()) {
                     this.mergeState({ signCheckboxVal: checked });
@@ -523,7 +522,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState().signCheckboxVal
         }) : null;
 
-        const wordWrapCheckbox = new Checkbox("Word Wrap", null, {
+        const wordWrapCheckbox = advancedOpts.wordWrap ? new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean) => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                 S.props.setPropVal(J.NodeProp.NOWRAP, appState.editNode, checked ? null : "1");
@@ -532,9 +531,9 @@ export class EditNodeDlg extends DialogBase {
                 }
             },
             getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, appState.editNode) !== "1"
-        });
+        }) : null;
 
-        const inlineChildrenCheckbox = appState.editNode.hasChildren ? new Checkbox("Inline Subnodes", null,
+        const inlineChildrenCheckbox = advancedOpts.inlineChildren && appState.editNode.hasChildren ? new Checkbox("Inline Subnodes", null,
             this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
 
         return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox, signCheckBox];

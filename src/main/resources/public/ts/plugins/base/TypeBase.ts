@@ -4,6 +4,7 @@ import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
+import { EditorOptions } from "../../Interfaces";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
@@ -192,5 +193,9 @@ export class TypeBase implements TypeHandlerIntf {
 
     subOrdinal(): number {
         return -1;
+    }
+
+    getEditorOptions(): EditorOptions {
+        return {};
     }
 }

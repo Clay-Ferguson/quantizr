@@ -1,3 +1,4 @@
+import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
@@ -11,4 +12,16 @@ export class CommentTypeHandler extends TypeBase {
     // getExtraMarkdownClass(): string {
     //     return "commentMarkdownClass";
     // }
+
+    getEditorOptions(): EditorOptions {
+        return {
+            tags: true,
+            nodeName: true,
+            priority: true,
+            wordWrap: true,
+            encrypt: true,
+            sign: true,
+            inlineChildren: true
+        };
+    }
 }

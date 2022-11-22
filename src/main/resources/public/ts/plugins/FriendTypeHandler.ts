@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
+import { EditorOptions } from "../Interfaces";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
@@ -35,13 +36,6 @@ export class FriendTypeHandler extends TypeBase {
         }
     }
 
-    getEditLabelForProp(propName: string): string {
-        if (propName === J.NodeProp.USER_TAGS) {
-            return "Hashtags (Categories for this User)";
-        }
-        return propName;
-    }
-
     getAllowPropertyAdd(): boolean {
         return false;
     }
@@ -50,18 +44,12 @@ export class FriendTypeHandler extends TypeBase {
         return false;
     }
 
-    getCustomProperties(): string[] {
-        return [J.NodeProp.USER_TAGS];
-    }
-
     allowPropertyEdit(propName: string, state: AppState): boolean {
-        if (propName === J.NodeProp.USER_TAGS) return true;
         return false;
     }
 
     ensureDefaultProperties(node: J.NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.USER);
-        this.ensureStringPropExists(node, J.NodeProp.USER_TAGS);
     }
 
     renderEditorSubPanel = (node: J.NodeInfo): Comp => {
@@ -90,5 +78,11 @@ export class FriendTypeHandler extends TypeBase {
             displayName, null, isTreeView ? "treeFriendImage" : "listFriendImage", isTreeView, () => {
                 new UserProfileDlg(userNodeId).open();
             });
+    }
+
+    getEditorOptions(): EditorOptions {
+        return {
+            tags: true
+        };
     }
 }
