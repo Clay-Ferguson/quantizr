@@ -34,7 +34,7 @@ export interface TypeHandlerIntf {
     subOrdinal(): number;
     renderEditorSubPanel(node: J.NodeInfo): Comp;
 
-    // todo-0: now that we have EditorOptions, many of the fixed values can be subsumed into it to simplify
+    // todo-1: now that we have EditorOptions, many of the fixed values can be subsumed into it to simplify
     // this interface
     getEditorOptions(): EditorOptions;
 }

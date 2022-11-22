@@ -276,6 +276,7 @@ public class Convert extends ServiceBase {
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken();
 			int tokLen = tok.length();
+			int atCount = 0;
 
 			// Hashtag
 			if (tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 //
@@ -290,12 +291,16 @@ public class Convert extends ServiceBase {
 				}
 			}
 			// Mention
-			else if (tokLen > 1 && tok.startsWith("@") && StringUtils.countMatches(tok, "@") == 1 //
+			else if (tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2 //
 					&& Character.isLetter(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
 					if (ok(href)) {
+						// if tok is a 'long fedi name' make it the shortened version (no domain)
+						if (atCount == 2) {
+							tok = XString.truncAfterLast(tok, "@");
+						}
 						sb.append("<a class='mention' href='" + href + "'>" + tok + "</a>");
 					}
 				}
