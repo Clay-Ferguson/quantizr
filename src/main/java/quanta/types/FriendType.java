@@ -40,7 +40,7 @@ public class FriendType extends TypeBase {
          * be null, and is normal
          */
         if (ok(accountId)) {
-            SubNode accountNode = read.getNode(ms, accountId, false);
+            SubNode accountNode = read.getNode(ms, accountId, false, null);
 
             /*
              * to load up a friend node for the browser to display, we have to populate these "Client Props", on

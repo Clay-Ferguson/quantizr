@@ -684,7 +684,7 @@ public class UserManagerService extends ServiceBase {
 		String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
 		exec.run(() -> {
 			arun.run(as -> {
-				SubNode userNode = read.getNode(as, userNodeId, false);
+				SubNode userNode = read.getNode(as, userNodeId, false, null);
 				String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
 
 				// If we didn't already generate the key for this user, then generate one.
@@ -960,7 +960,7 @@ public class UserManagerService extends ServiceBase {
 				if (no(userId)) {
 					userNode = read.getUserNodeByUserName(as, sessionUserName);
 				} else {
-					userNode = read.getNode(as, userId, false);
+					userNode = read.getNode(as, userId, false, null);
 				}
 			} else {
 				userNode = _userNode;
@@ -1244,7 +1244,7 @@ public class UserManagerService extends ServiceBase {
 
 					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
-					SubNode friendAccountNode = read.getNode(ms, userNodeId, false);
+					SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
 					if (ok(friendAccountNode)) {
 						// if a local user use BIN property on node (account node BIN property is the Avatar)
 						if (userName.indexOf("@") == -1) {

@@ -521,7 +521,7 @@ public class MongoAuth extends ServiceBase {
 		}
 		/* else we need the user name */
 		else {
-			SubNode principalNode = read.getNode(ms, principalId, false);
+			SubNode principalNode = read.getNode(ms, principalId, false, null);
 			if (no(principalNode)) {
 				return null;
 			}

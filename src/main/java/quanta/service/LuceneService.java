@@ -20,7 +20,7 @@ public class LuceneService extends ServiceBase  {
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
-		SubNode node = read.getNode(ms, nodeId, true);
+		SubNode node = read.getNode(ms, nodeId, true, null);
 		if (ok(node)) {
 			/*
 			 * Remember 'searchFolder' will have to be visible to the VM and therefore this might require adding

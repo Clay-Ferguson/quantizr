@@ -1086,7 +1086,7 @@ public class NodeEditService extends ServiceBase {
 		log.debug("Transfer node: " + nodeId + " operation=" + req.getOperation());
 
 		// we do allowAuth below, not here
-		SubNode node = read.getNode(ms, nodeId, false);
+		SubNode node = read.getNode(ms, nodeId, false, null);
 		if (no(node)) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
@@ -1240,7 +1240,7 @@ public class NodeEditService extends ServiceBase {
 	public UpdateHeadingsResponse updateHeadings(MongoSession ms, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
 
-		SubNode node = read.getNode(ms, req.getNodeId(), true);
+		SubNode node = read.getNode(ms, req.getNodeId(), true, null);
 		String content = node.getContent();
 		if (ok(content)) {
 			content = content.trim();

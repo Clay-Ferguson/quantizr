@@ -35,6 +35,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.Val;
 import quanta.util.XString;
 
 /**
@@ -132,7 +133,7 @@ public class MongoRead extends ServiceBase {
      */
     public boolean noChildren(MongoSession ms, String path) {
         if (SubNode.USE_HAS_CHILDREN) {
-            SubNode node = getNode(ms, path, false);
+            SubNode node = getNode(ms, path, false, null);
             // using booleanValue for clarity
             if (ok(node) && ok(node.getHasChildren()) && !node.getHasChildren().booleanValue()) {
                 return true;
@@ -228,7 +229,7 @@ public class MongoRead extends ServiceBase {
             return;
         }
 
-        SubNode parentNode = read.getNode(ms, parentPath, false);
+        SubNode parentNode = read.getNode(ms, parentPath, false, null);
         if (ok(parentNode)) {
             // a nice efficiency side-effect we can do here is set 'hasChildren' to true on the parent
             // because we now know it exists. If it's not changing that's fine no DB update will be triggered.
@@ -241,7 +242,7 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public SubNode getNodeByName(MongoSession ms, String name) {
-        return getNodeByName(ms, name, true);
+        return getNodeByName(ms, name, true, null);
     }
 
     /*
@@ -252,7 +253,7 @@ public class MongoRead extends ServiceBase {
      * 2) "userName:nodeName" (a named node some user has created)
      */
     @PerfMon(category = "read")
-    public SubNode getNodeByName(MongoSession ms, String name, boolean allowAuth) {
+    public SubNode getNodeByName(MongoSession ms, String name, boolean allowAuth, Val<SubNode> accntNode) {
         Query q = new Query();
 
         if (no(name))
@@ -289,6 +290,12 @@ public class MongoRead extends ServiceBase {
                 log.debug("Unable to find node by: " + name);
                 return null;
             }
+
+            // set output parameter if we have one
+            if (ok(accntNode)) {
+                accntNode.setVal(userNode);
+            }
+
             nodeOwnerId = userNode.getOwner();
             name = name.substring(colonIdx + 1);
         }
@@ -311,7 +318,7 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read(m,i)")
     public SubNode getNode(MongoSession ms, String identifier) {
         // calling thru proxy for AOP here.
-        return read.getNode(ms, identifier, true);
+        return read.getNode(ms, identifier, true, null);
     }
 
     /**
@@ -328,7 +335,7 @@ public class MongoRead extends ServiceBase {
      * </pre>
      */
     @PerfMon(category = "read(m,i,a)")
-    public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
+    public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth, Val<SubNode> accntNode) {
         if (no(identifier))
             return null;
 
@@ -349,7 +356,7 @@ public class MongoRead extends ServiceBase {
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
-            ret = read.getNodeByName(ms, identifier.substring(1), allowAuth);
+            ret = read.getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
             authPending = false;
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
@@ -444,7 +451,7 @@ public class MongoRead extends ServiceBase {
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
 
-        SubNode ret = read.getNode(ms, parentPath, allowAuth);
+        SubNode ret = read.getNode(ms, parentPath, allowAuth, null);
         if (ok(ret) && allowAuth) {
             auth.auth(ms, ret, PrivilegeType.READ);
         }

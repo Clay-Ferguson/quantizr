@@ -128,7 +128,7 @@ public class AttachmentService extends ServiceBase {
 			 * UNDERNEATH this current node. Pass allowAuth=false here becasue below we check the ownerAuth
 			 * which will be even more strict.
 			 */
-			SubNode node = read.getNode(ms, nodeId, false);
+			SubNode node = read.getNode(ms, nodeId, false, null);
 			if (no(node)) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
@@ -561,7 +561,7 @@ public class AttachmentService extends ServiceBase {
 			ms = ThreadLocals.ensure(ms);
 
 			if (no(node)) {
-				node = read.getNode(ms, nodeId, false);
+				node = read.getNode(ms, nodeId, false, null);
 			} else {
 				nodeId = node.getIdStr();
 			}
@@ -721,7 +721,7 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		try {
-			SubNode node = read.getNode(ms, nodeId, false);
+			SubNode node = read.getNode(ms, nodeId, false, null);
 			if (no(node)) {
 				throw new RuntimeEx("node not found: " + nodeId);
 			}
@@ -767,7 +767,7 @@ public class AttachmentService extends ServiceBase {
 		BufferedInputStream inStream = null;
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
-			SubNode node = read.getNode(ms, nodeId, false);
+			SubNode node = read.getNode(ms, nodeId, false, null);
 			Attachment att = node.getFirstAttachment();
 			if (no(att))
 				throw ExUtil.wrapEx("no attachment info found");

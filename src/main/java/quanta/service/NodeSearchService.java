@@ -135,7 +135,7 @@ public class NodeSearchService extends ServiceBase {
 		int counter = 0;
 
 		if ("node.id".equals(req.getSearchProp())) {
-			SubNode node = read.getNode(ms, searchText, true);
+			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 						false, false, false, false, true, null);
@@ -152,7 +152,7 @@ public class NodeSearchService extends ServiceBase {
 					searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
 				}
 			}
-			SubNode node = read.getNode(ms, searchText, true);
+			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 						false, false, false, false, true, null);

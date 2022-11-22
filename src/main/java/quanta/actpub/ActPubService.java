@@ -976,7 +976,7 @@ public class ActPubService extends ServiceBase {
             String replyToId = null;
             if (lastIdx != -1) {
                 replyToId = inReplyTo.substring(lastIdx + 1);
-                nodeBeingRepliedTo = read.getNode(as, replyToId, false);
+                nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
             }
         }
 

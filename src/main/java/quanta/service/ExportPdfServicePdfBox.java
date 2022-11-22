@@ -101,7 +101,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 		setFontSize(baseFontSize);
 
-		SubNode exportNode = read.getNode(ms, nodeId, true);
+		SubNode exportNode = read.getNode(ms, nodeId, true, null);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".pdf";
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;

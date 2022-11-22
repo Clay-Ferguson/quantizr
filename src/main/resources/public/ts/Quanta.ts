@@ -4,6 +4,7 @@ import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
@@ -12,6 +13,7 @@ import { S } from "./Singletons";
 
 declare const g_requireCrypto: string;
 declare let g_userMessage: string;
+declare let g_displayUserProfileId: string;
 
 export class Quanta {
     static appGuid: string = "appid." + Math.random();
@@ -332,6 +334,11 @@ export class Quanta {
                             if (g_userMessage) {
                                 S.util.showMessage(g_userMessage, "");
                                 g_userMessage = null;
+                            }
+
+                            if (g_displayUserProfileId) {
+                                new UserProfileDlg(g_displayUserProfileId).open();
+                                g_displayUserProfileId = null;
                             }
                         }, 100);
                         return s;

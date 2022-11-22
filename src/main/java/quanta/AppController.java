@@ -265,7 +265,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
-			SessionContext.init(context, session, true); 
+			SessionContext.init(context, session, true);
 
 			if (!MongoRepository.fullInit) {
 				throw new RuntimeException("Server temporarily offline.");
@@ -286,8 +286,13 @@ public class AppController extends ServiceBase implements ErrorController {
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());
 
+			boolean isHomeNodeRequest = false;
+
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+				if ("home".equalsIgnoreCase(nameOnUserNode)) {
+					isHomeNodeRequest = true;
+				}
 				id = ":" + userName + ":" + nameOnUserNode;
 			} else if (!StringUtils.isEmpty(nameOnAdminNode)) {
 				id = ":" + nameOnAdminNode;
@@ -310,11 +315,17 @@ public class AppController extends ServiceBase implements ErrorController {
 			// log.debug("ID specified on url=" + id);
 			String _id = id;
 			boolean _urlId = urlId;
+			boolean _isHomeNodeRequest = isHomeNodeRequest;
 
 			arun.run(as -> {
 				SubNode node = null;
 				try {
-					node = read.getNode(as, _id);
+					Val<SubNode> accntNode = new Val<>();
+					node = read.getNode(as, _id, true, accntNode);
+
+					if (no(node) && _isHomeNodeRequest && accntNode.hasVal()) {
+						attrs.put("displayUserProfileId", accntNode.getVal().getIdStr());
+					}
 				} catch (Exception e) {
 					attrs.put("urlIdFailMsg", "Unable to access " + _id);
 					ExUtil.warn(log, "Unable to access node: " + _id, e);
@@ -389,19 +400,19 @@ public class AppController extends ServiceBase implements ErrorController {
 	// #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
 	// @GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	// public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
-	// 		HttpServletResponse response, //
-	// 		HttpSession session) {
-	// 	callProc.run("rss", false, false, null, session, ms -> {
-	// 		arun.run(as -> {
-	// 			try {
-	// 				rssFeed.getRssFeed(as, nodeId, response.getWriter());
-	// 			} catch (Exception e) {
-	// 				throw new RuntimeException("internal server error");
-	// 			}
-	// 			return null;
-	// 		});
-	// 		return null;
-	// 	});
+	// HttpServletResponse response, //
+	// HttpSession session) {
+	// callProc.run("rss", false, false, null, session, ms -> {
+	// arun.run(as -> {
+	// try {
+	// rssFeed.getRssFeed(as, nodeId, response.getWriter());
+	// } catch (Exception e) {
+	// throw new RuntimeException("internal server error");
+	// }
+	// return null;
+	// });
+	// return null;
+	// });
 	// }
 
 	/*
