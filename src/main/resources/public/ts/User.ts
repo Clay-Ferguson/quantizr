@@ -2,6 +2,7 @@ import { dispatch, getAppState, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { FriendsDlg } from "./dlg/FriendsDlg";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
@@ -329,5 +330,10 @@ export class User {
 
     userSignup = () => {
         new SignupDlg().open();
+    }
+
+    showUsersList = (node: J.NodeInfo) => {
+        const friendsDlg = new FriendsDlg("People", node.id);
+        friendsDlg.open();
     }
 }

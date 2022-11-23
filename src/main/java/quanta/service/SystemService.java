@@ -248,11 +248,7 @@ public class SystemService extends ServiceBase {
 		StringBuilder sb = new StringBuilder();
 
 		List<SessionContext> sessions = SessionContext.getHistoricalSessions();
-		sessions.sort((s1, s2) -> {
-			String s1key = s1.getUserName();
-			String s2key = s2.getUserName();
-			return s1key.compareTo(s2key);
-		});
+		sessions.sort((s1, s2) -> s1.getUserName().compareTo(s2.getUserName()));
 
 		sb.append("Live Sessions:\n");
 		for (SessionContext s : sessions) {

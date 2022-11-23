@@ -44,16 +44,18 @@ export class EditPrivsTableRow extends ListBoxRow {
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
         }
-        let img: Img = null;
 
+        let img: Div = null;
         if (src) {
-            img = new Img({
-                className: "friendListImage",
-                src: src,
-                onClick: () => {
-                    new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                }
-            });
+            img = new Div(null, { className: "friendListImgDiv" }, [
+                new Img({
+                    className: "friendListImage",
+                    src,
+                    onClick: () => {
+                        new UserProfileDlg(this.aclEntry.principalNodeId).open();
+                    }
+                })
+            ]);
         }
 
         const displayName = this.aclEntry.displayName
@@ -66,10 +68,12 @@ export class EditPrivsTableRow extends ListBoxRow {
             new Div(null, { className: "microMarginAll" }, [
                 this.renderAclPrivileges(this.aclEntry),
                 img,
-                isPublic ? new Icon({
-                    className: "fa fa-globe fa-lg sharingIcon marginAll",
-                    title: "Node is Public"
-                }) : null,
+                isPublic ? new Div(null, { className: "friendListImgDiv" }, [
+                    new Icon({
+                        className: "fa fa-globe fa-lg sharingIcon marginAll",
+                        title: "Node is Public"
+                    })
+                ]) : null,
                 isPublic ? new Span("Public (Everyone)", { className: "largeFont" })
                     : new Span(displayName, {
                         className: "clickable " + (img ? "marginLeft" : ""),

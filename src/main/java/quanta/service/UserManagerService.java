@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
+import quanta.actpub.model.APOMention;
+import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -1225,6 +1228,120 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
+	/* 
+	 * todo-0: the "People" icon isn't showing up for admin user and should be.
+	 */
+	public GetFriendsResponse getPeopleOnNode(MongoSession ms, String nodeId) {
+		GetFriendsResponse res = new GetFriendsResponse();
+		SubNode node = read.getNode(ms, nodeId);
+		if (no(node)) {
+			res.setMessage("Unable to find user.");
+			res.setSuccess(false);
+		}
+
+		HashSet<String> idSet = new HashSet<>();
+		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
+		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
+		if (ok(nodePropTags)) {
+			tags.putAll(nodePropTags);
+		}
+
+		// if we have likes add them into 'tags', becasue that's what we feed thru the rest of the code.
+		if (ok(node.getLikes())) {
+			node.getLikes().forEach(userName -> {
+				String mention = "@" + userName;
+				tags.put(mention, new APOMention(null, mention));
+			});
+		}
+
+		if (ok(tags) && tags.size() > 0) {
+			String userDoingAction = ThreadLocals.getSC().getUserName();
+			apub.importUsers(ms, tags, userDoingAction);
+		}
+
+		List<FriendInfo> friends = new LinkedList<>();
+		arun.run(as -> {
+			tags.forEach((user, tag) -> {
+				// ignore if this is something else (like a Hashtag)
+				if (!(tag instanceof APOMention))
+					return;
+				// remove '@' prefix
+				user = XString.stripIfStartsWith(user, "@");
+
+				try {
+					SubNode accntNode = read.getUserNodeByUserName(as, user);
+					if (ok(accntNode)) {
+						String id = accntNode.getIdStr();
+						if (!idSet.contains(id)) {
+							FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
+							if (ok(fi)) {
+								friends.add(fi);
+								idSet.add(id);
+							}
+						}
+					}
+				} catch (Exception e) {
+					ExUtil.warn(log, "Unable to load user: " + user, e);
+				}
+			});
+
+			if (ok(node.getAc())) {
+				/*
+				 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+				 */
+				for (String accntId : node.getAc().keySet()) {
+					// ignore public, it's not a user.
+					if (idSet.contains(accntId) || PrincipalName.PUBLIC.s().equals(accntId))
+						continue;
+
+					SubNode accntNode = apub.cachedGetAccntNodeById(as, accntId, false, null);
+					FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
+					if (ok(fi)) {
+						friends.add(fi);
+						idSet.add(accntId);
+					}
+				}
+				res.setFriends(friends);
+			}
+			return null;
+		});
+
+		if (ok(node.getLikes()) && ok(friends)) {
+			friends.forEach(fi -> {
+				if (node.getLikes().contains(fi.getUserName())) {
+					fi.setLiked(true);
+				}
+			});
+		}
+
+		friends.sort((f1, f2) -> f1.getUserName().compareTo(f2.getUserName()));
+
+		res.setSuccess(true);
+		return res;
+	}
+
+	public FriendInfo buildPersonInfoFromAccntNode(MongoSession ms, SubNode userNode) {
+		FriendInfo fi = new FriendInfo();
+		String userName = userNode.getStr(NodeProp.USER);
+		fi.setUserName(userName);
+		fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
+		fi.setUserNodeId(userNode.getIdStr());
+
+		if (userName.indexOf("@") == -1) {
+			Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+			if (ok(att)) {
+				fi.setAvatarVer(att.getBin());
+			}
+		}
+		// Otherwise the avatar will be specified as a remote user's Icon.
+		else {
+			fi.setForeignAvatarUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+		}
+
+		return fi;
+	}
+
+
 	public GetFriendsResponse getFriends(MongoSession ms) {
 		GetFriendsResponse res = new GetFriendsResponse();
 		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
@@ -1232,33 +1349,8 @@ public class UserManagerService extends ServiceBase {
 		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();
 			for (SubNode friendNode : friendNodes) {
-				String userName = friendNode.getStr(NodeProp.USER);
-				if (ok(userName)) {
-					FriendInfo fi = new FriendInfo();
-					fi.setUserName(userName);
-
-					SubNode userNode = read.getUserNodeByUserName(null, userName);
-					if (ok(userNode)) {
-						fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
-					}
-
-					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-
-					SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
-					if (ok(friendAccountNode)) {
-						// if a local user use BIN property on node (account node BIN property is the Avatar)
-						if (userName.indexOf("@") == -1) {
-							Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-							if (ok(att)) {
-								fi.setAvatarVer(att.getBin());
-							}
-						}
-						// Otherwise the avatar will be specified as a remote user's Icon.
-						else {
-							fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
-						}
-					}
-					fi.setUserNodeId(userNodeId);
+				FriendInfo fi = buildPersonInfoFromFriendNode(ms, friendNode);
+				if (ok(fi)) {
 					friends.add(fi);
 				}
 			}
@@ -1266,6 +1358,39 @@ public class UserManagerService extends ServiceBase {
 		}
 		res.setSuccess(true);
 		return res;
+	}
+
+	public FriendInfo buildPersonInfoFromFriendNode(MongoSession ms, SubNode friendNode) {
+		String userName = friendNode.getStr(NodeProp.USER);
+		FriendInfo fi = null;
+		if (ok(userName)) {
+			fi = new FriendInfo();
+			fi.setUserName(userName);
+
+			SubNode userNode = read.getUserNodeByUserName(null, userName);
+			if (ok(userNode)) {
+				fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
+			}
+
+			String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
+
+			SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
+			if (ok(friendAccountNode)) {
+				// if a local user use BIN property on node (account node BIN property is the Avatar)
+				if (userName.indexOf("@") == -1) {
+					Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+					if (ok(att)) {
+						fi.setAvatarVer(att.getBin());
+					}
+				}
+				// Otherwise the avatar will be specified as a remote user's Icon.
+				else {
+					fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+				}
+			}
+			fi.setUserNodeId(userNodeId);
+		}
+		return fi;
 	}
 
 	/**

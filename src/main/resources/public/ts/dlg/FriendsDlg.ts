@@ -14,8 +14,8 @@ import { FriendsDlgState as LS } from "./FriendsDlgState";
 export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");
 
-    constructor() {
-        super("Friends", "app-modal-content-medium-width");
+    constructor(title: string, private nodeId: string) {
+        super(title, "app-modal-content-medium-width");
 
         this.mergeState<LS>({
             selections: new Set<string>(),
@@ -23,8 +23,11 @@ export class FriendsDlg extends DialogBase {
         });
 
         (async () => {
-            const res = await S.rpcUtil.rpc<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
+            const res = await S.rpcUtil.rpc<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
+                nodeId
+            });
             this.mergeState<LS>({
+                nodeId,
                 friends: res.friends,
                 loading: false
             });
@@ -38,17 +41,22 @@ export class FriendsDlg extends DialogBase {
             message = "Loading...";
         }
         else if (!state.friends || state.friends.length === 0) {
-            message = "Once you add some friends you can pick from a list here, but for now you can use the button below to find people by name.";
+            if (!this.nodeId) {
+                message = "Once you add some friends you can pick from a list here, but for now you can use the button below to find people by name.";
+            }
+            else {
+                message = "Only the Node Owner is associated with this node."
+            }
         }
 
         return [
             new Div(null, null, [
                 message ? new Div(message)
-                    : new FriendsTable(state.friends, this),
-                new TextField({ label: "User Names (comma separated)", val: this.userNameState }),
+                    : new FriendsTable(state.friends, !this.nodeId, this),
+                !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
-                    new Button("Ok", this.save, null, "btn-primary"),
-                    new Button("Cancel", this.cancel, null, "btn-secondary float-end")
+                    !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
+                    new Button(!this.nodeId ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])

@@ -234,6 +234,7 @@ export interface GetFollowingRequest extends RequestBase {
 }
 
 export interface GetFriendsRequest extends RequestBase {
+    nodeId: string;
 }
 
 export interface GetIPFSContentRequest extends RequestBase {
@@ -629,6 +630,7 @@ export interface FriendInfo {
     avatarVer: string;
     userNodeId: string;
     foreignAvatarUrl: string;
+    liked: boolean;
 }
 
 export interface GetActPubObjectResponse extends ResponseBase {

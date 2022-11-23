@@ -7,12 +7,14 @@ import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
+import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class FriendsTableRow extends ListBoxRow {
 
-    constructor(public friend: FriendInfo, private dlg: CompIntf) {
+    constructor(public friend: FriendInfo, private selectableRows: boolean, private dlg: CompIntf) {
         super(null, null, null);
+        this.attribs.className = "personsListItem";
     }
 
     preRender(): void {
@@ -30,13 +32,15 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        let img: Img = null;
+        let img: Div = null;
         if (src) {
-            img = new Img({
-                className: "friendListImage",
-                src: src,
-                onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
-            });
+            img = new Div(null, { className: "friendListImgDiv" }, [
+                new Img({
+                    className: "friendListImage",
+                    src,
+                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
+                })
+            ]);
         }
 
         const friendDisplay = this.friend.displayName
@@ -45,7 +49,7 @@ export class FriendsTableRow extends ListBoxRow {
 
         this.setChildren([
             new Div(null, null, [
-                new Checkbox(null, { className: "marginLeft" }, {
+                this.selectableRows ? new Checkbox(null, { className: "marginLeft" }, {
                     setValue: (checked: boolean) => {
                         const state: FriendsDlgState = this.dlg.getState();
                         if (checked) {
@@ -57,9 +61,18 @@ export class FriendsTableRow extends ListBoxRow {
                         this.dlg.mergeState(state);
                     },
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
-                }),
+                }) : null,
                 img,
-                new Span(friendDisplay, { className: "friendListText" })
+                new Span(friendDisplay, {
+                    className: "friendListText",
+                    onClick: () => {
+                        new UserProfileDlg(this.friend.userNodeId).open();
+                    }
+                }),
+                this.friend.liked ? new Icon({
+                    title: "This person Liked the Node",
+                    className: "fa fa-star fa-lg bigMarginLeft activeLikeIcon"
+                }): null
             ])
         ]);
     }

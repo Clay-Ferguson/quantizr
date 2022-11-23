@@ -167,7 +167,7 @@ public class ActPubService extends ServiceBase {
                             if (PrincipalName.PUBLIC.s().equals(accntId)) {
                                 privateMessage = false;
                             } else {
-                                SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
+                                SubNode accntNode = cachedGetAccntNodeById(ms, accntId, false, null);
 
                                 // get username off this node and add to 'toUserNames'
                                 if (ok(accntNode)) {
@@ -259,13 +259,13 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    public SubNode cachedGetAccntNodeById(MongoSession ms, String id) {
+    public SubNode cachedGetAccntNodeById(MongoSession ms, String id, boolean allowAuth, Val<SubNode> accntNode) {
         // try to get the node from the cache first
         SubNode node = apCache.acctNodesById.get(id);
 
         // if not in cache find the node from the DB and ADD to the cache.
         if (no(node)) {
-            node = read.getNode(ms, id);
+            node = read.getNode(ms, id, allowAuth, accntNode);
             apCache.acctNodesById.put(id, node);
         }
         return node;
@@ -289,7 +289,7 @@ public class ActPubService extends ServiceBase {
                         privateMessage = false;
                     } else {
                         // try to get account node from cache
-                        SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
+                        SubNode accntNode = cachedGetAccntNodeById(ms, accntId, true, null);
 
                         // get username off this node and add to 'toUserNames'
                         if (ok(accntNode)) {
@@ -2014,7 +2014,7 @@ public class ActPubService extends ServiceBase {
             }
 
             try {
-                SubNode accntNode = cachedGetAccntNodeById(ms, accntId);
+                SubNode accntNode = cachedGetAccntNodeById(ms, accntId, false, null);
 
                 // get username off this node and add to 'toUserNames'
                 if (ok(accntNode)) {

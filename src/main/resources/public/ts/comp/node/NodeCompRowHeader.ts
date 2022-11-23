@@ -145,25 +145,37 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        if (!state.isAdminUser && showInfo) {
-            verboseChildren.push(new Icon({
-                title: "Boost this Node",
-                className: "fa fa-retweet fa-lg marginRight",
-                onClick: () => {
-                    if (state.isAnonUser) {
-                        S.util.showMessage("Login to boost nodes.", "Login!");
+        if (showInfo) {
+            if (!state.isAdminUser) {
+                verboseChildren.push(new Icon({
+                    title: "Boost this Node",
+                    className: "fa fa-retweet fa-lg marginRight",
+                    onClick: () => {
+                        if (state.isAnonUser) {
+                            S.util.showMessage("Login to boost nodes.", "Login!");
+                        }
+                        else {
+                            S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, state)
+                        }
                     }
-                    else {
-                        S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, state)
-                    }
-                }
-            }));
+                }));
+            }
+
+            /* only allow this for logged in users, because it might try to access over ActivityPub potentially
+             and we need to have a user identity for all the HTTP sigs for that. */
+            if (!state.isAnonUser) {
+                verboseChildren.push(new Icon({
+                    title: "Mentioned People on this Node",
+                    className: "fa fa-users fa-lg marginRight",
+                    onClick: () => S.user.showUsersList(this.node)
+                }));
+            }
 
             let youLiked: boolean = false;
             let likeDisplay: string = null;
             if (this.node.likes) {
                 youLiked = !!this.node.likes.find(u => u === state.userName);
-                likeDisplay = "Liked by "+this.node.likes.length;
+                likeDisplay = "Liked by " + this.node.likes.length;
                 if (youLiked) {
                     likeDisplay += " (including You)";
                 }
@@ -171,8 +183,13 @@ export class NodeCompRowHeader extends Div {
 
             verboseChildren.push(new Icon({
                 title: likeDisplay ? likeDisplay : "Like this Node",
-                className: "fa fa-star fa-lg " + (youLiked ? "activeLikeIcon" : ""),
+                className: "fa fa-star fa-lg marginRight " + (youLiked ? "activeLikeIcon" : ""),
                 onClick: () => {
+                    if (state.isAdminUser) {
+                        S.util.showMessage("Admin user can't do Likes.", "Admin");
+                        return;
+                    }
+
                     if (state.isAnonUser) {
                         S.util.showMessage("Login to like and create content.", "Login!");
                     }

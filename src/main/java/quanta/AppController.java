@@ -662,11 +662,17 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	// todo-0: Need to rename this getPeople (and and rename paraemeters accordingly), becuase we use it
+	// for lists of people in general and not just lists of friends
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
 
 		return callProc.run("getFriends", true, true, req, session, ms -> {
-			return user.getFriends(ms);
+			if (ok(req.getNodeId())) {
+				return user.getPeopleOnNode(ms, req.getNodeId());
+			} else {
+				return user.getFriends(ms);
+			}
 		});
 	}
 
@@ -854,7 +860,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	/* Creates a new node as a child of the specified node */
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
 	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
-
 		return callProc.run("createSubNode", true, true, req, session, ms -> {
 			return edit.createSubNode(ms, req);
 		});

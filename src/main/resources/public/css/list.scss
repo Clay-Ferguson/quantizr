@@ -31,3 +31,11 @@
     @extend .unselectedListItem;
     background-color: $menuItemHoverBackgroundColor;
 }
+
+.personsList {
+    padding: 12px;
+}
+
+.personsListItem {
+    cursor: pointer;
+}

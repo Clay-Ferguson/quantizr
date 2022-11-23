@@ -21,7 +21,7 @@ export class SharingDlg extends DialogBase {
     dirty: boolean = false;
 
     constructor() {
-        super("Node Sharing", "app-modal-content-medium-width");
+        super("Node Sharing");
         this.mergeState<LS>({ recursive: false });
     }
 
@@ -66,7 +66,7 @@ export class SharingDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     new Button("Choose People", async () => {
-                        const friendsDlg: FriendsDlg = new FriendsDlg();
+                        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
                         await friendsDlg.open();
                         if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {
                             this.dirty = true;

@@ -48,7 +48,10 @@ public class ActPubCache extends ServiceBase {
     /* Account Node by User Name */
     public final ConcurrentHashMap<String, SubNode> acctNodesByUserName = new ConcurrentHashMap<>();
 
-    /* Account Node by node ID */
+    /* Account Node by node ID 
+     * 
+     * todo-0: this cache and potentially others should be cleaned out on a schedule like maybe once per day.
+    */
     public final ConcurrentHashMap<String, SubNode> acctNodesById = new ConcurrentHashMap<>();
 
     /* Cache WebFinger objects by UserName in memory only for now */

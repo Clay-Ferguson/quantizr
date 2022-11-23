@@ -672,19 +672,15 @@ public class MongoAuth extends ServiceBase {
 
 			if (tok.length() > 1) {
 				// Mention (@name@server.com or @name)
-				if (tok.startsWith("@") && StringUtils.countMatches(tok, "@") <= 2) {
-					if (parseMentions) {
-						// NOTE: href added as null here, but gets set during the importUsers call that happens
-						// after we return these tags.
-						tags.put(tok, new APOMention(null, tok));
-					}
+				if (parseMentions && tok.startsWith("@") && StringUtils.countMatches(tok, "@") <= 2) {
+					// NOTE: href added as null here, but gets set during the importUsers call that happens
+					// after we return these tags.
+					tags.put(tok, new APOMention(null, tok));
 				}
 				// Hashtag
-				else if (tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
-					if (parseHashtags) {
-						String shortTok = XString.stripIfStartsWith(tok, "#");
-						tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
-					}
+				else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
+					String shortTok = XString.stripIfStartsWith(tok, "#");
+					tags.put(tok, new APOHashtag(prop.getProtocolHostAndPort() + "?view=feed&tagSearch=" + shortTok, tok));
 				}
 			}
 		}

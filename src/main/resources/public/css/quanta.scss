@@ -1759,10 +1759,15 @@ Will come back later and study this more. todo-3 */
     margin-left: 12px;
 }
 
-.friendListImage {
-    max-width: 60px;
-    max-height: 60px;
+.friendListImgDiv {
+    display: inline-block;
+    width: 70px;
+    max-width: 70px;
     cursor: pointer;
+}
+
+.friendListImage {
+    width: 100%;
     border: 1px solid gray;
     border-radius: $border-radius;
     margin: 4px;
