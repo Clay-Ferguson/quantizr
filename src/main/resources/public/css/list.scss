@@ -32,10 +32,12 @@
     background-color: $menuItemHoverBackgroundColor;
 }
 
-.personsList {
-    padding: 12px;
-}
+.personsList {}
 
 .personsListItem {
     cursor: pointer;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
 }

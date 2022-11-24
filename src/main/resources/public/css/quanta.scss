@@ -1754,9 +1754,13 @@ Will come back later and study this more. todo-3 */
 }
 
 .friendListText {
+    display: inline-block;
     font-size: 1.2rem;
     font-weight: 500;
     margin-left: 12px;
+    padding-left: 8px;
+    padding-top: 6px;
+    cursor: pointer;
 }
 
 .friendListImgDiv {
@@ -1764,6 +1768,7 @@ Will come back later and study this more. todo-3 */
     width: 70px;
     max-width: 70px;
     cursor: pointer;
+    vertical-align: top;
 }
 
 .friendListImage {

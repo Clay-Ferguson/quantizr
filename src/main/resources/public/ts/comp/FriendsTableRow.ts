@@ -1,6 +1,5 @@
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
-import { Span } from "../comp/core/Span";
 import { FriendsDlgState } from "../dlg/FriendsDlgState";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
@@ -43,10 +42,6 @@ export class FriendsTableRow extends ListBoxRow {
             ]);
         }
 
-        const friendDisplay = this.friend.displayName
-            ? this.friend.displayName + " (@" + this.friend.userName + ")"
-            : ("@" + this.friend.userName);
-
         this.setChildren([
             new Div(null, null, [
                 this.selectableRows ? new Checkbox(null, { className: "marginLeft" }, {
@@ -63,16 +58,19 @@ export class FriendsTableRow extends ListBoxRow {
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
                 }) : null,
                 img,
-                new Span(friendDisplay, {
+                new Div(null, {
                     className: "friendListText",
                     onClick: () => {
                         new UserProfileDlg(this.friend.userNodeId).open();
                     }
-                }),
+                }, [
+                    new Div(this.friend.displayName),
+                    new Div("@" + this.friend.userName)
+                ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
                     className: "fa fa-star fa-lg bigMarginLeft activeLikeIcon"
-                }): null
+                }) : null
             ])
         ]);
     }

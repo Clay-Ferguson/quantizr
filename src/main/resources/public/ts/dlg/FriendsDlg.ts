@@ -15,7 +15,7 @@ export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");
 
     constructor(title: string, private nodeId: string) {
-        super(title, "app-modal-content-medium-width");
+        super(title);
 
         this.mergeState<LS>({
             selections: new Set<string>(),
