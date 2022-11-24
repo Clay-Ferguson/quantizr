@@ -338,7 +338,7 @@ public class ActPubService extends ServiceBase {
      */
     public void getSharedInboxesOfFollowers(String userName, HashSet<String> sharedInboxes, HashSet<String> userInboxes) {
         // This query gets the FRIEND nodes that specify userName on them
-        Query q = arun.run(as -> apFollower.getFriendsByUserName_query(as, null, userName));
+        Query q = arun.run(as -> apFollower.getPeopleByUserName_query(as, null, userName));
         if (no(q))
             return;
 

@@ -1,3 +1,4 @@
+import { getAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { FriendsDlgState } from "../dlg/FriendsDlgState";
@@ -17,6 +18,7 @@ export class FriendsTableRow extends ListBoxRow {
     }
 
     preRender(): void {
+        const appState = getAppState();
         let src: string = null;
 
         // local users will have this kind of avatar
@@ -69,7 +71,8 @@ export class FriendsTableRow extends ListBoxRow {
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
-                    className: "fa fa-star fa-lg bigMarginLeft activeLikeIcon"
+                    className: "fa fa-thumbs-up fa-lg bigMarginLeft " +
+                        (this.friend.userName === appState.userName ? "likedByMeIcon" : "")
                 }) : null
             ])
         ]);

@@ -233,10 +233,6 @@ export interface GetFollowingRequest extends RequestBase {
     targetUserName: string;
 }
 
-export interface GetFriendsRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface GetIPFSContentRequest extends RequestBase {
     id: string;
 }
@@ -266,6 +262,10 @@ export interface GetNodeStatsRequest extends RequestBase {
 
 export interface GetOpenGraphRequest extends RequestBase {
     url: string;
+}
+
+export interface GetPeopleRequest extends RequestBase {
+    nodeId: string;
 }
 
 export interface GetServerInfoRequest extends RequestBase {
@@ -653,10 +653,6 @@ export interface GetFollowingResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 
-export interface GetFriendsResponse extends ResponseBase {
-    friends: FriendInfo[];
-}
-
 export interface GetIPFSContentResponse extends ResponseBase {
     content: string;
 }
@@ -685,6 +681,10 @@ export interface GetNodeStatsResponse extends ResponseBase {
 
 export interface GetOpenGraphResponse extends ResponseBase {
     openGraph: OpenGraph;
+}
+
+export interface GetPeopleResponse extends ResponseBase {
+    people: FriendInfo[];
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {

@@ -70,7 +70,7 @@ import quanta.response.ChangePasswordResponse;
 import quanta.response.CloseAccountResponse;
 import quanta.response.DeleteFriendResponse;
 import quanta.response.FriendInfo;
-import quanta.response.GetFriendsResponse;
+import quanta.response.GetPeopleResponse;
 import quanta.response.GetUserAccountInfoResponse;
 import quanta.response.LoginResponse;
 import quanta.response.PushPageMessage;
@@ -1228,11 +1228,8 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
-	/* 
-	 * todo-0: the "People" icon isn't showing up for admin user and should be.
-	 */
-	public GetFriendsResponse getPeopleOnNode(MongoSession ms, String nodeId) {
-		GetFriendsResponse res = new GetFriendsResponse();
+	public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
+		GetPeopleResponse res = new GetPeopleResponse();
 		SubNode node = read.getNode(ms, nodeId);
 		if (no(node)) {
 			res.setMessage("Unable to find user.");
@@ -1301,7 +1298,7 @@ public class UserManagerService extends ServiceBase {
 						idSet.add(accntId);
 					}
 				}
-				res.setFriends(friends);
+				res.setPeople(friends);
 			}
 			return null;
 		});
@@ -1342,8 +1339,8 @@ public class UserManagerService extends ServiceBase {
 	}
 
 
-	public GetFriendsResponse getFriends(MongoSession ms) {
-		GetFriendsResponse res = new GetFriendsResponse();
+	public GetPeopleResponse getPeople(MongoSession ms) {
+		GetPeopleResponse res = new GetPeopleResponse();
 		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
 
 		if (ok(friendNodes)) {
@@ -1354,7 +1351,7 @@ public class UserManagerService extends ServiceBase {
 					friends.add(fi);
 				}
 			}
-			res.setFriends(friends);
+			res.setPeople(friends);
 		}
 		res.setSuccess(true);
 		return res;

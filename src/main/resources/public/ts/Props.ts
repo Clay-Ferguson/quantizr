@@ -70,6 +70,23 @@ export class Props {
         return !!node.ac;
     }
 
+    hasNonPublicShares = (node: J.NodeInfo): boolean => {
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== "public");
+    }
+
+    hasMentions = (node: J.NodeInfo): boolean => {
+        const tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
+        let ret = false;
+        if (tags?.forEach) {
+            tags.forEach((t: any) => {
+                if (t.type === "Mention") {
+                    ret = true;
+                }
+            })
+        }
+        return ret;
+    }
+
     isPublic = (node: J.NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public");
     }

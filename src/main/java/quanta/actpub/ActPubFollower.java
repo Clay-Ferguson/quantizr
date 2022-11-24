@@ -117,7 +117,7 @@ public class ActPubFollower extends ServiceBase {
              * Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e.
              * representing followers of this user)
              */
-            Iterable<SubNode> iter = getFriendsByUserName(as, userName);
+            Iterable<SubNode> iter = getPeopleByUserName(as, userName);
 
             for (SubNode n : iter) {
                 // the owner of the friend node is the "Follower".
@@ -172,8 +172,8 @@ public class ActPubFollower extends ServiceBase {
         return ret;
     }
 
-    public Iterable<SubNode> getFriendsByUserName(MongoSession ms, String userName) {
-        Query q = getFriendsByUserName_query(ms, null, userName);
+    public Iterable<SubNode> getPeopleByUserName(MongoSession ms, String userName) {
+        Query q = getPeopleByUserName_query(ms, null, userName);
         if (no(q))
             return null;
         return mongoUtil.find(q);
@@ -183,7 +183,7 @@ public class ActPubFollower extends ServiceBase {
         GetFollowersResponse res = new GetFollowersResponse();
 
         return arun.run(as -> {
-            Query q = getFriendsByUserName_query(as, null, req.getTargetUserName());
+            Query q = getPeopleByUserName_query(as, null, req.getTargetUserName());
             if (no(q))
                 return null;
 
@@ -234,14 +234,14 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
-        Query q = getFriendsByUserName_query(ms, userNode, userName);
+        Query q = getPeopleByUserName_query(ms, userNode, userName);
         if (no(q))
             return 0L;
         return ops.count(q, SubNode.class);
     }
 
     /* caller can pass userName only or else pass userNode if it's already available */
-    public Query getFriendsByUserName_query(MongoSession ms, SubNode userNode, String userName) {
+    public Query getPeopleByUserName_query(MongoSession ms, SubNode userNode, String userName) {
         Query q = new Query();
 
         if (no(userNode)) {

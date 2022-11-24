@@ -161,9 +161,12 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
+            const hasNonPublicShares = S.props.hasNonPublicShares(this.node);
+            const hasMentions = S.props.hasMentions(this.node);
+
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
              and we need to have a user identity for all the HTTP sigs for that. */
-            if (!state.isAnonUser) {
+            if (!state.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 verboseChildren.push(new Icon({
                     title: "Mentioned People on this Node",
                     className: "fa fa-users fa-lg marginRight",
@@ -183,7 +186,7 @@ export class NodeCompRowHeader extends Div {
 
             verboseChildren.push(new Icon({
                 title: likeDisplay ? likeDisplay : "Like this Node",
-                className: "fa fa-star fa-lg marginRight " + (youLiked ? "activeLikeIcon" : ""),
+                className: "fa fa-thumbs-up fa-lg marginRight " + (youLiked ? "likedByMeIcon" : ""),
                 onClick: () => {
                     if (state.isAdminUser) {
                         S.util.showMessage("Admin user can't do Likes.", "Admin");

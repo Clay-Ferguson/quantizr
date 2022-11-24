@@ -23,12 +23,12 @@ export class FriendsDlg extends DialogBase {
         });
 
         (async () => {
-            const res = await S.rpcUtil.rpc<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
+            const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
                 nodeId
             });
             this.mergeState<LS>({
                 nodeId,
-                friends: res.friends,
+                friends: res.people,
                 loading: false
             });
         })();

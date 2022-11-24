@@ -75,7 +75,7 @@ import quanta.request.GetBookmarksRequest;
 import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
-import quanta.request.GetFriendsRequest;
+import quanta.request.GetPeopleRequest;
 import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
@@ -664,14 +664,14 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	// todo-0: Need to rename this getPeople (and and rename paraemeters accordingly), becuase we use it
 	// for lists of people in general and not just lists of friends
-	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
-	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
+	@RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
+	public @ResponseBody Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
 
-		return callProc.run("getFriends", true, true, req, session, ms -> {
+		return callProc.run("getPeople", true, true, req, session, ms -> {
 			if (ok(req.getNodeId())) {
 				return user.getPeopleOnNode(ms, req.getNodeId());
 			} else {
-				return user.getFriends(ms);
+				return user.getPeople(ms);
 			}
 		});
 	}
@@ -1300,7 +1300,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	}
 
 	/*
-	 * This function is similar to getFriends, but since getFriends is for a picker dialog we can
+	 * This function is similar to getPeople, but since getPeople is for a picker dialog we can
 	 * consider it to be the odd man out which will eventually need to support paging (currently
 	 * doesn't) and go ahead and duplicate that functionality here in a way analogous to getFollowers
 	 */
