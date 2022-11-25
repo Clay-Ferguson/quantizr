@@ -234,8 +234,7 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
-	 * Note: We don't even use this becasue it wouldn't delete the orphans. We always delete using the
-	 * path prefix query so all subnodes in the subgraph go away (no orphans)
+     * Note: This method doesn't remove orphans of the node.
 	 */
 	public DeleteResult delete(MongoSession ms, SubNode node) {
 		SubNode parent = read.getParent(ms, node, false);

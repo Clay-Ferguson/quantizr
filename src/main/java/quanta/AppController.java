@@ -662,8 +662,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	// todo-0: Need to rename this getPeople (and and rename paraemeters accordingly), becuase we use it
-	// for lists of people in general and not just lists of friends
 	@RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
 	public @ResponseBody Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
 

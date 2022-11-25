@@ -193,7 +193,13 @@ public class ActPubFollowing extends ServiceBase {
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
-                    SubNode friendNode = read.findNodeByUserAndType(as, followerFriendList, null, userToFollow, NodeType.FRIEND.s());
+                    SubNode friendNode = read.findFriendNode(as, followerFriendList.getOwner(), null, userToFollow);
+
+                    // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
+                    if (ok(friendNode) && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
+                        delete.delete(as, friendNode);
+                        friendNode = null;
+                    }
 
                     if (no(friendNode)) {
                         if (!unFollow) {
@@ -400,8 +406,8 @@ public class ActPubFollowing extends ServiceBase {
             int counter = 0;
 
             for (SubNode node : iterable) {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
-                        false, false, false, false, false, null);
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false, false,
+                        false, false, false, false, null);
                 if (ok(info)) {
                     searchResults.add(info);
                 }

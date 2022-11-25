@@ -748,31 +748,30 @@ public class UserManagerService extends ServiceBase {
 			});
 		});
 	}
-
+	
+	/* The code pattern here is very similar to addFriendInternal */
 	public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
 		String userName = ThreadLocals.getSC().getUserName();
+		ObjectId accntIdDoingBlock = ThreadLocals.getSC().getUserNodeId();
 
 		// get the node that holds all blocked users
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 
-		/*
-		 * lookup to see if this will be a duplicate
-		 */
-		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, null, req.getUserName(), NodeType.FRIEND.s());
+		SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
+		
+		// if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
+		if (ok(userNode) && !mongoUtil.isChildOf(blockedList, userNode)) {
+			delete.delete(ms, userNode);
+			userNode = null;
+		}
+		
 		if (no(userNode)) {
-			SubNode accntNode = arun.run(s -> {
-				return read.getUserNodeByUserName(s, req.getUserName());
-			});
+			SubNode accntNode = arun.run(s -> read.getUserNodeByUserName(s, req.getUserName()));
 
 			if (no(accntNode))
 				throw new RuntimeException("User not found.");
-
-			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
-			// the DB enforcing this.
-			deleteFriend(ms, accntNode.getIdStr(), NodeType.FRIEND_LIST.s());
-			update.saveSession(ms);
 
 			userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
 			if (ok(userNode)) {
@@ -815,12 +814,14 @@ public class UserManagerService extends ServiceBase {
 		return res;
 	}
 
+	/*
+	 * Adds all the users in 'req.userName' (as a newline elimited list) as new friends of the current
+	 * user
+	 */
 	public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
-		// apLog.trace("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		String userDoingAction = ThreadLocals.getSC().getUserName();
 
-		// if a foreign user, update thru ActivityPub.
 		if (userDoingAction.equals(PrincipalName.ADMIN.s())) {
 			throw new RuntimeException("Don't follow from admin account.");
 		}
@@ -829,13 +830,13 @@ public class UserManagerService extends ServiceBase {
 
 		// If just following one user do it synchronously and send back the response
 		if (users.size() == 1) {
-			String ret = addFriend(ms, false, userDoingAction, users.get(0));
+			String ret = addFriend(ms, userDoingAction, null, users.get(0));
 			res.setMessage(ret);
 		}
 		// else if following multiple users run in an async exector thread
 		else if (users.size() > 1) {
 
-			// For now we only allow FollowBot to do this.
+			// For now we only allow FollowBot to do multiple-user follows
 			if (!userDoingAction.equals(PrincipalName.FOLLOW_BOT.s())) {
 				throw new RuntimeException("Account not authorized for multi-follows.");
 			}
@@ -846,7 +847,7 @@ public class UserManagerService extends ServiceBase {
 				users.forEach(u -> {
 					counter.setVal(counter.getVal() + 1);
 					log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
-					addFriend(ms, false, userDoingAction, u);
+					addFriend(ms, userDoingAction, null, u);
 
 					// sleep so the foreign server doesn't start throttling us if these users are
 					// very many onthe same server.
@@ -862,10 +863,9 @@ public class UserManagerService extends ServiceBase {
 	/*
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
-	 * 
-	 * NOTE: userDoingTheFollow should be short name like "clay" (not full fediverse name)
 	 */
-	public String addFriend(MongoSession ms, boolean asAdmin, String userDoingTheFollow, String userBeingFollowed) {
+	public String addFriend(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
+			String userBeingFollowed) {
 		String _userToFollow = userBeingFollowed;
 		_userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
 
@@ -876,55 +876,59 @@ public class UserManagerService extends ServiceBase {
 			return "You can't be friends with the admin.";
 		}
 
-		if (asAdmin) {
-			arun.run(as -> {
-				addFriendInternal(as, userDoingTheFollow, userToFollow);
-				return null;
-			});
-		} else {
-			// run as logged in user (request thread identifies auth)
-			exec.run(() -> {
-				addFriendInternal(ThreadLocals.getMongoSession(), userDoingTheFollow, userToFollow);
-			});
+		// If we don't know the account id of the person doing the follow, then look it up.
+		if (no(accntIdDoingFollow)) {
+			SubNode followerAcctNode = arun.run(s -> read.getUserNodeByUserName(ms, userDoingFollow, false));
+
+			if (no(followerAcctNode)) {
+				throw new RuntimeException("Unable to find user: " + userDoingFollow);
+			}
+			accntIdDoingFollow = followerAcctNode.getId();
 		}
+
+		addFriendInternal(ThreadLocals.getMongoSession(), userDoingFollow, accntIdDoingFollow, userToFollow);
 		return "Added Friend: " + userToFollow;
 	}
 
-	private void addFriendInternal(MongoSession ms, String userDoingTheFollow, String userToFollow) {
-		SubNode inUserNode = null;
-
+	/* The code pattern here is very similar to 'blockUser' */
+	private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
+			String userToFollow) {
 		SubNode followerFriendList =
-				read.getUserNodeByType(ms, userDoingTheFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+				read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
 		if (no(followerFriendList)) {
-			log.debug("Can't access Friend list for: " + userDoingTheFollow);
+			log.debug("Can't access Friend list for: " + userDoingFollow);
 			return;
 		}
 
 		/*
-		 * lookup to see if this followerFriendList node already has userToFollow already under it
+		 * lookup to see if this followerFriendList node already has userToFollow already under it.
 		 */
-		SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, inUserNode, userToFollow, NodeType.FRIEND.s());
+		SubNode friendNode = read.findFriendNode(ms, accntIdDoingFollow, null, userToFollow);
+		
+		// if we have this node but in some obsolete path delete it.  Might be the path of BLOCKED_USERS
+		if (ok(friendNode) && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
+			delete.delete(ms, friendNode);
+			friendNode = null;
+		}
 
 		// if friendNode is non-null here it means we were already following the user.
 		if (ok(friendNode))
 			return;
 
 		if (userToFollow.contains("@")) {
-			apub.loadForeignUser(userDoingTheFollow, userToFollow);
+			apub.loadForeignUser(userDoingFollow, userToFollow);
 		}
 
 		// the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
 		// must use arun.
-		SubNode userNode = arun.run(s -> {
-			return read.getUserNodeByUserName(s, userToFollow);
-		});
+		SubNode userNode = arun.run(s -> read.getUserNodeByUserName(s, userToFollow, false));
 
 		if (no(userNode))
 			return;
 
 		// follower bot never blocks people, so we can avoid calling that if follower bot.
-		if (!userDoingTheFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
+		if (!userDoingFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
 			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
 			// the DB enforcing this.
 			deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
@@ -937,7 +941,7 @@ public class UserManagerService extends ServiceBase {
 			friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
 
 			// updates AND sends the friend request out to the foreign server.
-			edit.updateSavedFriendNode(userDoingTheFollow, friendNode);
+			edit.updateSavedFriendNode(userDoingFollow, friendNode);
 
 			// Update our cache, becasue we now have a new followed user.
 			synchronized (apCache.followedUsers) {
@@ -1031,6 +1035,9 @@ public class UserManagerService extends ServiceBase {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
+		
+		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or Block.
+		//       Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
 		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}
@@ -1039,6 +1046,9 @@ public class UserManagerService extends ServiceBase {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
+		
+		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or Block.
+		//       Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, inUserNode, maybeBlockedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}

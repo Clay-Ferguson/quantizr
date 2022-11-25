@@ -885,6 +885,10 @@ public class MongoUtil extends ServiceBase {
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
+	public boolean isChildOf(SubNode parent, SubNode child) {
+		return child.getParentPath().equals(parent.getPath());
+	}
+
 	public String regexRecursiveChildrenOfPathIncludeRoot(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/|^" + Pattern.quote(path) + "$";

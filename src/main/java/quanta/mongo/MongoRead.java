@@ -1109,14 +1109,44 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * Finds and returns the first node matching userName and type under the 'node', or null if not
-     * existing. Caller can pass userNode if its available, or else userName will be used to look it up
+     * userNode and userName correspond to the FRIEND node and not the person who OWNS the friend node. The
+     * person whose friend we're trying to look up is 'ownerId' so they will be the OWNER of the
+     * FriendNode.
+     * 
+     * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"
+     */
+    public SubNode findFriendNode(MongoSession ms, ObjectId ownerId, SubNode userNode, String userName) {
+        if (no(userNode)) {
+            userNode = read.getUserNodeByUserName(ms, userName, false);
+            if (no(userNode)) {
+                return null;
+            }
+        }
+
+        // Otherwise for ordinary users root is based off their username
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.OWNER).is(ownerId)//
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s()) //
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
+
+        crit = auth.addSecurityCriteria(ms, crit);
+        q.addCriteria(crit);
+        SubNode ret = mongoUtil.findOne(q);
+        return ret;
+    }
+
+    /*
+     * Finds and returns the first node matching userName and type as direct child of 'node', or null if
+     * not existing. Caller can pass userNode if its available, or else userName will be used to look it
+     * up
      */
     @PerfMon(category = "read")
     public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, SubNode userNode, String userName, String type) {
-        if (noChildren(node)) {
-            return null;
-        }
+        // It's slighty more resiliant when, in this special case we don't trust the 'hasChildren'
+        // flag
+        // if (noChildren(node)) {
+        // return null;
+        // }
 
         if (no(userNode)) {
             userNode = read.getUserNodeByUserName(ms, userName, false);
@@ -1125,10 +1155,10 @@ public class MongoRead extends ServiceBase {
             }
         }
 
-        // Other wise for ordinary users root is based off their username
+        // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+        Criteria crit = Criteria.where(SubNode.PATH)//
+                .regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
                 .and(SubNode.TYPE).is(type) //
                 .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
 
