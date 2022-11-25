@@ -43,7 +43,7 @@ export class EditNodeDlgUtil {
         return numPropsShowing;
     }
 
-    public saveNode = async (dlg: EditNodeDlg) => {
+    public saveNode = async (dlg: EditNodeDlg): Promise<boolean> => {
         const appState = getAppState();
         const editNode = appState.editNode;
 
@@ -99,18 +99,19 @@ export class EditNodeDlgUtil {
             node: editNode
         });
 
-        if (res?.success) {
-            dlg.resetAutoSaver();
+        if (!res?.success) {
+            return false;
         }
+        dlg.resetAutoSaver();
 
         /* IMPORTANT: If there's an after edit action function specified on the dialog then that will be the ONLY
          action performed after the saveNode, so if we ever need any of the below logic to be run, in the case with
          afterEditAction we'd have to call that logic inside the afterEditAction function. */
-        if (dlg.afterEditAction) return;
+        if (dlg.afterEditAction) return true;
 
         // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
         // page refreshing after the edit.
-        if (res.node.type === J.NodeType.BOOKMARK && editNode.type !== J.NodeType.BOOKMARK_LIST) {
+        if (res.node?.type === J.NodeType.BOOKMARK && editNode.type !== J.NodeType.BOOKMARK_LIST) {
             // do nothing.
         }
         else {
@@ -128,6 +129,8 @@ export class EditNodeDlgUtil {
                 S.util.loadBookmarks();
             }, 250);
         }
+
+        return true;
     }
 
     // Takes all the propStates values and converts them into node properties on the node

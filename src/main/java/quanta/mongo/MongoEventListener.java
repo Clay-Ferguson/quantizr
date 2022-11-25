@@ -200,7 +200,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
 				&& (isNew || node.verifyParentPath)) {
-			read.checkParentExists(null, node);
+			read.checkParentExists(null, node.getPath());
 		}
 
 		saveAuthByThread(node, isNew);

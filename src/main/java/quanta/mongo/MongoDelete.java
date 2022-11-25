@@ -234,7 +234,7 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
-     * Note: This method doesn't remove orphans of the node.
+	 * Note: This method doesn't remove orphans of the node.
 	 */
 	public DeleteResult delete(MongoSession ms, SubNode node) {
 		SubNode parent = read.getParent(ms, node, false);
@@ -242,6 +242,10 @@ public class MongoDelete extends ServiceBase {
 			parent.setHasChildren(null);
 		}
 		return ops.remove(node);
+	}
+
+	public void directDelete(SubNode node) {
+		ops.remove(node);
 	}
 
 	public void deleteByPropVal(MongoSession ms, String prop, String val) {
@@ -551,12 +555,12 @@ public class MongoDelete extends ServiceBase {
 			// get the parent of the node and add it's id to parentIds
 			SubNode parent = read.getParent(ms, node, false);
 			if (no(parent)) {
-				// if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's
-				// essentially
-				// already deleted.
-				// todo-1: Could we have a background queue mow thru "Known Orphans" like this one, because any
-				// subnodes
-				// of it can be blown away once you identify an orphan by whatever means it was.
+				/*
+				 * if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's
+				 * essentially already deleted. todo-1: Could we have a background queue mow thru "Known Orphans"
+				 * like this one, because any subnodes of it can be blown away once you identify an orphan by
+				 * whatever means it was.
+				 */
 				continue;
 			}
 

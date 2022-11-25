@@ -207,15 +207,50 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
+    /* If this 'path' is known to exist and never needs to be validated, return true */
+    public boolean knownPath(String path) {
+        // if this is a path we KNOW exists, return false
+        if (no(path) || path.length() == 0 || !path.contains("/") || path.equals(NodePath.PENDING_PATH)
+                || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks ALL parent paths to make sure they all exist. Returns true of some parent doesn't exist */
+    public boolean isOrphan(String path) {
+        int sanityCheck = 0;
+
+        // if this is a path we KNOW exists, return false
+        if (knownPath(path))
+            return false;
+
+        while (sanityCheck++ < 1000) {
+            // get parent path
+            path = XString.truncAfterLast(path, "/");
+
+            if (knownPath(path))
+                return false;
+
+            // if the parent path does not exist, we're done. Path passed in is an orphan.
+            if (!read.pathExists(path)) {
+                return true;
+            }
+        }
+
+        // If we get here this is definitely a bug.
+        throw new RuntimeException("isOrphan algo failure.");
+    }
+
     /*
-     * Throws an exception if the parent of 'node' does not exist
+     * Throws an exception if the parent Node of 'path' does not exist.
      */
-    public void checkParentExists(MongoSession ms, SubNode node) {
-        boolean isRootPath = mongoUtil.isRootPath(node.getPath());
+    public void checkParentExists(MongoSession ms, String path) {
+        boolean isRootPath = mongoUtil.isRootPath(path);
         if (isRootPath)
             return;
 
-        String parentPath = getParentPath(node);
+        String parentPath = XString.truncAfterLast(path, "/");
         if (no(parentPath) || parentPath.equals("") || parentPath.equals("/") || parentPath.equals(NodePath.ROOT_PATH)
                 || parentPath.equals(NodePath.PENDING_PATH) || parentPath.equals(NodePath.PENDING_PATH + "/"))
             return;
@@ -229,13 +264,12 @@ public class MongoRead extends ServiceBase {
             return;
         }
 
-        SubNode parentNode = read.getNode(ms, parentPath, false, null);
-        if (ok(parentNode)) {
-            // a nice efficiency side-effect we can do here is set 'hasChildren' to true on the parent
-            // because we now know it exists. If it's not changing that's fine no DB update will be triggered.
-            parentNode.setHasChildren(true);
+        // no need to check USERS
+        if (parentPath.equals(NodePath.USERS_PATH) || parentPath.equals(NodePath.USERS_PATH + "/")) {
             return;
-        } else {
+        }
+
+        if (!read.pathExists(parentPath)) {
             throw new RuntimeEx("Attempted to add a node before its parent exists:" + parentPath);
         }
     }
@@ -375,12 +409,20 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    // todo-0: look for calls to this which could use 'pathExists()' instead.
     @PerfMon(category = "read")
     public SubNode findNodeByPath(String path) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.PATH).is(path));
         return mongoUtil.findOne(q);
+    }
+
+    public boolean pathExists(String path) {
+        path = XString.stripIfEndsWith(path, "/");
+        Query q = new Query();
+        q.addCriteria(Criteria.where(SubNode.PATH).is(path));
+        return ops.exists(q, SubNode.class);
     }
 
     public boolean nodeExists(MongoSession ms, ObjectId id) {
@@ -1109,8 +1151,8 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * userNode and userName correspond to the FRIEND node and not the person who OWNS the friend node. The
-     * person whose friend we're trying to look up is 'ownerId' so they will be the OWNER of the
+     * userNode and userName correspond to the FRIEND node and not the person who OWNS the friend node.
+     * The person whose friend we're trying to look up is 'ownerId' so they will be the OWNER of the
      * FriendNode.
      * 
      * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"

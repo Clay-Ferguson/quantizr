@@ -299,11 +299,9 @@ export class EditNodeDlg extends DialogBase {
         if (allowContentEdit) {
             const rows = editorOpts.contentEditorRows || (getAppState().mobileMode ? "8" : "10");
 
-            // if (!customProps) {
-                mainPropsTable.addChild(this.makeContentEditor(rows));
-                this.contentEditor.setWordWrap(isWordWrap);
-                propsVisible = true;
-            // }
+            mainPropsTable.addChild(this.makeContentEditor(rows));
+            this.contentEditor.setWordWrap(isWordWrap);
+            propsVisible = true;
         }
 
         if (this.buildPropsEditing(propsParent, state, typeHandler, customProps)) {
@@ -547,13 +545,15 @@ export class EditNodeDlg extends DialogBase {
         };
     }
 
-    save = () => {
+    save = async () => {
         // it's important to call saveNode before close, because close destroys some of our state, what we need
         // to complete the updating and page refresh.
-        this.utl.saveNode(this);
-        this.close();
-        if (this.afterEditAction) {
-            this.afterEditAction();
+        const savedOk: boolean = await this.utl.saveNode(this);
+        if (savedOk) {
+            this.close();
+            if (this.afterEditAction) {
+                this.afterEditAction();
+            }
         }
     }
 
