@@ -45,7 +45,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
             style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         }
 
-        const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false,
+        const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, /* this.data.id, false, */ false,
             true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style, state);
 
         if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {

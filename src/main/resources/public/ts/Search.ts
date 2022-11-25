@@ -507,21 +507,24 @@ export class Search {
      * Renders a single line of search results on the search results page.
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number,
-        prefix: string,
-        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
+        isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
         allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
         extraStyle: any, state: AppState): Comp => {
         if (!node) return;
+        const prefix = tabData.id;
+
+        // render with info bar, etc always, if this is a threaview or freed tab.
+        const renderAsFeedItem = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, /* prefix, isFeed, */ true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle, state);
         }
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
-        let clazz = isFeed ? "feed-node" : "results-node";
+        let clazz = renderAsFeedItem ? "feed-node" : "results-node";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
@@ -545,7 +548,7 @@ export class Search {
             const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
 
             boostComp = new Div(null, { className: "boost-row" }, [
-                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
+                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, renderAsFeedItem, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
                 allowFooter ? new NodeCompRowFooter(node.boostedNode) : null,
                 allowFooter ? new Clearfix() : null
@@ -573,7 +576,7 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false, allowDelete) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, renderAsFeedItem, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
             allowFooter ? new NodeCompRowFooter(node) : null,

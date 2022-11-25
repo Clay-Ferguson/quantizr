@@ -228,7 +228,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
                     // console.log("FEED: node id=" + node.id + " content: " + node.content);
-                    children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, "feed", true,
+                    children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount,
                         false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, state));
                     i++;
                     rowCount++;

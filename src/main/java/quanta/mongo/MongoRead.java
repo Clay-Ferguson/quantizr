@@ -409,7 +409,6 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    // todo-0: look for calls to this which could use 'pathExists()' instead.
     @PerfMon(category = "read")
     public SubNode findNodeByPath(String path) {
         path = XString.stripIfEndsWith(path, "/");
