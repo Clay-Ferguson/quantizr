@@ -2,7 +2,7 @@
 
 source ./define-functions.sh
 
-export QUANTA_VER=2.11.6
+export QUANTA_VER=2.11.7
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 # Uncomment either option 1 or option 2

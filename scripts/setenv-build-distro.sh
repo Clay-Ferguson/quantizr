@@ -8,7 +8,7 @@ THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export QUANTA_VER=2.11.6
+export QUANTA_VER=2.11.7
 
 # always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
 # builds we run on our machine should ever target to the 'subnode/repo:'
