@@ -168,7 +168,7 @@ export class RightNavPanel extends Div {
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu")
+                    !state.isAnonUser ? new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
                 ]),
 
                 // note: Anonymouse users don't have nodeHistory

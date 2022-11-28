@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
+import { TabPanelButtons } from "./TabPanelButtons";
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -81,7 +82,8 @@ export class LeftNavPanel extends Div {
                     title: "Show new messages"
                 }) : null
             ]),
-            new MenuPanel(state)
+            new MenuPanel(state),
+            state.isAnonUser ? new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
         ]);
     }
 
