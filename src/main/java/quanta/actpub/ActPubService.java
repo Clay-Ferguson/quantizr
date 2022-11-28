@@ -809,6 +809,13 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
+            String userDoingAction = ThreadLocals.getSC().getUserName();
+            SubNode actorAccntNode = apub.getAcctNodeByActorUrl(as, userDoingAction, activity.getActor());
+            if (no(actorAccntNode)) {
+                throw new RuntimeException("actor not found.");
+            }
+            String actorUserName = actorAccntNode.getStr(NodeProp.USER);
+
             // Our objects are identified like this: "https://quanta.wiki?id=6277120c1363dc5d1fb426b5"
             // So by chopping after last '=' we can get the ID part.
             String nodeId = XString.parseAfterLast(objectIdUrl, "=");
@@ -821,9 +828,9 @@ public class ActPubService extends ServiceBase {
             }
 
             if (unlike) {
-                node.removeLike(activity.getActor());
+                node.removeLike(actorUserName);
             } else {
-                node.addLike(activity.getActor());
+                node.addLike(actorUserName);
             }
             return null;
         });

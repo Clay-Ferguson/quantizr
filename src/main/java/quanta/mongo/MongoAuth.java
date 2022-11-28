@@ -733,8 +733,20 @@ public class MongoAuth extends ServiceBase {
 							// sometimes the name is ALREADY containing the host, so be sure not to append it again in that case
 							// or else we end up with "user@server.com@server.com"
 							String longName = (String) name;
-							if (!longName.contains("@" + hrefUrl.getHost())) {
+
+							// if 'longName' is like "@user" with no domain, then add the domain.
+							if (StringUtils.countMatches(longName, "@") < 2) {
 								longName += "@" + hrefUrl.getHost();
+							}
+
+							// I'm just adding this as a sanity check but it should be unnecessary
+							if (!longName.startsWith("@")) {
+								longName = "@" + longName;
+							}
+
+							// one more sanity check to be sure everything is ok with the name
+							if (StringUtils.countMatches(longName, "@") > 2) {
+								continue;
 							}
 
 							// build this name without host part if it's a local user, otherwise full fediverse name
