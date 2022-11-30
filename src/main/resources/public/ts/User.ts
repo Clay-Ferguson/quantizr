@@ -333,7 +333,7 @@ export class User {
     }
 
     showUsersList = (node: J.NodeInfo) => {
-        const friendsDlg = new FriendsDlg("Mentions & Sharing", node.id);
+        const friendsDlg = new FriendsDlg("People", node.id);
         friendsDlg.open();
     }
 }

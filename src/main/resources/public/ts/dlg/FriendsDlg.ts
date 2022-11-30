@@ -28,7 +28,7 @@ export class FriendsDlg extends DialogBase {
             });
             this.mergeState<LS>({
                 nodeId,
-                friends: res.people,
+                friends: [res.nodeOwner, ...res.people],
                 loading: false
             });
         })();

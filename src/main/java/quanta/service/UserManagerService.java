@@ -748,7 +748,7 @@ public class UserManagerService extends ServiceBase {
 			});
 		});
 	}
-	
+
 	/* The code pattern here is very similar to addFriendInternal */
 	public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
@@ -760,13 +760,13 @@ public class UserManagerService extends ServiceBase {
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 
 		SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
-		
+
 		// if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
 		if (ok(userNode) && !mongoUtil.isChildOf(blockedList, userNode)) {
 			delete.delete(ms, userNode);
 			userNode = null;
 		}
-		
+
 		if (no(userNode)) {
 			SubNode accntNode = arun.run(s -> read.getUserNodeByUserName(s, req.getUserName()));
 
@@ -864,8 +864,7 @@ public class UserManagerService extends ServiceBase {
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
 	 */
-	public String addFriend(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-			String userBeingFollowed) {
+	public String addFriend(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow, String userBeingFollowed) {
 		String _userToFollow = userBeingFollowed;
 		_userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
 
@@ -891,8 +890,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	/* The code pattern here is very similar to 'blockUser' */
-	private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-			String userToFollow) {
+	private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow, String userToFollow) {
 		SubNode followerFriendList =
 				read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
@@ -905,8 +903,8 @@ public class UserManagerService extends ServiceBase {
 		 * lookup to see if this followerFriendList node already has userToFollow already under it.
 		 */
 		SubNode friendNode = read.findFriendNode(ms, accntIdDoingFollow, null, userToFollow);
-		
-		// if we have this node but in some obsolete path delete it.  Might be the path of BLOCKED_USERS
+
+		// if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
 		if (ok(friendNode) && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
 			delete.delete(ms, friendNode);
 			friendNode = null;
@@ -1035,9 +1033,10 @@ public class UserManagerService extends ServiceBase {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
-		
-		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or Block.
-		//       Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
+
+		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
+		// Block.
+		// Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
 		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}
@@ -1046,9 +1045,10 @@ public class UserManagerService extends ServiceBase {
 		String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
-		
-		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or Block.
-		//       Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
+
+		// note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
+		// Block.
+		// Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, inUserNode, maybeBlockedUser, NodeType.FRIEND.s());
 		return ok(userNode);
 	}
@@ -1242,9 +1242,11 @@ public class UserManagerService extends ServiceBase {
 		GetPeopleResponse res = new GetPeopleResponse();
 		SubNode node = read.getNode(ms, nodeId);
 		if (no(node)) {
-			res.setMessage("Unable to find user.");
+			res.setMessage("Unable to find node.");
 			res.setSuccess(false);
 		}
+
+		String ownerIdStr = node.getOwner().toHexString();
 
 		HashSet<String> idSet = new HashSet<>();
 		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
@@ -1268,12 +1270,27 @@ public class UserManagerService extends ServiceBase {
 
 		List<FriendInfo> friends = new LinkedList<>();
 		arun.run(as -> {
+
+			SubNode ownerAccntNode = read.getNode(as, node.getOwner());
+			String ownerName = null;
+
+			if (ok(ownerAccntNode)) {
+				ownerName = ownerAccntNode.getStr(NodeProp.USER);
+				FriendInfo ownerInfo = buildPersonInfoFromAccntNode(as, ownerAccntNode);
+				if (node.getLikes().contains(ownerInfo.getUserName())) {
+					ownerInfo.setLiked(true);
+				}
+				res.setNodeOwner(ownerInfo);
+			}
+
+			String _ownerName = ownerName;
 			tags.forEach((user, tag) -> {
 				// ignore if this is something else (like a Hashtag)
 				if (!(tag instanceof APOMention))
 					return;
 				// remove '@' prefix
 				user = XString.stripIfStartsWith(user, "@");
+				if (user.equals(_ownerName)) return;
 
 				try {
 					SubNode accntNode = read.getUserNodeByUserName(as, user);
@@ -1298,7 +1315,7 @@ public class UserManagerService extends ServiceBase {
 				 */
 				for (String accntId : node.getAc().keySet()) {
 					// ignore public, it's not a user.
-					if (idSet.contains(accntId) || PrincipalName.PUBLIC.s().equals(accntId))
+					if (accntId.equals(ownerIdStr) || idSet.contains(accntId) || PrincipalName.PUBLIC.s().equals(accntId))
 						continue;
 
 					SubNode accntNode = apub.cachedGetAccntNodeById(as, accntId, false, null);
@@ -1310,6 +1327,7 @@ public class UserManagerService extends ServiceBase {
 				}
 				res.setPeople(friends);
 			}
+
 			return null;
 		});
 

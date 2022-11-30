@@ -168,7 +168,7 @@ export class NodeCompRowHeader extends Div {
              and we need to have a user identity for all the HTTP sigs for that. */
             if (!state.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 verboseChildren.push(new Icon({
-                    title: "Mentioned People on this Node",
+                    title: "People associated with this Node",
                     className: "fa fa-users fa-lg marginRight",
                     onClick: () => S.user.showUsersList(this.node)
                 }));

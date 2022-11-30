@@ -684,6 +684,7 @@ export interface GetOpenGraphResponse extends ResponseBase {
 }
 
 export interface GetPeopleResponse extends ResponseBase {
+    nodeOwner: FriendInfo;
     people: FriendInfo[];
 }
 

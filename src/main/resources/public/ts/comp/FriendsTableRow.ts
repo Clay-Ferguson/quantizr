@@ -71,7 +71,7 @@ export class FriendsTableRow extends ListBoxRow {
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
-                    className: "fa fa-thumbs-up fa-lg bigMarginLeft " +
+                    className: "fa fa-thumbs-up fa-lg marginTop marginRight float-end " +
                         (this.friend.userName === appState.userName ? "likedByMeIcon" : "")
                 }) : null
             ])
