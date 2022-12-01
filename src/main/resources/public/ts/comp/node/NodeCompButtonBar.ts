@@ -46,7 +46,7 @@ export class NodeCompButtonBar extends Div {
         let pasteSpan: Span;
 
         const isPageRootNode = state.node && this.node.id === state.node.id;
-        const typeHandler = S.plugin.getTypeHandler(this.node.type);
+        const type = S.plugin.getTypeHandler(this.node.type);
         let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;
@@ -56,11 +56,11 @@ export class NodeCompButtonBar extends Div {
             deleteAllowed = true;
             editableNode = true;
         }
-        else if (typeHandler) {
+        else if (type) {
             if (editingAllowed) {
-                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
-                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, this.node, state);
-                editableNode = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, state);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, state);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node, state);
             }
         }
         else {
@@ -116,7 +116,7 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPrefs.editMode) {
-            const checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, this.node, state));
+            const checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node, state));
             const checkboxForDelete = state.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
@@ -143,8 +143,8 @@ export class NodeCompButtonBar extends Div {
 
             // if this is our own account node, we can always leave insertAllowed=true
             if (state.userProfile?.userNodeId !== this.node.id) {
-                if (typeHandler) {
-                    insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, this.node, state);
+                if (type) {
+                    insertAllowed = state.isAdminUser || type.allowAction(NodeActionType.insert, this.node, state);
                 }
             }
             const editInsertAllowed = S.props.isWritableByMe(this.node);

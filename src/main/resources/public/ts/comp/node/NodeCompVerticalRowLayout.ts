@@ -40,8 +40,8 @@ export class NodeCompVerticalRowLayout extends Div {
                 let boostComp: NodeCompRow = null;
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                    const typeHandler = S.plugin.getTypeHandler(n.boostedNode.type);
-                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, typeHandler, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, state);
+                    const type = S.plugin.getTypeHandler(n.boostedNode.type);
+                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, state);
                 }
 
                 if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
@@ -52,10 +52,10 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 else {
-                    const typeHandler = S.plugin.getTypeHandler(n.type);
+                    const type = S.plugin.getTypeHandler(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
+                    if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
                     }
                     else {
                         lastNode = n;
@@ -67,16 +67,16 @@ export class NodeCompVerticalRowLayout extends Div {
                         /* NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
                          because if the user wants their Account root laid out in a grid just let them do that and show everything
                          without doing any collapsedComps. */
-                        if (typeHandler && typeHandler.isSpecialAccountNode()) {
+                        if (type && type.isSpecialAccountNode()) {
                             if (NodeCompVerticalRowLayout.showSpecialNodes) {
-                                row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null, state);
+                                row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null, state);
 
                                 // I'm gonna be evil here and do this object without a type.
-                                collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
+                                collapsedComps.push({ comp: row, subOrdinal: type.subOrdinal() });
                             }
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, state);
+                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, state);
                             comps.push(row);
                         }
                         inVerticalSpace = false;

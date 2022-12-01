@@ -290,10 +290,10 @@ export class MenuPanel extends Div {
         }
 
         const createMenuItems: CompIntf[] = [];
-        const typeHandlers = S.plugin.getAllTypeHandlers();
-        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string) => {
-            if (appState.isAdminUser || typeHandler.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, appState), //
+        const types = S.plugin.getAllTypeHandlers();
+        types.forEach((type: TypeHandlerIntf, k: string) => {
+            if (appState.isAdminUser || type.getAllowUserSelect()) {
+                createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null, appState), //
                     !appState.isAnonUser && !!hltNode));
             }
         });

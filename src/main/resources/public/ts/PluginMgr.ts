@@ -21,20 +21,21 @@ import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
 import { RssFeedsTypeHandler } from "./plugins/RssFeedsTypeHandler";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
+
 export class PluginMgr {
 
-    private typeHandlers: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
+    private types: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
 
-    addTypeHandler = (typeHandler: TypeHandlerIntf) => {
-        // console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
-        if (this.typeHandlers.get(typeHandler.getTypeName())) {
-            throw new Error("duplicate type handler: " + typeHandler.getTypeName());
+    addTypeHandler = (type: TypeHandlerIntf) => {
+        // console.log("Adding TypeHandler: type=" + type.getTypeName());
+        if (this.types.get(type.getTypeName())) {
+            throw new Error("duplicate type handler: " + type.getTypeName());
         }
-        this.typeHandlers.set(typeHandler.getTypeName(), typeHandler);
+        this.types.set(type.getTypeName(), type);
     }
 
     getTypeHandler = (typeName: string): TypeHandlerIntf => {
-        const handler = this.typeHandlers.get(typeName);
+        const handler = this.types.get(typeName);
         if (!handler) {
             console.warn("No type handler for: " + typeName);
         }
@@ -42,7 +43,7 @@ export class PluginMgr {
     }
 
     getAllTypeHandlers = (): Map<string, TypeHandlerIntf> => {
-        return this.typeHandlers;
+        return this.types;
     }
 
     // todo-2: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.

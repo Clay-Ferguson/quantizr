@@ -6,17 +6,17 @@ import { Span } from "./core/Span";
 
 export class NodeTypeListBoxRow extends ListBoxRow {
 
-    constructor(public typeHandler: TypeHandlerIntf, onClickFunc: Function, public isSelected: boolean) {
+    constructor(public type: TypeHandlerIntf, onClickFunc: Function, public isSelected: boolean) {
         super(null, onClickFunc);
     }
 
     preRender(): void {
-        const iconClass = this.typeHandler.getIconClass();
+        const iconClass = this.type.getIconClass();
 
         this.setChildren([
             new FlexLayout([
                 iconClass ? new Icon({ className: iconClass + " typeListIcon" }) : null,
-                new Span(this.typeHandler.getName())
+                new Span(this.type.getName())
             ], this.isSelected ? "selectedListItem" : "unselectedListItem")
         ]);
     }

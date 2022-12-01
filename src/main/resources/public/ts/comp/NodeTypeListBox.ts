@@ -14,13 +14,13 @@ export class NodeTypeListBox extends ListBox {
 
     preRender(): void {
         const children: Comp[] = [];
-        const typeHandlers = S.plugin.getAllTypeHandlers();
+        const types = S.plugin.getAllTypeHandlers();
 
-        typeHandlers.forEach((typeHandler, k) => {
-            if (getAppState().isAdminUser || typeHandler.getAllowUserSelect()) {
-                children.push(new NodeTypeListBoxRow(typeHandler, () => {
-                    this.updateVal(typeHandler.getTypeName());
-                }, this.valueIntf.getValue() === typeHandler.getTypeName()));
+        types.forEach((type, k) => {
+            if (getAppState().isAdminUser || type.getAllowUserSelect()) {
+                children.push(new NodeTypeListBoxRow(type, () => {
+                    this.updateVal(type.getTypeName());
+                }, this.valueIntf.getValue() === type.getTypeName()));
             }
         });
 

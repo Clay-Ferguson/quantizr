@@ -67,13 +67,13 @@ export class NodeCompRowHeader extends Div {
 
         const verboseChildren: Comp[] = state.mobileMode ? [] : children;
 
-        const typeHandler = S.plugin.getTypeHandler(this.node.type);
-        if (typeHandler) {
-            const iconClass = typeHandler.getIconClass();
+        const type = S.plugin.getTypeHandler(this.node.type);
+        if (type) {
+            const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 verboseChildren.push(new Icon({
                     className: iconClass + " rowTypeIcon",
-                    title: "Node Type: " + typeHandler.getName(),
+                    title: "Node Type: " + type.getName(),
                     onMouseOver: () => { S.quanta.draggableId = this.node.id; },
                     onMouseOut: () => { S.quanta.draggableId = null; }
                 }));
@@ -273,11 +273,11 @@ export class NodeCompRowHeader extends Div {
             editableNode = true;
             deleteAllowed = true;
         }
-        else if (typeHandler) {
+        else if (type) {
             if (editingAllowed) {
-                editingAllowed = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
-                editableNode = typeHandler.allowAction(NodeActionType.editNode, this.node, state);
-                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, this.node, state);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, state);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node, state);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, state);
             }
         }
 

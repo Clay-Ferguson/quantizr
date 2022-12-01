@@ -38,17 +38,17 @@ export class NodeCompContent extends Div {
         }
 
         const children: CompIntf[] = [];
-        let typeHandler = S.plugin.getTypeHandler(this.node.type);
-        typeHandler = typeHandler || S.plugin.getTypeHandler(J.NodeType.NONE);
+        let type = S.plugin.getTypeHandler(this.node.type);
+        type = type || S.plugin.getTypeHandler(J.NodeType.NONE);
 
-        this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
+        this.domPreUpdateFunc = type.getDomPreUpdateFunction;
 
         const name: string = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_NAME, this.node);
         if (name) {
             children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
         }
 
-        children.push(typeHandler.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
+        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
 
         if (state.userPrefs.showProps && this.node.properties?.length > 0) {
             children.push(new PropTable(this.node));

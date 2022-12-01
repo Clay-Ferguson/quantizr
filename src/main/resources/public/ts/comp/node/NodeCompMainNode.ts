@@ -25,10 +25,10 @@ export class NodeCompMainNode extends Div {
             // tabIndex: "-1"
         });
 
-        const typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
+        const type = S.plugin.getTypeHandler(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!typeHandler || typeHandler.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt: any) => this.dragStart(evt, state.node.id);
             this.attribs.onDragEnd = this.dragEnd;
@@ -80,7 +80,7 @@ export class NodeCompMainNode extends Div {
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
-            const typeHandler = S.plugin.getTypeHandler(node.type);
+            const type = S.plugin.getTypeHandler(node.type);
 
             let allowHeader: boolean = false;
             // special case, if node is owned by admin and we're not admin, never show header
@@ -88,7 +88,7 @@ export class NodeCompMainNode extends Div {
                 // leave allowHeader false
             }
             else {
-                allowHeader = state.userPrefs.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())
+                allowHeader = state.userPrefs.showMetaData && (type == null || type?.getAllowRowHeader())
             }
 
             if (allowHeader) {
@@ -109,8 +109,8 @@ export class NodeCompMainNode extends Div {
             let boostComp: NodeCompRow = null;
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                const typeHandler = S.plugin.getTypeHandler(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, typeHandler, 0, 0, 0, 0, false, false, true, false, true, null, state);
+                const type = S.plugin.getTypeHandler(node.boostedNode.type);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, state);
             }
 
             this.setChildren([

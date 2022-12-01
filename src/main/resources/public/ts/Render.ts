@@ -410,8 +410,8 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
-        return !typeHandler || typeHandler.allowAction(action, node, appState);
+    allowAction = (type: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
+        return !type || type.allowAction(action, node, appState);
     }
 
     renderPage = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
@@ -635,8 +635,8 @@ export class Render {
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
-        const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        return typeHandler ? typeHandler.allowPropertyEdit(propName, state) : true;
+        const type: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        return type ? type.allowPropertyEdit(propName, state) : true;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {

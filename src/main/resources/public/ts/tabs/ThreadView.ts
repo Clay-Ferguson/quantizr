@@ -37,7 +37,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                 !this.data.props.endReached ? new Div("More of this thread can be displayed", { className: "float-end" }) : null,
                 new Clearfix(),
                 !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() },
-                    { className: "float-end" }, "btn-primary") : null,
+                    { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
                 new Clearfix()
             ]),
             this.data.props.description ? new Div(this.data.props.description) : null

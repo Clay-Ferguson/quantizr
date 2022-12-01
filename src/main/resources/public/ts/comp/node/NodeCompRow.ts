@@ -24,7 +24,7 @@ export class NodeCompRow extends Div {
 
     // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
-    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
         super(null, {
@@ -34,7 +34,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPrefs.editMode && !appState.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && appState.userPrefs.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt: any) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;
@@ -161,7 +161,7 @@ export class NodeCompRow extends Div {
             // leave allowHeader false.
         }
         else {
-            allowHeader = this.allowHeaders && state.userPrefs.showMetaData && (this.typeHandler == null || this.typeHandler?.getAllowRowHeader())
+            allowHeader = this.allowHeaders && state.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
         }
 
         if (allowHeader) {

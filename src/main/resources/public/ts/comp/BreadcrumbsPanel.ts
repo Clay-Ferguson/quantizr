@@ -30,8 +30,8 @@ export class BreadcrumbsPanel extends Div {
                 }
                 else if (bc.id) {
                     if (!bc.name) {
-                        const typeHandler = S.plugin.getTypeHandler(bc.type);
-                        bc.name = typeHandler ? typeHandler.getName() : "???";
+                        const type = S.plugin.getTypeHandler(bc.type);
+                        bc.name = type ? type.getName() : "???";
                     }
 
                     return new Span(S.util.removeHtmlTags(bc.name), {

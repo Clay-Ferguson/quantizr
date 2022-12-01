@@ -38,9 +38,9 @@ export class HistoryPanel extends Div {
             let parentDropTarg: CompIntf;
             let parentIcon: Icon;
 
-            const typeHandler = S.plugin.getTypeHandler(h.type);
-            if (typeHandler) {
-                const iconClass = typeHandler.getIconClass();
+            const type = S.plugin.getTypeHandler(h.type);
+            if (type) {
+                const iconClass = type.getIconClass();
                 if (iconClass) {
                     const dragProps = state.userPrefs.editMode ? {
                         onMouseOver: () => { S.quanta.draggableId = h.id; },
@@ -49,7 +49,7 @@ export class HistoryPanel extends Div {
 
                     parentIcon = new Icon({
                         className: iconClass + " rowTypeIcon",
-                        title: "Node Type: " + typeHandler.getName(),
+                        title: "Node Type: " + type.getName(),
                         ...dragProps
                     });
                 }
@@ -88,9 +88,9 @@ export class HistoryPanel extends Div {
                         let dropTarg: Div;
                         let icon: Icon;
 
-                        const typeHandler = S.plugin.getTypeHandler(h.type);
-                        if (typeHandler) {
-                            const iconClass = typeHandler.getIconClass();
+                        const type = S.plugin.getTypeHandler(h.type);
+                        if (type) {
+                            const iconClass = type.getIconClass();
                             if (iconClass) {
                                 const dragProps = state.userPrefs.editMode ? {
                                     onMouseOver: () => { S.quanta.draggableId = h.id; },
@@ -99,7 +99,7 @@ export class HistoryPanel extends Div {
 
                                 icon = new Icon({
                                     className: iconClass + " rowTypeIcon",
-                                    title: "Node Type: " + typeHandler.getName(),
+                                    title: "Node Type: " + type.getName(),
                                     ...dragProps
                                 });
                             }

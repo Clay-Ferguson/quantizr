@@ -171,13 +171,13 @@ export class EditNodeDlg extends DialogBase {
         const appState = getAppState();
         let span: Span = null;
 
-        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
-        if (typeHandler) {
-            const iconClass = typeHandler.getIconClass();
+        const type = S.plugin.getTypeHandler(appState.editNode.type);
+        if (type) {
+            const iconClass = type.getIconClass();
             if (iconClass) {
                 span = span || new Span();
                 span.addChild(new Icon({
-                    title: `Node is a '${typeHandler.getName()}' type.`,
+                    title: `Node is a '${type.getName()}' type.`,
                     className: iconClass + " iconMarginRight clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
@@ -189,7 +189,7 @@ export class EditNodeDlg extends DialogBase {
                     className: "fa fa-calendar fa-lg iconMarginRight"
                 }));
             }
-            span.addChild(new Span(typeHandler.getName(), { className: "marginRight" }));
+            span.addChild(new Span(type.getName(), { className: "marginRight" }));
         }
 
         if (this.showJumpButton) {
@@ -237,17 +237,17 @@ export class EditNodeDlg extends DialogBase {
         const hasAttachment: boolean = S.props.hasBinary(appState.editNode);
 
         this.editorHelp = null;
-        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
+        const type = S.plugin.getTypeHandler(appState.editNode.type);
         let customProps: string[] = null;
         let editorOpts: EditorOptions = {};
-        if (typeHandler) {
-            editorOpts = typeHandler.getEditorOptions();
-            customProps = typeHandler.getCustomProperties();
-            typeHandler.ensureDefaultProperties(appState.editNode);
-            this.editorHelp = typeHandler.getEditorHelp();
+        if (type) {
+            editorOpts = type.getEditorOptions();
+            customProps = type.getCustomProperties();
+            type.ensureDefaultProperties(appState.editNode);
+            this.editorHelp = type.getEditorHelp();
         }
 
-        const allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
+        const allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
         let propEditFieldContainer: Div = null;
         const children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
@@ -304,7 +304,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        if (this.buildPropsEditing(propsParent, state, typeHandler, customProps)) {
+        if (this.buildPropsEditing(propsParent, state, type, customProps)) {
             propsVisible = true;
         }
 
@@ -358,8 +358,8 @@ export class EditNodeDlg extends DialogBase {
         ]) : null;
 
         let editorSubPanel: Comp = null;
-        if (typeHandler) {
-            editorSubPanel = typeHandler.renderEditorSubPanel(appState.editNode);
+        if (type) {
+            editorSubPanel = type.renderEditorSubPanel(appState.editNode);
         }
 
         const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
@@ -424,7 +424,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* returns true if props table is not empty */
-    buildPropsEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): boolean => {
+    buildPropsEditing = (propsParent: CompIntf, state: LS, type: TypeHandlerIntf, customProps: string[]): boolean => {
         let numPropsShowing: number = 0;
         let ret = false;
         const appState = getAppState();
@@ -442,8 +442,8 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
-                        const allowSelection = !customProps || typeHandler?.hasSelectableProp(prop.name);
-                        const tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
+                        const allowSelection = !customProps || type?.hasSelectableProp(prop.name);
+                        const tableRow = this.makePropEditor(type, prop, allowSelection, type ? type.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                         propsParent.addChild(tableRow);
                         ret = true;
@@ -452,7 +452,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        const allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
         if (allowPropAdd) {
             if (numPropsShowing > 0) {
                 const state = this.getState<LS>();
@@ -561,24 +561,24 @@ export class EditNodeDlg extends DialogBase {
         const appState = getAppState();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
-        const typeHandler = S.plugin.getTypeHandler(appState.editNode.type);
-        if (typeHandler) {
-            typeHandler.ensureDefaultProperties(appState.editNode);
+        const type = S.plugin.getTypeHandler(appState.editNode.type);
+        if (type) {
+            type.ensureDefaultProperties(appState.editNode);
         }
 
-        // let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
+        // let allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        const allowUpload: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.upload, appState.editNode, getAppState())) : true;
-        const allowShare: boolean = typeHandler ? (getAppState().isAdminUser || typeHandler.allowAction(NodeActionType.share, appState.editNode, getAppState())) : true;
+        const allowUpload: boolean = type ? (getAppState().isAdminUser || type.allowAction(NodeActionType.upload, appState.editNode, getAppState())) : true;
+        const allowShare: boolean = type ? (getAppState().isAdminUser || type.allowAction(NodeActionType.share, appState.editNode, getAppState())) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, appState.editNode);
 
         const numPropsShowing = this.utl.countPropsShowing(this);
         const advancedButtons: boolean = !!this.contentEditor;
-        const allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
@@ -647,14 +647,14 @@ export class EditNodeDlg extends DialogBase {
         new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
-    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+    makePropEditor = (type: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
         const appState = getAppState();
         const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
         const allowEditAllProps: boolean = getAppState().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems = [];
-        const label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
+        const label = type ? type.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: Validator = this.propStates.get(propEntry.name);
