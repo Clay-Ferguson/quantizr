@@ -81,9 +81,7 @@ export class App extends Main {
                 // }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
                 state.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
-                    onClick: () => {
-                        S.view.scrollActiveToTop(state);
-                    },
+                    onClick: () => S.view.scrollActiveToTop(state),
                     title: "Scroll to Top"
                 }, "btn-secondary scrollTopButtonLowerRight", "off")
             ]);

@@ -250,7 +250,7 @@ export class NodeUtil {
     removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
-            principalNodeId: "public",
+            principalNodeId: J.PrincipalName.PUBLIC,
             privilege: "*"
         });
         this.removePrivilegeResponse(node, editorDlg);
@@ -299,7 +299,7 @@ export class NodeUtil {
             // }
 
             // Skip public here we processed that above.
-            if (ac.principalName && ac.principalName !== "public") {
+            if (ac.principalName && ac.principalName !== J.PrincipalName.PUBLIC) {
                 let props = null;
 
                 // If we have a local node for this user we will have the principleNodeId here and show a link

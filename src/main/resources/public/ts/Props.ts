@@ -71,7 +71,7 @@ export class Props {
     }
 
     hasNonPublicShares = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== "public");
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== J.PrincipalName.PUBLIC);
     }
 
     hasMentions = (node: J.NodeInfo): boolean => {
@@ -88,11 +88,11 @@ export class Props {
     }
 
     isPublic = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public");
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC);
     }
 
     isPublicWritable = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
     isWritableByMe = (node: J.NodeInfo): boolean => {
@@ -114,12 +114,12 @@ export class Props {
 
         // writeable by us if there's any kind of share to us or a writable public share.
         return node && node.ac && !!node.ac.find(ace =>
-            (ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE)) ||
+            (ace.principalNodeId === J.PrincipalName.PUBLIC && this.hasPrivilege(ace, J.PrivilegeType.WRITE)) ||
             ace.principalNodeId === appState.userProfile?.userNodeId);
     }
 
     isPublicReadOnly = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && !this.hasPrivilege(ace, J.PrivilegeType.WRITE));
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC && !this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
     getAcCount = (node: J.NodeInfo): number => {

@@ -1396,7 +1396,7 @@ export class Edit {
    can use their private key to decrypt the key to the data, to view the node.
    */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
-        if (principalNodeId === "public" || !S.crypto.avail) {
+        if (principalNodeId === J.PrincipalName.PUBLIC || !S.crypto.avail) {
             console.warn("public node has encryption turned on. This is a bug.");
             return;
         }

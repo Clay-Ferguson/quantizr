@@ -62,7 +62,7 @@ export class EditPrivsTableRow extends ListBoxRow {
             ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
             : ("@" + this.aclEntry.principalName);
 
-        const isPublic = this.aclEntry.principalName === "public";
+        const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
             new Div(null, { className: "microMarginAll" }, [

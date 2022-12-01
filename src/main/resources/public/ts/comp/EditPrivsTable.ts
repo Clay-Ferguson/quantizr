@@ -2,6 +2,7 @@ import { Div } from "../comp/core/Div";
 import { AccessControlInfo } from "../JavaIntf";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
+import * as J from "../JavaIntf";
 
 export class EditPrivsTable extends ListBox {
 
@@ -15,13 +16,13 @@ export class EditPrivsTable extends ListBox {
         if (this.acl) {
             // first add public, so it's at the top
             this.acl.forEach(aclEntry => {
-                if (aclEntry.principalName?.toLowerCase() === "public") {
+                if (aclEntry.principalName?.toLowerCase() === J.PrincipalName.PUBLIC) {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }
             });
 
             this.acl.forEach(aclEntry => {
-                if (aclEntry.principalName?.toLowerCase() !== "public") {
+                if (aclEntry.principalName?.toLowerCase() !== J.PrincipalName.PUBLIC) {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }
             });

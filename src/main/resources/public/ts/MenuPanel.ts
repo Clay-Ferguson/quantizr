@@ -87,8 +87,8 @@ export class MenuPanel extends Div {
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
-    static showPublicWritableShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.WRITE); }
-    static showPublicReadonlyShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.READ); }
+    static showPublicWritableShares = () => { S.srch.findShares(null, J.PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
+    static showPublicReadonlyShares = () => { S.srch.findShares(null, J.PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null, null); }
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
