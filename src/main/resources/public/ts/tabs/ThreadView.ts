@@ -20,8 +20,8 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     preRender(): void {
         const ast = useAppState();
         const results = this.data?.props?.results;
-        this.attribs.className = this.getClass(ast);
         if (!results) return;
+        this.attribs.className = this.getClass(ast);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -70,10 +70,10 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     moreHistory = () => {
-        const state = getAppState();
-        const results = this.data && this.data.props.results;
+        const ast = getAppState();
+        const results = this.data?.props?.results;
         if (!results || results.length === 0) return;
-        S.srch.showThreadAddMore(results[0].id, state);
+        S.srch.showThreadAddMore(results[0].id, ast);
     }
 
     /* overridable (don't use arrow function) */

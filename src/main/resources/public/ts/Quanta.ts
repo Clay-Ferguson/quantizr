@@ -127,8 +127,8 @@ export class Quanta {
             console.log("createTabs");
             S.tabUtil.createAppTabs();
 
-            const state = getAppState();
-            state.pendingLocationHash = window.location.hash;
+            const ast = getAppState();
+            ast.pendingLocationHash = window.location.hash;
 
             console.log("createPlugins");
             S.plugin.initPlugins();
@@ -208,8 +208,7 @@ export class Quanta {
                 // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
                 // capture events going to dialogs / edit fields
                 document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                    // console.log("keydown: " + event.code);
-                    let state = getAppState();
+                    let ast = getAppState();
 
                     if (event.code === "Backquote") {
                         if (S.util.ctrlKeyCheck()) {
@@ -224,37 +223,37 @@ export class Quanta {
                                 break;
                             case "Escape":
                                 S.domUtil.removeAnnotation();
-                                if (S.util.fullscreenViewerActive(state)) {
-                                    S.nav.closeFullScreenViewer(state);
+                                if (S.util.fullscreenViewerActive(ast)) {
+                                    S.nav.closeFullScreenViewer(ast);
                                 }
                                 break;
 
                             // case "ArrowDown":
                             //     if (this.keyDebounce()) return;
-                            //     state = getAppState()
-                            //     S.view.scrollRelativeToNode("down", state);
+                            //     ast = getAppState()
+                            //     S.view.scrollRelativeToNode("down", ast);
                             //     break;
 
                             // case "ArrowUp":
                             //     if (this.keyDebounce()) return;
-                            //     state = getAppState()
-                            //     S.view.scrollRelativeToNode("up", state);
+                            //     ast = getAppState()
+                            //     S.view.scrollRelativeToNode("up", ast);
                             //     break;
 
                             case "ArrowLeft":
                                 if (this.keyDebounce()) return;
                                 // S.nav.navUpLevel();
-                                if (state.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                    S.nav.prevFullScreenImgViewer(state);
+                                if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
+                                    S.nav.prevFullScreenImgViewer(ast);
                                 }
                                 break;
 
                             case "ArrowRight":
                                 if (this.keyDebounce()) return;
-                                state = getAppState();
+                                ast = getAppState();
                                 // S.nav.navOpenSelectedNode(state);
-                                if (state.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                    S.nav.nextFullScreenImgViewer(state);
+                                if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
+                                    S.nav.nextFullScreenImgViewer(ast);
                                 }
                                 break;
 

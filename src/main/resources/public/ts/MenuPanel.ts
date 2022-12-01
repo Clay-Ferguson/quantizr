@@ -52,15 +52,15 @@ export class MenuPanel extends Div {
     };
 
     static openBookmarksNode = () => {
-        const state = getAppState();
-        S.util.setUserPreferences(state, true);
+        const ast = getAppState();
+        S.util.setUserPreferences(ast, true);
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
     static continueEditing = () => {
-        const state = getAppState();
-        if (state.editNode) {
-            S.view.jumpToId(state.editNode.id);
+        const ast = getAppState();
+        if (ast.editNode) {
+            S.view.jumpToId(ast.editNode.id);
         }
     };
 

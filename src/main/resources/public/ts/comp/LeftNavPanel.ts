@@ -19,9 +19,9 @@ export class LeftNavPanel extends Div {
             tabIndex: "1"
         });
 
-        const state = getAppState();
+        const ast = getAppState();
 
-        let cols = state.userPrefs.mainPanelCols || 6;
+        let cols = ast.userPrefs.mainPanelCols || 6;
         if (cols < 4) cols = 4;
         if (cols > 8) cols = 8;
 

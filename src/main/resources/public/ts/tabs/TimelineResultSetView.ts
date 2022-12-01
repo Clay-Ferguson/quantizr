@@ -13,14 +13,13 @@ export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetVi
     }
 
     pageChange(delta: number): void {
-        const state = getAppState();
-
+        const ast = getAppState();
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.timeline(this.data.props.node, this.data.props.prop, state, this.data.props.timeRangeType,
+        S.srch.timeline(this.data.props.node, this.data.props.prop, ast, this.data.props.timeRangeType,
             this.data.props.description,
             page, this.data.props.recursive);
     }

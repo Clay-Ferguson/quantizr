@@ -80,15 +80,15 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
-            const state = getAppState();
+            const ast = getAppState();
             const data: J.FeedPushInfo = JSON.parse(e.data);
-            this.feedPushItem(data.nodeInfo, state);
+            this.feedPushItem(data.nodeInfo, ast);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            const state = getAppState();
+            const ast = getAppState();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
-            this.ipsmPushItem(data.payload, state);
+            this.ipsmPushItem(data.payload, ast);
         }, false);
 
         // This is where we recieve signing requests pushed from the server to be signed by the browser and pushed back up.

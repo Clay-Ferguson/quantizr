@@ -32,8 +32,8 @@ export class LogView extends AppTab implements LogViewIntf {
     }
 
     preRender(): void {
-        const state = getAppState();
-        this.attribs.className = this.getClass(state);
+        const ast = getAppState();
+        this.attribs.className = this.getClass(ast);
 
         this.setChildren([
             new Heading(3, "Log", { className: "logView" }),

@@ -856,8 +856,8 @@ export class Util {
     }
 
     loadBookmarks = async () => {
-        const state = getAppState();
-        if (!state.isAnonUser) {
+        const ast = getAppState();
+        if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
             dispatch("loadBookmarks", s => {

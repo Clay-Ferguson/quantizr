@@ -14,13 +14,13 @@ export class TabPanel extends Div {
     constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB });
         TabPanel.inst = this;
-        const state = getAppState();
+        const ast = getAppState();
 
-        if (state.mobileMode) {
+        if (ast.mobileMode) {
             this.attribs.className = "col-12 tabPanelMobile";
         }
         else {
-            const panelCols = state.userPrefs.mainPanelCols || 6;
+            const panelCols = ast.userPrefs.mainPanelCols || 6;
             this.attribs.className = "col-" + panelCols + " tabPanel";
         }
     }

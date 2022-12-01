@@ -76,9 +76,9 @@ export class NodeCompMainList extends Div {
                     const observer = new IntersectionObserver(entries => {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
-                        const state = getAppState();
+                        const ast = getAppState();
 
-                        if (!state.editNode) {
+                        if (!ast.editNode) {
                             entries.forEach(entry => {
                                 if (entry.isIntersecting) {
                                     // if this button comes into visibility within 2 seconds of it being created
@@ -91,7 +91,7 @@ export class NodeCompMainList extends Div {
                                     // scrolled to it, so we scroll in the new nodes to display (infinite scrolling)
                                     else {
                                         moreButton.replaceWithWaitIcon();
-                                        S.view.growPage(state);
+                                        S.view.growPage(ast);
                                     }
                                 }
                             });

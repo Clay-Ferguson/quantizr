@@ -34,9 +34,9 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
     preRender(): void {
         const ast = useAppState();
-        const results = this.data && this.data.props.results;
-        this.attribs.className = this.getClass(ast);
+        const results = this.data?.props?.results;
         if (!results) return;
+        this.attribs.className = this.getClass(ast);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -107,7 +107,6 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
-
         let moreButton: IconButton = null;
         if (!this.data.props.endReached && allowMoreButton) {
             moreButton = new IconButton("fa-angle-right", "More", {

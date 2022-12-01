@@ -34,20 +34,20 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = async () => {
-        const state = getAppState();
-        if (!state.isAnonUser) {
+        const ast = getAppState();
+        if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: state.userProfile.userNodeId,
+                userNodeId: ast.userProfile.userNodeId,
                 userPreferences: {
-                    editMode: state.userPrefs.editMode,
-                    showMetaData: state.userPrefs.showMetaData,
-                    nsfw: state.userPrefs.nsfw,
-                    showProps: state.userPrefs.showProps,
-                    autoRefreshFeed: state.userPrefs.autoRefreshFeed, // #add-prop
-                    showParents: state.userPrefs.showParents,
-                    showReplies: state.userPrefs.showReplies,
-                    rssHeadlinesOnly: state.userPrefs.rssHeadlinesOnly,
-                    mainPanelCols: state.userPrefs.mainPanelCols,
+                    editMode: ast.userPrefs.editMode,
+                    showMetaData: ast.userPrefs.showMetaData,
+                    nsfw: ast.userPrefs.nsfw,
+                    showProps: ast.userPrefs.showProps,
+                    autoRefreshFeed: ast.userPrefs.autoRefreshFeed, // #add-prop
+                    showParents: ast.userPrefs.showParents,
+                    showReplies: ast.userPrefs.showReplies,
+                    rssHeadlinesOnly: ast.userPrefs.rssHeadlinesOnly,
+                    mainPanelCols: ast.userPrefs.mainPanelCols,
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }

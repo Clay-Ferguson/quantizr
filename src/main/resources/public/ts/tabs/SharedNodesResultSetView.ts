@@ -14,7 +14,7 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
     }
 
     pageChange(delta: number): void {
-        const state = getAppState();
+        const ast = getAppState();
 
         let page = this.data.props.page;
         if (delta !== null) {
@@ -26,7 +26,7 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
             this.data.props.shareNodesType,
             this.data.props.shareTarget,
             this.data.props.accessOption,
-            state);
+            ast);
     }
 
     extraPagingComps = (): Comp[] => {

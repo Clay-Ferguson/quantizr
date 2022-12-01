@@ -15,7 +15,7 @@ export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
-        const state = getAppState();
+        const ast = getAppState();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -29,7 +29,7 @@ export class View {
             allowScroll: true,
             setTab: true,
             forceRenderParent,
-            state
+            state: ast
         });
     }
 

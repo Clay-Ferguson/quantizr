@@ -18,8 +18,8 @@ export class FriendType extends TypeBase {
     }
 
     getEditorHelp(): string {
-        const state = getAppState();
-        return state.config.help?.type?.friend?.editor;
+        const ast = getAppState();
+        return ast.config.help?.type?.friend?.editor;
     }
 
     getAllowRowHeader(): boolean {

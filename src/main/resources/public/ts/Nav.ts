@@ -95,10 +95,10 @@ export class Nav {
     }
 
     navUpLevel = async (processingDelete: boolean): Promise<void> => {
-        const state = getAppState();
-        if (!state.node) return null;
+        const ast = getAppState();
+        if (!ast.node) return null;
 
-        if (!this.parentVisibleToUser(state)) {
+        if (!this.parentVisibleToUser(ast)) {
             S.util.showMessage("The parent of this node isn't shared to you.", "Warning");
             // Already at root. Can't go up.
             return;
@@ -106,7 +106,7 @@ export class Nav {
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: state.node.id,
+                nodeId: ast.node.id,
                 upLevel: true,
                 siblingOffset: 0,
                 renderParentIfLeaf: false,
@@ -115,14 +115,14 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
             if (processingDelete) {
-                S.quanta.refresh(state);
+                S.quanta.refresh(ast);
             }
             else {
-                this.upLevelResponse(res, state.node.id, false, state);
+                this.upLevelResponse(res, ast.node.id, false, ast);
             }
         }
         catch (e) {
@@ -305,10 +305,10 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const state = getAppState();
+        const ast = getAppState();
 
         setTimeout(async () => {
-            let node = MainTab.inst?.findNode(state, id);
+            let node = MainTab.inst?.findNode(ast, id);
 
             // if we don't have this node locally on our tree, get it from the server.
             if (!node) {
@@ -330,28 +330,28 @@ export class Nav {
                 }
                 node = res.node;
             }
-            S.srch.showDocument(node, false, state);
+            S.srch.showDocument(node, false, ast);
         }, 250);
     }
 
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        const state = getAppState();
+        const ast = getAppState();
         this.clickTreeNode(null, id);
 
         setTimeout(() => {
-            const node = MainTab.inst?.findNode(state, id);
+            const node = MainTab.inst?.findNode(ast, id);
             if (!node) {
                 return;
             }
-            S.srch.timeline(node, "mtm", state, null, "Rev-chron by Modify Time", 0, true);
+            S.srch.timeline(node, "mtm", ast, null, "Rev-chron by Modify Time", 0, true);
         }, 250);
     }
 
     openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const state = getAppState();
-        const node = MainTab.inst?.findNode(state, id);
+        const ast = getAppState();
+        const node = MainTab.inst?.findNode(ast, id);
         if (node) {
             setTimeout(() => {
                 if (FeedTab.inst) {

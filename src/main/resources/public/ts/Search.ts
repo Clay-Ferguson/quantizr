@@ -426,9 +426,9 @@ export class Search {
     }
 
     showFollowers = async (page: number, userName: string) => {
-        const state = getAppState();
-        if (state.isAnonUser) return;
-        userName = userName || state.userName;
+        const ast = getAppState();
+        if (ast.isAnonUser) return;
+        userName = userName || ast.userName;
 
         const res = await S.rpcUtil.rpc<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
@@ -465,9 +465,9 @@ export class Search {
     }
 
     showFollowing = async (page: number, userName: string) => {
-        const state = getAppState();
-        if (state.isAnonUser) return;
-        userName = userName || state.userName;
+        const ast = getAppState();
+        if (ast.isAnonUser) return;
+        userName = userName || ast.userName;
 
         const res = await S.rpcUtil.rpc<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,

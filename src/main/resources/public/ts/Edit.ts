@@ -392,7 +392,7 @@ export class Edit {
 
     refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
         return new Promise<J.NodeInfo>(async (resolve, reject) => {
-            const state = getAppState();
+            const ast = getAppState();
 
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId,
@@ -404,7 +404,7 @@ export class Edit {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: true,
-                parentCount: state.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
             if (!res || !res.node) {
@@ -426,7 +426,7 @@ export class Edit {
                     }
 
                     // make all tabs update their copy of the node of they have it
-                    state.tabData.forEach(td => td.replaceNode(s, res.node));
+                    ast.tabData.forEach(td => td.replaceNode(s, res.node));
 
                     return s;
                 });
@@ -451,19 +451,19 @@ export class Edit {
 
     setMainPanelCols = (val: number) => {
         setTimeout(() => {
-            const state = getAppState();
+            const ast = getAppState();
             if (val < 4) val = 4;
             if (val > 8) val = 8;
-            state.userPrefs.mainPanelCols = val;
-            S.util.saveUserPreferences(state);
+            ast.userPrefs.mainPanelCols = val;
+            S.util.saveUserPreferences(ast);
         }, 100);
     };
 
     setMetadataOption = (val: boolean) => {
         setTimeout(() => {
-            const state = getAppState();
-            state.userPrefs.showMetaData = val;
-            S.util.saveUserPreferences(state);
+            const ast = getAppState();
+            ast.userPrefs.showMetaData = val;
+            S.util.saveUserPreferences(ast);
         }, 100);
     };
 
@@ -777,12 +777,12 @@ export class Edit {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
-        const state = getAppState();
+        const ast = getAppState();
         if (S.util.ctrlKeyCheck()) {
             this.saveClipboardToChildNode(id);
         }
         else {
-            this.createSubNode(id, null, true, state.node, null);
+            this.createSubNode(id, null, true, ast.node, null);
         }
     }
 
@@ -914,21 +914,21 @@ export class Edit {
             });
         }
 
-        const state = getAppState();
+        const ast = getAppState();
         // note: the setNodeSel above isn't causing this to get anything here
-        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
+        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(ast);
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to delete.", "Warning");
             return;
         }
 
-        if (selNodesArray.find(id => id === state.userProfile?.userNodeId)) {
+        if (selNodesArray.find(id => id === ast.userProfile?.userNodeId)) {
             S.util.showMessage("You can't delete your account root node!", "Warning");
             return;
         }
 
-        if (selNodesArray.find(id => id === state.node?.id)) {
+        if (selNodesArray.find(id => id === ast.node?.id)) {
             S.util.showMessage("You can't delete your page node! Go up a level to do that.", "Warning");
             return;
         }
@@ -943,16 +943,16 @@ export class Edit {
                 childrenOnly: false,
                 bulkDelete: false
             });
-            this.removeNodesFromHistory(selNodesArray, state);
-            this.removeNodesFromCalendarData(selNodesArray, state);
+            this.removeNodesFromHistory(selNodesArray, ast);
+            this.removeNodesFromCalendarData(selNodesArray, ast);
 
             /* Node: state.node can be null if we've never been to the tree view yet */
-            if (state.node && S.util.checkSuccess("Delete node", res)) {
-                if (state.node.children) {
-                    state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
+            if (ast.node && S.util.checkSuccess("Delete node", res)) {
+                if (ast.node.children) {
+                    ast.node.children = ast.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
                 }
 
-                if (state.activeTab === C.TAB_MAIN && state.node.children.length === 0) {
+                if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
                     dispatch("NodeDeleteComplete", s => {
                         // remove this node from all data from all the tabs, so they all refresh without
                         // the deleted node without being queries from the server again.
@@ -962,7 +962,7 @@ export class Edit {
                         s.selectedNodes.clear();
                         return s;
                     });
-                    S.view.jumpToId(state.node.id);
+                    S.view.jumpToId(ast.node.id);
                 }
                 else {
                     dispatch("UpdateChildren", s => {
@@ -970,7 +970,7 @@ export class Edit {
                             S.srch.removeNodeById(id, s);
                         });
                         s.selectedNodes.clear();
-                        s.node.children = state.node.children;
+                        s.node.children = ast.node.children;
                         return s;
                     });
                 }
@@ -1034,8 +1034,8 @@ export class Edit {
 
     pasteSelNodesInside = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const state = getAppState();
-        this.pasteSelNodes(id, "inside", state);
+        const ast = getAppState();
+        this.pasteSelNodes(id, "inside", ast);
     }
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
@@ -1145,7 +1145,7 @@ export class Edit {
         }
         else {
             setTimeout(() => {
-                const state = getAppState();
+                const ast = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: true,
@@ -1156,7 +1156,7 @@ export class Edit {
                     allowScroll: true,
                     setTab: true,
                     forceRenderParent: false,
-                    state
+                    state: ast
                 });
             }, 500);
         }
@@ -1344,7 +1344,7 @@ export class Edit {
                     s.nodesToMove = null;
                     return s;
                 });
-                const state = getAppState();
+                const ast = getAppState();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: false,
@@ -1355,7 +1355,7 @@ export class Edit {
                     allowScroll: false,
                     setTab: false,
                     forceRenderParent: false,
-                    state
+                    state: ast
                 });
             }
         }

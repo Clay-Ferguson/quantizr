@@ -21,7 +21,7 @@ export class APPostsType extends TypeBase {
     }
 
     getEditorHelp(): string {
-        const state = getAppState();
-        return state.config.help?.editor?.dialog;
+        const ast = getAppState();
+        return ast.config.help?.editor?.dialog;
     }
 }

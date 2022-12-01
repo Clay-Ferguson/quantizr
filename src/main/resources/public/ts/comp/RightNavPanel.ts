@@ -22,10 +22,10 @@ export class RightNavPanel extends Div {
     public static inst: RightNavPanel = null;
 
     constructor() {
-        const state = getAppState();
+        const ast = getAppState();
         super(null, {
             id: C.ID_RHS,
-            className: state.mobileMode ? "mobileRHSPanel" : null,
+            className: ast.mobileMode ? "mobileRHSPanel" : null,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
@@ -41,10 +41,10 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        const state = getAppState();
+        const ast = getAppState();
 
-        if (!state.mobileMode) {
-            let panelCols = state.userPrefs.mainPanelCols || 6;
+        if (!ast.mobileMode) {
+            let panelCols = ast.userPrefs.mainPanelCols || 6;
             if (panelCols < 4) panelCols = 4;
             if (panelCols > 8) panelCols = 8;
             let rightCols = 4;
@@ -66,18 +66,18 @@ export class RightNavPanel extends Div {
         // hack for now. I decided showing the header image isn't very attractive when user has a narrow
         // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
         const headerImg: Div = null;
-        const avatarImg = this.makeAvatarDiv(state, !!headerImg);
-        let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
+        const avatarImg = this.makeAvatarDiv(ast, !!headerImg);
+        let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
-        if (displayName && state.node) {
-            displayName = S.util.insertActPubTags(displayName, state.node);
+        if (displayName && ast.node) {
+            displayName = S.util.insertActPubTags(displayName, ast.node);
 
             // If user had nothing left after insertion after ":tags:" replacement in their display name, then display their userName
-            displayName = displayName || state.node.owner;
+            displayName = displayName || ast.node.owner;
         }
 
-        const allowEditMode = !state.isAnonUser;
-        const fullScreenViewer = S.util.fullscreenViewerActive(state);
+        const allowEditMode = !ast.isAnonUser;
+        const fullScreenViewer = S.util.fullscreenViewerActive(ast);
 
         // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
         //     className: "fa fa-clipboard fa-lg marginRight clickable",
@@ -89,7 +89,7 @@ export class RightNavPanel extends Div {
         //     title: "Save clipboard"
         // }) : null;
 
-        const addNoteButton = !state.isAnonUser && !state.mobileMode ? new Icon({
+        const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
@@ -104,7 +104,7 @@ export class RightNavPanel extends Div {
                         }
                     }
                 }
-                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, ast);
             },
             title: "Create new Private Note"
         }) : null;
@@ -115,7 +115,7 @@ export class RightNavPanel extends Div {
                     // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
-                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, state);
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, ast);
                         return;
                     }
                 }
@@ -125,10 +125,10 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
-                    !state.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
+                    !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
                     // Not showing login on this panel in mobileMode, because it's shown at top of page instead
-                    state.isAnonUser && !state.mobileMode ? new Div("Login / Signup", {
+                    ast.isAnonUser && !ast.mobileMode ? new Div("Login / Signup", {
                         className: "signupLinkText",
                         onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
@@ -139,13 +139,13 @@ export class RightNavPanel extends Div {
                     new Div(null, { className: "bigMarginBottom" }, [
                         addNoteButton,
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
-                            setValue: (checked: boolean) => S.edit.toggleEditMode(state),
-                            getValue: (): boolean => state.userPrefs.editMode
+                            setValue: (checked: boolean) => S.edit.toggleEditMode(ast),
+                            getValue: (): boolean => ast.userPrefs.editMode
                         }, "form-switch form-check-inline") : null,
 
                         !fullScreenViewer ? new Checkbox("Info", { title: "Display of avatars, timestamps, etc." }, {
-                            setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
-                            getValue: (): boolean => state.userPrefs.showMetaData
+                            setValue: (checked: boolean) => S.edit.toggleShowMetaData(ast),
+                            getValue: (): boolean => ast.userPrefs.showMetaData
                         }, "form-switch form-check-inline") : null
                     ]),
 
@@ -159,7 +159,7 @@ export class RightNavPanel extends Div {
                     //         }) : null
                     //     ])
                     // ]),
-                    displayName && !state.isAnonUser ? new Div(displayName, {
+                    displayName && !ast.isAnonUser ? new Div(displayName, {
                         className: "clickable float-end marginRight",
                         onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
@@ -168,7 +168,7 @@ export class RightNavPanel extends Div {
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    !state.isAnonUser ? new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
+                    !ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
                 ]),
 
                 // note: Anonymouse users don't have nodeHistory

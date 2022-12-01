@@ -737,10 +737,10 @@ export class Render {
     }
 
     makeWidthSizerPanel = (): Span => {
-        const state = getAppState();
-        const panelCols = state.userPrefs.mainPanelCols || 6;
+        const ast = getAppState();
+        const panelCols = ast.userPrefs.mainPanelCols || 6;
 
-        return !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
+        return !ast.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
             panelCols > 4 ? new Icon({
                 className: "fa fa-step-backward widthSizerIcon",
                 title: "Narrower view",

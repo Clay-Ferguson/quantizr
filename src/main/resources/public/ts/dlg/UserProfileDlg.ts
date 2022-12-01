@@ -34,9 +34,9 @@ export class UserProfileDlg extends DialogBase {
     some other user, and this dialog should be readOnly */
     constructor(private userNodeId: string) {
         super("User Profile", "app-modal-content");
-        const state = getAppState();
-        userNodeId = userNodeId || state.userProfile.userNodeId;
-        this.readOnly = !state.userProfile || state.userProfile.userNodeId !== userNodeId;
+        const ast = getAppState();
+        userNodeId = userNodeId || ast.userProfile.userNodeId;
+        this.readOnly = !ast.userProfile || ast.userProfile.userNodeId !== userNodeId;
         this.mergeState<LS>({ userProfile: null });
     }
 

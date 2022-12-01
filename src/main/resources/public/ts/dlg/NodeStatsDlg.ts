@@ -20,13 +20,13 @@ export class NodeStatsDlg extends DialogBase {
 
     renderDlg = (): CompIntf[] => {
         const tagPanel = new Div(null, { className: "wordStatsArea" });
-        const state = getAppState();
+        const ast = getAppState();
 
         if (this.res.topVotes?.length > 0) {
             tagPanel.addChild(new Heading(4, "Votes"));
             this.res.topVotes.forEach(word => {
                 tagPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\""
                 }));
             });
@@ -36,7 +36,7 @@ export class NodeStatsDlg extends DialogBase {
             tagPanel.addChild(new Heading(4, "Hashtags"));
             this.res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
@@ -48,7 +48,7 @@ export class NodeStatsDlg extends DialogBase {
             mentionPanel.addChild(new Heading(4, "Mentions"));
             this.res.topMentions.forEach(word => {
                 mentionPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
@@ -60,7 +60,7 @@ export class NodeStatsDlg extends DialogBase {
             wordPanel.addChild(new Heading(4, "Words"));
             this.res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: this.searchWord
                 }));

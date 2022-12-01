@@ -249,7 +249,7 @@ export class User {
             }
 
             // we may have just processed a dispatch so we need to get the current state now.
-            const state = getAppState();
+            const ast = getAppState();
 
             if (g_nodeId) {
                 id = g_nodeId;
@@ -265,7 +265,7 @@ export class User {
                     id = lastNode;
                     childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                 } else {
-                    id = state.userProfile?.userNodeId;
+                    id = ast.userProfile?.userNodeId;
                 }
             }
 
@@ -279,7 +279,7 @@ export class User {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state
+                state: ast
             });
         } else {
             console.log("LocalDb login failed.");
