@@ -90,8 +90,8 @@ export class NodeCompBinary extends Div {
     /* This method needs to be called statically and we cannot use 'this' in it,
     because it's referenced by the plain HTML text that's used when positioned images are inserted in the content */
     static clickOnImage = (id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
-        const appState = getAppState();
-        const node = S.nodeUtil.findNode(appState, id);
+        const ast = getAppState();
+        const node = S.nodeUtil.findNode(ast, id);
         const att = S.props.getAttachment(attName, node);
 
         if (isEditorEmbed) {

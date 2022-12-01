@@ -19,7 +19,7 @@ export class AccountType extends TypeBase {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
         switch (action) {
             case NodeActionType.editNode:
                 return false;

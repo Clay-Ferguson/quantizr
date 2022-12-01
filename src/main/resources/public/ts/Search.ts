@@ -345,12 +345,12 @@ export class Search {
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
-        const appState = getAppState();
+        const ast = getAppState();
         if (!FeedTab.inst) {
             return;
         }
 
-        const loadFriendsTags: boolean = appState.friendHashTags === null;
+        const loadFriendsTags: boolean = ast.friendHashTags === null;
 
         const res = await S.rpcUtil.rpc<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
@@ -364,7 +364,7 @@ export class Search {
             fromFriends: FeedTab.inst.props.feedFilterFriends,
 
             // never show anonymous users NSFW content.
-            nsfw: appState.isAnonUser ? false : appState.userPrefs.nsfw,
+            nsfw: ast.isAnonUser ? false : ast.userPrefs.nsfw,
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,

@@ -33,11 +33,11 @@ export abstract class DialogBase extends Comp {
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
-        const appState = getAppState();
+        const ast = getAppState();
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
-        if (!forceMode && (!this.mode || appState.mobileMode)) {
-            this.mode = appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
+        if (!forceMode && (!this.mode || ast.mobileMode)) {
+            this.mode = ast.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
         }
     }
 
@@ -138,7 +138,7 @@ export abstract class DialogBase extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const appState = getAppState();
+        const ast = getAppState();
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
@@ -176,7 +176,7 @@ export abstract class DialogBase extends Comp {
             return this.tag("div");
         }
         else {
-            const clazzName = appState.mobileMode
+            const clazzName = ast.mobileMode
                 ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
                 : (this.overrideClass ? this.overrideClass : "app-modal-content");
 
@@ -189,7 +189,7 @@ export abstract class DialogBase extends Comp {
             else {
                 return this.tag("div", {
                     id: this.getId(DialogBase.BACKDROP_PREFIX),
-                    className: "app-modal " + (appState.mobileMode ? "normalScrollbar" : "customScrollbar"),
+                    className: "app-modal " + (ast.mobileMode ? "normalScrollbar" : "customScrollbar"),
                     style: { zIndex: this.zIndex },
                     onClick: (evt: Event) => {
                         if (this.closeByOutsideClick) {

@@ -44,10 +44,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const appState = getAppState();
+        const ast = getAppState();
         const children = [
             new Div(null, null, [
-                this.importMode || !appState.config.ipfsEnabled ? null : new HorizontalLayout([
+                this.importMode || !ast.config.ipfsEnabled ? null : new HorizontalLayout([
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
@@ -62,7 +62,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new Button("URL", this.uploadFromUrl),
-                    this.importMode || !appState.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
+                    this.importMode || !ast.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
                     this.importMode || !S.util.clipboardReadable() ? null : new Button("Clipboard", this.uploadFromClipboard),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {

@@ -34,7 +34,7 @@ export class RssType extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
         switch (action) {
             case NodeActionType.upload:
                 return false;

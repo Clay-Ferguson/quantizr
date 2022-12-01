@@ -52,7 +52,7 @@ export class UserProfileDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state = this.getState<LS>();
-        const appState = getAppState();
+        const ast = getAppState();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
@@ -61,9 +61,9 @@ export class UserProfileDlg extends DialogBase {
         const profileImg = this.makeProfileImg(!!profileHeaderImg);
         const localUser = S.util.isLocalUserName(state.userProfile.userName);
         let web3Div: Div = null;
-        const web3Enabled = appState.allowedFeatures && appState.allowedFeatures.indexOf("web3") !== -1;
+        const web3Enabled = ast.allowedFeatures && ast.allowedFeatures.indexOf("web3") !== -1;
 
-        if (appState.config.ipfsEnabled && web3Enabled) {
+        if (ast.config.ipfsEnabled && web3Enabled) {
             const web3Comps: CompIntf[] = [];
 
             if (state.userProfile.didIPNS) {
@@ -170,7 +170,7 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     getAppState().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    (getAppState().isAnonUser || this.readOnly || !appState.config.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
+                    (getAppState().isAnonUser || this.readOnly || !ast.config.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 
@@ -180,22 +180,22 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
-                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
-                    !appState.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
-                    !appState.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Friend Settings", this.editFriendNode) : null,
 
-                    !appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Follow", this.addFriend) : null,
 
-                    !appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Block", this.blockUser) : null,
 
-                    appState.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
+                    ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
 
                     state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
                     new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")

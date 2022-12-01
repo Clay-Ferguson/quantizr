@@ -19,12 +19,12 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent = () => {
-        const appState = getAppState();
-        if (!appState.graphData) return;
+        const ast = getAppState();
+        if (!ast.graphData) return;
         const customForceDirectedTree = this.forceDirectedTree();
 
         d3.select(".d3Graph")
-            .datum(appState.graphData)
+            .datum(ast.graphData)
             .call(customForceDirectedTree);
     }
 
@@ -33,8 +33,8 @@ export class FullScreenGraphViewer extends Main {
         /* We use 'thiz' to capture 'this' becasue the methods below to expect to have their own 'this'
          that will be set based on code outside our control that is expected by the Graph Implementation itself. */
         const thiz = this;
-        const appState = getAppState();
-        const nodeId = appState.fullScreenConfig.nodeId;
+        const ast = getAppState();
+        const nodeId = ast.fullScreenConfig.nodeId;
 
         return function (selection: any) {
             const margin = { top: 0, right: 0, bottom: 0, left: 0 };

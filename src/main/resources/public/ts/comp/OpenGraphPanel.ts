@@ -18,7 +18,7 @@ interface LS { // Local State
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(private appState: AppState, private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
+    constructor(private ast: AppState, private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, private allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
             title: url,
@@ -135,7 +135,7 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.appState.isAnonUser ? new Icon({
+        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.ast.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
             onClick: () => S.edit.addLinkBookmark(state.og.url, null, null)
         }) : null;
@@ -152,7 +152,7 @@ export class OpenGraphPanel extends Div {
             state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
 
             // if mobile portrait mode render image above (not beside) description
-            if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
+            if (this.ast.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
                     new Img({
                         className: "openGraphImageVert",

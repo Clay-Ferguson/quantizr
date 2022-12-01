@@ -14,7 +14,7 @@ export class CalendarType extends TypeBase {
         super(J.NodeType.CALENDAR, "Calendar", "fa-calendar", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
         return true;
     }
 

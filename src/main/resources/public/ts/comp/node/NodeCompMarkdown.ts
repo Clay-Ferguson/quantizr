@@ -22,7 +22,7 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, appState: AppState) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, ast: AppState) {
         super(null, { key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
 
@@ -30,7 +30,7 @@ export class NodeCompMarkdown extends Html {
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
         this.purifyHtml = node.owner !== "admin";
 
-        if (!appState.mobileMode) {
+        if (!ast.mobileMode) {
             const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
             this.attribs.className = "markdown-content " + widthStyle;
         }
@@ -146,11 +146,11 @@ export class NodeCompMarkdown extends Html {
         if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
-        const appState = getAppState();
+        const ast = getAppState();
         const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 
-        const cipherKey = S.props.getCryptoKey(this.node, appState);
+        const cipherKey = S.props.getCryptoKey(this.node, ast);
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
             let clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });

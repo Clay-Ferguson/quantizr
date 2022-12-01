@@ -407,7 +407,7 @@ export class Nav {
         }
     }
 
-    closeFullScreenViewer = (appState: AppState) => {
+    closeFullScreenViewer = (ast: AppState) => {
         dispatch("CloseFullScreenViewer", s => {
             s.fullScreenConfig = { type: FullScreenType.NONE };
             s.graphData = null;
@@ -415,14 +415,14 @@ export class Nav {
         });
     }
 
-    prevFullScreenImgViewer = (appState: AppState) => {
-        const node = S.nodeUtil.findNode(appState, appState.fullScreenConfig.nodeId);
+    prevFullScreenImgViewer = (ast: AppState) => {
+        const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
             let selAtt: J.Attachment = list[0];
             let lastAtt: J.Attachment = null;
             list.forEach(att => {
-                if (att.o === appState.fullScreenConfig.ordinal) {
+                if (att.o === ast.fullScreenConfig.ordinal) {
                     selAtt = lastAtt;
                 }
                 lastAtt = att;
@@ -435,8 +435,8 @@ export class Nav {
         }
     }
 
-    nextFullScreenImgViewer = (appState: AppState) => {
-        const node = S.nodeUtil.findNode(appState, appState.fullScreenConfig.nodeId);
+    nextFullScreenImgViewer = (ast: AppState) => {
+        const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
             let selAtt: J.Attachment = list[list.length-1];
@@ -446,7 +446,7 @@ export class Nav {
                     selAtt = att;
                     takeNext = false;
                 }
-                if (att.o === appState.fullScreenConfig.ordinal) {
+                if (att.o === ast.fullScreenConfig.ordinal) {
                     takeNext = true;
                 }
             });

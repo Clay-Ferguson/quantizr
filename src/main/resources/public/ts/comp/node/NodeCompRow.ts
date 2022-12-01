@@ -26,7 +26,7 @@ export class NodeCompRow extends Div {
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
     constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
+        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, ast: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -34,7 +34,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && appState.userPrefs.editMode && !appState.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt: any) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;

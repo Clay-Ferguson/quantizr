@@ -16,12 +16,12 @@ export class Menu extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const appState = useAppState();
+        const ast = useAppState();
         const expanded =this.menuPanelState.expanded.has(this.name);
 
         this.setChildren([
             new Div(this.name, {
-                className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (appState.mobileMode ? " mobileMenuText" : ""),
+                className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (ast.mobileMode ? " mobileMenuText" : ""),
                 id: this.getId("heading"),
                 onClick: () => {
                     PubSub.pub(C.PUBSUB_menuClicked, this.name);

@@ -555,9 +555,9 @@ export class Util {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState) => {
+    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, ast: AppState) => {
         if (!node) {
-            node = appState.node;
+            node = ast.node;
         }
         if (!node) {
             return;

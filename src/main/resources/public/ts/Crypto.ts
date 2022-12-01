@@ -847,8 +847,8 @@ export class Crypto {
     // returns true if key is ok to use
     warnIfEncKeyUnknown = () => {
         let ret = true;
-        const appState = getAppState();
-        if (appState.unknownPubEncKey) {
+        const ast = getAppState();
+        if (ast.unknownPubEncKey) {
             ret = false;
             this.showEncryptionKeyProblem("Encryption Key (Asymmetric Key)", "Encryption");
         }
@@ -858,8 +858,8 @@ export class Crypto {
     // returns true of key is ok to use
     warnIfSigKeyUnknown = () => {
         let ret = true;
-        const appState = getAppState();
-        if (appState.unknownPubSigKey) {
+        const ast = getAppState();
+        if (ast.unknownPubSigKey) {
             ret = false;
             this.showEncryptionKeyProblem("Signature Key", "Signature")
         }

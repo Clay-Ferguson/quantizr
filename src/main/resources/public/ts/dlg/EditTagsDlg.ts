@@ -43,21 +43,21 @@ export class EditTagsDlg extends DialogBase {
     }
 
     save = () => {
-        const appState = getAppState();
-        appState.userProfile.userTags = this.tagsState.getValue();
+        const ast = getAppState();
+        ast.userProfile.userTags = this.tagsState.getValue();
 
         dispatch("SetUserProfile", s => {
-            s.userProfile = appState.userProfile;
+            s.userProfile = ast.userProfile;
             return s;
         });
 
         S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: appState.userProfile.userTags,
-            userBio: appState.userProfile.userBio,
-            displayName: appState.userProfile.displayName,
+            userTags: ast.userProfile.userTags,
+            userBio: ast.userProfile.userBio,
+            displayName: ast.userProfile.displayName,
             publish: false,
-            mfsEnable: appState.userProfile.mfsEnable
+            mfsEnable: ast.userProfile.mfsEnable
         });
         this.close();
     }

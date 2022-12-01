@@ -26,35 +26,35 @@ export class SharingDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const appState = getAppState();
-        const isPublic = S.props.isPublic(appState.editNode);
+        const ast = getAppState();
+        const isPublic = S.props.isPublic(ast.editNode);
         const state: LS = this.getState<LS>();
-        const numShares: number = appState.editNode.ac?.length;
+        const numShares: number = ast.editNode.ac?.length;
 
         return [
             new Div(null, null, [
                 numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
                 new EditPrivsTable((userName: string, allowAppends: boolean) => {
                     this.shareNodeToUser(userName, allowAppends);
-                }, appState.editNode.ac, this.removePrivilege),
-                S.props.isShared(appState.editNode) ? new Div("Remove All", {
+                }, ast.editNode.ac, this.removePrivilege),
+                S.props.isShared(ast.editNode) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                appState.editNode.ac?.length > 0 ? new Checkbox("Unpublished", null, {
+                ast.editNode.ac?.length > 0 ? new Checkbox("Unpublished", null, {
                     setValue: async (checked: boolean) => {
                         this.dirty = true;
                         await S.rpcUtil.rpc<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
-                            nodeId: appState.editNode.id,
+                            nodeId: ast.editNode.id,
                             unpublished: checked
                         });
-                        S.props.setPropVal(J.NodeProp.UNPUBLISHED, appState.editNode, checked ? "true" : null);
-                        S.edit.updateNode(appState.editNode);
+                        S.props.setPropVal(J.NodeProp.UNPUBLISHED, ast.editNode, checked ? "true" : null);
+                        S.edit.updateNode(ast.editNode);
                         return null;
                     },
                     getValue: (): boolean => {
-                        return !!S.props.getPropStr(J.NodeProp.UNPUBLISHED, appState.editNode);
+                        return !!S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
                     }
                 }) : null,
                 new Checkbox("Apply to Subnodes", null, {
@@ -86,9 +86,9 @@ export class SharingDlg extends DialogBase {
     }
 
     shareImmediate = async (names: string[]) => {
-        const appState = getAppState();
+        const ast = getAppState();
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            nodeId: appState.editNode.id,
+            nodeId: ast.editNode.id,
             principals: names,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
@@ -103,19 +103,19 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and saves into state.
      */
     reload = async () => {
-        const appState = getAppState();
+        const ast = getAppState();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: appState.editNode.id
+            nodeId: ast.editNode.id
         });
-        appState.editNode.ac = res.aclEntries;
-        S.edit.updateNode(appState.editNode);
+        ast.editNode.ac = res.aclEntries;
+        S.edit.updateNode(ast.editNode);
     }
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        const appState = getAppState();
+        const ast = getAppState();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
-            nodeId: appState.editNode.id,
+            nodeId: ast.editNode.id,
             principalNodeId: "*",
             privilege: "*"
         });
@@ -130,9 +130,9 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    const appState = getAppState();
+                    const ast = getAppState();
                     await S.rpcUtil.rpc<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
-                        nodeId: appState.editNode.id
+                        nodeId: ast.editNode.id
                     });
 
                     S.quanta.refresh(getAppState());
@@ -143,9 +143,9 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        const appState = getAppState();
+        const ast = getAppState();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
-            nodeId: appState.editNode.id,
+            nodeId: ast.editNode.id,
             principalNodeId,
             privilege
         });
@@ -153,20 +153,20 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilegeResponse = async () => {
-        const appState = getAppState();
+        const ast = getAppState();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
-            nodeId: appState.editNode.id
+            nodeId: ast.editNode.id
         });
 
-        appState.editNode.ac = res.aclEntries;
-        S.edit.updateNode(appState.editNode);
+        ast.editNode.ac = res.aclEntries;
+        S.edit.updateNode(ast.editNode);
     }
 
     // userName="public", or a username
     shareNodeToUser = async (userName: string, allowAppends: boolean) => {
         this.dirty = true;
-        const appState = getAppState();
-        if (S.props.isEncrypted(appState.editNode)) {
+        const ast = getAppState();
+        if (S.props.isEncrypted(ast.editNode)) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
@@ -177,7 +177,7 @@ export class SharingDlg extends DialogBase {
          * TODO: this additional call can be avoided as an optimization
          */
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
-            nodeId: appState.editNode.id,
+            nodeId: ast.editNode.id,
             principals: [userName],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });

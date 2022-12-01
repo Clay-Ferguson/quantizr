@@ -41,7 +41,7 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const appState = getAppState();
+        const ast = getAppState();
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
@@ -54,7 +54,7 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("HTML", "html")
             ], "radioButtonsBar marginTop"),
             this.getState<LS>().exportType === "pdf" ? this.makePdfOptions() : null,
-            appState.config.ipfsEnabled ? new Div(null, null, [
+            ast.config.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
             new ButtonBar([

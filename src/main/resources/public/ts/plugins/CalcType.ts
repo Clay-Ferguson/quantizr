@@ -23,7 +23,7 @@ export class CalcType extends TypeBase {
         return state.config.help?.type?.calculator?.editor;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
         return true;
     }
 

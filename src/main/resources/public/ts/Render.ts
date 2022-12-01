@@ -410,8 +410,8 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
-        return !type || type.allowAction(action, node, appState);
+    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean => {
+        return !type || type.allowAction(action, node, ast);
     }
 
     renderPage = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {

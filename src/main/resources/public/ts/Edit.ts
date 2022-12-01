@@ -724,9 +724,9 @@ export class Edit {
             return;
         }
 
-        const appState: AppState = getAppState();
+        const ast = getAppState();
         if (!id) {
-            const node = S.nodeUtil.getHighlightedNode(appState);
+            const node = S.nodeUtil.getHighlightedNode(ast);
             if (node) {
                 id = node.id;
             }
@@ -746,7 +746,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, appState);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, ast);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {
@@ -837,8 +837,8 @@ export class Edit {
     }
 
     subGraphHash = async () => {
-        const appState = getAppState();
-        const node = S.nodeUtil.getHighlightedNode(appState);
+        const ast = getAppState();
+        const node = S.nodeUtil.getHighlightedNode(ast);
 
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -986,7 +986,7 @@ export class Edit {
     }
 
     /* Updates 'nodeHistory' when nodes are deleted */
-    removeNodesFromHistory = (selNodesArray: string[], appState: AppState) => {
+    removeNodesFromHistory = (selNodesArray: string[], ast: AppState) => {
         if (!selNodesArray) return;
         selNodesArray.forEach(id => {
             // remove any top level history item that matches 'id'
@@ -1001,16 +1001,16 @@ export class Edit {
         });
     }
 
-    removeNodesFromCalendarData = (selNodesArray: string[], appState: AppState) => {
-        if (!appState.calendarData) return;
+    removeNodesFromCalendarData = (selNodesArray: string[], ast: AppState) => {
+        if (!ast.calendarData) return;
 
         selNodesArray.forEach(id => {
-            appState.calendarData = appState.calendarData.filter((item: EventInput) => item.id !== id);
+            ast.calendarData = ast.calendarData.filter((item: EventInput) => item.id !== id);
         });
 
         // I'll leave this here commented until I actually TEST deleting calendar items again.
         // dispatch("UpdateCalendarData", s => {
-        //     return appState;
+        //     return ast;
         // });
     }
 

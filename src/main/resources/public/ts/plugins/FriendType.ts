@@ -26,7 +26,7 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
         switch (action) {
             case NodeActionType.delete:
             case NodeActionType.editNode:

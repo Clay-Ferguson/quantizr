@@ -18,7 +18,7 @@ export class FriendsTableRow extends ListBoxRow {
     }
 
     preRender(): void {
-        const appState = getAppState();
+        const ast = getAppState();
         let src: string = null;
 
         // local users will have this kind of avatar
@@ -70,7 +70,7 @@ export class FriendsTableRow extends ListBoxRow {
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
                     className: "fa fa-thumbs-up fa-lg marginTop marginRight float-end " +
-                        (this.friend.userName === appState.userName ? "likedByMeIcon" : "")
+                        (this.friend.userName === ast.userName ? "likedByMeIcon" : "")
                 }) : null
             ])
         ]);

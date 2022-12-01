@@ -8,7 +8,7 @@ import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
 export class NodeTypeListBox extends ListBox {
 
-    constructor(valueIntf: ValueIntf, public appState: AppState) {
+    constructor(valueIntf: ValueIntf, public ast: AppState) {
         super(valueIntf);
     }
 

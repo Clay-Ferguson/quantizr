@@ -11,7 +11,7 @@ export interface TypeIntf {
     getName(): string;
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp;
     getIconClass(): string;
-    allowAction(action : NodeActionType, node: J.NodeInfo, appState: AppState): boolean;
+    allowAction(action : NodeActionType, node: J.NodeInfo, ast: AppState): boolean;
     getAllowRowHeader(): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;
     getDomPreUpdateFunction(parent: CompIntf): void;

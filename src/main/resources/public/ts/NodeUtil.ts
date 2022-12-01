@@ -262,9 +262,9 @@ export class NodeUtil {
         });
 
         if (editorDlg) {
-            const appState = getAppState();
-            appState.editNode.ac = res.aclEntries;
-            S.edit.updateNode(appState.editNode);
+            const ast = getAppState();
+            ast.editNode.ac = res.aclEntries;
+            S.edit.updateNode(ast.editNode);
         }
     }
 

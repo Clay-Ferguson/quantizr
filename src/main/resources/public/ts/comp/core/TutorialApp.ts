@@ -27,11 +27,11 @@ export class TutorialApp extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const appState: AppState = useAppState();
+        const ast = useAppState();
 
         return this.tag("div", null, [
             this.getState<LS>().content,
-            appState?.userName ? new Div("userName: " + appState.userName) : null,
+            ast?.userName ? new Div("userName: " + ast.userName) : null,
             new Div(null, null, [
                 new Anchor("https://someserver.com", "My Link")
             ]),

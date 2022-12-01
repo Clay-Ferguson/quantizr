@@ -43,7 +43,7 @@ export class EditAttachmentsPanel extends Div {
     }
 
     makeAttachmentPanel = (att: J.Attachment, isFirst: boolean): Div => {
-        const appState = getAppState();
+        const ast = getAppState();
         if (!att) return null;
         const key = (att as any).key;
         const ipfsLink = att.il;
@@ -79,30 +79,30 @@ export class EditAttachmentsPanel extends Div {
             getValue: (): boolean => this.editorDlg.getState<LS>().selectedAttachments.has((att as any).key)
         }, "delAttCheckbox");
 
-        const imgSizeSelection = S.props.hasImage(appState.editNode, key)
+        const imgSizeSelection = S.props.hasImage(ast.editNode, key)
             ? this.createImgSizeSelection("Width", "widthDropDown", //
                 {
                     setValue: (val: string): void => {
-                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
                             att.c = val;
                             if (isFirst) {
-                                this.askMakeAllSameSize(appState.editNode, val);
+                                this.askMakeAllSameSize(ast.editNode, val);
                             }
                             this.editorDlg.binaryDirty = true;
                         }
                     },
                     getValue: (): string => {
-                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
                         return att && att.c;
                     }
                 }) : null;
 
-        const imgPositionSelection = S.props.hasImage(appState.editNode, key)
+        const imgPositionSelection = S.props.hasImage(ast.editNode, key)
             ? this.createImgPositionSelection("Position", "positionDropDown", //
                 {
                     setValue: (val: string): void => {
-                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
                             att.p = val === "auto" ? null : val;
                             this.editorDlg.binaryDirty = true;
@@ -110,7 +110,7 @@ export class EditAttachmentsPanel extends Div {
                         this.editorDlg.mergeState({});
                     },
                     getValue: (): string => {
-                        const att: J.Attachment = S.props.getAttachment(key, appState.editNode);
+                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
                         let ret = att && att.p;
                         if (!ret) ret = "auto";
                         return ret;
@@ -125,13 +125,13 @@ export class EditAttachmentsPanel extends Div {
 
         const fileNameField = new TextField({ labelClass: "txtFieldLabelShort", outterClass: "fileNameField", label: "File Name", val: fileNameFieldState });
 
-        const list: J.Attachment[] = S.props.getOrderedAttachments(appState.editNode);
+        const list: J.Attachment[] = S.props.getOrderedAttachments(ast.editNode);
         const firstAttachment = list[0].o === att.o;
         const lastAttachment = list[list.length - 1].o === att.o;
 
         const topBinRow = new HorizontalLayout([
             attCheckbox,
-            new NodeCompBinary(appState.editNode, key, true, false),
+            new NodeCompBinary(ast.editNode, key, true, false),
 
             new HorizontalLayout([
                 new Div(null, null, [
@@ -147,18 +147,18 @@ export class EditAttachmentsPanel extends Div {
                     !firstAttachment ? new Icon({
                         className: "fa fa-lg fa-arrow-up clickable marginLeft",
                         title: "Move Attachment Up",
-                        onClick: () => this.moveAttachmentUp(att, appState.editNode)
+                        onClick: () => this.moveAttachmentUp(att, ast.editNode)
                     }) : null,
                     !lastAttachment ? new Icon({
                         className: "fa fa-lg fa-arrow-down clickable marginLeft",
                         title: "Move Attachment Down",
-                        onClick: () => this.moveAttachmentDown(att, appState.editNode)
+                        onClick: () => this.moveAttachmentDown(att, ast.editNode)
                     }) : null
                 ])
             ])
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
-            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
+            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.ast), { title: "Show the IPFS URL for the attached file." }) : null
         ], "horizontalLayoutCompCompact");
 
         let bottomBinRow = null;
