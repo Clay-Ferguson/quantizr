@@ -10,6 +10,7 @@ import { FeedTab } from "../tabs/data/FeedTab";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
+
 export class TabPanelButtons extends Div {
 
     constructor(private verticalButtons: boolean, public moreClasses: string = "") {
@@ -36,9 +37,9 @@ export class TabPanelButtons extends Div {
         for (const tab of state.tabData) {
             items.push(this.getTabButton(state, tab));
 
-            const tabSubOptions = tab.getTabSubOptions(state);
-            if (tabSubOptions) {
-                items.push(tabSubOptions);
+            const tabSubOpts = tab.getTabSubOptions(state);
+            if (tabSubOpts) {
+                items.push(tabSubOpts);
             }
         }
         return items;

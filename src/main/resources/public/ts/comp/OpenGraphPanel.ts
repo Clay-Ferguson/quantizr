@@ -38,7 +38,8 @@ export class OpenGraphPanel extends Div {
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         const og = S.quanta.openGraphData.get(this.url);
         if (!og) {
-            const observer = new IntersectionObserver(entries => entries.forEach(entry => this.processOgEntry(entry, elm)));
+            const observer = new IntersectionObserver(entries => //
+                entries.forEach(entry => this.processOgEntry(entry, elm)));
             observer.observe(elm.parentElement);
         }
         else {
@@ -136,9 +137,7 @@ export class OpenGraphPanel extends Div {
 
         const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.appState.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
-            onClick: () => {
-                S.edit.addLinkBookmark(state.og.url, null, null);
-            }
+            onClick: () => S.edit.addLinkBookmark(state.og.url, null, null)
         }) : null;
 
         if (state.og?.description?.length > 804) {

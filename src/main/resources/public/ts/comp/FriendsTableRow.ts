@@ -62,9 +62,7 @@ export class FriendsTableRow extends ListBoxRow {
                 img,
                 new Div(null, {
                     className: "friendListText",
-                    onClick: () => {
-                        new UserProfileDlg(this.friend.userNodeId).open();
-                    }
+                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
                     new Div(this.friend.displayName),
                     new Div("@" + this.friend.userName)

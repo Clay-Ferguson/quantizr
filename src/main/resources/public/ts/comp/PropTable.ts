@@ -16,17 +16,17 @@ export class PropTable extends Comp {
     compRender = (): ReactNode => {
         this.setChildren([]);
         if (this.node.properties) {
-            this.node.properties.forEach(property => {
-                if (S.props.isGuiControlBasedProp(property)) return;
+            this.node.properties.forEach(prop => {
+                if (S.props.isGuiControlBasedProp(prop)) return;
 
                 // console.log("Render Prop: "+property.name);
                 this.addChild(new PropTableRow({
                     className: "prop-table-row"
                 }, [
-                    new PropTableCell(property.name, {
+                    new PropTableCell(prop.name, {
                         className: "prop-table-name-col"
                     }),
-                    new PropTableCell(property.value, {
+                    new PropTableCell(prop.value, {
                         className: "prop-table-val-col"
                     })
                 ]));

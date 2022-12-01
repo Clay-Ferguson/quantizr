@@ -33,8 +33,7 @@ export class FullScreenImgViewer extends Main {
         });
 
         if (S.props.hasBinary(node) && !isAnAccountNode) {
-            const binary = new NodeCompBinary(node, attName, false, true);
-            children.push(binary);
+            children.push(new NodeCompBinary(node, attName, false, true));
         }
 
         this.setChildren(children);

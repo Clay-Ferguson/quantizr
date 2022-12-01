@@ -159,7 +159,7 @@ export class HistoryPanel extends Div {
                 // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
                 if (item.kind === "string") {
-                    item.getAsString((s) => {
+                    item.getAsString(s => {
                         // console.log("String: " + s);
                         S.edit.moveNodeByDrop(id, s, "inside", true);
                     });
