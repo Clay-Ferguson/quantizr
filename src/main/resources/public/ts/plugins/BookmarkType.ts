@@ -9,7 +9,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-export class BookmarkTypeHandler extends TypeBase {
+export class BookmarkType extends TypeBase {
     constructor() {
         super(J.NodeType.BOOKMARK, "Bookmark", "fa-bookmark", false);
     }

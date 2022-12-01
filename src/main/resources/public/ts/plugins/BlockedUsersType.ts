@@ -3,11 +3,11 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
-export class BlockedUsersTypeHandler extends TypeBase {
+export class BlockedUsersType extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {

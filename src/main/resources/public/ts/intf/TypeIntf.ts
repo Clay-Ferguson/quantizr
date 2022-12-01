@@ -6,7 +6,7 @@ import { TabIntf } from "./TabIntf";
 import { EditorOptions } from "../Interfaces";
 
 /* This interface is how Type Plugins are handled */
-export interface TypeHandlerIntf {
+export interface TypeIntf {
     getTypeName(): string;
     getName(): string;
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp;

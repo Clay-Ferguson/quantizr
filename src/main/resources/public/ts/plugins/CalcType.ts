@@ -4,14 +4,14 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Pre } from "../comp/core/Pre";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 const win: any = window;
 
-export class CalcTypeHandler extends TypeBase {
+export class CalcType extends TypeBase {
 
     constructor() {
         // false=disabling user's ability to select

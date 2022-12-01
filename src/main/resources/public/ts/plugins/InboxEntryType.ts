@@ -1,9 +1,9 @@
 import { AppState } from "../AppState";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
-export class InboxEntryTypeHandler extends TypeBase {
+export class InboxEntryType extends TypeBase {
     constructor() {
         super(J.NodeType.INBOX_ENTRY, "Notification", "fa-envelope", false);
     }

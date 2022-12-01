@@ -22,7 +22,7 @@ import { Constants as C } from "../Constants";
 import { DialogBase, DialogMode } from "../DialogBase";
 import * as I from "../Interfaces";
 import { EditorOptions } from "../Interfaces";
-import { NodeActionType, TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import { NodeActionType, TypeIntf } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
@@ -171,7 +171,7 @@ export class EditNodeDlg extends DialogBase {
         const appState = getAppState();
         let span: Span = null;
 
-        const type = S.plugin.getTypeHandler(appState.editNode.type);
+        const type = S.plugin.getType(appState.editNode.type);
         if (type) {
             const iconClass = type.getIconClass();
             if (iconClass) {
@@ -237,7 +237,7 @@ export class EditNodeDlg extends DialogBase {
         const hasAttachment: boolean = S.props.hasBinary(appState.editNode);
 
         this.editorHelp = null;
-        const type = S.plugin.getTypeHandler(appState.editNode.type);
+        const type = S.plugin.getType(appState.editNode.type);
         let customProps: string[] = null;
         let editorOpts: EditorOptions = {};
         if (type) {
@@ -424,7 +424,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* returns true if props table is not empty */
-    buildPropsEditing = (propsParent: CompIntf, state: LS, type: TypeHandlerIntf, customProps: string[]): boolean => {
+    buildPropsEditing = (propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[]): boolean => {
         let numPropsShowing: number = 0;
         let ret = false;
         const appState = getAppState();
@@ -561,7 +561,7 @@ export class EditNodeDlg extends DialogBase {
         const appState = getAppState();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
-        const type = S.plugin.getTypeHandler(appState.editNode.type);
+        const type = S.plugin.getType(appState.editNode.type);
         if (type) {
             type.ensureDefaultProperties(appState.editNode);
         }
@@ -647,7 +647,7 @@ export class EditNodeDlg extends DialogBase {
         new ChangeNodeTypeDlg(appState.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
-    makePropEditor = (type: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+    makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
         const appState = getAppState();
         const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 

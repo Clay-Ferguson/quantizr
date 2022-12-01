@@ -4,12 +4,12 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-export class RoomTypeHandler extends TypeBase {
+export class RoomType extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {

@@ -4,12 +4,12 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-export class CalendarTypeHandler extends TypeBase {
+export class CalendarType extends TypeBase {
     constructor() {
         super(J.NodeType.CALENDAR, "Calendar", "fa-calendar", true);
     }

@@ -8,7 +8,7 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
-import { NodeActionType, TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
+import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Icon } from "../core/Icon";
@@ -24,7 +24,7 @@ export class NodeCompRow extends Div {
 
     // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
-    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, appState: AppState) {
         super(null, {
@@ -74,9 +74,9 @@ export class NodeCompRow extends Div {
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
             can insert or not */
             if (this.level === 1) {
-                const parentTypeHandler = S.plugin.getTypeHandler(state.node.type);
-                if (parentTypeHandler) {
-                    insertAllowed = state.isAdminUser || parentTypeHandler.allowAction(NodeActionType.insert, state.node, state);
+                const parentType = S.plugin.getType(state.node.type);
+                if (parentType) {
+                    insertAllowed = state.isAdminUser || parentType.allowAction(NodeActionType.insert, state.node, state);
                 }
             }
 

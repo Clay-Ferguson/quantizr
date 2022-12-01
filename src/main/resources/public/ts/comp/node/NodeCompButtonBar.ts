@@ -8,7 +8,7 @@ import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
-import { NodeActionType } from "../../intf/TypeHandlerIntf";
+import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
@@ -46,7 +46,7 @@ export class NodeCompButtonBar extends Div {
         let pasteSpan: Span;
 
         const isPageRootNode = state.node && this.node.id === state.node.id;
-        const type = S.plugin.getTypeHandler(this.node.type);
+        const type = S.plugin.getType(this.node.type);
         let editingAllowed = S.edit.isEditAllowed(this.node, state);
         let deleteAllowed = false;
         let editableNode = true;

@@ -37,8 +37,8 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically
     all be the same here which will be the user being followed, and is not needed to be displayed.
 
-    This node needs to share as much implementation for item rendering as possible with what's done in the, FriendTypeHandler
-    Probably need a static method on FriendTypeHandler itself which can do everything based on input parameters only.
+    This node needs to share as much implementation for item rendering as possible with what's done in the, FriendType
+    Probably need a static method on FriendType itself which can do everything based on input parameters only.
     */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         // console.log("Render Follower: " + S.util.prettyPrint(node));

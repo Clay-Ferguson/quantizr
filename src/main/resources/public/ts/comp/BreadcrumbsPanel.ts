@@ -30,7 +30,7 @@ export class BreadcrumbsPanel extends Div {
                 }
                 else if (bc.id) {
                     if (!bc.name) {
-                        const type = S.plugin.getTypeHandler(bc.type);
+                        const type = S.plugin.getType(bc.type);
                         bc.name = type ? type.getName() : "???";
                     }
 

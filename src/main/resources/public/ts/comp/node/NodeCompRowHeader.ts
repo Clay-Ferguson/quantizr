@@ -7,7 +7,7 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { UserProfileDlg } from "../../dlg/UserProfileDlg";
-import { NodeActionType } from "../../intf/TypeHandlerIntf";
+import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -67,7 +67,7 @@ export class NodeCompRowHeader extends Div {
 
         const verboseChildren: Comp[] = state.mobileMode ? [] : children;
 
-        const type = S.plugin.getTypeHandler(this.node.type);
+        const type = S.plugin.getType(this.node.type);
         if (type) {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {

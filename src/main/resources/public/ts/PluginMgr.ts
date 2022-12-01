@@ -1,40 +1,40 @@
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
-import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
-import { APPostsTypeHandler } from "./plugins/APPostsTypeHandler";
-import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
-import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
-import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
-import { CommentTypeHandler } from "./plugins/CommentTypeHandler";
-import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
-import { CalendarTypeHandler } from "./plugins/CalendarTypeHandler";
-import { ExportsTypeHandler } from "./plugins/ExportsTypeHandler";
-import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
-import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
-import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
-import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
-import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
-import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
-import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
-import { PostsTypeHandler } from "./plugins/PostsTypeHandler";
-import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
-import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
-import { RssFeedsTypeHandler } from "./plugins/RssFeedsTypeHandler";
-import { RssTypeHandler } from "./plugins/RssTypeHandler";
-import { TextTypeHandler } from "./plugins/TextTypeHandler";
+import { TypeIntf } from "./intf/TypeIntf";
+import { AccountType } from "./plugins/AccountType";
+import { APPostsType } from "./plugins/APPostsType";
+import { BlockedUsersType } from "./plugins/BlockedUsersType";
+import { BookmarkListType } from "./plugins/BookmarkListType";
+import { BookmarkType } from "./plugins/BookmarkType";
+import { CommentType } from "./plugins/CommentType";
+import { CalcType } from "./plugins/CalcType";
+import { CalendarType } from "./plugins/CalendarType";
+import { ExportsType } from "./plugins/ExportsType";
+import { FriendsListType } from "./plugins/FriendsListType";
+import { FriendType } from "./plugins/FriendType";
+import { InboxEntryType } from "./plugins/InboxEntryType";
+import { InboxNodeType } from "./plugins/InboxNodeType";
+import { IPFSNodeType } from "./plugins/IPFSNodeType";
+import { MarkdownType } from "./plugins/MarkdownType";
+import { NotesNodeType } from "./plugins/NotesNodeType";
+import { PostsType } from "./plugins/PostsType";
+import { RepoRootType } from "./plugins/RepoRootType";
+import { RoomType } from "./plugins/RoomType";
+import { RssFeedsType } from "./plugins/RssFeedsType";
+import { RssType } from "./plugins/RssType";
+import { TextType } from "./plugins/TextType";
 
 export class PluginMgr {
 
-    private types: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
+    private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
 
-    addTypeHandler = (type: TypeHandlerIntf) => {
-        // console.log("Adding TypeHandler: type=" + type.getTypeName());
+    addType = (type: TypeIntf) => {
+        // console.log("Adding Type: type=" + type.getTypeName());
         if (this.types.get(type.getTypeName())) {
             throw new Error("duplicate type handler: " + type.getTypeName());
         }
         this.types.set(type.getTypeName(), type);
     }
 
-    getTypeHandler = (typeName: string): TypeHandlerIntf => {
+    getType = (typeName: string): TypeIntf => {
         const handler = this.types.get(typeName);
         if (!handler) {
             console.warn("No type handler for: " + typeName);
@@ -42,7 +42,7 @@ export class PluginMgr {
         return handler;
     }
 
-    getAllTypeHandlers = (): Map<string, TypeHandlerIntf> => {
+    getAllTypes = (): Map<string, TypeIntf> => {
         return this.types;
     }
 
@@ -52,27 +52,27 @@ export class PluginMgr {
 
         /* We could have made each type base-class automatically register here, but they'd executed in nondeterminisitic order
         so it's better to just have this one place where we define all them in the order we want */
-        this.addTypeHandler(new MarkdownTypeHandler());
-        this.addTypeHandler(new TextTypeHandler());
-        this.addTypeHandler(new RssFeedsTypeHandler());
-        this.addTypeHandler(new RssTypeHandler());
-        this.addTypeHandler(new CalcTypeHandler());
-        this.addTypeHandler(new RoomTypeHandler());
-        this.addTypeHandler(new CalendarTypeHandler());
-        this.addTypeHandler(new IPFSNodeTypeHandler());
-        this.addTypeHandler(new RepoRootTypeHandler());
-        this.addTypeHandler(new AccountTypeHandler());
-        this.addTypeHandler(new PostsTypeHandler());
-        this.addTypeHandler(new APPostsTypeHandler());
-        this.addTypeHandler(new ExportsTypeHandler());
-        this.addTypeHandler(new InboxNodeTypeHandler());
-        this.addTypeHandler(new InboxEntryTypeHandler());
-        this.addTypeHandler(new NotesNodeTypeHandler());
-        this.addTypeHandler(new BookmarkTypeHandler());
-        this.addTypeHandler(new CommentTypeHandler());
-        this.addTypeHandler(new BookmarkListTypeHandler());
-        this.addTypeHandler(new FriendsListTypeHandler());
-        this.addTypeHandler(new BlockedUsersTypeHandler());
-        this.addTypeHandler(new FriendTypeHandler());
+        this.addType(new MarkdownType());
+        this.addType(new TextType());
+        this.addType(new RssFeedsType());
+        this.addType(new RssType());
+        this.addType(new CalcType());
+        this.addType(new RoomType());
+        this.addType(new CalendarType());
+        this.addType(new IPFSNodeType());
+        this.addType(new RepoRootType());
+        this.addType(new AccountType());
+        this.addType(new PostsType());
+        this.addType(new APPostsType());
+        this.addType(new ExportsType());
+        this.addType(new InboxNodeType());
+        this.addType(new InboxEntryType());
+        this.addType(new NotesNodeType());
+        this.addType(new BookmarkType());
+        this.addType(new CommentType());
+        this.addType(new BookmarkListType());
+        this.addType(new FriendsListType());
+        this.addType(new BlockedUsersType());
+        this.addType(new FriendType());
     }
 }

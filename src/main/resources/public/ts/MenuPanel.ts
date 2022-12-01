@@ -22,7 +22,7 @@ import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { MenuPanelState } from "./Interfaces";
-import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
+import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
@@ -290,8 +290,8 @@ export class MenuPanel extends Div {
         }
 
         const createMenuItems: CompIntf[] = [];
-        const types = S.plugin.getAllTypeHandlers();
-        types.forEach((type: TypeHandlerIntf, k: string) => {
+        const types = S.plugin.getAllTypes();
+        types.forEach((type: TypeIntf, k: string) => {
             if (appState.isAdminUser || type.getAllowUserSelect()) {
                 createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null, appState), //
                     !appState.isAnonUser && !!hltNode));

@@ -5,9 +5,9 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 
-export class BookmarkListTypeHandler extends TypeBase {
+export class BookmarkListType extends TypeBase {
     constructor() {
         super(J.NodeType.BOOKMARK_LIST, "Bookmarks", "fa-bookmark", false);
     }

@@ -4,12 +4,12 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-export class AccountTypeHandler extends TypeBase {
+export class AccountType extends TypeBase {
 
     constructor() {
         super(J.NodeType.ACCOUNT, "Account Root", "fa-database", false);

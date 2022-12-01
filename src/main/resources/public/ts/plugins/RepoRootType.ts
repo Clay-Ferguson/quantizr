@@ -1,23 +1,24 @@
 import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
 
-export class NotesNodeTypeHandler extends TypeBase {
+export class RepoRootType extends TypeBase {
+
     constructor() {
-        super(J.NodeType.NOTES, "Notes", "fa-sticky-note", false);
+        super(J.NodeType.REPO_ROOT, "Root", "fa-home", false);
     }
 
-    isSpecialAccountNode(): boolean {
+    allowPropertyEdit(propName: string, state: AppState): boolean {
         return true;
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
-        return new Div(null, null, [
-            new Heading(4, "Notes", { className: "marginAll" })
-        ]);
+        return new HorizontalLayout([
+            new Heading(4, "Root")
+        ], "displayTable systemNodeContent marginAll");
     }
 }

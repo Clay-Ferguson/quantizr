@@ -40,7 +40,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let boostComp: NodeCompRow = null;
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                    const type = S.plugin.getTypeHandler(n.boostedNode.type);
+                    const type = S.plugin.getType(n.boostedNode.type);
                     boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, state);
                 }
 
@@ -52,7 +52,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 else {
-                    const type = S.plugin.getTypeHandler(n.type);
+                    const type = S.plugin.getType(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
                     if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {

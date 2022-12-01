@@ -25,7 +25,7 @@ export class NodeCompMainNode extends Div {
             // tabIndex: "-1"
         });
 
-        const type = S.plugin.getTypeHandler(J.NodeType.NONE);
+        const type = S.plugin.getType(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
         if ((!type || type.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
@@ -80,7 +80,7 @@ export class NodeCompMainNode extends Div {
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
-            const type = S.plugin.getTypeHandler(node.type);
+            const type = S.plugin.getType(node.type);
 
             let allowHeader: boolean = false;
             // special case, if node is owned by admin and we're not admin, never show header
@@ -109,7 +109,7 @@ export class NodeCompMainNode extends Div {
             let boostComp: NodeCompRow = null;
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                const type = S.plugin.getTypeHandler(node.boostedNode.type);
+                const type = S.plugin.getType(node.boostedNode.type);
                 boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, state);
             }
 

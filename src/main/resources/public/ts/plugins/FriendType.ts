@@ -5,12 +5,12 @@ import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { EditorOptions } from "../Interfaces";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-export class FriendTypeHandler extends TypeBase {
+export class FriendType extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {

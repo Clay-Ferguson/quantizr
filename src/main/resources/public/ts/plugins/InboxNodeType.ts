@@ -6,11 +6,12 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Heading } from "../comp/core/Heading";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
-export class InboxNodeTypeHandler extends TypeBase {
+
+export class InboxNodeType extends TypeBase {
     constructor() {
         super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }

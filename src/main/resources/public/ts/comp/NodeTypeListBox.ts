@@ -14,7 +14,7 @@ export class NodeTypeListBox extends ListBox {
 
     preRender(): void {
         const children: Comp[] = [];
-        const types = S.plugin.getAllTypeHandlers();
+        const types = S.plugin.getAllTypes();
 
         types.forEach((type, k) => {
             if (getAppState().isAdminUser || type.getAllowUserSelect()) {

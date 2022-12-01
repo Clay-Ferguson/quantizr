@@ -19,13 +19,13 @@ import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { MainTab } from "../tabs/data/MainTab";
 import { TypeBase } from "./base/TypeBase";
 
-export class RssTypeHandler extends TypeBase {
+export class RssType extends TypeBase {
     static expansionState: any = {};
     static lastGoodFeed: J.RssFeed;
     static lastGoodPage: number;
@@ -82,7 +82,7 @@ export class RssTypeHandler extends TypeBase {
 
         let feedContent: Comp = null;
 
-        // console.log("RSSTypeHandler.render");
+        // console.log("RSSType.render");
         const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
         if (feedSrc) {
             const feedSrcHash = S.util.hashOfString(feedSrc);
@@ -108,7 +108,7 @@ export class RssTypeHandler extends TypeBase {
                 feedContent = new Button("Load Feed", () => {
                     dispatch("LoadingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
-                        RssTypeHandler.loadFeed(state, feedSrcHash, feedSrc);
+                        RssType.loadFeed(state, feedSrcHash, feedSrc);
                         return s;
                     });
                 }, null, "btn-primary marginAll");
@@ -159,16 +159,16 @@ export class RssTypeHandler extends TypeBase {
                 }, 1000);
 
                 if (!res.feed.entries || res.feed.entries.length === 0) {
-                    s.rssFeedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
-                    s.rssFeedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
+                    s.rssFeedCache[feedSrcHash] = RssType.lastGoodFeed || {};
+                    s.rssFeedPage[feedSrcHash] = RssType.lastGoodPage || 1;
                     setTimeout(() => {
                         S.util.showMessage("No more RSS items found.", "RSS");
                     }, 250);
                 }
                 else {
                     s.rssFeedCache[feedSrcHash] = res.feed;
-                    RssTypeHandler.lastGoodFeed = res.feed;
-                    RssTypeHandler.lastGoodPage = s.rssFeedPage[feedSrcHash];
+                    RssType.lastGoodFeed = res.feed;
+                    RssType.lastGoodPage = s.rssFeedPage[feedSrcHash];
                 }
                 return s;
             });
@@ -295,7 +295,7 @@ export class RssTypeHandler extends TypeBase {
             // deleting will force a requery from the server
             s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
-            RssTypeHandler.loadFeed(state, feedSrcHash, feedSrc);
+            RssType.loadFeed(state, feedSrcHash, feedSrc);
             return s;
         });
     }

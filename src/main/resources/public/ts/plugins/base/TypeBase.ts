@@ -6,12 +6,12 @@ import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { EditorOptions } from "../../Interfaces";
 import { TabIntf } from "../../intf/TabIntf";
-import { NodeActionType, TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
+import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
-export class TypeBase implements TypeHandlerIntf {
+export class TypeBase implements TypeIntf {
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }

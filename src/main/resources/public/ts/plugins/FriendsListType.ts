@@ -6,11 +6,11 @@ import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { TabIntf } from "../intf/TabIntf";
-import { NodeActionType } from "../intf/TypeHandlerIntf";
+import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
-export class FriendsListTypeHandler extends TypeBase {
+export class FriendsListType extends TypeBase {
     constructor() {
         super(J.NodeType.FRIEND_LIST, "Friends", "fa-users", false);
     }

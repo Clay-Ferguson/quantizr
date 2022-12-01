@@ -7,29 +7,21 @@ import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
-export class ExportsTypeHandler extends TypeBase {
+export class APPostsType extends TypeBase {
     constructor() {
-        super(J.NodeType.EXPORTS, "Exports", "fa-briefcase", false);
+        super(J.NodeType.ACT_PUB_POSTS, "Fediverse Posts", "fa-comments-o", false);
     }
 
-    getAllowRowHeader(): boolean {
-        return false;
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+        return new Div(null, { className: "systemNodeContent" }, [
+            new Heading(4, "Posts", {
+                className: "marginAll"
+            })
+        ]);
     }
 
     getEditorHelp(): string {
         const state = getAppState();
         return state.config.help?.editor?.dialog;
-    }
-
-    isSpecialAccountNode(): boolean {
-        return true;
-    }
-
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
-        return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, "Exports", {
-                className: "marginAll"
-            })
-        ]);
     }
 }

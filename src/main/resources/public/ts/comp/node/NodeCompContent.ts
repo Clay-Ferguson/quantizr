@@ -38,8 +38,8 @@ export class NodeCompContent extends Div {
         }
 
         const children: CompIntf[] = [];
-        let type = S.plugin.getTypeHandler(this.node.type);
-        type = type || S.plugin.getTypeHandler(J.NodeType.NONE);
+        let type = S.plugin.getType(this.node.type);
+        type = type || S.plugin.getType(J.NodeType.NONE);
 
         this.domPreUpdateFunc = type.getDomPreUpdateFunction;
 

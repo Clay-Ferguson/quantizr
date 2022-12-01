@@ -21,9 +21,9 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
-import { NodeActionType, TypeHandlerIntf } from "./intf/TypeHandlerIntf";
+import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
-import { RssTypeHandler } from "./plugins/RssTypeHandler";
+import { RssType } from "./plugins/RssType";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
@@ -410,7 +410,7 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    allowAction = (type: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
+    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
         return !type || type.allowAction(action, node, appState);
     }
 
@@ -460,7 +460,7 @@ export class Render {
                                     dispatch("AutoRSSUpdate", s => {
                                         s.rssFeedCache[feedSrcHash] = "loading";
                                         s.rssFeedPage[feedSrcHash] = 1;
-                                        RssTypeHandler.loadFeed(s, feedSrcHash, feedSrc);
+                                        RssType.loadFeed(s, feedSrcHash, feedSrc);
                                         return s;
                                     });
                                 }, 250);
@@ -635,7 +635,7 @@ export class Render {
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
-        const type: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        const type: TypeIntf = S.plugin.getType(node.type);
         return type ? type.allowPropertyEdit(propName, state) : true;
     }
 
