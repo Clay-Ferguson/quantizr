@@ -38,6 +38,7 @@ public enum NodeProp {
     ACT_PUB_SENSITIVE("ap:nsfw"), //
 
     ACT_PUB_TAG("ap:tag"), //
+    ACT_PUB_REPLIES("ap:replies"), //
 
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of

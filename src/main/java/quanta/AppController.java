@@ -559,7 +559,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-
 		return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
 			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
 			return res;
@@ -1558,7 +1557,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					break;
 
 				case "getActPubJson":
-					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, req.getNodeId(), req.getParameter()), null));
+					res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
 					break;
 
 				case "readOutbox":

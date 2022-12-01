@@ -1071,6 +1071,8 @@ public class ActPubService extends ServiceBase {
         Boolean sensitive = apBool(obj, APObj.sensitive);
         List<?> tagArray = (List<?>) apList(obj, APObj.tag, false);
 
+        APObj replies = apAPObj(obj, APObj.replies);
+
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
         Object context = apObj(obj, APObj.context);
@@ -1188,6 +1190,10 @@ public class ActPubService extends ServiceBase {
 
         if (ok(name)) {
             newNode.set(NodeProp.ACT_PUB_OBJ_NAME, name);
+        }
+
+        if (ok(replies)) {
+            newNode.set(NodeProp.ACT_PUB_REPLIES, replies);
         }
 
         newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO, inReplyTo);
@@ -2072,16 +2078,16 @@ public class ActPubService extends ServiceBase {
 
         // if we have a nodeId try to use it to get the objUrl from and ignore objUrl param, otherwise
         // we'll just end up using the passed objUrl
-        if (ok(nodeId)) {
-            SubNode node = read.getNode(ms, nodeId);
-            if (no(node)) {
-                return "Node not found.";
-            }
-            objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
-            if (no(objUrl)) {
-                return "Node has no ActivityPub URL";
-            }
-        }
+        // if (ok(nodeId)) {
+        //     SubNode node = read.getNode(ms, nodeId);
+        //     if (no(node)) {
+        //         return "Node not found.";
+        //     }
+        //     objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+        //     if (no(objUrl)) {
+        //         return "Node has no ActivityPub URL";
+        //     }
+        // }
 
         String userDoingAction = ThreadLocals.getSC().getUserName();
         try {

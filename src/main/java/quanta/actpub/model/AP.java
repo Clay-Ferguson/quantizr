@@ -159,8 +159,9 @@ public class AP {
             }
         }
 
-        ExUtil.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
-                + prop + " from obj " + XString.prettyPrint(obj));
+        // todo-0: make this warning be triggered only by flag param 
+        // ExUtil.warn("unhandled type on apList(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+        //         + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
 

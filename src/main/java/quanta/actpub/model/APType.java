@@ -22,6 +22,8 @@ public class APType {
     public static final String Person = "Person";
     public static final String Image = "Image";
     public static final String Accept = "Accept";
+    public static final String Collection = "Collection";
+    public static final String CollectionPage = "CollectionPage";
     public static final String OrderedCollection = "OrderedCollection";
     public static final String OrderedCollectionPage = "OrderedCollectionPage";
 }

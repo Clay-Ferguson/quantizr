@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -594,6 +595,7 @@ public class ActPubUtil extends ServiceBase {
         return ok(url) && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
+    // todo-0: rename method and all internals to remove "ordered" part of var names.
     public void iterateOrderedCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
             ActPubObserver observer) {
         if (no(collectionObj))
@@ -603,7 +605,7 @@ public class ActPubUtil extends ServiceBase {
          * and really just one page would be ideal if not for the fact that some servers return an empty
          * first page and put the results in the 'last' page
          */
-        int maxPageQueries = 2;
+        int maxPageQueries = 5;
         int pageQueries = 0;
 
         // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
@@ -620,7 +622,14 @@ public class ActPubUtil extends ServiceBase {
          * have any paging
          */
         List<?> orderedItems = apList(collectionObj, APObj.orderedItems, false);
+
+        // try as unordered next (we handle both)
+        if (no(orderedItems)) {
+            orderedItems = apList(collectionObj, APObj.items, false);
+        }
+
         if (ok(orderedItems)) {
+            // log.debug("orderedItems(a): " + XString.prettyPrint(orderedItems));
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
@@ -642,7 +651,7 @@ public class ActPubUtil extends ServiceBase {
         Object firstPage = apObj(collectionObj, APObj.first);
 
         if (ok(firstPage)) {
-            // log.debug("First Page Url: " + firstPageUrl);
+            // log.debug("First Page Url: " + XString.prettyPrint(firstPage));
             if (++pageQueries > maxPageQueries)
                 return;
 
@@ -651,6 +660,7 @@ public class ActPubUtil extends ServiceBase {
             // if firstPage contained a String consider it a URL to the page and get it.
             if (firstPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) firstPage);
+                // log.debug("ocPage(a): " + XString.prettyPrint(ocPage));
             }
             // else consider firstPage to be the ACTUAL first page object
             else {
@@ -660,7 +670,13 @@ public class ActPubUtil extends ServiceBase {
             while (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems, false);
 
+                if (no(orderedItems)) {
+                    orderedItems = apList(ocPage, APObj.items, false);
+                }
+
                 if (ok(orderedItems)) {
+                    // log.debug("orderedItems(b): " + XString.prettyPrint(orderedItems));
+
                     for (Object item : orderedItems) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
@@ -692,12 +708,14 @@ public class ActPubUtil extends ServiceBase {
                 Object nextPage = apObj(ocPage, APObj.next);
 
                 if (ok(nextPage)) {
+                    // log.debug("nextPage: " + XString.prettyPrint(nextPage));
                     if (++pageQueries > maxPageQueries)
                         return;
 
                     // if nextPage is a string consider that a reference to the URL of the page and get it
                     if (nextPage instanceof String) {
                         ocPage = getRemoteAP(ms, userDoingAction, (String) nextPage);
+                        // log.debug("ocPage(d): " + XString.prettyPrint(ocPage));
                     } else {
                         ocPage = nextPage;
                     }
@@ -709,7 +727,7 @@ public class ActPubUtil extends ServiceBase {
 
         Object lastPage = apObj(collectionObj, APObj.last);
         if (ok(lastPage)) {
-            // log.debug("Last Page Url: " + lastPageUrl);
+            // log.debug("Last Page Url: " + lastPage);
             if (++pageQueries > maxPageQueries)
                 return;
 
@@ -718,6 +736,7 @@ public class ActPubUtil extends ServiceBase {
             // if lastPage is a string it's the url
             if (lastPage instanceof String) {
                 ocPage = getRemoteAP(ms, userDoingAction, (String) lastPage);
+                // log.debug("ocPage(c): " + XString.prettyPrint(ocPage));
             }
             // else it's the page object
             else {
@@ -726,7 +745,12 @@ public class ActPubUtil extends ServiceBase {
             if (ok(ocPage)) {
                 orderedItems = apList(ocPage, APObj.orderedItems, false);
 
+                if (no(orderedItems)) {
+                    orderedItems = apList(ocPage, APObj.items, false);
+                }
+
                 if (ok(orderedItems)) {
+                    // log.debug("orderedItems(c): " + XString.prettyPrint(orderedItems));
                     for (Object item : orderedItems) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
@@ -809,6 +833,31 @@ public class ActPubUtil extends ServiceBase {
         deleteNodeNotify((ObjectId) event.getSource());
     }
 
+    public void readForeignReplies(MongoSession ms, SubNode node) {
+        String apId = node.getStr(NodeProp.ACT_PUB_ID);
+        if (no(apId)) {
+            // if no apId exists this isn't a foreign node, nothing to do here.
+            return;
+        }
+
+        Map<String, Object> repliesObj = node.getObj(NodeProp.ACT_PUB_REPLIES.s(), Map.class);
+        if (no(repliesObj))
+            return;
+
+        String type = apStr(repliesObj, APObj.type);
+        if (!APType.Collection.equals(type) && !APType.OrderedCollection.equals(type)) {
+            return;
+        }
+
+        String userDoingAction = ThreadLocals.getSC().getUserName();
+
+        // todo-0: what to do about max count here?
+        apUtil.iterateOrderedCollection(ms, userDoingAction, repliesObj, 100, obj -> {
+            log.debug("REPLY: " + XString.prettyPrint(obj));
+            return true;
+        });
+    }
+
     /*
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
      * towards the root of the tree, also importing as we go along any 'inReplyTo' references we haven't
@@ -823,6 +872,13 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
         ObjectId lastNodeId = null;
 
+        // todo-1: This is an unfinished work in progress. I was unable to find any foreign posts
+        // that put any messages in their 'replies' collection, or at least when I query collections
+        // I get back an empty array of items for whatever reason.
+        // if (ok(node)) {
+        //     readForeignReplies(ms, node);
+        // }
+
         // iterate up the parent chain or chain of inReplyTo for ActivityPub
         while (ok(node) && nodes.size() < MAX_THREAD_NODES) {
             try {
@@ -833,8 +889,8 @@ public class ActPubUtil extends ServiceBase {
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS);
 
                 if (!topNode) {
-                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, false,
-                            false, true, true, null);
+                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, false, false,
+                            true, true, null);
 
 
                     // we only collect children at this leve if it's not an account top level post
@@ -847,8 +903,8 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
-                                        false, false, false, false, true, true, null));
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1, false,
+                                        false, false, false, true, true, null));
                             }
                         }
 
@@ -862,8 +918,8 @@ public class ActPubUtil extends ServiceBase {
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                            -1, false, false, false, false, true, true, null));
+                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
+                                            false, false, false, false, true, true, null));
                                 }
                             }
                         }

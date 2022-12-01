@@ -53,7 +53,9 @@ public class APObj extends HashMap<String, Object> {
     public static final String sensitive = "sensitive";
     public static final String content = "content";
     public static final String tag = "tag";
+    public static final String replies = "replies";
     public static final String orderedItems = "orderedItems";
+    public static final String items = "items";
     public static final String partOf = "partOf";
     public static final String rel = "rel";
     public static final String endpoints = "endpoints";
