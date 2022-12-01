@@ -15,8 +15,8 @@ export class BreadcrumbsPanel extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.setChildren([this.createBreadcrumbs(state)]);
+        const ast = useAppState();
+        this.setChildren([this.createBreadcrumbs(ast)]);
     }
 
     createBreadcrumbs = (state: AppState): Comp => {

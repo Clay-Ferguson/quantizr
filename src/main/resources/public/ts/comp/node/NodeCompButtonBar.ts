@@ -22,7 +22,7 @@ export class NodeCompButtonBar extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         // make drop target if not a drop-on-self
         if (S.quanta.draggableId !== this.node.id) {
@@ -45,22 +45,22 @@ export class NodeCompButtonBar extends Div {
         let deleteNodeIcon: Icon;
         let pasteSpan: Span;
 
-        const isPageRootNode = state.node && this.node.id === state.node.id;
+        const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
-        let editingAllowed = S.edit.isEditAllowed(this.node, state);
+        let editingAllowed = S.edit.isEditAllowed(this.node, ast);
         let deleteAllowed = false;
         let editableNode = true;
 
-        if (state.isAdminUser) {
+        if (ast.isAdminUser) {
             editingAllowed = true;
             deleteAllowed = true;
             editableNode = true;
         }
         else if (type) {
             if (editingAllowed) {
-                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, state);
-                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, state);
-                editableNode = type.allowAction(NodeActionType.editNode, this.node, state);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, ast);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, ast);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node, ast);
             }
         }
         else {
@@ -103,7 +103,7 @@ export class NodeCompButtonBar extends Div {
         */
         if (this.node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
-            (!isInlineChildren || state.userPrefs.editMode)) {
+            (!isInlineChildren || ast.userPrefs.editMode)) {
             openButton = new Button(null, S.nav.openNodeById, {
                 nid: this.node.id,
                 title: "Open Node"
@@ -115,13 +115,13 @@ export class NodeCompButtonBar extends Div {
          * they don't have privileges the server side security will let them know. In the future we can add more
          * intelligence to when to show these buttons or not.
          */
-        if (state.userPrefs.editMode) {
-            const checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node, state));
-            const checkboxForDelete = state.isAdminUser || deleteAllowed;
+        if (ast.userPrefs.editMode) {
+            const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node, ast));
+            const checkboxForDelete = ast.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
                 // no need to ever select home node
-                this.node.id !== state.node.id) {
+                this.node.id !== ast.node.id) {
                 selCheckbox = new Checkbox(null, {
                     title: "Select Nodes."
                 }, {
@@ -135,16 +135,16 @@ export class NodeCompButtonBar extends Div {
                             return s;
                         });
                     },
-                    getValue: (): boolean => state.selectedNodes.has(this.node.id)
+                    getValue: (): boolean => ast.selectedNodes.has(this.node.id)
                 }, "float-start");
             }
 
             let insertAllowed = true;
 
             // if this is our own account node, we can always leave insertAllowed=true
-            if (state.userProfile?.userNodeId !== this.node.id) {
+            if (ast.userProfile?.userNodeId !== this.node.id) {
                 if (type) {
-                    insertAllowed = state.isAdminUser || type.allowAction(NodeActionType.insert, this.node, state);
+                    insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node, ast);
                 }
             }
             const editInsertAllowed = S.props.isWritableByMe(this.node);
@@ -156,7 +156,7 @@ export class NodeCompButtonBar extends Div {
                 }, null, "fa-plus");
             }
 
-            const userCanPaste = S.props.isMine(this.node, state) || state.isAdminUser || this.node.id === state.userProfile?.userNodeId;
+            const userCanPaste = S.props.isMine(this.node, ast) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
@@ -166,7 +166,7 @@ export class NodeCompButtonBar extends Div {
                     }, null, "fa-edit");
                 }
 
-                if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
+                if (!isPageRootNode && this.node.type !== J.NodeType.REPO_ROOT && !ast.nodesToMove) {
                     cutNodeIcon = new Icon({
                         className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",
@@ -185,7 +185,7 @@ export class NodeCompButtonBar extends Div {
                         });
                     }
 
-                    if (!this.node.lastChild && state.node.children && state.node.children.length > 1) {
+                    if (!this.node.lastChild && ast.node.children && ast.node.children.length > 1) {
                         moveNodeDownIcon = new Icon({
                             className: "fa fa-lg fa-arrow-down buttonBarIcon",
                             title: "Move Node Down",
@@ -198,7 +198,7 @@ export class NodeCompButtonBar extends Div {
 
             if (deleteAllowed) {
                 // not user's account node!
-                if (this.node.id !== state.userProfile?.userNodeId) {
+                if (this.node.id !== ast.userProfile?.userNodeId) {
                     deleteNodeIcon = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
@@ -208,12 +208,12 @@ export class NodeCompButtonBar extends Div {
                 }
             }
 
-            if (!!state.nodesToMove && userCanPaste) {
+            if (!!ast.nodesToMove && userCanPaste) {
                 pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
 
-                    this.node.id !== state.userProfile?.userNodeId
+                    this.node.id !== ast.userProfile?.userNodeId
                         ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }
@@ -227,7 +227,7 @@ export class NodeCompButtonBar extends Div {
         let nextButton: Button;
 
         if (isPageRootNode) {
-            if (S.nav.parentVisibleToUser(state)) {
+            if (S.nav.parentVisibleToUser(ast)) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     nid: this.node.id,
                     onClick: S.nav.navUpLevelClick,
@@ -235,7 +235,7 @@ export class NodeCompButtonBar extends Div {
                 }, "btn-primary");
             }
 
-            if (!S.nav.displayingRepositoryRoot(state)) {
+            if (!S.nav.displayingRepositoryRoot(ast)) {
                 prevButton = new Button(null, S.nav.navToPrev, {
                     className: "fa fa-chevron-circle-left",
                     title: "Prev"

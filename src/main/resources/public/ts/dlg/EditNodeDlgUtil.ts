@@ -25,10 +25,7 @@ export class EditNodeDlgUtil {
 
         // This loop creates all the editor input fields for all the properties
         ast.editNode.properties?.forEach(prop => {
-            // console.log("prop=" + S.util.prettyPrint(prop));
-
             if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAppState())) {
-                // console.log("Hiding property: " + prop.name);
                 return;
             }
 
@@ -76,7 +73,6 @@ export class EditNodeDlgUtil {
 
         this.savePropsToNode(editNode, dlg);
         this.saveAttFileNamesToNode(editNode, dlg);
-        // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(editNode));
 
         /*
         Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
@@ -94,7 +90,6 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
-        // console.log("Node Being Saved: "+S.util.prettyPrint(editNode));
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode
         });
@@ -136,7 +131,6 @@ export class EditNodeDlgUtil {
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
         editNode.properties?.forEach(prop => {
-            // console.log("Save prop iterator: name=" + prop.name);
             const propState = dlg.propStates.get(prop.name);
             if (propState) {
                 // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
@@ -453,9 +447,7 @@ an upload has been added or removed.
 
         if (node.properties) {
             node.properties.forEach(prop => {
-                // console.log("prop: " + S.util.prettyPrint(prop));
                 if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAppState())) {
-                    // ("Hiding property: " + prop.name);
                     return;
                 }
 

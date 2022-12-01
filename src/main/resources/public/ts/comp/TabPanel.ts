@@ -33,9 +33,9 @@ export class TabPanel extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
-        if (!state.tabPanelVisible) {
+        if (!ast.tabPanelVisible) {
             // not sure why, but this had no effect, we're ok without it, but
             // would be nicer if we could hide the comp during preparing final scrolling.
             this.attribs.className += " comp-hidden";
@@ -47,15 +47,15 @@ export class TabPanel extends Div {
                 className: "row tab-content",
                 role: "main",
                 id: "tabPanelContentId"
-            }, this.buildTabs(state)),
-            !state.mobileMode ? new ButtonBar([
-                S.quanta.activeTab === C.TAB_MAIN && S.nav.parentVisibleToUser(state) && state.node ? new IconButton("fa-folder", "Up Level", {
-                    nid: state.node.id,
+            }, this.buildTabs(ast)),
+            !ast.mobileMode ? new ButtonBar([
+                S.quanta.activeTab === C.TAB_MAIN && S.nav.parentVisibleToUser(ast) && ast.node ? new IconButton("fa-folder", "Up Level", {
+                    nid: ast.node.id,
                     onClick: S.nav.navUpLevelClick,
                     title: "Go to Parent Node"
                 }) : null,
                 new IconButton("fa-angle-double-up", null, {
-                    onClick: () => S.view.scrollActiveToTop(state),
+                    onClick: () => S.view.scrollActiveToTop(ast),
                     title: "Scroll to Top"
                 }, null, "off")
             ], null, "scrollTopButtonLowerRight") : null

@@ -41,8 +41,6 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
     Probably need a static method on FriendType itself which can do everything based on input parameters only.
     */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        // console.log("Render Follower: " + S.util.prettyPrint(node));
-
         // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         // let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);

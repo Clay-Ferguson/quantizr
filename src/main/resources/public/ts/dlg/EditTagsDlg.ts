@@ -36,7 +36,6 @@ export class EditTagsDlg extends DialogBase {
             userId: getAppState().userProfile.userNodeId
         });
 
-        // console.log("UserProfile Response: " + S.util.prettyPrint(res));
         if (res?.userProfile) {
             this.tagsState.setValue(res.userProfile.userTags);
         }

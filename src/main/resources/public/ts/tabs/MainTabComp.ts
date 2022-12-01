@@ -22,15 +22,15 @@ export class MainTabComp extends AppTab {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.attribs.className = this.getClass(state);
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
         const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         let contentDiv: Div = null;
         if (g_urlIdFailMsg) {
             contentDiv = new Div(g_urlIdFailMsg);
         }
-        else if (!state.node) {
+        else if (!ast.node) {
             contentDiv = null;
         }
         else {
@@ -47,17 +47,17 @@ export class MainTabComp extends AppTab {
 
             contentDiv = new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
-                className: state.rendering ? "compHidden" : "compVisible"
+                className: ast.rendering ? "compHidden" : "compVisible"
             }, [
-                !state.mobileMode ? new BreadcrumbsPanel() : null,
-                state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-end" }) : null,
-                state.pageMessage ? new Clearfix() : null,
+                !ast.mobileMode ? new BreadcrumbsPanel() : null,
+                ast.pageMessage ? new Html(ast.pageMessage, { className: "alert alert-info float-end" }) : null,
+                ast.pageMessage ? new Clearfix() : null,
 
                 // if we have some parents to display...
-                state.node.parents?.length > 0 ? new NodeCompParentNodes(state, this.data) : null,
+                ast.node.parents?.length > 0 ? new NodeCompParentNodes(ast, this.data) : null,
 
-                new Div(null, { className: state.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
-                    new NodeCompMainNode(state, this.data),
+                new Div(null, { className: ast.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
+                    new NodeCompMainNode(ast, this.data),
                     new NodeCompMainList(this.data)
                 ])
             ]);

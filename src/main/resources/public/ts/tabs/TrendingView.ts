@@ -52,8 +52,8 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.attribs.className = this.getClass(state);
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
         const res = this.data ? this.data.props.res : null;
 
         if (!res) {
@@ -69,7 +69,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
             res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: TrendingView.searchWord
                 }));
@@ -81,7 +81,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle alert alert-primary" }));
             res.topMentions.forEach(word => {
                 mentionPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: TrendingView.searchWord
                 }));
@@ -93,7 +93,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle alert alert-primary" }));
             res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
-                    className: state.mobileMode ? "statsWordMobile" : "statsWord",
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     word,
                     onClick: TrendingView.searchWord
                 }));

@@ -73,12 +73,8 @@ export class SelectTagsDlg extends DialogBase {
                     break;
                 case "edit":
                     buttons = [
-                        new Button("Select", () => {
-                            this.select();
-                        }, null, "btn-primary"),
-                        new Button("Clear", () => {
-                            this.clear();
-                        })
+                        new Button("Select", () => this.select(), null, "btn-primary"),
+                        new Button("Clear", () => this.clear())
                     ];
                     break;
             }

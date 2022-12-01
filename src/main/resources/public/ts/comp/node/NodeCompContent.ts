@@ -30,7 +30,7 @@ export class NodeCompContent extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         if (!this.node) {
             this.setChildren(null);
@@ -48,9 +48,9 @@ export class NodeCompContent extends Div {
             children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
         }
 
-        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, state));
+        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, ast));
 
-        if (state.userPrefs.showProps && this.node.properties?.length > 0) {
+        if (ast.userPrefs.showProps && this.node.properties?.length > 0) {
             children.push(new PropTable(this.node));
             children.push(new Clearfix());
         }

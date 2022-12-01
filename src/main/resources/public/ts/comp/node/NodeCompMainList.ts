@@ -15,19 +15,19 @@ export class NodeCompMainList extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         const children: Comp[] = [];
-        if (state.node?.children) {
-            this.addPaginationButtons(children, state.endReached, "", state, true);
+        if (ast.node?.children) {
+            this.addPaginationButtons(children, ast.endReached, "", ast, true);
 
-            const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, state.node);
+            const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, ast.node);
 
-            const isMineOrImAdmin = state.isAdminUser || S.props.isMine(state.node, state);
+            const isMineOrImAdmin = ast.isAdminUser || S.props.isMine(ast.node, ast);
             const allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
-            children.push(S.render.renderChildren(state.node, this.tabData, 1, allowNodeMove, state));
+            children.push(S.render.renderChildren(ast.node, this.tabData, 1, allowNodeMove, ast));
 
-            this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state, false);
+            this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", ast, false);
         }
 
         // children.push(new HelpButton(state.config.help?.gettingStarted));

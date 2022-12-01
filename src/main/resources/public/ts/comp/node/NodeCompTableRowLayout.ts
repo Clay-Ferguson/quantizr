@@ -14,8 +14,8 @@ export class NodeCompTableRowLayout extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
-        const nodesToMove = state.nodesToMove;
+        const ast = useAppState();
+        const nodesToMove = ast.nodesToMove;
         let curRow = new Div(null, { className: "node-grid-row" });
         const children: Comp[] = [];
         const childCount: number = this.node.children.length;
@@ -59,14 +59,14 @@ export class NodeCompTableRowLayout extends Div {
                 const type = S.plugin.getType(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
-                if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !state.userPrefs.editMode && !S.props.hasBinary(n)) {
+                if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
                 }
                 else {
                     lastNode = n;
                     if (n.children && !inVerticalSpace) {
                         comps.push(new Div(null, { className: "vertical-space" }));
                     }
-                    const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, state);
+                    const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, ast);
                     inVerticalSpace = false;
                     comps.push(row);
                 }
@@ -75,7 +75,7 @@ export class NodeCompTableRowLayout extends Div {
                 // if we have any children on the node they will always have been loaded to be displayed so display them
                 // This is the linline children
                 if (n.children) {
-                    comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove, state));
+                    comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove, ast));
                     comps.push(new Div(null, { className: "vertical-space" }));
                     inVerticalSpace = true;
                 }
@@ -104,14 +104,14 @@ export class NodeCompTableRowLayout extends Div {
             children.push(curRow);
         }
 
-        const isMine = S.props.isMine(state.node, state);
+        const isMine = S.props.isMine(ast.node, ast);
 
         /* I'll leave this block here, for future reference, but it's dead code. If editMode is on we never do the
         table layout but show each node as if it were vertical layout instead */
-        if (isMine && this.allowHeaders && allowInsert && !state.isAnonUser && state.userPrefs.editMode) {
+        if (isMine && this.allowHeaders && allowInsert && !ast.isAnonUser && ast.userPrefs.editMode) {
             const attribs = {};
-            if (state.userPrefs.editMode) {
-                S.render.setNodeDropHandler(attribs, lastNode, false, state);
+            if (ast.userPrefs.editMode) {
+                S.render.setNodeDropHandler(attribs, lastNode, false, ast);
             }
 
             if (this.level <= 1) {
@@ -119,16 +119,16 @@ export class NodeCompTableRowLayout extends Div {
 
                 children.push(new Button(null, () => {
                     if (lastNode) {
-                        S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, state);
+                        S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, ast);
                     } else {
-                        S.edit.newSubNode(null, state.node.id);
+                        S.edit.newSubNode(null, ast.node.id);
                     }
                 }, {
                     title: "Insert new node"
                 }, "btn-secondary marginLeft marginTop", "fa-plus"));
 
-                const userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.userProfile?.userNodeId;
-                if (!!state.nodesToMove && userCanPaste) {
+                const userCanPaste = (S.props.isMine(lastNode, ast) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
+                if (!!ast.nodesToMove && userCanPaste) {
                     children.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton marginLeft"));
                 }
             }

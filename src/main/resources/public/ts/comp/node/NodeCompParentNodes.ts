@@ -17,12 +17,12 @@ export class NodeCompParentNodes extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
          from 'parents' array, but the system architecture is such that if we ever want to display
          more than one parent we can implement that easily */
-        const node = state.node?.parents?.length > 0 ? state.node?.parents[0] : null;
+        const node = ast.node?.parents?.length > 0 ? ast.node?.parents[0] : null;
 
         if (!node) {
             this.setChildren(null);
@@ -30,14 +30,14 @@ export class NodeCompParentNodes extends Div {
         }
 
         this.attribs.className = "parentNodeContentStyle";
-        const showCloseParentsIcon = state.userPrefs.showParents && state.node.parents?.length > 0;
+        const showCloseParentsIcon = ast.userPrefs.showParents && ast.node.parents?.length > 0;
 
         this.setChildren([
             // state.userPrefs.showMetaData ? new NodeCompRowHeader(node, true, true, false, false, true, false) : null,
             showCloseParentsIcon ? new Icon({
                 className: "fa fa-level-up fa-lg showParentsIcon float-end",
                 title: "Toggle: Show Parent on page",
-                onClick: () => S.edit.toggleShowParents(state)
+                onClick: () => S.edit.toggleShowParents(ast)
             }) : null,
 
             // hard-coding 'false' isLinkedNode here. Should only effect styling on openGraphPanel in boosted items,

@@ -52,19 +52,19 @@ export class NodeCompMainNode extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
-        const node = state.node;
+        const ast = useAppState();
+        const node = ast.node;
 
         if (!node) {
             this.setChildren(null);
             return;
         }
 
-        if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && node.id === state.editNode.id) {
-            this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null)]);
+        if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && node.id === ast.editNode.id) {
+            this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null)]);
         }
         else {
-            const focusNode = S.nodeUtil.getHighlightedNode(state);
+            const focusNode = S.nodeUtil.getHighlightedNode(ast);
             const selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = selected ? "active-row-main" : "inactive-row-main";
 
@@ -84,11 +84,11 @@ export class NodeCompMainNode extends Div {
 
             let allowHeader: boolean = false;
             // special case, if node is owned by admin and we're not admin, never show header
-            if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+            if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
                 // leave allowHeader false
             }
             else {
-                allowHeader = state.userPrefs.showMetaData && (type == null || type?.getAllowRowHeader())
+                allowHeader = ast.userPrefs.showMetaData && (type == null || type?.getAllowRowHeader())
             }
 
             if (allowHeader) {
@@ -110,12 +110,12 @@ export class NodeCompMainNode extends Div {
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 const type = S.plugin.getType(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, state);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, ast);
             }
 
             this.setChildren([
                 header,
-                !state.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
+                !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
                 new Clearfix(),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),

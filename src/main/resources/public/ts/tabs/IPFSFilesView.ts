@@ -40,9 +40,8 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.attribs.className = this.getClass(state);
-
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
         const children = [];
 
         if (this.data.props.loading) {
@@ -135,8 +134,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 className: "files-table"
             });
 
-            // console.log("ListCids: " + this.data.props.listCids);
-
             // render folders only
             this.renderItems(propTable, mfsFiles, mfsFolder, mfsMode, true);
 
@@ -177,7 +174,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 sizeStr = "";
             }
 
-            // console.log("entry: " + S.util.prettyPrint(entry));
             const propTableRow = new FilesTableRow({
                 className: "files-table-row"
             }, [
@@ -255,7 +251,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     openFile = async (item: string, shortName: string, hash: string) => {
-        // console.log(S.util.prettyPrint(item));
         const res = await S.rpcUtil.rpc<J.GetIPFSContentRequest, J.GetIPFSContentResponse>("getIPFSContent", {
             id: item
         });
@@ -294,8 +289,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // });
 
         setTimeout(async () => {
-            console.log("Loading: " + folder);
-
             // ensure this is never empty string. Server needs to get null instead of empty string.
             if (!folder) folder = null;
 

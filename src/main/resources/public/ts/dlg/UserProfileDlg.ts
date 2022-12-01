@@ -74,7 +74,6 @@ export class UserProfileDlg extends DialogBase {
                         const link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
                         S.util.copyToClipboard(link);
                         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                        // window.open(link, "_blank");
                     }
                 }));
             }
@@ -165,7 +164,6 @@ export class UserProfileDlg extends DialogBase {
                     }, this.bioState, null, false, this.textScrollPos),
 
                 web3Div,
-
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.user.userLogout }),
 
                 new ButtonBar([
@@ -410,8 +408,6 @@ export class UserProfileDlg extends DialogBase {
 
         const onClick = () => {
             if (this.readOnly) return;
-
-            // h = Heading
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, false, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {

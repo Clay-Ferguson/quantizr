@@ -75,10 +75,10 @@ export class SignupDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        this.signupNow(null);
+        this.signupNow();
     }
 
-    signupNow = async (reCaptchaToken: string) => {
+    signupNow = async () => {
         const res = await S.rpcUtil.rpc<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userNameState.getValue(),
             password: this.passwordState.getValue(),

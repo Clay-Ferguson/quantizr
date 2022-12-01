@@ -58,7 +58,7 @@ export class NodeCompRow extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         if (this.allowHeaders) {
             this.attribs.nid = this.node.id;
@@ -66,21 +66,21 @@ export class NodeCompRow extends Div {
         }
 
         let insertInlineButton = null;
-        const isPageRootNode = state.node && this.node.id === state.node.id;
+        const isPageRootNode = ast.node && this.node.id === ast.node.id;
 
-        if (this.allowHeaders && state.userPrefs.editMode) {
+        if (this.allowHeaders && ast.userPrefs.editMode) {
             let insertAllowed = true;
 
             /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
             can insert or not */
             if (this.level === 1) {
-                const parentType = S.plugin.getType(state.node.type);
+                const parentType = S.plugin.getType(ast.node.type);
                 if (parentType) {
-                    insertAllowed = state.isAdminUser || parentType.allowAction(NodeActionType.insert, state.node, state);
+                    insertAllowed = ast.isAdminUser || parentType.allowAction(NodeActionType.insert, ast.node, ast);
                 }
             }
 
-            const isMine = S.props.isMine(state.node, state);
+            const isMine = S.props.isMine(ast.node, ast);
 
             if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed) {
 
@@ -88,7 +88,7 @@ export class NodeCompRow extends Div {
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     insertButton = new Button(null, () => {
-                        S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, state);
+                        S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                     }, {
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
@@ -99,7 +99,7 @@ export class NodeCompRow extends Div {
                         // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
                         if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
-                            S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, state);
+                            S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                             return;
                         }
                     }
@@ -108,11 +108,11 @@ export class NodeCompRow extends Div {
         }
 
         let buttonBar = null;
-        if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
+        if (this.allowHeaders && NodeCompRow.showButtonBar && !ast.inlineEditId) {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : (state.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
+        let layoutClass = this.isTableCell ? "node-grid-item" : (ast.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
         layoutClass += " " + this.tabData.id
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
@@ -125,15 +125,15 @@ export class NodeCompRow extends Div {
         // }
         else {
             if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
-                layoutClass += state.userPrefs.editMode || state.userPrefs.showMetaData ? " row-border-edit" : " row-border-inline-children";
+                layoutClass += ast.userPrefs.editMode || ast.userPrefs.showMetaData ? " row-border-edit" : " row-border-inline-children";
             }
             else {
-                layoutClass += state.userPrefs.editMode || state.userPrefs.showMetaData ? " row-border-edit" : " row-border";
+                layoutClass += ast.userPrefs.editMode || ast.userPrefs.showMetaData ? " row-border-edit" : " row-border";
             }
         }
 
         const indentLevel = this.isTableCell ? 0 : this.level;
-        const focusNode = S.nodeUtil.getHighlightedNode(state);
+        const focusNode = S.nodeUtil.getHighlightedNode(ast);
         const selected: boolean = (focusNode && focusNode.id === this.node.id);
 
         if (this.isLinkedNode) {
@@ -157,11 +157,11 @@ export class NodeCompRow extends Div {
 
         let allowHeader: boolean = false;
         // special case, if node is owned by admin and we're not admin, never show header
-        if (!C.ALLOW_ADMIN_NODE_HEADERS && this.node.owner === J.PrincipalName.ADMIN && state.userName !== J.PrincipalName.ADMIN) {
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && this.node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
             // leave allowHeader false.
         }
         else {
-            allowHeader = this.allowHeaders && state.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
+            allowHeader = this.allowHeaders && ast.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
         }
 
         if (allowHeader) {
@@ -182,14 +182,14 @@ export class NodeCompRow extends Div {
         }
 
         // if editMode is on, an this isn't the page root node
-        if (state.userPrefs.editMode && this.node.id !== state.node.id) {
-            S.render.setNodeDropHandler(this.attribs, this.node, true, state);
+        if (ast.userPrefs.editMode && this.node.id !== ast.node.id) {
+            S.render.setNodeDropHandler(this.attribs, this.node, true, ast);
         }
 
         // This icon for editing a node shows up if user has edit mode and info mode both off, and they own the node. This just makes
         // it easier to do a quick edit of a node without the need to turn edit mode on which clutters up the screen.
         let quickEditIcon: Icon = null;
-        if (!this.isTableCell && !state.userPrefs.editMode && S.props.isMine(this.node, state)) {
+        if (!this.isTableCell && !ast.userPrefs.editMode && S.props.isMine(this.node, ast)) {
             quickEditIcon = new Icon({
                 className: "fa fa-edit float-end quickEditIcon",
                 title: "Edit this Node",

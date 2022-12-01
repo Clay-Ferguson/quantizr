@@ -14,9 +14,9 @@ export class FullScreenImgViewer extends Main {
     }
 
     preRender(): void {
-        const state = useAppState();
-        const nodeId = state.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNode(state, nodeId);
+        const ast = useAppState();
+        const nodeId = ast.fullScreenConfig.nodeId;
+        const node = S.nodeUtil.findNode(ast, nodeId);
         if (!node) {
             console.error("Can't find nodeId " + nodeId);
         }
@@ -27,7 +27,7 @@ export class FullScreenImgViewer extends Main {
         const list: J.Attachment[] = S.props.getOrderedAttachments(node);
         let attName = null;
         list.forEach(att => {
-            if (att.o === state.fullScreenConfig.ordinal) {
+            if (att.o === ast.fullScreenConfig.ordinal) {
                 attName = (att as any).key;
             }
         });

@@ -32,26 +32,26 @@ export class App extends Main {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
-        if (state.mobileMode && state.dialogStack.length > 0) {
+        if (ast.mobileMode && ast.dialogStack.length > 0) {
             // eventually ONLY mobile will do this 'top-only' display, and desktop mode will have all dialog
             // divs simultaneously onscreen in background of top one.
-            const dialog = state.dialogStack[state.dialogStack.length - 1];
+            const dialog = ast.dialogStack[ast.dialogStack.length - 1];
             if (dialog && dialog.mode !== DialogMode.POPUP) {
                 this.setChildren([dialog]);
                 return;
             }
         }
 
-        const fullScreenViewer = this.getFullScreenViewer(state);
-        const mobileTopBar = this.getTopMobileBar(state);
-        this.attribs.className = "container-fluid " + (state.mobileMode ? "mainContainerMobile" : "mainContainer");
+        const fullScreenViewer = this.getFullScreenViewer(ast);
+        const mobileTopBar = this.getTopMobileBar(ast);
+        this.attribs.className = "container-fluid " + (ast.mobileMode ? "mainContainerMobile" : "mainContainer");
 
         if (fullScreenViewer) {
             this.setChildren([
-                state.fullScreenConfig.type !== FullScreenType.CALENDAR ? new FullScreenControlBar() : null,
+                ast.fullScreenConfig.type !== FullScreenType.CALENDAR ? new FullScreenControlBar() : null,
                 new Clearfix(),
                 fullScreenViewer
             ]);
@@ -67,9 +67,9 @@ export class App extends Main {
                     className: "row mainAppRow",
                     id: "appMainContainer"
                 }, [
-                    state.mobileMode ? null : new LeftNavPanel(),
+                    ast.mobileMode ? null : new LeftNavPanel(),
                     new TabPanel(mobileTopBar),
-                    state.mobileMode ? null : new RightNavPanel()
+                    ast.mobileMode ? null : new RightNavPanel()
                 ]),
 
                 // I don't like this clutter. Leaving as an example for now.
@@ -80,15 +80,15 @@ export class App extends Main {
                 //     title: "Scroll to Top"
                 // }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
-                state.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
-                    onClick: () => S.view.scrollActiveToTop(state),
+                ast.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
+                    onClick: () => S.view.scrollActiveToTop(ast),
                     title: "Scroll to Top"
                 }, "btn-secondary scrollTopButtonLowerRight", "off")
             ]);
         }
 
-        if (state.dialogStack?.length > 0) {
-            this.addChildren(state.dialogStack);
+        if (ast.dialogStack?.length > 0) {
+            this.addChildren(ast.dialogStack);
         }
     }
 

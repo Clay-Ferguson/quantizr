@@ -31,8 +31,8 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.attribs.className = this.getClass(state);
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -44,8 +44,8 @@ export class FeedView extends AppTab<FeedViewProps> {
         let showBookmarkIcon: boolean = false;
 
         // set showBookmarkIcon visible if we don't already have it bookmarked
-        if (this.data.props.feedFilterRootNode && state.bookmarks) {
-            showBookmarkIcon = !state.bookmarks.find((bookmark: J.Bookmark): boolean => {
+        if (this.data.props.feedFilterRootNode && ast.bookmarks) {
+            showBookmarkIcon = !ast.bookmarks.find((bookmark: J.Bookmark): boolean => {
                 return bookmark.id === this.data.props.feedFilterRootNode.id;
             });
         }
@@ -62,11 +62,11 @@ export class FeedView extends AppTab<FeedViewProps> {
         by editing one of their friends nodes, then we show a dropdown letting the user quickly choose which
         tag/category of friends they want to see the feed of */
         let friendsTagDropDown: Selection = null;
-        if (state.friendHashTags && state.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
+        if (ast.friendHashTags && ast.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
             const items: any[] = [
                 { key: "", val: "All Tags" }
             ];
-            for (const tag of state.friendHashTags) {
+            for (const tag of ast.friendHashTags) {
                 items.push({ key: tag, val: tag });
             }
 
@@ -85,7 +85,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             new Div(null, { className: "marginTop" }, [
 
                 new Div(null, { className: "headingBar" }, [
-                    this.renderHeading(state),
+                    this.renderHeading(ast),
                     this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                         onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                         title: "Back to Tree View"
@@ -94,16 +94,16 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 new Div(null, null, [
                     newItems,
-                    state.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
+                    ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                         val: this.data.props.searchTextState,
                         placeholder: "Search for...",
                         enter: S.srch.refreshFeed,
                         outterClass: "marginBottom feedSearchField"
                     }) : null,
                     // we show this button just as an icon unless the search field is displaying
-                    new IconButton("fa-search", state.displayFeedSearch ? "Search" : null, {
+                    new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
                         onClick: () => {
-                            if (state.displayFeedSearch) {
+                            if (ast.displayFeedSearch) {
                                 S.srch.refreshFeed()
                             }
                             else {
@@ -116,9 +116,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                         title: "Search Feed"
                     }),
                     new IconButton("fa-refresh", null, {
-                        onClick: () => {
-                            S.srch.refreshFeed();
-                        },
+                        onClick: () => S.srch.refreshFeed(),
                         title: "Refresh Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
@@ -126,7 +124,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {
                         title: "Bookmark this Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
+                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, ast)
                     }) : null,
                     new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
                         setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
@@ -137,7 +135,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     // new HelpButton(() => state.config.help?.fediverse?.feed),
 
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
-                    state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, null, true, state), {
+                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, null, true, ast), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "attentionButton float-end")
                 ]),
@@ -171,13 +169,13 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         // if we're editing an existing item determine that before starting to render rows.
         let editingExistingItem = false;
-        if (state.editNode && state.editNodeOnTab === C.TAB_FEED) {
-            editingExistingItem = this.data.props.feedResults.findIndex(n => n.id === state.editNode.id) !== -1;
+        if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED) {
+            editingExistingItem = this.data.props.feedResults.findIndex(n => n.id === ast.editNode.id) !== -1;
         }
 
         // if editing a new post (not a reply)
-        if (!editingExistingItem && state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
+        if (!editingExistingItem && ast.editNode && ast.editNodeOnTab === C.TAB_FEED && !ast.editNodeReplyToId) {
+            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
@@ -189,7 +187,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
         else if (this.data.props.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
-            if (state.activeTab === C.TAB_FEED) {
+            if (ast.activeTab === C.TAB_FEED) {
                 setTimeout(() => {
                     S.srch.refreshFeed();
                 }, 100);
@@ -222,26 +220,26 @@ export class FeedView extends AppTab<FeedViewProps> {
                 }
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
-                if (editingExistingItem && node.id === state.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
+                if (editingExistingItem && node.id === ast.editNode.id) {
+                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
                 }
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
                     // console.log("FEED: node id=" + node.id + " content: " + node.content);
                     children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount,
-                        false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, state));
+                        false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, ast));
                     i++;
                     rowCount++;
 
                     // editing a reply inline.
-                    if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
+                    if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED && ast.editNodeReplyToId === node.id) {
+                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
                     }
                 }
             });
 
             // only show "More" button if we aren't currently editing. Wouldn't make sense to navigate while editing.
-            if (!state.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
+            if (!ast.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
                 const moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event: Event) => {
                         event.stopPropagation();

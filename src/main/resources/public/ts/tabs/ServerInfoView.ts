@@ -15,17 +15,18 @@ export class ServerInfoView extends AppTab {
     }
 
     preRender(): void {
-        const state = useAppState();
-        this.attribs.className = this.getClass(state);
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
+
         this.setChildren([
             new Div(null, { className: "marginTop" }, [
 
-                state.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
-                    S.view.runServerCommand("getServerInfo", null, "Info View", null, state);
+                ast.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
+                    S.view.runServerCommand("getServerInfo", null, "Info View", null, ast);
                 }, { className: "float-end" }) : null,
 
-                new Heading(3, state.serverInfoTitle),
-                new Pre(state.serverInfoText, { className: "serverInfoText" })
+                new Heading(3, ast.serverInfoTitle),
+                new Pre(ast.serverInfoText, { className: "serverInfoText" })
             ])
         ]);
     }

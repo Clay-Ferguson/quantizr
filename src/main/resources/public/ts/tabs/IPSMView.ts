@@ -14,14 +14,13 @@ export class IPSMView extends AppTab {
     }
 
     preRender(): void {
-        const state = useAppState();
-
-        this.attribs.className = this.getClass(state);
+        const ast = useAppState();
+        this.attribs.className = this.getClass(ast);
         const children: Comp[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
-                this.renderHeading(state)
+                this.renderHeading(ast)
             ]),
             new Div("Realtime IPFS PubSub events from ipsm-heartbeat topic..."),
             new HelpButton(() => {

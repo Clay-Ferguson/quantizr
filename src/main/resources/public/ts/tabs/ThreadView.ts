@@ -18,9 +18,9 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
         const results = this.data?.props?.results;
-        this.attribs.className = this.getClass(state);
+        this.attribs.className = this.getClass(ast);
         if (!results) return;
 
         /*
@@ -43,10 +43,10 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
             this.data.props.description ? new Div(this.data.props.description) : null
         ]));
 
-        const jumpButton = state.isAdminUser || !this.data.props.searchType;
+        const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
-            const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem", state);
+            const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem", ast);
             if (c) {
                 children.push(c);
             }
@@ -54,7 +54,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
             if (node.children) {
                 const subComps: CompIntf[] = [];
                 node.children.forEach(child => {
-                    const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", state);
+                    const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", ast);
                     if (c) {
                         subComps.push(c);
                     }

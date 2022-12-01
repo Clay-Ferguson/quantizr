@@ -25,15 +25,15 @@ export class NodeCompRowHeader extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
         const children = [];
         let avatarImg: Img = null;
 
-        const isMine = S.props.isMine(this.node, state);
-        const showInfo = state.userPrefs.showMetaData || this.isFeed;
+        const isMine = S.props.isMine(this.node, ast);
+        const showInfo = ast.userPrefs.showMetaData || this.isFeed;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
-            avatarImg = S.render.makeAvatarImage(this.node, state);
+            avatarImg = S.render.makeAvatarImage(this.node, ast);
             if (avatarImg) {
                 children.push(avatarImg);
             }
@@ -65,7 +65,7 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        const verboseChildren: Comp[] = state.mobileMode ? [] : children;
+        const verboseChildren: Comp[] = ast.mobileMode ? [] : children;
 
         const type = S.plugin.getType(this.node.type);
         if (type) {
@@ -96,7 +96,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
-        if (state.isAdminUser) {
+        if (ast.isAdminUser) {
             verboseChildren.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
         }
 
@@ -104,16 +104,16 @@ export class NodeCompRowHeader extends Div {
             verboseChildren.push(new Icon({
                 className: "fa fa-link fa-lg marginRight",
                 title: "Show URLs for this node",
-                onClick: () => S.render.showNodeUrl(this.node, state)
+                onClick: () => S.render.showNodeUrl(this.node, ast)
             }));
         }
 
         // Allow bookmarking any kind of node other than bookmark nodes.
-        if (showInfo && !state.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
+        if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
             verboseChildren.push(new Icon({
                 className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
-                onClick: () => S.edit.addBookmark(this.node, state)
+                onClick: () => S.edit.addBookmark(this.node, ast)
             }));
         }
 
@@ -130,32 +130,32 @@ export class NodeCompRowHeader extends Div {
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         // Also we don't allow admin user to do any replies
-        if (!state.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
+        if (!ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             verboseChildren.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
                 onClick: () => {
-                    if (state.isAnonUser) {
+                    if (ast.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, null, true, state);
+                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, null, true, ast);
                     }
                 }
             }));
         }
 
         if (showInfo) {
-            if (!state.isAdminUser) {
+            if (!ast.isAdminUser) {
                 verboseChildren.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg marginRight",
                     onClick: () => {
-                        if (state.isAnonUser) {
+                        if (ast.isAnonUser) {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, state)
+                            S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, ast)
                         }
                     }
                 }));
@@ -166,7 +166,7 @@ export class NodeCompRowHeader extends Div {
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
              and we need to have a user identity for all the HTTP sigs for that. */
-            if (!state.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
+            if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 verboseChildren.push(new Icon({
                     title: "People associated with this Node",
                     className: "fa fa-users fa-lg marginRight",
@@ -177,7 +177,7 @@ export class NodeCompRowHeader extends Div {
             let youLiked: boolean = false;
             let likeDisplay: string = null;
             if (this.node.likes) {
-                youLiked = !!this.node.likes.find(u => u === state.userName);
+                youLiked = !!this.node.likes.find(u => u === ast.userName);
                 likeDisplay = "Liked by " + this.node.likes.length;
                 if (youLiked) {
                     likeDisplay += " (including You)";
@@ -188,16 +188,16 @@ export class NodeCompRowHeader extends Div {
                 title: likeDisplay ? likeDisplay : "Like this Node",
                 className: "fa fa-thumbs-up fa-lg marginRight " + (youLiked ? "likedByMeIcon" : ""),
                 onClick: () => {
-                    if (state.isAdminUser) {
+                    if (ast.isAdminUser) {
                         S.util.showMessage("Admin user can't do Likes.", "Admin");
                         return;
                     }
 
-                    if (state.isAnonUser) {
+                    if (ast.isAnonUser) {
                         S.util.showMessage("Login to like and create content.", "Login!");
                     }
                     else {
-                        S.edit.likeNode(this.node, !youLiked, state);
+                        S.edit.likeNode(this.node, !youLiked, ast);
                     }
                 }
             }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
@@ -249,7 +249,7 @@ export class NodeCompRowHeader extends Div {
             }
             // Show all the share names
             else if (S.props.isShared(this.node)) {
-                const shareComps = S.nodeUtil.getSharingNames(state, this.node, null);
+                const shareComps = S.nodeUtil.getSharingNames(ast, this.node, null);
                 floatUpperRightDiv.addChildren([
                     new Span(null, {
                         className: "rowHeaderSharingNames"
@@ -264,20 +264,20 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        let editingAllowed = S.edit.isEditAllowed(this.node, state);
+        let editingAllowed = S.edit.isEditAllowed(this.node, ast);
         let deleteAllowed = false;
         let editableNode = true;
 
-        if (state.isAdminUser) {
+        if (ast.isAdminUser) {
             editingAllowed = true;
             editableNode = true;
             deleteAllowed = true;
         }
         else if (type) {
             if (editingAllowed) {
-                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, state);
-                editableNode = type.allowAction(NodeActionType.editNode, this.node, state);
-                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, state);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, ast);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node, ast);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, ast);
             }
         }
 
@@ -290,7 +290,7 @@ export class NodeCompRowHeader extends Div {
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isBoost && !this.isMainTree && state.userPrefs.editMode) {
+        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
             if (editingAllowed && editableNode) {
                 editButton = new IconButton("fa-edit", null, {
                     className: "marginLeft",
@@ -300,7 +300,7 @@ export class NodeCompRowHeader extends Div {
                 });
             }
 
-            if (deleteAllowed && this.node.id !== state.userProfile?.userNodeId) {
+            if (deleteAllowed && this.node.id !== ast.userProfile?.userNodeId) {
                 floatUpperRightDiv.addChild(new Icon({
                     className: "fa fa-trash fa-lg buttonBarIcon",
                     title: "Delete node(s)",
@@ -334,7 +334,7 @@ export class NodeCompRowHeader extends Div {
         if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
-                onClick: () => S.srch.clickSearchNode(this.node.id, state),
+                onClick: () => S.srch.clickSearchNode(this.node.id, ast),
                 title: "Jump to Tree"
             });
         }
@@ -348,17 +348,17 @@ export class NodeCompRowHeader extends Div {
             verboseChildren.push(new Clearfix());
         }
 
-        if (state.mobileMode) {
+        if (ast.mobileMode) {
             this.setChildren([
                 ...children || [],
                 new CollapsiblePanel("n/a", "n/a", null, verboseChildren, false, (s: boolean) => {
                     if (s) {
-                        state.expandedHeaderIds.add(this.node.id);
+                        ast.expandedHeaderIds.add(this.node.id);
                     }
                     else {
-                        state.expandedHeaderIds.delete(this.node.id);
+                        ast.expandedHeaderIds.delete(this.node.id);
                     }
-                }, state.expandedHeaderIds.has(this.node.id), "headerInfoButton", "headerInfoDivExpanded", "headerInfoDivCollapsed float-end")
+                }, ast.expandedHeaderIds.has(this.node.id), "headerInfoButton", "headerInfoDivExpanded", "headerInfoDivCollapsed float-end")
             ]);
         }
         else {

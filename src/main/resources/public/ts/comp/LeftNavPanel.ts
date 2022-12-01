@@ -47,11 +47,11 @@ export class LeftNavPanel extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
-        const s = state.newMessageCount > 1 ? "s" : "";
-        let messages = state.newMessageCount > 0
-            ? (state.newMessageCount + " message" + s) : "";
+        const s = ast.newMessageCount > 1 ? "s" : "";
+        let messages = ast.newMessageCount > 0
+            ? (ast.newMessageCount + " message" + s) : "";
 
         // todo-2: this is a hack to keep the new incomming "chat" messages (Node Feed) from tricking
         // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
@@ -82,8 +82,8 @@ export class LeftNavPanel extends Div {
                     title: "Show new messages"
                 }) : null
             ]),
-            new MenuPanel(state),
-            state.isAnonUser ? new TabPanelButtons(true, state.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
+            new MenuPanel(ast),
+            ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
         ]);
     }
 

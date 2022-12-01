@@ -138,9 +138,8 @@ export class SearchContentDlg extends DialogBase {
     }
 
     addTagsToSearchField = (dlg: SelectTagsDlg) => {
-        let val = ""; // this.searchTextState.getValue();
+        let val = "";
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
-            // if (val.indexOf(tag) !== -1) return;
             if (val) val += " ";
             if (dlg.matchAny) {
                 val += tag;
@@ -161,7 +160,6 @@ export class SearchContentDlg extends DialogBase {
         }
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
-
         this.close();
         S.render.showGraph(null, SearchContentDlg.defaultSearchText, getAppState());
     }

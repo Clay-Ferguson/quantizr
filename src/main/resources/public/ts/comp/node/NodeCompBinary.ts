@@ -118,7 +118,7 @@ export class NodeCompBinary extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
         const node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);
@@ -127,7 +127,7 @@ export class NodeCompBinary extends Div {
 
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node, this.attName)) {
-            this.setChildren([this.makeImageComp(node, state)]);
+            this.setChildren([this.makeImageComp(node, ast)]);
         }
         else if (S.props.hasVideo(node, this.attName)) {
             this.setChildren([new HorizontalLayout([

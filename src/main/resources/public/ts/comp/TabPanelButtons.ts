@@ -18,7 +18,7 @@ export class TabPanelButtons extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         this.setChildren([
             new Div(null, {
@@ -27,7 +27,7 @@ export class TabPanelButtons extends Div {
                 new Ul(null, {
                     className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
                     id: "navTabs"
-                }, this.buildTabButtons(state))]
+                }, this.buildTabButtons(ast))]
             )
         ]);
     }

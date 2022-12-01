@@ -19,7 +19,7 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
 
         if (S.quanta.nodeHistory.length === 0) {
             this.setChildren(null);
@@ -42,7 +42,7 @@ export class HistoryPanel extends Div {
             if (type) {
                 const iconClass = type.getIconClass();
                 if (iconClass) {
-                    const dragProps = state.userPrefs.editMode ? {
+                    const dragProps = ast.userPrefs.editMode ? {
                         onMouseOver: () => { S.quanta.draggableId = h.id; },
                         onMouseOut: () => { S.quanta.draggableId = null; }
                     } : {};
@@ -55,7 +55,7 @@ export class HistoryPanel extends Div {
                 }
             }
 
-            const dragProps = state.userPrefs.editMode ? {
+            const dragProps = ast.userPrefs.editMode ? {
                 draggable: "true",
                 onDragStart: (evt: any) => this.dragStart(evt, h.id),
                 onDragEnd: this.dragEnd
@@ -92,7 +92,7 @@ export class HistoryPanel extends Div {
                         if (type) {
                             const iconClass = type.getIconClass();
                             if (iconClass) {
-                                const dragProps = state.userPrefs.editMode ? {
+                                const dragProps = ast.userPrefs.editMode ? {
                                     onMouseOver: () => { S.quanta.draggableId = h.id; },
                                     onMouseOut: () => { S.quanta.draggableId = null; }
                                 } : {};
@@ -105,7 +105,7 @@ export class HistoryPanel extends Div {
                             }
                         }
 
-                        const dragProps = state.userPrefs.editMode ? {
+                        const dragProps = ast.userPrefs.editMode ? {
                             draggable: "true",
                             onDragStart: (evt: any) => this.dragStart(evt, h.id),
                             onDragEnd: this.dragEnd

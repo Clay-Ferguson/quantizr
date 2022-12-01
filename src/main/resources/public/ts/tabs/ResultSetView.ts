@@ -33,9 +33,9 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     preRender(): void {
-        const state = useAppState();
+        const ast = useAppState();
         const results = this.data && this.data.props.results;
-        this.attribs.className = this.getClass(state);
+        this.attribs.className = this.getClass(ast);
         if (!results) return;
 
         /*
@@ -55,7 +55,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         children.push(new Div(null, null, [
             new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
-                this.renderHeading(state),
+                this.renderHeading(ast),
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
@@ -68,17 +68,17 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
-        this.addPaginationBar(state, children, false, this.allowTopMoreButton, true);
+        this.addPaginationBar(ast, children, false, this.allowTopMoreButton, true);
 
         let i = 0;
-        const jumpButton = state.isAdminUser || !this.data.props.searchType;
+        const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
-            if (state.editNode && state.editNode.id === node.id && state.editNodeOnTab === this.data.id) {
-                children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editEncrypt, state.editShowJumpButton, DialogMode.EMBED, null));
+            if (ast.editNode && ast.editNode.id === node.id && ast.editNodeOnTab === this.data.id) {
+                children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
             }
             else {
-                const c = this.renderItem(node, i, rowCount, jumpButton, state);
+                const c = this.renderItem(node, i, rowCount, jumpButton, ast);
                 if (c) {
                     children.push(c);
                 }
@@ -87,7 +87,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             rowCount++;
         });
 
-        this.addPaginationBar(state, children, true, true, false);
+        this.addPaginationBar(ast, children, true, true, false);
         this.setChildren(children);
     }
 
