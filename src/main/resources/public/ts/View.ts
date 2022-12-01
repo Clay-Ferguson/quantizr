@@ -29,7 +29,7 @@ export class View {
             allowScroll: true,
             setTab: true,
             forceRenderParent,
-            state: ast
+            ast: ast
         });
     }
 
@@ -37,18 +37,18 @@ export class View {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = async (a: RefreshTreeArgs) => {
-        if (!a.nodeId && a.state.node) {
-            a.nodeId = a.state.node.id;
+        if (!a.nodeId && a.ast.node) {
+            a.nodeId = a.ast.node.id;
         }
 
         if (!a.highlightId) {
-            const currentSelNode = S.nodeUtil.getHighlightedNode(a.state);
+            const currentSelNode = S.nodeUtil.getHighlightedNode(a.ast);
             a.highlightId = currentSelNode ? currentSelNode.id : a.nodeId;
         }
 
         let offset = 0;
         if (!a.zeroOffset) {
-            const firstChild = S.edit.getFirstChildNode(a.state);
+            const firstChild = S.edit.getFirstChildNode(a.ast);
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
@@ -70,7 +70,7 @@ export class View {
                 goToLastPage: false,
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: a.state.userPrefs.showParents ? 1 : 0
+                parentCount: a.ast.userPrefs.showParents ? 1 : 0
             });
 
             if (!res || !res.success) {
@@ -88,31 +88,31 @@ export class View {
         }
     }
 
-    firstPage = (state: AppState) => {
-        this.loadPage(false, 0, false, state);
+    firstPage = (ast: AppState) => {
+        this.loadPage(false, 0, false, ast);
     }
 
-    prevPage = (state: AppState) => {
-        const firstChildNode = S.edit.getFirstChildNode(state);
+    prevPage = (ast: AppState) => {
+        const firstChildNode = S.edit.getFirstChildNode(ast);
         if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
             let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
                 targetOffset = 0;
             }
 
-            this.loadPage(false, targetOffset, false, state);
+            this.loadPage(false, targetOffset, false, ast);
         }
     }
 
-    nextPage = (state: AppState) => {
-        const lastChildNode = S.edit.getLastChildNode(state);
+    nextPage = (ast: AppState) => {
+        const lastChildNode = S.edit.getLastChildNode(ast);
         if (lastChildNode) {
             const targetOffset = lastChildNode.logicalOrdinal + 1;
-            this.loadPage(false, targetOffset, false, state);
+            this.loadPage(false, targetOffset, false, ast);
         }
     }
 
-    lastPage = (state: AppState) => {
+    lastPage = (ast: AppState) => {
         // console.log("Running lastPage Query");
         // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
@@ -120,19 +120,19 @@ export class View {
 
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
-    growPage = (state: AppState) => {
-        const lastChildNode = S.edit.getLastChildNode(state);
+    growPage = (ast: AppState) => {
+        const lastChildNode = S.edit.getLastChildNode(ast);
         if (lastChildNode) {
             const targetOffset = lastChildNode.logicalOrdinal + 1;
-            this.loadPage(false, targetOffset, true, state);
+            this.loadPage(false, targetOffset, true, ast);
         }
     }
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
-    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState) => {
+    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, ast: AppState) => {
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: state.node.id,
+                nodeId: ast.node.id,
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: true,
@@ -141,7 +141,7 @@ export class View {
                 goToLastPage,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
             if (!res.node) return;
@@ -150,15 +150,15 @@ export class View {
             if (growingPage) {
                 /* if the response has some children, and we already have local children we can add to, and we haven't reached
                 max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
-                if (res?.node?.children && state?.node?.children) {
+                if (res?.node?.children && ast?.node?.children) {
                     // create a set for duplicate detection
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    state.node.children.forEach(child => idSet.add(child.id));
+                    ast.node.children.forEach(child => idSet.add(child.id));
 
                     // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
-                    res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
+                    res.node.children = ast.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
                 }
                 S.render.renderPage(res, false, null, false, false);
             }
@@ -176,7 +176,7 @@ export class View {
     }
 
     // NOTE: Method not still being used. Let's keep it for future reference
-    // scrollRelativeToNode = (dir: string, state: AppState) => {
+    // scrollRelativeToNode = (dir: string, ast: AppState) => {
     //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
     //     if (!currentSelNode) return;
 
@@ -229,17 +229,17 @@ export class View {
     //     }
     // }
 
-    scrollActiveToTop = (state: AppState) => {
+    scrollActiveToTop = (ast: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
-        const activeTabComp = S.tabUtil.getActiveTabComp(state);
+        const activeTabComp = S.tabUtil.getActiveTabComp(ast);
         if (activeTabComp?.getRef()) {
             activeTabComp.setScrollTop(0);
         }
     }
 
-    scrollToNode = (state: AppState, node: J.NodeInfo = null, delay: number = 100) => {
+    scrollToNode = (ast: AppState, node: J.NodeInfo = null, delay: number = 100) => {
         if (!Comp.allowScrollSets) return;
 
         const func = () => {
@@ -247,7 +247,7 @@ export class View {
                 /* Check to see if we are rendering the top node (page root), and if so
                 it is better looking to just scroll to zero index, because that will always
                 be what user wants to see */
-                node = node || S.nodeUtil.getHighlightedNode(state);
+                node = node || S.nodeUtil.getHighlightedNode(ast);
 
                 /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
                  a case where the user is editing a node and we KNOW we don't need to scroll after editing,
@@ -256,8 +256,8 @@ export class View {
                     return;
                 }
 
-                if (state.node.id === node.id) {
-                    this.scrollActiveToTop(state);
+                if (ast.node.id === node.id) {
+                    this.scrollActiveToTop(ast);
                     return;
                 }
 
@@ -277,9 +277,9 @@ export class View {
         });
     }
 
-    getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
-        const node = S.nodeUtil.getHighlightedNode(state);
-        const isMine = !!node && (node.owner === state.userName || state.userName === "admin");
+    getNodeStats = async (ast: AppState, trending: boolean, feed: boolean): Promise<any> => {
+        const node = S.nodeUtil.getHighlightedNode(ast);
+        const isMine = !!node && (node.owner === ast.userName || ast.userName === "admin");
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -293,19 +293,19 @@ export class View {
         new NodeStatsDlg(res, trending, feed).open();
     }
 
-    signSubGraph = async (state: AppState): Promise<any> => {
+    signSubGraph = async (ast: AppState): Promise<any> => {
         if (!S.crypto.warnIfEncKeyUnknown()) {
             return null;
         }
-        const node = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(ast);
         await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
             nodeId: node ? node.id : null
         });
         S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
     }
 
-    getNodeSignatureVerify = async (state: AppState): Promise<any> => {
-        const node = S.nodeUtil.getHighlightedNode(state);
+    getNodeSignatureVerify = async (ast: AppState): Promise<any> => {
+        const node = S.nodeUtil.getHighlightedNode(ast);
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending: false,
@@ -318,8 +318,8 @@ export class View {
         new NodeStatsDlg(res, false, false).open();
     }
 
-    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
-        const node = S.nodeUtil.getHighlightedNode(state);
+    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, ast: AppState) => {
+        const node = S.nodeUtil.getHighlightedNode(ast);
 
         const res = await S.rpcUtil.rpc<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,
@@ -365,5 +365,5 @@ interface RefreshTreeArgs {
     allowScroll: boolean;
     setTab: boolean;
     forceRenderParent: boolean;
-    state: AppState
+    ast: AppState
 }

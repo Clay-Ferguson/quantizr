@@ -114,7 +114,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo, state: AppState) => {
+    forceFeedItem = (nodeInfo: J.NodeInfo, ast: AppState) => {
         if (!nodeInfo) return;
         FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
 
@@ -139,7 +139,7 @@ export class ServerPush {
         }
     }
 
-    ipsmPushItem = (payload: string, state: AppState) => {
+    ipsmPushItem = (payload: string, ast: AppState) => {
         // IPSM currently disabled
         // const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         // if (!feedData) return;
@@ -153,9 +153,9 @@ export class ServerPush {
         // });
     }
 
-    feedPushItem = (nodeInfo: J.NodeInfo, state: AppState) => {
+    feedPushItem = (nodeInfo: J.NodeInfo, ast: AppState) => {
         if (!nodeInfo || !FeedTab.inst) return;
-        const isMine = S.props.isMine(nodeInfo, state);
+        const isMine = S.props.isMine(nodeInfo, ast);
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
             nodeInfo.content = "[Encrypted]";
@@ -164,7 +164,7 @@ export class ServerPush {
         /* Ignore changes comming in during edit if we're editing on feed tab (inline)
          which will be fine because in this case when we are done editing we always
          process all the accumulated feedDirtyList items. */
-        if (state.activeTab === C.TAB_FEED && state.editNode) {
+        if (ast.activeTab === C.TAB_FEED && ast.editNode) {
             FeedTab.inst.props.feedDirtyList = FeedTab.inst.props.feedDirtyList || [];
             FeedTab.inst.props.feedDirtyList.push(nodeInfo);
             return;

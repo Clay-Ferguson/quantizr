@@ -200,7 +200,7 @@ export class RpcUtil {
         setInterval(this.progressInterval, 1000);
     }
 
-    progressInterval = (state: AppState) => {
+    progressInterval = (ast: AppState) => {
         /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
          querying server like the APP would do (index.html) */
         if (__page !== "index") return;

@@ -98,11 +98,11 @@ export class TypeBase implements TypeIntf {
         return this.displayName;
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -121,7 +121,7 @@ export class TypeBase implements TypeIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), state) : null;
+        const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), ast) : null;
 
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
@@ -134,7 +134,7 @@ export class TypeBase implements TypeIntf {
             comp.urls.forEach(url => {
                 // allow max of 10 urls.
                 if (count++ < 10) {
-                    const og = new OpenGraphPanel(state, tabData, comp.getId("og" + count + "_"), url,
+                    const og = new OpenGraphPanel(ast, tabData, comp.getId("og" + count + "_"), url,
                         isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
@@ -146,10 +146,10 @@ export class TypeBase implements TypeIntf {
             return new Div(null, null, children);
         }
         else {
-            const isRoot = node.id === state.node?.id;
+            const isRoot = node.id === ast.node?.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
-            if (node.tags && (state.userPrefs.showMetaData || state.userPrefs.editMode)) {
+            if (node.tags && (ast.userPrefs.showMetaData || ast.userPrefs.editMode)) {
                 return new Div(null, null, [
                     comp,
                     new Div(node.tags, { className: "nodeTags float-end " + (isRoot ? "smallMarginBottom" : "") })

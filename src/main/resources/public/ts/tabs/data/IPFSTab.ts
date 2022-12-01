@@ -25,22 +25,22 @@ export class IPFSTab implements TabIntf<any> {
         IPFSTab.inst = this;
     }
 
-    isVisible = (state: AppState) => {
+    isVisible = (ast: AppState) => {
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
         // return state.showIpfsTab;
-        return state.config.ipfsEnabled && state.userProfile?.mfsEnable && state.allowedFeatures && state.allowedFeatures.indexOf("web3") !== -1;
+        return ast.config.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures && ast.allowedFeatures.indexOf("web3") !== -1;
     };
 
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    getTabSubOptions = (ast: AppState): Div => { return null; };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
     }
 }

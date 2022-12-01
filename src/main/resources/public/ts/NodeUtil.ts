@@ -11,18 +11,18 @@ import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
-    getSelNodeIdsArray = (state: AppState): string[] => {
+    getSelNodeIdsArray = (ast: AppState): string[] => {
         const sels: string[] = [];
-        state.selectedNodes.forEach(id => sels.push(id));
+        ast.selectedNodes.forEach(id => sels.push(id));
         return sels;
     }
 
     /* return an object with properties for each NodeInfo where the key is the id */
-    getSelNodesAsMapById = (state: AppState): Object => {
+    getSelNodesAsMapById = (ast: AppState): Object => {
         const ret: Object = {};
-        const selArray = this.getSelNodesArray(state);
+        const selArray = this.getSelNodesArray(ast);
         if (!selArray || selArray.length === 0) {
-            const node = this.getHighlightedNode(state);
+            const node = this.getHighlightedNode(ast);
             if (node) {
                 ret[node.id] = node;
                 return ret;
@@ -36,10 +36,10 @@ export class NodeUtil {
     }
 
     /* Gets selected nodes as NodeInfo.java objects array */
-    getSelNodesArray = (state: AppState): J.NodeInfo[] => {
+    getSelNodesArray = (ast: AppState): J.NodeInfo[] => {
         const selArray: J.NodeInfo[] = [];
-        state.selectedNodes.forEach(id => {
-            const node = MainTab.inst?.findNode(state, id);
+        ast.selectedNodes.forEach(id => {
+            const node = MainTab.inst?.findNode(ast, id);
             if (node) {
                 selArray.push(node);
             }
@@ -47,8 +47,8 @@ export class NodeUtil {
         return selArray;
     }
 
-    clearSelNodes = (state: AppState = null) => {
-        state = getAppState(state);
+    clearSelNodes = (ast: AppState = null) => {
+        ast = getAppState(ast);
         dispatch("ClearSelections", s => {
             s.selectedNodes.clear();
             return s;
@@ -65,28 +65,28 @@ export class NodeUtil {
         // });
     }
 
-    getHighlightedNode = (state: AppState = null): J.NodeInfo => {
-        state = getAppState(state);
-        if (!state.node) return null;
-        const id: string = S.quanta.parentIdToFocusNodeMap.get(state.node.id);
+    getHighlightedNode = (ast: AppState = null): J.NodeInfo => {
+        ast = getAppState(ast);
+        if (!ast.node) return null;
+        const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
         if (id) {
-            return MainTab.inst?.findNode(state, id);
+            return MainTab.inst?.findNode(ast, id);
         }
         return null;
     }
 
     /* Returns true if successful */
-    highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
-        let node = MainTab.inst?.findNode(state, id);
+    highlightRowById = (id: string, scroll: boolean, ast: AppState): boolean => {
+        let node = MainTab.inst?.findNode(ast, id);
         let ret = true;
 
         /* If node not known, resort to taking the best, previous node we had */
         if (!node) {
-            node = this.getHighlightedNode(state);
+            node = this.getHighlightedNode(ast);
         }
 
         if (node) {
-            this.highlightNode(node, scroll, state);
+            this.highlightNode(node, scroll, ast);
         } else {
             // if we can't find that node, best behvior is at least to scroll to top.
             if (scroll) {
@@ -97,30 +97,30 @@ export class NodeUtil {
         return ret;
     }
 
-    highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState) => {
-        if (!node || !state.node) {
+    highlightNode = (node: J.NodeInfo, scroll: boolean, ast: AppState) => {
+        if (!node || !ast.node) {
             return;
         }
 
-        if (!state.isAnonUser) {
-            S.util.updateHistory(state.node, node, state);
+        if (!ast.isAnonUser) {
+            S.util.updateHistory(ast.node, node, ast);
         }
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always
         // keys off parentIdToFocusNodeMap actually reading the value.
-        state.highlightNodeId = node.id;
+        ast.highlightNodeId = node.id;
 
-        S.quanta.parentIdToFocusNodeMap.set(state.node.id, node.id);
+        S.quanta.parentIdToFocusNodeMap.set(ast.node.id, node.id);
 
         if (scroll) {
-            S.view.scrollToNode(state, node);
+            S.view.scrollToNode(ast, node);
         }
     }
 
     /* Find node by looking everywhere we possibly can on local storage for it */
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        for (const data of state.tabData) {
-            const node = data.findNode(state, nodeId);
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+        for (const data of ast.tabData) {
+            const node = data.findNode(ast, nodeId);
             if (node) return node;
         }
         return null;
@@ -132,18 +132,18 @@ export class NodeUtil {
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
-    getSingleSelectedNode = (state: AppState): J.NodeInfo => {
+    getSingleSelectedNode = (ast: AppState): J.NodeInfo => {
         let ret = null;
         // note: Set doesn't have a 'findFirst' so we can just use forEach instead
-        state.selectedNodes.forEach(id => {
-            ret = MainTab.inst?.findNode(state, id);
+        ast.selectedNodes.forEach(id => {
+            ret = MainTab.inst?.findNode(ast, id);
         });
         return ret;
     }
 
     /* Returns true if this node is able to have an effect on the tree, such that if it changed
     we would need to re-render the tree. For root top level call node==state.node */
-    nodeIdIsVisible = (node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean => {
+    nodeIdIsVisible = (node: J.NodeInfo, nodeId: string, parentPath: string, ast: AppState): boolean => {
         if (!nodeId || !node) return false;
         if (node.id === nodeId || node.path === parentPath) return true;
 
@@ -151,7 +151,7 @@ export class NodeUtil {
         if (node.children) {
             // for now we do ONE level, and this would fail for
             node.children.forEach(n => {
-                if (this.nodeIdIsVisible(n, nodeId, parentPath, state)) {
+                if (this.nodeIdIsVisible(n, nodeId, parentPath, ast)) {
                     ret = true;
                 }
             });
@@ -160,19 +160,19 @@ export class NodeUtil {
     }
 
     /* Returns the node if it's currently displaying on the page. For now we don't have ability */
-    displayingOnTree = (state: AppState, nodeId: string): J.NodeInfo => {
-        if (!state.node) return null;
-        if (state.node.id === nodeId) return state.node;
-        if (!state.node.children) return null;
-        return state.node.children.find(node => node?.id === nodeId);
+    displayingOnTree = (ast: AppState, nodeId: string): J.NodeInfo => {
+        if (!ast.node) return null;
+        if (ast.node.id === nodeId) return ast.node;
+        if (!ast.node.children) return null;
+        return ast.node.children.find(node => node?.id === nodeId);
     }
 
-    getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {
+    getNodeByName = (node: J.NodeInfo, name: string, ast: AppState): J.NodeInfo => {
         if (!node) return null;
         if (node.name === name) return node;
 
         if (node.children) {
-            return state.node.children.find(node => node?.name === name);
+            return ast.node.children.find(node => node?.name === name);
         }
         return null;
     }
@@ -268,7 +268,7 @@ export class NodeUtil {
         }
     }
 
-    getSharingNames = (state: AppState, node: J.NodeInfo, editorDlg: Comp): Comp[] => {
+    getSharingNames = (ast: AppState, node: J.NodeInfo, editorDlg: Comp): Comp[] => {
         if (!node?.ac) return null;
 
         const ret: Comp[] = [];

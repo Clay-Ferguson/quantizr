@@ -15,10 +15,10 @@ export class AppTab<T = any> extends Div {
         // console.log("Constructed AppTab: " + data.id);
     }
 
-    getClass = (state: AppState): string => {
-        const className = (state.mobileMode ? "my-tab-pane-mobile " : "my-tab-pane ") + "customScrollbar " +
-            (state.userPrefs.editMode && this.extraEditModeClass ? (this.extraEditModeClass) : "") +
-            (state.activeTab === this.getId() ? " visible" : " invisible");
+    getClass = (ast: AppState): string => {
+        const className = (ast.mobileMode ? "my-tab-pane-mobile " : "my-tab-pane ") + "customScrollbar " +
+            (ast.userPrefs.editMode && this.extraEditModeClass ? (this.extraEditModeClass) : "") +
+            (ast.activeTab === this.getId() ? " visible" : " invisible");
         return className;
     }
 

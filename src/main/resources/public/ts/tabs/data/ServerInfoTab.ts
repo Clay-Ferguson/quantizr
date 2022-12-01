@@ -20,20 +20,20 @@ export class ServerInfoTab implements TabIntf<any> {
         ServerInfoTab.inst = this;
     }
 
-    isVisible = (state: AppState) => {
-        return !!state.serverInfoText;
+    isVisible = (ast: AppState) => {
+        return !!ast.serverInfoText;
     };
 
     constructView = (data: TabIntf) => new ServerInfoView(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    getTabSubOptions = (ast: AppState): Div => { return null; };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
     }
 }

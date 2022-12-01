@@ -28,15 +28,15 @@ export class InboxNodeType extends TypeBase {
         return false;
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([
-                new Button("Clear Inbox", () => S.edit.clearInbox(state))
+                new Button("Clear Inbox", () => S.edit.clearInbox(ast))
             ], null, "float-end marginBottom"),
             new Clearfix()
         ], "displayTable systemNodeContent marginAll");

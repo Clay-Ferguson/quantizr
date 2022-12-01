@@ -285,7 +285,7 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(state: AppState): CompIntf {
+    renderHeading(ast: AppState): CompIntf {
         return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
@@ -336,9 +336,9 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     // DO NOT DELETE - may be needed in the future.
-    // makeFilterButtonsBar = (state: AppState): Div => {
+    // makeFilterButtonsBar = (ast: AppState): Div => {
     //     return new Div(null, { className: "marginTop" }, [
-    //         state.isAnonUser ? null : new Checkbox("Friends", {
+    //         ast.isAnonUser ? null : new Checkbox("Friends", {
     //             title: "Include nodes posted by your friends"
     //         }, {
     //             setValue: (checked: boolean) => {

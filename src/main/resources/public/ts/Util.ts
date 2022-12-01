@@ -886,7 +886,7 @@ export class Util {
         }
     }
 
-    processUrlParams = (state: AppState) => {
+    processUrlParams = (ast: AppState) => {
         const passCode = this.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
@@ -934,24 +934,24 @@ export class Util {
         }
     }
 
-    setUserPreferences = (state: AppState, flag: boolean) => {
-        if (flag !== state.userPrefs.editMode) {
-            state.userPrefs.editMode = flag;
-            this.saveUserPreferences(state);
+    setUserPreferences = (ast: AppState, flag: boolean) => {
+        if (flag !== ast.userPrefs.editMode) {
+            ast.userPrefs.editMode = flag;
+            this.saveUserPreferences(ast);
         }
     }
 
-    saveUserPreferences = async (state: AppState, dispatchNow: boolean = true) => {
-        if (!state.isAnonUser) {
+    saveUserPreferences = async (ast: AppState, dispatchNow: boolean = true) => {
+        if (!ast.isAnonUser) {
             await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-                userNodeId: state.userProfile.userNodeId,
-                userPreferences: state.userPrefs
+                userNodeId: ast.userProfile.userNodeId,
+                userPreferences: ast.userPrefs
             });
         }
 
         if (dispatchNow) {
             await promiseDispatch("SetUserPreferences", s => {
-                s.userPrefs = state.userPrefs;
+                s.userPrefs = ast.userPrefs;
                 if (!s.userPrefs.showParents && s.node) {
                     s.node.parents = null;
                 }
@@ -1009,8 +1009,8 @@ export class Util {
         return feedRes.filter(ni => !idSet.has(ni.id));
     }
 
-    fullscreenViewerActive = (state: AppState): boolean => {
-        return state.fullScreenConfig.type !== I.FullScreenType.NONE;
+    fullscreenViewerActive = (ast: AppState): boolean => {
+        return ast.fullScreenConfig.type !== I.FullScreenType.NONE;
     }
 
     ctrlKeyCheck = (): boolean => {

@@ -22,19 +22,19 @@ export class FollowingTab implements TabIntf<FollowingRSInfo> {
         FollowingTab.inst = this;
     }
 
-    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
-    constructView = (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    isVisible = (ast: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWING);
+    constructView = (ast: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(ast);
+    getTabSubOptions = (ast: AppState): Div => { return null; };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });

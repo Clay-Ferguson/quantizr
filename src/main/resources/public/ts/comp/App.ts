@@ -99,8 +99,8 @@ export class App extends Main {
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
 
-    getFullScreenViewer = (state: AppState): CompIntf => {
-        switch (state.fullScreenConfig.type) {
+    getFullScreenViewer = (ast: AppState): CompIntf => {
+        switch (ast.fullScreenConfig.type) {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
             case FullScreenType.GRAPH:
@@ -112,10 +112,10 @@ export class App extends Main {
         }
     }
 
-    getTopMobileBar = (state: AppState): CompIntf => {
-        if (state.mobileMode) {
+    getTopMobileBar = (ast: AppState): CompIntf => {
+        if (ast.mobileMode) {
             const menuButton = new IconButton("fa-bars", "Menu", {
-                onClick: () => S.nav.showMainMenu(state),
+                onClick: () => S.nav.showMainMenu(ast),
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 
@@ -133,7 +133,7 @@ export class App extends Main {
             //         getValue: (): boolean => state.userPrefs.showMetaData
             //     }, "form-switch form-check-inline") : null;
 
-            const loginButton = state.isAnonUser ? new Button("Login", S.user.userLogin, {
+            const loginButton = ast.isAnonUser ? new Button("Login", S.user.userLogin, {
                 className: "menuButton"
             }, "btn-primary") : null;
 

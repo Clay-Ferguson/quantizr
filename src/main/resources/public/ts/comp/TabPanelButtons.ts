@@ -32,12 +32,12 @@ export class TabPanelButtons extends Div {
         ]);
     }
 
-    buildTabButtons = (state: AppState): Comp[] => {
+    buildTabButtons = (ast: AppState): Comp[] => {
         const items: Comp[] = [];
-        for (const tab of state.tabData) {
-            items.push(this.getTabButton(state, tab));
+        for (const tab of ast.tabData) {
+            items.push(this.getTabButton(ast, tab));
 
-            const tabSubOpts = tab.getTabSubOptions(state);
+            const tabSubOpts = tab.getTabSubOptions(ast);
             if (tabSubOpts) {
                 items.push(tabSubOpts);
             }
@@ -45,7 +45,7 @@ export class TabPanelButtons extends Div {
         return items;
     }
 
-    getTabButton(state: AppState, data: TabIntf): Li {
+    getTabButton(ast: AppState, data: TabIntf): Li {
         let tabName = data.name;
 
         // slight hack until we have 'name' as a function and not a string.
@@ -55,7 +55,7 @@ export class TabPanelButtons extends Div {
 
         return new Li(null, {
             className: "nav-item",
-            style: { display: data.isVisible(state) ? "inline" : "none" },
+            style: { display: data.isVisible(ast) ? "inline" : "none" },
             onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();
@@ -65,7 +65,7 @@ export class TabPanelButtons extends Div {
         }, [
             new Anchor("#" + data.id, tabName, {
                 "data-bs-toggle": "tab",
-                className: "nav-link appNavTab" + (state.activeTab === data.id ? " active" : ""),
+                className: "nav-link appNavTab" + (ast.activeTab === data.id ? " active" : ""),
                 title: data.tooltip
             })
         ]);

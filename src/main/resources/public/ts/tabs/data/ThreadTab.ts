@@ -22,20 +22,20 @@ export class ThreadTab implements TabIntf<ThreadRSInfo> {
         ThreadTab.inst = this;
     }
 
-    isVisible = (state: AppState) => { return !!state.threadViewNodeId; };
+    isVisible = (ast: AppState) => { return !!ast.threadViewNodeId; };
 
     constructView = (data: TabIntf) => new ThreadView(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    getTabSubOptions = (ast: AppState): Div => { return null; };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });

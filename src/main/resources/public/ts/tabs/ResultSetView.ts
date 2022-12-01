@@ -92,21 +92,21 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(state: AppState): CompIntf {
+    renderHeading(ast: AppState): CompIntf {
         return new Div(this.data.name, { className: "tabTitle" });
     }
 
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        const allowHeader = this.allowHeader && (state.userPrefs.showMetaData || state.userPrefs.editMode);
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, ast: AppState): CompIntf {
+        const allowHeader = this.allowHeader && (ast.userPrefs.showMetaData || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false, true,
             jumpButton, allowHeader, this.allowFooter, true, "userFeedItem",
-            "userFeedItemHighlight", null, state);
+            "userFeedItemHighlight", null, ast);
     }
 
-    addPaginationBar = (state: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
+    addPaginationBar = (ast: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
         let moreButton: IconButton = null;
         if (!this.data.props.endReached && allowMoreButton) {
             moreButton = new IconButton("fa-angle-right", "More", {

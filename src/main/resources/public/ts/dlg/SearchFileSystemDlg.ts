@@ -42,13 +42,13 @@ export class SearchFileSystemDlg extends DialogBase {
         ];
     }
 
-    searchNodes = async (state: AppState) => {
+    searchNodes = async (ast: AppState) => {
         if (!this.validate()) {
             return;
         }
 
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(ast);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

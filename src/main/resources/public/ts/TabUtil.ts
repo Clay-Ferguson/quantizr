@@ -39,8 +39,8 @@ export class TabUtil {
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
-    selectTabStateOnly = (tabName: string, state: AppState) => {
-        if (tabName === C.TAB_MAIN && !state.node) {
+    selectTabStateOnly = (tabName: string, ast: AppState) => {
+        if (tabName === C.TAB_MAIN && !ast.node) {
 
             // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
             // an error that we did a dispatch in a dispatch.
@@ -49,8 +49,8 @@ export class TabUtil {
             }, 1);
         }
         else {
-            this.tabChanging(state.activeTab, tabName, state);
-            state.activeTab = S.quanta.activeTab = tabName;
+            this.tabChanging(ast.activeTab, tabName, ast);
+            ast.activeTab = S.quanta.activeTab = tabName;
         }
     }
 
@@ -107,28 +107,28 @@ export class TabUtil {
         });
     }
 
-    getActiveTabComp = (state: AppState): AppTab => {
-        if (!state.tabData) return null;
-        const data = state.tabData.find(d => d.id === state.activeTab);
+    getActiveTabComp = (ast: AppState): AppTab => {
+        if (!ast.tabData) return null;
+        const data = ast.tabData.find(d => d.id === ast.activeTab);
         return data ? data.inst : null;
     }
 
-    getAppTabInst = (state: AppState, tabId: string): AppTab => {
-        if (!state.tabData) return null;
-        const data = state.tabData.find(d => d.id === tabId);
+    getAppTabInst = (ast: AppState, tabId: string): AppTab => {
+        if (!ast.tabData) return null;
+        const data = ast.tabData.find(d => d.id === tabId);
         return data ? data.inst : null;
     }
 
-    getAppTabData = (state: AppState, tabId: string): TabIntf => {
-        if (!state.tabData) return null;
-        return state.tabData.find(d => d.id === tabId);
+    getAppTabData = (ast: AppState, tabId: string): TabIntf => {
+        if (!ast.tabData) return null;
+        return ast.tabData.find(d => d.id === tabId);
     }
 
-    tabScroll = (state: AppState, tabName: string, pos: number) => {
+    tabScroll = (ast: AppState, tabName: string, pos: number) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Scrolling tab " + tabName + " to offset " + pos);
         }
-        const data = state.tabData.find(d => d.id === tabName);
+        const data = ast.tabData.find(d => d.id === tabName);
         if (data) {
             data.scrollPos = pos;
         }
@@ -144,7 +144,7 @@ export class TabUtil {
     /* This function manages persisting the scroll position when switching
     from one tab to another, to automatically restore the scroll position that was
     last scroll position on any given tab */
-    tabChanging = (prevTab: string, newTab: string, state: AppState) => {
+    tabChanging = (prevTab: string, newTab: string, ast: AppState) => {
 
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {

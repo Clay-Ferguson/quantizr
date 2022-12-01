@@ -62,7 +62,7 @@ export class ImportDlg extends DialogBase {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state: getAppState()
+                ast: getAppState()
             });
             S.view.scrollToNode(getAppState());
         }

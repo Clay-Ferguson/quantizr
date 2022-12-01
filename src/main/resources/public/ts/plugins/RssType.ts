@@ -69,7 +69,7 @@ export class RssType extends TypeBase {
         return [J.NodeProp.RSS_FEED_SRC];
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return propName === J.NodeProp.RSS_FEED_SRC;
     }
 
@@ -78,7 +78,7 @@ export class RssType extends TypeBase {
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
 
         let feedContent: Comp = null;
 
@@ -92,49 +92,49 @@ export class RssType extends TypeBase {
             disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
             figure this out yet.
             */
-            if (state.rssFeedCache[feedSrcHash] === "failed") {
+            if (ast.rssFeedCache[feedSrcHash] === "failed") {
                 feedContent = new Div("Feed Failed: " + feedSrc, {
                     className: "marginAll"
                 });
             }
             // if it's currently loading show the spinner
-            else if (state.rssFeedCache[feedSrcHash] === "loading") {
+            else if (ast.rssFeedCache[feedSrcHash] === "loading") {
                 feedContent = new Div(null, { className: "bigMargin" }, [
                     new Heading(4, "Loading RSS Feed..."),
                     new Spinner()
                 ]);
             }
-            else if (!state.rssFeedCache[feedSrcHash]) {
+            else if (!ast.rssFeedCache[feedSrcHash]) {
                 feedContent = new Button("Load Feed", () => {
                     dispatch("LoadingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
-                        RssType.loadFeed(state, feedSrcHash, feedSrc);
+                        RssType.loadFeed(ast, feedSrcHash, feedSrc);
                         return s;
                     });
                 }, null, "btn-primary marginAll");
             }
             /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
-            else if (state.rssFeedCache[feedSrcHash]) {
-                feedContent = this.renderItem(state.rssFeedCache[feedSrcHash], feedSrc, state);
+            else if (ast.rssFeedCache[feedSrcHash]) {
+                feedContent = this.renderItem(ast.rssFeedCache[feedSrcHash], feedSrc, ast);
             }
             else {
                 console.error("unknown state in feed runner");
             }
         }
 
-        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, state);
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, ast);
         return new Div(null, null, [
             baseComp,
             feedContent
         ]);
     }
 
-    static loadFeed = async (state: AppState, feedSrcHash: string, feedSrc: string) => {
+    static loadFeed = async (ast: AppState, feedSrcHash: string, feedSrc: string) => {
         /* warning: paging here is not zero offset. First page is number 1 */
-        let page: number = state.rssFeedPage[feedSrcHash];
+        let page: number = ast.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
-            state.rssFeedPage[feedSrcHash] = page;
+            ast.rssFeedPage[feedSrcHash] = page;
         }
 
         const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
@@ -175,13 +175,13 @@ export class RssType extends TypeBase {
         }
     }
 
-    renderItem(feed: J.RssFeed, feedSrc: string, state: AppState): Comp {
+    renderItem(feed: J.RssFeed, feedSrc: string, ast: AppState): Comp {
         const feedList = new Div("", { className: "rss-feed-listing" });
         const feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
         const feedSrcHash = S.util.hashOfString(feedSrc);
-        let page: number = state.rssFeedPage[feedSrcHash];
+        let page: number = ast.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
@@ -195,10 +195,10 @@ export class RssType extends TypeBase {
                     return s;
                 });
             },
-            getValue: (): boolean => state.userPrefs.rssHeadlinesOnly
+            getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
         }));
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, state));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, ast));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -244,20 +244,20 @@ export class RssType extends TypeBase {
         feedList.addChild(feedOutDiv);
 
         for (const item of feed.entries) {
-            feedList.addChild(this.buildFeedItem(feed, item, state));
+            feedList.addChild(this.buildFeedItem(feed, item, ast));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, state));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, ast));
         return feedList;
     }
 
-    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, state: AppState): ButtonBar => {
+    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, ast: AppState): ButtonBar => {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.setPage(feedSrc, feedSrcHash, state, 1);
+                    this.setPage(feedSrc, feedSrcHash, ast, 1);
                 },
                 title: "First Page"
             }) : null,
@@ -265,7 +265,7 @@ export class RssType extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, state, -1);
+                    this.pageBump(feedSrc, feedSrcHash, ast, -1);
                 },
                 title: "Previous Page"
             }) : null,
@@ -273,7 +273,7 @@ export class RssType extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, state, 1);
+                    this.pageBump(feedSrc, feedSrcHash, ast, 1);
                 },
                 title: "Next Page"
             })
@@ -281,26 +281,26 @@ export class RssType extends TypeBase {
     }
 
     /* cleverly does both prev or next paging */
-    pageBump = (feedSrc: string, feedSrcHash: string, state: AppState, bump: number) => {
-        let page: number = state.rssFeedPage[feedSrcHash];
+    pageBump = (feedSrc: string, feedSrcHash: string, ast: AppState, bump: number) => {
+        let page: number = ast.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
         if (page + bump < 1) return;
-        this.setPage(feedSrc, feedSrcHash, state, page + bump);
+        this.setPage(feedSrc, feedSrcHash, ast, page + bump);
     }
 
-    setPage = (feedSrc: string, feedSrcHash: string, state: AppState, page: number) => {
+    setPage = (feedSrc: string, feedSrcHash: string, ast: AppState, page: number) => {
         dispatch("RSSUpdated", s => {
             // deleting will force a requery from the server
             s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
-            RssType.loadFeed(state, feedSrcHash, feedSrc);
+            RssType.loadFeed(ast, feedSrcHash, feedSrc);
             return s;
         });
     }
 
-    buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, state: AppState): Comp {
+    buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, ast: AppState): Comp {
         // console.log("ENTRY: " + S.util.prettyPrint(entry));
         const children: Comp[] = [];
         const headerDivChildren = [];
@@ -408,14 +408,14 @@ export class RssType extends TypeBase {
             });
         }
 
-        if (!state.userPrefs.rssHeadlinesOnly) {
+        if (!ast.userPrefs.rssHeadlinesOnly) {
             if (entry.description) {
                 children.push(new Html(entry.description));
             }
         }
 
         if (anchor) {
-            const og = new OpenGraphPanel(state, MainTab.inst, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            const og = new OpenGraphPanel(ast, MainTab.inst, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
             if (MainTab.inst) {
@@ -432,21 +432,21 @@ export class RssType extends TypeBase {
             }
         });
 
-        const postIcon = !state.isAnonUser ? new Icon({
+        const postIcon = !ast.isAnonUser ? new Icon({
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
-                S.edit.addNode(null, null, false, entry.title + "\n\n" + entry.link, null, null, null, null, false, state);
+                S.edit.addNode(null, null, false, entry.title + "\n\n" + entry.link, null, null, null, null, false, ast);
             }
         }) : null;
 
-        const bookmarkIcon = !state.isAnonUser ? new Icon({
+        const bookmarkIcon = !ast.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg rssBookmarkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
                 let content = "#### " + feed.title + ": " + entry.title + "\n\n" + entry.link;
                 if (audioUrl) content += "\n\n" + audioUrl;
-                S.edit.addLinkBookmark(content, audioUrl, state);
+                S.edit.addLinkBookmark(content, audioUrl, ast);
             }
         }) : null;
 

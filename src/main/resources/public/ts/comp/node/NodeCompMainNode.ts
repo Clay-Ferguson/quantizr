@@ -18,9 +18,9 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
 
-    constructor(state: AppState, public tabData: TabIntf<any>) {
+    constructor(ast: AppState, public tabData: TabIntf<any>) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + state.node.id
+            id: S.nav._UID_ROWID_PREFIX + ast.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
@@ -28,9 +28,9 @@ export class NodeCompMainNode extends Div {
         const type = S.plugin.getType(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && state.userPrefs.editMode && !state.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.inlineEditId) {
             this.attribs.draggable = "true";
-            this.attribs.onDragStart = (evt: any) => this.dragStart(evt, state.node.id);
+            this.attribs.onDragStart = (evt: any) => this.dragStart(evt, ast.node.id);
             this.attribs.onDragEnd = this.dragEnd;
         }
     }

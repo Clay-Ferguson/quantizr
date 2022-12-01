@@ -25,11 +25,11 @@ export class MainTab implements TabIntf<any> {
         MainTab.inst = this;
     }
 
-    isVisible = (state: AppState) => true;
+    isVisible = (ast: AppState) => true;
     constructView = (data: TabIntf) => new MainTabComp(data);
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
-        return this.findNodeRecursive(state.node, nodeId);
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+        return this.findNodeRecursive(ast.node, nodeId);
     }
 
     // finds a node matching node with 'id' on this node or any of it's chilren
@@ -47,39 +47,39 @@ export class MainTab implements TabIntf<any> {
         }
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
-        if (!state.node) return;
-        state.node.children = state.node.children?.filter(n => nodeId !== n.id);
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
+        if (!ast.node) return;
+        ast.node.children = ast.node.children?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
-        if (!state.node || !state.node.children) return;
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+        if (!ast.node || !ast.node.children) return;
 
-        state.node.children = state.node.children.map(n => {
+        ast.node.children = ast.node.children.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    getTabSubOptions = (state: AppState): Div => {
+    getTabSubOptions = (ast: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            !state.isAnonUser ? new AppNavLink("My Account", () => S.nav.navToMyAccntRoot(state)) : null,
-            !state.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + state.userName + ":home")) : null,
-            !state.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
-            ...this.customAnonRHSLinks(state),
-            ...this.buildCustomLinks(state, state.config.rhsLinks)
+            !ast.isAnonUser ? new AppNavLink("My Account", () => S.nav.navToMyAccntRoot(ast)) : null,
+            !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home")) : null,
+            !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
+            ...this.customAnonRHSLinks(ast),
+            ...this.buildCustomLinks(ast, ast.config.rhsLinks)
         ]);
     };
 
     // Put these directly here on main page for non-logged in users, becasue we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
-    customAnonRHSLinks = (state: AppState): CompIntf[] => {
+    customAnonRHSLinks = (ast: AppState): CompIntf[] => {
         // if not anon user return empty items
-        if (!state.isAnonUser) return [];
+        if (!ast.isAnonUser) return [];
 
-        return this.buildCustomLinks(state, state.config.rhsAnonLinks);
+        return this.buildCustomLinks(ast, ast.config.rhsAnonLinks);
     }
 
-    buildCustomLinks = (state: AppState, configArray: any): CompIntf[] => {
+    buildCustomLinks = (ast: AppState, configArray: any): CompIntf[] => {
         const items: CompIntf[] = [];
 
         if (configArray) {

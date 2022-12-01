@@ -19,12 +19,12 @@ export class BreadcrumbsPanel extends Div {
         this.setChildren([this.createBreadcrumbs(ast)]);
     }
 
-    createBreadcrumbs = (state: AppState): Comp => {
+    createBreadcrumbs = (ast: AppState): Comp => {
         let children: CompIntf[] = [];
 
-        if (state.breadcrumbs?.length > 0) {
-            children = state.breadcrumbs.map(bc => {
-                if (bc.id === state.node.id) {
+        if (ast.breadcrumbs?.length > 0) {
+            children = ast.breadcrumbs.map(bc => {
+                if (bc.id === ast.node.id) {
                     // ignore root node or page root node. we don't need it.
                     return null;
                 }
@@ -45,11 +45,11 @@ export class BreadcrumbsPanel extends Div {
             }).filter(c => !!c);
         }
 
-        if (children.length > 0 && !state.userPrefs.showParents) {
+        if (children.length > 0 && !ast.userPrefs.showParents) {
             children.push(new Icon({
                 className: "fa fa-level-down fa-lg showParentsIcon",
                 title: "Toggle: Show Parent on page",
-                onClick: () => S.edit.toggleShowParents(state)
+                onClick: () => S.edit.toggleShowParents(ast)
             }));
         }
 

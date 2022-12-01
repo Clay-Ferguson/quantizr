@@ -23,9 +23,9 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
         TrendingTab.inst = this;
     }
 
-    isVisible = (state: AppState) => true;
+    isVisible = (ast: AppState) => true;
     constructView = (data: TabIntf) => new TrendingView(data);
-    getTabSubOptions = (state: AppState): Div => {
+    getTabSubOptions = (ast: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
             new AppNavLink("Hashtags", S.nav.showTrendingHashtags),
             new AppNavLink("Mentions", S.nav.showTrendingMentions),
@@ -33,15 +33,15 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
         ]);
     };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });

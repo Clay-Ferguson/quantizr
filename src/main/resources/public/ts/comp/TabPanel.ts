@@ -62,9 +62,9 @@ export class TabPanel extends Div {
         ]);
     }
 
-    buildTabs = (state: AppState): AppTab[] => {
-        const tabs = state.tabData.map(tab => {
-            if (tab.isVisible(state)) {
+    buildTabs = (ast: AppState): AppTab[] => {
+        const tabs = ast.tabData.map(tab => {
+            if (tab.isVisible(ast)) {
                 return tab.constructView(tab);
             }
             return null;

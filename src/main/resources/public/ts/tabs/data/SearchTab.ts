@@ -22,19 +22,19 @@ export class SearchTab implements TabIntf<ResultSetInfo> {
         SearchTab.inst = this;
     }
 
-    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
+    isVisible = (ast: AppState) => S.tabUtil.resultSetHasData(C.TAB_SEARCH);
     constructView = (data: TabIntf) => new SearchResultSetView(data)
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    getTabSubOptions = (ast: AppState): Div => { return null; };
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         if (!this.props.results) return;
 
         this.props.results = this.props.results?.map(n => {

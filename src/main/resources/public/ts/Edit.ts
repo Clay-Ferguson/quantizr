@@ -21,8 +21,8 @@ declare const g_requireCrypto: string;
 export class Edit {
     showReadOnlyProperties: boolean = false;
 
-    openImportDlg = (state: AppState): any => {
-        const node = S.nodeUtil.getHighlightedNode(state);
+    openImportDlg = (ast: AppState): any => {
+        const node = S.nodeUtil.getHighlightedNode(ast);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -34,14 +34,14 @@ export class Edit {
         dlg.open();
     }
 
-    openExportDlg = (state: AppState): any => {
-        const node = S.nodeUtil.getHighlightedNode(state);
+    openExportDlg = (ast: AppState): any => {
+        const node = S.nodeUtil.getHighlightedNode(ast);
         if (node) {
             new ExportDlg(node).open();
         }
     }
 
-    private insertBookResponse = (res: J.InsertBookResponse, state: AppState): any => {
+    private insertBookResponse = (res: J.InsertBookResponse, ast: AppState): any => {
         S.util.checkSuccess("Insert Book", res);
 
         S.view.refreshTree({
@@ -54,17 +54,17 @@ export class Edit {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            state
+            ast: ast
         });
-        S.view.scrollToNode(state);
+        S.view.scrollToNode(ast);
     }
 
-    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): any => {
-        state = getAppState(state);
+    private joinNodesResponse = (res: J.JoinNodesResponse, ast: AppState): any => {
+        ast = getAppState(ast);
         if (S.util.checkSuccess("Join node", res)) {
-            S.nodeUtil.clearSelNodes(state);
+            S.nodeUtil.clearSelNodes(ast);
             S.view.refreshTree({
-                nodeId: state.node.id,
+                nodeId: ast.node.id,
                 zeroOffset: false,
                 renderParentIfLeaf: false,
                 highlightId: null,
@@ -73,28 +73,29 @@ export class Edit {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state
+                ast: ast
             });
         }
     }
 
-    public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
+    public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
+        showJumpButton: boolean, replyToId: string, afterEditAction: Function, ast: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
-            if (state.mobileMode) forceUsePopup = true;
+            if (ast.mobileMode) forceUsePopup = true;
 
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
-            const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, state);
+            const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, ast);
             if (editingAllowed) {
 
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
-                let editInPopup = forceUsePopup || state.mobileMode ||
+                let editInPopup = forceUsePopup || ast.mobileMode ||
                     // node not found on tree.
-                    (!S.nodeUtil.displayingOnTree(state, res.nodeInfo.id) &&
-                        !S.nodeUtil.displayingOnTree(state, S.quanta.newNodeTargetId)) ||
+                    (!S.nodeUtil.displayingOnTree(ast, res.nodeInfo.id) &&
+                        !S.nodeUtil.displayingOnTree(ast, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
-                    S.util.fullscreenViewerActive(state);
+                    S.util.fullscreenViewerActive(ast);
 
                 if (S.quanta.activeTab === C.TAB_DOCUMENT || //
                     S.quanta.activeTab === C.TAB_SEARCH || //
@@ -139,7 +140,7 @@ export class Edit {
     }
 
     /* nodeId is optional and represents what to highlight after the paste if anything */
-    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState) => {
+    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, ast: AppState) => {
         if (S.util.checkSuccess("Move nodes", res)) {
             if (res.signaturesRemoved) {
                 setTimeout(() => {
@@ -163,7 +164,7 @@ export class Edit {
                     allowScroll: true,
                     setTab: true,
                     forceRenderParent: false,
-                    state
+                    ast: ast
                 });
             }
             else {
@@ -172,19 +173,19 @@ export class Edit {
         }
     }
 
-    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState) => {
+    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, ast: AppState) => {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
         }
     }
 
     /* returns true if we are admin or else the owner of the node */
-    isEditAllowed = (node: any, state: AppState): boolean => {
+    isEditAllowed = (node: any, ast: AppState): boolean => {
         if (!node) return false;
-        if (state.isAdminUser) return true;
+        if (ast.isAdminUser) return true;
 
         // if no owner treat as if admin owns
-        return state.userName === (node.owner || "admin");
+        return ast.userName === (node.owner || "admin");
     }
 
     /*
@@ -192,7 +193,8 @@ export class Edit {
     * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
-    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState) => {
+    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo,
+        nodeInsertTarget: J.NodeInfo, ordinalOffset: number, ast: AppState) => {
         if (!S.props.isWritableByMe(parentNode)) {
             // console.log("Rejecting request to edit. Not authorized");
             return;
@@ -218,7 +220,7 @@ export class Edit {
                     initialValue: clipboardText
                 });
                 if (blob) {
-                    this.insertNodeResponse(res, state);
+                    this.insertNodeResponse(res, ast);
                 }
             } else {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -235,12 +237,12 @@ export class Edit {
                     fediSend: false
                 });
                 if (blob) {
-                    this.createSubNodeResponse(res, false, null, null, state);
+                    this.createSubNodeResponse(res, false, null, null, ast);
                 }
             }
 
             if (!blob) {
-                S.quanta.refresh(state);
+                S.quanta.refresh(ast);
             }
         }
         else {
@@ -253,7 +255,7 @@ export class Edit {
                     typeName: typeName || J.NodeType.NONE,
                     initialValue: ""
                 });
-                this.insertNodeResponse(res, state);
+                this.insertNodeResponse(res, ast);
             } else {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
@@ -268,22 +270,22 @@ export class Edit {
                     boostTarget: null,
                     fediSend: false
                 });
-                this.createSubNodeResponse(res, false, null, null, state);
+                this.createSubNodeResponse(res, false, null, null, ast);
             }
         }
     }
 
-    insertNodeResponse = (res: J.InsertNodeResponse, state: AppState) => {
+    insertNodeResponse = (res: J.InsertNodeResponse, ast: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.nodeUtil.highlightNode(res.newNode, false, state);
+            S.nodeUtil.highlightNode(res.newNode, false, ast);
             this.runEditNode(null, res.newNode.id, false, false, false, null, null, false);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, state: AppState) => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, ast: AppState) => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
-                S.quanta.refresh(state);
+                S.quanta.refresh(ast);
             }
             else {
                 this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, false);
@@ -292,18 +294,18 @@ export class Edit {
     }
 
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean,
-        newNodeTargetId: string, newNodeTargetOffset: number, state: AppState) => {
+        newNodeTargetId: string, newNodeTargetOffset: number, ast: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
 
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
             // todo-2: shouldn't we do this regardless of which tab is active?
-            if (state.activeTab === C.TAB_FEED) {
+            if (ast.activeTab === C.TAB_FEED) {
                 if (FeedTab.inst?.props?.feedDirtyList) {
                     for (const node of FeedTab.inst.props.feedDirtyList) {
                         // console.log("Force Feed: " + node.content);
-                        S.push.forceFeedItem(node, state);
+                        S.push.forceFeedItem(node, ast);
                     }
                     FeedTab.inst.props.feedDirtyList = null;
 
@@ -329,21 +331,21 @@ export class Edit {
 
             const newNode = await this.refreshNodeFromServer(node.id, newNodeTargetId);
 
-            if (state.activeTab === C.TAB_MAIN) {
+            if (ast.activeTab === C.TAB_MAIN) {
                 // Inject the new node right into the page children
                 if (newNodeTargetId) {
                     await this.injectNewNodeIntoChildren(newNode, newNodeTargetId, newNodeTargetOffset);
                 }
                 // any kind of insert that's not a new node injected into the page ends up here.
                 else {
-                    if (!S.nodeUtil.displayingOnTree(state, node.id)) {
+                    if (!S.nodeUtil.displayingOnTree(ast, node.id)) {
                         S.view.jumpToId(node.id);
                     }
                 }
             }
 
-            if (state.fullScreenConfig.type === FullScreenType.CALENDAR) {
-                S.render.showCalendar(state.fullScreenConfig.nodeId, state);
+            if (ast.fullScreenConfig.type === FullScreenType.CALENDAR) {
+                S.render.showCalendar(ast.fullScreenConfig.nodeId, ast);
             }
         }
     }
@@ -444,9 +446,9 @@ export class Edit {
         }
     }
 
-    setRssHeadlinesOnly = async (state: AppState, val: boolean) => {
-        state.userPrefs.rssHeadlinesOnly = val;
-        S.util.saveUserPreferences(state);
+    setRssHeadlinesOnly = async (ast: AppState, val: boolean) => {
+        ast.userPrefs.rssHeadlinesOnly = val;
+        S.util.saveUserPreferences(ast);
     }
 
     setMainPanelCols = (val: number) => {
@@ -468,13 +470,13 @@ export class Edit {
     };
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
-    saveTabsTopmostVisible = async (state: AppState): Promise<boolean> => {
+    saveTabsTopmostVisible = async (ast: AppState): Promise<boolean> => {
         let doScrolling = false;
 
         // in this loop record the currently topmost visible element in each tab, so we can scroll
         // those back it view after doing some change to the DOM that will potentially cause the page
         // to jump to a different effective scroll position.
-        for (const data of state.tabData) {
+        for (const data of ast.tabData) {
             // Warning: Uninitialized tabs will have 'scrollPos==undefined' here, so we check for that case, because
             // otherwise it will get interpreted as a number
             // We do nothing if user hasn't scrolled down enough to loose their place when the screen rerenders.
@@ -498,11 +500,11 @@ export class Edit {
     }
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
-    scrollTabsTopmostVisible = (state: AppState) => {
+    scrollTabsTopmostVisible = (ast: AppState) => {
         // this timer is because all scrolling in browser needs to be delayed or we can have failures.
         setTimeout(async () => {
             // scroll into view whatever was the topmost item
-            for (const data of state.tabData) {
+            for (const data of ast.tabData) {
                 if (data.topmostVisibleElmId) {
                     // we have to lookup the element again, because our DOM will have rendered and we will likely
                     // have a new actual element.
@@ -519,8 +521,8 @@ export class Edit {
     }
 
     // WARNING: This func is expected to NOT alter that the active tab is!
-    runScrollAffectingOp = async (state: AppState, func: Function) => {
-        const doScrolling = await this.saveTabsTopmostVisible(state);
+    runScrollAffectingOp = async (ast: AppState, func: Function) => {
+        const doScrolling = await this.saveTabsTopmostVisible(ast);
         if (doScrolling) {
             // turn off Comp stuff so it doesn't interfere with what we're about to do with scrolling.
             Comp.allowScrollSets = false;
@@ -528,15 +530,15 @@ export class Edit {
         await func();
 
         if (doScrolling) {
-            this.scrollTabsTopmostVisible(state);
+            this.scrollTabsTopmostVisible(ast);
             Comp.allowScrollSets = true;
         }
     }
 
     // We allow a function (func) to run here in such a way that the scroll positions of every tab panel are very
     // intelligently maintained so the user doesn't loose their place after the screen completely updates.
-    setUserPreferenceVal = (state: AppState, func: (s: AppState) => void) => {
-        this.runScrollAffectingOp(state, async () => {
+    setUserPreferenceVal = (ast: AppState, func: (s: AppState) => void) => {
+        this.runScrollAffectingOp(ast, async () => {
             // we force this to go thru immediately, but the saveUserPerference is call is async and we don't wait.
             await promiseDispatch("modUserPref", (s) => {
                 func(s);
@@ -546,17 +548,17 @@ export class Edit {
         });
     }
 
-    toggleEditMode = async (state: AppState) => {
-        this.setUserPreferenceVal(state, (s: AppState) => { s.userPrefs.editMode = !s.userPrefs.editMode; });
+    toggleEditMode = async (ast: AppState) => {
+        this.setUserPreferenceVal(ast, (s: AppState) => { s.userPrefs.editMode = !s.userPrefs.editMode; });
     }
 
-    toggleShowMetaData = (state: AppState) => {
-        this.setUserPreferenceVal(state, (s: AppState) => { s.userPrefs.showMetaData = !s.userPrefs.showMetaData; });
+    toggleShowMetaData = (ast: AppState) => {
+        this.setUserPreferenceVal(ast, (s: AppState) => { s.userPrefs.showMetaData = !s.userPrefs.showMetaData; });
     }
 
-    toggleNsfw = async (state: AppState) => {
-        state.userPrefs.nsfw = !state.userPrefs.nsfw;
-        return S.util.saveUserPreferences(state, true);
+    toggleNsfw = async (ast: AppState) => {
+        ast.userPrefs.nsfw = !ast.userPrefs.nsfw;
+        return S.util.saveUserPreferences(ast, true);
     }
 
     // #add-prop
@@ -565,19 +567,19 @@ export class Edit {
         return S.util.saveUserPreferences(getAppState(), true);
     }
 
-    toggleShowProps = async (state: AppState) => {
-        state.userPrefs.showProps = !state.userPrefs.showProps;
-        return S.util.saveUserPreferences(state, true);
+    toggleShowProps = async (ast: AppState) => {
+        ast.userPrefs.showProps = !ast.userPrefs.showProps;
+        return S.util.saveUserPreferences(ast, true);
     }
 
-    toggleShowParents = (state: AppState) => {
-        state.userPrefs.showParents = !state.userPrefs.showParents;
-        S.util.saveUserPreferences(state, false);
-        S.quanta.refresh(state);
+    toggleShowParents = (ast: AppState) => {
+        ast.userPrefs.showParents = !ast.userPrefs.showParents;
+        S.util.saveUserPreferences(ast, false);
+        S.quanta.refresh(ast);
     }
 
     // This updates userPref without affecting the GUI (no rerendering)
-    setShowComments = async (showReplies: boolean, state: AppState) => {
+    setShowComments = async (showReplies: boolean, ast: AppState) => {
 
         // update render state
         dispatch("setShowReplies", (s) => {
@@ -586,20 +588,20 @@ export class Edit {
         });
 
         // update our db
-        state.userPrefs.showReplies = showReplies;
-        S.util.saveUserPreferences(state, false);
+        ast.userPrefs.showReplies = showReplies;
+        S.util.saveUserPreferences(ast, false);
     }
 
-    toggleShowReplies = async (state: AppState) => {
-        state.userPrefs.showReplies = !state.userPrefs.showReplies;
-        await S.util.saveUserPreferences(state, false);
+    toggleShowReplies = async (ast: AppState) => {
+        ast.userPrefs.showReplies = !ast.userPrefs.showReplies;
+        await S.util.saveUserPreferences(ast, false);
 
         // todo-1: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
-        if (state.activeTab === C.TAB_MAIN) {
-            S.quanta.refresh(state);
+        if (ast.activeTab === C.TAB_MAIN) {
+            S.quanta.refresh(ast);
         }
-        else if (state.activeTab === C.TAB_DOCUMENT) {
-            const data: TabIntf = S.tabUtil.getAppTabData(state, C.TAB_DOCUMENT);
+        else if (ast.activeTab === C.TAB_DOCUMENT) {
+            const data: TabIntf = S.tabUtil.getAppTabData(ast, C.TAB_DOCUMENT);
             if (data) {
                 S.srch.showDocument(data.props.node, false, getAppState());
             }
@@ -607,7 +609,7 @@ export class Edit {
         else {
             // update render state (using local state), this way if we're not refreshing the tree.
             dispatch("setShowReplies", (s) => {
-                s.userPrefs.showReplies = state.userPrefs.showReplies;
+                s.userPrefs.showReplies = ast.userPrefs.showReplies;
                 return s;
             });
         }
@@ -630,11 +632,11 @@ export class Edit {
         }
     }
 
-    moveNodeDown = async (evt: Event, id: string, state: AppState) => {
+    moveNodeDown = async (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        state = getAppState(state);
+        ast = getAppState(ast);
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
         }
 
@@ -643,14 +645,14 @@ export class Edit {
                 nodeId: id,
                 targetName: "down"
             });
-            this.setNodePositionResponse(res, id, state);
+            this.setNodePositionResponse(res, id, ast);
         }
     }
 
-    moveNodeToTop = async (id: string = null, state: AppState = null) => {
-        state = getAppState(state);
+    moveNodeToTop = async (id: string = null, ast: AppState = null) => {
+        ast = getAppState(ast);
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
         }
 
@@ -659,14 +661,14 @@ export class Edit {
                 nodeId: id,
                 targetName: "top"
             });
-            this.setNodePositionResponse(res, id, state);
+            this.setNodePositionResponse(res, id, ast);
         }
     }
 
-    moveNodeToBottom = async (id: string = null, state: AppState = null) => {
-        state = getAppState(state);
+    moveNodeToBottom = async (id: string = null, ast: AppState = null) => {
+        ast = getAppState(ast);
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(state);
+            const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
         }
 
@@ -675,18 +677,18 @@ export class Edit {
                 nodeId: id,
                 targetName: "bottom"
             });
-            this.setNodePositionResponse(res, id, state);
+            this.setNodePositionResponse(res, id, ast);
         }
     }
 
-    getFirstChildNode = (state: AppState): any => {
-        if (!state.node || !state.node.children || state.node.children.length === 0) return null;
-        return state.node.children[0];
+    getFirstChildNode = (ast: AppState): any => {
+        if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
+        return ast.node.children[0];
     }
 
-    getLastChildNode = (state: AppState): J.NodeInfo => {
-        if (!state.node || !state.node.children || state.node.children.length === 0) return null;
-        return state.node.children[state.node.children.length - 1];
+    getLastChildNode = (ast: AppState): J.NodeInfo => {
+        if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
+        return ast.node.children[ast.node.children.length - 1];
     }
 
     checkEditPending = (): boolean => {
@@ -786,42 +788,42 @@ export class Edit {
         }
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): any => {
-        state = getAppState(state);
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, ast: AppState): any => {
+        ast = getAppState(ast);
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
          */
         if (!id) {
-            const node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(ast);
             if (node) {
                 parentNode = node;
             }
             else {
-                if (!state.node || !state.node.children) return null;
-                parentNode = state.node;
+                if (!ast.node || !ast.node.children) return null;
+                parentNode = ast.node;
             }
         } else {
-            parentNode = MainTab.inst?.findNode(state, id);
+            parentNode = MainTab.inst?.findNode(ast, id);
             if (!parentNode) {
                 // console.log("Unknown nodeId in createSubNode: " + id);
                 return;
             }
         }
 
-        this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0, state);
+        this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0, ast);
     }
 
-    selectAllNodes = async (state: AppState) => {
-        const highlightNode = S.nodeUtil.getHighlightedNode(state);
+    selectAllNodes = async (ast: AppState) => {
+        const highlightNode = S.nodeUtil.getHighlightedNode(ast);
         const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
         S.nodeUtil.selectAllNodes(res.nodeIds);
     }
 
-    clearInbox = async (state: AppState) => {
-        S.nodeUtil.clearSelNodes(state);
+    clearInbox = async (ast: AppState) => {
+        S.nodeUtil.clearSelNodes(ast);
 
         const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
             "btn-danger", "alert alert-danger");
@@ -832,7 +834,7 @@ export class Edit {
                 childrenOnly: true,
                 bulkDelete: false
             });
-            S.nav.openContentNode(state.userProfile.userNodeId, state);
+            S.nav.openContentNode(ast.userProfile.userNodeId, ast);
         }
     }
 
@@ -1064,13 +1066,13 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    insertBookWarAndPeace = async (state: AppState) => {
+    insertBookWarAndPeace = async (ast: AppState) => {
         const dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
             "Confirm", null, null);
         await dlg.open();
         if (dlg.yes) {
             /* inserting under whatever node user has focused */
-            const node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(ast);
 
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
@@ -1078,9 +1080,9 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
-                    truncated: S.user.isTestUserAccount(state)
+                    truncated: S.user.isTestUserAccount(ast)
                 });
-                this.insertBookResponse(res, state);
+                this.insertBookResponse(res, ast);
             }
         }
     }
@@ -1156,14 +1158,14 @@ export class Edit {
                     allowScroll: true,
                     setTab: true,
                     forceRenderParent: false,
-                    state: ast
+                    ast: ast
                 });
             }, 500);
         }
     }
 
-    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState) => {
-        node = node || S.nodeUtil.getHighlightedNode(state);
+    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, ast: AppState) => {
+        node = node || S.nodeUtil.getHighlightedNode(ast);
 
         if (!node) {
             S.util.showMessage("You didn't select a node to split.", "Warning");
@@ -1175,10 +1177,10 @@ export class Edit {
             nodeId: node.id,
             delimiter
         });
-        this.splitNodeResponse(res, state);
+        this.splitNodeResponse(res, ast);
     }
 
-    splitNodeResponse = (res: J.SplitNodeResponse, state: AppState) => {
+    splitNodeResponse = (res: J.SplitNodeResponse, ast: AppState) => {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,
@@ -1190,18 +1192,18 @@ export class Edit {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state
+                ast: ast
             });
-            S.view.scrollToNode(state);
+            S.view.scrollToNode(ast);
         }
     }
 
-    addBookmark = (node: J.NodeInfo, state: AppState) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, state);
+    addBookmark = (node: J.NodeInfo, ast: AppState) => {
+        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, ast);
     }
 
-    addLinkBookmark = async (content: any, audioUrl: string, state: AppState) => {
-        state = getAppState(state);
+    addLinkBookmark = async (content: any, audioUrl: string, ast: AppState) => {
+        ast = getAppState(ast);
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
@@ -1217,11 +1219,11 @@ export class Edit {
             boostTarget: null,
             fediSend: false
         });
-        this.createSubNodeResponse(res, true, null, null, state);
+        this.createSubNodeResponse(res, true, null, null, ast);
     }
 
     // like==false means 'unlike'
-    likeNode = async (node: J.NodeInfo, like: boolean, state: AppState) => {
+    likeNode = async (node: J.NodeInfo, like: boolean, ast: AppState) => {
         await S.rpcUtil.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
@@ -1230,25 +1232,26 @@ export class Edit {
         dispatch("likeNode", s => {
             node.likes = node.likes || [];
 
-            if (like && !node.likes.find(u => u === state.userName)) {
+            if (like && !node.likes.find(u => u === ast.userName)) {
                 // add userName to likes
-                node.likes.push(state.userName);
+                node.likes.push(ast.userName);
             }
             else {
                 // remove userName from likes
-                node.likes = node.likes.filter(u => u !== state.userName);
+                node.likes = node.likes.filter(u => u !== ast.userName);
             }
             return s;
         });
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string, afterEditAction: Function, boostTarget: string, fediSend: boolean, state: AppState) => {
-        state = getAppState(state);
+    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
+        afterEditAction: Function, boostTarget: string, fediSend: boolean, ast: AppState) => {
+        ast = getAppState(ast);
 
         // auto-enable edit mode
-        if (!boostTarget && !state.userPrefs.editMode) {
-            await this.toggleEditMode(state);
+        if (!boostTarget && !ast.userPrefs.editMode) {
+            await this.toggleEditMode(ast);
         }
 
         // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
@@ -1268,15 +1271,16 @@ export class Edit {
         });
 
         if (!boostTarget) {
-            this.createSubNodeResponse(res, false, replyToId, afterEditAction, state);
+            this.createSubNodeResponse(res, false, replyToId, afterEditAction, ast);
         }
         else {
             S.util.flashMessageQuick("Post was boosted!", "Boost");
         }
     }
 
-    createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
-        state = getAppState(state);
+    createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
+        pendingEdit: boolean, payloadType: string, content: string, ast: AppState) => {
+        ast = getAppState(ast);
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
@@ -1294,18 +1298,18 @@ export class Edit {
         });
 
         // auto-enable edit mode
-        if (!state.userPrefs.editMode) {
-            await this.toggleEditMode(state);
+        if (!ast.userPrefs.editMode) {
+            await this.toggleEditMode(ast);
         }
-        this.createSubNodeResponse(res, forceUsePopup, null, null, state);
+        this.createSubNodeResponse(res, forceUsePopup, null, null, ast);
     }
 
-    addCalendarEntry = async (initDate: number, state: AppState) => {
-        state = getAppState(state);
+    addCalendarEntry = async (initDate: number, ast: AppState) => {
+        ast = getAppState(ast);
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
-            nodeId: state.fullScreenConfig.nodeId,
+            nodeId: ast.fullScreenConfig.nodeId,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1316,7 +1320,7 @@ export class Edit {
             boostTarget: null,
             fediSend: false
         });
-        this.createSubNodeResponse(res, false, null, null, state);
+        this.createSubNodeResponse(res, false, null, null, ast);
     }
 
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean) => {
@@ -1355,7 +1359,7 @@ export class Edit {
                     allowScroll: false,
                     setTab: false,
                     forceRenderParent: false,
-                    state: ast
+                    ast: ast
                 });
             }
         }
@@ -1364,22 +1368,22 @@ export class Edit {
         }
     }
 
-    updateHeadings = async (state: AppState) => {
-        state = getAppState(state);
-        const node = S.nodeUtil.getHighlightedNode(state);
+    updateHeadings = async (ast: AppState) => {
+        ast = getAppState(ast);
+        const node = S.nodeUtil.getHighlightedNode(ast);
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
             });
-            S.quanta.refresh(state);
+            S.quanta.refresh(ast);
         }
     }
 
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (state: AppState, node: J.NodeInfo) => {
-        node = node || S.nodeUtil.getHighlightedNode(state);
+    editNodeSharing = async (ast: AppState, node: J.NodeInfo) => {
+        node = node || S.nodeUtil.getHighlightedNode(ast);
 
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");

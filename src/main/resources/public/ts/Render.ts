@@ -198,7 +198,7 @@ export class Render {
         });
     }
 
-    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState) => {
+    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, ast: AppState) => {
         if (!node) return;
 
         S.domUtil.setDropHandler(attribs, false, (evt: DragEvent) => {
@@ -213,7 +213,7 @@ export class Render {
                             if (s.startsWith(location.protocol + "//" + location.hostname)) {
                                 return;
                             }
-                            S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, state);
+                            S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, ast);
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
                         else {
@@ -232,7 +232,7 @@ export class Render {
                     //     return;
                     // }
 
-                    S.attachment.openUploadFromFileDlg(false, node, file, state);
+                    S.attachment.openUploadFromFileDlg(false, node, file, ast);
                     return;
                 }
             }
@@ -240,9 +240,9 @@ export class Render {
     }
 
     /* nodeId is parent node to query for calendar content */
-    showCalendar = async (nodeId: string, state: AppState) => {
+    showCalendar = async (nodeId: string, ast: AppState) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(ast);
             if (node) {
                 nodeId = node.id;
             }
@@ -267,9 +267,9 @@ export class Render {
         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
     }
 
-    showNodeUrl = (node: J.NodeInfo, state: AppState) => {
+    showNodeUrl = (node: J.NodeInfo, ast: AppState) => {
         if (!node) {
-            node = S.nodeUtil.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(ast);
         }
         if (!node) {
             S.util.showMessage("You must first click on a node.", "Warning");
@@ -381,8 +381,8 @@ export class Render {
 
             if (attachmentComps.length > 0) {
                 children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
-                    state.linksToAttachmentsExpanded = s;
-                }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
+                    ast.linksToAttachmentsExpanded = s;
+                }, ast.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
         }
 
@@ -581,7 +581,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
+    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, ast: AppState): Comp => {
         if (!node || !node.children) return null;
 
         /*
@@ -591,7 +591,7 @@ export class Render {
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, node);
 
         /* Note: for edit mode, or on mobile devices, always use vertical layout. */
-        if (state.userPrefs.editMode || state.mobileMode || !layout || layout === "v") {
+        if (ast.userPrefs.editMode || ast.mobileMode || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {
@@ -613,7 +613,7 @@ export class Render {
         return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    makeAvatarImage = (node: J.NodeInfo, state: AppState) => {
+    makeAvatarImage = (node: J.NodeInfo, ast: AppState) => {
         const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
@@ -634,17 +634,17 @@ export class Render {
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
-    allowPropertyEdit = (node: J.NodeInfo, propName: string, state: AppState): boolean => {
+    allowPropertyEdit = (node: J.NodeInfo, propName: string, ast: AppState): boolean => {
         const type: TypeIntf = S.plugin.getType(node.type);
-        return type ? type.allowPropertyEdit(propName, state) : true;
+        return type ? type.allowPropertyEdit(propName, ast) : true;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = async (node: J.NodeInfo, searchText: string, state: AppState) => {
-        node = node || S.nodeUtil.getHighlightedNode(state);
+    showGraph = async (node: J.NodeInfo, searchText: string, ast: AppState) => {
+        node = node || S.nodeUtil.getHighlightedNode(ast);
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchText,

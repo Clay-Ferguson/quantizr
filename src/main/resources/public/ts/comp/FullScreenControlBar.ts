@@ -19,23 +19,23 @@ export class FullScreenControlBar extends Div {
         this.setChildren(this.getButtons(useAppState()));
     }
 
-    getButtons = (state: AppState): Comp[] => {
+    getButtons = (ast: AppState): Comp[] => {
         const buttons = [];
 
-        if (state.fullScreenConfig.type === FullScreenType.IMAGE && state.activeTab === C.TAB_MAIN) {
-            const node = S.nodeUtil.findNode(state, state.fullScreenConfig.nodeId);
+        if (ast.fullScreenConfig.type === FullScreenType.IMAGE && ast.activeTab === C.TAB_MAIN) {
+            const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
             let onFirst = false;
             let onLast = false;
             if (node && node.attachments) {
                 const list: J.Attachment[] = S.props.getOrderedAttachments(node);
-                onFirst = list[0].o === state.fullScreenConfig.ordinal;
-                onLast = list[list.length-1].o === state.fullScreenConfig.ordinal;
+                onFirst = list[0].o === ast.fullScreenConfig.ordinal;
+                onLast = list[list.length-1].o === ast.fullScreenConfig.ordinal;
             }
 
             if (!onFirst) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: () => S.nav.prevFullScreenImgViewer(state),
+                        onClick: () => S.nav.prevFullScreenImgViewer(ast),
                         title: "View Previous Attachment"
                     }, "btn-primary", "off"));
             }
@@ -43,7 +43,7 @@ export class FullScreenControlBar extends Div {
             if (!onLast) {
                 buttons.push(
                     new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: () => S.nav.nextFullScreenImgViewer(state),
+                        onClick: () => S.nav.nextFullScreenImgViewer(ast),
                         title: "View Next Attachment"
                     }, "btn-primary", "off"));
             }
@@ -51,7 +51,7 @@ export class FullScreenControlBar extends Div {
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
-                onClick: () => S.nav.closeFullScreenViewer(state),
+                onClick: () => S.nav.closeFullScreenViewer(ast),
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 

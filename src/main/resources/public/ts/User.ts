@@ -43,8 +43,8 @@ export class User {
      * into production, but on my own production these are my "testUserAccounts", so no real user will be able to
      * use these names
      */
-    isTestUserAccount = (state: AppState): boolean => {
-        const lcUserName = state.userName.toLowerCase();
+    isTestUserAccount = (ast: AppState): boolean => {
+        const lcUserName = ast.userName.toLowerCase();
         return lcUserName === "adam" || //
             lcUserName === "bob" || //
             lcUserName === "cory" || //
@@ -71,7 +71,7 @@ export class User {
         return false;
     }
 
-    refreshLogin = async (state: AppState) => {
+    refreshLogin = async (ast: AppState) => {
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
         /* if we have *known* state as logged out, then do nothing here */
@@ -149,8 +149,8 @@ export class User {
         }
     }
 
-    logout = async (updateLocalDb: any, state: AppState) => {
-        if (state.isAnonUser) {
+    logout = async (updateLocalDb: any, ast: AppState) => {
+        if (ast.isAnonUser) {
             return;
         }
 
@@ -279,7 +279,7 @@ export class User {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state: ast
+                ast: ast
             });
         } else {
             console.log("LocalDb login failed.");
@@ -323,9 +323,9 @@ export class User {
         new LoginDlg().open();
     }
 
-    userLogout = (state: AppState = null) => {
-        state = getAppState(state);
-        this.logout(true, state);
+    userLogout = (ast: AppState = null) => {
+        ast = getAppState(ast);
+        this.logout(true, ast);
     }
 
     userSignup = () => {

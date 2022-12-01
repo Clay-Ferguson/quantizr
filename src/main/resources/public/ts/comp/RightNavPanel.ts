@@ -182,17 +182,17 @@ export class RightNavPanel extends Div {
         ]);
     }
 
-    makeHeaderDiv = (state: AppState): CompIntf => {
-        if (!state.userProfile) return null;
+    makeHeaderDiv = (ast: AppState): CompIntf => {
+        if (!ast.userProfile) return null;
 
-        const src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId, state.userProfile.headerImageVer);
+        const src = S.render.getProfileHeaderImgUrl(ast.userProfile.userNodeId, ast.userProfile.headerImageVer);
         if (src) {
             const attr: any = {
                 className: "headerImageRHS",
                 src
             };
 
-            if (!state.isAnonUser) {
+            if (!ast.isAnonUser) {
                 attr.onClick = () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     new UserProfileDlg(null).open();
@@ -208,16 +208,16 @@ export class RightNavPanel extends Div {
         }
     }
 
-    makeAvatarDiv = (state: AppState, offset: boolean): CompIntf => {
+    makeAvatarDiv = (ast: AppState, offset: boolean): CompIntf => {
         let src: string = null;
-        if (!state.userProfile) return null;
+        if (!ast.userProfile) return null;
 
         // if ActivityPub icon exists, we know that's the one to use.
-        if (state.userProfile.apIconUrl) {
-            src = state.userProfile.apIconUrl;
+        if (ast.userProfile.apIconUrl) {
+            src = ast.userProfile.apIconUrl;
         }
         else {
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId, state.userProfile.avatarVer);
+            src = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);
         }
 
         if (src) {
@@ -226,7 +226,7 @@ export class RightNavPanel extends Div {
                 src
             };
 
-            if (!state.isAnonUser) {
+            if (!ast.isAnonUser) {
                 attr.onClick = () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     new UserProfileDlg(null).open();

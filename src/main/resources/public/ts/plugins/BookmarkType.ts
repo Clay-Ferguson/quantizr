@@ -18,10 +18,10 @@ export class BookmarkType extends TypeBase {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Div(null, null, [
-            new NodeCompMarkdown(node, null, state),
+            new NodeCompMarkdown(node, null, ast),
             audioUrl ? new Button("Play Audio", () => {
                 new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0).open();
             }, null, "btn-primary marginLeft") : null

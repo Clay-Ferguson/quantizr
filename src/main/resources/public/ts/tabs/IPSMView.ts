@@ -38,7 +38,7 @@ export class IPSMView extends AppTab {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(state: AppState): CompIntf {
+    renderHeading(ast: AppState): CompIntf {
         return new Div("IPSM Console", { className: "tabTitle" });
     }
 }

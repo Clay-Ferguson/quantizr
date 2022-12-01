@@ -49,12 +49,12 @@ export class Props {
     node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
-    getCryptoKey = (node: J.NodeInfo, state: AppState) => {
+    getCryptoKey = (node: J.NodeInfo, ast: AppState) => {
         if (!node) return null;
         let cipherKey = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
-        if (state.userName === node.owner) {
+        if (ast.userName === node.owner) {
             cipherKey = this.getPropStr(J.NodeProp.ENC_KEY, node);
             // console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
@@ -131,9 +131,9 @@ export class Props {
         return !!ace.privileges.find(p => p.privilegeName.indexOf(priv) !== -1);
     }
 
-    isMine = (node: J.NodeInfo, state: AppState): boolean => {
-        if (!node || !state.userName || state.userName === J.PrincipalName.ANON) return false;
-        return state.userName === node.owner;
+    isMine = (node: J.NodeInfo, ast: AppState): boolean => {
+        if (!node || !ast.userName || ast.userName === J.PrincipalName.ANON) return false;
+        return ast.userName === node.owner;
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {

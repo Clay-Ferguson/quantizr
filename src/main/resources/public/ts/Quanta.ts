@@ -72,7 +72,7 @@ export class Quanta {
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
 
-    refresh = (state: AppState) => {
+    refresh = (ast: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
         }
@@ -87,7 +87,7 @@ export class Quanta {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            state
+            ast: ast
         });
     }
 
@@ -168,7 +168,7 @@ export class Quanta {
                         allowScroll: true,
                         setTab: true,
                         forceRenderParent: false,
-                        state: getAppState()
+                        ast: getAppState()
                     });
                     S.tabUtil.selectTab(C.TAB_MAIN);
                 }

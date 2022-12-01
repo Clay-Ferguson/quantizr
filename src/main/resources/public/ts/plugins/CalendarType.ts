@@ -19,19 +19,19 @@ export class CalendarType extends TypeBase {
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
-        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, state);
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, ast);
         return new Div(null, null, [
             baseComp,
             new ButtonBar([
                 new Button("Past", () => {
-                    S.srch.timeline(node, J.NodeProp.DATE_FULL, state, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, ast, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
                 }, null),
                 new Button("Future", () => {
-                    S.srch.timeline(node, J.NodeProp.DATE_FULL, state, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, ast, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
                 }, null),
                 new Button("Calendar", () => {
-                    S.render.showCalendar(node.id, state);
+                    S.render.showCalendar(node.id, ast);
                 }, null)
             ], "marginLeft marginBottom")
         ]);

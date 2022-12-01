@@ -11,9 +11,9 @@ export class SharesTab implements TabIntf<SharesRSInfo> {
     name = "Shared Nodes";
     tooltip = "Shows all the Shared nodes made accessible to other users";
     id = C.TAB_SHARES;
-    isVisible = (state: AppState) => S.tabUtil.resultSetHasData(C.TAB_SHARES);
+    isVisible = (ast: AppState) => S.tabUtil.resultSetHasData(C.TAB_SHARES);
     constructView = (data: TabIntf) => new SharedNodesResultSetView<SharesRSInfo>(data);
-    getTabSubOptions = (state: AppState): Div => { return null; };
+    getTabSubOptions = (ast: AppState): Div => { return null; };
     props = new SharesRSInfo();
     scrollPos: 0;
     openGraphComps: [];
@@ -24,15 +24,15 @@ export class SharesTab implements TabIntf<SharesRSInfo> {
         SharesTab.inst = this;
     }
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });

@@ -23,26 +23,26 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         FeedTab.inst = this;
     }
 
-    isVisible = (state: AppState) => true;
+    isVisible = (ast: AppState) => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
-    findNode = (state: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.feedResults, nodeId);
     }
 
-    nodeDeleted = (state: AppState, nodeId: string): void => {
+    nodeDeleted = (ast: AppState, nodeId: string): void => {
         this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (state: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
         this.props.feedResults = this.props.feedResults?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    getTabSubOptions = (state: AppState): Div => {
+    getTabSubOptions = (ast: AppState): Div => {
         if (this.props?.feedFilterRootNode) {
-            return !state.isAnonUser
+            return !ast.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
                     // we close chat by swithing user back to the Fediverse view.
                     new AppNavLink("Close Chat", S.nav.messagesFediverse)
@@ -50,12 +50,12 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         }
         else {
             return new Div(null, { className: "tabSubOptions" }, [
-                state.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
-                state.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
-                state.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
-                state.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
+                ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
+                ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
+                ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
+                ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
                 // todo-1: evntually we will make available to all users
-                state.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
+                ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
                 new AppNavLink("Federated", S.nav.messagesFediverse)
             ]);
         }

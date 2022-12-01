@@ -34,24 +34,24 @@ export class NodeCompMainList extends Div {
         this.setChildren(children);
     }
 
-    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState, pageTop: boolean) => {
+    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, ast: AppState, pageTop: boolean) => {
         let firstButton: IconButton;
         let prevButton: IconButton;
         let moreButton: IconButton;
         let prevNodeButton: IconButton;
         let nextNodeButton: IconButton;
-        const firstChild = S.edit.getFirstChildNode(state);
+        const firstChild = S.edit.getFirstChildNode(ast);
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {
-                onClick: () => S.view.firstPage(state),
+                onClick: () => S.view.firstPage(ast),
                 title: "First Page"
             });
         }
 
         if (firstChild && firstChild.logicalOrdinal > 0) {
             prevButton = new IconButton("fa-angle-left", null, {
-                onClick: () => S.view.prevPage(state),
+                onClick: () => S.view.prevPage(ast),
                 title: "Previous Page"
             });
         }
@@ -61,7 +61,7 @@ export class NodeCompMainList extends Div {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    S.view.nextPage(state);
+                    S.view.nextPage(ast);
                 },
                 title: "Next Page"
             });
@@ -102,7 +102,7 @@ export class NodeCompMainList extends Div {
             }
         }
         else {
-            if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {
+            if (!pageTop && !S.nav.displayingRepositoryRoot(ast)) {
                 prevNodeButton = new IconButton("fa-chevron-circle-left", "Prev", {
                     onClick: S.nav.navToPrev,
                     title: "Prev"

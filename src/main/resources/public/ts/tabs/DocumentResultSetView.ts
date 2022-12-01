@@ -23,11 +23,11 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         this.pagingContainerClass = "float-end";
     }
 
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, ast: AppState): CompIntf {
 
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either
         // of these user prefs is active we show the header bar.
-        const allowHeader = state.userPrefs.showMetaData || state.userPrefs.editMode;
+        const allowHeader = ast.userPrefs.showMetaData || ast.userPrefs.editMode;
 
         // we have 'marginButtom' on these just to add extra space between paragraphs for a less compact view. We could
         // make this paragraph spacing a user preference...some day.
@@ -40,13 +40,13 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         const nodeSlashesMatch = node.path.match(/\//g);
 
         let style = null;
-        if (state.docIndent) {
+        if (ast.docIndent) {
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
             style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
         }
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, /* this.data.id, false, */ false,
-            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style, state);
+            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style, ast);
 
         if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
             // todo-1: We could easily make this icon clickable to render this node as the root of a new document

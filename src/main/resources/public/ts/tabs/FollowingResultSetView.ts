@@ -27,7 +27,7 @@ export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSet
         S.srch.showFollowing(page, this.data.props.showingFollowingOfUser);
     }
 
-    renderHeading(state: AppState): CompIntf {
+    renderHeading(ast: AppState): CompIntf {
         return new Div("@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "tabTitle" });
     }
 

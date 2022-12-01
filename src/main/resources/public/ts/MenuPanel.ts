@@ -33,11 +33,11 @@ export class MenuPanel extends Div {
     static activeMenu: Set<string> = new Set<string>();
     static inst: MenuPanel;
 
-    constructor(state: AppState) {
+    constructor(ast: AppState) {
         super(null, {
             id: C.ID_MENU,
             role: "tablist",
-            className: (state.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
+            className: (ast.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
         MenuPanel.inst = this;
         this.mergeState<MenuPanelState>({ lastAction: null, lastClicked: null, expanded: MenuPanel.activeMenu });
@@ -578,10 +578,10 @@ export class MenuPanel extends Div {
     }
 
     // These are defined externally in config-text.yaml
-    helpMenuItems = (state: AppState): Div[] => {
+    helpMenuItems = (ast: AppState): Div[] => {
         const items: Div[] = [];
-        if (state.config.menu?.help) {
-            for (const menuItem of state.config.menu.help) {
+        if (ast.config.menu?.help) {
+            for (const menuItem of ast.config.menu.help) {
                 if (menuItem.name === "separator") {
                     items.push(new MenuItemSeparator());
                 }

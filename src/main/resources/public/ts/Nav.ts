@@ -18,27 +18,27 @@ import { TrendingTab } from "./tabs/data/TrendingTab";
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
 
-    displayingRepositoryRoot = (state: AppState): boolean => {
-        if (!state.node) return false;
+    displayingRepositoryRoot = (ast: AppState): boolean => {
+        if (!ast.node) return false;
         // one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
         // console.log(S.util.prettyPrint(S.quanta.currentNodeData.node));
-        return state.node.id === state.node.ownerId;
+        return ast.node.id === ast.node.ownerId;
     }
 
-    displayingHome = (state: AppState): boolean => {
-        if (!state.node) return false;
-        if (state.isAnonUser) {
-            return state.node.id === state.anonUserLandingPageNode;
+    displayingHome = (ast: AppState): boolean => {
+        if (!ast.node) return false;
+        if (ast.isAnonUser) {
+            return ast.node.id === ast.anonUserLandingPageNode;
         } else {
-            return state.node.id === state.userProfile?.homeNodeId;
+            return ast.node.id === ast.userProfile?.homeNodeId;
         }
     }
 
-    parentVisibleToUser = (state: AppState): boolean => {
-        return !this.displayingHome(state);
+    parentVisibleToUser = (ast: AppState): boolean => {
+        return !this.displayingHome(ast);
     }
 
-    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState) => {
+    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, ast: AppState) => {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             S.util.showPageMessage("The node above is not shared.");
         } else {
@@ -46,13 +46,13 @@ export class Nav {
         }
     }
 
-    navOpenSelectedNode = (state: AppState) => {
-        const selNode = S.nodeUtil.getHighlightedNode(state);
+    navOpenSelectedNode = (ast: AppState) => {
+        const selNode = S.nodeUtil.getHighlightedNode(ast);
         if (!selNode) return;
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
         }
-        this.openNodeById(null, selNode.id, state);
+        this.openNodeById(null, selNode.id, ast);
     }
 
     navToPrev = () => {
@@ -163,8 +163,8 @@ export class Nav {
         });
     }
 
-    openContentNode = async (nodePathOrId: string, state: AppState = null) => {
-        state = getAppState(state);
+    openContentNode = async (nodePathOrId: string, ast: AppState = null) => {
+        ast = getAppState(ast);
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -177,20 +177,20 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
-            this.navPageNodeResponse(res, state);
+            this.navPageNodeResponse(res, ast);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
         }
     }
 
-    openNodeById = (evt: Event, id: string, state: AppState) => {
+    openNodeById = (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        state = getAppState(state);
-        const node = MainTab.inst?.findNode(state, id);
+        ast = getAppState(ast);
+        const node = MainTab.inst?.findNode(ast, id);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -198,7 +198,7 @@ export class Nav {
             if (C.DEBUG_SCROLLING) {
                 console.log("openNodeById");
             }
-            S.nodeUtil.highlightNode(node, false, state);
+            S.nodeUtil.highlightNode(node, false, ast);
             S.view.refreshTree({
                 nodeId: node.id,
                 zeroOffset: true,
@@ -209,27 +209,27 @@ export class Nav {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                state
+                ast: ast
             });
         }
     }
 
-    setNodeSel = (selected: boolean, id: string, state: AppState) => {
+    setNodeSel = (selected: boolean, id: string, ast: AppState) => {
         if (!id) return;
-        state = getAppState(state);
+        ast = getAppState(ast);
         if (selected) {
-            state.selectedNodes.add(id);
+            ast.selectedNodes.add(id);
         } else {
-            state.selectedNodes.delete(id);
+            ast.selectedNodes.delete(id);
         }
     }
 
-    navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState) => {
+    navPageNodeResponse = (res: J.RenderNodeResponse, ast: AppState) => {
         S.render.renderPage(res, true, null, true, true);
         S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
-    geoLocation = (state: AppState) => {
+    geoLocation = (ast: AppState) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 // todo-2: make this string a configurable property template
@@ -256,22 +256,22 @@ export class Nav {
         }
     }
 
-    showMainMenu = (state: AppState) => {
+    showMainMenu = (ast: AppState) => {
         S.quanta.mainMenu = new MainMenuDlg();
         S.quanta.mainMenu.open();
     }
 
-    navToMyAccntRoot = async (state: AppState = null) => {
-        state = getAppState(state);
-        S.view.scrollActiveToTop(state);
+    navToMyAccntRoot = async (ast: AppState = null) => {
+        ast = getAppState(ast);
+        S.view.scrollActiveToTop(ast);
 
         // console.log("navHome()");
-        if (state.isAnonUser) {
+        if (ast.isAnonUser) {
             S.util.loadAnonPageHome();
         } else {
             try {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                    nodeId: state.userProfile?.userNodeId,
+                    nodeId: ast.userProfile?.userNodeId,
                     upLevel: false,
                     siblingOffset: 0,
                     renderParentIfLeaf: false,
@@ -280,10 +280,10 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: state.userPrefs.showParents ? 1 : 0
+                    parentCount: ast.userPrefs.showParents ? 1 : 0
                 });
 
-                this.navPageNodeResponse(res, state);
+                this.navPageNodeResponse(res, ast);
             }
             catch (e) {
                 S.nodeUtil.clearLastNodeIds();
@@ -647,8 +647,8 @@ export class Nav {
         });
     }
 
-    messagesNodeFeed = (state: AppState) => {
-        const hltNode = S.nodeUtil.getHighlightedNode(state);
+    messagesNodeFeed = (ast: AppState) => {
+        const hltNode = S.nodeUtil.getHighlightedNode(ast);
         if (!hltNode) return;
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");

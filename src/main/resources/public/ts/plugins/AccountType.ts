@@ -28,11 +28,11 @@ export class AccountType extends TypeBase {
         }
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new Div(null, {
             className: "marginAll systemNodeContent"
         }, [
@@ -41,7 +41,7 @@ export class AccountType extends TypeBase {
                 onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
                     // their own account this is not a way to do it.
-                    if (!S.props.isMine(node, state)) {
+                    if (!S.props.isMine(node, ast)) {
                         new UserProfileDlg(node.ownerId).open();
                     }
                 }

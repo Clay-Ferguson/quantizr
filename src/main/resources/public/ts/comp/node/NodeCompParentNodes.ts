@@ -8,9 +8,9 @@ import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompParentNodes extends Div {
 
-    constructor(state: AppState, public tabData: TabIntf<any>) {
+    constructor(ast: AppState, public tabData: TabIntf<any>) {
         super(null, {
-            id: "parent_" + state.node.id
+            id: "parent_" + ast.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });

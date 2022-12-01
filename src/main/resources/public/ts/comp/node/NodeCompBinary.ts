@@ -27,7 +27,7 @@ export class NodeCompBinary extends Div {
         this.mergeState<LS>({ node });
     }
 
-    makeImageComp = (node: J.NodeInfo, state: AppState): Img => {
+    makeImageComp = (node: J.NodeInfo, ast: AppState): Img => {
         if (!node) return null;
         const att = S.props.getAttachment(this.attName, node);
         if (!att) return null;
@@ -37,7 +37,7 @@ export class NodeCompBinary extends Div {
         const style: any = {};
         let size = "";
         if (this.isFullScreenEmbed) {
-            size = state.fullScreenImageSize;
+            size = ast.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
             // same as 'img-in-editor' class width

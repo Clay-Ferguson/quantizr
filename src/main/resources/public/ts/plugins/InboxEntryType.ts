@@ -25,7 +25,7 @@ export class InboxEntryType extends TypeBase {
         return false;
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return false;
     }
 }

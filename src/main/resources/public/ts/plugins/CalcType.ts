@@ -31,8 +31,8 @@ export class CalcType extends TypeBase {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
-        if (!S.props.isMine(node, state)) {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+        if (!S.props.isMine(node, ast)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
 

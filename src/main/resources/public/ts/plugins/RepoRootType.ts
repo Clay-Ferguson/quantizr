@@ -12,11 +12,11 @@ export class RepoRootType extends TypeBase {
         super(J.NodeType.REPO_ROOT, "Root", "fa-home", false);
     }
 
-    allowPropertyEdit(propName: string, state: AppState): boolean {
+    allowPropertyEdit(propName: string, ast: AppState): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new HorizontalLayout([
             new Heading(4, "Root")
         ], "displayTable systemNodeContent marginAll");

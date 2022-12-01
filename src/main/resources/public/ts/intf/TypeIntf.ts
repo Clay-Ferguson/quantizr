@@ -9,11 +9,11 @@ import { EditorOptions } from "../Interfaces";
 export interface TypeIntf {
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, state: AppState): Comp;
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp;
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo, ast: AppState): boolean;
     getAllowRowHeader(): boolean;
-    allowPropertyEdit(typeName: string, state: AppState): boolean;
+    allowPropertyEdit(typeName: string, ast: AppState): boolean;
     getDomPreUpdateFunction(parent: CompIntf): void;
 
     // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND
