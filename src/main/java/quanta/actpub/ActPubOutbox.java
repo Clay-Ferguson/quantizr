@@ -103,7 +103,7 @@ public class ActPubOutbox extends ServiceBase {
             final SubNode _userNode = userNode;
 
             // log.debug("scanning outbox orderedCollection");
-            apUtil.iterateOrderedCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
+            apUtil.iterateCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
                 try {
                     // if (ok(obj)) {
                     //     log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));

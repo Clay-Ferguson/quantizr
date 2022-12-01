@@ -595,8 +595,7 @@ public class ActPubUtil extends ServiceBase {
         return ok(url) && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
-    // todo-0: rename method and all internals to remove "ordered" part of var names.
-    public void iterateOrderedCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
+    public void iterateCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
             ActPubObserver observer) {
         if (no(collectionObj))
             return;
@@ -617,23 +616,23 @@ public class ActPubUtil extends ServiceBase {
         HashSet<String> apIdSet = new HashSet<>();
 
         /*
-         * The collection object itself is allowed to have orderedItems, which if present we process, in
+         * The collection object itself is allowed to have items/orderedItems, which if present we process, in
          * addition to the paging, although normally when the collection has the items it means it won't
          * have any paging
          */
-        List<?> orderedItems = apList(collectionObj, APObj.orderedItems, false);
+        List<?> items = apList(collectionObj, APObj.orderedItems, false);
 
         // try as unordered next (we handle both)
-        if (no(orderedItems)) {
-            orderedItems = apList(collectionObj, APObj.items, false);
+        if (no(items)) {
+            items = apList(collectionObj, APObj.items, false);
         }
 
-        if (ok(orderedItems)) {
+        if (ok(items)) {
             // log.debug("orderedItems(a): " + XString.prettyPrint(orderedItems));
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
-            for (Object obj : orderedItems) {
+            for (Object obj : items) {
                 if (!observer.item(obj)) {
                     return;
                 }
@@ -668,16 +667,16 @@ public class ActPubUtil extends ServiceBase {
             }
 
             while (ok(ocPage)) {
-                orderedItems = apList(ocPage, APObj.orderedItems, false);
+                items = apList(ocPage, APObj.orderedItems, false);
 
-                if (no(orderedItems)) {
-                    orderedItems = apList(ocPage, APObj.items, false);
+                if (no(items)) {
+                    items = apList(ocPage, APObj.items, false);
                 }
 
-                if (ok(orderedItems)) {
+                if (ok(items)) {
                     // log.debug("orderedItems(b): " + XString.prettyPrint(orderedItems));
 
-                    for (Object item : orderedItems) {
+                    for (Object item : items) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
                             String apId = apStr(item, APObj.id);
@@ -743,15 +742,15 @@ public class ActPubUtil extends ServiceBase {
                 ocPage = lastPage;
             }
             if (ok(ocPage)) {
-                orderedItems = apList(ocPage, APObj.orderedItems, false);
+                items = apList(ocPage, APObj.orderedItems, false);
 
-                if (no(orderedItems)) {
-                    orderedItems = apList(ocPage, APObj.items, false);
+                if (no(items)) {
+                    items = apList(ocPage, APObj.items, false);
                 }
 
-                if (ok(orderedItems)) {
+                if (ok(items)) {
                     // log.debug("orderedItems(c): " + XString.prettyPrint(orderedItems));
-                    for (Object item : orderedItems) {
+                    for (Object item : items) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
                             String apId = apStr(item, APObj.id);
@@ -833,6 +832,7 @@ public class ActPubUtil extends ServiceBase {
         deleteNodeNotify((ObjectId) event.getSource());
     }
 
+    // todo-1: method is part of a work in progress and is not complete
     public void readForeignReplies(MongoSession ms, SubNode node) {
         String apId = node.getStr(NodeProp.ACT_PUB_ID);
         if (no(apId)) {
@@ -851,8 +851,8 @@ public class ActPubUtil extends ServiceBase {
 
         String userDoingAction = ThreadLocals.getSC().getUserName();
 
-        // todo-0: what to do about max count here?
-        apUtil.iterateOrderedCollection(ms, userDoingAction, repliesObj, 100, obj -> {
+        // todo-1: what to do about max count here?
+        apUtil.iterateCollection(ms, userDoingAction, repliesObj, 100, obj -> {
             log.debug("REPLY: " + XString.prettyPrint(obj));
             return true;
         });

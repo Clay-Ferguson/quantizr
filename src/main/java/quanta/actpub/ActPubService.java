@@ -1394,7 +1394,7 @@ public class ActPubService extends ServiceBase {
                 APObj followersObj = apUtil.getRemoteAP(ms, userDoingAction, url);
                 if (ok(followersObj)) {
                     // note/warning: the ActPubFollower.java class also has code to read followers.
-                    apUtil.iterateOrderedCollection(ms, userDoingAction, followersObj, MAX_FOLLOWERS, obj -> {
+                    apUtil.iterateCollection(ms, userDoingAction, followersObj, MAX_FOLLOWERS, obj -> {
                         /*
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
                          */

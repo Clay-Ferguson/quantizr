@@ -301,7 +301,7 @@ public class ActPubFollowing extends ServiceBase {
 
         int ret = apInt(followings, APObj.totalItems);
 
-        apUtil.iterateOrderedCollection(ms, userDoingAction, followings, Integer.MAX_VALUE, obj -> {
+        apUtil.iterateCollection(ms, userDoingAction, followings, Integer.MAX_VALUE, obj -> {
             try {
                 // if (ok(obj )) {
                 // log.debug("follower: OBJ=" + XString.prettyPrint(obj));
