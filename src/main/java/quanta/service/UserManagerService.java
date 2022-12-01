@@ -1277,7 +1277,7 @@ public class UserManagerService extends ServiceBase {
 			if (ok(ownerAccntNode)) {
 				ownerName = ownerAccntNode.getStr(NodeProp.USER);
 				FriendInfo ownerInfo = buildPersonInfoFromAccntNode(as, ownerAccntNode);
-				if (node.getLikes().contains(ownerInfo.getUserName())) {
+				if (ok(node.getLikes()) && node.getLikes().contains(ownerInfo.getUserName())) {
 					ownerInfo.setLiked(true);
 				}
 				res.setNodeOwner(ownerInfo);
