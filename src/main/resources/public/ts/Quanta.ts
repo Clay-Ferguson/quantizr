@@ -325,7 +325,6 @@ export class Quanta {
                 if (res.config) {
                     dispatch("configUpdates", s => {
                         s.config = res.config || {};
-                        // console.log("CONFIG: " + S.util.prettyPrint(s.config));
 
                         // we show the user message after the config is set, but there's no reason to do it here
                         // other than perhaps have the screen updated with the latest based on the config.
@@ -374,9 +373,7 @@ export class Quanta {
     */
     static overlayCounter: number = 1; // this starting value is important.
     setOverlay = (showOverlay: boolean) => {
-
         Quanta.overlayCounter += showOverlay ? 1 : -1;
-        // Log.log("overlayCounter=" + Meta64.overlayCounter);
 
         /* if overlayCounter goes negative, that's a mismatch */
         if (Quanta.overlayCounter < 0) {
@@ -392,7 +389,6 @@ export class Quanta {
             setTimeout(() => {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Quanta.overlayCounter > 0) {
-                    // Log.log("showing overlay.");
                     const elm = S.domUtil.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
@@ -402,12 +398,10 @@ export class Quanta {
             }, 1200);
         }
         else if (Quanta.overlayCounter === 0) {
-            // Log.log("hiding overlay.");
             const elm = S.domUtil.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }
         }
-        // Log.log("overlayCounter=" + Meta64.overlayCounter);
     }
 }

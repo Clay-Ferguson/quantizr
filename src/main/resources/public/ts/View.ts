@@ -93,9 +93,9 @@ export class View {
     }
 
     prevPage = (ast: AppState) => {
-        const firstChildNode = S.edit.getFirstChildNode(ast);
-        if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
-            let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
+        const firstChild = S.edit.getFirstChildNode(ast);
+        if (firstChild && firstChild.logicalOrdinal > 0) {
+            let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
                 targetOffset = 0;
             }
@@ -105,15 +105,14 @@ export class View {
     }
 
     nextPage = (ast: AppState) => {
-        const lastChildNode = S.edit.getLastChildNode(ast);
-        if (lastChildNode) {
-            const targetOffset = lastChildNode.logicalOrdinal + 1;
+        const lastChild = S.edit.getLastChildNode(ast);
+        if (lastChild) {
+            const targetOffset = lastChild.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, false, ast);
         }
     }
 
     lastPage = (ast: AppState) => {
-        // console.log("Running lastPage Query");
         // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
     }
@@ -121,9 +120,9 @@ export class View {
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
     growPage = (ast: AppState) => {
-        const lastChildNode = S.edit.getLastChildNode(ast);
-        if (lastChildNode) {
-            const targetOffset = lastChildNode.logicalOrdinal + 1;
+        const lastChild = S.edit.getLastChildNode(ast);
+        if (lastChild) {
+            const targetOffset = lastChild.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, true, ast);
         }
     }
@@ -279,7 +278,7 @@ export class View {
 
     getNodeStats = async (ast: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode(ast);
-        const isMine = !!node && (node.owner === ast.userName || ast.userName === "admin");
+        const isMine = !!node && (node.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,

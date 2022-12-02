@@ -7,7 +7,6 @@ import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
 
 export class RepoRootType extends TypeBase {
-
     constructor() {
         super(J.NodeType.REPO_ROOT, "Root", "fa-home", false);
     }

@@ -17,8 +17,6 @@ export class PubSub {
     private static lastFires: Object = {};
 
     static pub = (name: string, ...args: any[]) => {
-        // console.log("pub: " + name);
-
         if (PubSub.registry[name]) {
             PubSub.lastFires[name] = args;
             PubSub.registry[name].forEach((fn: Function) => fn.apply(null, args));

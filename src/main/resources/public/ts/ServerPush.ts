@@ -127,11 +127,9 @@ export class ServerPush {
 
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
-            // console.log("force*** update existing item!");
             FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
         }
         else {
-            // console.log("force*** push new item");
             FeedTab.inst.props.feedResults.unshift(nodeInfo);
             // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
             // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
@@ -181,8 +179,6 @@ export class ServerPush {
                 FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }
             else if (s.userPrefs.autoRefreshFeed) {
-                // console.log("adding in new item.");
-
                 // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now
                 // I think we can just display any messages we get pushed in, and not try to query the server
                 // again just for performance reasons.
@@ -203,7 +199,6 @@ export class ServerPush {
             // or finally if autoRefresh is off we just set feedDirty, and it's up to the user to click refresh
             // button themselves.
             else {
-                // console.log("Setting feed dirty.");
                 if (!isMine) {
                     S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                 }

@@ -27,7 +27,6 @@ export class DomUtil {
         if (evt?.target) {
             let target: any = evt.target;
             while (target) {
-                // console.log("Checking target.id " + target.id + " for nid");
                 val = target.getAttribute(prop);
                 if (val) return val;
                 target = target.parentElement;
@@ -43,20 +42,16 @@ export class DomUtil {
     /* set focus to element by id */
     focusId = (id: string) => {
         if (!id) return;
-        // console.log("*** focusId = " + id);
         Comp.focusElmId = id;
         setTimeout(() => {
-            // console.log("delayed Focusing Id: " + id);
             const elm: HTMLElement = this.domElm(id);
             if (elm) {
                 /* This is a fix to a focus bug using the 'safest' way to do this without any redesign.
                  If the current focus is on an 'editor' then don't let this logic focus AWAY
                  from the editor. That breaks user input/keyboard. */
                 if (S.quanta.currentFocusId?.startsWith(C.ID_PREFIX_EDIT) && document.getElementById(S.quanta.currentFocusId)) {
-                    // console.log("Ignoring call to focus away from editor while editing.");
                     return;
                 }
-                // console.log(`Element found (${id}), focusing`);
                 elm.focus();
             }
         }, 750);
@@ -109,7 +104,6 @@ export class DomUtil {
             // First we immediately try to get the element.
             const e: HTMLElement = document.getElementById(id);
             if (e) {
-                // console.log("ELM found immediately: "+id);
                 if (exResolve) {
                     exResolve(e);
                 }
@@ -125,7 +119,6 @@ export class DomUtil {
                 const maxWaitTime = 5000;
 
                 const interval = setInterval(() => {
-                    // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
                     accumWaitTime += timeSlice;
                     if (accumWaitTime >= maxWaitTime) {
                         console.error("waited for but never found element: " + id);
@@ -134,10 +127,8 @@ export class DomUtil {
                     }
 
                     const e: HTMLElement = document.getElementById(id);
-                    // console.log("waiting for elm: "+id);
                     if (e) {
                         clearInterval(interval);
-                        // console.log("Got Elm: "+id);
                         if (exResolve) {
                             exResolve(e);
                         }
@@ -200,7 +191,6 @@ export class DomUtil {
         attribs.onDragOver = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
-            // console.log("onDragOver: id=" + event.target.id);
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
             if (fullOutline) {
                 event.currentTarget.style.border = "2px solid green";
@@ -222,7 +212,6 @@ export class DomUtil {
         };
 
         attribs.onDrop = function (event: any) {
-            // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
             if (fullOutline) {

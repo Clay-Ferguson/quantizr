@@ -38,7 +38,7 @@ export class Props {
     }
 
     getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
-        if (!node || !node.clientProps) {
+        if (!node?.clientProps) {
             return null;
         }
 
@@ -51,19 +51,17 @@ export class Props {
     */
     getCryptoKey = (node: J.NodeInfo, ast: AppState) => {
         if (!node) return null;
-        let cipherKey = null;
+        let key = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
         if (ast.userName === node.owner) {
-            cipherKey = this.getPropStr(J.NodeProp.ENC_KEY, node);
-            // console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
+            key = this.getPropStr(J.NodeProp.ENC_KEY, node);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
         else {
-            cipherKey = node.cipherKey;
-            // console.log("getting cipherKey from node.cipherKey (not your node): " + cipherKey);
+            key = node.cipherKey;
         }
-        return cipherKey;
+        return key;
     }
 
     isShared = (node: J.NodeInfo): boolean => {
@@ -158,7 +156,7 @@ export class Props {
         }
 
         // now sort and return the list
-        list.sort((a: J.Attachment, b: J.Attachment) => a.o - b.o);
+        list.sort((a, b) => a.o - b.o);
         return list;
     }
 

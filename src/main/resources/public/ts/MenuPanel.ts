@@ -165,7 +165,7 @@ export class MenuPanel extends Div {
         const state = this.getState();
 
         const hltNode = S.nodeUtil.getHighlightedNode(ast);
-        const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === "admin");
+        const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;
 

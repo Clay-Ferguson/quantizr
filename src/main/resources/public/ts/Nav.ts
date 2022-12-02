@@ -21,7 +21,6 @@ export class Nav {
     displayingRepositoryRoot = (ast: AppState): boolean => {
         if (!ast.node) return false;
         // one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
-        // console.log(S.util.prettyPrint(S.quanta.currentNodeData.node));
         return ast.node.id === ast.node.ownerId;
     }
 
@@ -265,7 +264,6 @@ export class Nav {
         ast = getAppState(ast);
         S.view.scrollActiveToTop(ast);
 
-        // console.log("navHome()");
         if (ast.isAnonUser) {
             S.util.loadAnonPageHome();
         } else {

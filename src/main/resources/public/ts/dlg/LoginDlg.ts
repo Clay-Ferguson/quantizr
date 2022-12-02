@@ -59,7 +59,7 @@ export class LoginDlg extends DialogBase {
 
         /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
         if (usr === "a") {
-            usr = "admin";
+            usr = J.PrincipalName.ADMIN;
         }
 
         // if the password field is empty, or CTRL key is down, and a username is provided, then get the password from the browser

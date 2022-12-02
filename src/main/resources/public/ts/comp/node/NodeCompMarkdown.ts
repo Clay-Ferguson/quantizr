@@ -28,7 +28,7 @@ export class NodeCompMarkdown extends Html {
 
         // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
-        this.purifyHtml = node.owner !== "admin";
+        this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
 
         if (!ast.mobileMode) {
             const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "content-wide" : "content-narrow";

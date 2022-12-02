@@ -82,7 +82,6 @@ export class RssType extends TypeBase {
 
         let feedContent: Comp = null;
 
-        // console.log("RSSType.render");
         const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
         if (feedSrc) {
             const feedSrcHash = S.util.hashOfString(feedSrc);
@@ -178,7 +177,6 @@ export class RssType extends TypeBase {
     renderItem(feed: J.RssFeed, feedSrc: string, ast: AppState): Comp {
         const feedList = new Div("", { className: "rss-feed-listing" });
         const feedOut: Comp[] = [];
-        // console.log("FEED: " + S.util.prettyPrint(feed));
 
         const feedSrcHash = S.util.hashOfString(feedSrc);
         let page: number = ast.rssFeedPage[feedSrcHash];
@@ -301,7 +299,6 @@ export class RssType extends TypeBase {
     }
 
     buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, ast: AppState): Comp {
-        // console.log("ENTRY: " + S.util.prettyPrint(entry));
         const children: Comp[] = [];
         const headerDivChildren = [];
         let imageShown = false;

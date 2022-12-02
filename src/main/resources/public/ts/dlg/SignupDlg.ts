@@ -90,7 +90,6 @@ export class SignupDlg extends DialogBase {
 
     signupResponse = async (res: J.SignupResponse): Promise<void> => {
         if (res.success) {
-            /* close the signup dialog */
             this.close();
 
             if (this.adminCreatingUser) {
@@ -105,7 +104,6 @@ export class SignupDlg extends DialogBase {
             }
         }
         else {
-            // S.util.showMessage("Invalid information for Signup", "Signup");
             this.userNameState.setError(res.userError);
             this.passwordState.setError(res.passwordError);
             this.emailState.setError(res.emailError);

@@ -33,6 +33,7 @@ export class Search {
             shareTarget,
             accessOption
         });
+
         if (res.searchResults?.length > 0) {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SHARES);
@@ -139,14 +140,8 @@ export class Search {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
-        this.search(node, null, null, ast, null, "Priority Listing",
-            false,
-            false, 0,
-            true,
-            J.NodeProp.PRIORITY_FULL,
-            "asc",
-            true,
-            null);
+        this.search(node, null, null, ast, null, "Priority Listing", false, false, 0, true,
+            J.NodeProp.PRIORITY_FULL, "asc", true, null);
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, ast: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
@@ -613,6 +608,7 @@ export class Search {
             search,
             replace
         });
+
         S.view.refreshTree({
             nodeId: null,
             zeroOffset: false,

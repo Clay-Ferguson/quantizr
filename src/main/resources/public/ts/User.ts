@@ -117,7 +117,6 @@ export class User {
                 }
 
                 if (usingCredentials) {
-                    // console.log("calling loginResponse()");
                     // Note: If user entered wrong case-sentitivity string on login dialog they can still login
                     // but this res.userName however will have the correct name (case-sensitive) here now.
                     this.loginResponse(res, res.userProfile.userName, callPwd, false);
@@ -289,7 +288,6 @@ export class User {
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
 
-            // location.reload();
             if (!calledFromLoginDlg) {
                 this.userLogin();
             }

@@ -83,9 +83,7 @@ export class Edit {
         if (S.util.checkSuccess("Editing node", res)) {
             if (ast.mobileMode) forceUsePopup = true;
 
-            /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
-            do need even when edit mode is technically off */
-            const editingAllowed = /* state.userPrefs.editMode && */ this.isEditAllowed(res.nodeInfo, ast);
+            const editingAllowed = this.isEditAllowed(res.nodeInfo, ast);
             if (editingAllowed) {
 
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
@@ -185,7 +183,7 @@ export class Edit {
         if (ast.isAdminUser) return true;
 
         // if no owner treat as if admin owns
-        return ast.userName === (node.owner || "admin");
+        return ast.userName === (node.owner || J.PrincipalName.ADMIN);
     }
 
     /*
@@ -318,14 +316,12 @@ export class Edit {
 
             // find and update the history item if it exists.
             const histItem = S.quanta.nodeHistory.find(h => h.id === node.id);
-
             if (histItem) {
                 histItem.content = S.nodeUtil.getShortContent(node);
             }
 
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
             // and so before refreshing the screen we check for that edge case.
-            // console.log("saveNodeResponse: " + S.util.prettyPrint(node));
             const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
@@ -806,7 +802,6 @@ export class Edit {
         } else {
             parentNode = MainTab.inst?.findNode(ast, id);
             if (!parentNode) {
-                // console.log("Unknown nodeId in createSubNode: " + id);
                 return;
             }
         }
@@ -1087,16 +1082,6 @@ export class Edit {
         }
     }
 
-    // showIpfsTab = () => {
-    //     dispatch("showIpfsTab", s => {
-    //         s.showIpfsTab = true;
-    //         setTimeout(() => {
-    //             S.tabUtil.selectTab(C.TAB_IPFSVIEW);
-    //         }, 250);
-    //         return s;
-    //     });
-    // }
-
     saveClipboardToChildNode = async (parentId: string) => {
         let clipText: string = await (navigator as any)?.clipboard?.readText();
         if (clipText) {
@@ -1324,16 +1309,12 @@ export class Edit {
     }
 
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean) => {
-        // console.log("targetNodeId=" + targetNodeId);
-
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
             return;
         }
 
-        // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = getAppState(null);
-
         const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
@@ -1390,8 +1371,7 @@ export class Edit {
             return;
         }
 
-        const dlg: SharingDlg = new SharingDlg();
-        await dlg.open();
+        await new SharingDlg().open();
     }
 
     /* Whenever we share an encrypted node to a another user, this is the final operation we run which
@@ -1404,11 +1384,9 @@ export class Edit {
             console.warn("public node has encryption turned on. This is a bug.");
             return;
         }
-        // console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
 
         // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
         const cipherKey = S.props.getPropStr(J.NodeProp.ENC_KEY, node);
-        // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
         // get this broswer's private key from browser storage
         const privateKey: CryptoKey = await S.crypto.getPrivateEncKey();
@@ -1419,16 +1397,12 @@ export class Edit {
             throw new Error("Unable to access encryption key.");
         }
 
-        // console.log("clear text key to re-encrypt: " + clearKey + "\nEncrpyting key using this pub key of user: " +
-        //     principalPublicKeyStr);
-
         // first parse the key and build a usable key from principalPublicKey.
         const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
         const principalPublicKey = await S.crypto.importKey(principalSymKeyJsonObj, S.crypto.ASYM_IMPORT_ALGO, true, S.crypto.OP_ENC);
 
         // now re-encrypt this clearTextKey using the public key (of the user being shared to).
         const userCipherKey = await S.crypto.asymEncryptString(principalPublicKey, clearKey);
-        // console.log("userCipherKey=" + userCipherKey);
 
         /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
         then store this key alongside the ACL (access control list) for the sharing entry for this user */

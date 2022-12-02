@@ -569,7 +569,6 @@ export class Util {
         }
 
         const content = S.nodeUtil.getShortContent(node);
-        // console.log("updateHistory: id=" + node.id + " subId=" + childNodeId + " cont=" + content);
         let url, title, state;
         if (node.name) {
             const queryPath = S.nodeUtil.getPathPartForNamedNode(node);
@@ -971,7 +970,7 @@ export class Util {
         dispatch("LoginResponse", s => {
             s.userProfile = res.userProfile;
             s.userName = res.userProfile.userName;
-            s.isAdminUser = res.userProfile.userName === "admin";
+            s.isAdminUser = res.userProfile.userName === J.PrincipalName.ADMIN;
             s.isAnonUser = res.userProfile.userName === J.PrincipalName.ANON;
 
             // allow for everyone for now

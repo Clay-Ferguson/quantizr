@@ -23,11 +23,9 @@ import { RssType } from "./plugins/RssType";
 import { TextType } from "./plugins/TextType";
 
 export class PluginMgr {
-
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
 
     addType = (type: TypeIntf) => {
-        // console.log("Adding Type: type=" + type.getTypeName());
         if (this.types.get(type.getTypeName())) {
             throw new Error("duplicate type handler: " + type.getTypeName());
         }
@@ -35,11 +33,11 @@ export class PluginMgr {
     }
 
     getType = (typeName: string): TypeIntf => {
-        const handler = this.types.get(typeName);
-        if (!handler) {
+        const type = this.types.get(typeName);
+        if (!type) {
             console.warn("No type handler for: " + typeName);
         }
-        return handler;
+        return type;
     }
 
     getAllTypes = (): Map<string, TypeIntf> => {

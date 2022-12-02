@@ -10,7 +10,6 @@ import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 export class AccountType extends TypeBase {
-
     constructor() {
         super(J.NodeType.ACCOUNT, "Account Root", "fa-database", false);
     }

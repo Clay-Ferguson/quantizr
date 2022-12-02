@@ -180,7 +180,7 @@ export class NodeUtil {
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
         if (!node || !node.name) return null;
 
-        if (node.owner === "admin") {
+        if (node.owner === J.PrincipalName.ADMIN) {
             return "/n/" + node.name;
         }
         else {
@@ -191,7 +191,7 @@ export class NodeUtil {
     getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
         if (!node || !node.name) return null;
 
-        if (node.owner === "admin") {
+        if (node.owner === J.PrincipalName.ADMIN) {
             return "/f/" + node.name;
         }
         else {

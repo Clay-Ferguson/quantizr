@@ -13,7 +13,6 @@ import { TrendingRSInfo } from "../TrendingRSInfo";
 import { FeedTab } from "./data/FeedTab";
 
 PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
-    // console.log("Tab Changing in TrendingView [id=" + this.getId() + "]: " + tabName);
     if (tabId === C.TAB_TRENDING) {
         // We have this timer to allow the TrendingView to come into existence.
         setTimeout(() => {

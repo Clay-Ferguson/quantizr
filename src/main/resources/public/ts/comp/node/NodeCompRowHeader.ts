@@ -44,7 +44,7 @@ export class NodeCompRowHeader extends Div {
 
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
-        if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== "admin") {
+        if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== J.PrincipalName.ADMIN) {
             let displayName = this.node.displayName || ("@" + this.node.owner);
 
             displayName = S.util.insertActPubTags(displayName, this.node);
