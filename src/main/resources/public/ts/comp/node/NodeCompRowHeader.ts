@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { dispatch, useAppState } from "../../AppContext";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -11,8 +11,6 @@ import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Comp } from "../base/Comp";
-import { CollapsiblePanel } from "../core/CollapsiblePanel";
 
 export class NodeCompRowHeader extends Div {
 
@@ -26,6 +24,7 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         const ast = useAppState();
+        const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
         const children = [];
         let avatarImg: Img = null;
 
@@ -65,15 +64,25 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        const verboseChildren: Comp[] = ast.mobileMode ? [] : children;
-
         const type = S.plugin.getType(this.node.type);
         if (type) {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
-                verboseChildren.push(new Icon({
+                children.push(new Icon({
                     className: iconClass + " rowTypeIcon",
-                    title: "Node Type: " + type.getName(),
+                    title: "Node Type: " + type.getName()+"\n\nClick for more options...",
+                    onClick: () => {
+                        dispatch("SetHeaderDetailsState", s => {
+                            const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
+                            if (!showDetails) {
+                                s.expandedHeaderIds.add(this.node.id);
+                            }
+                            else {
+                                s.expandedHeaderIds.delete(this.node.id);
+                            }
+                            return s;
+                        });
+                    },
                     onMouseOver: () => { S.quanta.draggableId = this.node.id; },
                     onMouseOut: () => { S.quanta.draggableId = null; }
                 }));
@@ -82,14 +91,14 @@ export class NodeCompRowHeader extends Div {
 
         const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
         if (signed) {
-            verboseChildren.push(new Icon({
+            children.push(new Icon({
                 title: "Crypto Signature Verified",
                 className: "fa fa-certificate fa-lg signatureIcon"
             }));
         }
 
         if (S.props.isEncrypted(this.node)) {
-            verboseChildren.push(new Icon({
+            children.push(new Icon({
                 className: "fa fa-lock fa-lg lockIcon",
                 title: "Node is Encrypted."
             }));
@@ -97,11 +106,11 @@ export class NodeCompRowHeader extends Div {
 
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
         if (ast.isAdminUser) {
-            verboseChildren.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
+            children.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
         }
 
-        if (showInfo) {
-            verboseChildren.push(new Icon({
+        if (showInfo && showDetails) {
+            children.push(new Icon({
                 className: "fa fa-link fa-lg marginRight",
                 title: "Show URLs for this node",
                 onClick: () => S.render.showNodeUrl(this.node, ast)
@@ -109,16 +118,16 @@ export class NodeCompRowHeader extends Div {
         }
 
         // Allow bookmarking any kind of node other than bookmark nodes.
-        if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
-            verboseChildren.push(new Icon({
+        if (showInfo && showDetails && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
+            children.push(new Icon({
                 className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
                 onClick: () => S.edit.addBookmark(this.node, ast)
             }));
         }
 
-        if (showInfo && this.showThreadButton) {
-            verboseChildren.push(new Icon({
+        if (showInfo && showDetails && this.showThreadButton) {
+            children.push(new Icon({
                 className: "fa fa-th-list fa-lg marginRight",
                 title: "Show Full Thread History",
                 onClick: () => S.srch.showThread(this.node)
@@ -131,7 +140,7 @@ export class NodeCompRowHeader extends Div {
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         // Also we don't allow admin user to do any replies
         if (!ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
-            verboseChildren.push(new Icon({
+            children.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg marginRight",
                 onClick: () => {
@@ -147,7 +156,7 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo) {
             if (!ast.isAdminUser) {
-                verboseChildren.push(new Icon({
+                children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg marginRight",
                     onClick: () => {
@@ -166,8 +175,8 @@ export class NodeCompRowHeader extends Div {
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
              and we need to have a user identity for all the HTTP sigs for that. */
-            if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
-                verboseChildren.push(new Icon({
+            if (showDetails && !ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
+                children.push(new Icon({
                     title: "People associated with this Node",
                     className: "fa fa-users fa-lg marginRight",
                     onClick: () => S.user.showUsersList(this.node)
@@ -184,9 +193,9 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            verboseChildren.push(new Icon({
+            children.push(new Icon({
                 title: likeDisplay ? likeDisplay : "Like this Node",
-                className: "fa fa-thumbs-up fa-lg marginRight " + (youLiked ? "likedByMeIcon" : ""),
+                className: "fa fa-star fa-lg marginRight " + (youLiked ? "likedByMeIcon" : ""),
                 onClick: () => {
                     if (ast.isAdminUser) {
                         S.util.showMessage("Admin user can't do Likes.", "Admin");
@@ -204,7 +213,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (showInfo && priority) {
-            verboseChildren.push(new Span(priority, {
+            children.push(new Span(priority, {
                 className: "priorityTag" + priorityVal
             }));
         }
@@ -344,25 +353,10 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (floatUpperRightDiv.hasChildren()) {
-            verboseChildren.push(floatUpperRightDiv);
-            verboseChildren.push(new Clearfix());
+            children.push(floatUpperRightDiv);
+            children.push(new Clearfix());
         }
 
-        if (ast.mobileMode) {
-            this.setChildren([
-                ...children || [],
-                new CollapsiblePanel("n/a", "n/a", null, verboseChildren, false, (s: boolean) => {
-                    if (s) {
-                        ast.expandedHeaderIds.add(this.node.id);
-                    }
-                    else {
-                        ast.expandedHeaderIds.delete(this.node.id);
-                    }
-                }, ast.expandedHeaderIds.has(this.node.id), "headerInfoButton", "headerInfoDivExpanded", "headerInfoDivCollapsed float-end")
-            ]);
-        }
-        else {
-            this.setChildren(children);
-        }
+        this.setChildren(children);
     }
 }
