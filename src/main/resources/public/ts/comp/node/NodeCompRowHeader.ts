@@ -56,7 +56,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             children.push(new Span(displayName, {
-                className: this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other"),
+                className: "mediumMarginRight " + (this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other")),
                 title: "Show Profile:\n\n" + this.node.owner,
                 onClick: () => {
                     new UserProfileDlg(this.node.ownerId).open();
@@ -64,75 +64,25 @@ export class NodeCompRowHeader extends Div {
             }, null, true));
         }
 
-        const type = S.plugin.getType(this.node.type);
-        if (type) {
-            const iconClass = type.getIconClass();
-            if (showInfo && iconClass) {
-                children.push(new Icon({
-                    className: iconClass + " rowTypeIcon",
-                    title: "Node Type: " + type.getName()+"\n\nClick for more options...",
-                    onClick: () => {
-                        dispatch("SetHeaderDetailsState", s => {
-                            const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
-                            if (!showDetails) {
-                                s.expandedHeaderIds.add(this.node.id);
-                            }
-                            else {
-                                s.expandedHeaderIds.delete(this.node.id);
-                            }
-                            return s;
-                        });
-                    },
-                    onMouseOver: () => { S.quanta.draggableId = this.node.id; },
-                    onMouseOut: () => { S.quanta.draggableId = null; }
-                }));
-            }
-        }
-
         const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
         if (signed) {
             children.push(new Icon({
                 title: "Crypto Signature Verified",
-                className: "fa fa-certificate fa-lg signatureIcon"
+                className: "fa fa-certificate fa-lg signatureIcon mediumMarginRight"
             }));
         }
 
         if (S.props.isEncrypted(this.node)) {
             children.push(new Icon({
-                className: "fa fa-lock fa-lg lockIcon",
+                className: "fa fa-lock fa-lg lockIcon mediumMarginRight",
                 title: "Node is Encrypted."
             }));
         }
 
         /* for admin user show id, ordinal, and type right on the row. For diagnostics only. */
-        if (ast.isAdminUser) {
-            children.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
-        }
-
-        if (showInfo && showDetails) {
-            children.push(new Icon({
-                className: "fa fa-link fa-lg marginRight",
-                title: "Show URLs for this node",
-                onClick: () => S.render.showNodeUrl(this.node, ast)
-            }));
-        }
-
-        // Allow bookmarking any kind of node other than bookmark nodes.
-        if (showInfo && showDetails && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
-            children.push(new Icon({
-                className: "fa fa-bookmark fa-lg marginRight",
-                title: "Bookmark this Node",
-                onClick: () => S.edit.addBookmark(this.node, ast)
-            }));
-        }
-
-        if (showInfo && showDetails && this.showThreadButton) {
-            children.push(new Icon({
-                className: "fa fa-th-list fa-lg marginRight",
-                title: "Show Full Thread History",
-                onClick: () => S.srch.showThread(this.node)
-            }));
-        }
+        // if (ast.isAdminUser) {
+        //     children.push(new Span("[" + this.node.ordinal + "]", { className: "marginRight" }));
+        // }
 
         const editInsertAllowed = S.props.isWritableByMe(this.node);
         const actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
@@ -142,7 +92,7 @@ export class NodeCompRowHeader extends Div {
         if (!ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
-                className: "fa fa-reply fa-lg marginRight",
+                className: "fa fa-reply fa-lg mediumMarginRight",
                 onClick: () => {
                     if (ast.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -158,7 +108,7 @@ export class NodeCompRowHeader extends Div {
             if (!ast.isAdminUser) {
                 children.push(new Icon({
                     title: "Boost this Node",
-                    className: "fa fa-retweet fa-lg marginRight",
+                    className: "fa fa-retweet fa-lg mediumMarginRight",
                     onClick: () => {
                         if (ast.isAnonUser) {
                             S.util.showMessage("Login to boost nodes.", "Login!");
@@ -173,16 +123,6 @@ export class NodeCompRowHeader extends Div {
             const hasNonPublicShares = S.props.hasNonPublicShares(this.node);
             const hasMentions = S.props.hasMentions(this.node);
 
-            /* only allow this for logged in users, because it might try to access over ActivityPub potentially
-             and we need to have a user identity for all the HTTP sigs for that. */
-            if (showDetails && !ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
-                children.push(new Icon({
-                    title: "People associated with this Node",
-                    className: "fa fa-users fa-lg marginRight",
-                    onClick: () => S.user.showUsersList(this.node)
-                }));
-            }
-
             let youLiked: boolean = false;
             let likeDisplay: string = null;
             if (this.node.likes) {
@@ -195,7 +135,7 @@ export class NodeCompRowHeader extends Div {
 
             children.push(new Icon({
                 title: likeDisplay ? likeDisplay : "Like this Node",
-                className: "fa fa-star fa-lg marginRight " + (youLiked ? "likedByMeIcon" : ""),
+                className: "fa fa-star fa-lg mediumMarginRight " + (youLiked ? "likedByMeIcon" : ""),
                 onClick: () => {
                     if (ast.isAdminUser) {
                         S.util.showMessage("Admin user can't do Likes.", "Admin");
@@ -210,11 +150,66 @@ export class NodeCompRowHeader extends Div {
                     }
                 }
             }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
+
+            /* only allow this for logged in users, because it might try to access over ActivityPub potentially
+            and we need to have a user identity for all the HTTP sigs for that. */
+            if (showDetails && !ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
+                children.push(new Icon({
+                    title: "People associated with this Node",
+                    className: "fa fa-users fa-lg mediumMarginRight",
+                    onClick: () => S.user.showUsersList(this.node)
+                }));
+            }
+
+            if (showInfo && showDetails) {
+                children.push(new Icon({
+                    className: "fa fa-link fa-lg mediumMarginRight",
+                    title: "Show URLs for this node",
+                    onClick: () => S.render.showNodeUrl(this.node, ast)
+                }));
+            }
+
+            // Allow bookmarking any kind of node other than bookmark nodes.
+            if (showInfo && showDetails && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
+                children.push(new Icon({
+                    className: "fa fa-bookmark fa-lg mediumMarginRight",
+                    title: "Bookmark this Node",
+                    onClick: () => S.edit.addBookmark(this.node, ast)
+                }));
+            }
+
+            if (showInfo && showDetails && this.showThreadButton) {
+                children.push(new Icon({
+                    className: "fa fa-th-list fa-lg mediumMarginRight",
+                    title: "Show Full Thread History",
+                    onClick: () => S.srch.showThread(this.node)
+                }));
+            }
         }
 
         if (showInfo && priority) {
             children.push(new Span(priority, {
-                className: "priorityTag" + priorityVal
+                className: "mediumMarginRight priorityTag" + priorityVal
+            }));
+        }
+
+        if (!showDetails) {
+            children.push(new Icon({
+                title: "More",
+                className: "fa fa-ellipsis-h fa-lg mediumMarginRight",
+                onClick: () => {
+                    dispatch("SetHeaderDetailsState", s => {
+                        const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
+                        if (!showDetails) {
+                            s.expandedHeaderIds.add(this.node.id);
+                        }
+                        // leaving this code as example of "turn off" logic.
+                        // else {
+                        //     s.expandedHeaderIds.delete(this.node.id);
+                        // }
+                        return s;
+                    });
+                }
             }));
         }
 
@@ -224,6 +219,19 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo && this.node.lastModified) {
             floatUpperRightDiv.addChild(new Span(S.util.formatDateTime(new Date(this.node.lastModified))));
+        }
+
+        const type = S.plugin.getType(this.node.type);
+        if (type) {
+            const iconClass = type.getIconClass();
+            if (showInfo && showDetails && iconClass) {
+                floatUpperRightDiv.addChild(new Icon({
+                    className: iconClass + " marginLeft marginRight",
+                    title: "Node Type: " + type.getName(),
+                    onMouseOver: () => { S.quanta.draggableId = this.node.id; },
+                    onMouseOut: () => { S.quanta.draggableId = null; }
+                }));
+            }
         }
 
         if (showInfo && this.node.name) {
@@ -340,7 +348,8 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (this.jumpButton && !jumpButtonAdded) {
+        /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
+        if (ast.isAdminUser && this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
                 onClick: () => S.srch.clickSearchNode(this.node.id, ast),

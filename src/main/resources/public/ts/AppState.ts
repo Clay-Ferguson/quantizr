@@ -94,6 +94,8 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
+
+    // todo-0: need to remame this to "showAllRowDetails"
     expandedHeaderIds: Set<string> = new Set<string>();
 
     highlightSearchNodeId: string;

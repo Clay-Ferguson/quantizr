@@ -54,6 +54,7 @@ $createdByAnotherTextColor: white;
 $listBackgroundColor: lightGray;
 
 $smallGap: 12px;
+$mediumGap: 18px;
 $bigGap: 24px;
 $tinyGap: 8px;
 $microGap: 4px;
@@ -947,6 +948,10 @@ Will come back later and study this more. todo-3 */
     margin-right: $smallGap;
 }
 
+.mediumMarginRight {
+    margin-right: $mediumGap;
+}
+
 .img-block {
     margin-top: 12px;
     margin-right: 12px;
@@ -1103,6 +1108,7 @@ Will come back later and study this more. todo-3 */
 .quickEditIcon {
     cursor: pointer;
     color: $nodeBorderBottomColor;
+    margin-left: $smallGap;
 }
 
 /* 
@@ -1190,8 +1196,6 @@ Will come back later and study this more. todo-3 */
     padding: 6px;
     border-radius: $border-radius;
     cursor: pointer;
-    margin-right: $tinyGap;
-    margin-bottom: 4px;
 }
 
 .rowTypeName {
