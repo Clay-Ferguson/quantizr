@@ -24,7 +24,7 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         const ast = useAppState();
-        const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
+        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id);
         const children = [];
         let avatarImg: Img = null;
 
@@ -199,13 +199,13 @@ export class NodeCompRowHeader extends Div {
                 className: "fa fa-ellipsis-h fa-lg mediumMarginRight",
                 onClick: () => {
                     dispatch("SetHeaderDetailsState", s => {
-                        const showDetails: boolean = ast.expandedHeaderIds.has(this.node.id);
+                        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id);
                         if (!showDetails) {
-                            s.expandedHeaderIds.add(this.node.id);
+                            s.showAllRowDetails.add(this.node.id);
                         }
                         // leaving this code as example of "turn off" logic.
                         // else {
-                        //     s.expandedHeaderIds.delete(this.node.id);
+                        //     s.showAllRowDetails.delete(this.node.id);
                         // }
                         return s;
                     });

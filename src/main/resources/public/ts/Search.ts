@@ -511,7 +511,7 @@ export class Search {
         // render with info bar, etc always, if this is a threaview or freed tab.
         const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED;
         if (isFeed && allowFooter) {
-            allowFooter = ast.expandedHeaderIds.has(node.id);
+            allowFooter = ast.showAllRowDetails.has(node.id);
         }
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
