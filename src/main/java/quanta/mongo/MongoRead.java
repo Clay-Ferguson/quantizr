@@ -1110,6 +1110,7 @@ public class MongoRead extends ServiceBase {
         return read.getUserNodeByUserName(ms, user, true);
     }
 
+    // todo-0: wip -  I think if name contains "@" we can query "/usr/R" (remote user) otherwise "/usr/L" (local)
     @PerfMon(category = "read")
     public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
         if (no(user)) {
@@ -1129,8 +1130,7 @@ public class MongoRead extends ServiceBase {
 
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.USERS_PATH)) //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.USERS_PATH)) //
                 // case-insensitive lookup of username:
                 .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$") //
                 .and(SubNode.TYPE).is(NodeType.ACCOUNT.s());

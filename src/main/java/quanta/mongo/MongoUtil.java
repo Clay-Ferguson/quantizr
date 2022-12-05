@@ -53,9 +53,11 @@ public class MongoUtil extends ServiceBase {
 	private static final Random rand = new Random();
 
 	public static SubNode allUsersRootNode = null;
+	public static SubNode localUsersNode = null;
+	public static SubNode remoteUsersNode = null;
 
 	/*
-	 * removed 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
+	 * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
 	 * performant way to translate from /r/p to /r path and vice verse
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
@@ -972,7 +974,11 @@ public class MongoUtil extends ServiceBase {
 			ms.setUserNodeId(adminNode.getId());
 		}
 
-		allUsersRootNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
+		allUsersRootNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
+		
+		localUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
+		remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
+
 		createPublicNodes(ms);
 	}
 

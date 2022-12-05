@@ -79,6 +79,9 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
+
+    // todo-0: need constants used here
+    static openUsersNode = () => S.nav.openContentNode("/r/usr");
     static transferNode = () => { new TransferNodeDlg("transfer").open(); };
     static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
     static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
@@ -208,6 +211,7 @@ export class MenuPanel extends Div {
                 new MenuItem("My Account", S.nav.navToMyAccntRoot),
                 new MenuItem("My Home", MenuPanel.openHomeNode),
                 new MenuItem("My Posts", MenuPanel.openPostsNode),
+                ast.isAdminUser ? new MenuItem("Users Node", MenuPanel.openUsersNode) : null,
                 new MenuItemSeparator(),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
                 new MenuItem("Notes", MenuPanel.openNotesNode),

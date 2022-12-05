@@ -1663,13 +1663,13 @@ Will come back later and study this more. todo-3 */
 .userFeedItem {
     padding-top: 10px;
     border-top: 1px solid $nodeBorderBottomColor;
-    padding-bottom: $smallGap;
+    padding-bottom: $tinyGap;
 }
 
 .userFeedItemHighlight {
     padding-top: 10px;
     border: 1px solid olivedrab;
-    padding-bottom: $smallGap;
+    padding-bottom: $tinyGap;
 }
 
 .userFeedParent {

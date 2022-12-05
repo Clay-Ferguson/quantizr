@@ -153,6 +153,7 @@ public class OutboxMgr extends ServiceBase {
 				return OutboxMgr.outboxNode;
 			}
 
+			// todo-0: replace all "/" + NodePath.ROOT with NodePath.ROOT_PATH
 			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.OUTBOX, null, "Outbox", null, true, null, null);
 
 			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.OUTBOX + "/" + NodePath.SYSTEM, null,
