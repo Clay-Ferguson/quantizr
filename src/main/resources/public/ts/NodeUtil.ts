@@ -335,7 +335,16 @@ export class NodeUtil {
                     showMore += "\n";
                 }
                 else {
-                    ret.push(new Span("@" + ac.principalName + suffix, props));
+                    let nameInSpan = ac.principalName;
+
+                    // If nameInSpan contains '@' (a foreign user) then chop off the server name to make the
+                    // display shorter
+                    const atIdx = nameInSpan.indexOf("@");
+                    if (atIdx !== -1) {
+                        nameInSpan = nameInSpan.substring(0, atIdx);
+                    }
+
+                    ret.push(new Span("@" + nameInSpan + suffix, props));
                 }
                 numShares++;
             }

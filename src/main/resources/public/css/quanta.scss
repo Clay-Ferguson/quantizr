@@ -1631,17 +1631,17 @@ Will come back later and study this more. todo-3 */
 
 .threadFeedItem {
     margin-top: 8px;
-    padding-top: 5px;
-    border: 2px solid $nodeBorderBottomColor;
+    padding-top: 10px;
+    border: 1px solid $nodeBorderBottomColor;
     padding-bottom: $smallGap;
     border-radius: $border-radius;
 }
 
 .threadFeedSubItem {
-    padding-top: 5px;
+    padding-top: 10px;
 
     &:not(:last-child) {
-        border-bottom: 2px solid $nodeBorderBottomColor;
+        border-bottom: 1px solid $nodeBorderBottomColor;
     }
 
     &:last-child {
@@ -1654,21 +1654,21 @@ Will come back later and study this more. todo-3 */
 
 .threadFeedItemHighlight {
     margin-top: 5px;
-    padding-top: 5px;
-    border: 2px solid olivedrab;
+    padding-top: 10px;
+    border: 1px solid olivedrab;
     padding-bottom: $smallGap;
     border-radius: $border-radius;
 }
 
 .userFeedItem {
-    padding-top: 5px;
-    border-top: 2px solid $nodeBorderBottomColor;
+    padding-top: 10px;
+    border-top: 1px solid $nodeBorderBottomColor;
     padding-bottom: $smallGap;
 }
 
 .userFeedItemHighlight {
-    padding-top: 5px;
-    border: 2px solid olivedrab;
+    padding-top: 10px;
+    border: 1px solid olivedrab;
     padding-bottom: $smallGap;
 }
 

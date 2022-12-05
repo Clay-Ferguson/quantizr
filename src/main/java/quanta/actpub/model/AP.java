@@ -187,9 +187,10 @@ public class AP {
         if (o instanceof Map<?, ?>) {
             return typeFromFactory(new APObj((Map<?, ?>) o));
         } else {
-            ExUtil.warn("[2]getting prop " + prop + " from unsupported container type: "
-                    + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
-                    + XString.prettyPrint(obj));
+            // this is not an indication of a problem when we check for a property and don't find it.
+            // ExUtil.warn("[2]getting prop " + prop + " from unsupported container type: "
+            //         + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
+            //         + XString.prettyPrint(obj));
         }
         return null;
     }

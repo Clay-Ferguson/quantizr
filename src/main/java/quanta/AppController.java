@@ -260,6 +260,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			@RequestParam(value = "view", required = false) String initialTab, //
 			@RequestParam(value = "tagSearch", required = false) String tagSearch, //
+			@RequestParam(value = "info", required = false) String info, // sets info mode on
 			HttpSession session, //
 			Model model) {
 		HashMap<String, String> attrs = getThymeleafAttribs();
@@ -282,6 +283,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			attrs.put("initialTab", initialTab);
 			attrs.put("tagSearch", tagSearch);
+
+			if (!StringUtils.isEmpty(info)) {
+				attrs.put("info", "on");
+			}
 
 			// log.debug("AppController.index: sessionUser=" +
 			// sessionContext.getUserName());

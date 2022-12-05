@@ -1285,7 +1285,8 @@ public class ActPubService extends ServiceBase {
 
             if ("Mention".equalsIgnoreCase(type)) {
                 tags.put(name, new APOMention(href, name));
-            } else if ("Hashtag".equalsIgnoreCase(type)) {
+            } //
+            else if ("Hashtag".equalsIgnoreCase(type)) {
                 tags.put(name, new APOHashtag(href, name));
             }
         }

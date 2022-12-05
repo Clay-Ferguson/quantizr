@@ -30,6 +30,7 @@ import { MainTab } from "./tabs/data/MainTab";
 
 // eslint-disable-next-line no-unused-vars
 declare let g_urlIdFailMsg: string;
+declare let g_info: string;
 
 export class Render {
     private debug: boolean = false;
@@ -429,6 +430,11 @@ export class Render {
                 if (!s.activeTab || clickTab) {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN, s);
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
+                }
+
+                if (g_info && s.userPrefs) {
+                    s.userPrefs.showMetaData = true;
+                    g_info = null;
                 }
 
                 s.pageMessage = null;
