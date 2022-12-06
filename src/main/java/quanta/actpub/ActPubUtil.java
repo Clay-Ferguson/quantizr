@@ -915,7 +915,7 @@ public class ActPubUtil extends ServiceBase {
                         String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
                         if (ok(actPubId)) {
 
-                            // todo-0: we have to do both LOCAL and REMOTE users separately here until I create the 
+                            // todo-1: we have to do both LOCAL and REMOTE users separately here until I create the 
                             // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                             // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
                             iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), actPubId);

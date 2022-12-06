@@ -56,12 +56,12 @@ public class AppFilter extends GenericFilterBean {
 				httpRes = (HttpServletResponse) res;
 
 				// if server hasn't completed startup process return 'service unavailable'
-				// todo-0: It's probably slightly better to go ahead and hang this thread here, and do a
-				// 20 second sleep, before returning the actual error, since server is probably that close to
-				// being ready and we can process rather than loose this request.
 				if (!MongoRepository.fullInit) {
-					httpRes.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-					return;
+					Util.sleep(20000);
+					if (!MongoRepository.fullInit) {
+						httpRes.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+						return;
+					}
 				}
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
@@ -100,9 +100,12 @@ public class AppFilter extends GenericFilterBean {
 				}
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
-			
+
 				if (!MongoRepository.fullInit) {
-					throw new RuntimeException("Server temporarily offline.");
+					Util.sleep(20000);
+					if (!MongoRepository.fullInit) {
+						throw new RuntimeException("Server temporarily offline.");
+					}
 				}
 			}
 
@@ -126,6 +129,6 @@ public class AppFilter extends GenericFilterBean {
 			 * cause it to send back the html error page.
 			 */
 			httpRes.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} 
+		}
 	}
 }
