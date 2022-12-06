@@ -53,7 +53,6 @@ public class MongoRead extends ServiceBase {
 
     private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;
-    private SubNode userRoot;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
@@ -62,15 +61,6 @@ public class MongoRead extends ServiceBase {
                 dbRoot = findNodeByPath(NodePath.ROOT_PATH);
             }
             return dbRoot;
-        }
-    }
-
-    public SubNode getUserRoot() {
-        synchronized (dbRootsLock) {
-            if (no(userRoot)) {
-                userRoot = findNodeByPath(NodePath.USERS_PATH);
-            }
-            return userRoot;
         }
     }
 
@@ -211,7 +201,8 @@ public class MongoRead extends ServiceBase {
     public boolean knownPath(String path) {
         // if this is a path we KNOW exists, return false
         if (no(path) || path.length() == 0 || !path.contains("/") || path.equals(NodePath.PENDING_PATH)
-                || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH)) {
+                || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH) || path.equals(NodePath.LOCAL_USERS_PATH)
+                || path.equals(NodePath.REMOTE_USERS_PATH)) {
             return true;
         }
         return false;
@@ -266,6 +257,16 @@ public class MongoRead extends ServiceBase {
 
         // no need to check USERS
         if (parentPath.equals(NodePath.USERS_PATH) || parentPath.equals(NodePath.USERS_PATH + "/")) {
+            return;
+        }
+
+        // no need to check REMOTE USERS
+        if (parentPath.equals(NodePath.REMOTE_USERS_PATH) || parentPath.equals(NodePath.REMOTE_USERS_PATH + "/")) {
+            return;
+        }
+
+        // no need to check LOCAL USERS
+        if (parentPath.equals(NodePath.LOCAL_USERS_PATH) || parentPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
             return;
         }
 
@@ -1110,7 +1111,6 @@ public class MongoRead extends ServiceBase {
         return read.getUserNodeByUserName(ms, user, true);
     }
 
-    // todo-0: wip -  I think if name contains "@" we can query "/usr/R" (remote user) otherwise "/usr/L" (local)
     @PerfMon(category = "read")
     public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
         if (no(user)) {
@@ -1118,9 +1118,11 @@ public class MongoRead extends ServiceBase {
         }
         user = user.trim();
 
-        // if user name ends with "@domain.com" for example, truncate it after the '@'
-        // character.
+        // if user name ends with "@quanta.wiki" for example, truncate it after the '@'
+        // character, so that ONLY foreign names will have any '@' in the string.
         user = convertIfLocalName(user);
+
+        String pathToQuery = user.contains("@") ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
 
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
@@ -1130,7 +1132,7 @@ public class MongoRead extends ServiceBase {
 
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.USERS_PATH)) //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(pathToQuery)) //
                 // case-insensitive lookup of username:
                 .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$") //
                 .and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
@@ -1350,6 +1352,42 @@ public class MongoRead extends ServiceBase {
         // SubNode ret = mongoUtil.findOne(q);
         // auth.auth(ms, ret, PrivilegeType.READ);
         // return ret;
+    }
+
+    public Iterable<SubNode> getAccountNodes(MongoSession ms, TextCriteria textCriteria, Sort sort, Integer limit, int skip, boolean remote, boolean local) {
+        if (!remote && !local) {
+            throw new RuntimeException("Accont query needs local and/or remote specified.");
+        }
+
+        Query q = new Query();
+        Criteria crit = new Criteria();
+        List<Criteria> critList = new LinkedList<>();
+        if (remote) {
+            critList.add(Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)));
+        }
+
+        if (local) {
+            critList.add(Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)));
+        }
+
+        if (ok(textCriteria)) {
+            q.addCriteria(textCriteria);
+        }
+        q.addCriteria(crit.orOperator(critList));
+
+        if (ok(limit) && limit.intValue() > 0) {
+            q.limit(limit.intValue());
+        }
+
+        if (skip > 0) {
+            q.skip(skip);
+        }
+
+        if (ok(sort)) {
+            q.with(sort);
+        }
+
+        return mongoUtil.find(q);
     }
 
     // (not currently used)

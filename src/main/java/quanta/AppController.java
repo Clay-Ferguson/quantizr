@@ -268,10 +268,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
 			SessionContext.init(context, session, true);
 
-			if (!MongoRepository.fullInit) {
-				throw new RuntimeException("Server temporarily offline.");
-			}
-
 			// Conver tab name if short name given
 			if ("doc".equals(initialTab)) {
 				initialTab = "docRS";

@@ -226,6 +226,14 @@ public class UserFeedService extends ServiceBase {
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
+
+		/*
+		 * We block the "remote users" and "local users" by blocking any admin owned nodes, but we also just
+		 * want to in general for other reasons block any admin-owned nodes from showing up in feeds. Feeds
+		 * are always only about user content.
+		 */
+		blockedUserIds.add(auth.getAdminSession().getUserNodeId());
+
 		boolean allowNonEnglish = true;
 
 		if (!bidirectional) {
@@ -472,7 +480,8 @@ public class UserFeedService extends ServiceBase {
 							continue;
 						}
 
-						if (!allowBadWords && !auth.ownedByThreadUser(boostedNode) && english.hasBadWords(boostedNode.getContent())) {
+						if (!allowBadWords && !auth.ownedByThreadUser(boostedNode)
+								&& english.hasBadWords(boostedNode.getContent())) {
 							skipped++;
 							continue;
 						}

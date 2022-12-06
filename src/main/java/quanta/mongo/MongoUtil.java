@@ -39,6 +39,7 @@ import quanta.request.SignupRequest;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
+import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
@@ -57,8 +58,8 @@ public class MongoUtil extends ServiceBase {
 	public static SubNode remoteUsersNode = null;
 
 	/*
-	 * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
-	 * performant way to translate from /r/p to /r path and vice verse
+	 * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
+	 * need very performant way to translate from /r/p to /r path and vice verse
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
@@ -385,35 +386,43 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
-		// Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getPath(), null,
-		// 0, 0, null, null);
+		Iterable<SubNode> accntNodes =
+				read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
-		// for (SubNode acctNode : accountNodes) {
+		for (SubNode acctNode : accntNodes) {
+			String userName = acctNode.getStr(NodeProp.USER.s());
+			if (no(userName))
+				continue;
 
-		// // if this is a foreign node ignore it.
-		// String userName = acctNode.getStr(NodeProp.USER.s());
-		// log.debug("Processing Account: " + acctNode.getIdStr() + " user: " + userName);
+			log.debug("Proc Accnt: " + userName);
+			String path = acctNode.getPath();
 
-		// if (no(userName) || userName.contains("@")) {
-		// // invalid userName or foreign user, ignore.
-		// } else {
-		// // any node that's a child here and doesn't have ACCOUNT type should be set to account type
-		// // Need to signup a new user and make sure it's working to set the account type WITHOUT this
-		// stupid
-		// // fix.
-		// if (!NodeType.ACCOUNT.s().equals(acctNode.getType())) {
-		// acctNode.setType(NodeType.ACCOUNT.s());
-		// }
-		// acctNode.set(NodeProp.USER_PREF_SHOW_REPLIES.s(), Boolean.TRUE);
-		// }
+			// foreign user
+			if (userName.contains("@")) {
+				move.changePathOfSubGraph(ms, acctNode, NodePath.REMOTE_USERS_PATH, null);
 
-		// if (ThreadLocals.getDirtyNodeCount() > 200) {
-		// update.saveSession(ms);
-		// }
-		// }
+				if (!path.startsWith(NodePath.REMOTE_USERS_PATH)) {
+					path = XString.stripIfStartsWith(path, NodePath.USERS_PATH);
+					acctNode.setPath(NodePath.REMOTE_USERS_PATH + path);
+				}
+			}
+			// local user
+			else {
+				move.changePathOfSubGraph(ms, acctNode, NodePath.LOCAL_USERS_PATH, null);
 
-		// // should be unnecessary but let's save here too.
-		// update.saveSession(ms);
+				if (!path.startsWith(NodePath.LOCAL_USERS_PATH)) {
+					path = XString.stripIfStartsWith(path, NodePath.USERS_PATH);
+					acctNode.setPath(NodePath.LOCAL_USERS_PATH + path);
+				}
+			}
+
+			if (ThreadLocals.getDirtyNodeCount() > 200) {
+				update.saveSession(ms);
+			}
+		}
+
+		// should be unnecessary but let's save here too.
+		update.saveSession(ms);
 	}
 
 	/*
@@ -586,7 +595,7 @@ public class MongoUtil extends ServiceBase {
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
-		 * user. That is, prefixed by their username followed by two dashes. 
+		 * user. That is, prefixed by their username followed by two dashes.
 		 */
 		createIndex(ms, SubNode.class, SubNode.NAME);
 		createIndex(ms, SubNode.class, SubNode.TYPE);
@@ -855,7 +864,7 @@ public class MongoUtil extends ServiceBase {
 		path = XString.stripIfEndsWith(path, "/");
 
 		// NOTES:
-		// - The leftmost caret (^) matches path to first part of the string.
+		// - The leftmost caret (^) matches path to first part of the string (i.e. starts with 'path')
 		// - The caret inside the ([]) means "not" containing the '/' char.
 		// - \\/ is basically just '/' (escaped properly)
 		// - The '*' means we match the "not /" condition one or more times.
@@ -911,7 +920,8 @@ public class MongoUtil extends ServiceBase {
 		auth.requireAdmin(ms);
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
-		userNode = create.createNode(ms, read.getUserRoot(), NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true); 
+		SubNode parentNode = newUserName.contains("@") ? remoteUsersNode : localUsersNode;
+		userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true);
 
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
@@ -954,9 +964,6 @@ public class MongoUtil extends ServiceBase {
 	public void createAdminUser(MongoSession ms) {
 		String adminUser = prop.getMongoAdminUserName();
 
-		// I'm throwing this in here, but it's not necessary.
-		read.getUserRoot();
-
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (no(adminNode)) {
 			adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
@@ -975,9 +982,10 @@ public class MongoUtil extends ServiceBase {
 		}
 
 		allUsersRootNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
-		
-		localUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
-		remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
+		localUsersNode =
+				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
+		remoteUsersNode =
+				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
 
 		createPublicNodes(ms);
 	}

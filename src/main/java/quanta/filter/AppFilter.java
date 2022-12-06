@@ -43,11 +43,6 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-		if (!MongoRepository.fullInit) {
-			// todo-1: need to return 503 error code here.
-			throw new RuntimeException("Server temporarily offline.");
-		}
-
 		HttpServletResponse httpRes = null;
 		try {
 			int thisReqId = ++reqId;
@@ -59,6 +54,15 @@ public class AppFilter extends GenericFilterBean {
 
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
+
+				// if server hasn't completed startup process return 'service unavailable'
+				// todo-0: It's probably slightly better to go ahead and hang this thread here, and do a
+				// 20 second sleep, before returning the actual error, since server is probably that close to
+				// being ready and we can process rather than loose this request.
+				if (!MongoRepository.fullInit) {
+					httpRes.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+					return;
+				}
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				SessionContext sc = ThreadLocals.getSC();
@@ -96,6 +100,10 @@ public class AppFilter extends GenericFilterBean {
 				}
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
+			
+				if (!MongoRepository.fullInit) {
+					throw new RuntimeException("Server temporarily offline.");
+				}
 			}
 
 			if (res instanceof HttpServletResponse) {

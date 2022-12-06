@@ -103,8 +103,8 @@ public class NodeSearchService extends ServiceBase {
 		perf.chain("rendDoc:getDocList");
 
 		for (SubNode n : nodes) {
-			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false,
-					false, false, false, false, true, null);
+			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
+					false, false, false, true, null);
 
 			if (ok(info)) {
 				if (truncates.contains(n.getIdStr())) {
@@ -137,8 +137,8 @@ public class NodeSearchService extends ServiceBase {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-						false, false, false, false, true, null);
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
+						false, false, false, true, null);
 				if (ok(info)) {
 					searchResults.add(info);
 				}
@@ -154,8 +154,8 @@ public class NodeSearchService extends ServiceBase {
 			}
 			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
-				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-						false, false, false, false, true, null);
+				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
+						false, false, false, true, null);
 				if (ok(info)) {
 					searchResults.add(info);
 				}
@@ -183,8 +183,8 @@ public class NodeSearchService extends ServiceBase {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-								counter + 1, false, false, false, false, false, true, null);
+						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, counter + 1,
+								false, false, false, false, false, true, null);
 						if (ok(info)) {
 							searchResults.add(info);
 						}
@@ -221,24 +221,18 @@ public class NodeSearchService extends ServiceBase {
 			textCriteria.caseSensitive(req.getCaseSensitive());
 		}
 
-		Criteria moreCriteria = null;
-		// searching only Foreign users
-		if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ACTOR_URL.s()).ne(null);
-		}
-		// searching only Local users
-		else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ACTOR_URL.s()).is(null);
-		}
 
 		Val<Iterable<SubNode>> accountNodes = new Val<>();;
 		final TextCriteria _textCriteria = textCriteria;
-		final Criteria _moreCriteria = moreCriteria;
 
 		// Run this as admin because ordinary users don't have access to account nodes.
 		arun.run(as -> {
-			accountNodes.setVal(read.getChildren(as, MongoUtil.allUsersRootNode.getPath(), null, ConstantInt.ROWS_PER_PAGE.val(),
-					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), _textCriteria, _moreCriteria, true));
+			accountNodes.setVal(read.getAccountNodes(as, _textCriteria, null, //
+					ConstantInt.ROWS_PER_PAGE.val(), //
+					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
+					Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
+					Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())));
+
 			return null;
 		});
 
@@ -249,8 +243,8 @@ public class NodeSearchService extends ServiceBase {
 			 */
 			for (SubNode node : accountNodes.getVal()) {
 				try {
-					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-							false, false, false, false, false, false, null);
+					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+							false, false, false, false, false, null);
 					if (ok(info)) {
 						searchResults.add(info);
 					}
@@ -272,8 +266,8 @@ public class NodeSearchService extends ServiceBase {
 				SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
 				if (ok(userNode)) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false,
-								counter + 1, false, false, false, false, false, false, null);
+						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false, counter + 1,
+								false, false, false, false, false, false, null);
 						if (ok(info)) {
 							searchResults.add(info);
 						}
@@ -343,8 +337,8 @@ public class NodeSearchService extends ServiceBase {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-					false, false, false, false, true, null);
+			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
+					false, false, false, true, null);
 			if (ok(info)) {
 				searchResults.add(info);
 			}
@@ -411,6 +405,7 @@ public class NodeSearchService extends ServiceBase {
 			strictFiltering = true;
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
+
 			Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
 
 			// This pattern is what is required when you have multiple conditions added to a
@@ -423,6 +418,13 @@ public class NodeSearchService extends ServiceBase {
 			ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 
 			HashSet<ObjectId> blockedUserIds = new HashSet<>();
+
+			/*
+			 * We block the "remote users" and "local users" by blocking any admin owned nodes, but we also just
+			 * want to in general for other reasons block any admin-owned nodes from showing up in feeds. Feeds
+			 * are always only about user content.
+			 */
+			blockedUserIds.add(auth.getAdminSession().getUserNodeId());
 
 			// filter out any nodes owned by users the admin has blocked.
 			userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());

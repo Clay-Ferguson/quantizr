@@ -56,7 +56,6 @@ import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
@@ -1300,7 +1299,6 @@ public class ActPubService extends ServiceBase {
             return;
 
         users.forEach((user, tag) -> {
-
             // ignore of this is something else like a Hashtag
             if (!(tag instanceof APOMention))
                 return;
@@ -1664,8 +1662,7 @@ public class ActPubService extends ServiceBase {
             accountsRefreshed = 0;
             arun.run(as -> {
                 // Query to pull all user accounts
-                Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
 
                 for (SubNode acctNode : accountNodes) {
                     // get userName, and skip over any that aren't foreign accounts
@@ -1804,8 +1801,7 @@ public class ActPubService extends ServiceBase {
             try {
                 scanningForeignUsers = true;
 
-                Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
 
                 for (SubNode node : accountNodes) {
                     if (!prop.isDaemonsEnabled())
@@ -1884,9 +1880,8 @@ public class ActPubService extends ServiceBase {
                 HashSet<ObjectId> blockedUserIds = new HashSet<>();
                 userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
-                Iterable<SubNode> accountNodes = read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(),
-                        false, Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS);
-
+                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, //
+                        Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME), NUM_CURATED_ACCOUNTS, -1, true, true);
                 StringBuilder usersToFollow = new StringBuilder();
 
                 // process each account in the system
@@ -1928,8 +1923,7 @@ public class ActPubService extends ServiceBase {
             return "ActivityPub not enabled";
 
         return arun.run(as -> {
-            Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(as, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
+            Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -2080,14 +2074,14 @@ public class ActPubService extends ServiceBase {
         // if we have a nodeId try to use it to get the objUrl from and ignore objUrl param, otherwise
         // we'll just end up using the passed objUrl
         // if (ok(nodeId)) {
-        //     SubNode node = read.getNode(ms, nodeId);
-        //     if (no(node)) {
-        //         return "Node not found.";
-        //     }
-        //     objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
-        //     if (no(objUrl)) {
-        //         return "Node has no ActivityPub URL";
-        //     }
+        // SubNode node = read.getNode(ms, nodeId);
+        // if (no(node)) {
+        // return "Node not found.";
+        // }
+        // objUrl = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+        // if (no(objUrl)) {
+        // return "Node has no ActivityPub URL";
+        // }
         // }
 
         String userDoingAction = ThreadLocals.getSC().getUserName();

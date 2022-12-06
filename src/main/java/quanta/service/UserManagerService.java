@@ -1486,7 +1486,7 @@ public class UserManagerService extends ServiceBase {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode, null, null, 0, null);
+		Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, true, true);
 
 		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStr(NodeProp.USER);

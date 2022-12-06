@@ -316,8 +316,10 @@ public class NodeMoveService extends ServiceBase {
 		}
 	}
 
-	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res) {
+	/* WARNING: This does NOT affect teh path of 'graphRoot' itself, but only changes the location of all the children under it */
+	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res) {
 		String originalPath = graphRoot.getPath();
+
 		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 

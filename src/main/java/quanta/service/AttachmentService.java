@@ -1345,7 +1345,7 @@ public class AttachmentService extends ServiceBase {
 				}
 			}
 
-			Iterable<SubNode> accountNodes = read.getChildren(as, MongoUtil.allUsersRootNode, null, null, 0, null);
+			Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

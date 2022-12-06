@@ -25,7 +25,10 @@ public class MongoRepository extends ServiceBase {
 	@Autowired
 	private EventPublisher publisher;
 
-	// hack for now to make RSS deamon wait.
+	/*
+	 * Flag only gets set to true when application is fully initialized, all DB conversiona have been
+	 * done and all endpoints are ready to start servicing requests
+	 */
 	public static boolean fullInit = false;
 
 	/*
@@ -74,14 +77,11 @@ public class MongoRepository extends ServiceBase {
 			MongoSession as = auth.getAdminSession();
 			ThreadLocals.setMongoSession(as);
 
-			// DO NOT DELETE
-			// WARNING: When running this kind of conversion stuff
-			// be sure to disable the deamon processing also, which can be
-			// mongoUtil.convertDBAttachments(as);
-			// mongoUtil.setParentNodes(as);
-			// mongoUtil.processAccounts(as);
-
 			mongoUtil.createAdminUser(as);
+
+			// DO NOT DELETE
+			// mongoUtil.setParentNodes(as);
+			mongoUtil.processAccounts(as);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import quanta.actpub.APConst;
+import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
@@ -306,7 +307,7 @@ public class AppProp {
 	}
 
 	public boolean isDaemonsEnabled() {
-		return daemonsEnabled;
+		return daemonsEnabled && MongoRepository.fullInit;
 	}
 
 	public void setDaemonsEnabled(boolean daemonsEnabled) {
