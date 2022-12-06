@@ -486,7 +486,7 @@ public class MongoRead extends ServiceBase {
             return null;
 
         String pendingPath = NodePath.PENDING_PATH + "/";
-        String rootPath = "/" + NodePath.ROOT + "/";
+        String rootPath = NodePath.ROOT_PATH + "/";
 
         /*
          * If node is in pending area take the pending part out of the path to get the real parent

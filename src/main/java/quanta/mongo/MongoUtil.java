@@ -276,7 +276,7 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
 		String pendingPath = NodePath.PENDING_PATH + "/";
-		String rootPath = "/" + NodePath.ROOT + "/";
+		String rootPath = NodePath.ROOT_PATH + "/";
 
 		// ensure node starts with /r/p
 		if (pending && !node.getPath().startsWith(pendingPath)) {
@@ -994,7 +994,7 @@ public class MongoUtil extends ServiceBase {
 		log.debug("creating Public Nodes");
 		Val<Boolean> created = new Val<>(Boolean.FALSE);
 		SubNode publicNode =
-				snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.PUBLIC, null, "Public", null, true, null, created);
+				snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
 			acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
@@ -1009,7 +1009,7 @@ public class MongoUtil extends ServiceBase {
 		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC, NodeName.HOME,
+		SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME,
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public

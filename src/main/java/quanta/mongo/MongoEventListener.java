@@ -145,7 +145,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			 * and we only allow this to run during initialiation when the server may be creating the database,
 			 * and is not yet processing user requests
 			 */
-			if (node.getPath().equals("/" + NodePath.ROOT) && !MongoRepository.fullInit) {
+			if (node.getPath().equals(NodePath.ROOT_PATH) && !MongoRepository.fullInit) {
 				ThreadLocals.requireAdminThread();
 				dbObj.put(SubNode.OWNER, id);
 				node.setOwner(id);
@@ -264,7 +264,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			apCache.saveNotify(node);
 		}
 
-		String dbRoot = "/" + NodePath.ROOT;
+		String dbRoot = NodePath.ROOT_PATH;
 		if (dbRoot.equals(node.getPath())) {
 			read.setDbRoot(node);
 		}
