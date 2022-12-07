@@ -1,10 +1,13 @@
 package quanta.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -21,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.MongoRepository;
 
 public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
@@ -32,6 +36,21 @@ public class Util {
 
 	public static boolean ok(Object o) {
 		return o != null;
+	}
+
+	public static boolean gracefulReadyCheck(ServletResponse res) throws RuntimeException, IOException {
+		if (!MongoRepository.fullInit) {
+			if (res instanceof HttpServletResponse) {
+				try {
+					((HttpServletResponse) res).sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+				} catch (Exception e) {
+					// silently ignore this exception.
+				}
+			} else {
+				throw new RuntimeException("Server not yet started.");
+			}
+		}
+		return MongoRepository.fullInit;
 	}
 
 	// supposedly in Java 17, we now have this: HexFormat.of().parseHex(s) that can replace this.

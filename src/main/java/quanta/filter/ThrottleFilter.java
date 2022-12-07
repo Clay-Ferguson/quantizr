@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.AppProp;
 import quanta.model.IPInfo;
+import quanta.util.Util;
 
 /**
  * ServletFilter for throttling access
@@ -50,6 +51,7 @@ public class ThrottleFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (!Util.gracefulReadyCheck(response)) return;
 
 		HttpServletRequest sreq = null;
 		IPInfo info = null;

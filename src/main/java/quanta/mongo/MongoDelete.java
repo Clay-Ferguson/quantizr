@@ -637,6 +637,7 @@ public class MongoDelete extends ServiceBase {
 			bops = update.bulkOpSetPropVal(bops, node.getId(), SubNode.HAS_CHILDREN, null);
 		}
 
+		int opCount = 0;
 		/*
 		 * Now Query the entire subgraph of this deleted 'node' todo-1: Actually we can do even better here,
 		 * and just run a single command 'delete' op on the underlying query that this getSubGraph ends up
@@ -651,6 +652,13 @@ public class MongoDelete extends ServiceBase {
 			 */
 			// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
 			bops = bulkOpRemoveNode(bops, child.getId());
+			
+			if (opCount++ > 200) {
+				BulkWriteResult results = bops.execute();
+				// log.debug("SubGraph of " + node.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
+				bops = null;
+				opCount = 0;
+			}
 		}
 
 		// deletes all nodes in this subgraph branch

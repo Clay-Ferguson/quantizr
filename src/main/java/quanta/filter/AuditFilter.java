@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.util.Util;
 
 /**
  * Filter for logging details of any request/response
@@ -32,6 +33,7 @@ public class AuditFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (!Util.gracefulReadyCheck(response)) return;
 
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {
@@ -284,7 +286,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append("]");
 			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
 			log.debug(sb.toString());
-		} 
+		}
 		// VERBOSE Logging
 		else if (log.isTraceEnabled()) {
 			try {

@@ -19,6 +19,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.actpub.APConst;
 import quanta.config.SessionContext;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 
 /**
  * Global Servlet filter for cross-cutting concerns across all endpoints
@@ -34,6 +35,7 @@ public class GlobalFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		if (!Util.gracefulReadyCheck(response)) return;
 
 		try {
 			ThreadLocals.removeAll();

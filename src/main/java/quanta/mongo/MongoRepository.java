@@ -81,7 +81,7 @@ public class MongoRepository extends ServiceBase {
 
 			// DO NOT DELETE
 			// mongoUtil.setParentNodes(as);
-			mongoUtil.processAccounts(as);
+			// mongoUtil.processAccounts(as);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())

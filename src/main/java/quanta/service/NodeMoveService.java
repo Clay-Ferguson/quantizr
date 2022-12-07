@@ -7,7 +7,13 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -278,7 +284,7 @@ public class NodeMoveService extends ServiceBase {
 						throw new RuntimeException("Impossible node move requested.");
 					}
 
-					changePathOfSubGraph(as, node, parentPath, res);
+					changePathOfSubGraph(as, node, parentPath, res, false, null);
 
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
@@ -317,13 +323,15 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	/* WARNING: This does NOT affect teh path of 'graphRoot' itself, but only changes the location of all the children under it */
-	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res) {
+	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res, boolean fast, BulkOperations bops) {
 		String originalPath = graphRoot.getPath();
 
 		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
+		boolean removeOrphans = !fast;
+		boolean localBulkOps = false;
 
-		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true, false, false)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
@@ -350,17 +358,28 @@ public class NodeMoveService extends ServiceBase {
 				newPath = mongoUtil.findAvailablePath(newPath);
 			}
 
-			// log.debug(" finalAvailablePathFound: " + newPath);
-			node.setPath(newPath);
+			if (no(bops)) {
+				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+				localBulkOps = true;
+			}
+
+			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+			Update update = new Update().set(SubNode.PATH, newPath);
+			bops.updateOne(query, update);
 
 			// crypto sig uses path as part of it, so we just invalidated the signature.
-			if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
-				node.delete(NodeProp.CRYPTO_SIG);
-				if (ok(res)) {
-					res.setSignaturesRemoved(true);
-				}
-			}
-			node.verifyParentPath = false;
+			// todo-0: bring this back (can wait until after prod db convert)
+			// if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+			// 	node.delete(NodeProp.CRYPTO_SIG);
+			// 	if (ok(res)) {
+			// 		res.setSignaturesRemoved(true);
+			// 	}
+			// }
+		}
+
+		if (localBulkOps && ok(bops)) {
+			BulkWriteResult results = bops.execute();
+			log.debug("Bulk updated: " + results.getModifiedCount());
 		}
 	}
 

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.MongoRepository;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -43,6 +42,8 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+		if (!Util.gracefulReadyCheck(res)) return;
+
 		HttpServletResponse httpRes = null;
 		try {
 			int thisReqId = ++reqId;
@@ -54,15 +55,6 @@ public class AppFilter extends GenericFilterBean {
 
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
-
-				// if server hasn't completed startup process return 'service unavailable'
-				if (!MongoRepository.fullInit) {
-					Util.sleep(20000);
-					if (!MongoRepository.fullInit) {
-						httpRes.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-						return;
-					}
-				}
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				SessionContext sc = ThreadLocals.getSC();
@@ -100,13 +92,6 @@ public class AppFilter extends GenericFilterBean {
 				}
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
-
-				if (!MongoRepository.fullInit) {
-					Util.sleep(20000);
-					if (!MongoRepository.fullInit) {
-						throw new RuntimeException("Server temporarily offline.");
-					}
-				}
 			}
 
 			if (res instanceof HttpServletResponse) {

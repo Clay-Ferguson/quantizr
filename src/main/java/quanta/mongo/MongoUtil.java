@@ -14,6 +14,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexField;
 import org.springframework.data.mongodb.core.index.IndexInfo;
@@ -22,7 +24,9 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -39,9 +43,11 @@ import quanta.request.SignupRequest;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
+import quanta.util.IntVal;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
+
 
 /**
  * Verious utilities related to MongoDB persistence
@@ -60,8 +66,10 @@ public class MongoUtil extends ServiceBase {
 	/*
 	 * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
 	 * need very performant way to translate from /r/p to /r path and vice verse
+	 * 
+	 * removed R and L because we have /r/usr/R and /r/usr/L for remote and local users.
 	 */
-	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
+	static final String PATH_CHARS = "0123456789ABCDEFGHIJKMNOPQSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
 	/*
 	 * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or
@@ -379,13 +387,34 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
-	/*
-	 * DO NOT DELETE
-	 * 
-	 * Use this for various one-off data conversions.
-	 */
+	// DO NOT DELETE - LEAVE AS EXAMPLE (for similar future needs)
+	// This is the code I used to convert paths /r/usr to /r/usr/L (local) and /r/usr/R (remote)
 	public void processAccounts(MongoSession ms) {
-		// Query to pull all user accounts
+		dropAllIndexes(ms);
+
+		HashSet<String> localPathPart = new HashSet<>();
+		HashSet<String> remotePathPart = new HashSet<>();
+
+		log.debug("pre scan...");
+		IntVal scanCount = new IntVal();
+		LinkedList<SubNode> toDel = new LinkedList<>();
+		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+			String path = node.getPath();
+			if (path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH)
+					|| path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/")) {
+				toDel.add(node);
+			}
+			scanCount.inc();
+			if (scanCount.getVal() % 5000 == 0) {
+				log.debug("scanCount: " + scanCount.getVal());
+			}
+		});
+
+		log.debug("pre scan...deleting: " + toDel.size());;
+		for (SubNode node : toDel) {
+			delete.delete(ms, node);
+		}
+
 		Iterable<SubNode> accntNodes =
 				read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s(), false, null, null);
 
@@ -394,35 +423,102 @@ public class MongoUtil extends ServiceBase {
 			if (no(userName))
 				continue;
 
-			log.debug("Proc Accnt: " + userName);
 			String path = acctNode.getPath();
+			log.debug("ProcUser: " + userName);
+			String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
 
-			// foreign user
 			if (userName.contains("@")) {
-				move.changePathOfSubGraph(ms, acctNode, NodePath.REMOTE_USERS_PATH, null);
-
-				if (!path.startsWith(NodePath.REMOTE_USERS_PATH)) {
-					path = XString.stripIfStartsWith(path, NodePath.USERS_PATH);
-					acctNode.setPath(NodePath.REMOTE_USERS_PATH + path);
-				}
-			}
-			// local user
-			else {
-				move.changePathOfSubGraph(ms, acctNode, NodePath.LOCAL_USERS_PATH, null);
-
-				if (!path.startsWith(NodePath.LOCAL_USERS_PATH)) {
-					path = XString.stripIfStartsWith(path, NodePath.USERS_PATH);
-					acctNode.setPath(NodePath.LOCAL_USERS_PATH + path);
-				}
-			}
-
-			if (ThreadLocals.getDirtyNodeCount() > 200) {
-				update.saveSession(ms);
+				// log.debug("Short Piece: Remote: " + shortPart);
+				remotePathPart.add(shortPart);
+			} else {
+				// log.debug("Short Piece: Local: " + shortPart);
+				localPathPart.add(shortPart);
 			}
 		}
 
-		// should be unnecessary but let's save here too.
+		ThreadLocals.clearDirtyNodes();
+		// we might have wiped these above, so ensure we have them.
+		ensureUsersLocalAndRemotePath(ms);
 		update.saveSession(ms);
+
+		// ---------------------------------
+
+		SubNode localCheck = read.getNode(ms, "/r/usr/L");
+		if (no(localCheck)) {
+			log.debug("localCheck failed");
+			return;
+		} else {
+			log.debug("Local Check: " + XString.prettyPrint(localCheck));
+		}
+
+		// -----------------------------------
+		SubNode remoteCheck = read.getNode(ms, "/r/usr/R");
+		if (no(remoteCheck)) {
+			log.debug("remoteCheck failed");
+			return;
+		} else {
+			log.debug("Remote Check: " + XString.prettyPrint(remoteCheck));
+		}
+
+		ThreadLocals.clearDirtyNodes();
+
+		// ----------------------------------
+
+		Val<BulkOperations> bops = new Val<>();
+		IntVal opCount = new IntVal();
+		IntVal total = new IntVal();
+
+		// stream every node
+		ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+			String path = node.getPath();
+			String newPath = null;
+			if (!path.startsWith(NodePath.USERS_PATH + "/") || //
+					path.startsWith(NodePath.LOCAL_USERS_PATH + "/") || path.startsWith(NodePath.REMOTE_USERS_PATH + "/"))
+				return;
+
+			String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
+			String shortPiece = XString.truncAfterFirst(shortPart, "/");
+
+			// if this is a local node
+			if (localPathPart.contains(shortPiece)) {
+				newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
+				// log.debug("LOCAL PATH [" + path + "] => [" + newPath + "]");
+			} //
+			else if (remotePathPart.contains(shortPiece)) {
+				newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
+				// log.debug("REMOT PATH [" + path + "] => [" + newPath + "]");
+			} else {
+				// log.debug("IGNORE PATH [" + path + "]");
+				return;
+			}
+
+			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+			Update update = new Update().set(SubNode.PATH, newPath);
+
+			if (!bops.hasVal()) {
+				bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+			}
+
+			bops.getVal().updateOne(query, update);
+			opCount.inc();
+			total.inc();
+
+			// todo-0: max batch size for mongodb is 1000 ops, so need to check ALL my operationo sizes
+			// to be sure I'm well within that.
+			if (opCount.getVal() > 500) {
+				BulkWriteResult results = bops.getVal().execute();
+				log.debug("Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
+				bops.setVal(null);
+				opCount.setVal(0);
+			}
+		});
+
+		if (bops.hasVal()) {
+			BulkWriteResult results = bops.getVal().execute();
+			log.debug("Final Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
+		}
+
+		createAllIndexes(ms);
 	}
 
 	/*
@@ -655,6 +751,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public void dropAllIndexes(MongoSession ms) {
+		log.debug("dropAllIndexes");
 		auth.requireAdmin(ms);
 		ops.indexOps(SubNode.class).dropAllIndexes();
 	}
@@ -982,12 +1079,16 @@ public class MongoUtil extends ServiceBase {
 		}
 
 		allUsersRootNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
+
+		ensureUsersLocalAndRemotePath(ms);
+		createPublicNodes(ms);
+	}
+
+	public void ensureUsersLocalAndRemotePath(MongoSession ms) {
 		localUsersNode =
 				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
 		remoteUsersNode =
 				snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
-
-		createPublicNodes(ms);
 	}
 
 	public void createPublicNodes(MongoSession ms) {
@@ -1009,8 +1110,8 @@ public class MongoUtil extends ServiceBase {
 		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME,
-				NodeName.HOME, "Public Home", null, true, null, created);
+		SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME, NodeName.HOME,
+				"Public Home", null, true, null, created);
 
 		// make node public
 		acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
