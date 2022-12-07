@@ -1,6 +1,7 @@
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
+import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
@@ -152,7 +153,8 @@ export class TypeBase implements TypeIntf {
             if (node.tags && (ast.userPrefs.showMetaData || ast.userPrefs.editMode)) {
                 return new Div(null, null, [
                     comp,
-                    new Div(node.tags, { className: "nodeTags float-end " + (isRoot ? "smallMarginBottom" : "") })
+                    new Div(node.tags, { className: "nodeTags float-end " + (isRoot ? "smallMarginBottom" : "") }),
+                    new Clearfix()
                 ])
             }
             // otherwise just return the content component itself.

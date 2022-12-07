@@ -5,6 +5,7 @@ import { toArray } from "react-emoji-render";
 import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
+import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { Heading } from "./comp/core/Heading";
@@ -727,7 +728,8 @@ export class Render {
                             onClick
                         })
                     ]),
-                    tagsDiv
+                    tagsDiv,
+                    new Clearfix()
 
                     // The page just looks cleaner with the username only. We can click them to see their bio text.
                     // userBio ? new Html(userBio, {

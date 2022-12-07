@@ -112,7 +112,7 @@ public class UserFeedService extends ServiceBase {
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 
-		String pathToSearch = testQuery ? NodePath.ROOT_PATH : NodePath.USERS_PATH;
+		String pathToSearch = testQuery ? NodePath.ROOT_PATH : (req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH);
 		boolean doAuth = true;
 
 		/*
@@ -373,11 +373,6 @@ public class UserFeedService extends ServiceBase {
 
 		if (orCriteria.size() > 0) {
 			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
-		}
-
-		// use ACT_PUB_ID proptery to determine whether a node is 'local' (posted by this server) or not.
-		if (req.getLocalOnly()) {
-			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s()).is(null);
 		}
 
 		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get
