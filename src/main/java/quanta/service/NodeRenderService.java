@@ -38,6 +38,7 @@ import quanta.request.RenderNodeRequest;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
+import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -313,6 +314,7 @@ public class NodeRenderService extends ServiceBase {
 		// -1 means "no last ordinal known" (i.e. first iteration)
 		long lastOrdinal = -1;
 		BulkOperations bops = null;
+		int batchSize = 0;
 
 		/*
 		 * Main loop to keep reading nodes from the database until we have enough to render the page
@@ -325,12 +327,13 @@ public class NodeRenderService extends ServiceBase {
 			}
 			SubNode n = iterator.next();
 
-			// Side Effect: Fixing Duplicate Ordinals
-			//
-			// we do the side effect of repairing ordinals here just because it's really only an issue if it's
-			// rendered
-			// and here's where we're rendering. It would be 'possible' but less performant to just detect when
-			// a node's children have dupliate ordinals, and fix the entire list of children
+			/*
+			 * Side Effect: Fixing Duplicate Ordinals
+			 * 
+			 * we do the side effect of repairing ordinals here just because it's really only an issue if it's
+			 * rendered and here's where we're rendering. It would be 'possible' but less performant to just
+			 * detect when a node's children have dupliate ordinals, and fix the entire list of children
+			 */
 			if (isOrdinalOrder) {
 				if (lastOrdinal != -1 && lastOrdinal == n.getOrdinal()) {
 					lastOrdinal++;
@@ -341,6 +344,11 @@ public class NodeRenderService extends ServiceBase {
 					Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
 					Update update = new Update().set(SubNode.ORDINAL, lastOrdinal);
 					bops.updateOne(query, update);
+					if (++batchSize > Const.MAX_BULK_OPS) {
+						bops.execute();
+						batchSize = 0;
+						bops = null;
+					}
 				} else {
 					lastOrdinal = n.getOrdinal();
 				}
@@ -508,7 +516,7 @@ public class NodeRenderService extends ServiceBase {
 		if (req.getEditMyFriendNode()) {
 			String _nodeId = nodeId;
 			nodeId = arun.run(as -> {
-				Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId); 
+				Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
 				// we query as a list, but there should only be ONE result.
 				List<SubNode> friendNodes = user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
 				if (ok(friendNodes)) {

@@ -503,9 +503,7 @@ public class MongoUtil extends ServiceBase {
 			opCount.inc();
 			total.inc();
 
-			// todo-0: max batch size for mongodb is 1000 ops, so need to check ALL my operationo sizes
-			// to be sure I'm well within that.
-			if (opCount.getVal() > 500) {
+			if (opCount.getVal() > Const.MAX_BULK_OPS) {
 				BulkWriteResult results = bops.getVal().execute();
 				log.debug("Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
 				bops.setVal(null);

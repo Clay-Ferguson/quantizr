@@ -20,6 +20,7 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
+import quanta.util.Const;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
@@ -184,9 +185,10 @@ public class MongoCreate extends ServiceBase {
 		Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
 
 		BulkOperations bops = null;
+		int batchSize = 0;
 
 		for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit)) {
-
+		
 			// lazy create bulkOps
 			if (no(bops)) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
@@ -195,11 +197,16 @@ public class MongoCreate extends ServiceBase {
 			Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
 			Update update = new Update().set(SubNode.ORDINAL, child.getOrdinal() + rangeSize);
 			bops.updateOne(query, update);
+
+			if (++batchSize > Const.MAX_BULK_OPS) {
+				bops.execute();
+				batchSize = 0;
+				bops = null;
+			}
 		}
 
 		if (ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			// log.debug("Bulk Ordinal: updated " + results.getModifiedCount() + " nodes.");
+			bops.execute();
 		}
 
 		return newOrdinal;

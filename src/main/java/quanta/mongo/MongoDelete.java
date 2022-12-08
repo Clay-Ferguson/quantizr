@@ -29,6 +29,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
+import quanta.util.Const;
 import quanta.util.IntVal;
 import quanta.util.LongVal;
 import quanta.util.Val;
@@ -268,6 +269,7 @@ public class MongoDelete extends ServiceBase {
 	// iterates over 'q' setting prop=val on ever PARENT node of all those nodes.
 	public void bulkSetPropValOnParents(MongoSession ms, Query q, String prop, Object val) {
 		Val<BulkOperations> bops = new Val<>(null);
+		IntVal batchSize = new IntVal();
 
 		// this hash set just makes sure we only submit each val set once! No replicated work.
 		HashSet<ObjectId> parentIds = new HashSet<>();
@@ -289,39 +291,54 @@ public class MongoDelete extends ServiceBase {
 				// we have a known 'bops' in this one and don't lazy create so we don't care about the
 				// return value of this call
 				update.bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
+				batchSize.inc();
+			}
+
+			if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+				bops.getVal().execute();
+				batchSize.setVal(0);
+				bops.setVal(null);
 			}
 		});
 
 		if (bops.hasVal()) {
-			BulkWriteResult results = bops.getVal().execute();
-			// log.debug("bulkPropValOnParents PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() +
-			// " nodes.");
+			bops.getVal().execute();
 		}
 	}
 
 	public void bulkSetPropsByIdObjs(Collection<ObjectId> ids, String prop, Object val) {
 		BulkOperations bops = null;
+		int batchSize = 0;
 
 		for (ObjectId id : ids) {
 			bops = update.bulkOpSetPropVal(bops, id, prop, null);
+			if (++batchSize > Const.MAX_BULK_OPS) {
+				bops.execute();
+				batchSize = 0;
+				bops = null;
+			}
 		}
 
 		if (ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("bulkSetProps Updated PROP[" + prop + "]=[" + val + "] " + results.getModifiedCount() + " nodes.");
+			bops.execute();
 		}
 	}
 
 	public void bulkSetPropsByIdStr(Collection<String> ids, String prop, Object val) {
 		BulkOperations bops = null;
+		int batchSize = 0;
 
 		for (String id : ids) {
 			bops = update.bulkOpSetPropVal(bops, new ObjectId(id), prop, null);
+			if (++batchSize > Const.MAX_BULK_OPS) {
+				bops.execute();
+				batchSize = 0;
+				bops = null;
+			}
 		}
 
 		if (ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("bulkSetProps Updated " + results.getModifiedCount() + " nodes.");
+			bops.execute();
 		}
 	}
 
@@ -377,8 +394,7 @@ public class MongoDelete extends ServiceBase {
 					opsPending.inc();
 					deletesInPass.inc();
 
-					// if we have 100 to delete run the bulk delete on them now
-					if (opsPending.getVal() > 100) {
+					if (opsPending.getVal() > Const.MAX_BULK_OPS) {
 						BulkWriteResult results = bops.getVal().execute();
 						totalDeleted.add(results.getDeletedCount());
 						log.debug("DEL TOTAL: " + totalDeleted.getVal());
@@ -505,7 +521,7 @@ public class MongoDelete extends ServiceBase {
 				opsPending.inc();
 				deletesInPass.inc();
 
-				if (opsPending.getVal() > 100) {
+				if (opsPending.getVal() > Const.MAX_BULK_OPS) {
 					BulkWriteResult results = bops.getVal().execute();
 					totalDeleted.add(results.getDeletedCount());
 					log.debug("DEL TOTAL: " + totalDeleted.getVal());
@@ -544,6 +560,7 @@ public class MongoDelete extends ServiceBase {
 		BulkOperations bops = null;
 		List<SubNode> nodes = new LinkedList<>();
 		HashSet<ObjectId> parentIds = new HashSet<>();
+		int batchSize = 0;
 
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
@@ -595,6 +612,11 @@ public class MongoDelete extends ServiceBase {
 			 * correct results.
 			 */
 			bops = bulkOpRemoveNode(bops, node.getId());
+			if (++batchSize > Const.MAX_BULK_OPS) {
+				bops.execute();
+				batchSize = 0;
+				bops = null;
+			}
 		}
 
 		// in async thread send out all the deletes to the foreign servers.
@@ -606,8 +628,7 @@ public class MongoDelete extends ServiceBase {
 		});
 
 		if (ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("Nodes Deleted + ParentsUpdated = " + results.getDeletedCount());
+			bops.execute();
 		}
 
 		update.saveSession(ms);
@@ -653,9 +674,8 @@ public class MongoDelete extends ServiceBase {
 			// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
 			bops = bulkOpRemoveNode(bops, child.getId());
 			
-			if (opCount++ > 200) {
-				BulkWriteResult results = bops.execute();
-				// log.debug("SubGraph of " + node.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
+			if (++opCount > Const.MAX_BULK_OPS) {
+				bops.execute();
 				bops = null;
 				opCount = 0;
 			}
@@ -663,8 +683,7 @@ public class MongoDelete extends ServiceBase {
 
 		// deletes all nodes in this subgraph branch
 		if (ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("SubGraph of " + node.getIdStr() + " Nodes Deleted: " + results.getDeletedCount());
+			bops.execute();
 		}
 	}
 

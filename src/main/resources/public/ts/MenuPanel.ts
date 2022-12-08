@@ -79,8 +79,6 @@ export class MenuPanel extends Div {
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAppState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-
-    // todo-0: need constants used here
     static openUsersNode = () => S.nav.openContentNode("/r/usr");
     static transferNode = () => { new TransferNodeDlg("transfer").open(); };
     static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };

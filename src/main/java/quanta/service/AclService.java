@@ -40,6 +40,7 @@ import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
 import quanta.response.SetUnpublishedResponse;
+import quanta.util.Const;
 import quanta.util.XString;
 
 /**
@@ -70,13 +71,15 @@ public class AclService extends ServiceBase {
 		BulkOperations bops = null;
 
 		/*
-		 * todo-2: It seems like maybe batching can't update a collection property? so for now I'm
-		 * disabling batch mode which makes this code work.
+		 * todo-2: It seems like maybe batching can't update a collection property? so for now I'm disabling
+		 * batch mode which makes this code work.
 		 */
 		boolean batchMode = false;
 		Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
+		int batchSize = 0;
 
-		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
+		for (SubNode n : read.getSubGraph(ms, node, null, 0, true, //
+				false, true)) {
 			if (batchMode) {
 				// lazy instantiate
 				if (no(bops)) {
@@ -91,6 +94,12 @@ public class AclService extends ServiceBase {
 					// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(node.getAc()));
 					Update update = new Update().set(SubNode.AC, node.getAc()).set(SubNode.PROPS, n.getProps());
 					bops.updateOne(query, update);
+
+					if (++batchSize > Const.MAX_BULK_OPS) {
+						bops.execute();
+						batchSize = 0;
+						bops = null;
+					}
 				} catch (Exception e) {
 					// not an error, we just can't properties on nodes we don't own, so we skip them
 				}
@@ -103,8 +112,7 @@ public class AclService extends ServiceBase {
 		}
 
 		if (batchMode && ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+			bops.execute();
 		} else {
 			update.saveSession(ms);
 		}
@@ -222,8 +230,7 @@ public class AclService extends ServiceBase {
 					}
 					return false;
 				}
-			}
-			else {
+			} else {
 				principal = principalNode.getStr(NodeProp.USER);
 			}
 			mapKey = principalNode.getIdStr();

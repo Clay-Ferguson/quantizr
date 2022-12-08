@@ -27,6 +27,7 @@ import quanta.response.JoinNodesResponse;
 import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
+import quanta.util.Const;
 import quanta.util.ThreadLocals;
 
 /**
@@ -121,7 +122,7 @@ public class NodeMoveService extends ServiceBase {
 
 	/*
 	 * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
-	 * one we keep and join to. 
+	 * one we keep and join to.
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
@@ -284,7 +285,7 @@ public class NodeMoveService extends ServiceBase {
 						throw new RuntimeException("Impossible node move requested.");
 					}
 
-					changePathOfSubGraph(as, node, parentPath, res, false, null);
+					changePathOfSubGraph(as, node, parentPath, res, false);
 
 					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
@@ -322,14 +323,19 @@ public class NodeMoveService extends ServiceBase {
 		}
 	}
 
-	/* WARNING: This does NOT affect teh path of 'graphRoot' itself, but only changes the location of all the children under it */
-	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res, boolean fast, BulkOperations bops) {
+	/*
+	 * WARNING: This does NOT affect teh path of 'graphRoot' itself, but only changes the location of
+	 * all the children under it
+	 */
+	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res,
+			boolean fast) {
 		String originalPath = graphRoot.getPath();
 
 		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 		boolean removeOrphans = !fast;
-		boolean localBulkOps = false;
+		BulkOperations bops = null;
+		int batchSize = 0;
 
 		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, removeOrphans, false, false)) {
 			if (!node.getPath().startsWith(originalPath)) {
@@ -360,26 +366,28 @@ public class NodeMoveService extends ServiceBase {
 
 			if (no(bops)) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
-				localBulkOps = true;
 			}
 
 			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 			Update update = new Update().set(SubNode.PATH, newPath);
-			bops.updateOne(query, update);
 
-			// crypto sig uses path as part of it, so we just invalidated the signature.
-			// todo-0: bring this back (can wait until after prod db convert)
-			// if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
-			// 	node.delete(NodeProp.CRYPTO_SIG);
-			// 	if (ok(res)) {
-			// 		res.setSignaturesRemoved(true);
-			// 	}
-			// }
+			if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+				// crypto sig uses path as part of it, so we just invalidated the signature.
+				node.getProps().remove(NodeProp.CRYPTO_SIG.s());
+				update.set(SubNode.PROPS, node.getProps());
+				res.setSignaturesRemoved(true);
+			}
+
+			bops.updateOne(query, update);
+			if (++batchSize > Const.MAX_BULK_OPS) {
+				bops.execute();
+				batchSize = 0;
+				bops = null;
+			}
 		}
 
-		if (localBulkOps && ok(bops)) {
-			BulkWriteResult results = bops.execute();
-			log.debug("Bulk updated: " + results.getModifiedCount());
+		if (ok(bops)) {
+			bops.execute();
 		}
 	}
 

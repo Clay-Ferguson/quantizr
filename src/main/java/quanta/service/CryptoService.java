@@ -39,6 +39,7 @@ import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
 import quanta.response.SignNodesResponse;
 import quanta.util.BooleanVal;
+import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.IntVal;
 import quanta.util.ThreadLocals;
@@ -178,6 +179,7 @@ public class CryptoService extends ServiceBase {
 		 */
 		if (sigPendingQueue.containsKey(req.getWorkloadId())) {
 			BulkOperations bops = null;
+			int batchSize = 0;
 
 			for (NodeSigData data : req.getListToSign()) {
 				ObjectId id = new ObjectId(data.getNodeId());
@@ -194,12 +196,16 @@ public class CryptoService extends ServiceBase {
 					ThreadLocals.clean(node);
 
 					bops = update.bulkOpSetPropVal(bops, id, SubNode.PROPS, node.getProps());
+					if (++batchSize > Const.MAX_BULK_OPS) {
+						bops.execute();
+						batchSize = 0;
+						bops = null;
+					}
 				}
 			}
 
 			if (ok(bops)) {
-				BulkWriteResult results = bops.execute();
-				// log.debug("Sigs set on " + results.getModifiedCount() + " nodes.");
+				bops.execute();
 			}
 			sigPendingQueue.remove(req.getWorkloadId());
 		} else {
