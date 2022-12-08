@@ -301,6 +301,11 @@ export class NodeUtil {
             // Skip public here we processed that above.
             if (ac.principalName && ac.principalName !== J.PrincipalName.PUBLIC) {
                 let props = null;
+                let title = "";
+                if (ac.displayName) {
+                    title = ac.displayName;
+                }
+                title += (title ? "\n\n@" : "@") + ac.principalName;
 
                 // If we have a local node for this user we will have the principleNodeId here and show a link
                 // to open the user.
@@ -312,7 +317,7 @@ export class NodeUtil {
                             new UserProfileDlg(ac.principalNodeId).open();
                         },
                         className: "sharingName clickable",
-                        title: "Shared to " + (ac.displayName || ac.principalName || "")
+                        title
                     }
                 }
                 // todo-1: Else this is a foreign user, so is there a way to set a link
@@ -321,8 +326,8 @@ export class NodeUtil {
                 // UserPreferences server call and dialog
                 else {
                     props = {
-                        title: "Shared to " + (ac.displayName || ac.principalName || ""),
-                        className: "sharingName"
+                        className: "sharingName",
+                        title
                     }
                 }
 
