@@ -301,7 +301,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.set(NodeProp.UNPUBLISHED, true);
 		}
 
-		node.assignAttachmentOwners();
+		node.fixAttachments();
 		node.verifyParentPath = StringUtils.isEmpty(node.getPath());
 
 		if (ThreadLocals.hasDirtyNode(node.getId())) {

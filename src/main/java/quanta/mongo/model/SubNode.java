@@ -557,13 +557,16 @@ public class SubNode {
 		}
 	}
 
-	public void assignAttachmentOwners() {
+	public void fixAttachments() {
 		if (ok(getAttachments())) {
 			if (getAttachments().size() == 0) {
 				setAttachments(null);
 			} else {
 				getAttachments().forEach((String key, Attachment att) -> {
 					att.setOwnerNode(this);
+					if ("blob".equals(att.getFileName())) {
+						att.setFileName("file-" + key);
+					}
 				});
 			}
 		}
