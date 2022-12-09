@@ -682,6 +682,20 @@ export class Render {
         return newValue;
     };
 
+    renderTagsDiv = (node: J.NodeInfo, moreClasses: string = ""): Div => {
+        if (!node || !node.tags) return null;
+        const tags = node.tags.split(" ");
+        const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
+        return new Div(null, {
+            title: "Click to copy to clipboard",
+            onClick: () => {
+                S.util.copyToClipboard(node.tags);
+                S.util.flashMessage("Copied hashtags to Clipboard", "Clipboard", true);
+            },
+            className: "clickable float-end " + moreClasses
+        }, spans);
+    }
+
     renderUser(node: J.NodeInfo, user: string, userBio: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
@@ -694,7 +708,7 @@ export class Render {
 
         const attribs: any = {};
         if (className) attribs.className = className;
-        const tagsDiv = node?.tags ? new Div(node.tags, { className: "nodeTags float-end " }) : null;
+        const tagsDiv = this.renderTagsDiv(node, "microMarginBottom");
 
         return new Div(null, attribs, [
             new HorizontalLayout([
