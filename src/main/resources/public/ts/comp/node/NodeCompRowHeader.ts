@@ -349,7 +349,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
-        if (ast.isAdminUser && this.jumpButton && !jumpButtonAdded) {
+        if (showDetails && this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
                 onClick: () => S.srch.clickSearchNode(this.node.id, ast),

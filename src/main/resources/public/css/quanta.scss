@@ -1459,7 +1459,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .accountNode {
-    margin: 8px 0 0 8px;
+    margin: 8px 8px 8px 12px;
 }
 
 .systemNodeContent {
@@ -1467,7 +1467,6 @@ Will come back later and study this more. todo-3 */
     border-radius: $border-radius;
     background-color: #17202A;
     margin: $tinyGap 0 $tinyGap $tinyGap;
-    padding: $tinyGap;
 }
 
 // todo-1: once I'm certain about it I can remove these

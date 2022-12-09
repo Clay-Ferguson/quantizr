@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
@@ -265,6 +266,12 @@ public class NodeRenderService extends ServiceBase {
 
 		if (!StringUtils.isEmpty(orderBy)) {
 			sort = parseOrderBy(orderBy);
+		}
+		// if this is a user's POSTS node show in revchron always.
+		else {
+			if (NodeName.POSTS.equals(node.getName())) {
+				sort = Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME);
+			}
 		}
 
 		boolean isOrdinalOrder = false;
