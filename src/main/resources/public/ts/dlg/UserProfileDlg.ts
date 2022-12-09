@@ -1,7 +1,6 @@
 import { dispatch, getAppState } from "../AppContext";
 import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -164,7 +163,6 @@ export class UserProfileDlg extends DialogBase {
                     }, this.bioState, null, false, this.textScrollPos),
 
                 web3Div,
-                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.user.userLogout }),
 
                 new ButtonBar([
                     getAppState().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
@@ -196,6 +194,7 @@ export class UserProfileDlg extends DialogBase {
                     ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
 
                     state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
+
                     new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
