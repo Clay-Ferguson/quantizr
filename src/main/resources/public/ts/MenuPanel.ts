@@ -13,6 +13,7 @@ import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
+import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -94,6 +95,7 @@ export class MenuPanel extends Div {
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
+    static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static multiFollow = () => { new MultiFollowDlg().open(); };
     static createUser = () => { new SignupDlg(true).open(); };
@@ -309,6 +311,7 @@ export class MenuPanel extends Div {
                 new MenuItem("By Content", MenuPanel.searchByContent, !!hltNode), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
+                new MenuItem("By Fediverse URL", MenuPanel.searchByFediUrl), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
