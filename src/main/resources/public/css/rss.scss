@@ -83,14 +83,14 @@
 }
 
 .rss-feed-item {
-    border-top: 4px solid $nodeBorderBottomColor;
+    border-top: 2px solid $nodeBorderBottomColor;
     margin-bottom: 4px;
     margin-left: 12px;
     padding-top: 4px;
 }
 
 .rss-feed-item:last-child {
-    border-bottom: 4px solid $nodeBorderBottomColor;
+    border-bottom: 2px solid $nodeBorderBottomColor;
     margin-bottom: 4px;
     margin-left: 12px;
     padding-top: 4px;
