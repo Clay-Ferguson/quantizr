@@ -634,7 +634,7 @@ export interface FriendInfo {
 }
 
 export interface GetActPubObjectResponse extends ResponseBase {
-    nodeId: string;
+    node: NodeInfo;
 }
 
 export interface GetBookmarksResponse extends ResponseBase {

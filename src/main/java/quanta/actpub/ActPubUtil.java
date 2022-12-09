@@ -988,6 +988,13 @@ public class ActPubUtil extends ServiceBase {
         return res;
     }
 
+    public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
+        SubNode node = loadObject(ms,userDoingAction, url);
+        NodeInfo info = convert.convertToNodeInfo(false,  ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
+							true, true, null);
+        return info;
+    }
+
     /*
      * Loads the foreign object into Quanta under the foreign account representing that user, and
      * returns it. Returns existing node if found instead. If there's no account created yet for the

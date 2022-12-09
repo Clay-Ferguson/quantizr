@@ -1,16 +1,16 @@
 package quanta.response;
 
-
 import quanta.response.base.ResponseBase;
+import quanta.model.NodeInfo;
 
 public class GetActPubObjectResponse extends ResponseBase {
-    private String nodeId;
+    private NodeInfo node;
 
-    public String getNodeId() {
-        return nodeId;
+    public NodeInfo getNode() {
+        return node;
     }
 
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId;
+    public void setNode(NodeInfo node) {
+        this.node = node;
     }
 }

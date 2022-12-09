@@ -49,11 +49,11 @@ import quanta.filter.AuditFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
+import quanta.model.NodeInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeType;
-import quanta.mongo.MongoRepository;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
@@ -75,13 +75,13 @@ import quanta.request.GetBookmarksRequest;
 import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
-import quanta.request.GetPeopleRequest;
 import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
+import quanta.request.GetPeopleRequest;
 import quanta.request.GetServerInfoRequest;
 import quanta.request.GetSharedNodesRequest;
 import quanta.request.GetThreadViewRequest;
@@ -550,9 +550,9 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 
 		return callProc.run("loadActPubObject", true, true, req, session, ms -> {
-			SubNode node = apUtil.loadObject(ms, null, req.getUrl());
+			NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
 			GetActPubObjectResponse res = new GetActPubObjectResponse();
-			res.setNodeId(ok(node) ? node.getIdStr() : null);
+			res.setNode(node);
 			res.setSuccess(true);
 			return res;
 		});

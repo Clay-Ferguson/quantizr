@@ -327,15 +327,51 @@ export class Search {
             FeedTab.inst.props.refreshCounter++;
         }
 
+        // If user enters the url for a fediverse page we try to load it and display it.
+        const searchText = FeedTab.inst.props.searchTextState.getValue();
+        if (searchText?.indexOf("https://") === 0) {
+            this.loadSingleFeedItemByUrl(searchText);
+            return;
+        }
+
         await promiseDispatch("RefreshFeed", s => {
             FeedTab.inst.props.feedLoading = true;
-            if (!FeedTab.inst.props.searchTextState.getValue()) {
+            if (!searchText) {
                 s.displayFeedSearch = false;
             }
             return s;
         });
 
-        this.feed(FeedTab.inst.props.page, FeedTab.inst.props.searchTextState.getValue(), false, false);
+        this.feed(FeedTab.inst.props.page, searchText, false, false);
+    }
+
+    loadSingleFeedItemByUrl = async (url: string) => {
+        const res = await S.rpcUtil.rpc<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
+            url
+        });
+
+        if (res.success) {
+            dispatch("RenderFeedResults", s => {
+                FeedTab.inst.openGraphComps = [];
+
+                // once user requests their stuff, turn off the new messages count indicator.
+                if (FeedTab.inst.props.feedFilterToMe) {
+                    s.newMessageCount = 0;
+                }
+
+                S.edit.setMetadataOption(true);
+                FeedTab.inst.props.feedResults = [res.node];
+                FeedTab.inst.props.feedEndReached = true;
+                FeedTab.inst.props.feedDirty = false;
+                FeedTab.inst.props.feedLoading = false;
+
+                S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
+                S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
+
+                S.domUtil.focusId(C.TAB_FEED);
+                return s;
+            });
+        }
     }
 
     /* growResults==true is the "infinite scrolling" support */
