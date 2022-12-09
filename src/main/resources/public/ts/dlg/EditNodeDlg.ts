@@ -482,7 +482,7 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
-                    const dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.tagsState.getValue());
+                    const dlg = new SelectTagsDlg("edit", this.tagsState.getValue());
                     await dlg.open();
                     this.addTagsToTextField(dlg);
                 },
@@ -492,10 +492,14 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addTagsToTextField = (dlg: SelectTagsDlg) => {
-        let val = "";
+        let val = this.tagsState.getValue();
+        val = val.trim();
+        const tags: string[] = val.split(" ");
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
-            if (val) val += " ";
-            val += tag;
+            if (!tags.includes(tag)) {
+                if (val) val += " ";
+                val += tag;
+            }
         });
         this.tagsState.setValue(val);
     }

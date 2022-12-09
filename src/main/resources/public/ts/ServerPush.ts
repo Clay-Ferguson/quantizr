@@ -91,7 +91,7 @@ export class ServerPush {
             this.ipsmPushItem(data.payload, ast);
         }, false);
 
-        // This is where we recieve signing requests pushed from the server to be signed by the browser and pushed back up.
+        // This is where we receive signing requests pushed from the server to be signed by the browser and pushed back up.
         this.eventSource.addEventListener("sigPush", async (e: any) => {
             const data: J.NodeSigPushInfo = JSON.parse(e.data);
             await S.crypto.generateAndSendSigs(data);

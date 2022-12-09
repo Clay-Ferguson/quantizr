@@ -27,7 +27,7 @@ export class ResetPasswordDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextContent("Enter your user name and email address to recieve a reset link."),
+                new TextContent("Enter your user name and email address to receive a reset link."),
                 new TextField({ label: "User Name", val: this.userState }),
                 new TextField({ label: "Email Address", val: this.emailState }),
                 new ButtonBar([

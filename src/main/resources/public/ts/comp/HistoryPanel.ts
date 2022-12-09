@@ -48,7 +48,7 @@ export class HistoryPanel extends Div {
                     } : {};
 
                     parentIcon = new Icon({
-                        className: iconClass + " rowTypeIcon",
+                        className: iconClass + " histTypeIcon",
                         title: "Node Type: " + type.getName(),
                         ...dragProps
                     });
@@ -98,7 +98,7 @@ export class HistoryPanel extends Div {
                                 } : {};
 
                                 icon = new Icon({
-                                    className: iconClass + " rowTypeIcon",
+                                    className: iconClass + " histTypeIcon",
                                     title: "Node Type: " + type.getName(),
                                     ...dragProps
                                 });

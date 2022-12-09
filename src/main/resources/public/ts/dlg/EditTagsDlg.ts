@@ -21,7 +21,7 @@ export class EditTagsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new Div("Enter your custom hashtags, each on a separate line below. Hashtags must start with #."),
+                new Div("Enter custom hashtags, each on a separate line below. Hashtags must start with #."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),

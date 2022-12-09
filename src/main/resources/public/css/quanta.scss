@@ -1187,10 +1187,16 @@ Will come back later and study this more. todo-3 */
 
 .rowTypeIcon {
     vertical-align: middle;
-    border: 2px solid gray;
+    border: 1px solid gray;
     padding: 6px;
     border-radius: $border-radius;
     cursor: pointer;
+}
+
+.histTypeIcon {
+    @extend .rowTypeIcon;
+    margin-right: $tinyGap;
+    margin-bottom: $tinyGap;
 }
 
 .rowTypeName {

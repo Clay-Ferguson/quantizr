@@ -27,7 +27,7 @@ export class ChangePasswordDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextContent("Enter your new password below..."),
+                new TextContent("Enter new password below..."),
                 this.passwordField = new TextField({
                     label: "New Password", pwd: true, val: this.pwdState
                 }),

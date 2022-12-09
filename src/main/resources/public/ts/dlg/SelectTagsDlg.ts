@@ -8,7 +8,6 @@ import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { EditTagsDlg } from "./EditTagsDlg";
 
 export interface LS { // Local State
     tags: Tag[];
@@ -95,7 +94,10 @@ export class SelectTagsDlg extends DialogBase {
                 new ButtonBar([
                     ...buttons,
                     new Button("Edit Tags", this.edit),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Cancel", () => {
+                        this.clear();
+                        this.close();
+                    }, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
@@ -121,7 +123,16 @@ export class SelectTagsDlg extends DialogBase {
         }
     }
 
-    /* returns an array of objects like {tag, description} */
+    /* returns an array of objects like {tag, description}
+    Example format:
+    <pre>
+    My Heading
+      Hidden from gui text
+    #tag1
+    #tag2:Tag Two Description
+    // also hidden from GUI text
+    </pre>
+    */
     parseTags = (): Tag[] => {
         if (!getAppState().userProfile?.userTags) return null;
         const tags: Tag[] = [];
@@ -188,7 +199,8 @@ export class SelectTagsDlg extends DialogBase {
     processAddCheckboxOrHeading = (div: Div, tagObj: Tag) => {
         let attribs: any = null;
         if (tagObj.description && tagObj.tag) {
-            attribs = { title: tagObj.tag };
+            // we only prefix with Tag: to move it over so the mouse doesn't cover it up.
+            attribs = { title: "Tag: " + tagObj.tag };
         }
 
         if (!tagObj.tag) {
@@ -219,12 +231,10 @@ export class SelectTagsDlg extends DialogBase {
 
     clear = () => {
         this.mergeState({ selectedTags: new Set<string>() });
-        this.close();
     }
 
     edit = async () => {
-        const dlg = new EditTagsDlg();
-        await dlg.open();
+        await S.edit.editHashtags();
         const tags = this.parseTags();
         this.mergeState({ tags });
     }

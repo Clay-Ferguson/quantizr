@@ -6,6 +6,7 @@ import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
+import { EditTagsDlg } from "./dlg/EditTagsDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
@@ -20,6 +21,11 @@ declare const g_requireCrypto: string;
 
 export class Edit {
     showReadOnlyProperties: boolean = false;
+
+    editHashtags = async () => {
+        const dlg = new EditTagsDlg();
+        await dlg.open();
+    }
 
     openImportDlg = (ast: AppState): any => {
         const node = S.nodeUtil.getHighlightedNode(ast);

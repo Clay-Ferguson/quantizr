@@ -128,7 +128,7 @@ export class SearchContentDlg extends DialogBase {
         return new ButtonBar([
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
-                    const dlg: SelectTagsDlg = new SelectTagsDlg("search", null);
+                    const dlg = new SelectTagsDlg("search", this.searchTextState.getValue());
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },
@@ -138,14 +138,22 @@ export class SearchContentDlg extends DialogBase {
     }
 
     addTagsToSearchField = (dlg: SelectTagsDlg) => {
-        let val = "";
+        let val = this.searchTextState.getValue();
+        val = val.trim();
+        const tags: string[] = val.split(" ");
+
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
+            const quoteTag = "\"" + tag + "\"";
             if (val) val += " ";
-            if (dlg.matchAny) {
-                val += tag;
-            }
-            else {
-                val += "\"" + tag + "\"";
+            if (!tags.includes(tag) && !tags.includes(quoteTag)) {
+                if (dlg.matchAny) {
+                    val += tag;
+                    tags.push(tag);
+                }
+                else {
+                    val += quoteTag;
+                    tags.push(quoteTag);
+                }
             }
         });
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
