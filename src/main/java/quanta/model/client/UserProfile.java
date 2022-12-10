@@ -30,6 +30,7 @@ public class UserProfile {
 
 	/* for foreign users this will be their actor url */
 	private String actorUrl;
+	private String actorId;
 
 	private int followerCount;
 	private int followingCount;
@@ -110,6 +111,14 @@ public class UserProfile {
 
 	public void setActorUrl(String actorUrl) {
 		this.actorUrl = actorUrl;
+	}
+
+	public String getActorId() {
+		return actorId;
+	}
+
+	public void setActorId(String actorId) {
+		this.actorId = actorId;
 	}
 
 	public String getHomeNodeId() {

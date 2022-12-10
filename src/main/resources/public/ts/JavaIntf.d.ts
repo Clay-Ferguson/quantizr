@@ -112,6 +112,7 @@ export interface UserProfile {
     apIconUrl: string;
     apImageUrl: string;
     actorUrl: string;
+    actorId: string;
     followerCount: number;
     followingCount: number;
     following: boolean;

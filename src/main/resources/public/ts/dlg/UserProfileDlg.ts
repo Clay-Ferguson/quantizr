@@ -127,7 +127,7 @@ export class UserProfileDlg extends DialogBase {
                                             S.srch.showFollowers(0, state.userProfile.userName);
                                         }
                                         else {
-                                            window.open(state.userProfile.actorUrl, "_blank");
+                                            window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                                         }
                                     }
                                 },
@@ -142,7 +142,7 @@ export class UserProfileDlg extends DialogBase {
                                             S.srch.showFollowing(0, state.userProfile.userName);
                                         }
                                         else {
-                                            window.open(state.userProfile.actorUrl, "_blank");
+                                            window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                                         }
 
                                         // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
@@ -193,7 +193,9 @@ export class UserProfileDlg extends DialogBase {
 
                     ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState(null))) : null,
 
-                    state.userProfile.actorUrl ? new Button("User Page", () => window.open(state.userProfile.actorUrl, "_blank")) : null,
+                    state.userProfile.actorUrl || state.userProfile.actorId ? new Button("User Page", () => {
+                        window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
+                    }) : null,
 
                     new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")

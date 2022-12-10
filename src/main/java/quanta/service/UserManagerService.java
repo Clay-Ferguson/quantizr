@@ -980,6 +980,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setDisplayName(displayName);
 
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
+				String actorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
 				userProfile.setMfsEnable(userNode.getBool(NodeProp.MFS_ENABLE));
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
@@ -999,6 +1000,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
+				userProfile.setActorId(actorId);
 
 				if (!abbreviated) {
 					SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + NodeName.HOME);
