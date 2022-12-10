@@ -1,4 +1,3 @@
-import { getAppState } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
@@ -13,8 +12,6 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
     }
 
     pageChange(delta: number): void {
-        const ast = getAppState();
-
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
@@ -23,7 +20,6 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
         S.srch.search(this.data.props.node,
             this.data.props.prop,
             this.data.props.searchText,
-            ast,
             this.data.props.searchType,
             this.data.props.description,
             this.data.props.searchRoot,

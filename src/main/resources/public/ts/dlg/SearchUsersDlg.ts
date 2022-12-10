@@ -103,7 +103,7 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, getAppState(),
+        S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
             this.getState<LS>().searchType,
             desc,
             null,

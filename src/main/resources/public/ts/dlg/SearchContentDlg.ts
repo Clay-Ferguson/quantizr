@@ -115,9 +115,9 @@ export class SearchContentDlg extends DialogBase {
                         }),
                         requirePriorityCheckbox
                     ]),
-                    new Selection(null, "Nodes to Search", [
+                    new Selection(null, "Search in...", [
                         { key: "curNode", val: "Current Node" },
-                        { key: "allNodes", val: "All My Nodes" }
+                        { key: "allNodes", val: "My Account" }
                     ], "m-2", "searchDlgSearchRoot", {
                         setValue: (val: string) => {
                             SearchContentDlg.dlgState.searchRoot = val;
@@ -204,7 +204,7 @@ export class SearchContentDlg extends DialogBase {
             requirePriority = false;
         }
 
-        S.srch.search(node, null, SearchContentDlg.defaultSearchText, getAppState(), null, desc,
+        S.srch.search(node, null, SearchContentDlg.defaultSearchText, null, desc,
             state.searchRoot,
             state.fuzzy,
             state.caseSensitive, 0,

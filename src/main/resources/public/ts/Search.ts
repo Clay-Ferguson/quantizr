@@ -140,12 +140,11 @@ export class Search {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
-        this.search(node, null, null, ast, null, "Priority Listing", null, false, false, 0, true,
+        this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
             J.NodeProp.PRIORITY_FULL, "asc", true, null);
     }
 
-    /* todo-0: remove ast parameter. it'd unused */
-    search = async (node: J.NodeInfo, prop: string, searchText: string, ast: AppState, searchType: string, description: string, searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
+    search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string, searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
             page,
