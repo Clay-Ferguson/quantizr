@@ -382,6 +382,7 @@ export interface NodeFeedRequest extends RequestBase {
 }
 
 export interface NodeSearchRequest extends RequestBase {
+    searchRoot: string;
     page: number;
     sortDir: string;
     sortField: string;

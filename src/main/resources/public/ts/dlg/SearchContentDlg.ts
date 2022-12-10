@@ -17,6 +17,7 @@ import { Validator } from "../Validator";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
+    searchRoot?: string;
     sortField?: string;
     requirePriority?: boolean;
     caseSensitive?: boolean;
@@ -87,33 +88,47 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): boolean => this.getState<LS>().recursive
                     })
-                    // requirePriorityCheckbox
                 ], "displayTable marginBottom"),
-                new Div(null, null, [
-                    new Selection(null, "Sort by", [
-                        { key: "0", val: "Relevance" },
-                        { key: "ctm", val: "Create Time" },
-                        { key: "mtm", val: "Modify Time" },
-                        { key: "contentLength", val: "Text Length" },
-                        { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
-                    ], "m-2", "searchDlgOrderBy", {
+                new HorizontalLayout([
+                    new Div(null, null, [
+                        new Selection(null, "Sort by", [
+                            { key: "0", val: "Relevance" },
+                            { key: "ctm", val: "Create Time" },
+                            { key: "mtm", val: "Modify Time" },
+                            { key: "contentLength", val: "Text Length" },
+                            { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
+                        ], "m-2", "searchDlgOrderBy", {
+                            setValue: (val: string) => {
+                                let sortDir = val === "0" ? "" : "DESC";
+                                if (val === J.NodeProp.PRIORITY_FULL) {
+                                    sortDir = "asc";
+                                }
+                                SearchContentDlg.dlgState.sortField = val;
+                                SearchContentDlg.dlgState.sortDir = sortDir;
+
+                                this.mergeState<LS>({
+                                    sortField: val,
+                                    sortDir
+                                });
+                            },
+                            getValue: (): string => this.getState<LS>().sortField
+                        }),
+                        requirePriorityCheckbox
+                    ]),
+                    new Selection(null, "Nodes to Search", [
+                        { key: "curNode", val: "Current Node" },
+                        { key: "allNodes", val: "All My Nodes" }
+                    ], "m-2", "searchDlgSearchRoot", {
                         setValue: (val: string) => {
-                            let sortDir = val === "0" ? "" : "DESC";
-                            if (val === J.NodeProp.PRIORITY_FULL) {
-                                sortDir = "asc";
-                            }
-                            SearchContentDlg.dlgState.sortField = val;
-                            SearchContentDlg.dlgState.sortDir = sortDir;
+                            SearchContentDlg.dlgState.searchRoot = val;
 
                             this.mergeState<LS>({
-                                sortField: val,
-                                sortDir
+                                searchRoot: val
                             });
                         },
-                        getValue: (): string => this.getState<LS>().sortField
-                    }),
-                    requirePriorityCheckbox
-                ]),
+                        getValue: (): string => this.getState<LS>().searchRoot
+                    })
+                ], "displayTable marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph),
@@ -182,18 +197,20 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
         const desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
+        const state = this.getState<LS>();
 
-        let requirePriority = this.getState<LS>().requirePriority;
-        if (this.getState<LS>().sortField !== J.NodeProp.PRIORITY_FULL) {
+        let requirePriority = state.requirePriority;
+        if (state.sortField !== J.NodeProp.PRIORITY_FULL) {
             requirePriority = false;
         }
 
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, getAppState(), null, desc,
-            this.getState<LS>().fuzzy,
-            this.getState<LS>().caseSensitive, 0,
-            this.getState<LS>().recursive,
-            this.getState<LS>().sortField,
-            this.getState<LS>().sortDir,
+            state.searchRoot,
+            state.fuzzy,
+            state.caseSensitive, 0,
+            state.recursive,
+            state.sortField,
+            state.sortDir,
             requirePriority,
             this.close);
     }

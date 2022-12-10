@@ -26,6 +26,7 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
             ast,
             this.data.props.searchType,
             this.data.props.description,
+            this.data.props.searchRoot,
             this.data.props.fuzzy,
             this.data.props.caseSensitive,
             page,

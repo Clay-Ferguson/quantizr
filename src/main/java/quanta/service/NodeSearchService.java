@@ -171,7 +171,15 @@ public class NodeSearchService extends ServiceBase {
 			}
 			// else we're doing a normal subgraph search for the text
 			else {
-				SubNode searchRoot = read.getNode(ms, req.getNodeId());
+				SubNode searchRoot = null;
+
+				// todo-0: make this 'allNodes' a constant
+				if ("allNodes".equals(req.getSearchRoot())) {
+					searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
+				}
+				else {
+					searchRoot = read.getNode(ms, req.getNodeId());
+				}
 				boolean adminOnly = acl.isAdminOwned(searchRoot);
 
 				if ("timeline".equals(req.getSearchDefinition())) {

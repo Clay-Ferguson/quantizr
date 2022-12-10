@@ -4,6 +4,9 @@ import quanta.request.base.RequestBase;
 
 public class NodeSearchRequest extends RequestBase {
 
+	/* Can be 'curNode' (default, null) or 'allNodes' */
+	private String searchRoot;
+
 	/* Zero offset page number. First page is zero */
 	private int page;
 
@@ -36,6 +39,14 @@ public class NodeSearchRequest extends RequestBase {
 	private boolean recursive;
 
 	private boolean requirePriority;
+
+	public String getSearchRoot() {
+		return searchRoot;
+	}
+
+	public void setSearchRoot(String searchRoot) {
+		this.searchRoot = searchRoot;
+	}
 
 	public String getNodeId() {
 		return nodeId;
