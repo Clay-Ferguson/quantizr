@@ -8,6 +8,6 @@ export class SelectionOption extends Comp {
     }
 
     compRender = (): ReactNode => {
-        return this.tag("option", null, [this.val]);
+        return this.tag("option", { className: "selectOption" }, [this.val]);
     }
 }

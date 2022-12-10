@@ -262,8 +262,6 @@ export class MenuPanel extends Div {
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
 
-                new MenuItem("Edit Hashtags", S.edit.editHashtags), //
-
                 // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
                 new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !!ast.nodesToMove), //
 
@@ -422,6 +420,9 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Settings", [
+                new MenuItem("Edit Hashtags", S.edit.editHashtags), //
+                new MenuItemSeparator(), //
+
                 // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)
                 // new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
                 // new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
