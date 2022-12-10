@@ -264,7 +264,7 @@ export class Render {
         });
     }
 
-    showLink = (link: string) => {
+    copyLinkToClipboard = (link: string) => {
         S.util.copyToClipboard(link);
         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
     }
@@ -285,11 +285,20 @@ export class Render {
 
         const byIdUrl = window.location.origin + "?id=" + node.id;
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
+
         children.push(new Heading(5, "By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",
                 title: "Click -> Copy to clipboard",
-                onClick: () => this.showLink(byIdUrl)
+                onClick: () => this.copyLinkToClipboard(byIdUrl)
+            }));
+
+        const markdownByIdUrl = "[Link](?id=" + node.id + ")";
+        children.push(new Heading(5, "By ID (Markdown)"), //
+            new Div(markdownByIdUrl, {
+                className: "linkDisplay",
+                title: "Click -> Copy to clipboard",
+                onClick: () => this.copyLinkToClipboard(markdownByIdUrl)
             }));
 
         if (node.name) {
@@ -298,7 +307,15 @@ export class Render {
                 new Div(byNameUrl, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => this.showLink(byNameUrl)
+                    onClick: () => this.copyLinkToClipboard(byNameUrl)
+                }));
+
+            const markdownByNameUrl = "[Link](" + S.nodeUtil.getPathPartForNamedNode(node) + ")";
+            children.push(new Heading(5, "By Name (Markdown)"), //
+                new Div(markdownByNameUrl, {
+                    className: "linkDisplay",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => this.copyLinkToClipboard(markdownByNameUrl)
                 }));
         }
 
@@ -329,7 +346,7 @@ export class Render {
                         new Div(attByIdUrl, {
                             className: "linkDisplay",
                             title: "Click -> Copy to clipboard",
-                            onClick: () => this.showLink(attByIdUrl)
+                            onClick: () => this.copyLinkToClipboard(attByIdUrl)
                         })
                     ]);
 
@@ -339,7 +356,7 @@ export class Render {
                         new Div(downloadAttByIdUrl, {
                             className: "linkDisplay",
                             title: "Click -> Copy to clipboard",
-                            onClick: () => this.showLink(downloadAttByIdUrl)
+                            onClick: () => this.copyLinkToClipboard(downloadAttByIdUrl)
                         })
                     ]);
 
@@ -350,7 +367,7 @@ export class Render {
                             new Div(attByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
-                                onClick: () => this.showLink(attByNameUrl)
+                                onClick: () => this.copyLinkToClipboard(attByNameUrl)
                             })
                         ]);
 
@@ -360,7 +377,7 @@ export class Render {
                             new Div(downloadAttByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
-                                onClick: () => this.showLink(downloadAttByNameUrl)
+                                onClick: () => this.copyLinkToClipboard(downloadAttByNameUrl)
                             })
                         ]);
                     }
@@ -372,7 +389,7 @@ export class Render {
                             new Div("ipfs://" + att.il, {
                                 className: "linkDisplay",
                                 title: "Click -> Copy to clipboard",
-                                onClick: () => this.showLink("ipfs://" + att.il)
+                                onClick: () => this.copyLinkToClipboard("ipfs://" + att.il)
                             })
                         ]);
                     }
@@ -394,7 +411,7 @@ export class Render {
                 new Div("ipfs://" + ipfsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => this.showLink(ipfsCid)
+                    onClick: () => this.copyLinkToClipboard(ipfsCid)
                 }));
         }
 
@@ -404,7 +421,7 @@ export class Render {
                 new Div("ipns://" + ipnsCid, {
                     className: "linkDisplay",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => this.showLink("ipns://" + ipnsCid)
+                    onClick: () => this.copyLinkToClipboard("ipns://" + ipnsCid)
                 }));
         }
 
