@@ -44,6 +44,8 @@ export class FriendsTableRow extends ListBoxRow {
             ]);
         }
 
+        const tagsSuffix = this.friend.tags ? (" (" + this.friend.tags + ")") : "";
+
         this.setChildren([
             new Div(null, null, [
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
@@ -65,7 +67,7 @@ export class FriendsTableRow extends ListBoxRow {
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
                     new Div(this.friend.displayName),
-                    new Div("@" + this.friend.userName + " (" + this.friend.tags + ")")
+                    new Div("@" + this.friend.userName + tagsSuffix)
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
