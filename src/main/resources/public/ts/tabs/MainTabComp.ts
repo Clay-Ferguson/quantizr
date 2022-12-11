@@ -24,7 +24,6 @@ export class MainTabComp extends AppTab {
     preRender(): void {
         const ast = useAppState();
         this.attribs.className = this.getClass(ast);
-        const widthSizerPanel = S.render.makeWidthSizerPanel();
 
         let contentDiv: Div = null;
         if (g_urlIdFailMsg) {
@@ -64,7 +63,6 @@ export class MainTabComp extends AppTab {
         }
 
         this.setChildren([
-            widthSizerPanel,
             new Div(null, { className: "headingBar" }, [
                 new Div(g_brandingAppName, {
                     className: "tabTitle",

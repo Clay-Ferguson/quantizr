@@ -29,7 +29,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
          */
         let rowCount = 0;
         let i = 0;
-        const children: CompIntf[] = [S.render.makeWidthSizerPanel()];
+        const children: CompIntf[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "headingBar" }, [

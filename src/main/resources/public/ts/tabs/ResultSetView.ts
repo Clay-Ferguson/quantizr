@@ -43,7 +43,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
          * client side for various reasons.
          */
         let rowCount = 0;
-        const children: CompIntf[] = [S.render.makeWidthSizerPanel()];
+        const children: CompIntf[] = [];
 
         let content = null;
         if (this.showContentHeading && //

@@ -280,7 +280,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
 
         this.setChildren([
-            S.render.makeWidthSizerPanel(),
             new Div(null, { className: "feedView" }, children)]);
     }
 

@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -10,7 +10,6 @@ import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { Heading } from "./comp/core/Heading";
 import { HorizontalLayout } from "./comp/core/HorizontalLayout";
-import { Icon } from "./comp/core/Icon";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -770,33 +769,5 @@ export class Render {
 
             ], "displayTable userInfo", null)
         ]);
-    }
-
-    makeWidthSizerPanel = (): Span => {
-        const ast = getAppState();
-        const panelCols = ast.userPrefs.mainPanelCols || 6;
-
-        return !ast.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
-            panelCols > 4 ? new Icon({
-                className: "fa fa-step-backward widthSizerIcon",
-                title: "Narrower view",
-                onClick: () => {
-                    dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(--s.userPrefs.mainPanelCols);
-                        return s;
-                    });
-                }
-            }) : null,
-            panelCols < 8 ? new Icon({
-                className: "fa fa-step-forward widthSizerIcon",
-                title: "Wider view",
-                onClick: () => {
-                    dispatch("widthAdjust", s => {
-                        S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
-                        return s;
-                    });
-                }
-            }) : null
-        ]) : null;
     }
 }

@@ -1,4 +1,4 @@
-import { getAppState, promiseDispatch, useAppState } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch, useAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
@@ -162,6 +162,16 @@ export class MenuPanel extends Div {
     static toggleReplies = () => S.edit.toggleShowReplies(getAppState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
+
+    static narrowerView = () => dispatch("widthAdjust", s => {
+        S.edit.setMainPanelCols(--s.userPrefs.mainPanelCols);
+        return s;
+    });
+
+    static widerView = () => dispatch("widthAdjust", s => {
+        S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
+        return s;
+    });
 
     preRender(): void {
         const ast = useAppState();
@@ -419,6 +429,8 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
+            const panelCols = ast.userPrefs.mainPanelCols || 6;
+
             children.push(new Menu(state, "Settings", [
                 new MenuItem("Edit Hashtags", S.edit.editHashtags), //
                 new MenuItemSeparator(), //
@@ -439,6 +451,7 @@ export class MenuPanel extends Div {
                 // new MenuItem("Preferences", () => {new PrefsDlg().open();}, !state.isAnonUser), // "fa-gear"
 
                 new MenuItemSeparator(), //
+
                 /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
                  that I have to impose an intentional performance lag to let the animation show up, so in order to have the
                  absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
@@ -446,7 +459,11 @@ export class MenuPanel extends Div {
                 new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !ast.mobileMode, () => S.domUtil.mouseEffect),
 
                 new MenuItem("Browser Info", MenuPanel.browserInfo), //
-                new MenuItem(ast.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //
+                new MenuItem(ast.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
+
+                !ast.mobileMode ? new MenuItemSeparator() : null, //
+                !ast.mobileMode ? new MenuItem("Narrower View", MenuPanel.narrowerView, panelCols > 4) : null,
+                !ast.mobileMode ? new MenuItem("Wider View", MenuPanel.widerView, panelCols < 8) : null
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
