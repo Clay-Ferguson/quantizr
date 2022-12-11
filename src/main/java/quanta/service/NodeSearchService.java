@@ -173,7 +173,7 @@ public class NodeSearchService extends ServiceBase {
 			else {
 				SubNode searchRoot = null;
 
-				// todo-0: make this 'allNodes' a constant
+				// todo-1: make this 'allNodes' a constant
 				if ("allNodes".equals(req.getSearchRoot())) {
 					searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
 				}

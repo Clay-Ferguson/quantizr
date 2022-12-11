@@ -159,13 +159,14 @@ export class SearchContentDlg extends DialogBase {
 
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
             const quoteTag = "\"" + tag + "\"";
-            if (val) val += " ";
             if (!tags.includes(tag) && !tags.includes(quoteTag)) {
                 if (dlg.matchAny) {
+                    if (val) val += " ";
                     val += tag;
                     tags.push(tag);
                 }
                 else {
+                    if (val) val += " ";
                     val += quoteTag;
                     tags.push(quoteTag);
                 }
