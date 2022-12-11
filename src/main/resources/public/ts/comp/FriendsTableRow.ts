@@ -65,7 +65,7 @@ export class FriendsTableRow extends ListBoxRow {
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
                     new Div(this.friend.displayName),
-                    new Div("@" + this.friend.userName)
+                    new Div("@" + this.friend.userName + " (" + this.friend.tags + ")")
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
