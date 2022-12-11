@@ -46,7 +46,7 @@ export class FriendsTableRow extends ListBoxRow {
 
         this.setChildren([
             new Div(null, null, [
-                this.selectableRows ? new Checkbox(null, { className: "marginLeft" }, {
+                this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: FriendsDlgState = this.dlg.getState();
                         if (checked) {

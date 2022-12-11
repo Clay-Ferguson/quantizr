@@ -583,11 +583,15 @@ export class Search {
         if (node.boostedNode) {
             const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
 
+            let allowBoostFooter = isFeed;
+            if (isFeed) {
+                allowBoostFooter = ast.showAllRowDetails.has(node.boostedNode.id);
+            }
             boostComp = new Div(null, { className: "boost-row" }, [
                 allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
-                allowFooter ? new NodeCompRowFooter(node.boostedNode) : null,
-                allowFooter ? new Clearfix() : null
+                allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
+                allowBoostFooter ? new Clearfix() : null
             ])
         }
 

@@ -87,9 +87,7 @@ export abstract class DialogBase extends Comp {
     public abort = () => {
         if (this.aborted) return;
         this.aborted = true;
-        setTimeout(() => {
-            this.close();
-        }, 100);
+        setTimeout(this.close, 100);
     }
 
     closeByUser = () => {

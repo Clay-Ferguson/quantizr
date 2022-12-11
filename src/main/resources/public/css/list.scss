@@ -34,6 +34,11 @@
 
 .personsList {}
 
+.personsListItemCheckBox {
+    vertical-align: top;
+    margin: $smallGap;
+}
+
 .personsListItem {
     cursor: pointer;
 
