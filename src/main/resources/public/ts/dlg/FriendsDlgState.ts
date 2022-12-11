@@ -5,4 +5,5 @@ export interface FriendsDlgState { // Local State
     selections?: Set<string>;
     loading?: boolean;
     friends?: J.FriendInfo[];
+    selectAll?: boolean;
 }

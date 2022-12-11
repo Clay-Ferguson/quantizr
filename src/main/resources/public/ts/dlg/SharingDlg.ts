@@ -65,7 +65,7 @@ export class SharingDlg extends DialogBase {
                     getValue: (): boolean => state.recursive
                 }),
                 new ButtonBar([
-                    new Button("Choose People", async () => {
+                    new Button("Add People", async () => {
                         const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
                         await friendsDlg.open();
                         if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {

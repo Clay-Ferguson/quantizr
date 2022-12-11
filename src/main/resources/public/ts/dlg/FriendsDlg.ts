@@ -2,6 +2,7 @@ import { getAppState, promiseDispatch } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
@@ -37,9 +38,17 @@ export class FriendsDlg extends DialogBase {
                 return s;
             });
 
+            let friends: J.FriendInfo[] = [];
+            if (res.nodeOwner) {
+                friends.push(res.nodeOwner);
+            }
+            if (res.people) {
+                friends = friends.concat(res.people);
+            }
+
             this.mergeState<LS>({
                 nodeId,
-                friends: [res.nodeOwner, ...res.people],
+                friends,
                 loading: false
             });
         })();
@@ -98,6 +107,16 @@ export class FriendsDlg extends DialogBase {
                 ]),
                 message ? new Div(message)
                     : new FriendsTable(state.friends, this.searchTextState.getValue(), this.friendsTagSearch, !this.nodeId, this),
+                state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {
+                    setValue: (checked: boolean) => {
+                        const state: LS = this.getState();
+                        state.selectAll = checked;
+                        this.setSelectAllPersons(state, checked);
+                        this.mergeState(state);
+                    },
+                    getValue: (): boolean => state.selectAll
+                }, "float-end") : null,
+                state.friends?.length > 1 ? new Clearfix() : null,
                 !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
@@ -106,6 +125,17 @@ export class FriendsDlg extends DialogBase {
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
+    }
+
+    setSelectAllPersons = (state: LS, selectAll: boolean) => {
+        state.selections = new Set<string>()
+
+        // note: if !selectAll we set empty selections, and this is correct.
+        if (selectAll && state.friends) {
+            state.friends.forEach(friend => {
+                state.selections.add(friend.userName);
+            });
+        }
     }
 
     userSearch = () => {

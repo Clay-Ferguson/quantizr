@@ -41,19 +41,9 @@ export class FriendsTable extends ListBox {
     }
 
     friendMatchesString = (friend: FriendInfo, text: string) => {
-        // console.log("match: " + text + " to " + S.util.prettyPrint(friend));
-
         const ret = (friend.displayName && friend.displayName.toLowerCase().indexOf(text) !== -1) || //
             (friend.userName && friend.userName.toLowerCase().indexOf(text) !== -1) || //
             (friend.tags && friend.tags.toLowerCase().indexOf(text) !== -1);
-
-        // if (friend.tags) {
-        //     debugger;
-        //     console.log("indexof [" + text + "] in [" + friend.tags + "] is " + friend.tags.toLowerCase().indexOf(text));
-        //     console.log("CHECK1: " + (friend.tags && friend.tags.toLowerCase().indexOf(text) !== -1));
-        //     console.log("ret=" + ret);
-        // }
-
         return ret;
     }
 
