@@ -103,7 +103,8 @@ export class NodeCompMarkdown extends Html {
             /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
             trying to process those for OpenGraph we detect using the 'mention' and 'hashtag' classes */
             if (e.classList.contains("mention") ||
-                e.classList.contains("hashtag")) return;
+                e.classList.contains("hashtag") ||
+                e.classList.contains("u-url")) return;
 
             // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
             if (content.indexOf("(" + href + ")") !== -1) return;

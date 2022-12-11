@@ -1,6 +1,7 @@
 package quanta.util;
 
 public class Const {
+	public static final String REL_FOREIGN_LINK = "nofollow noopener noreferrer";
 	public static final int MAX_BULK_OPS = 500;
 	public static final int ONE_MB = 1024 * 1024;
 	public static final int DEFAULT_USER_QUOTA = 10 * ONE_MB;

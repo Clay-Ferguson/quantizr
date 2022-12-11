@@ -270,9 +270,6 @@ public class Convert extends ServiceBase {
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
 
-		/*
-		 * build the new comma-delimited privs list by adding all that aren't in the setToRemove
-		 */
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken();
 			int tokLen = tok.length();
@@ -285,8 +282,10 @@ public class Convert extends ServiceBase {
 				if (tag instanceof APOHashtag) {
 					String href = (String) tag.get(APObj.href);
 					if (ok(href)) {
+						String shortTok = XString.stripIfStartsWith(tok, "#");
 						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
-						sb.append("<a class='mention hashtag' href='" + href + "'>" + tok + "</a>");
+						sb.append("<a class='mention hashtag' href='" + href + //
+								"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>");
 					}
 				}
 			}
@@ -301,7 +300,10 @@ public class Convert extends ServiceBase {
 						if (atCount == 2) {
 							tok = XString.truncAfterLast(tok, "@");
 						}
-						sb.append("<a class='mention' href='" + href + "'>" + tok + "</a>");
+						String shortTok = XString.stripIfStartsWith(tok, "@");
+						// NOTE: h-card and u-url are part of 'microformats'
+						sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
+								"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok + "</span></a></span>");
 					}
 				}
 			} else {
