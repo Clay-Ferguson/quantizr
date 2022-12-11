@@ -1,8 +1,11 @@
+import { getAppState, promiseDispatch } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { FriendsTable } from "../comp/FriendsTable";
 import { DialogBase } from "../DialogBase";
@@ -13,6 +16,8 @@ import { FriendsDlgState as LS } from "./FriendsDlgState";
 
 export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");
+    searchTextState: Validator = new Validator();
+    friendsTagSearch: string;
 
     constructor(title: string, private nodeId: string) {
         super(title);
@@ -26,6 +31,12 @@ export class FriendsDlg extends DialogBase {
             const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
                 nodeId
             });
+
+            await promiseDispatch("SetFriendHashTags", s => {
+                s.friendHashTags = res.friendHashTags;
+                return s;
+            });
+
             this.mergeState<LS>({
                 nodeId,
                 friends: [res.nodeOwner, ...res.people],
@@ -36,6 +47,7 @@ export class FriendsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state: LS = this.getState();
+        const ast = getAppState();
         let message = null;
         if (state.loading) {
             message = "Loading...";
@@ -49,10 +61,43 @@ export class FriendsDlg extends DialogBase {
             }
         }
 
+        let friendsTagDropDown: Selection = null;
+
+        if (ast.friendHashTags && ast.friendHashTags.length > 0) {
+            const items: any[] = [
+                { key: "", val: "All Tags" }
+            ];
+
+            for (const tag of ast.friendHashTags) {
+                items.push({ key: tag, val: tag });
+            }
+
+            friendsTagDropDown = new Selection(null, "Filter By Tag",
+                items,
+                null, "friendsTagPickerDropdown", {
+                setValue: (val: string) => {
+                    this.friendsTagSearch = val;
+                    this.userSearch();
+                },
+                getValue: (): string => this.friendsTagSearch
+            });
+        }
+
         return [
             new Div(null, null, [
+                new HorizontalLayout([
+                    !message ? new TextField({
+                        labelClass: "txtFieldLabelShort",
+                        label: "Search",
+                        val: this.searchTextState,
+                        placeholder: "Search for...",
+                        enter: this.userSearch,
+                        outterClass: "marginBottom tagSearchField"
+                    }) : null,
+                    !message ? friendsTagDropDown : null
+                ]),
                 message ? new Div(message)
-                    : new FriendsTable(state.friends, !this.nodeId, this),
+                    : new FriendsTable(state.friends, this.searchTextState.getValue(), this.friendsTagSearch, !this.nodeId, this),
                 !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
@@ -61,6 +106,10 @@ export class FriendsDlg extends DialogBase {
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
+    }
+
+    userSearch = () => {
+        this.mergeState<LS>({});
     }
 
     cancel = () => {

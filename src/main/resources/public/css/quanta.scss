@@ -1366,6 +1366,10 @@ Will come back later and study this more. todo-3 */
     border: 2px solid #E74C3C;
 }
 
+.tagSearchField {
+    width: 60%;
+}
+
 .txtFieldLabelShort {
     margin-right: .25rem;
 }
@@ -1792,7 +1796,6 @@ Will come back later and study this more. todo-3 */
     width: 100%;
     border: 1px solid gray;
     border-radius: $border-radius;
-    margin: 4px;
 }
 
 .mobileRHSPanel {

@@ -112,7 +112,8 @@ public class UserFeedService extends ServiceBase {
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 
-		String pathToSearch = testQuery ? NodePath.ROOT_PATH : (req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH);
+		String pathToSearch =
+				testQuery ? NodePath.ROOT_PATH : (req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH);
 		boolean doAuth = true;
 
 		/*
@@ -312,6 +313,7 @@ public class UserFeedService extends ServiceBase {
 				friendsProcessed = true;
 
 				ThreadLocals.getSC().setFriendsTagsDirty(false);
+
 				HashSet<String> friendsHashTagsSet = new HashSet<>();
 				List<SubNode> allFriendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
 				if (ok(allFriendNodes)) {
@@ -328,8 +330,9 @@ public class UserFeedService extends ServiceBase {
 
 						// since we're processing ALL friends we can go ahead and update friendIds here
 						// but also only do that if we're not filtering for tags, or the filter is a match
-						if (StringUtils.isEmpty(req.getFriendsTagSearch()) || (StringUtils.isNotEmpty(friendNode.getTags())
-								&& friendNode.getTags().contains(req.getFriendsTagSearch()))) {
+						if (StringUtils.isEmpty(req.getFriendsTagSearch()) || //
+								(StringUtils.isNotEmpty(friendNode.getTags())
+										&& friendNode.getTags().contains(req.getFriendsTagSearch()))) {
 							String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 							// if we have a userNodeId and they aren't in the blocked list.
@@ -506,6 +509,27 @@ public class UserFeedService extends ServiceBase {
 		res.setSuccess(true);
 		// log.debug("search results count: " + counter);
 		return res;
+	}
+
+	public LinkedList<String> getFriendsHashTags(MongoSession ms) {
+		HashSet<String> friendsHashTagsSet = new HashSet<>();
+		List<SubNode> allFriendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
+		if (ok(allFriendNodes)) {
+			for (SubNode friendNode : allFriendNodes) {
+				List<String> hashTags = XString.tokenize(friendNode.getTags(), " ,", false);
+				if (ok(hashTags)) {
+					for (String hashTag : hashTags) {
+						// ignore anything that happens not to be a tag
+						if (hashTag.startsWith("#")) {
+							friendsHashTagsSet.add(hashTag);
+						}
+					}
+				}
+			}
+
+			return new LinkedList<String>(friendsHashTagsSet);
+		}
+		return null;
 	}
 
 	/*

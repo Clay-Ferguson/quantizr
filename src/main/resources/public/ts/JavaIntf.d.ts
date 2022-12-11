@@ -632,6 +632,7 @@ export interface FriendInfo {
     avatarVer: string;
     userNodeId: string;
     foreignAvatarUrl: string;
+    tags: string;
     liked: boolean;
 }
 
@@ -688,6 +689,7 @@ export interface GetOpenGraphResponse extends ResponseBase {
 export interface GetPeopleResponse extends ResponseBase {
     nodeOwner: FriendInfo;
     people: FriendInfo[];
+    friendHashTags: string[];
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {

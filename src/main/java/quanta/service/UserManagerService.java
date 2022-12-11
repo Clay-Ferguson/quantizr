@@ -1368,7 +1368,6 @@ public class UserManagerService extends ServiceBase {
 		return fi;
 	}
 
-
 	public GetPeopleResponse getPeople(MongoSession ms) {
 		GetPeopleResponse res = new GetPeopleResponse();
 		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
@@ -1393,6 +1392,7 @@ public class UserManagerService extends ServiceBase {
 		if (ok(userName)) {
 			fi = new FriendInfo();
 			fi.setUserName(userName);
+			fi.setTags(friendNode.getTags());
 
 			SubNode userNode = read.getUserNodeByUserName(null, userName);
 			if (ok(userNode)) {

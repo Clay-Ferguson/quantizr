@@ -7,6 +7,7 @@ public class FriendInfo {
     private String avatarVer;
     private String userNodeId;
     private String foreignAvatarUrl;
+    private String tags;
 
     // indicates this user liked some node, and is dependent upon use case where this FriendInfo is being used
     private Boolean liked;
@@ -57,5 +58,13 @@ public class FriendInfo {
 
     public void setLiked(Boolean liked) {
         this.liked = liked;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

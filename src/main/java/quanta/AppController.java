@@ -136,6 +136,7 @@ import quanta.response.GetConfigResponse;
 import quanta.response.GetIPFSContentResponse;
 import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
+import quanta.response.GetPeopleResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
 import quanta.response.GetUserProfileResponse;
@@ -666,11 +667,14 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
 
 		return callProc.run("getPeople", true, true, req, session, ms -> {
+			GetPeopleResponse ret = null;
 			if (ok(req.getNodeId())) {
-				return user.getPeopleOnNode(ms, req.getNodeId());
+				ret = user.getPeopleOnNode(ms, req.getNodeId());
 			} else {
-				return user.getPeople(ms);
+				ret = user.getPeople(ms);
 			}
+			ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
+			return ret;
 		});
 	}
 
