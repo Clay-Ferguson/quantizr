@@ -4,6 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
@@ -61,13 +62,12 @@ export class SearchContentDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                new Div(null, { className: "row align-items-end" }, [
-                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-9" }),
-                    new Button("Clear", () => this.searchTextState.setValue(""), { className: "col-1" }),
-                    !getAppState().isAnonUser ? this.createSearchFieldIconButtons() : null
+                new Div(null, null, [
+                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState })
                 ]),
+                this.createSearchFieldIconButtons(),
+                new Clearfix(),
                 new HorizontalLayout([
-                    // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
@@ -91,6 +91,19 @@ export class SearchContentDlg extends DialogBase {
                     })
                 ], "displayTable marginBottom"),
                 new HorizontalLayout([
+                    new Selection(null, "Search in", [
+                        { key: "curNode", val: "Current Node" },
+                        { key: "allNodes", val: "My Account" }
+                    ], "m-2", "searchDlgSearchRoot", {
+                        setValue: (val: string) => {
+                            SearchContentDlg.dlgState.searchRoot = val;
+
+                            this.mergeState<LS>({
+                                searchRoot: val
+                            });
+                        },
+                        getValue: (): string => this.getState<LS>().searchRoot
+                    }),
                     new Div(null, null, [
                         new Selection(null, "Sort by", [
                             { key: "0", val: "Relevance" },
@@ -115,20 +128,7 @@ export class SearchContentDlg extends DialogBase {
                             getValue: (): string => this.getState<LS>().sortField
                         }),
                         requirePriorityCheckbox
-                    ]),
-                    new Selection(null, "Search in...", [
-                        { key: "curNode", val: "Current Node" },
-                        { key: "allNodes", val: "My Account" }
-                    ], "m-2", "searchDlgSearchRoot", {
-                        setValue: (val: string) => {
-                            SearchContentDlg.dlgState.searchRoot = val;
-
-                            this.mergeState<LS>({
-                                searchRoot: val
-                            });
-                        },
-                        getValue: (): string => this.getState<LS>().searchRoot
-                    })
+                    ])
                 ], "displayTable marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -142,15 +142,16 @@ export class SearchContentDlg extends DialogBase {
 
     createSearchFieldIconButtons = (): Comp => {
         return new ButtonBar([
-            new IconButton("fa-tag fa-lg", "", {
+            new Button("Clear", () => this.searchTextState.setValue("")),
+            !getAppState().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
                     const dlg = new SelectTagsDlg("search", this.searchTextState.getValue());
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },
                 title: "Select Hashtags to Search"
-            }, "btn-primary", "off")
-        ], "col-2");
+            }, "btn-primary", "off") : null
+        ], "float-end");
     }
 
     addTagsToSearchField = (dlg: SelectTagsDlg) => {
