@@ -57,7 +57,7 @@ export class SearchContentDlg extends DialogBase {
                     this.mergeState<LS>({ requirePriority: checked });
                 },
                 getValue: (): boolean => this.getState<LS>().requirePriority
-            });
+            }, "marginLeft");
         }
 
         return [
@@ -67,6 +67,7 @@ export class SearchContentDlg extends DialogBase {
                 ]),
                 this.createSearchFieldIconButtons(),
                 new Clearfix(),
+
                 new HorizontalLayout([
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean) => {
@@ -90,11 +91,12 @@ export class SearchContentDlg extends DialogBase {
                         getValue: (): boolean => this.getState<LS>().recursive
                     })
                 ], "displayTable marginBottom"),
+
                 new HorizontalLayout([
                     new Selection(null, "Search in", [
                         { key: "curNode", val: "Current Node" },
                         { key: "allNodes", val: "My Account" }
-                    ], "m-2", "searchDlgSearchRoot", {
+                    ], null, "searchDlgSearchRoot", {
                         setValue: (val: string) => {
                             SearchContentDlg.dlgState.searchRoot = val;
 
@@ -111,7 +113,7 @@ export class SearchContentDlg extends DialogBase {
                             { key: "mtm", val: "Modify Time" },
                             { key: "contentLength", val: "Text Length" },
                             { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
-                        ], "m-2", "searchDlgOrderBy", {
+                        ], null, "searchDlgOrderBy", {
                             setValue: (val: string) => {
                                 let sortDir = val === "0" ? "" : "DESC";
                                 if (val === J.NodeProp.PRIORITY_FULL) {
@@ -126,10 +128,13 @@ export class SearchContentDlg extends DialogBase {
                                 });
                             },
                             getValue: (): string => this.getState<LS>().sortField
-                        }),
+                        })
+                    ]),
+                    new Div(null, null, [
                         requirePriorityCheckbox
                     ])
-                ], "displayTable marginBottom"),
+                ], "horizontalLayoutComp bigMarginBottom"),
+
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph),

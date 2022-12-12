@@ -267,7 +267,8 @@ export class Props {
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.ACT_PUB_OBJ_URLS, //
-            J.NodeProp.ACT_PUB_OBJ_ICONS //
+            J.NodeProp.ACT_PUB_OBJ_ICONS, //
+            J.NodeProp.ACT_PUB_TAG
         ]);
     }
 
