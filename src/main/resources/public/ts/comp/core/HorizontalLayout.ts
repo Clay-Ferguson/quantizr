@@ -3,6 +3,7 @@ import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 import { Div } from "./Div";
 
+// todo-1: finish converting all thse to FlexRowLayout
 export class HorizontalLayout extends Comp {
 
     constructor(public comps: CompIntf[] = null, classes: string = "horizontalLayoutComp", attribs: any = {}) {

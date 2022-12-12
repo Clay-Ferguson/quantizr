@@ -50,7 +50,6 @@
 }
 
 .openGraphLhs {
-    margin: 8px;
     width: 20%;
     // This min width is required when there are some crazy long strings in the RHS, and the browser
     // crowds out the left hand side smashin it down to zero size unless we give a min size.
@@ -58,10 +57,8 @@
 }
 
 .openGraphRhs {
-    margin: 8px;
     width: 80%;
-    padding-left: 18px;
-    padding-top: 10px;
+    padding: 18px 18px 0px 18px;
 }
 
 .openGraphDesc {

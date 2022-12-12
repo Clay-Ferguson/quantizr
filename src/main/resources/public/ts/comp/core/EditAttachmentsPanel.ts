@@ -11,7 +11,7 @@ import { NodeCompBinary } from "../node/NodeCompBinary";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
-import { HorizontalLayout } from "./HorizontalLayout";
+import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
 import { TextField } from "./TextField";
@@ -129,11 +129,11 @@ export class EditAttachmentsPanel extends Div {
         const firstAttachment = list[0].o === att.o;
         const lastAttachment = list[list.length - 1].o === att.o;
 
-        const topBinRow = new HorizontalLayout([
+        const topBinRow = new FlexRowLayout([
             attCheckbox,
             new NodeCompBinary(ast.editNode, key, true, false),
 
-            new HorizontalLayout([
+            new FlexRowLayout([
                 new Div(null, null, [
                     ipfsLink ? new Div("IPFS", {
                         className: "smallHeading"
@@ -155,11 +155,11 @@ export class EditAttachmentsPanel extends Div {
                         onClick: () => this.moveAttachmentDown(att, ast.editNode)
                     }) : null
                 ])
-            ])
+            ], "marginLeft")
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
             // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.ast), { title: "Show the IPFS URL for the attached file." }) : null
-        ], "horizontalLayoutCompCompact");
+        ]);
 
         let bottomBinRow = null;
         if (ipfsLink) {

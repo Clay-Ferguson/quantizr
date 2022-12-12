@@ -8,8 +8,8 @@ import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
+import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
-import { HorizontalLayout } from "./comp/core/HorizontalLayout";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -727,7 +727,7 @@ export class Render {
         const tagsDiv = this.renderTagsDiv(node, "microMarginBottom");
 
         return new Div(null, attribs, [
-            new HorizontalLayout([
+            new FlexRowLayout([
                 new Div(null, { className: "friendLhs" }, [
                     img
                 ]),
@@ -767,7 +767,7 @@ export class Render {
                     // }) : null
                 ])
 
-            ], "displayTable userInfo", null)
+            ], "userInfo")
         ]);
     }
 }

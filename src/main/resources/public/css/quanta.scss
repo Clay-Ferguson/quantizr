@@ -1102,6 +1102,7 @@ Will come back later and study this more. todo-3 */
     padding: 4px;
 }
 
+// see if flexRowLayout can be used here (CSS class and or TS class)
 .horizontalLayout {
     // flex will layout things all on the same horizontal row
     display: flex;
@@ -1176,9 +1177,17 @@ Will come back later and study this more. todo-3 */
     margin-left: 2rem;
 }
 
+// todo-1: ended up with two different version of this class. only difference is lowercase of 'F'. fix it.
 .textfield {
     margin-bottom: $smallGap;
+    font-family: "monospace";
 }
+
+.textField {
+    margin-bottom: $smallGap;
+    font-family: "monospace";
+}
+
 
 /* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
 .passwordTextField {
@@ -1761,11 +1770,17 @@ Will come back later and study this more. todo-3 */
     border-radius: $border-radius;
     margin-bottom: $smallGap;
     margin-top: $tinyGap;
+    padding: $smallGap;
+}
+
+.binaryEditorItem {
+    padding-bottom: $microGap;
 }
 
 .binaryEditorItem {
     &:not(:last-child) {
         border-bottom: 1px solid $gray-700;
+        margin-bottom: $tinyGap;
     }
 }
 
@@ -1933,6 +1948,11 @@ audio::-webkit-media-controls-play-button {
     border-spacing: 10px;
 }
 
+.flexRowLayout {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .horizontalLayoutComp {
     display: table;
     border-spacing: 10px;
@@ -1971,11 +1991,8 @@ audio::-webkit-media-controls-play-button {
 .userInfo {
     cursor: pointer;
     width: 100%;
-}
-
-.textField {
     margin-top: $smallGap;
-    margin-top: 4px;
+    margin-bottom: $smallGap;
 }
 
 .stickyNote {
@@ -2077,6 +2094,3 @@ audio::-webkit-media-controls-play-button {
     font-family: "monospace";
 }
 
-.textField {
-    font-family: "monospace";
-}

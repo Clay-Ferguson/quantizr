@@ -7,7 +7,7 @@ import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { HorizontalLayout } from "./core/HorizontalLayout";
+import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Html } from "./core/Html";
 
 interface LS { // Local State
@@ -163,7 +163,7 @@ export class OpenGraphPanel extends Div {
             }
             else {
                 // if we have an image then render a left-hand side and right-hand side.
-                imgAndDesc = new HorizontalLayout([
+                imgAndDesc = new FlexRowLayout([
                     !S.quanta.brokenImages.has(state.og.image) ? new Div(null, { className: "openGraphLhs" }, [
                         new Img({
                             className: this.imageClass,
@@ -173,7 +173,7 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
-                ], "displayTableNoSpacing");
+                ]);
             }
         }
         // if no image just display the description in a div
