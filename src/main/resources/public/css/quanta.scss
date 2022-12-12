@@ -1380,7 +1380,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .tagSearchField {
-    width: 60%;
+    width: 20em;
 }
 
 .txtFieldLabelShort {
@@ -1702,6 +1702,10 @@ Will come back later and study this more. todo-3 */
     @extend .iconToggle;
     border: 3px solid var(--bs-green);
     padding: 1px;
+}
+
+.alignBottom {
+    vertical-align: bottom !important;
 }
 
 .iconToggleOff {

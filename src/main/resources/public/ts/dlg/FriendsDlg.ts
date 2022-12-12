@@ -6,6 +6,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { FriendsTable } from "../comp/FriendsTable";
@@ -19,6 +20,7 @@ export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");
     searchTextState: Validator = new Validator();
     friendsTagSearch: string;
+    searchTextField: TextField;
 
     constructor(title: string, private nodeId: string) {
         super(title);
@@ -83,7 +85,7 @@ export class FriendsDlg extends DialogBase {
 
             friendsTagDropDown = new Selection(null, "Filter By Tag",
                 items,
-                null, "friendsTagPickerDropdown", {
+                null, "friendsTagPickerDropdown alignBottom", {
                 setValue: (val: string) => {
                     this.friendsTagSearch = val;
                     this.userSearch();
@@ -95,14 +97,21 @@ export class FriendsDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new HorizontalLayout([
-                    !message ? new TextField({
+
+                    !message ? (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",
                         label: "Search",
                         val: this.searchTextState,
                         placeholder: "Search for...",
                         enter: this.userSearch,
                         outterClass: "marginBottom tagSearchField"
-                    }) : null,
+                    })) : null,
+
+                    new IconButton("fa-search", null, {
+                        onClick: this.userSearch,
+                        title: "Jump to the Node"
+                    }, "btn-secondary alignBottom"),
+
                     !message ? friendsTagDropDown : null
                 ]),
                 message ? new Div(message)
@@ -140,6 +149,8 @@ export class FriendsDlg extends DialogBase {
 
     userSearch = () => {
         this.mergeState<LS>({});
+        // warning: keep the fat arrow function here.
+        setTimeout(() => this.searchTextField.focus(), 50);
     }
 
     cancel = () => {
