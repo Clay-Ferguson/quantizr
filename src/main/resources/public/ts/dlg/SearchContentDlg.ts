@@ -62,7 +62,8 @@ export class SearchContentDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new Div(null, { className: "row align-items-end" }, [
-                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-10" }),
+                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-9" }),
+                    new Button("Clear", () => this.searchTextState.setValue(""), { className: "col-1" }),
                     !getAppState().isAnonUser ? this.createSearchFieldIconButtons() : null
                 ]),
                 new HorizontalLayout([
@@ -157,20 +158,23 @@ export class SearchContentDlg extends DialogBase {
         val = val.trim();
         const tags: string[] = val.split(" ");
 
-        dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
-            const quoteTag = "\"" + tag + "\"";
-            if (!tags.includes(tag) && !tags.includes(quoteTag)) {
-                if (dlg.matchAny) {
-                    if (val) val += " ";
-                    val += tag;
-                    tags.push(tag);
+        dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(mtag => {
+            const amtags: string[] = mtag.split(" ");
+            amtags.forEach(tag => {
+                const quoteTag = "\"" + tag + "\"";
+                if (!tags.includes(tag) && !tags.includes(quoteTag)) {
+                    if (dlg.matchAny) {
+                        if (val) val += " ";
+                        val += tag;
+                        tags.push(tag);
+                    }
+                    else {
+                        if (val) val += " ";
+                        val += quoteTag;
+                        tags.push(quoteTag);
+                    }
                 }
-                else {
-                    if (val) val += " ";
-                    val += quoteTag;
-                    tags.push(quoteTag);
-                }
-            }
+            });
         });
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
     }
