@@ -47,6 +47,7 @@ export class EditNodeDlg extends DialogBase {
     decryptFailed: boolean = false;
     nameState: Validator = new Validator();
     tagsState: Validator = new Validator();
+    newTagState: Validator = new Validator();
 
     // holds a map of states by property names.
     propStates: Map<string, Validator> = new Map<string, Validator>();
@@ -65,6 +66,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
     contentScrollPos = new ScrollPos();
+    tagTextField: TextField;
 
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
         super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
@@ -352,9 +354,22 @@ export class EditNodeDlg extends DialogBase {
                 }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
-        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "marginBottom row align-items-end" }, [
-            new TextField({ label: "Tags", outterClass: "col-10", val: this.tagsState }),
-            this.createTagsIconButtons()
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection row align-items-end" }, [
+            this.tagTextField = new TextField({
+                label: "Add Tag",
+                outterClass: "col-3",
+                val: this.newTagState,
+                labelClass: "txtFieldLabelShort",
+                enter: () => {
+                    if (this.addOneTagToTextField(this.newTagState.getValue())) {
+                        this.newTagState.setValue("");
+                        // do not simplify this: leave this fat arrow! It's required!
+                        setTimeout(() => { this.tagTextField.focus(); }, 100);
+                    }
+                }
+            }),
+            this.createTagsIconButtons(),
+            this.renderTagsDiv(this.tagsState.getValue())
         ]) : null;
 
         let editorSubPanel: Comp = null;
@@ -400,6 +415,25 @@ export class EditNodeDlg extends DialogBase {
             propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
 
         return children;
+    }
+
+    renderTagsDiv = (tagsStr: string): Div => {
+        const tags = tagsStr.split(" ");
+        let tagCount = 0;
+        const spans: Span[] = tags.map(tag => {
+            if (!tag) return null;
+            tagCount++;
+            return new Span(tag, {
+                title: "Click to Remove",
+                onClick: () => this.removeTag(tag),
+                className: "nodeTagInEditor"
+            })
+        });
+
+        if (tagCount === 0) return null;
+        return new Div(null, {
+            className: "tagsFlexContainer col-7"
+        }, spans);
     }
 
     makePublic = async (allowAppends: boolean) => {
@@ -480,6 +514,15 @@ export class EditNodeDlg extends DialogBase {
 
     createTagsIconButtons = (): Comp => {
         return new ButtonBar([
+            new IconButton("fa-plus fa-lg", "", {
+                onClick: async () => {
+                    this.addOneTagToTextField(this.newTagState.getValue());
+                    this.newTagState.setValue("");
+                    // do not simplify this: leave this fat arrow! It's required!
+                    setTimeout(() => { this.tagTextField.focus(); }, 100);
+                },
+                title: "Add Hashtags"
+            }, "btn-primary", "off"),
             new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
                     const dlg = new SelectTagsDlg("edit", this.tagsState.getValue());
@@ -491,17 +534,67 @@ export class EditNodeDlg extends DialogBase {
         ], "col-2");
     }
 
+    removeTag = (removeTag: string) => {
+        let val = this.tagsState.getValue();
+        val = val.trim();
+        const tags: string[] = val.split(" ");
+        let newTags = "";
+
+        tags.forEach(tag => {
+            if (removeTag !== tag) {
+                if (newTags) newTags += " ";
+                newTags += tag;
+            }
+        });
+
+        this.tagsState.setValue(newTags);
+        this.mergeState({});
+    }
+
+    addOneTagToTextField = (tag: string): boolean => {
+        if (!tag || tag.indexOf(" ") !== -1) {
+            S.util.showMessage("Enter a hashtag to add.", "Tag");
+            return false;
+        }
+        let val = this.tagsState.getValue();
+        val = val.trim();
+        const tags: string[] = val.split(" ");
+
+        if (!tag.startsWith("#")) {
+            tag = "#" + tag;
+        }
+
+        if (!tags.includes(tag)) {
+            if (val) val += " ";
+            val += tag;
+        }
+
+        this.tagsState.setValue(this.sortTags(val));
+        this.mergeState({});
+        return true;
+    }
+
+    sortTags = (tagStr: string) => {
+        if (!tagStr) return tagStr;
+        const tags: string[] = tagStr.split(" ");
+        tags.sort();
+        return tags.join(" ");
+    }
+
     addTagsToTextField = (dlg: SelectTagsDlg) => {
         let val = this.tagsState.getValue();
         val = val.trim();
         const tags: string[] = val.split(" ");
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
+            if (!tag.startsWith("#")) {
+                tag = "#" + tag;
+            }
             if (!tags.includes(tag)) {
                 if (val) val += " ";
                 val += tag;
             }
         });
-        this.tagsState.setValue(val);
+        this.tagsState.setValue(this.sortTags(val));
     }
 
     makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {

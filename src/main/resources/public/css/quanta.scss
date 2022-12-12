@@ -1366,6 +1366,19 @@ Will come back later and study this more. todo-3 */
     border: 2px solid #E74C3C;
 }
 
+.editorTagsSection {
+    border: 1px solid gray;
+    border-radius: 6px;
+    padding-top: $smallGap;
+    padding-bottom: $smallGap;
+    margin: $smallGap 0 0 0;
+}
+
+.tagsFlexContainer {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .tagSearchField {
     width: 60%;
 }
