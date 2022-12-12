@@ -9,6 +9,8 @@ import { EditNodeDlg } from "./EditNodeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
+import { FriendsDlg } from "./FriendsDlg";
+import { FriendsDlgState } from "./FriendsDlgState";
 import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -475,6 +477,24 @@ an upload has been added or removed.
         await emojiDlg.open();
         if (emojiDlg.getState().selectedEmoji) {
             dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji, selStart);
+        }
+    }
+
+    insertUserNames = async (dlg: EditNodeDlg) => {
+        if (!dlg.contentEditor) return;
+        // get the selStart immediately or it can be wrong, after renders.
+        const selStart = dlg.contentEditor.getSelStart();
+        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
+        // loose the cursor position.
+
+        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
+        await friendsDlg.open();
+        debugger;
+        if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {
+            const names: string[] = [];
+            friendsDlg.getState<FriendsDlgState>().selections.forEach(n => names.push("@" + n));
+            const namesStr = names.join(" ");
+            dlg.contentEditor.insertTextAtCursor(" " + namesStr + " ", selStart);
         }
     }
 

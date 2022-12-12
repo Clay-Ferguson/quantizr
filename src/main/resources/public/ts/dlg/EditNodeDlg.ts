@@ -911,8 +911,14 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-lg fa-smile-o editorIcon",
                 title: "Insert emoji at cursor",
                 onClick: () => this.utl.insertEmoji(this)
+            }),
+
+            new Icon({
+                className: "fa fa-lg fa-user editorIcon",
+                title: "Insert Username(s) at cursor",
+                onClick: () => this.utl.insertUserNames(this)
             })
-        ], "float-end microMarginBottom"));
+        ], "float-end microMarginBottom bigMarginRight"));
         editItems.push(this.contentEditor as any as Comp);
 
         return new Div(null, null, editItems);
