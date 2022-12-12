@@ -151,7 +151,7 @@ export class SearchContentDlg extends DialogBase {
                 },
                 title: "Select Hashtags to Search"
             }, "btn-primary", "off") : null
-        ], "float-end");
+        ], "float-end tinyMarginTop");
     }
 
     addTagsToSearchField = (dlg: SelectTagsDlg) => {

@@ -29,7 +29,7 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
             this.data.props.recursive,
             this.data.props.sortField,
             this.data.props.sortDir,
-            false,
+            this.data.props.requirePriority,
             null);
     }
 

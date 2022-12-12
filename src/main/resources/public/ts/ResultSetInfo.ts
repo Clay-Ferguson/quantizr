@@ -16,4 +16,5 @@ export class ResultSetInfo {
     public recursive: boolean;
     public sortField: string;
     public sortDir: string;
+    public requirePriority: boolean;
 }

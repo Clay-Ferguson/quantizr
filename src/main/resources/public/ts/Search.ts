@@ -185,6 +185,7 @@ export class Search {
                 data.props.caseSensitive = caseSensitive;
                 data.props.recursive = recursive;
                 data.props.sortField = sortField;
+                data.props.requirePriority = requirePriority;
                 data.props.sortDir = sortDir;
                 data.props.prop = prop;
                 data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
