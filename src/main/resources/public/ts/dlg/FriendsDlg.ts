@@ -85,7 +85,7 @@ export class FriendsDlg extends DialogBase {
 
             friendsTagDropDown = new Selection(null, "Filter By Tag",
                 items,
-                null, "friendsTagPickerDropdown alignBottom", {
+                null, "friendsTagPickerOnEditor alignBottom", {
                 setValue: (val: string) => {
                     this.friendsTagSearch = val;
                     this.userSearch();

@@ -8,6 +8,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -72,7 +73,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
             friendsTagDropDown = new Selection(null, "Filter By Tag",
                 items,
-                null, "friendsTagPickerDropdown", {
+                null, "friendsTagPickerOnView", {
                 setValue: (val: string) => {
                     this.data.props.friendsTagSearch = val;
                     S.srch.refreshFeed();
@@ -100,44 +101,45 @@ export class FeedView extends AppTab<FeedViewProps> {
                         enter: S.srch.refreshFeed,
                         outterClass: "marginBottom feedSearchField"
                     }) : null,
-                    // we show this button just as an icon unless the search field is displaying
-                    new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
-                        onClick: () => {
-                            if (ast.displayFeedSearch) {
-                                S.srch.refreshFeed()
-                            }
-                            else {
-                                dispatch("DisplayFeedSearch", s => {
-                                    s.displayFeedSearch = true;
-                                    return s;
-                                });
-                            }
-                        },
-                        title: "Search Feed"
-                    }),
-                    new IconButton("fa-refresh", null, {
-                        onClick: () => S.srch.refreshFeed(),
-                        title: "Refresh Feed"
-                    }),
-                    this.data.props.searchTextState.getValue() //
-                        ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
-
-                    showBookmarkIcon ? new IconButton("fa-bookmark", null, {
-                        title: "Bookmark this Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, ast)
-                    }) : null,
-                    new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
-                        setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
-                        getValue: (): boolean => getAppState().userPrefs.autoRefreshFeed
-                    }),
-                    friendsTagDropDown,
-                    // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
-                    // new HelpButton(() => state.config.help?.fediverse?.feed),
-
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, null, true, ast), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "attentionButton float-end")
+                    }, "attentionButton float-end"),
+                    new FlexRowLayout([
+                        // we show this button just as an icon unless the search field is displaying
+                        new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
+                            onClick: () => {
+                                if (ast.displayFeedSearch) {
+                                    S.srch.refreshFeed()
+                                }
+                                else {
+                                    dispatch("DisplayFeedSearch", s => {
+                                        s.displayFeedSearch = true;
+                                        return s;
+                                    });
+                                }
+                            },
+                            title: "Search Feed"
+                        }),
+                        new IconButton("fa-refresh", null, {
+                            onClick: () => S.srch.refreshFeed(),
+                            title: "Refresh Feed"
+                        }),
+                        this.data.props.searchTextState.getValue() //
+                            ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
+
+                        showBookmarkIcon ? new IconButton("fa-bookmark", null, {
+                            title: "Bookmark this Chat Room",
+                            onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, ast)
+                        }) : null,
+                        new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
+                            setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
+                            getValue: (): boolean => getAppState().userPrefs.autoRefreshFeed
+                        }),
+                        friendsTagDropDown
+                        // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
+                        // new HelpButton(() => state.config.help?.fediverse?.feed),
+                    ], "flexRowAlignBottom")
                 ]),
                 new Clearfix()
             ]),

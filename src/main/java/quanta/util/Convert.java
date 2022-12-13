@@ -172,7 +172,7 @@ public class Convert extends ServiceBase {
 		}
 
 		String content = node.getContent();
-		String renderContent = replaceTagsWithHtml(node);
+		String renderContent = replaceTagsWithHtml(node, true);
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
@@ -253,7 +253,7 @@ public class Convert extends ServiceBase {
 	 * NOTE: The client knows not to render any openGraph panels for anchor tags that have classes
 	 * 'mention' or 'hashtag' on them
 	 */
-	public static String replaceTagsWithHtml(SubNode node) {
+	public static String replaceTagsWithHtml(SubNode node, boolean includeHashtags) {
 
 		// don't process foreign-created nodes!
 		if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
@@ -276,7 +276,7 @@ public class Convert extends ServiceBase {
 			int atCount = 0;
 
 			// Hashtag
-			if (tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 //
+			if (includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 //
 					&& Character.isLetter(tok.charAt(1))) {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOHashtag) {
@@ -285,7 +285,9 @@ public class Convert extends ServiceBase {
 						String shortTok = XString.stripIfStartsWith(tok, "#");
 						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
 						sb.append("<a class='mention hashtag' href='" + href + //
-								"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>");
+								"' target='_blank'>#<span>" + shortTok + "</span></a>");
+						// sb.append("<a class='mention hashtag' href='" + href + //
+						// "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>");
 					}
 				}
 			}
@@ -303,7 +305,12 @@ public class Convert extends ServiceBase {
 						String shortTok = XString.stripIfStartsWith(tok, "@");
 						// NOTE: h-card and u-url are part of 'microformats'
 						sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
-								"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok + "</span></a></span>");
+								"' target='_blank'>@<span>" + shortTok
+								+ "</span></a></span>");
+
+						// sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
+						// 		"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok
+						// 		+ "</span></a></span>");
 					}
 				}
 			} else {

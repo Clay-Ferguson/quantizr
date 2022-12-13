@@ -217,7 +217,7 @@ public class ActPubService extends ServiceBase {
                     }
                     // else send out as a note.
                     else {
-                        String content = Convert.replaceTagsWithHtml(node);
+                        String content = Convert.replaceTagsWithHtml(node, false);
                         if (no(content)) {
                             content = node.getContent();
                         }

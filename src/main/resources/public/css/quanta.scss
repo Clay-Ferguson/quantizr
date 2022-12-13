@@ -1774,8 +1774,13 @@ Will come back later and study this more. todo-3 */
     width: 10%;
 }
 
-.friendsTagPickerDropdown {
+.friendsTagPickerOnEditor {
     width: 40%;
+    padding-left: $bigGap;
+}
+
+.friendsTagPickerOnView {
+    width: 15em;
     padding-left: $bigGap;
 }
 

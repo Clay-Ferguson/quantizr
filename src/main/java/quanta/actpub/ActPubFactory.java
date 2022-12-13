@@ -203,7 +203,7 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		String content = Convert.replaceTagsWithHtml(child);
+		String content = Convert.replaceTagsWithHtml(child, true);
 		if (no(content)) {
 			content = child.getContent();
 		}
@@ -238,7 +238,7 @@ public class ActPubFactory extends ServiceBase {
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
-		String content = Convert.replaceTagsWithHtml(child);
+		String content = Convert.replaceTagsWithHtml(child, true);
 		if (no(content)) {
 			content = child.getContent();
 		}
