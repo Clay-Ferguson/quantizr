@@ -23,6 +23,8 @@ $disabled-body-color: gray; //darken($body-color, 90%);
 // This gives us awesome large checkboxes and radio buttons!!
 $custom-control-indicator-size: 1.75rem;
 
+$form-select-indicator-color: lightGray;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 @import "bootswatch.scss";
@@ -1122,10 +1124,12 @@ Will come back later and study this more. todo-3 */
 */
 .icon-up:after {
     content: "\25B2";
+    padding-left: 5px;
 }
 
 .icon-down:after {
     content: "\25BC";
+    padding-left: 5px;
 }
 
 .textarea-min-4 {
