@@ -13,7 +13,6 @@ export class HorizontalLayout extends Comp {
 
     compRender = (): ReactNode => {
         if (this.comps) {
-            // todo-0: this is an ugly way to accomplish horizontal layout
             for (const comp of this.comps) {
                 if (!comp) continue;
 
