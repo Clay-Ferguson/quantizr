@@ -17,7 +17,7 @@ export class RepoRootType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new HorizontalLayout([
-            new Heading(4, "Root")
-        ], "displayTable systemNodeContent marginAll");
+            new Heading(4, "Root", { className: "noMargin" })
+        ], "displayTable systemNodeContent");
     }
 }

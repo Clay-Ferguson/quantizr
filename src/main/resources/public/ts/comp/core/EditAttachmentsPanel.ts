@@ -155,7 +155,7 @@ export class EditAttachmentsPanel extends Div {
                         onClick: () => this.moveAttachmentDown(att, ast.editNode)
                     }) : null
                 ])
-            ], "marginLeft")
+            ], "bigMarginLeft")
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
             // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.ast), { title: "Show the IPFS URL for the attached file." }) : null

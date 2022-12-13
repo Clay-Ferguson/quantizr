@@ -56,15 +56,17 @@
     margin-left: 8px;
 }
 
+.nodeCompBinary {
+    padding: 6px;
+}
+
 .img-in-row {
     cursor: pointer;
-    margin-left: $smallGap;
-    margin-bottom: $smallGap;
-    margin-top: $smallGap;
-    border: 1px solid $gray-700;
     vertical-align: top;
     border-radius: $border-radius;
-    max-width: 98%;
+    border: 1px solid $gray-700;
+    // we size this to 100% becasue the DIV it's inside is the one that actually has the specified sizing
+    width: 100%;
 }
 
 .attachmentLinksPanel {

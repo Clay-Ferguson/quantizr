@@ -33,10 +33,10 @@ export class AccountType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new Div(null, {
-            className: "marginAll systemNodeContent"
+            className: "systemNodeContent"
         }, [
             new Heading(4, "User: " + node.owner, {
-                className: "clickable accountNode",
+                className: "clickable noMargin",
                 onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
                     // their own account this is not a way to do it.

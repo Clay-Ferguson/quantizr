@@ -34,12 +34,12 @@ export class InboxNodeType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new HorizontalLayout([
-            new Heading(4, "Inbox"),
+            new Heading(4, "Inbox", { className: "noMargin" }),
             new ButtonBar([
                 new Button("Clear Inbox", () => S.edit.clearInbox(ast))
             ], null, "float-end marginBottom"),
             new Clearfix()
-        ], "displayTable systemNodeContent marginAll");
+        ], "displayTable systemNodeContent");
     }
 
     isSpecialAccountNode(): boolean {

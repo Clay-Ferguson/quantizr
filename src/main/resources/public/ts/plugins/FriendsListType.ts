@@ -26,11 +26,11 @@ export class FriendsListType extends TypeBase {
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => ast.config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
-            new Heading(4, "Friends", { className: "marginAll" }),
-            new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginLeft" }),
+            new Heading(4, "Friends", { className: "noMargin" }),
+            new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
             new Button("Find People", () => {
                 new SearchUsersDlg().open();
-            }, { className: "marginAll" })
+            }, null, "btn-primary")
         ]);
     }
 

@@ -37,7 +37,7 @@ export class RssFeedsType extends TypeBase {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-end"),
-            new Heading(4, "RSS Feed Subscriptions", { className: "marginAll" })
+            new Heading(4, "RSS Feed Subscriptions", { className: "noMargin" })
         ]);
     }
 }

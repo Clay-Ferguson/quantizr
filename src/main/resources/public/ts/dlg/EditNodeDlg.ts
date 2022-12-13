@@ -357,7 +357,7 @@ export class EditNodeDlg extends DialogBase {
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection row align-items-end" }, [
             this.tagTextField = new TextField({
                 label: "Add Tag",
-                outterClass: "col-3",
+                outterClass: "col-3 noPaddingRight",
                 val: this.newTagState,
                 labelClass: "txtFieldLabelShort",
                 enter: () => {

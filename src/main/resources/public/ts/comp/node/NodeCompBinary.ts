@@ -82,6 +82,7 @@ export class NodeCompBinary extends Div {
         }
         else {
             this.attribs.style = style;
+            this.attribs.className = "nodeCompBinary";
         }
 
         return new Img(imgAttrs);

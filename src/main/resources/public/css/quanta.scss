@@ -1287,6 +1287,9 @@ Will come back later and study this more. todo-3 */
 .rowImageContainer {
     display: flex;
     flex-wrap: wrap;
+    margin-left: $tinyGap;
+    margin-top: $tinyGap;
+    margin-bottom: $tinyGap;
 }
 
 .full-screen-img {
@@ -1383,6 +1386,7 @@ Will come back later and study this more. todo-3 */
     padding-top: $smallGap;
     padding-bottom: $smallGap;
     margin: $smallGap 0 0 0;
+    background-color: #17202A;
 }
 
 .tagsFlexContainer {
@@ -1495,15 +1499,21 @@ Will come back later and study this more. todo-3 */
     margin-bottom: 20px;
 }
 
-.accountNode {
-    margin: 8px 8px 8px 12px;
+.noMargin {
+    margin: 0 0 0 0;
+}
+
+.noPaddingRight {
+    padding-right: 0px !important;
 }
 
 .systemNodeContent {
-    border: 2px solid $nodeBorderBottomColor;
+    border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
-    background-color: #17202A;
-    margin: $tinyGap 0 $tinyGap $tinyGap;
+    background-color: $secondary; 
+    margin: $tinyGap $bigGap $tinyGap $tinyGap;
+    padding: $tinyGap;
+    width: 80%;
 }
 
 // todo-1: once I'm certain about it I can remove these
@@ -1775,6 +1785,7 @@ Will come back later and study this more. todo-3 */
     margin-bottom: $smallGap;
     margin-top: $tinyGap;
     padding: $smallGap;
+    background-color: #17202A;
 }
 
 .binaryEditorItem {
