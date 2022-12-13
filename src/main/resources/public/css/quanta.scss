@@ -1179,12 +1179,12 @@ Will come back later and study this more. todo-3 */
 
 // todo-1: ended up with two different version of this class. only difference is lowercase of 'F'. fix it.
 .textfield {
-    margin-bottom: $smallGap;
+    // margin-bottom: $smallGap; // todo-0: after removing this I now need to retest ALL edit field spacing!
     font-family: "monospace";
 }
 
 .textField {
-    margin-bottom: $smallGap;
+    // margin-bottom: $smallGap; // todo-0: after removing this I now need to retest ALL edit field spacing!
     font-family: "monospace";
 }
 
@@ -1386,10 +1386,6 @@ Will come back later and study this more. todo-3 */
 .tagsFlexContainer {
 	display: flex;
 	flex-wrap: wrap;
-}
-
-.tagSearchField {
-    width: 20em;
 }
 
 .txtFieldLabelShort {
@@ -1757,12 +1753,18 @@ Will come back later and study this more. todo-3 */
     width: 7rem;
 }
 
+.friendSearchField {
+    width: 50%;
+}
+
+.friendSearchButtonDiv {
+    padding-left: $tinyGap;
+    width: 10%;
+}
+
 .friendsTagPickerDropdown {
-    display: inline-block;
-    margin-right: $smallGap;
-    width: 15rem;
-    min-width: 10rem;
-    margin-left: $bigGap;
+    width: 40%;
+    padding-left: $bigGap;
 }
 
 .binaryEditorSection {
@@ -1951,6 +1953,10 @@ audio::-webkit-media-controls-play-button {
 .flexRowLayout {
     display: flex;
     flex-wrap: wrap;
+}
+
+.flexRowAlignBottom {
+    align-items: end;
 }
 
 .horizontalLayoutComp {

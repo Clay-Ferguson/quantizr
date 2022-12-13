@@ -5,7 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
@@ -96,7 +96,7 @@ export class FriendsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                new HorizontalLayout([
+                new FlexRowLayout([
 
                     !message ? (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",
@@ -104,16 +104,19 @@ export class FriendsDlg extends DialogBase {
                         val: this.searchTextState,
                         placeholder: "Search for...",
                         enter: this.userSearch,
-                        outterClass: "marginBottom tagSearchField"
+                        outterClass: "friendSearchField"
                     })) : null,
 
-                    new IconButton("fa-search", null, {
-                        onClick: this.userSearch,
-                        title: "Jump to the Node"
-                    }, "btn-secondary alignBottom"),
+                    // This div wrapper is to keep the button from stretching wrong
+                    new Div(null, { className: "friendSearchButtonDiv" }, [
+                        new IconButton("fa-search", null, {
+                            onClick: this.userSearch,
+                            title: "Search"
+                        }, "btn-secondary")
+                    ]),
 
                     !message ? friendsTagDropDown : null
-                ]),
+                ], "flexRowAlignBottom marginBottom"),
                 message ? new Div(message)
                     : new FriendsTable(state.friends, this.searchTextState.getValue(), this.friendsTagSearch, !this.nodeId, this),
                 state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {
