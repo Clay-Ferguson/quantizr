@@ -11,7 +11,6 @@ import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
-import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
@@ -555,7 +554,7 @@ export class Util {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, ast: AppState) => {
+    updateHistory = (node: J.NodeInfo, ast: AppState) => {
         if (!node) {
             node = ast.node;
         }
@@ -563,115 +562,46 @@ export class Util {
             return;
         }
 
-        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, node.id);
-        if (childNode) {
-            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, childNode.id);
-        }
-
         const content = S.nodeUtil.getShortContent(node);
-        let url, title, state;
+        let url, title, newHistObj;
         if (node.name) {
             const queryPath = S.nodeUtil.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
-            if (childNode && childNode.id && childNode.id !== node.id) {
-                url += "#" + childNode.id;
-            }
-            state = {
-                nodeId: ":" + node.name,
-                highlightId: (childNode && childNode.id && childNode.id !== node.id) ? childNode.id : null
+            newHistObj = {
+                nodeId: ":" + node.name
             };
             title = node.name;
         }
         else {
             url = window.location.origin + "?id=" + node.id;
-            if (childNode && childNode.id && childNode.id !== node.id) {
-                url += "#" + childNode.id;
-            }
-            state = {
-                nodeId: node.id,
-                highlightId: (childNode && childNode.id && childNode.id !== node.id) ? childNode.id : null
+
+            newHistObj = {
+                nodeId: node.id
             };
-            // title = node.id;
             title = content;
         }
 
-        if (history.state && state.nodeId === history.state.nodeId) {
-            history.replaceState(state, title, url);
-            // console.log("REPLACED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
+        if (newHistObj.nodeId === history.state?.nodeId) {
+            history.replaceState(newHistObj, title, url);
+            // console.log("REPLACED STATE: url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
         }
         else {
-            history.pushState(state, title, url);
-            // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
+            history.pushState(newHistObj, title, url);
+            // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
         }
 
-        this.updateNodeHistory(node, childNode);
+        this.updateNodeHistory(node);
     }
 
-    removeHistorySubItem = (nodeId: string) => {
-        /* First whenever we have a new 'node' we need to remove 'node' from any of the
-         subItems that exist, because any top level item doesn't need to also exist as a subItem */
-        S.quanta.nodeHistory.forEach(h => {
-            if (h.subItems) {
-                h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
-                    return hi.id !== nodeId;
-                });
-            }
-        });
-    }
-
-    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null) => {
+    updateNodeHistory = (node: J.NodeInfo) => {
         if (S.quanta.nodeHistoryLocked) return;
-        let subItems: NodeHistoryItem[] = null;
-
-        this.removeHistorySubItem(node.id);
-
-        /* First whenever we have a new 'node' we need to remove 'node' from any of the
-         subItems that exist, because any top level item doesn't need to also exist as a subItem */
-        S.quanta.nodeHistory.forEach(h => {
-            if (h.subItems) {
-                h.subItems = h.subItems.filter(hi => hi.id !== node.id);
-            }
-        });
-
-        // Lookup this history item so we can update the subIds first.
-        const histItem: NodeHistoryItem = S.quanta.nodeHistory.find(h => h.id === node.id);
-
-        // if we found the histItem we need to update subIds
-        if (histItem) {
-            subItems = histItem.subItems;
-
-            if (childNode) {
-                if (subItems) {
-                    // remove id if it exists in history (so we can add to top)
-                    subItems = subItems.filter(item => item.id !== childNode.id && item.id !== node.id);
-                }
-                else {
-                    subItems = [];
-                }
-
-                if (childNode.id !== node.id) {
-                    const childFound = S.quanta.nodeHistory.find(h => h.id === childNode.id);
-
-                    // if this child at at a top level now, don't let it be appended as a child second level item.
-                    if (!childFound) {
-                        // new NodeHistoryItem
-                        subItems.unshift({
-                            id: childNode.id,
-                            type: childNode.type,
-                            content: S.nodeUtil.getShortContent(childNode),
-                            subItems: null
-                        });
-                    }
-                }
-            }
-        }
 
         // remove node if it exists in history (so we can add to top)
         S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== node.id);
 
         // now add to top.
-        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node), subItems });
+        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) /* , subItems */ });
     }
 
     removeHtmlTags = (text: string) => {

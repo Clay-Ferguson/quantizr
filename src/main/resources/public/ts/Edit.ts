@@ -946,6 +946,8 @@ export class Edit {
                 childrenOnly: false,
                 bulkDelete: false
             });
+
+            // todo-0: need a more pub-sub[ish] way to do this.
             this.removeNodesFromHistory(selNodesArray, ast);
             this.removeNodesFromCalendarData(selNodesArray, ast);
 
@@ -994,13 +996,6 @@ export class Edit {
         selNodesArray.forEach(id => {
             // remove any top level history item that matches 'id'
             S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== id);
-
-            // scan all top level history items, and remove 'id' from any subItems
-            S.quanta.nodeHistory.forEach(h => {
-                if (h.subItems) {
-                    h.subItems = h.subItems.filter(hi => hi.id !== id);
-                }
-            });
         });
     }
 
@@ -1331,7 +1326,6 @@ export class Edit {
         if (refreshCurrentNode) {
             if (S.util.checkSuccess("Move nodes", res)) {
                 dispatch("SetNodesToMove", s => {
-                    S.util.removeHistorySubItem(sourceNodeId);
                     s.nodesToMove = null;
                     return s;
                 });

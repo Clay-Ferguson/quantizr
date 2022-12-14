@@ -103,7 +103,9 @@ export class NodeUtil {
         }
 
         if (!ast.isAnonUser) {
-            S.util.updateHistory(ast.node, node, ast);
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, ast.node.id);
+            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
+            S.util.updateHistory(node, ast);
         }
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always

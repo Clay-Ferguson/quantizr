@@ -9,7 +9,6 @@ import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 
 export class HistoryPanel extends Div {
-    private static MAX_SUBITEMS = 5;
 
     constructor() {
         super(null, {
@@ -74,67 +73,6 @@ export class HistoryPanel extends Div {
 
             this.makeDropTarget(parentDropTarg.attribs, h.id);
 
-            if (h.subItems) {
-                let count = 0;
-                let dotsShown = false;
-
-                // we include topLevelId in the ids below so the React 'key' (same as id, by default) isn't
-                // ever able to be duplilcated, because that throws a warning in React.
-                const topLevelId = h.id;
-
-                h.subItems.forEach(h => {
-                    if (!h.content || dotsShown) return;
-                    if (count++ < HistoryPanel.MAX_SUBITEMS) {
-                        let dropTarg: Div;
-                        let icon: Icon;
-
-                        const type = S.plugin.getType(h.type);
-                        if (type) {
-                            const iconClass = type.getIconClass();
-                            if (iconClass) {
-                                const dragProps = ast.userPrefs.editMode ? {
-                                    onMouseOver: () => { S.quanta.draggableId = h.id; },
-                                    onMouseOut: () => { S.quanta.draggableId = null; }
-                                } : {};
-
-                                icon = new Icon({
-                                    className: iconClass + " histTypeIcon",
-                                    title: "Node Type: " + type.getName(),
-                                    ...dragProps
-                                });
-                            }
-                        }
-
-                        const dragProps = ast.userPrefs.editMode ? {
-                            draggable: "true",
-                            onDragStart: (evt: any) => this.dragStart(evt, h.id),
-                            onDragEnd: this.dragEnd
-                        } : {};
-
-                        children.push(dropTarg = new Div(null, {
-                            className: "nodeHistorySubItem",
-                            id: topLevelId + "_" + h.id + "_subhist",
-                            nid: h.id,
-                            onClick: this.jumpToId,
-                            ...dragProps
-                        }, [
-                            icon,
-                            new Span(h.content, null, null, true)
-                        ]));
-
-                        this.makeDropTarget(dropTarg.attribs, h.id);
-                    }
-                    else {
-                        if (!dotsShown) {
-                            dotsShown = true;
-                            children.push(new Div("...", {
-                                id: topLevelId + "_" + h.id + "_subhist",
-                                className: "nodeHistorySubItemDots"
-                            }));
-                        }
-                    }
-                });
-            }
         });
         this.setChildren(children);
     }
