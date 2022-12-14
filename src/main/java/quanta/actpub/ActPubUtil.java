@@ -449,7 +449,8 @@ public class ActPubUtil extends ServiceBase {
 
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            log.debug("POST TO: " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody());
+            log.debug("POST: " + body + "\nTO: " + url + " RESULT: " + response.getStatusCode() + " response="
+                    + response.getBody());
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
             throw new RuntimeException(e);
@@ -616,8 +617,8 @@ public class ActPubUtil extends ServiceBase {
         HashSet<String> apIdSet = new HashSet<>();
 
         /*
-         * The collection object itself is allowed to have items/orderedItems, which if present we process, in
-         * addition to the paging, although normally when the collection has the items it means it won't
+         * The collection object itself is allowed to have items/orderedItems, which if present we process,
+         * in addition to the paging, although normally when the collection has the items it means it won't
          * have any paging
          */
         List<?> items = apList(collectionObj, APObj.orderedItems, false);
@@ -876,7 +877,7 @@ public class ActPubUtil extends ServiceBase {
         // that put any messages in their 'replies' collection, or at least when I query collections
         // I get back an empty array of items for whatever reason.
         // if (ok(node)) {
-        //     readForeignReplies(ms, node);
+        // readForeignReplies(ms, node);
         // }
 
         // iterate up the parent chain or chain of inReplyTo for ActivityPub
@@ -915,10 +916,11 @@ public class ActPubUtil extends ServiceBase {
                         String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
                         if (ok(actPubId)) {
 
-                            // todo-1: we have to do both LOCAL and REMOTE users separately here until I create the 
+                            // todo-1: we have to do both LOCAL and REMOTE users separately here until I create the
                             // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                             // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                            iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), actPubId);
+                            iter = read.findNodesByProp(ms, NodePath.LOCAL_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                                    actPubId);
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
@@ -927,7 +929,8 @@ public class ActPubUtil extends ServiceBase {
                                 }
                             }
 
-                            iter = read.findNodesByProp(ms, NodePath.REMOTE_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), actPubId);
+                            iter = read.findNodesByProp(ms, NodePath.REMOTE_USERS_PATH, NodeProp.ACT_PUB_OBJ_INREPLYTO.s(),
+                                    actPubId);
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
@@ -989,9 +992,9 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
-        SubNode node = loadObject(ms,userDoingAction, url);
-        NodeInfo info = convert.convertToNodeInfo(false,  ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
-							true, true, null);
+        SubNode node = loadObject(ms, userDoingAction, url);
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
+                true, true, null);
         return info;
     }
 

@@ -12,11 +12,8 @@ export class CheckboxInput extends Comp {
         super(attribs, s || new State());
 
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-            // let checked = this.getRef().state.checked; // <-- I think this would work too, to get state.
             this.mergeState<LS>({ checked: evt.target.checked });
-            if (this.valueIntf) {
-                this.valueIntf.setValue(evt.target.checked);
-            }
+            this.valueIntf?.setValue(evt.target.checked);
         };
         if (this.valueIntf) {
             this.mergeState<LS>({ checked: !!valueIntf.getValue() })

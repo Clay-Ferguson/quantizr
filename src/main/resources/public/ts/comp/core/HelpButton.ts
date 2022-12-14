@@ -24,9 +24,6 @@ export class HelpButton extends Comp {
             if (idx !== -1) {
                 const title = helpText.substring(0, idx);
                 const content = helpText.substring(idx);
-                // content = content.replace("\n\n", "[nl]");
-                // content = content.replace("\n", " ");
-                // content = content.replace("[nl]", "\n\n");
                 new MessageDlg(null, title, null, new Markdown(content), false, 0, null).open();
             }
         }

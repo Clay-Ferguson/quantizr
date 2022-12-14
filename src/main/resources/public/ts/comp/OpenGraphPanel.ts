@@ -186,7 +186,7 @@ export class OpenGraphPanel extends Div {
         this.attribs.className = this.wrapperClass;
         this.setChildren([
             bookmarkIcon,
-            this.showTitle ? (state.og.url ? new Anchor(state.og.url, state.og.title, {
+            this.showTitle ? (state.og.url ? new Anchor(this.url, state.og.title, {
                 target: "_blank",
                 className: "openGraphTitle"
             }) : new Div(state.og.title, {

@@ -13,8 +13,6 @@ export class PieChart extends Div {
     }
 
     domPreUpdateEvent = () => {
-        // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
-        // let state = this.getState<LS>();
         const svg = d3.select("." + this.className);
 
         // width/height must match d3PieChart scss class

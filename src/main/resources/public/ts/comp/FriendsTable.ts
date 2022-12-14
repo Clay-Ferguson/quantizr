@@ -9,7 +9,10 @@ export class FriendsTable extends ListBox {
 
     constructor(public friends: FriendInfo[], private searchText: string, private tagSearch: string, private selectableRows: boolean, private dlg: CompIntf) {
         super();
-        const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.75) : 300;
+
+        // todo-0: do this maxHeight for scrolling list thing in all other dialogs too.
+        const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;
+
         this.attribs.className = "scrollY scrollBorder personsList";
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
