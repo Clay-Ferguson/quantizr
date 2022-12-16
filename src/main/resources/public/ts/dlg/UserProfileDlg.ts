@@ -182,10 +182,9 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
-                    // I'm disabling this because we can't have TWO EditNodeDlgs open at the same time and there IS a pathway
-                    // where we can arrive at that scenario if we're currently editing a node.
-                    // !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
-                    //     ? new Button("Friend Settings", this.editFriendNode) : null,
+                    // only show editFriend node if we're NOT currently editing.
+                    !ast.editNode && !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                        ? new Button("Friend Settings", this.editFriendNode) : null,
 
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Follow", this.addFriend) : null,

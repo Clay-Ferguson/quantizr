@@ -12,7 +12,7 @@
 .openGraphPanelBoost {
     @extend .openGraphPanel;
     background-color: black;
-    margin-right: 0px;
+    margin-right: $smallGap;
 }
 
 .openGraphPanelRss {
