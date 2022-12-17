@@ -661,10 +661,10 @@ public class MongoAuth extends ServiceBase {
 	 * including the # or @ as first char of the key.
 	 */
 	public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
-		if (no(content))
-			return null;
-
 		HashMap<String, APObj> tags = new HashMap<>();
+		if (no(content))
+			return tags;
+
 		StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
 
 		while (t.hasMoreTokens()) {
@@ -672,10 +672,23 @@ public class MongoAuth extends ServiceBase {
 
 			if (tok.length() > 1) {
 				// Mention (@name@server.com or @name)
-				if (parseMentions && tok.startsWith("@") && StringUtils.countMatches(tok, "@") <= 2) {
-					// NOTE: href added as null here, but gets set during the importUsers call that happens
-					// after we return these tags.
-					tags.put(tok, new APOMention(null, tok));
+				int atMatches = StringUtils.countMatches(tok, "@");
+				if (parseMentions && tok.startsWith("@") && atMatches <= 2) {
+					String actor = null;
+
+					String userName = tok;
+					boolean isLocalUserName = userName.endsWith("@" + prop.getMetaHost().toLowerCase());
+					if (isLocalUserName) {
+						userName = XString.stripIfStartsWith(userName, "@");
+						userName = apUtil.stripHostFromUserName(userName);
+						actor = apUtil.makeActorUrlForUserName(userName);
+					}
+					// foreign userName
+					else if (atMatches == 2) {
+						String userDoingAction = ThreadLocals.getSC().getUserName();
+						actor = apUtil.getActorUrlFromForeignUserName(userDoingAction, tok);
+					}
+					tags.put(tok, new APOMention(actor, tok));
 				}
 				// Hashtag
 				else if (parseHashtags && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1) {
@@ -692,10 +705,9 @@ public class MongoAuth extends ServiceBase {
 	 * Parses Mentions+Hashtags from ACT_PUB_TAG property of the node.
 	 */
 	public HashMap<String, APObj> parseTags(SubNode node) {
-		if (no(node))
-			return null;
-
 		HashMap<String, APObj> tagSet = new HashMap<>();
+		if (no(node))
+			return tagSet;
 
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
 		if (ok(tags)) {

@@ -260,7 +260,12 @@ public class Convert extends ServiceBase {
 			return null;
 		}
 
-		HashMap<String, APObj> tags = auth.parseTags(node);
+		// todo-0: look for other places where we only call parseTags(text) or parseTags(node) but needed to parse both.
+		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
+		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
+		if (ok(nodePropTags)) {
+			tags.putAll(nodePropTags);
+		}
 
 		// sending back null for renderContent if no tags were inserted (no special HTML to send back, but
 		// just markdown)
@@ -274,6 +279,7 @@ public class Convert extends ServiceBase {
 			String tok = t.nextToken();
 			int tokLen = tok.length();
 			int atCount = 0;
+			boolean formatted = false;
 
 			// Hashtag
 			if (includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1 //
@@ -284,6 +290,7 @@ public class Convert extends ServiceBase {
 					if (ok(href)) {
 						String shortTok = XString.stripIfStartsWith(tok, "#");
 						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
+						formatted = true;
 						sb.append("<a class='mention hashtag' href='" + href + //
 								"' target='_blank'>#<span>" + shortTok + "</span></a>");
 						// sb.append("<a class='mention hashtag' href='" + href + //
@@ -304,16 +311,18 @@ public class Convert extends ServiceBase {
 						}
 						String shortTok = XString.stripIfStartsWith(tok, "@");
 						// NOTE: h-card and u-url are part of 'microformats'
+						formatted = true;
 						sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
-								"' target='_blank'>@<span>" + shortTok
-								+ "</span></a></span>");
+								"' target='_blank'>@<span>" + shortTok + "</span></a></span>");
 
 						// sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
-						// 		"' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok
-						// 		+ "</span></a></span>");
+						// "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok
+						// + "</span></a></span>");
 					}
 				}
-			} else {
+			}
+
+			if (!formatted) {
 				sb.append(tok);
 			}
 		}
