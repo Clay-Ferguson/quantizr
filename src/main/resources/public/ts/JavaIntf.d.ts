@@ -983,6 +983,7 @@ export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
     avatarVer: string;
+    foreignAvatarUrl: string;
     privileges: PrivilegeInfo[];
     publicKey: string;
 }

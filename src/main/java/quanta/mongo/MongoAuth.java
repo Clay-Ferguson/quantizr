@@ -514,6 +514,7 @@ public class MongoAuth extends ServiceBase {
 		String principalName = null;
 		String publicKey = null;
 		String avatarVer = null;
+		String foreignAvatarUrl = null;
 
 		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
@@ -529,11 +530,17 @@ public class MongoAuth extends ServiceBase {
 			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
 			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
 
-			Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-			avatarVer = ok(att) ? att.getBin() : null;
+			// This will be null if it's a local node, and this is fine
+			foreignAvatarUrl = principalNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+
+			if (no(foreignAvatarUrl)) {
+				Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+				avatarVer = ok(att) ? att.getBin() : null;
+			}
 		}
 
-		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);
+		AccessControlInfo info =
+				new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer, foreignAvatarUrl);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}

@@ -14,19 +14,26 @@ public class AccessControlInfo {
 	private String displayName;
 	private String principalName;
 	private String principalNodeId;
+
+	// used to build local user avatars
 	private String avatarVer;
+
+	// used to hold foreign user avatars (not always populated)
+	private String foreignAvatarUrl;
+
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
 	public AccessControlInfo() {}
 
 	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey,
-			String avatarVer) {
+			String avatarVer, String foreignAvatarUrl) {
 		this.displayName = displayName;
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
 		this.publicKey = publicKey;
 		this.avatarVer = avatarVer;
+		this.foreignAvatarUrl = foreignAvatarUrl;
 	}
 
 	public String getPrincipalName() {
@@ -74,6 +81,14 @@ public class AccessControlInfo {
 
 	public void setAvatarVer(String avatarVer) {
 		this.avatarVer = avatarVer;
+	}
+
+	public String getForeignAvatarUrl() {
+		return foreignAvatarUrl;
+	}
+
+	public void setForeignAvatarUrl(String foreignAvatarUrl) {
+		this.foreignAvatarUrl = foreignAvatarUrl;
 	}
 
 	public String getDisplayName() {

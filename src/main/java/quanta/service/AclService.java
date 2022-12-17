@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import com.mongodb.bulk.BulkWriteResult;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;

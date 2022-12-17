@@ -44,6 +44,10 @@ export class EditPrivsTableRow extends ListBoxRow {
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
         }
+        // foreign users have this kind of avatar
+        else if (this.aclEntry.foreignAvatarUrl) {
+            src = this.aclEntry.foreignAvatarUrl;
+        }
 
         let img: Div = null;
         if (src) {
