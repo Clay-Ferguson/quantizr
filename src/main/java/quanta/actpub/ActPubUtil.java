@@ -110,7 +110,7 @@ public class ActPubUtil extends ServiceBase {
      * 
      * output: clay
      * 
-     * todo-0: make this still work even if input is (@clay@server.com) and also make sure this fix won't
+     * todo-1: make this still work even if input is (@clay@server.com) and also make sure this fix won't
      * simultaneously break something else.
      */
     public String stripHostFromUserName(String userName) {

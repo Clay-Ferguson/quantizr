@@ -7,7 +7,7 @@ import { ListBox } from "./ListBox";
 export class FriendsTable extends ListBox {
     static scrollPos: number = 0;
 
-    constructor(public friends: FriendInfo[], private searchText: string, private tagSearch: string, private selectableRows: boolean, private dlg: CompIntf) {
+    constructor(public friends: FriendInfo[], private selectableRows: boolean, private dlg: CompIntf) {
         super();
 
         // todo-0: do this maxHeight for scrolling list thing in all other dialogs too.
@@ -18,20 +18,10 @@ export class FriendsTable extends ListBox {
     }
 
     preRender(): void {
-        this.searchText = this.searchText?.toLowerCase();
-        this.tagSearch = this.tagSearch?.toLowerCase();
-
         if (this.friends) {
             const friendsComps = this.friends.map(friend => {
                 if (!friend) return null;
-
-                if ((!this.searchText || this.friendMatchesString(friend, this.searchText)) &&
-                    (!this.tagSearch || this.friendMatchesString(friend, this.tagSearch))) {
-                    return new FriendsTableRow(friend, this.selectableRows, this.dlg);
-                }
-                else {
-                    return null;
-                }
+                return new FriendsTableRow(friend, this.selectableRows, this.dlg);
             });
 
             if (friendsComps?.length > 0) {
@@ -41,13 +31,6 @@ export class FriendsTable extends ListBox {
                 this.setChildren([new Div("No matching users.")]);
             }
         }
-    }
-
-    friendMatchesString = (friend: FriendInfo, text: string) => {
-        const ret = (friend.displayName && friend.displayName.toLowerCase().indexOf(text) !== -1) || //
-            (friend.userName && friend.userName.toLowerCase().indexOf(text) !== -1) || //
-            (friend.tags && friend.tags.toLowerCase().indexOf(text) !== -1);
-        return ret;
     }
 
     getScrollPos = (): number => {

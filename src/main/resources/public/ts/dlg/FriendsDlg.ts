@@ -94,6 +94,24 @@ export class FriendsDlg extends DialogBase {
             });
         }
 
+        let searchText = this.searchTextState.getValue();
+        let tagSearch = this.friendsTagSearch;
+
+        searchText = searchText?.toLowerCase();
+        tagSearch = tagSearch?.toLowerCase();
+
+        const filteredFriends = state.friends.map(friend => {
+            if (!friend) return null;
+
+            if ((!searchText || this.friendMatchesString(friend, searchText)) &&
+                (!tagSearch || this.friendMatchesString(friend, tagSearch))) {
+                return friend;
+            }
+            else {
+                return null;
+            }
+        });
+
         return [
             new Div(null, null, [
                 new FlexRowLayout([
@@ -118,7 +136,7 @@ export class FriendsDlg extends DialogBase {
                     !message ? friendsTagDropDown : null
                 ], "flexRowAlignBottom marginBottom"),
                 message ? new Div(message)
-                    : new FriendsTable(state.friends, this.searchTextState.getValue(), this.friendsTagSearch, !this.nodeId, this),
+                    : new FriendsTable(filteredFriends, !this.nodeId, this),
                 state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: LS = this.getState();
@@ -144,8 +162,18 @@ export class FriendsDlg extends DialogBase {
 
         // note: if !selectAll we set empty selections, and this is correct.
         if (selectAll && state.friends) {
+            let searchText = this.searchTextState.getValue();
+            let tagSearch = this.friendsTagSearch;
+
+            searchText = searchText?.toLowerCase();
+            tagSearch = tagSearch?.toLowerCase();
+
             state.friends.forEach(friend => {
-                state.selections.add(friend.userName);
+                if (!friend) return;
+                if ((!searchText || this.friendMatchesString(friend, searchText)) &&
+                    (!tagSearch || this.friendMatchesString(friend, tagSearch))) {
+                    state.selections.add(friend.userName);
+                }
             });
         }
     }
@@ -161,6 +189,13 @@ export class FriendsDlg extends DialogBase {
             selections: new Set<string>()
         });
         this.close();
+    }
+
+    friendMatchesString = (friend: J.FriendInfo, text: string) => {
+        const ret = (friend.displayName && friend.displayName.toLowerCase().indexOf(text) !== -1) || //
+            (friend.userName && friend.userName.toLowerCase().indexOf(text) !== -1) || //
+            (friend.tags && friend.tags.toLowerCase().indexOf(text) !== -1);
+        return ret;
     }
 
     save = () => {

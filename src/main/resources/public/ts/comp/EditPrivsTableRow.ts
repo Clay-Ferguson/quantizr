@@ -76,7 +76,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 ]) : null,
                 isPublic ? new Span("Public (Everyone)", { className: "largeFont" })
                     : new Span(displayName, {
-                        className: "clickable " + (img ? "marginLeft" : ""),
+                        className: "clickable marginLeft marginTop",
                         onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }

@@ -947,7 +947,7 @@ export class Edit {
                 bulkDelete: false
             });
 
-            // todo-0: need a more pub-sub[ish] way to do this.
+            // todo-1: need a more pub-sub[ish] way to do this.
             this.removeNodesFromHistory(selNodesArray, ast);
             this.removeNodesFromCalendarData(selNodesArray, ast);
 
