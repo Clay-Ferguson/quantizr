@@ -595,7 +595,7 @@ export class Util {
     }
 
     updateNodeHistory = (node: J.NodeInfo) => {
-        if (S.quanta.nodeHistoryLocked) return;
+        if (S.quanta.nodeHistoryLocked || !node) return;
 
         // remove node if it exists in history (so we can add to top)
         S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== node.id);
