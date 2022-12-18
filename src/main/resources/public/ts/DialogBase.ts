@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { dispatch, getAppState } from "./AppContext";
+import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
@@ -16,7 +17,6 @@ export abstract class DialogBase extends Comp {
     resolve: Function;
 
     aborted: boolean = false;
-
     backdrop: HTMLElement;
 
     /* this is a slight hack so we can ignore 'close()' calls that are bogus, and doesn't apply to the EMBED mode */
@@ -25,6 +25,18 @@ export abstract class DialogBase extends Comp {
 
     validatedStates: Validator[] = null;
     zIndex: number = DialogBase.backdropZIndex;
+
+    isDown: boolean;
+    dragged: boolean;
+    offsetX: number = 0;
+    offsetY: number = 0;
+    mouseX: number = 0;
+    mouseY: number = 0;
+    lastPosX: string = "0px"
+    dlgWidth: string = "600px";
+    lastPosY: string = "60px";
+    dlgFrame: Div;
+    titleDiv: Div;
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
@@ -137,6 +149,12 @@ export abstract class DialogBase extends Comp {
 
     compRender = (): ReactNode => {
         const ast = getAppState();
+        const isTopmost = this.isTopmost(ast);
+        if (!this.dragged) {
+            this.lastPosX = (window.innerWidth * 0.25) + "px";
+            this.dlgWidth = (window.innerWidth * 0.75) + "px";
+        }
+
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
@@ -157,12 +175,24 @@ export abstract class DialogBase extends Comp {
             ])
         ];
 
+        let extraTitleClass = "";
+        let extraContentClass = "";
+
+        // this 'closeByOutsideClick' and a other uses of that variable in here also really need to be
+        // 'isMenu' instead.
+        if (this.mode === DialogMode.POPUP && !this.closeByOutsideClick) {
+            extraTitleClass = (isTopmost ? " dlg-title-border-topmost" : "dlg-title-border-normal");
+            extraContentClass = (isTopmost ? " dlg-content-border-topmost" : "dlg-content-border-normal");
+        }
+
         this.setChildren([
-            this.title ? new Div(null, {
-                className: "app-modal-title"
+            this.title ? (this.titleDiv = new Div(null, {
+                className: (this.mode === DialogMode.POPUP ? "app-modal-title-popup " : "app-modal-title-normal ") + extraTitleClass
             },
-                titleChildren) : null,
-            new Div(null, null, this.renderDlg())
+                titleChildren)) : null,
+            new Div(null, {
+                className: "app-modal-content-area " + extraContentClass
+            }, this.renderDlg())
         ]);
 
         if (this.mode === DialogMode.EMBED) {
@@ -185,10 +215,12 @@ export abstract class DialogBase extends Comp {
             }
             // else wrap dialog in backdrop
             else {
-                return this.tag("div", {
+                const style: any = { zIndex: this.zIndex };
+                const ret = this.tag("div", {
                     id: this.getId(DialogBase.BACKDROP_PREFIX),
-                    className: "app-modal " + (ast.mobileMode ? "normalScrollbar" : "customScrollbar"),
-                    style: { zIndex: this.zIndex },
+                    className: (isTopmost ? "app-modal-top-backdrop " : "app-modal-backdrop ") + //
+                        (ast.mobileMode ? "normalScrollbar" : "customScrollbar"),
+                    style,
                     onClick: (evt: Event) => {
                         if (this.closeByOutsideClick) {
                             const dlgElm: any = S.domUtil.domElm(this.getId());
@@ -199,9 +231,87 @@ export abstract class DialogBase extends Comp {
                         }
                     }
                 }, [
-                    new Div(null, { id: this.getId(), className: clazzName }, this.getChildren())
+                    this.dlgFrame = new Div(null, {
+                        id: this.getId(),
+                        className: clazzName,
+                        style: {
+                            left: this.lastPosX,
+                            top: this.lastPosY,
+                            width: this.dlgWidth
+                        }
+                    }, this.getChildren())
                 ]);
+
+                if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
+                    this.makeDraggable(ast, this.dlgFrame, this.titleDiv);
+                }
+                return ret;
             }
+        }
+    }
+
+    isTopmost = (ast: AppState) => {
+        if (ast.dialogStack.length < 2) return true;
+        return this === ast.dialogStack[ast.dialogStack.length - 1];
+    }
+
+    makeDraggable = (ast: AppState, dragDiv: Div, clickDiv: Div) => {
+        if (!this.isTopmost(ast)) {
+            return;
+        }
+        this.isDown = false;
+
+        clickDiv.domAddEvent = () => {
+            const clickDivElm: HTMLElement = clickDiv.getRef();
+
+            clickDivElm.addEventListener("mousedown", (e) => {
+                if (!this.isTopmost(ast)) return;
+                e.preventDefault();
+                e.stopPropagation();
+
+                // only accept left-button click
+                if (e.button !== 0) return;
+
+                const dragDivElm: HTMLElement = dragDiv.getRef();
+                if (dragDivElm) {
+                    this.offsetX = dragDivElm.offsetLeft - e.clientX;
+                    this.offsetY = dragDivElm.offsetTop - e.clientY;
+
+                    this.isDown = true;
+                    this.dragged = true;
+                }
+            }, true);
+        }
+
+        this.domAddEvent = () => {
+            const elm: HTMLElement = this.getRef();
+            if (!elm) return;
+
+            elm.addEventListener("mouseup", (e) => {
+                if (!this.isTopmost(ast)) return;
+                this.isDown = false;
+                e.preventDefault();
+                e.stopPropagation();
+            }, true);
+
+            elm.addEventListener("mousemove", (e) => {
+                if (!this.isTopmost(ast)) return;
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (this.isDown) {
+                    this.mouseX = e.clientX;
+                    this.mouseY = e.clientY;
+                    this.lastPosX = (this.mouseX + this.offsetX) + "px";
+                    this.lastPosY = (this.mouseY + this.offsetY) + "px";
+
+                    const dragDivElm: HTMLElement = dragDiv.getRef();
+                    if (dragDivElm) {
+                        dragDivElm.style.left = this.lastPosX;
+                        dragDivElm.style.top = this.lastPosY;
+                    }
+                }
+            }, true);
         }
     }
 

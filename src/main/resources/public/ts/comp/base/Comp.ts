@@ -81,10 +81,14 @@ export abstract class Comp implements CompIntf {
         if (this.attribs.ref) {
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
-        // else {
-        //     let elm: HTMLElement = document.getElementById(this.getId());
-        //     ret = (elm && elm.isConnected) ? elm : null;
-        // }
+
+        if (!ret) {
+            const elm: HTMLElement = document.getElementById(this.getId());
+            if (elm) {
+                // console.log("Repaired ref: " + this.getId());
+                ret = this.attribs.ref = elm;
+            }
+        }
 
         if (!ret && warn) {
             console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted +

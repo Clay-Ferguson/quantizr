@@ -100,7 +100,7 @@ export class FriendsDlg extends DialogBase {
         searchText = searchText?.toLowerCase();
         tagSearch = tagSearch?.toLowerCase();
 
-        const filteredFriends = state.friends.map(friend => {
+        const filteredFriends = state.friends?.map(friend => {
             if (!friend) return null;
 
             if ((!searchText || this.friendMatchesString(friend, searchText)) &&

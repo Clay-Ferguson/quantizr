@@ -618,23 +618,26 @@ strong em {
     margin-left: 8px;
 }
 
-.app-modal-title {
-    margin-bottom: .7rem;
+.app-modal-title-normal {
     font-size: 130%;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    padding: 8px 10px 4px 12px;
+}
 
-    // This makes a nice title bar, but I just like the cleaner look without.
-    // border: 1px solid gray;
-    // background-color: $primary;
-    // border-radius: $border-radius;
-    // padding: 4px 10px 4px 10px;
-    padding-left: 4px;
+.app-modal-title-popup {
+    @extend .app-modal-title-normal;
+    cursor: grab;
+    background-color: $primary;
+    padding: 6px 10px 4px 12px;
 }
 
 .app-modal-title-close-icon {
     cursor: pointer;
+    margin-right: 4px;
 }
 
-.app-modal {
+.app-modal-backdrop {
     position: fixed;
     z-index: 16000000;
     left: 0;
@@ -642,7 +645,11 @@ strong em {
     right: 0;
     bottom: 0;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.app-modal-top-backdrop {
+    @extend .app-modal-backdrop;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
@@ -651,20 +658,49 @@ strong em {
     background-color: $modal-content-bg;
     border: 2px solid gray;
     border-radius: $border-radius;
-    padding: 14px;
     width: 100%;
     margin-bottom: 10px;
     margin-top: 12px;
 }
 
+.app-modal-content-area {
+    padding: 12px;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
 .app-modal-content {
+    position: absolute;
     background-color: $modal-content-bg;
-    border: 2px solid gray;
     margin: $smallGap auto;
-    padding: 14px;
-    width: 75%;
     max-width: 800px;
     border-radius: $border-radius;
+}
+
+.dlg-content-border-topmost {
+    border-left: 2px solid var(--bs-green);
+    border-right: 2px solid var(--bs-green);
+    border-bottom: 2px solid var(--bs-green);
+}
+
+.dlg-content-border-normal {
+    border-left: 2px solid gray;
+    border-right: 2px solid gray;
+    border-bottom: 2px solid gray;
+}
+
+.dlg-title-border-topmost {
+    border-top: 2px solid var(--bs-green);
+    border-left: 2px solid var(--bs-green);
+    border-right: 2px solid var(--bs-green);
+    border-bottom: 1px solid gray;
+}
+
+.dlg-title-border-normal {
+    border-top: 2px solid gray;
+    border-left: 2px solid gray;
+    border-right: 2px solid gray;
+    border-bottom: 1px solid gray;
 }
 
 .app-modal-content-tiny-width {
@@ -1390,8 +1426,8 @@ Will come back later and study this more. todo-3 */
 }
 
 .tagsFlexContainer {
-	display: flex;
-	flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .txtFieldLabelShort {
@@ -1510,7 +1546,7 @@ Will come back later and study this more. todo-3 */
 .systemNodeContent {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
-    background-color: $secondary; 
+    background-color: $secondary;
     margin: $tinyGap $bigGap $tinyGap $tinyGap;
     padding: $tinyGap;
     width: 80%;
@@ -1922,7 +1958,7 @@ audio::-webkit-media-controls-play-button {
     cursor: pointer;
 }
 
-.iconMarginRight {
+.dlgIcon {
     margin-right: 12px;
     vertical-align: "middle";
 }
@@ -2115,4 +2151,3 @@ audio::-webkit-media-controls-play-button {
 .timeField {
     font-family: "monospace";
 }
-

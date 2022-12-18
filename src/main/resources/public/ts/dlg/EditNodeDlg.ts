@@ -180,7 +180,7 @@ export class EditNodeDlg extends DialogBase {
                 span = span || new Span();
                 span.addChild(new Icon({
                     title: `Node is a '${type.getName()}' type.`,
-                    className: iconClass + " iconMarginRight clickable",
+                    className: iconClass + " dlgIcon clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
             }
@@ -188,7 +188,7 @@ export class EditNodeDlg extends DialogBase {
                 span = span || new Span();
                 span.addChild(new Icon({
                     title: "Node has a 'Date' property.",
-                    className: "fa fa-calendar fa-lg iconMarginRight"
+                    className: "fa fa-calendar fa-lg dlgIcon"
                 }));
             }
             span.addChild(new Span(type.getName(), { className: "marginRight" }));

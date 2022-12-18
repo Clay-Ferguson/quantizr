@@ -174,7 +174,10 @@ export class UserProfileDlg extends DialogBase {
                     localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
 
                     // but all users we know of will have a posts node simply from having their posts imported
-                    new Button("Posts", () => this.openUserHomePage(state, "posts")), //
+                    new Button("Posts", () => {
+                        if (this.currentlyEditingWarning()) return;
+                        this.openUserHomePage(state, "posts");
+                    }), //
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
@@ -288,10 +291,21 @@ export class UserProfileDlg extends DialogBase {
     }
 
     editFriendNode = async () => {
+        if (this.currentlyEditingWarning()) return;
         S.edit.runEditNode(null, this.userNodeId, true, false, true, null, null, true);
     }
 
+    currentlyEditingWarning = (): boolean => {
+        const ast = getAppState();
+        if (ast.editNode) {
+            S.util.showMessage("You must first finish editing the node.", "Warning");
+            return true;
+        }
+        return false;
+    }
+
     sendMessage = () => {
+        if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
             S.edit.addNode(null, null, false, null, this.userNodeId, null, null, null, false, getAppState());
@@ -299,6 +313,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     previousMessages = () => {
+        if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
             const state: any = this.getState<LS>();
