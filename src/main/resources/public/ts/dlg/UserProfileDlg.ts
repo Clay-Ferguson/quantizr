@@ -201,7 +201,10 @@ export class UserProfileDlg extends DialogBase {
                         window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                     }) : null,
 
-                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
+                    new ButtonBar([
+                        !this.readOnly ? new Button("Logout", S.user.userLogout) : null,
+                        new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary")
+                    ], "float-end")
                 ], "marginTop")
             ])
         ];

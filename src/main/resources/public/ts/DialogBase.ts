@@ -150,9 +150,11 @@ export abstract class DialogBase extends Comp {
     compRender = (): ReactNode => {
         const ast = getAppState();
         const isTopmost = this.isTopmost(ast);
+
+        const width = this.genInitWidth();
+        this.dlgWidth = width + "px";
         if (!this.dragged) {
-            this.lastPosX = (window.innerWidth * 0.25) + "px";
-            this.dlgWidth = (window.innerWidth * 0.75) + "px";
+            this.lastPosX = ((window.innerWidth - width) / 2) + "px";
         }
 
         let useTitle = this.getTitleText() || this.title;
@@ -250,6 +252,22 @@ export abstract class DialogBase extends Comp {
         }
     }
 
+    genInitWidth = (): number => {
+        let width = 800;
+        if (this.overrideClass) {
+            if (this.overrideClass.indexOf("app-modal-content-tiny-width") !== -1) {
+                width = 350;
+            }
+            else if (this.overrideClass.indexOf("app-modal-content-narrow-width") !== -1) {
+                width = 500;
+            }
+            else if (this.overrideClass.indexOf("app-modal-content-medium-width") !== -1) {
+                width = 650;
+            }
+        }
+        return width;
+    }
+
     isTopmost = (ast: AppState) => {
         if (ast.dialogStack.length < 2) return true;
         return this === ast.dialogStack[ast.dialogStack.length - 1];
@@ -266,8 +284,6 @@ export abstract class DialogBase extends Comp {
 
             clickDivElm.addEventListener("mousedown", (e) => {
                 if (!this.isTopmost(ast)) return;
-                e.preventDefault();
-                e.stopPropagation();
 
                 // only accept left-button click
                 if (e.button !== 0) return;
@@ -290,14 +306,10 @@ export abstract class DialogBase extends Comp {
             elm.addEventListener("mouseup", (e) => {
                 if (!this.isTopmost(ast)) return;
                 this.isDown = false;
-                e.preventDefault();
-                e.stopPropagation();
             }, true);
 
             elm.addEventListener("mousemove", (e) => {
                 if (!this.isTopmost(ast)) return;
-                e.preventDefault();
-                e.stopPropagation();
 
                 if (this.isDown) {
                     this.mouseX = e.clientX;
