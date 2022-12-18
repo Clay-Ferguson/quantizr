@@ -30,11 +30,11 @@ export abstract class DialogBase extends Comp {
     dragged: boolean;
     offsetX: number = 0;
     offsetY: number = 0;
-    mouseX: number = 0;
-    mouseY: number = 0;
-    lastPosX: string = "0px"
+    lastPosX: number = 0;
+    lastPosY: number = 0;
+    widthForDragging: number = window.innerWidth;
+    heightForDragging: number = window.innerHeight;
     dlgWidth: string = "600px";
-    lastPosY: string = "60px";
     dlgFrame: Div;
     titleDiv: Div;
 
@@ -154,8 +154,10 @@ export abstract class DialogBase extends Comp {
         const width = this.genInitWidth();
         this.dlgWidth = width + "px";
         if (!this.dragged) {
-            this.lastPosX = ((window.innerWidth - width) / 2) + "px";
+            this.lastPosX = ((window.innerWidth - width) / 2);
         }
+
+        this.checkPositionBounds();
 
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
@@ -237,8 +239,8 @@ export abstract class DialogBase extends Comp {
                         id: this.getId(),
                         className: clazzName,
                         style: {
-                            left: this.lastPosX,
-                            top: this.lastPosY,
+                            left: this.lastPosX + "px",
+                            top: this.lastPosY + "px",
                             width: this.dlgWidth
                         }
                     }, this.getChildren())
@@ -249,6 +251,27 @@ export abstract class DialogBase extends Comp {
                 }
                 return ret;
             }
+        }
+    }
+
+    checkPositionBounds = () => {
+        const elm: HTMLElement = this.getRef();
+        if (!elm) return;
+
+        if (this.lastPosX > this.widthForDragging - 100) {
+            this.lastPosX = this.widthForDragging - 100;
+        }
+
+        if (this.lastPosY > this.heightForDragging - 100) {
+            this.lastPosY = this.heightForDragging - 100;
+        }
+
+        if (this.lastPosX < 0) {
+            this.lastPosX = 0;
+        }
+
+        if (this.lastPosY < 0) {
+            this.lastPosY = 0;
         }
     }
 
@@ -284,17 +307,43 @@ export abstract class DialogBase extends Comp {
 
             clickDivElm.addEventListener("mousedown", (e) => {
                 if (!this.isTopmost(ast)) return;
+                e.preventDefault();
+                // e.stopPropagation();
 
                 // only accept left-button click
                 if (e.button !== 0) return;
+
+                const elm: HTMLElement = this.getRef();
+                if (!elm) return;
+
+                /* If the dialog panel container scrolling area has been scrolled the only reason for doing
+                that would be to see more of the dialog itself, so if user starts dragging it in this case
+                we always just want to reset scrolling back to zero and reposition from scratch as if
+                dialog had just now come up. */
+                if (elm.scrollTop > 0 || elm.scrollLeft > 0) {
+                    elm.scrollTop = 0;
+                    elm.scrollLeft = 0;
+                    const width = this.genInitWidth();
+                    this.lastPosX = ((window.innerWidth - width) / 2);
+                    this.lastPosY = 0;
+
+                    const dragDivElm: HTMLElement = dragDiv.getRef();
+                    if (dragDivElm) {
+                        dragDivElm.style.left = this.lastPosX + "px";
+                        dragDivElm.style.top = this.lastPosY + "px";
+                    }
+                    return;
+                }
 
                 const dragDivElm: HTMLElement = dragDiv.getRef();
                 if (dragDivElm) {
                     this.offsetX = dragDivElm.offsetLeft - e.clientX;
                     this.offsetY = dragDivElm.offsetTop - e.clientY;
-
                     this.isDown = true;
                     this.dragged = true;
+
+                    this.widthForDragging = window.innerWidth;
+                    this.heightForDragging = window.innerHeight;
                 }
             }, true);
         }
@@ -310,17 +359,18 @@ export abstract class DialogBase extends Comp {
 
             elm.addEventListener("mousemove", (e) => {
                 if (!this.isTopmost(ast)) return;
+                e.preventDefault();
+                // e.stopPropagation();
 
                 if (this.isDown) {
-                    this.mouseX = e.clientX;
-                    this.mouseY = e.clientY;
-                    this.lastPosX = (this.mouseX + this.offsetX) + "px";
-                    this.lastPosY = (this.mouseY + this.offsetY) + "px";
+                    this.lastPosX = e.clientX + this.offsetX;
+                    this.lastPosY = e.clientY + this.offsetY;
+                    this.checkPositionBounds();
 
                     const dragDivElm: HTMLElement = dragDiv.getRef();
                     if (dragDivElm) {
-                        dragDivElm.style.left = this.lastPosX;
-                        dragDivElm.style.top = this.lastPosY;
+                        dragDivElm.style.left = this.lastPosX + "px";
+                        dragDivElm.style.top = this.lastPosY + "px";
                     }
                 }
             }, true);
