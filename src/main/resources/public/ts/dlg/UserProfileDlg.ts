@@ -5,8 +5,8 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Html } from "../comp/core/Html";
 import { Img } from "../comp/core/Img";
 import { Label } from "../comp/core/Label";
@@ -99,7 +99,7 @@ export class UserProfileDlg extends DialogBase {
                     ])
                 ]) : null,
 
-                new HorizontalLayout([
+                new FlexRowLayout([
                     profileImg,
                     new Div(null, { className: "userDisplayName" }, [
                         new Div(null, { className: "marginLeft" }, [
@@ -408,7 +408,7 @@ export class UserProfileDlg extends DialogBase {
 
             }
             return new Div("Click to upload Avatar Image", {
-                className: "userProfileDlgAvatar",
+                className: "userProfileDlgAvatarNone",
                 onClick
             });
         }
@@ -460,7 +460,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             return this.readOnly ? null : new Div("Click to upload Header Image", {
-                className: "userProfileDlgHeader",
+                className: "userProfileDlgHeaderNone",
                 onClick
             });
         }
