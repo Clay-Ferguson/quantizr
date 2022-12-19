@@ -8,6 +8,10 @@ export class EditPrivsTable extends ListBox {
 
     constructor(public shareNodeToUserFunc: Function, public acl: AccessControlInfo[], private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
+
+        const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;
+        this.attribs.className = "scrollY scrollBorder customScrollbar";
+        this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
     preRender(): void {

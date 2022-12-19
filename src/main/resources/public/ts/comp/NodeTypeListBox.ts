@@ -10,6 +10,10 @@ export class NodeTypeListBox extends ListBox {
 
     constructor(valueIntf: ValueIntf, public ast: AppState) {
         super(valueIntf);
+
+        const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.7) : 300;
+        this.attribs.className = "scrollY scrollBorder customScrollbar";
+        this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
     preRender(): void {

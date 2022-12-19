@@ -222,8 +222,7 @@ export abstract class DialogBase extends Comp {
                 const style: any = { zIndex: this.zIndex };
                 const ret = this.tag("div", {
                     id: this.getId(DialogBase.BACKDROP_PREFIX),
-                    className: (isTopmost ? "app-modal-top-backdrop " : "app-modal-backdrop ") + //
-                        (ast.mobileMode ? "normalScrollbar" : "customScrollbar"),
+                    className: (isTopmost ? "app-modal-top-backdrop " : "app-modal-backdrop ") + "customScrollbar",
                     style,
                     onClick: (evt: Event) => {
                         if (this.closeByOutsideClick) {
