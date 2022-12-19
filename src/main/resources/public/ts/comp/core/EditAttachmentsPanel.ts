@@ -179,7 +179,13 @@ export class EditAttachmentsPanel extends Div {
         let fileNameTagTip = null;
         if (att.p === "ft") {
             const fileName = fileNameFieldState.getValue();
-            fileNameTagTip = new Div(`File Tag: Image goes where you type {{${fileName}}}`, { className: "marginLeft tinyMarginBottom" });
+            fileNameTagTip = new Div(`File Tag: Image goes where you type {{${fileName}}}`, {
+                title: "Click to insert File Tag",
+                className: "clickable",
+                onClick: () => {
+                    this.editorDlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
+                }
+            });
         }
 
         return new Div(null, { className: "binaryEditorItem" }, [
