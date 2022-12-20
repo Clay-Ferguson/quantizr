@@ -846,7 +846,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .scrollY {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -1853,11 +1853,17 @@ Will come back later and study this more. todo-3 */
 
 .friendListText {
     display: inline-block;
-    font-size: 1.2rem;
     font-weight: 500;
     margin-left: 12px;
     padding-left: 8px;
     padding-top: 6px;
+    cursor: pointer;
+}
+
+.sharingDisplayName {
+    display: inline-block;
+    margin-left: $smallGap;
+    margin-top: $smallGap;
     cursor: pointer;
 }
 

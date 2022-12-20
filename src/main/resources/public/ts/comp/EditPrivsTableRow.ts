@@ -18,7 +18,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        const div = new Div(null, { className: "float-end microMarginBottom" });
+        const div = new Div(null, { className: "float-end tinyMarginAll" });
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
@@ -69,8 +69,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
-            new Div(null, { className: "microMarginAll" }, [
-                this.renderAclPrivileges(this.aclEntry),
+            new Div(null, null, [
                 img,
                 isPublic ? new Div(null, { className: "friendListImgDiv" }, [
                     new Icon({
@@ -78,13 +77,14 @@ export class EditPrivsTableRow extends ListBoxRow {
                         title: "Node is Public"
                     })
                 ]) : null,
-                isPublic ? new Span("Public (Everyone)", { className: "largeFont" })
+                isPublic ? new Span("Public (Everyone)", { className: "largeFont sharingDisplayName" })
                     : new Span(displayName, {
-                        className: "clickable marginLeft marginTop",
+                        className: "sharingDisplayName",
                         onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
-                    })
+                    }),
+                this.renderAclPrivileges(this.aclEntry)
             ])
         ]);
     }
