@@ -150,6 +150,7 @@ export abstract class DialogBase extends Comp {
     compRender = (): ReactNode => {
         const ast = getAppState();
         const isTopmost = this.isTopmost(ast);
+        let ret: ReactNode = null;
 
         const width = this.genInitWidth();
         this.dlgWidth = width + "px";
@@ -201,11 +202,11 @@ export abstract class DialogBase extends Comp {
 
         if (this.mode === DialogMode.EMBED) {
             this.attribs.className = this.overrideClass;
-            return this.tag("div");
+            ret = this.tag("div");
         }
         else if (this.mode === DialogMode.FULLSCREEN) {
             this.attribs.className = "app-modal-content-fullscreen";
-            return this.tag("div");
+            ret = this.tag("div");
         }
         else {
             const clazzName = ast.mobileMode
@@ -215,12 +216,12 @@ export abstract class DialogBase extends Comp {
             // if fullscreen we render without backdrop
             if (this.mode !== DialogMode.POPUP) {
                 this.attribs.className = clazzName;
-                return this.tag("div");
+                ret = this.tag("div");
             }
             // else wrap dialog in backdrop
             else {
                 const style: any = { zIndex: this.zIndex };
-                const ret = this.tag("div", {
+                ret = this.tag("div", {
                     id: this.getId(DialogBase.BACKDROP_PREFIX),
                     className: (isTopmost ? "app-modal-top-backdrop " : "app-modal-backdrop ") + "customScrollbar",
                     style,
@@ -248,15 +249,12 @@ export abstract class DialogBase extends Comp {
                 if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
                     this.makeDraggable(ast, this.dlgFrame, this.titleDiv);
                 }
-                return ret;
             }
         }
+        return ret;
     }
 
     checkPositionBounds = () => {
-        const elm: HTMLElement = this.getRef();
-        if (!elm) return;
-
         if (this.lastPosX > this.widthForDragging - 100) {
             this.lastPosX = this.widthForDragging - 100;
         }
@@ -306,7 +304,7 @@ export abstract class DialogBase extends Comp {
 
             clickDivElm.addEventListener("mousedown", (e) => {
                 if (!this.isTopmost(ast)) return;
-                e.preventDefault();
+                // e.preventDefault();
                 // e.stopPropagation();
 
                 // only accept left-button click
@@ -344,7 +342,7 @@ export abstract class DialogBase extends Comp {
                     this.widthForDragging = window.innerWidth;
                     this.heightForDragging = window.innerHeight;
                 }
-            }, true);
+            }/*, true */);
         }
 
         this.domAddEvent = () => {
@@ -354,11 +352,11 @@ export abstract class DialogBase extends Comp {
             elm.addEventListener("mouseup", (e) => {
                 if (!this.isTopmost(ast)) return;
                 this.isDown = false;
-            }, true);
+            }/*, true */);
 
             elm.addEventListener("mousemove", (e) => {
                 if (!this.isTopmost(ast)) return;
-                e.preventDefault();
+                // e.preventDefault();
                 // e.stopPropagation();
 
                 if (this.isDown) {
@@ -372,7 +370,7 @@ export abstract class DialogBase extends Comp {
                         dragDivElm.style.top = this.lastPosY + "px";
                     }
                 }
-            }, true);
+            }/*, true */);
         }
     }
 

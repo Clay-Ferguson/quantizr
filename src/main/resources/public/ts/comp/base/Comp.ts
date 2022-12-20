@@ -79,14 +79,20 @@ export abstract class Comp implements CompIntf {
     public getRef = (warn: boolean = true): HTMLElement => {
         let ret = null;
         if (this.attribs.ref) {
+            // todo-0: Note sure if isConnected is needed here.
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
 
         if (!ret) {
             const elm: HTMLElement = document.getElementById(this.getId());
             if (elm) {
-                // console.log("Repaired ref: " + this.getId());
-                ret = this.attribs.ref = elm;
+                console.log("Repaired ref: " + this.getId() + "\n" + (new Error().stack));
+
+                // I tried to simply "repair" the 'ref' in this oddball case, but the message below is shown
+                // if I do, so for now I'm just setting the return value leaving attribs alone.
+                // Warning: Unexpected ref object provided for div. Use either a ref-setter function or React.createRef().
+                // this.attribs.ref = elm;
+                ret = elm;
             }
         }
 

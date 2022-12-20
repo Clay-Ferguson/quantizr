@@ -520,7 +520,7 @@ export class Render {
                         // do this async just for performance
                         setTimeout(() => {
                             S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNode.id);
+                            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNode?.id);
                             S.util.updateHistory(targetNode, s);
                         }, 10);
                     }

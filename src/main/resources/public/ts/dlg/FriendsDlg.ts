@@ -30,6 +30,7 @@ export class FriendsDlg extends DialogBase {
             loading: true
         });
 
+        // todo-0: do this in the base class preRender? or something
         (async () => {
             const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
                 nodeId
@@ -65,7 +66,7 @@ export class FriendsDlg extends DialogBase {
         }
         else if (!state.friends || state.friends.length === 0) {
             if (!this.nodeId) {
-                message = "Once you add some friends you can pick from a list here, but for now you can use the button below to find people by name.";
+                message = "Once you add some friends you can pick from a list here.";
             }
             else {
                 message = "Only the Node Owner is associated with this node."
@@ -114,16 +115,15 @@ export class FriendsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                new FlexRowLayout([
-
-                    !message ? (this.searchTextField = new TextField({
+                !message ? new FlexRowLayout([
+                    (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",
                         label: "Search",
                         val: this.searchTextState,
                         placeholder: "Search for...",
                         enter: this.userSearch,
                         outterClass: "friendSearchField"
-                    })) : null,
+                    })),
 
                     // This div wrapper is to keep the button from stretching wrong
                     new Div(null, { className: "friendSearchButtonDiv" }, [
@@ -133,8 +133,8 @@ export class FriendsDlg extends DialogBase {
                         }, "btn-secondary")
                     ]),
 
-                    !message ? friendsTagDropDown : null
-                ], "flexRowAlignBottom marginBottom"),
+                    friendsTagDropDown
+                ], "flexRowAlignBottom marginBottom") : null,
                 message ? new Div(message)
                     : new FriendsTable(filteredFriends, !this.nodeId, this),
                 state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {

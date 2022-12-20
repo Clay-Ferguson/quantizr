@@ -489,7 +489,7 @@ an upload has been added or removed.
 
         const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
         await friendsDlg.open();
-        debugger;
+
         if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {
             const names: string[] = [];
             friendsDlg.getState<FriendsDlgState>().selections.forEach(n => names.push("@" + n));

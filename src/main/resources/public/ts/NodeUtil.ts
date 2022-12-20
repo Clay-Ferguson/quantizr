@@ -98,7 +98,7 @@ export class NodeUtil {
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, ast: AppState) => {
-        if (!node || !ast.node) {
+        if (!node || !ast || !ast.node) {
             return;
         }
 

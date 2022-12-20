@@ -1,8 +1,8 @@
-import { Div } from "../comp/core/Div";
+import * as J from "../JavaIntf";
 import { AccessControlInfo } from "../JavaIntf";
+import { TextContent } from "./core/TextContent";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
-import * as J from "../JavaIntf";
 
 export class EditPrivsTable extends ListBox {
 
@@ -33,7 +33,8 @@ export class EditPrivsTable extends ListBox {
         }
 
         if (children.length === 0) {
-            children.push(new Div("Node is not currently shared. Add people or make it public to share."));
+            this.attribs.className = null;
+            children.push(new TextContent("Node is not currently shared. Add people or make it public to share."));
         }
 
         this.setChildren(children);
