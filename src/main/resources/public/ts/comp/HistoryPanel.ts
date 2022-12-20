@@ -84,6 +84,7 @@ export class HistoryPanel extends Div {
         }
         ev.target.style.border = "6px dotted green";
         ev.dataTransfer.setData("text", draggingId);
+        ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
     }
 
     dragEnd = (ev: any) => {

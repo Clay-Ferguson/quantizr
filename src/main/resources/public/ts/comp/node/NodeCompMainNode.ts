@@ -45,6 +45,7 @@ export class NodeCompMainNode extends Div {
         }
         ev.target.style.borderLeft = "6px dotted green";
         ev.dataTransfer.setData("text", draggingId);
+        ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
     }
 
     dragEnd = (ev: any) => {

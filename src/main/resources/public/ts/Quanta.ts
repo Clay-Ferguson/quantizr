@@ -72,6 +72,8 @@ export class Quanta {
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
 
+    dragImg: any = null;
+
     refresh = (ast: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
@@ -93,6 +95,9 @@ export class Quanta {
 
     initApp = async () => {
         try {
+            this.dragImg = new Image();
+            // this.dragImg.src = "/images/favicon-32x32.png";
+
             if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
                 return;
             }
