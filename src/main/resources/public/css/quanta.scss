@@ -46,7 +46,7 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
-$dlgBorderColor: silver; //  var(--bs-green);
+$dlgBorderColor: var(--bs-green); // silver
 $dlgBorderWidth: 1px;
 
 $createdByMeBackgroundColor: green;
@@ -700,7 +700,7 @@ strong em {
     border-top: $dlgBorderWidth solid $dlgBorderColor;
     border-left: $dlgBorderWidth solid $dlgBorderColor;
     border-right: $dlgBorderWidth solid $dlgBorderColor;
-    border-bottom: $dlgBorderWidth solid $dlgBorderColor;
+    border-bottom: $dlgBorderWidth solid gray;
 }
 
 .dlg-title-border-normal {

@@ -5,13 +5,18 @@
     //maximally surround the list row and any padding margins contained in that list row. 
     margin: 0px;
     padding: 0px;
+    background-color: #17202A;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
 }
 
 .selectedListItem {
     cursor: pointer;
     background-color: $secondary;
     width: 100%;
-    border: 3px solid green;
+    border: 2px solid green;
     padding: 8px;
 }
 
@@ -22,17 +27,13 @@
     padding: 8px;
 }
 
-.selectedListItem:hover {
-    @extend .selectedListItem;
-    background-color: $menuItemHoverBackgroundColor;
+.personsList {
+    background-color: #17202A;
 }
 
-.unselectedListItem:hover {
-    @extend .unselectedListItem;
-    background-color: $menuItemHoverBackgroundColor;
+.privsTable {
+    background-color: #17202A;
 }
-
-.personsList {}
 
 .personsListItemCheckBox {
     vertical-align: top;
