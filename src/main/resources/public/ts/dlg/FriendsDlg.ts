@@ -29,32 +29,31 @@ export class FriendsDlg extends DialogBase {
             selections: new Set<string>(),
             loading: true
         });
+    }
 
-        // todo-0: do this in the base class preRender? or something
-        (async () => {
-            const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
-                nodeId
-            });
+    preLoad = async () => {
+        const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
+            nodeId: this.nodeId
+        });
 
-            await promiseDispatch("SetFriendHashTags", s => {
-                s.friendHashTags = res.friendHashTags;
-                return s;
-            });
+        await promiseDispatch("SetFriendHashTags", s => {
+            s.friendHashTags = res.friendHashTags;
+            return s;
+        });
 
-            let friends: J.FriendInfo[] = [];
-            if (res.nodeOwner) {
-                friends.push(res.nodeOwner);
-            }
-            if (res.people) {
-                friends = friends.concat(res.people);
-            }
+        let friends: J.FriendInfo[] = [];
+        if (res.nodeOwner) {
+            friends.push(res.nodeOwner);
+        }
+        if (res.people) {
+            friends = friends.concat(res.people);
+        }
 
-            this.mergeState<LS>({
-                nodeId,
-                friends,
-                loading: false
-            });
-        })();
+        this.mergeState<LS>({
+            nodeId: this.nodeId,
+            friends,
+            loading: false
+        });
     }
 
     renderDlg(): CompIntf[] {

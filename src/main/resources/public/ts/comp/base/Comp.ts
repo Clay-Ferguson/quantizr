@@ -79,7 +79,7 @@ export abstract class Comp implements CompIntf {
     public getRef = (warn: boolean = true): HTMLElement => {
         let ret = null;
         if (this.attribs.ref) {
-            // todo-0: Note sure if isConnected is needed here.
+            // todo-1: Note sure if isConnected is needed here.
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
 
