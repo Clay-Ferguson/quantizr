@@ -46,6 +46,8 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
+$dlgBorderColor: silver; //  var(--bs-green);
+$dlgBorderWidth: 1px;
 
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
@@ -627,7 +629,6 @@ strong em {
 
 .app-modal-title-popup {
     @extend .app-modal-title-normal;
-    cursor: grab;
     background-color: $primary;
     padding: 6px 10px 4px 12px;
 }
@@ -663,8 +664,14 @@ strong em {
     margin-top: 12px;
 }
 
-.app-modal-content-area {
+.app-modal-content-area-popup {
     padding: 12px;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
+.app-modal-content-area {
+    padding: 0 12px 12px 12px;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
 }
@@ -678,9 +685,9 @@ strong em {
 }
 
 .dlg-content-border-topmost {
-    border-left: 2px solid var(--bs-green);
-    border-right: 2px solid var(--bs-green);
-    border-bottom: 2px solid var(--bs-green);
+    border-left: $dlgBorderWidth solid $dlgBorderColor;
+    border-right: $dlgBorderWidth solid $dlgBorderColor;
+    border-bottom: $dlgBorderWidth solid $dlgBorderColor;
 }
 
 .dlg-content-border-normal {
@@ -690,10 +697,10 @@ strong em {
 }
 
 .dlg-title-border-topmost {
-    border-top: 2px solid var(--bs-green);
-    border-left: 2px solid var(--bs-green);
-    border-right: 2px solid var(--bs-green);
-    border-bottom: 1px solid gray;
+    border-top: $dlgBorderWidth solid $dlgBorderColor;
+    border-left: $dlgBorderWidth solid $dlgBorderColor;
+    border-right: $dlgBorderWidth solid $dlgBorderColor;
+    border-bottom: $dlgBorderWidth solid $dlgBorderColor;
 }
 
 .dlg-title-border-normal {

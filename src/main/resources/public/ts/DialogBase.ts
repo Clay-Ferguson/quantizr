@@ -181,13 +181,16 @@ export abstract class DialogBase extends Comp {
         ];
 
         let extraTitleClass = "";
-        let extraContentClass = "";
+        let contentAreaClass = "";
 
         // this 'closeByOutsideClick' and a other uses of that variable in here also really need to be
         // 'isMenu' instead.
         if (this.mode === DialogMode.POPUP && !this.closeByOutsideClick) {
             extraTitleClass = (isTopmost ? " dlg-title-border-topmost" : "dlg-title-border-normal");
-            extraContentClass = (isTopmost ? " dlg-content-border-topmost" : "dlg-content-border-normal");
+            contentAreaClass = "app-modal-content-area-popup " + (isTopmost ? " dlg-content-border-topmost" : "dlg-content-border-normal");
+        }
+        else {
+            contentAreaClass = "app-modal-content-area";
         }
 
         this.setChildren([
@@ -196,7 +199,7 @@ export abstract class DialogBase extends Comp {
             },
                 titleChildren)) : null,
             new Div(null, {
-                className: "app-modal-content-area " + extraContentClass
+                className: contentAreaClass
             }, this.renderDlg())
         ]);
 
