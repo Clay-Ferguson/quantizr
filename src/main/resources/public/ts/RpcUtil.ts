@@ -179,7 +179,7 @@ export class RpcUtil {
             console.error("Failed: " + status + " " + (error.message || ""));
 
             if (!background && allowErrorDlg) {
-                S.util.showMessage("Something went wrong. Try refreshing your browser page.", "Oops", true);
+                S.util.showMessage("Something went wrong. Try refreshing your browser.", "Warning", true);
             }
         } catch (ex) {
             S.util.logAndReThrow("Failed processing: " + postName, ex);

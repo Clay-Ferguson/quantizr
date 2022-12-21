@@ -116,12 +116,12 @@ public class SessionContext extends ServiceBase {
 		// log.trace(String.format("SessionContext: object hashCode[%d]", hashCode()));
 	}
 
-	public static SessionContext init(ApplicationContext context, HttpSession session, boolean forceNewBean) {
+	public static SessionContext init(ApplicationContext context, HttpSession session) {
 		// Get the SessionContext bean off the http session if it exists
 		SessionContext scBean = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
-		if (forceNewBean || no(scBean) || !scBean.isLive()) {
+		if (no(scBean) || !scBean.isLive()) {
 
 			// if we had a bean for this HTTP session, we need to remove it because we're replacing
 			// it with a new one now. 
@@ -225,6 +225,7 @@ public class SessionContext extends ServiceBase {
 		if (no(userToken)) {
 			userToken = Util.genStrongToken();
 		}
+
 		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
 				+ userToken);
 		setUserName(userName);
@@ -258,7 +259,6 @@ public class SessionContext extends ServiceBase {
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
 					if (ok(userName)) {
-						// need to add IP check here too, but IP can be spoofed?
 						return userName.equals(sc.getUserName());
 					} else {
 						return true;

@@ -267,7 +267,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
-			SessionContext.init(context, session, true);
+			SessionContext.init(context, session);
 
 			// Conver tab name if short name given
 			if ("doc".equals(initialTab)) {
