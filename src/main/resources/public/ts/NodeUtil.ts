@@ -223,6 +223,9 @@ export class NodeUtil {
         while (content.startsWith("#")) {
             content = content.substring(1);
         }
+        if (content.startsWith(J.Constant.ENC_TAG)) {
+            content = "[Encrypted]";
+        }
         return content.trim();
     }
 
