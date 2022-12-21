@@ -41,20 +41,15 @@ export class NodeCompRow extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
-        /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
-        getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
-        have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
-        if (S.quanta.draggableId !== draggingId) {
-            ev.preventDefault();
-            return;
-        }
-        ev.target.style.borderLeft = "6px dotted green";
-        ev.dataTransfer.setData("text", draggingId);
+        ev.currentTarget.classList.add("dragBorderSource");
+        S.quanta.dragElm = ev.target;
+        S.quanta.draggingId = draggingId;
+        ev.dataTransfer.setData(C.DND_TYPE_NODEID, draggingId);
         ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
     }
 
     dragEnd = (ev: any) => {
-        ev.target.style.borderLeft = "6px solid transparent";
+        ev.currentTarget.classList.remove("dragBorderSource");
     }
 
     preRender(): void {
@@ -94,9 +89,10 @@ export class NodeCompRow extends Div {
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
                 ]);
 
-                S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
-                        // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                        // console.log("DROP(d) kind=" + item.kind + " type=" + item.type);
+
                         if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
                             S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
@@ -182,8 +178,8 @@ export class NodeCompRow extends Div {
         }
 
         // if editMode is on, an this isn't the page root node
-        if (ast.userPrefs.editMode && this.node.id !== ast.node.id) {
-            S.render.setNodeDropHandler(this.attribs, this.node, true, ast);
+        if (ast.userPrefs.editMode) {
+            S.render.setNodeDropHandler(this.attribs, this.node);
         }
 
         this.setChildren([

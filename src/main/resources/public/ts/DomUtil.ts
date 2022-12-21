@@ -182,44 +182,33 @@ export class DomUtil {
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
-    setDropHandler = (attribs: any, fullOutline: boolean, func: (elm: any) => void) => {
+    setDropHandler = (attribs: any, func: (elm: any) => void) => {
         attribs.onDragEnter = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
         };
 
         attribs.onDragOver = function (event: any) {
+            if (event.currentTarget === S.quanta.dragElm) return;
             event.stopPropagation();
             event.preventDefault();
-            event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
-            if (fullOutline) {
-                event.currentTarget.style.border = "2px solid green";
-            }
-            else {
-                event.currentTarget.style.borderTop = "2px solid green";
-            }
+            event.dataTransfer.dropEffect = "move"; // See the section on the DataTransfer object.
+            event.currentTarget.classList.add("dragBorderTarget");
         };
 
         attribs.onDragLeave = function (event: any) {
+            if (event.currentTarget === S.quanta.dragElm) return;
             event.stopPropagation();
             event.preventDefault();
-            if (fullOutline) {
-                event.currentTarget.style.border = "2px solid transparent";
-            }
-            else {
-                event.currentTarget.style.borderTop = "2px solid transparent";
-            }
+            event.currentTarget.classList.remove("dragBorderTarget");
         };
 
         attribs.onDrop = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
-            if (fullOutline) {
-                event.currentTarget.style.border = "2px solid transparent";
-            }
-            else {
-                event.currentTarget.style.borderTop = "2px solid transparent";
-            }
+
+            event.currentTarget.classList.remove("dragBorderTarget");
+            event.currentTarget.classList.remove("dragBorder");
             func(event);
         };
     }

@@ -46,6 +46,7 @@ export abstract class DialogBase extends Comp {
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
         const ast = getAppState();
+        this.title = this.title || "Message";
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
         if (!forceMode && (!this.mode || ast.mobileMode)) {
@@ -159,7 +160,6 @@ export abstract class DialogBase extends Comp {
         }
 
         this.checkPositionBounds();
-
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 

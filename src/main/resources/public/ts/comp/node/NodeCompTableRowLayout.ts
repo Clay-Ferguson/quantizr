@@ -111,7 +111,7 @@ export class NodeCompTableRowLayout extends Div {
         if (isMine && this.allowHeaders && allowInsert && !ast.isAnonUser && ast.userPrefs.editMode) {
             const attribs = {};
             if (ast.userPrefs.editMode) {
-                S.render.setNodeDropHandler(attribs, lastNode, false, ast);
+                S.render.setNodeDropHandler(attribs, lastNode);
             }
 
             if (this.level <= 1) {

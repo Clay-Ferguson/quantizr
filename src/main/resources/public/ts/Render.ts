@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch } from "./AppContext";
+import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -17,7 +17,9 @@ import { NodeCompBinary } from "./comp/node/NodeCompBinary";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { PasteActionDlg } from "./dlg/PasteActionDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
@@ -199,16 +201,17 @@ export class Render {
         });
     }
 
-    setNodeDropHandler = (attribs: any, node: J.NodeInfo, isFirst: boolean, ast: AppState) => {
+    setNodeDropHandler = (attribs: any, node: J.NodeInfo) => {
         if (!node) return;
 
-        S.domUtil.setDropHandler(attribs, false, (evt: DragEvent) => {
+        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
+            const ast = getAppState();
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
-                // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                // console.log("DROP(a) kind=" + item.kind + " type=" + item.type);
 
-                if (item.kind === "string") {
-                    item.getAsString((s) => {
+                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+                    item.getAsString(async (s) => {
                         if (item.type.match("^text/uri-list")) {
                             /* Disallow dropping from our app onto our app */
                             if (s.startsWith(location.protocol + "//" + location.hostname)) {
@@ -218,7 +221,26 @@ export class Render {
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
                         else {
-                            S.edit.moveNodeByDrop(node.id, s, isFirst ? "inline-above" : "inline", false);
+                            if (S.quanta.draggingId === node.id) {
+                                S.util.showMessage("You can't copy a node to itself.");
+                            }
+
+                            // if we're dropping onto the page root node, we can do this without asking where
+                            // becasue the answer is always 'inside'
+                            if (node.id === ast.node.id) {
+                                const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
+                                    "btn-primary", "alert alert-info");
+                                await dlg.open();
+                                if (dlg.yes) {
+                                    S.edit.moveNodeByDrop(node.id, S.quanta.draggingId, "inside");
+                                }
+                            }
+                            // else we ask user where to drop
+                            else {
+                                new PasteActionDlg(node.id, S.quanta.draggingId).open();
+                            }
+                            S.quanta.draggingId = null;
+                            S.quanta.dragElm = null;
                         }
                     });
                     return;

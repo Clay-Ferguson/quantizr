@@ -38,7 +38,7 @@ export class Quanta {
     /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that by using the mouseover/mouseout
     on those icons to detect an 'is mouse over' condition any time a drag attempt is started on a row and only allow it if mouse
     is over the icon */
-    public draggableId: string = null;
+    public draggingId: string = null;
 
     // use this to know how long to delay the refresh for breadrumbs should wait to keep from interrupting the fade effect
     // by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
@@ -73,6 +73,7 @@ export class Quanta {
     nodeHistoryLocked: boolean;
 
     dragImg: any = null;
+    dragElm: any = null;
 
     refresh = (ast: AppState) => {
         if (C.DEBUG_SCROLLING) {

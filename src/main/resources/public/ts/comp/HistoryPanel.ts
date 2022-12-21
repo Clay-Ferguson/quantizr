@@ -4,6 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
+import { ConfirmDlg } from "../dlg/ConfirmDlg";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -41,15 +42,9 @@ export class HistoryPanel extends Div {
             if (type) {
                 const iconClass = type.getIconClass();
                 if (iconClass) {
-                    const dragProps = ast.userPrefs.editMode ? {
-                        onMouseOver: () => { S.quanta.draggableId = h.id; },
-                        onMouseOut: () => { S.quanta.draggableId = null; }
-                    } : {};
-
                     parentIcon = new Icon({
                         className: iconClass + " histTypeIcon",
-                        title: "Node Type: " + type.getName(),
-                        ...dragProps
+                        title: "Node Type: " + type.getName()
                     });
                 }
             }
@@ -78,29 +73,34 @@ export class HistoryPanel extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
-        if (S.quanta.draggableId !== draggingId) {
-            ev.preventDefault();
-            return;
-        }
-        ev.target.style.border = "6px dotted green";
-        ev.dataTransfer.setData("text", draggingId);
+        ev.currentTarget.classList.add("dragBorderSource");
+        S.quanta.dragElm = ev.target;
+        S.quanta.draggingId = draggingId;
+
+        ev.dataTransfer.setData(C.DND_TYPE_NODEID, draggingId); // was "text" type
         ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
     }
 
     dragEnd = (ev: any) => {
-        ev.target.style.border = "6px solid transparent";
+        ev.currentTarget.classList.remove("dragBorderSource");
+        S.quanta.dragElm = null;
     }
 
     makeDropTarget = (attribs: any, id: string) => {
-        S.domUtil.setDropHandler(attribs, true, (evt: DragEvent) => {
+        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
-                // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);
 
-                if (item.kind === "string") {
-                    item.getAsString(s => {
+                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+                    item.getAsString(async (s) => {
                         // console.log("String: " + s);
-                        S.edit.moveNodeByDrop(id, s, "inside", true);
+                        const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
+                            "btn-primary", "alert alert-info");
+                        await dlg.open();
+                        if (dlg.yes) {
+                            S.edit.moveNodeByDrop(id, s, "inside");
+                        }
                     });
                     return;
                 }

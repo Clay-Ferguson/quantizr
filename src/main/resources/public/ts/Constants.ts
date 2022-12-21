@@ -1,6 +1,8 @@
 console.log("entering Constants.ts");
 export class Constants {
 
+    static DND_TYPE_NODEID = "nodeid"; // keep lowercase
+
     // max rows to allow to scroll in via infinite scroll capability before we reset back to 25 rows.
     static MAX_DYNAMIC_ROWS = 500;
 

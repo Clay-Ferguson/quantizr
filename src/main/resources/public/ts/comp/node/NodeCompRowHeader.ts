@@ -227,9 +227,7 @@ export class NodeCompRowHeader extends Div {
             if (showInfo && showDetails && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
                     className: iconClass + " marginLeft marginRight",
-                    title: "Node Type: " + type.getName(),
-                    onMouseOver: () => { S.quanta.draggableId = this.node.id; },
-                    onMouseOut: () => { S.quanta.draggableId = null; }
+                    title: "Node Type: " + type.getName()
                 }));
             }
         }

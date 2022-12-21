@@ -23,12 +23,6 @@ export class NodeCompButtonBar extends Div {
 
     preRender(): void {
         const ast = useAppState();
-
-        // make drop target if not a drop-on-self
-        if (S.quanta.draggableId !== this.node.id) {
-            this.makeDropTarget(this.attribs, this.node.id);
-        }
-
         if (!this.node) {
             this.setChildren(null);
             return;
@@ -291,19 +285,5 @@ export class NodeCompButtonBar extends Div {
         if (!this.hasChildren()) {
             delete this.attribs.className;
         }
-    }
-
-    makeDropTarget = (attribs: any, id: string) => {
-        S.domUtil.setDropHandler(attribs, true, (evt: DragEvent) => {
-            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
-            for (const item of evt.dataTransfer.items) {
-                if (item.kind === "string") {
-                    item.getAsString((s) => {
-                        S.edit.moveNodeByDrop(id, s, "inside", true);
-                    });
-                    return;
-                }
-            }
-        });
     }
 }

@@ -36,20 +36,15 @@ export class NodeCompMainNode extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
-        /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
-        getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
-        have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
-        if (S.quanta.draggableId !== draggingId) {
-            ev.preventDefault();
-            return;
-        }
-        ev.target.style.borderLeft = "6px dotted green";
-        ev.dataTransfer.setData("text", draggingId);
+        ev.currentTarget.classList.add("dragBorderSource");
+        S.quanta.dragElm = ev.target;
+        S.quanta.draggingId = draggingId;
+        ev.dataTransfer.setData(C.DND_TYPE_NODEID, draggingId);
         ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
     }
 
     dragEnd = (ev: any) => {
-        ev.target.style.borderLeft = "6px solid transparent";
+        ev.currentTarget.classList.remove("dragBorderSource");
     }
 
     preRender(): void {
@@ -112,6 +107,11 @@ export class NodeCompMainNode extends Div {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 const type = S.plugin.getType(node.boostedNode.type);
                 boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, ast);
+            }
+
+            // if editMode is on, an this isn't the page root node
+            if (ast.userPrefs.editMode) {
+                S.render.setNodeDropHandler(this.attribs, node);
             }
 
             this.setChildren([

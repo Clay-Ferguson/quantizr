@@ -2134,6 +2134,22 @@ audio::-webkit-media-controls-play-button {
     font-size: 90%;
 }
 
+.dragBorderSource {
+    background: repeating-linear-gradient(-45deg,
+            orange,
+            orange 2px,
+            transparent 2px,
+            transparent 14px);
+}
+
+.dragBorderTarget {
+    background: repeating-linear-gradient(-45deg,
+            green,
+            green 2px,
+            transparent 2px,
+            transparent 14px);
+}
+
 .nodeHistoryItem {
     cursor: pointer;
     // anything 'draggable' needs a 2px border

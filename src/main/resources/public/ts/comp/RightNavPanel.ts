@@ -110,9 +110,10 @@ export class RightNavPanel extends Div {
         }) : null;
 
         if (addNoteButton) {
-            S.domUtil.setDropHandler(addNoteButton.attribs, true, (evt: DragEvent) => {
+            S.domUtil.setDropHandler(addNoteButton.attribs, (evt: DragEvent) => {
                 for (const item of evt.dataTransfer.items) {
-                    // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                    // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
+
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
                         S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, ast);

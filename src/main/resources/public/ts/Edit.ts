@@ -1309,13 +1309,12 @@ export class Edit {
         this.createSubNodeResponse(res, false, null, null, ast);
     }
 
-    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean) => {
+    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string) => {
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
             return;
         }
 
-        const state = getAppState(null);
         const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
@@ -1323,29 +1322,24 @@ export class Edit {
         });
         S.render.fadeInId = sourceNodeId;
 
-        if (refreshCurrentNode) {
-            if (S.util.checkSuccess("Move nodes", res)) {
-                dispatch("SetNodesToMove", s => {
-                    s.nodesToMove = null;
-                    return s;
-                });
-                const ast = getAppState();
-                S.view.refreshTree({
-                    nodeId: null,
-                    zeroOffset: false,
-                    renderParentIfLeaf: false,
-                    highlightId: null,
-                    forceIPFSRefresh: false,
-                    scrollToTop: false,
-                    allowScroll: false,
-                    setTab: false,
-                    forceRenderParent: false,
-                    ast: ast
-                });
-            }
-        }
-        else {
-            this.moveNodesResponse(res, sourceNodeId, false, state);
+        if (S.util.checkSuccess("Move nodes", res)) {
+            dispatch("SetNodesToMove", s => {
+                s.nodesToMove = null;
+                return s;
+            });
+            const ast = getAppState();
+            S.view.refreshTree({
+                nodeId: null,
+                zeroOffset: false,
+                renderParentIfLeaf: false,
+                highlightId: null,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: false,
+                setTab: false,
+                forceRenderParent: false,
+                ast: ast
+            });
         }
     }
 

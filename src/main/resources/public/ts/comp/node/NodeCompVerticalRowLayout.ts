@@ -102,7 +102,7 @@ export class NodeCompVerticalRowLayout extends Div {
         if (isMine && this.allowHeaders && allowInsert && !ast.isAnonUser && ast.userPrefs.editMode) {
             const attribs = {};
             if (ast.userPrefs.editMode) {
-                S.render.setNodeDropHandler(attribs, lastNode, false, ast);
+                S.render.setNodeDropHandler(attribs, lastNode);
             }
 
             if (this.level <= 1) {
@@ -122,8 +122,10 @@ export class NodeCompVerticalRowLayout extends Div {
                     }, "btn-secondary plusButtonFloatRight", "fa-plus")
                 ]));
 
-                S.domUtil.setDropHandler(insertButton.attribs, true, (evt: DragEvent) => {
+                S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
+                        // console.log("DROP(e) kind=" + item.kind + " type=" + item.type);
+
                         if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
                             if (lastNode) {
