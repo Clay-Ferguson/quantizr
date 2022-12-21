@@ -1,7 +1,6 @@
 import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
-import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
@@ -172,13 +171,7 @@ export class RightNavPanel extends Div {
                     !ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
                 ]),
 
-                // note: Anonymouse users don't have nodeHistory
-                S.quanta.nodeHistory && S.quanta.nodeHistory.length > 0 ? new CollapsiblePanel("Show History", "Hide History", null, [
-                    new HistoryPanel()
-                ], true,
-                    (state: boolean) => {
-                        RightNavPanel.historyExpanded = state;
-                    }, RightNavPanel.historyExpanded, "", "histPanelExpanded", "histPanelCollapsed", "div") : null
+                S.quanta.nodeHistory?.length > 0 ? new HistoryPanel() : null
             ])
         ]);
     }

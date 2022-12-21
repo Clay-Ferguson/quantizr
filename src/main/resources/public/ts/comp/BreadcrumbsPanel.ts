@@ -34,10 +34,13 @@ export class BreadcrumbsPanel extends Div {
                         bc.name = type ? type.getName() : "???";
                     }
 
-                    return new Span(S.util.removeHtmlTags(bc.name), {
+                    const span = new Span(S.util.removeHtmlTags(bc.name), {
                         onClick: () => S.view.jumpToId(bc.id),
                         className: "breadcrumbItem"
                     });
+                    S.domUtil.makeDropTarget(span, bc.id);
+
+                    return span;
                 }
                 else {
                     return new Span("...", { className: "marginRight" });

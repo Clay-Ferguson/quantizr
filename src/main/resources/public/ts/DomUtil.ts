@@ -1,5 +1,6 @@
 import { dispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
+import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { S } from "./Singletons";
@@ -385,8 +386,8 @@ export class DomUtil {
         }
     }
 
-    makeDropTarget = (attribs: any, id: string) => {
-        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
+    makeDropTarget = (comp: CompIntf, id: string) => {
+        S.domUtil.setDropHandler(comp.attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);

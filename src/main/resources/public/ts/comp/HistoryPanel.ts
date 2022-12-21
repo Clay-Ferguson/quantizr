@@ -26,10 +26,11 @@ export class HistoryPanel extends Div {
         }
         const children = [];
         children.push(new Div(null, null, [
+            new Span("History", { className: "historyPanelTitle" }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean) => S.quanta.nodeHistoryLocked = checked,
                 getValue: (): boolean => S.quanta.nodeHistoryLocked
-            }, "form-switch form-check-inline")
+            }, "form-switch form-check-inline-nomargin")
         ]));
 
         S.quanta.nodeHistory.forEach(h => {
@@ -65,7 +66,7 @@ export class HistoryPanel extends Div {
                 new Span(h.content, null, null, true)
             ]));
 
-            S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
+            S.domUtil.makeDropTarget(parentDropTarg, h.id);
         });
         this.setChildren(children);
     }
