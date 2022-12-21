@@ -1,6 +1,7 @@
 import { dispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { S } from "./Singletons";
 
 export class DomUtil {
@@ -382,5 +383,27 @@ export class DomUtil {
             document.onmousemove = null;
             elmnt.style.cursor = "default";
         }
+    }
+
+    makeDropTarget = (attribs: any, id: string) => {
+        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
+            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
+            for (const item of evt.dataTransfer.items) {
+                // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);
+
+                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+                    item.getAsString(async (s) => {
+                        // console.log("String: " + s);
+                        const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
+                            "btn-primary", "alert alert-info");
+                        await dlg.open();
+                        if (dlg.yes) {
+                            S.edit.moveNodeByDrop(id, s, "inside");
+                        }
+                    });
+                    return;
+                }
+            }
+        });
     }
 }

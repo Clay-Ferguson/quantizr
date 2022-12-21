@@ -197,7 +197,10 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             if (ast.bookmarks) {
                 ast.bookmarks.forEach(bookmark => {
-                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null));
+                    const nodeId = bookmark.id || bookmark.selfId;
+                    const mi = new MenuItem(bookmark.name, () => S.view.jumpToId(nodeId), true, null);
+                    S.domUtil.makeDropTarget(mi.attribs, nodeId);
+                    bookmarkItems.push(mi);
                 });
             }
 

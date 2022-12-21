@@ -4,7 +4,6 @@ import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
-import { ConfirmDlg } from "../dlg/ConfirmDlg";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -66,8 +65,7 @@ export class HistoryPanel extends Div {
                 new Span(h.content, null, null, true)
             ]));
 
-            this.makeDropTarget(parentDropTarg.attribs, h.id);
-
+            S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
         });
         this.setChildren(children);
     }
@@ -84,28 +82,6 @@ export class HistoryPanel extends Div {
     dragEnd = (ev: any) => {
         ev.currentTarget.classList.remove("dragBorderSource");
         S.quanta.dragElm = null;
-    }
-
-    makeDropTarget = (attribs: any, id: string) => {
-        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
-            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
-            for (const item of evt.dataTransfer.items) {
-                // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);
-
-                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
-                    item.getAsString(async (s) => {
-                        // console.log("String: " + s);
-                        const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
-                            "btn-primary", "alert alert-info");
-                        await dlg.open();
-                        if (dlg.yes) {
-                            S.edit.moveNodeByDrop(id, s, "inside");
-                        }
-                    });
-                    return;
-                }
-            }
-        });
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
