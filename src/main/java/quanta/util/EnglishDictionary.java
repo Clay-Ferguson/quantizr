@@ -102,10 +102,10 @@ public class EnglishDictionary extends ServiceBase {
 	 * example threshold=0.60f -> 60% english)
 	 */
 	public boolean isEnglish(String text) {
-		if (dictWords.size() == 0)
-			throw new RuntimeException("called isEnglish before dictionary was loaded.");
 		if (no(text))
 			return true;
+		if (dictWords.size() == 0)
+			throw new RuntimeException("called isEnglish before dictionary was loaded.");
 
 		// log.debug("Checking english: " + text);
 		int englishCount = 0;

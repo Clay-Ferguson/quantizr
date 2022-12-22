@@ -3,10 +3,14 @@
     border: 1px solid $nodeBorderBottomColor;
     padding: 10px;
     margin-bottom: $smallGap;
-    margin-right: 2px;
+    margin-right: $smallGap;
     border-radius: $border-radius;
     overflow-x: hidden;
     background-color: #17202A;
+}
+
+.feedView .openGraphPanelBoost {
+    margin-right: 0 !important;
 }
 
 .openGraphPanelBoost {

@@ -445,10 +445,11 @@ public class UserFeedService extends ServiceBase {
 				continue;
 			}
 
-			// for the curated feed ignore valueless super short messages that also have no attachment.
+			// for the curated feed ignore valueless super short messages that also have no attachment, unless
+			// it's a boost! Be careful boosts also have no content, but we DO want to show boosts.
 			if (Constant.FEED_PUB.s().equals(req.getName())) {
 				if ((StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) //
-						&& no(node.getAttachments())) {
+						&& no(node.getAttachments()) && no(node.getStr(NodeProp.BOOST))) {
 					skipped++;
 					continue;
 				}

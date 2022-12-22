@@ -47,7 +47,7 @@ $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'san
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
 $dlgBorderColor: var(--bs-green); // silver
-$dlgBorderWidth: 1px;
+$dlgBorderWidth: 2px;
 
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;
@@ -426,6 +426,7 @@ a {
     margin-bottom: $tinyGap;
     border: 1px solid gray;
     border-radius: $border-radius;
+    vertical-align: top;
 }
 
 .resultsContentHeading {
@@ -1257,7 +1258,7 @@ Will come back later and study this more. todo-3 */
 .histTypeIcon {
     @extend .rowTypeIcon;
     margin-right: $tinyGap;
-    margin-bottom: $tinyGap;
+    vertical-align: bottom; // important so long text looks consistent in row spacing
 }
 
 .rowTypeName {
@@ -1330,9 +1331,8 @@ Will come back later and study this more. todo-3 */
 .rowImageContainer {
     display: flex;
     flex-wrap: wrap;
-    margin-left: $tinyGap;
+    margin-left: $smallGap;
     margin-top: $tinyGap;
-    margin-bottom: $tinyGap;
 }
 
 .full-screen-img {
@@ -1554,7 +1554,7 @@ Will come back later and study this more. todo-3 */
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     background-color: $secondary;
-    margin: $tinyGap $bigGap $tinyGap $tinyGap;
+    margin: $tinyGap $bigGap $tinyGap $smallGap;
     padding: $tinyGap;
     width: 80%;
 }
@@ -2160,20 +2160,7 @@ audio::-webkit-media-controls-play-button {
 
 .nodeHistoryItem {
     cursor: pointer;
-    // anything 'draggable' needs a 2px border
-    border: 2px solid transparent;
-}
-
-.nodeHistorySubItem {
-    margin-left: 30px;
-    cursor: pointer;
-    // anything 'draggable' needs a 2px border
-    border: 2px solid transparent;
-}
-
-.nodeHistorySubItemDots {
-    margin-left: 20px;
-    margin-top: 5px;
+    margin: 0 $smallGap $smallGap $smallGap;
 }
 
 .ipsmFeedItem {
