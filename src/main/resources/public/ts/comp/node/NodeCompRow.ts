@@ -92,8 +92,7 @@ export class NodeCompRow extends Div {
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         // console.log("DROP(d) kind=" + item.kind + " type=" + item.type);
-
-                        if (item.kind === "file") {
+                       if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
                             S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                             return;

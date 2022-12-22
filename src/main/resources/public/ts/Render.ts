@@ -210,44 +210,7 @@ export class Render {
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(a) kind=" + item.kind + " type=" + item.type);
 
-                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
-                    item.getAsString(async (s) => {
-                        if (item.type.match("^text/uri-list")) {
-                            /* Disallow dropping from our app onto our app */
-                            if (s.startsWith(location.protocol + "//" + location.hostname)) {
-                                return;
-                            }
-                            S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, ast);
-                        }
-                        /* this is the case where a user is moving a node by dragging it over another node */
-                        else {
-                            if (S.quanta.draggingId === node.id) {
-                                S.util.showMessage("You can't copy a node to itself.");
-                            }
-
-                            // if we're dropping onto the page root node, we can do this without asking where
-                            // becasue the answer is always 'inside'
-                            if (node.id === ast.node.id) {
-                                const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
-                                    "btn-primary", "alert alert-info");
-                                await dlg.open();
-                                if (dlg.yes) {
-                                    S.edit.moveNodeByDrop(node.id, S.quanta.draggingId, "inside");
-                                }
-                            }
-                            // else we ask user where to drop
-                            else {
-                                new PasteActionDlg(node.id, S.quanta.draggingId).open();
-                            }
-                            S.quanta.draggingId = null;
-                            S.quanta.dragElm = null;
-                        }
-                    });
-                    return;
-                }
-                else if (item.kind === "string" && item.type.match("^text/html")) {
-                }
-                else if (item.kind === "file" /* && d.type.match('^image/') */) {
+                if (item.type.startsWith("image/") && item.kind === "file") {
                     const file: File = item.getAsFile();
 
                     // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
@@ -255,7 +218,41 @@ export class Render {
                     //     return;
                     // }
 
-                    S.attachment.openUploadFromFileDlg(false, node, file, ast);
+                    S.attachment.openUploadFromFileDlg(false, node.id, file, ast);
+                    return;
+                }
+                else if (item.type.match("^text/uri-list") && item.kind === "string") {
+                    item.getAsString(async (s) => {
+                        /* Disallow dropping from our app onto our app */
+                        if (s.startsWith(location.protocol + "//" + location.hostname)) {
+                            return;
+                        }
+                        S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, ast);
+                    });
+                }
+                else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+                    item.getAsString(async (s) => {
+                        if (S.quanta.draggingId === node.id) {
+                            S.util.showMessage("You can't copy a node to itself.");
+                        }
+
+                        // if we're dropping onto the page root node, we can do this without asking where
+                        // becasue the answer is always 'inside'
+                        if (node.id === ast.node.id) {
+                            const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
+                                "btn-primary", "alert alert-info");
+                            await dlg.open();
+                            if (dlg.yes) {
+                                S.edit.moveNodeByDrop(node.id, S.quanta.draggingId, "inside");
+                            }
+                        }
+                        // else we ask user where to drop
+                        else {
+                            new PasteActionDlg(node.id, S.quanta.draggingId).open();
+                        }
+                        S.quanta.draggingId = null;
+                        S.quanta.dragElm = null;
+                    });
                     return;
                 }
             }

@@ -1,4 +1,4 @@
-import { dispatch } from "./AppContext";
+import { dispatch, getAppState } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
@@ -392,7 +392,22 @@ export class DomUtil {
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);
 
-                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+                if (item.type.startsWith("image/") && item.kind === "file") {
+                    const file: File = item.getAsFile();
+
+                    // if (file.size > Constants.MAX_UPLOAD_MB * Constants.ONE_MB) {
+                    //     S.util.showMessage("That file is too large to upload. Max file size is "+Constants.MAX_UPLOAD_MB+" MB");
+                    //     return;
+                    // }
+
+                    const ast = getAppState();
+                    // todo-1: this is an ugly solution because it displays the upload dialog
+                    // and takes the user to the node that got uploade onto. I'd like to NOT do that,
+                    // but just make it behind the scenes automatic.
+                    S.attachment.openUploadFromFileDlg(false, id, file, ast);
+                    return;
+                }
+                else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
                         // console.log("String: " + s);
                         const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",

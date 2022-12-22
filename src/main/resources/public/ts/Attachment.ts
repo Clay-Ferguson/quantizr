@@ -7,17 +7,21 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Attachment {
-    openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, ast: AppState) => {
+    openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File, ast: AppState) => {
         ast = getAppState(ast);
-        node = node || S.nodeUtil.getHighlightedNode(ast);
 
-        if (!node) {
+        if (!nodeId) {
+            const node = S.nodeUtil.getHighlightedNode(ast);
+            nodeId = node?.id;
+        }
+
+        if (!nodeId) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 
-        new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, () => {
-            S.view.jumpToId(node.id);
+        new UploadFromFileDropzoneDlg(nodeId, "", toIpfs, autoAddFile, false, true, () => {
+            S.view.jumpToId(nodeId);
         }).open();
     };
 

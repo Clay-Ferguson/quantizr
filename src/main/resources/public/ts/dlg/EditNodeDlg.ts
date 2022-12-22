@@ -403,7 +403,6 @@ export class EditNodeDlg extends DialogBase {
         // Allows user to drag-n-drop files onto editor to upload
         S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
             for (const item of evt.dataTransfer.items) {
-                // console.log("DROP(f) kind=" + item.kind + " type=" + item.type);
                 if (item.kind === "file") {
                     const file = item.getAsFile();
                     this.utl.upload(file, this);

@@ -84,6 +84,7 @@
     margin-left: 10px;
     margin-bottom: 8px;
     border-radius: $border-radius;
+    border: 1px solid gray;
     display: inline-block;
 }
 
@@ -225,7 +226,7 @@ i'm backing out for now
 .boost-row {
     border: 2px solid gray;
     border-radius: $border-radius;
-    margin: 0px 12px 0px 12px;
+    margin: 4px 12px 4px 12px;
     padding-top: $tinyGap;
     background-color: #17202A;
 }
