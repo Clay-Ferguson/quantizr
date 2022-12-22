@@ -521,6 +521,7 @@ strong em {
     margin-bottom: $smallGap;
     padding: $smallGap;
     width: 100%;
+    background-color: #17202A;
 }
 
 .fixedFont {
@@ -625,13 +626,25 @@ strong em {
     font-size: 130%;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
-    padding: 8px 10px 4px 12px;
 }
 
 .app-modal-title-popup {
-    @extend .app-modal-title-normal;
+    font-size: 130%;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
     background-color: $primary;
-    padding: 6px 10px 4px 12px;
+}
+
+.dlg-title-topmost {
+    border-top: $dlgBorderWidth solid $dlgBorderColor;
+    border-left: $dlgBorderWidth solid $dlgBorderColor;
+    border-right: $dlgBorderWidth solid $dlgBorderColor;
+}
+
+.dlg-title-normal {
+    border-top: 2px solid gray;
+    border-left: 2px solid gray;
+    border-right: 2px solid gray;
 }
 
 .app-modal-title-close-icon {
@@ -665,17 +678,18 @@ strong em {
     margin-top: 12px;
 }
 
+.app-modal-content-area-embed {
+    padding: 0px 12px 12px 12px;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
 .app-modal-content-area-popup {
     padding: 12px;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
 }
 
-.app-modal-content-area {
-    padding: 0 12px 12px 12px;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
-}
 
 .app-modal-content {
     position: absolute;
@@ -697,18 +711,14 @@ strong em {
     border-bottom: 2px solid gray;
 }
 
-.dlg-title-border-topmost {
-    border-top: $dlgBorderWidth solid $dlgBorderColor;
-    border-left: $dlgBorderWidth solid $dlgBorderColor;
-    border-right: $dlgBorderWidth solid $dlgBorderColor;
-    border-bottom: $dlgBorderWidth solid gray;
+.dlg-title-content {
+    padding: 6px 6px 4px 12px;
+    width: 100%;
 }
 
-.dlg-title-border-normal {
-    border-top: 2px solid gray;
-    border-left: 2px solid gray;
-    border-right: 2px solid gray;
-    border-bottom: 1px solid gray;
+.line {
+    width: 100%;
+    border-bottom: 2px solid gray;
 }
 
 .app-modal-content-tiny-width {

@@ -186,18 +186,22 @@ export abstract class DialogBase extends Comp {
         // this 'closeByOutsideClick' and a other uses of that variable in here also really need to be
         // 'isMenu' instead.
         if (this.mode === DialogMode.POPUP && !this.closeByOutsideClick) {
-            extraTitleClass = (isTopmost ? " dlg-title-border-topmost" : "dlg-title-border-normal");
-            contentAreaClass = "app-modal-content-area-popup " + (isTopmost ? " dlg-content-border-topmost" : "dlg-content-border-normal");
+            extraTitleClass = (isTopmost ? " dlg-title-topmost" : "dlg-title-normal");
+            contentAreaClass = "app-modal-content-area-popup" + (isTopmost ? " dlg-content-border-topmost" : " dlg-content-border-normal");
         }
         else {
-            contentAreaClass = "app-modal-content-area";
+            contentAreaClass = "app-modal-content-area-embed";
         }
 
         this.setChildren([
             this.title ? (this.titleDiv = new Div(null, {
                 className: (this.mode === DialogMode.POPUP ? "app-modal-title-popup " : "app-modal-title-normal ") + extraTitleClass
             },
-                titleChildren)) : null,
+                [
+                    new Div(null, { className: "dlg-title-content" }, titleChildren),
+                    this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
+                ]
+            )) : null,
             new Div(null, {
                 className: contentAreaClass
             }, this.renderDlg())

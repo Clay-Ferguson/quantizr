@@ -38,7 +38,7 @@ export class SharingDlg extends DialogBase {
                     this.shareNodeToUser(userName, allowAppends);
                 }, ast.editNode.ac, this.removePrivilege),
                 S.props.isShared(ast.editNode) ? new Div("Remove All", {
-                    className: "marginBottom marginRight float-end clickable",
+                    className: "marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),

@@ -70,20 +70,7 @@ export class App extends Main {
                     ast.mobileMode ? null : new LeftNavPanel(),
                     new TabPanel(mobileTopBar),
                     ast.mobileMode ? null : new RightNavPanel()
-                ]),
-
-                // I don't like this clutter. Leaving as an example for now.
-                // new IconButton("fa-angle-double-up", null, {
-                //     onClick: () => {
-                //         S.view.scrollAllTop(state);
-                //     },
-                //     title: "Scroll to Top"
-                // }, "btn-secondary scrollTopButtonUpperRight", "off"),
-
-                ast.mobileMode ? null : new IconButton("fa-angle-double-up", null, {
-                    onClick: () => S.view.scrollActiveToTop(ast),
-                    title: "Scroll to Top"
-                }, "btn-secondary scrollTopButtonLowerRight", "off")
+                ])
             ]);
         }
 
