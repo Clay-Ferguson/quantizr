@@ -205,13 +205,26 @@ export class NodeUtil {
         let content = node.content;
         if (!content) {
             if (node.name) {
-                content = "Node Name: " + node.name;
+                return "Node Name: " + node.name;
             }
             else {
-                return content;
+                return "Node ID: " + node.id;
             }
         }
 
+        content = S.util.removeHtmlTags(content);
+        content = content.trim();
+
+        // if this is a node starting with hashtags or usernames then chop them all
+        while (content.startsWith("@") || content.startsWith("#")) {
+            let spaceIdx = content.indexOf(" ");
+            if (spaceIdx === -1) {
+                spaceIdx = content.indexOf("\n");
+            }
+            if (spaceIdx > 0) {
+                content = content.substring(spaceIdx+1);
+            }
+        }
         content = content.trim();
 
         const idx = content.indexOf("\n");
@@ -220,12 +233,11 @@ export class NodeUtil {
         }
 
         if (content.length > 140) content = content.substring(0, 140) + "...";
-        while (content.startsWith("#")) {
-            content = content.substring(1);
-        }
+
         if (content.startsWith(J.Constant.ENC_TAG)) {
             content = "[Encrypted]";
         }
+
         return content.trim();
     }
 

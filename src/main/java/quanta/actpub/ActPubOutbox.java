@@ -387,7 +387,10 @@ public class ActPubOutbox extends ServiceBase {
     public APObj getResource(HttpServletRequest httpReq, String nodeId) {
         if (no(nodeId))
             return null;
-        boolean experimental = true;
+
+        // this is breaking whenever a CURL command is used other scenarios
+        // where no signature is in the header.
+        boolean experimental = false;
         log.debug("getResource: " + nodeId);
 
         return (APObj) arun.run(as -> {

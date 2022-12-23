@@ -601,7 +601,7 @@ export class Util {
         S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== node.id);
 
         // now add to top.
-        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) /* , subItems */ });
+        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
     }
 
     removeHtmlTags = (text: string) => {

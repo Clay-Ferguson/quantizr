@@ -443,7 +443,8 @@ a {
 
 .trendingSectionTitle {
     margin-bottom: 10px;
-    padding-bottom: 10px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
 }
 
 .headerImageRHS {
@@ -2028,6 +2029,9 @@ audio::-webkit-media-controls-play-button {
 .flexRowLayout {
     display: flex;
     flex-wrap: wrap;
+
+    // WARNING: without this items can stretch vertically and this warps images 
+    align-items: flex-start;
 }
 
 .flexRowAlignBottom {

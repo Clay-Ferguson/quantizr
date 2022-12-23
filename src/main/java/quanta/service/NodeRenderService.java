@@ -691,12 +691,19 @@ public class NodeRenderService extends ServiceBase {
 		if (no(content))
 			return null;
 
-		content = stripRenderTags(content);
+		// if this is a node starting with hashtags or usernames then chop them all
+		while (content.startsWith("@") || content.startsWith("#")) {
+			int spaceIdx = content.indexOf(" ");
+			if (spaceIdx == -1) {
+				spaceIdx = content.indexOf("\n");
+			}
+			if (spaceIdx > 0) {
+				content = content.substring(spaceIdx + 1);
+			}
+		}
+
 		content = XString.truncAfterFirst(content, "\n");
 		content = XString.truncAfterFirst(content, "\r");
-		while (content.startsWith("#")) {
-			content = content.substring(1);
-		}
 
 		if (content.length() > maxLen) {
 			content = content.substring(0, maxLen) + "...";
