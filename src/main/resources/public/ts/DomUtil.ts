@@ -186,12 +186,19 @@ export class DomUtil {
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void) => {
         attribs.onDragEnter = function (event: any) {
+            // todo-1: should this also do the same thing onDragOver does? and then
+            // maybe we wouldn't need onDragOver in that case?
             event.stopPropagation();
             event.preventDefault();
         };
 
         attribs.onDragOver = function (event: any) {
-            if (event.currentTarget === S.quanta.dragElm) return;
+            if (event.currentTarget === S.quanta.dragElm ||
+
+            // we do a tiny bit of tight-coupling here and assume that if the attribs has a 'nid' property
+            // then that represents the nodeId (pretty standard in this app tho)
+            S.quanta.draggingId === attribs.nid) return;
+
             event.stopPropagation();
             event.preventDefault();
             event.dataTransfer.dropEffect = "move"; // See the section on the DataTransfer object.
@@ -387,6 +394,7 @@ export class DomUtil {
     }
 
     makeDropTarget = (comp: CompIntf, id: string) => {
+        comp.attribs.nid = id;
         S.domUtil.setDropHandler(comp.attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
@@ -409,6 +417,10 @@ export class DomUtil {
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
+                        if (comp.attribs.nid === s) {
+                            S.util.showMessage("Can't copy a node to itself.");
+                            return;
+                        }
                         // console.log("String: " + s);
                         const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
                             "btn-primary", "alert alert-info");

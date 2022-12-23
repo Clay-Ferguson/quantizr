@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { getAppState, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -36,6 +36,10 @@ export class NodeCompMainNode extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
+        const ast = getAppState();
+        if (ast.editNode) {
+            return;
+        }
         ev.currentTarget.classList.add("dragBorderSource");
         S.quanta.dragElm = ev.target;
         S.quanta.draggingId = draggingId;

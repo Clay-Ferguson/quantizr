@@ -204,6 +204,7 @@ export class Render {
     setNodeDropHandler = (attribs: any, node: J.NodeInfo) => {
         if (!node) return;
 
+        attribs.nid = node.id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             const ast = getAppState();
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
@@ -232,8 +233,11 @@ export class Render {
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
-                        if (S.quanta.draggingId === node.id) {
-                            S.util.showMessage("You can't copy a node to itself.");
+                        // we check both ways if we're doing a self drop.
+                        if (S.quanta.draggingId === node.id ||
+                            attribs.nid === s) {
+                            S.util.showMessage("Can't copy a node to itself.");
+                            return;
                         }
 
                         // if we're dropping onto the page root node, we can do this without asking where
