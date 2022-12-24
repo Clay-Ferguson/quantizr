@@ -93,6 +93,7 @@ import quanta.request.InsertBookRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
 import quanta.request.LikeNodeRequest;
+import quanta.request.LinkNodesRequest;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.LoginRequest;
 import quanta.request.LogoutRequest;
@@ -928,6 +929,14 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		return callProc.run("moveNodes", true, true, req, session, ms -> {
 			return move.moveNodes(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/linkNodes", method = RequestMethod.POST)
+	public @ResponseBody Object linkNodes(@RequestBody LinkNodesRequest req, HttpSession session) {
+
+		return callProc.run("linkNodes", true, true, req, session, ms -> {
+			return edit.linkNodes(ms, req);
 		});
 	}
 

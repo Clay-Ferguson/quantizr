@@ -17,7 +17,6 @@ import { NodeCompBinary } from "./comp/node/NodeCompBinary";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PasteActionDlg } from "./dlg/PasteActionDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
@@ -240,20 +239,9 @@ export class Render {
                             return;
                         }
 
-                        // if we're dropping onto the page root node, we can do this without asking where
-                        // becasue the answer is always 'inside'
-                        if (node.id === ast.node.id) {
-                            const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
-                                "btn-primary", "alert alert-info");
-                            await dlg.open();
-                            if (dlg.yes) {
-                                S.edit.moveNodeByDrop(node.id, S.quanta.draggingId, "inside");
-                            }
-                        }
-                        // else we ask user where to drop
-                        else {
-                            new PasteActionDlg(node.id, S.quanta.draggingId).open();
-                        }
+                        const dlg = new PasteActionDlg(node.id, S.quanta.draggingId);
+                        await dlg.open();
+
                         S.quanta.draggingId = null;
                         S.quanta.dragElm = null;
                     });

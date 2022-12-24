@@ -208,7 +208,7 @@ export class Nav {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                ast: ast
+                ast
             });
         }
     }

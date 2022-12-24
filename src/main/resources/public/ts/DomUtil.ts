@@ -2,7 +2,7 @@ import { dispatch, getAppState } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { PasteActionDlg } from "./dlg/PasteActionDlg";
 import { S } from "./Singletons";
 
 export class DomUtil {
@@ -421,13 +421,8 @@ export class DomUtil {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }
-                        // console.log("String: " + s);
-                        const dlg = new ConfirmDlg("Move nodes(s)?", "Confirm Move",
-                            "btn-primary", "alert alert-info");
+                        const dlg = new PasteActionDlg(id, s);
                         await dlg.open();
-                        if (dlg.yes) {
-                            S.edit.moveNodeByDrop(id, s, "inside");
-                        }
                     });
                     return;
                 }

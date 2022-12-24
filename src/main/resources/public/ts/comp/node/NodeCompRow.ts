@@ -11,6 +11,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Span } from "../core/Span";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
@@ -96,7 +97,7 @@ export class NodeCompRow extends Div {
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
                     for (const item of evt.dataTransfer.items) {
                         // console.log("DROP(d) kind=" + item.kind + " type=" + item.type);
-                       if (item.kind === "file") {
+                        if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
                             S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                             return;
@@ -193,8 +194,28 @@ export class NodeCompRow extends Div {
             jumpButton,
             new NodeCompContent(this.node, this.tabData, true, true, null, null, true, this.isLinkedNode, null),
             this.internalComp,
+            this.renderLinks(),
             this.allowHeaders ? new NodeCompRowFooter(this.node) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
+    }
+
+    renderLinks = (): Div => {
+        if (!this.node.links) return null;
+
+        const linkComps: CompIntf[] = [];
+        if (this.node.links) {
+            Object.keys(this.node.links).forEach(key => {
+                const nodeId = this.node.links[key].i; // i == nodeId
+                const linkName = this.node.links[key].n;
+                linkComps.push(new Span(linkName, {
+                    className: "nodeLink",
+                    onClick: () => {
+                        window.open(window.location.origin + "?id=" + nodeId, "_blank");
+                    }
+                }));
+            });
+        }
+        return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 }

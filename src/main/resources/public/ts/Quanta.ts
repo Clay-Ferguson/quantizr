@@ -90,7 +90,7 @@ export class Quanta {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast: ast
+            ast
         });
     }
 

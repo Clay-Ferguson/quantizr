@@ -179,7 +179,7 @@ public class Convert extends ServiceBase {
 				owner, ownerId, //
 				ok(node.getTransferFrom()) ? node.getTransferFrom().toHexString() : null, //
 				node.getOrdinal(), //
-				node.getModifyTime(), propList, node.getAttachments(), acList, likes, hasChildren, //
+				node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, //
 				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 
 		// if this node type has a plugin run it's converter to let it contribute

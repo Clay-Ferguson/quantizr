@@ -1,4 +1,8 @@
 import { dispatch, getAppState } from "../AppContext";
+import { AppState } from "../AppState";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/core/Div";
+import { Span } from "../comp/core/Span";
 import { SymKeyDataPackage } from "../Crypto";
 import { DialogMode } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -214,7 +218,7 @@ export class EditNodeDlgUtil {
         const ast = getAppState();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", state.toIpfs, file, false, true, async () => {
-            await this.refreshAttachmentsFromServer(ast.editNode);
+            await this.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
             dlg.binaryDirty = true;
         });
@@ -350,7 +354,8 @@ export class EditNodeDlgUtil {
         }
     }
 
-    refreshAttachmentsFromServer = async (node: J.NodeInfo) => {
+    /* WARNING: despite the name this only refreshes attachments and links */
+    refreshFromServer = async (node: J.NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
@@ -366,6 +371,7 @@ export class EditNodeDlgUtil {
 
         if (res.node) {
             node.attachments = res.node.attachments;
+            node.links = res.node.links;
         }
     }
 
@@ -509,5 +515,33 @@ an upload has been added or removed.
         if (dlg.binaryDirty) {
             S.quanta.refresh(getAppState());
         }
+    }
+
+    renderLinksEditing = (ast: AppState): Div => {
+        if (!ast.editNode.links) return null;
+
+        let hasLinks = false;
+        const linkComps: CompIntf[] = [];
+        if (ast.editNode.links) {
+            linkComps.push(new Span("Node Links: ", { className: "marginRight" }));
+            Object.keys(ast.editNode.links).forEach(key => {
+                hasLinks = true;
+                const linkName = ast.editNode.links[key].n;
+                linkComps.push(new Span(linkName, {
+                    className: "nodeLink",
+                    onClick: () => this.removeNodeLink(ast, linkName)
+                }));
+            });
+        }
+        return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
+    }
+
+    removeNodeLink = (ast: AppState, nodeName: string): void => {
+        Object.keys(ast.editNode.links).forEach(key => {
+            if (ast.editNode.links[key].n === nodeName) {
+                delete ast.editNode.links[key];
+            }
+        });
+        S.edit.updateNode(ast.editNode);
     }
 }

@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
+import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.util.ExUtil;
@@ -130,6 +131,14 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	private Object linksLock = new Object();
+
+	public static final String LINKS = "lnk";
+	@Field(LINKS)
+	private HashMap<String, NodeLink> links;
+
+	@Transient
+	@JsonIgnore
 	private Object attLock = new Object();
 
 	public static final String LIKES = "like";
@@ -187,6 +196,7 @@ public class SubNode {
 			SubNode.AC, //
 			SubNode.PROPS, //
 			SubNode.ATTACHMENTS, //
+			SubNode.LINKS, //
 			SubNode.LIKES};
 
 	@Transient
@@ -470,6 +480,38 @@ public class SubNode {
 		ThreadLocals.dirty(this);
 		synchronized (attLock) {
 			this.attachments = attachments;
+		}
+	}
+
+	@JsonProperty(LINKS)
+	public HashMap<String, NodeLink> getLinks() {
+		synchronized (linksLock) {
+			return links;
+		}
+	}
+
+	@JsonProperty(LINKS)
+	public void setLinks(HashMap<String, NodeLink> links) {
+		if (no(links) && no(this.links))
+			return;
+		ThreadLocals.dirty(this);
+		synchronized (linksLock) {
+			this.links = links;
+		}
+	}
+
+	@Transient
+	@JsonIgnore
+	public void addLink(String key, NodeLink link) {
+		synchronized (linksLock) {
+			if (no(links)) {
+				links = new HashMap<>();
+			}
+			if (no(key)) {
+				key = "k" + links.size();
+			}
+			links.put(key, link);
+			ThreadLocals.dirty(this);
 		}
 	}
 

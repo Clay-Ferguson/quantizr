@@ -56,6 +56,12 @@ export interface MFSDirEntry {
     Hash: string;
 }
 
+export interface NodeLink {
+    o: number;
+    i: string;
+    n: string;
+}
+
 export interface OpenGraph {
     url: string;
     title: string;
@@ -331,6 +337,13 @@ export interface JoinNodesRequest extends RequestBase {
 export interface LikeNodeRequest extends RequestBase {
     id: string;
     like: boolean;
+}
+
+export interface LinkNodesRequest extends RequestBase {
+    sourceNodeId: string;
+    targetNodeId: string;
+    name: string;
+    type: string;
 }
 
 export interface LoadNodeFromIpfsRequest extends RequestBase {
@@ -752,6 +765,9 @@ export interface JoinNodesResponse extends ResponseBase {
 export interface LikeNodeResponse extends ResponseBase {
 }
 
+export interface LinkNodesResponse extends ResponseBase {
+}
+
 export interface LoadNodeFromIpfsResponse extends ResponseBase {
 }
 
@@ -944,6 +960,7 @@ export interface NodeInfo {
     type: string;
     properties: PropertyInfo[];
     attachments: { [index: string]: Attachment };
+    links: { [index: string]: NodeLink };
     clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;

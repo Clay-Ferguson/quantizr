@@ -379,6 +379,7 @@ export class EditNodeDlg extends DialogBase {
 
         const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             tagsEditRow,
+            this.utl.renderLinksEditing(ast),
             new Div(null, { className: "row align-items-end" }, [
                 editorOpts.nodeName ? nodeNameTextField : null,
                 editorOpts.priority ? this.createPrioritySelection() : null

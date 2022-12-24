@@ -29,7 +29,7 @@ export class View {
             allowScroll: true,
             setTab: true,
             forceRenderParent,
-            ast: ast
+            ast
         });
     }
 

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import quanta.model.client.Attachment;
+import quanta.model.client.NodeLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
@@ -47,6 +48,7 @@ public class NodeInfo {
 	private String type;
 	private List<PropertyInfo> properties;
 	private HashMap<String, Attachment> attachments;
+	private HashMap<String, NodeLink> links;
 
 	/*
 	 * Holds information that the server needs to send back to the client to support client features,
@@ -101,7 +103,7 @@ public class NodeInfo {
 
 	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName, String owner,
 			String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
-			HashMap<String, Attachment> attachments, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
+			HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
 			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String avatarVer, String apAvatar,
 			String apImage) {
 		this.id = id;
@@ -119,6 +121,7 @@ public class NodeInfo {
 		this.logicalOrdinal = logicalOrdinal;
 		this.properties = properties;
 		this.attachments = attachments;
+		this.links = links;
 		this.ac = ac;
 		this.likes = likes;
 		this.hasChildren = hasChildren;
@@ -254,6 +257,14 @@ public class NodeInfo {
 
 	public void setAttachments(HashMap<String, Attachment> attachments) {
 		this.attachments = attachments;
+	}
+
+	public HashMap<String, NodeLink> getLinks() {
+		return links;
+	}
+
+	public void setLinks(HashMap<String, NodeLink> links) {
+		this.links = links;
 	}
 
 	public List<AccessControlInfo> getAc() {

@@ -60,7 +60,7 @@ export class Edit {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast: ast
+            ast
         });
         S.view.scrollToNode(ast);
     }
@@ -79,7 +79,7 @@ export class Edit {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                ast: ast
+                ast
             });
         }
     }
@@ -168,7 +168,7 @@ export class Edit {
                     allowScroll: true,
                     setTab: true,
                     forceRenderParent: false,
-                    ast: ast
+                    ast
                 });
             }
             else {
@@ -1144,7 +1144,7 @@ export class Edit {
                     allowScroll: true,
                     setTab: true,
                     forceRenderParent: false,
-                    ast: ast
+                    ast
                 });
             }, 500);
         }
@@ -1178,7 +1178,7 @@ export class Edit {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                ast: ast
+                ast
             });
             S.view.scrollToNode(ast);
         }
@@ -1309,6 +1309,35 @@ export class Edit {
         this.createSubNodeResponse(res, false, null, null, ast);
     }
 
+    linkNodes = async (sourceNodeId: string, targetNodeId: string, name: string, type: string) => {
+        if (targetNodeId === sourceNodeId) {
+            return;
+        }
+
+        const res = await S.rpcUtil.rpc<J.LinkNodesRequest, J.LinkNodesResponse>("linkNodes", {
+            sourceNodeId,
+            targetNodeId,
+            name,
+            type
+        });
+
+        if (S.util.checkSuccess("LinkNodes Response", res)) {
+            const ast = getAppState();
+            S.view.refreshTree({
+                nodeId: null,
+                zeroOffset: false,
+                renderParentIfLeaf: false,
+                highlightId: null,
+                forceIPFSRefresh: false,
+                scrollToTop: false,
+                allowScroll: false,
+                setTab: false,
+                forceRenderParent: false,
+                ast
+            });
+        }
+    }
+
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string) => {
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
@@ -1338,7 +1367,7 @@ export class Edit {
                 allowScroll: false,
                 setTab: false,
                 forceRenderParent: false,
-                ast: ast
+                ast
             });
         }
     }

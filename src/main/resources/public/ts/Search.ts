@@ -665,7 +665,7 @@ export class Search {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast: ast
+            ast
         });
         S.util.showMessage(res.message, "Success");
     }

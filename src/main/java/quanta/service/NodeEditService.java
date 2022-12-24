@@ -28,6 +28,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.client.NodeLink;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -44,6 +45,7 @@ import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.LikeNodeRequest;
+import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SplitNodeRequest;
@@ -55,6 +57,7 @@ import quanta.response.CreateSubNodeResponse;
 import quanta.response.DeletePropertyResponse;
 import quanta.response.InsertNodeResponse;
 import quanta.response.LikeNodeResponse;
+import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SplitNodeResponse;
@@ -488,6 +491,8 @@ public class NodeEditService extends ServiceBase {
 		// set new attachments
 		node.setAttachments(req.getNode().getAttachments());
 		attach.fixAllAttachmentMimes(node);
+
+		node.setLinks(req.getNode().getLinks());
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
@@ -1237,6 +1242,20 @@ public class NodeEditService extends ServiceBase {
 				ops.inc();
 			}
 		}
+	}
+
+	public LinkNodesResponse linkNodes(MongoSession ms, LinkNodesRequest req) {
+		LinkNodesResponse res = new LinkNodesResponse();
+
+		SubNode sourceNode = read.getNode(ms, req.getSourceNodeId());
+		if (ok(sourceNode)) {
+			NodeLink link = new NodeLink();
+			link.setNodeId(req.getTargetNodeId());
+			link.setName(req.getName());
+			sourceNode.addLink(null, link);
+		}
+		res.setSuccess(true);
+		return res;
 	}
 
 	/*
