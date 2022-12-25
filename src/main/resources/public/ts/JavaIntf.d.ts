@@ -1011,6 +1011,7 @@ export interface GraphNode {
     highlight: boolean;
     name: string;
     children: GraphNode[];
+    links: { [index: string]: NodeLink };
 }
 
 export interface CalendarItem {

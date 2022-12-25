@@ -33,7 +33,7 @@ public class GraphNodesService extends ServiceBase {
 
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
 		SubNode node = read.getNode(ms, req.getNodeId());
-		GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false);
+		GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false, node.getLinks());
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");
 
@@ -59,7 +59,7 @@ public class GraphNodesService extends ServiceBase {
 				try {
 					auth.auth(ms, node, PrivilegeType.READ);
 					GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
-							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching);
+							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
 					mapByPath.put(gn.getPath(), gn);
 				} catch (Exception e) {
 				}
@@ -153,7 +153,7 @@ public class GraphNodesService extends ServiceBase {
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.
 			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,
-					StringUtils.countMatches(parentPath, "/") - rootLevel, false);
+					StringUtils.countMatches(parentPath, "/") - rootLevel, false, null);
 			mapByPath.put(parentPath, parent);
 
 			// keep creating parents until we know we made it to common root.

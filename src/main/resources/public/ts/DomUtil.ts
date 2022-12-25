@@ -433,29 +433,35 @@ export class DomUtil {
     }
 
     processImage = (elm: any): void => {
+        // getImageData will fail without this crossOrigin
         elm.crossOrigin = "Anonymous";
+
         if (!elm.src || !elm.src.startsWith("http")) {
             return;
         }
 
-        const srcVal = this.imgCache.get(elm.src);
-        if (srcVal === "o") { // o = ok
+        const src = this.imgCache.get(elm.src);
+        if (src === "o") { // o = ok
+            // do nothing if we know the image has processed
         }
-        else if (srcVal === "d") { // d = dim
+        // if we have a "d" in the imgCache we now this 'elm.src' is too bright
+        // needs to be dimmed
+        else if (src === "d") { // d = dim
             elm.classList.add("dimImg");
         }
+        // else put a listener on the element to process when we can
         else {
             elm.addEventListener("load", () => {
                 // Ignore images not loaded yet and small images.
-                if (!elm.complete || elm.naturalHeight === 0 || elm.naturalWidth < 300) {
+                if (!elm.complete || elm.naturalHeight === 0 || elm.naturalWidth < 300 || !elm.src.startsWith("http")) {
                     return;
                 }
                 try {
-                    // we have to do this again to make sure load isn't getting called because we modified something
-                    if (!elm.src.startsWith("http")) return;
-
-                    // getImageData will fail without this crossOrigin
                     const canvas = document.createElement("canvas");
+
+                    // Note: the Image width will be the actual pixel size being displayed which may not be the same
+                    // as the true image size (naturalHeight/naturalWidth), and this is fine because first of all it's
+                    // faster to process less pixels, and also it's what the user is seeing that we want to affect too.
                     canvas.width = elm.width;
                     canvas.height = elm.height;
 

@@ -8,6 +8,8 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import * as J from "../JavaIntf";
 
+// todo-0: This really needs to be part of the fullscreen viewer classes themselves since each one
+// really might have a different version of this.
 export class FullScreenControlBar extends Div {
 
     constructor() {
@@ -48,6 +50,10 @@ export class FullScreenControlBar extends Div {
                     }, "btn-primary", "off"));
             }
         }
+
+        // if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
+        // todo-0: put slider here to turn nodeLinks on/off
+        // }
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {

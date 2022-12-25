@@ -49,7 +49,34 @@ export class FullScreenGraphViewer extends Main {
             const links: any = root.links();
             const nodes: any = root.descendants();
 
+            // todo-0: make slider that can turn this on and off.
+            const includeLinks = false;
+
+            let nodeLinks: any = null;
+
+            // The includeLinks will turn on the ability to display the "SubNode.links" node-to-node linkages
+            // as dotted lines between the linked nodes
+            if (includeLinks) {
+                const nodesMap = new Map<string, string>();
+                nodes.forEach((n: any) => {
+                    nodesMap.set(n.data.id, n);
+                });
+
+                nodeLinks = [];
+                nodes.forEach((n: any) => {
+                    if (n.data.links) {
+                        Object.keys(n.data.links).forEach(key => {
+                            const nt = nodesMap.get(n.data.links[key].i);
+                            if (nt) {
+                                nodeLinks.push({ source: n, target: nt });
+                            }
+                        });
+                    }
+                });
+            }
+
             const simulation = d3.forceSimulation(nodes)
+                // todo-1: should we include nodeLink links here in the force logic?
                 .force("link", d3.forceLink(links).id(function (d: any) { return d.id; }).distance(0).strength(1))
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
@@ -95,14 +122,35 @@ export class FullScreenGraphViewer extends Main {
 
             const link = g.append("g")
                 .attr("stroke", "#999")
-                .attr("stroke-width", 1.5)
+                // Tip: Do not Delete:
+                // (I think many (most?) of these things that support a value also
+                // support using a function to return the val based on data like
+                // this example)
+                // .style("stroke", function (d: any) {
+                //     return "#999"
+                // })
+                .attr("stroke-width", 1)
                 .attr("stroke-opacity", 0.6)
                 .selectAll("line")
                 .data(links)
                 .join("line");
 
+            let nodeLink: any = null;
+            if (includeLinks) {
+                nodeLink = g.append("g")
+                    .style("stroke", function (d: any) {
+                        return "green"
+                    })
+                    .attr("stroke-width", 1)
+                    .attr("stroke-opacity", 0.6)
+                    .attr("stroke-dasharray", "1,1")
+                    .selectAll("line")
+                    .data(nodeLinks)
+                    .join("line");
+            }
+
             const node = g.append("g")
-                .attr("stroke-width", 1.5)
+                .attr("stroke-width", 1.2)
                 .style("cursor", "pointer")
                 .selectAll("circle")
                 .data(nodes)
@@ -161,6 +209,14 @@ export class FullScreenGraphViewer extends Main {
                     .attr("x2", function (d: any) { return d.target.x; })
                     .attr("y2", function (d: any) { return d.target.y; });
 
+                if (includeLinks) {
+                    nodeLink
+                        .attr("x1", function (d: any) { return d.source.x; })
+                        .attr("y1", function (d: any) { return d.source.y; })
+                        .attr("x2", function (d: any) { return d.target.x; })
+                        .attr("y2", function (d: any) { return d.target.y; });
+                }
+
                 node
                     .attr("cx", function (d: any) { return d.x; })
                     .attr("cy", function (d: any) { return d.y; });
@@ -208,6 +264,7 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
+    // todo-0: get the nodeLinks to display too here!
     updateTooltip = async (d: any, x: number, y: number) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
