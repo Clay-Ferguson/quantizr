@@ -144,4 +144,13 @@ export class App extends Main {
         }
         return null;
     }
+
+    domPreUpdateEvent = () => {
+        // AUTO-DIMMING of Bright Images.
+        // todo-0: experimantal only for admin & clay
+        // todo-0: need this to be an optional user setting
+        if (S.quanta.userName === "admin" || S.quanta.userName === "clay" || S.quanta.userName === "bob") {
+            this.getRef()?.querySelectorAll("img").forEach(elm => S.domUtil.processImage(elm));
+        }
+    }
 }

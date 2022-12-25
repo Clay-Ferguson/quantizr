@@ -6,6 +6,8 @@ import { PasteActionDlg } from "./dlg/PasteActionDlg";
 import { S } from "./Singletons";
 
 export class DomUtil {
+    imgCache: Map<string, string> = new Map<string, string>();
+
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
@@ -195,9 +197,9 @@ export class DomUtil {
         attribs.onDragOver = function (event: any) {
             if (event.currentTarget === S.quanta.dragElm ||
 
-            // we do a tiny bit of tight-coupling here and assume that if the attribs has a 'nid' property
-            // then that represents the nodeId (pretty standard in this app tho)
-            S.quanta.draggingId === attribs.nid) return;
+                // we do a tiny bit of tight-coupling here and assume that if the attribs has a 'nid' property
+                // then that represents the nodeId (pretty standard in this app tho)
+                S.quanta.draggingId === attribs.nid) return;
 
             event.stopPropagation();
             event.preventDefault();
@@ -428,5 +430,64 @@ export class DomUtil {
                 }
             }
         });
+    }
+
+    processImage = (elm: any): void => {
+        elm.crossOrigin = "Anonymous";
+        if (!elm.src || !elm.src.startsWith("http")) {
+            return;
+        }
+
+        const srcVal = this.imgCache.get(elm.src);
+        if (srcVal === "o") { // o = ok
+        }
+        else if (srcVal === "d") { // d = dim
+            elm.classList.add("dimImg");
+        }
+        else {
+            elm.addEventListener("load", () => {
+                // Ignore images not loaded yet and small images.
+                if (!elm.complete || elm.naturalHeight === 0 || elm.naturalWidth < 300) {
+                    return;
+                }
+                try {
+                    // we have to do this again to make sure load isn't getting called because we modified something
+                    if (!elm.src.startsWith("http")) return;
+
+                    // getImageData will fail without this crossOrigin
+                    const canvas = document.createElement("canvas");
+                    canvas.width = elm.width;
+                    canvas.height = elm.height;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(elm, 0, 0, elm.width, elm.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+
+                    let i = 0;
+                    let power = 0;
+                    while (i < data.length) {
+                        power += (data[i] + data[i + 1] + data[i + 2]);
+                        i += 4;
+                    }
+
+                    // avgPower will range from 0 to 255 just like any R/G/B value.
+                    // 1.333 = 4/3 (4 data items per pixel, 3 RGB components)
+                    const avgPower = power * 1.333 / data.length;
+
+                    // Threshold is 130
+                    if (avgPower > 130) {
+                        this.imgCache.set(elm.src, "d");
+                        elm.classList.add("dimImg");
+                    }
+                    else {
+                        this.imgCache.set(elm.src, "o");
+                    }
+                }
+                catch (e) {
+                    this.imgCache.set(elm.src, "o");
+                }
+            });
+        }
     }
 }
