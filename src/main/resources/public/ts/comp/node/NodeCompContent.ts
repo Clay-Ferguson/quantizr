@@ -41,7 +41,7 @@ export class NodeCompContent extends Div {
         let type = S.plugin.getType(this.node.type);
         type = type || S.plugin.getType(J.NodeType.NONE);
 
-        this.domPreUpdateFunc = type.getDomPreUpdateFunction;
+        this.domPreUpdateFunc = type.domPreUpdateFunction;
 
         const name: string = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_NAME, this.node);
         if (name) {

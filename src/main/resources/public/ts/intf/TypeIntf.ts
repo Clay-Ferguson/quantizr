@@ -14,7 +14,7 @@ export interface TypeIntf {
     allowAction(action : NodeActionType, node: J.NodeInfo, ast: AppState): boolean;
     getAllowRowHeader(): boolean;
     allowPropertyEdit(typeName: string, ast: AppState): boolean;
-    getDomPreUpdateFunction(parent: CompIntf): void;
+    domPreUpdateFunction(parent: CompIntf): void;
 
     // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND
     // they will all be put outside the collapsible panel if they'd normally be inside he collapse panel

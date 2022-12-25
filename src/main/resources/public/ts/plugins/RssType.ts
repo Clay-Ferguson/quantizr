@@ -462,7 +462,7 @@ export class RssType extends TypeBase {
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
     otherwise we can get rediculously large images. */
-    getDomPreUpdateFunction(parent: CompIntf): void {
+    domPreUpdateFunction(parent: CompIntf): void {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 

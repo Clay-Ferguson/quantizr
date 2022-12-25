@@ -523,7 +523,7 @@ an upload has been added or removed.
         let hasLinks = false;
         const linkComps: CompIntf[] = [];
         if (ast.editNode.links) {
-            linkComps.push(new Span("Node Links: ", { className: "marginRight" }));
+            linkComps.push(new Span("Links: ", { className: "linksPrompt" }));
             Object.keys(ast.editNode.links).forEach(key => {
                 hasLinks = true;
                 const linkName = ast.editNode.links[key].n;

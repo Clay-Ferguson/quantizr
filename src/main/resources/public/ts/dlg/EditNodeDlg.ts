@@ -354,22 +354,9 @@ export class EditNodeDlg extends DialogBase {
                 }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
-        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection row align-items-end" }, [
-            this.tagTextField = new TextField({
-                label: "Add Tag",
-                outterClass: "col-3 noPaddingRight",
-                val: this.newTagState,
-                labelClass: "txtFieldLabelShort",
-                enter: () => {
-                    if (this.addOneTagToTextField(this.newTagState.getValue())) {
-                        this.newTagState.setValue("");
-                        // do not simplify this: leave this fat arrow! It's required!
-                        setTimeout(() => { this.tagTextField.focus(); }, 100);
-                    }
-                }
-            }),
-            this.createTagsIconButtons(),
-            this.renderTagsDiv(this.tagsState.getValue())
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [
+            this.renderTagsDiv(this.tagsState.getValue()),
+            this.utl.renderLinksEditing(ast)
         ]) : null;
 
         let editorSubPanel: Comp = null;
@@ -379,7 +366,6 @@ export class EditNodeDlg extends DialogBase {
 
         const collapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
             tagsEditRow,
-            this.utl.renderLinksEditing(ast),
             new Div(null, { className: "row align-items-end" }, [
                 editorOpts.nodeName ? nodeNameTextField : null,
                 editorOpts.priority ? this.createPrioritySelection() : null
@@ -434,8 +420,8 @@ export class EditNodeDlg extends DialogBase {
 
         if (tagCount === 0) return null;
         return new Div(null, {
-            className: "tagsFlexContainer col-7"
-        }, spans);
+            className: "tagsFlexContainer"
+        }, [new Span("Tags: ", { className: "tagsPrompt" }), ...spans]);
     }
 
     makePublic = async (allowAppends: boolean) => {
@@ -514,28 +500,6 @@ export class EditNodeDlg extends DialogBase {
         return ret;
     }
 
-    createTagsIconButtons = (): Comp => {
-        return new ButtonBar([
-            new IconButton("fa-plus fa-lg", "", {
-                onClick: async () => {
-                    this.addOneTagToTextField(this.newTagState.getValue());
-                    this.newTagState.setValue("");
-                    // do not simplify this: leave this fat arrow! It's required!
-                    setTimeout(() => { this.tagTextField.focus(); }, 100);
-                },
-                title: "Add Hashtags"
-            }, "btn-primary", "off"),
-            new IconButton("fa-tag fa-lg", "", {
-                onClick: async () => {
-                    const dlg = new SelectTagsDlg("edit", this.tagsState.getValue());
-                    await dlg.open();
-                    this.addTagsToTextField(dlg);
-                },
-                title: "Select Hashtags"
-            }, "btn-primary", "off")
-        ], "col-2");
-    }
-
     removeTag = (removeTag: string) => {
         let val = this.tagsState.getValue();
         val = val.trim();
@@ -551,29 +515,6 @@ export class EditNodeDlg extends DialogBase {
 
         this.tagsState.setValue(newTags);
         this.mergeState({});
-    }
-
-    addOneTagToTextField = (tag: string): boolean => {
-        if (!tag || tag.indexOf(" ") !== -1) {
-            S.util.showMessage("Enter a hashtag to add.", "Tag");
-            return false;
-        }
-        let val = this.tagsState.getValue();
-        val = val.trim();
-        const tags: string[] = val.split(" ");
-
-        if (!tag.startsWith("#")) {
-            tag = "#" + tag;
-        }
-
-        if (!tags.includes(tag)) {
-            if (val) val += " ";
-            val += tag;
-        }
-
-        this.tagsState.setValue(this.sortTags(val));
-        this.mergeState({});
-        return true;
     }
 
     sortTags = (tagStr: string) => {
@@ -597,6 +538,7 @@ export class EditNodeDlg extends DialogBase {
             }
         });
         this.tagsState.setValue(this.sortTags(val));
+        this.mergeState({});
     }
 
     makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
@@ -700,6 +642,15 @@ export class EditNodeDlg extends DialogBase {
                 },
                 title: "Add Property"
             }) : null,
+
+            new IconButton("fa-tag fa-lg", "", {
+                onClick: async () => {
+                    const dlg = new SelectTagsDlg("edit", this.tagsState.getValue());
+                    await dlg.open();
+                    this.addTagsToTextField(dlg);
+                },
+                title: "Select Hashtags"
+            }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive(getAppState())

@@ -5,9 +5,11 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { Validator } from "../Validator";
 
 export interface LS { // Local State
     tags: Tag[];
@@ -28,6 +30,7 @@ export class SelectTagsDlg extends DialogBase {
     matchAny = false;
     matchAll = false;
     indenting = false;
+    editFieldState: Validator = new Validator();
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string) {
@@ -84,6 +87,12 @@ export class SelectTagsDlg extends DialogBase {
 
         return [
             new Div(null, null, [
+                new TextField({
+                    label: "Tag",
+                    outterClass: "noPaddingRight",
+                    val: this.editFieldState,
+                    labelClass: "txtFieldLabelShort"
+                }),
                 new Checkbox("Suggest Tags", { className: "float-end" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
@@ -229,6 +238,12 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     select = () => {
+        const state = this.getState();
+        const editVal = this.editFieldState.getValue();
+        if (editVal) {
+            state.selectedTags.add(editVal);
+        }
+        this.mergeState(state);
         this.close();
     }
 

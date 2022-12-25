@@ -1435,12 +1435,7 @@ Will come back later and study this more. todo-3 */
 }
 
 .editorTagsSection {
-    border: 1px solid gray;
-    border-radius: 6px;
-    padding-top: $smallGap;
-    padding-bottom: $smallGap;
-    margin: $smallGap 0 0 0;
-    background-color: #17202A;
+    margin-top: $smallGap;
 }
 
 .tagsFlexContainer {
@@ -2197,25 +2192,39 @@ audio::-webkit-media-controls-play-button {
     padding: $smallGap;
 }
 
+.tagsPrompt {
+    width: 4em;
+    margin-right: $smallGap;
+    text-align: right;
+}
+
+.linksPrompt {
+    width: 4em;
+    margin-right: $smallGap;
+    text-align: right;
+}
+
 .nodeLink {
+    display: inline-block;
+    background-color: $primary;
     border: 1px solid gray;
-    border-radius: $border-radius;
-    padding: 4px;
-    background-color: $secondary;
+    border-radius: 5px;
+    padding: 0 6px 0 6px;
+    margin-right: 8px;
+    margin-bottom: 8px;
     cursor: pointer;
-    margin-right: $tinyGap;
+    white-space: nowrap;
 }
 
 .linksPanel {
     margin-left: $smallGap;
-    // border: 1px solid gray;
-    // border-radius: $border-radius;
 }
 
 .linksPanelInEditor {
-    border: 1px solid gray;
-    border-radius: 6px;
-    padding: $smallGap;
-    margin: $smallGap 0 0 0;
-    background-color: #17202A;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dimImg {
+    filter: brightness(70%);
 }

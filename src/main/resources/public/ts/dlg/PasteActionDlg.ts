@@ -4,10 +4,12 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { IconButton } from "../comp/core/IconButton";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
 export class PasteActionDlg extends DialogBase {
     yes: boolean = false;
@@ -47,6 +49,23 @@ export class PasteActionDlg extends DialogBase {
                         }
                         S.edit.linkNodes(this.sourceId, this.nodeId, name, "forward-link");
                         this.close();
+                    }),
+                    new IconButton("fa-tag fa-lg", "", {
+                        onClick: async () => {
+                            const dlg = new SelectTagsDlg("edit", "");
+                            await dlg.open();
+                            let val: string = null;
+                            dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
+                                if (!val) {
+                                    val = tag;
+                                    if (val.startsWith("#")) {
+                                        val = val.substring(1);
+                                    }
+                                }
+                            });
+                            this.nameState.setValue(val);
+                        },
+                        title: "Select Hashtags"
                     })
                 ], "marginTop")
             ]),

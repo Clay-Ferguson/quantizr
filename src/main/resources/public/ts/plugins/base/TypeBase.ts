@@ -174,7 +174,7 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    getDomPreUpdateFunction(parent: CompIntf): void {
+    domPreUpdateFunction(parent: CompIntf): void {
     }
 
     ensureStringPropExists(node: J.NodeInfo, propName: string) {
