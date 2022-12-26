@@ -9,11 +9,9 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
-declare const g_brandingAppName: string;
-
 export class MainTab implements TabIntf<any> {
-    name = g_brandingAppName;
-    tooltip = g_brandingAppName + " Content Tree";
+    name = "Navigate";
+    tooltip = "Navigate Content Tree";
     id = C.TAB_MAIN;
     scrollPos = 0;
     props = {};
