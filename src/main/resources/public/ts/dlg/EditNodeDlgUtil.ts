@@ -529,6 +529,7 @@ an upload has been added or removed.
                 const linkName = ast.editNode.links[key].n;
                 linkComps.push(new Span(linkName, {
                     className: "nodeLink",
+                    title: "Click to Remove Link",
                     onClick: () => this.removeNodeLink(ast, linkName)
                 }));
             });

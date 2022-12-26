@@ -794,6 +794,7 @@ export class Render {
                 const nodeId = node.links[key].i; // i == nodeId
                 const linkName = node.links[key].n;
                 linkComps.push(new Span(linkName, {
+                    title: "Click to Open (CRTL+CLICK for new Browser Tab)",
                     className: "nodeLink",
                     onClick: () => {
                         // if CTRL key down open in separate browser tab
