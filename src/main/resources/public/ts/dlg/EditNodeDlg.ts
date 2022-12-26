@@ -451,9 +451,12 @@ export class EditNodeDlg extends DialogBase {
         let ret = false;
         const ast = getAppState();
         if (ast.editNode.properties) {
+            const durationProp = S.props.getProp(J.NodeProp.DURATION, ast.editNode);
+
             // This loop creates all the editor input fields for all the properties
             ast.editNode.properties.forEach(prop => {
                 // console.log("prop=" + S.util.prettyPrint(prop));
+                if (prop.name === durationProp?.name) return;
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAppState())) {
                     // console.log("Hiding property: " + prop.name);
@@ -465,7 +468,7 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
                         const allowSelection = !customProps || type?.hasSelectableProp(prop.name);
-                        const tableRow = this.makePropEditor(type, prop, allowSelection, type ? type.getEditorRowsForProp(prop.name) : 1);
+                        const tableRow = this.makePropEditor(type, prop, durationProp, allowSelection, type ? type.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                         propsParent.addChild(tableRow);
                         ret = true;
@@ -697,7 +700,7 @@ export class EditNodeDlg extends DialogBase {
         new ChangeNodeTypeDlg(ast.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
-    makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+    makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
         const ast = getAppState();
         const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
@@ -711,6 +714,15 @@ export class EditNodeDlg extends DialogBase {
         if (!propState) {
             propState = new Validator(propEntry.value);
             this.propStates.set(propEntry.name, propState);
+        }
+
+        let durationState: Validator = null;
+        if (durationPropEntry) {
+            durationState = this.propStates.get(durationPropEntry.name);
+            if (!durationState) {
+                durationState = new Validator(durationPropEntry.value);
+                this.propStates.set(durationPropEntry.name, durationState);
+            }
         }
 
         // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
@@ -761,7 +773,7 @@ export class EditNodeDlg extends DialogBase {
                 /* todo-2: eventually we will have data types, but for now we use a hack
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === J.NodeProp.DATE) {
-                    valEditor = new DateTimeField(propState);
+                    valEditor = new DateTimeField(propState, durationState);
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);

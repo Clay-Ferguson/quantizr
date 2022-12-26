@@ -2,6 +2,7 @@ import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
 import { DateField } from "./DateField";
 import { Span } from "./Span";
+import { TextField } from "./TextField";
 import { TimeField } from "./TimeField";
 
 export class DateTimeField extends Span {
@@ -9,11 +10,11 @@ export class DateTimeField extends Span {
     timeState: Validator = new Validator();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: Validator) {
+    constructor(private dateTimeState: Validator, private durationState?: Validator) {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
-                className: "input-group marginTop"
+                className: "input-group"
             }
         };
 
@@ -79,7 +80,16 @@ export class DateTimeField extends Span {
     preRender(): void {
         this.setChildren([
             new DateField(this.dateState),
-            new TimeField(this.timeState, "marginLeft")
+            new TimeField(this.timeState, "marginLeft"),
+            this.durationState ? new TextField({
+                // NO LABEL!: Remember we have no room at top for a label because we're lining up with the rest
+                // of these components vertically which also have no labels.
+                // label: "HH:MM",
+                placeholder: "Duration...",
+                inputClass: "durationTypeInput",
+                outterTagName: "span",
+                val: this.durationState
+            }) : null
         ]);
     }
 }

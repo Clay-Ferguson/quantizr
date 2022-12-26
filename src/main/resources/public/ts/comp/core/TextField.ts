@@ -6,6 +6,7 @@ import { ErrorDiv } from "./ErrorDiv";
 import { Input } from "./Input";
 import { Label } from "./Label";
 import { Span } from "./Span";
+import { Tag } from "./Tag";
 import { ToggleIcon } from "./ToggleIcon";
 
 interface LS { // Local State
@@ -22,15 +23,16 @@ export interface TextFieldConfig {
     val?: Validator;
     outterClass?: string;
     placeholder?: string;
+    outterTagName?: string; // normally div or span
 }
 
-export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
+export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
     constructor(public cfg: TextFieldConfig) {
         // do not pass valState into base class, we want it to have state separately
-        super(null);
+        super(cfg.outterTagName || "div");
 
         this.attribs = {
             ...this.attribs, ...{

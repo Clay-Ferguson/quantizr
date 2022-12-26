@@ -1938,7 +1938,8 @@ Will come back later and study this more. todo-3 */
 }
 
 .durationTypeInput {
-    max-width: 8rem;
+    max-width: 5rem;
+    margin-left: $smallGap;
 }
 
 //We use the default player except we have our own big play and pause buttons.
