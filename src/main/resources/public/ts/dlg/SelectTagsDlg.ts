@@ -89,7 +89,7 @@ export class SelectTagsDlg extends DialogBase {
             new Div(null, null, [
                 new TextField({
                     label: "Tag",
-                    outterClass: "noPaddingRight",
+                    outterClass: "noPaddingRight marginBottom",
                     val: this.editFieldState,
                     labelClass: "txtFieldLabelShort"
                 }),
@@ -183,7 +183,7 @@ export class SelectTagsDlg extends DialogBase {
         let div: Div = null;
 
         if (state.tags?.length > 0) {
-            div = new Div();
+            div = new Div(null, { className: "marginBottom" });
 
             state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 

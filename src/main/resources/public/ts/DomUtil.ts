@@ -2,7 +2,7 @@ import { dispatch, getAppState } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
-import { PasteActionDlg } from "./dlg/PasteActionDlg";
+import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { S } from "./Singletons";
 
 export class DomUtil {
@@ -423,7 +423,7 @@ export class DomUtil {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }
-                        const dlg = new PasteActionDlg(id, s);
+                        const dlg = new PasteOrLinkDlg(id, s);
                         await dlg.open();
                     });
                     return;

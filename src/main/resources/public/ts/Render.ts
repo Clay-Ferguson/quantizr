@@ -19,7 +19,7 @@ import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { PasteActionDlg } from "./dlg/PasteActionDlg";
+import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
@@ -240,7 +240,7 @@ export class Render {
                             return;
                         }
 
-                        const dlg = new PasteActionDlg(node.id, S.quanta.draggingId);
+                        const dlg = new PasteOrLinkDlg(node.id, S.quanta.draggingId);
                         await dlg.open();
 
                         S.quanta.draggingId = null;

@@ -11,7 +11,7 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
-export class PasteActionDlg extends DialogBase {
+export class PasteOrLinkDlg extends DialogBase {
     yes: boolean = false;
 
     nameState: Validator = new Validator("");
@@ -58,9 +58,6 @@ export class PasteActionDlg extends DialogBase {
                             dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
                                 if (!val) {
                                     val = tag;
-                                    if (val.startsWith("#")) {
-                                        val = val.substring(1);
-                                    }
                                 }
                             });
                             this.nameState.setValue(val);
