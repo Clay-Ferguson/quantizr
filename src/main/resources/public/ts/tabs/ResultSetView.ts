@@ -74,6 +74,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
+            if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
             if (ast.editNode && ast.editNode.id === node.id && ast.editNodeOnTab === this.data.id) {
                 children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
             }

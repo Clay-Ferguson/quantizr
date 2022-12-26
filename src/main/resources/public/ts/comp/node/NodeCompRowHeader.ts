@@ -11,6 +11,7 @@ import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Button } from "../core/Button";
 
 export class NodeCompRowHeader extends Div {
 
@@ -302,6 +303,7 @@ export class NodeCompRowHeader extends Div {
 
         let editButton: IconButton = null;
         let jumpButton: IconButton = null;
+        let pasteButton: Button = null;
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
@@ -323,6 +325,12 @@ export class NodeCompRowHeader extends Div {
                     onClick: S.edit.deleteSelNodes
                 }));
             }
+        }
+
+        const userCanPaste = S.props.isMine(this.node, ast) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
+        if (!!ast.nodesToMove && userCanPaste) {
+            pasteButton = new Button("Paste Inside",
+                S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton")
         }
 
         let jumpButtonAdded = false;
@@ -356,7 +364,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (editButton || jumpButton) {
-            floatUpperRightDiv.addChild(new ButtonBar([editButton, jumpButton], null, "marginLeft"));
+            floatUpperRightDiv.addChild(new ButtonBar([pasteButton, editButton, jumpButton], null, "marginLeft"));
         }
 
         if (floatUpperRightDiv.hasChildren()) {
