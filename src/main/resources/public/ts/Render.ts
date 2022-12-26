@@ -796,7 +796,14 @@ export class Render {
                 linkComps.push(new Span(linkName, {
                     className: "nodeLink",
                     onClick: () => {
-                        window.open(window.location.origin + "?id=" + nodeId, "_blank");
+                        // if CTRL key down open in separate browser tab
+                        if (S.util.ctrlKeyCheck()) {
+                            window.open(window.location.origin + "?id=" + nodeId, "_blank");
+                        }
+                        // else open node in the current browser.
+                        else {
+                            S.view.jumpToId(nodeId);
+                        }
                     }
                 }));
             });

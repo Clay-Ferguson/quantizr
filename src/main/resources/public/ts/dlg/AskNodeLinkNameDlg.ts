@@ -4,22 +4,17 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
 
-/*
- * Property Editor Dialog (Edits Node Properties)
- * todo-0: Rename this to EditProperyNameDlg
- */
-export class EditPropertyDlg extends DialogBase {
+export class AskNodeLinkNameDlg extends DialogBase {
+    public nameEntered: string;
 
     nameState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    constructor(private editNode: J.NodeInfo) {
-        super("New Property", "app-modal-content-narrow-width");
+    constructor() {
+        super("Node Link Name", "app-modal-content-narrow-width");
         this.validatedStates = [this.nameState];
     }
 
@@ -29,7 +24,7 @@ export class EditPropertyDlg extends DialogBase {
                 new TextField({ label: "Name", val: this.nameState })
             ]),
             new ButtonBar([
-                new Button("Save", this.save, null, "btn-primary"),
+                new Button("Ok", this.save, null, "btn-primary"),
                 new Button("Cancel", this.close)
             ], "marginTop")
         ];
@@ -39,13 +34,7 @@ export class EditPropertyDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        const name = this.nameState.getValue();
-
-        /* verify first that this property doesn't already exist */
-        if (S.props.getProp(name, this.editNode)) {
-            S.util.showMessage("Property already exists: " + name, "Warning");
-            return;
-        }
+        this.nameEntered = this.nameState.getValue();
         this.close();
     }
 }

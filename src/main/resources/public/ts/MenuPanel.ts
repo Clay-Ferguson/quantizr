@@ -7,6 +7,7 @@ import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
+import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ManageCryptoKeysDlg } from "./dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
@@ -61,6 +62,35 @@ export class MenuPanel extends Div {
         if (ast.editNode) {
             S.view.jumpToId(ast.editNode.id);
         }
+    };
+
+    static setLinkSource = () => {
+        dispatch("setLinkSourceNodeId", s => {
+            const node = S.nodeUtil.getHighlightedNode(s);
+            if (node) {
+                s.linkSource = node.id;
+            }
+            return s;
+        });
+    };
+
+    static setLinkTarget = () => {
+        dispatch("setLinkSourceNodeId", s => {
+            const node = S.nodeUtil.getHighlightedNode(s);
+            if (node) {
+                const sourceId = s.linkSource;
+                const run = async () => {
+                    const dlg = new AskNodeLinkNameDlg();
+                    await dlg.open();
+                    if (dlg.nameEntered) {
+                        S.edit.linkNodes(sourceId, node.id, dlg.nameEntered, "forward-link");
+                    }
+                };
+                run();
+            }
+            s.linkSource = null;
+            return s;
+        });
     };
 
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
@@ -271,6 +301,10 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Edit", [
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
+                new MenuItem("Link From", MenuPanel.setLinkSource, ast.userPrefs.editMode && !ast.linkSource && selNodeIsMine), //
+                new MenuItem("Link To", MenuPanel.setLinkTarget, ast.userPrefs.editMode && ast.linkSource && selNodeIsMine), //
+                new MenuItemSeparator(), //
+
                 new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
 
                 // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //

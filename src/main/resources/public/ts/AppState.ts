@@ -140,4 +140,8 @@ export class AppState {
 
     morePanelExpanded: boolean;
     propsPanelExpanded: boolean;
+
+    // When this is on null it means user is in the process of linking two nodes, and we're
+    // ready for them to select the target node to finish linking the linkSource to the target node
+    linkSource: string = null;
 }
