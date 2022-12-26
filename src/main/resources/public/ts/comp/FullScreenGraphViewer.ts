@@ -49,20 +49,14 @@ export class FullScreenGraphViewer extends Main {
             const links: any = root.links();
             const nodes: any = root.descendants();
 
-            // todo-0: make slider that can turn this on and off.
-            const includeLinks = false;
+            const nodeLinks: any = [];
 
-            let nodeLinks: any = null;
-
-            // The includeLinks will turn on the ability to display the "SubNode.links" node-to-node linkages
-            // as dotted lines between the linked nodes
-            if (includeLinks) {
+            if (ast.showNodeLinksInGraph) {
                 const nodesMap = new Map<string, string>();
                 nodes.forEach((n: any) => {
                     nodesMap.set(n.data.id, n);
                 });
 
-                nodeLinks = [];
                 nodes.forEach((n: any) => {
                     if (n.data.links) {
                         Object.keys(n.data.links).forEach(key => {
@@ -76,16 +70,14 @@ export class FullScreenGraphViewer extends Main {
             }
 
             const simulation = d3.forceSimulation(nodes)
-                // todo-1: should we include nodeLink links here in the force logic?
-                .force("link", d3.forceLink(links).id(function (d: any) { return d.id; }).distance(0).strength(1))
+                .force("link", d3.forceLink(ast.attractionLinksInGraph ? [...links, ...nodeLinks] : links).id(function (d: any) { return d.id; }).distance(0).strength(1))
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
 
             thiz.tooltip = selection
                 .append("div")
-                .attr("class", "tooltip alert alert-secondary")
-                .style("font-size", "14px")
+                .attr("class", "tooltip graphPopup")
                 .style("pointer-events", "none");
 
             const drag = function (simulation: any) {
@@ -136,7 +128,7 @@ export class FullScreenGraphViewer extends Main {
                 .join("line");
 
             let nodeLink: any = null;
-            if (includeLinks) {
+            if (ast.showNodeLinksInGraph && nodeLinks?.length > 0) {
                 nodeLink = g.append("g")
                     .style("stroke", function (d: any) {
                         return "green"
@@ -209,7 +201,7 @@ export class FullScreenGraphViewer extends Main {
                     .attr("x2", function (d: any) { return d.target.x; })
                     .attr("y2", function (d: any) { return d.target.y; });
 
-                if (includeLinks) {
+                if (ast.showNodeLinksInGraph && nodeLink && nodeLinks?.length > 0) {
                     nodeLink
                         .attr("x1", function (d: any) { return d.source.x; })
                         .attr("y1", function (d: any) { return d.source.y; })
@@ -264,7 +256,6 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    // todo-0: get the nodeLinks to display too here!
     updateTooltip = async (d: any, x: number, y: number) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
@@ -280,11 +271,7 @@ export class FullScreenGraphViewer extends Main {
         });
 
         if (res?.node) {
-            let content = res.node.content;
-            if (content.length > 100) {
-                content = content.substring(0, 100) + "...";
-            }
-            d.data.name = content;
+            d.data.name = res.node.content;
             this.showTooltip(d, x, y);
         }
     }
@@ -292,15 +279,18 @@ export class FullScreenGraphViewer extends Main {
     showTooltip = (d: any, x: number, y: number) => {
         this.tooltip.transition()
             .duration(300)
-            .style("opacity", (d: any) => !this.isDragging ? 0.97 : 0);
+            .style("opacity", (d: any) => this.isDragging ? 0 : 0.97);
 
-        // DO NOT DELETE (example for how to use HTML)
-        // this.tooltip.html(() => {
-        //     return "<div class='alert alert-secondary'>" + d.data.name + "</div>";
-        // })
-        this.tooltip.text(d.data.name)
-            .style("left", (x + 15) + "px")
-            .style("top", (y - 50) + "px");
+        let content = d.data.name;
+        if (d.data.links) {
+            content += "<div class='popupNodeLinks'>";
+            Object.keys(d.data.links).forEach(key => {
+                content += "<span class='nodeLink'>" + d.data.links[key].n + "</span>";
+            });
+            content += "</div>";
+        }
+
+        this.tooltip.html(() => "<div>" + content + "</div>");
     }
 
     domRemoveEvent = () => {

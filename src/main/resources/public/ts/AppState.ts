@@ -122,6 +122,8 @@ export class AppState {
     editShowJumpButton: boolean;
     editEncrypt: boolean;
     serverInfoText: string = null;
+    showNodeLinksInGraph: boolean = true;
+    attractionLinksInGraph: boolean = true;
 
     // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
     threadViewNodeId: string = null;

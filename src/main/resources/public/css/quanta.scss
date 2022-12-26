@@ -261,6 +261,22 @@ td {
     // border: 1px solid gray;
 }
 
+.popupNodeLinks {
+    margin-top: $smallGap
+}
+
+.graphPopup {
+    background-color: $modal-content-bg;
+    border: 2px solid gray;
+    border-radius: $border-radius;
+    max-width: 30%;
+    margin: $smallGap !important;
+    padding: $smallGap !important;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
 .d3PieChart {
     width: 250px;
     height: 250px;

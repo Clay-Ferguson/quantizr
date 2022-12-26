@@ -82,9 +82,9 @@ public class GraphNodesService extends ServiceBase {
 			return "";
 		String name = null;
 
-		int newLineIdx = content.indexOf("\n");
-		if (newLineIdx != -1) {
-			name = content.substring(0, newLineIdx).trim();
+		int nlIdx = content.indexOf("\n");
+		if (nlIdx != -1) {
+			name = content.substring(0, nlIdx).trim();
 
 			// remove leading hash marks which will be there if this is a markdown heading.
 			while (name.startsWith("#")) {
@@ -94,8 +94,8 @@ public class GraphNodesService extends ServiceBase {
 		} else {
 			name = content;
 		}
-		if (name.length() > 100) {
-			name = name.substring(0, 100) + "...";
+		if (name.length() > 500) {
+			name = name.substring(0, 500) + "...";
 		}
 		return name;
 	}
