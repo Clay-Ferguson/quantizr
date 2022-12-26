@@ -864,8 +864,7 @@ public class ActPubUtil extends ServiceBase {
 
     /*
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
-     * towards the root of the tree, also importing as we go along any 'inReplyTo' references we haven't
-     * already loaded
+     * towards the root of the tree.
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
         GetThreadViewResponse res = new GetThreadViewResponse();
@@ -894,10 +893,9 @@ public class ActPubUtil extends ServiceBase {
 
                 if (!topNode) {
                     info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, false, false,
-                            true, true, null);
+                            true, true, null, true);
 
-
-                    // we only collect children at this leve if it's not an account top level post
+                    // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
                         Iterable<SubNode> iter =
                                 read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0);
@@ -908,7 +906,7 @@ public class ActPubUtil extends ServiceBase {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
                                 children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1, false,
-                                        false, false, false, true, true, null));
+                                        false, false, false, true, true, null, false));
                             }
                         }
 
@@ -928,7 +926,7 @@ public class ActPubUtil extends ServiceBase {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
                                     children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
-                                            false, false, false, false, true, true, null));
+                                            false, false, false, false, true, true, null, false));
                                 }
                             }
 
@@ -938,7 +936,7 @@ public class ActPubUtil extends ServiceBase {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
                                     children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
-                                            false, false, false, false, true, true, null));
+                                            false, false, false, false, true, true, null, false));
                                 }
                             }
                         }
@@ -997,7 +995,7 @@ public class ActPubUtil extends ServiceBase {
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
-                true, true, null);
+                true, true, null, false);
         return info;
     }
 

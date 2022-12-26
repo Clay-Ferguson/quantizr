@@ -83,6 +83,7 @@ public class NodeInfo {
 	// but all the parents up to a certain number of parents, up towards the root, however many levels
 	// up.
 	private LinkedList<NodeInfo> parents;
+	private LinkedList<NodeInfo> linkedNodes;
 
 	private List<String> likes;
 
@@ -415,6 +416,14 @@ public class NodeInfo {
 
 	public void setParents(LinkedList<NodeInfo> parents) {
 		this.parents = parents;
+	}
+
+	public LinkedList<NodeInfo> getLinkedNodes() {
+		return linkedNodes;
+	}
+
+	public void setLinkedNodes(LinkedList<NodeInfo> linkedNodes) {
+		this.linkedNodes = linkedNodes;
 	}
 
 	public List<String> getLikes() {

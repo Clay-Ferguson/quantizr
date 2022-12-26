@@ -58,7 +58,7 @@ public class Convert extends ServiceBase {
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
 			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
-			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal) {
+			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
 
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
@@ -210,11 +210,29 @@ public class Convert extends ServiceBase {
 					boolean multiLevel = true;
 
 					NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel, lastChild,
-							childrenCheck, false, loadLikes, false, null);
+							childrenCheck, false, loadLikes, false, null, false);
 					if (ok(info)) {
 						nodeInfo.safeGetChildren().add(info);
 					}
 				}
+			}
+		}
+
+		if (attachLinkedNodes) {
+			if (ok(node.getLinks())) {
+				LinkedList<NodeInfo> linkedNodes = new LinkedList<>();
+				nodeInfo.setLinkedNodes(linkedNodes);
+
+				node.getLinks().forEach((k, v) -> {
+					SubNode linkNode = read.getNode(ms, v.getNodeId());
+					if (ok(linkNode)) {
+						NodeInfo info = convertToNodeInfo(false, sc, ms, linkNode, false, 0, false, false, false, false, false,
+								false, null, false);
+						if (ok(info)) {
+							linkedNodes.add(info);
+						}
+					}
+				});
 			}
 		}
 
@@ -233,8 +251,8 @@ public class Convert extends ServiceBase {
 			}
 
 			if (ok(boostedNode)) {
-				NodeInfo info =
-						convertToNodeInfo(false, sc, ms, boostedNode, false, 0, false, false, false, false, false, false, null);
+				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, 0, false, false, false, false, false, false,
+						null, false);
 				if (ok(info)) {
 					nodeInfo.setBoostedNode(info);
 				}
@@ -260,7 +278,8 @@ public class Convert extends ServiceBase {
 			return null;
 		}
 
-		// todo-1: look for other places where we only call parseTags(text) or parseTags(node) but needed to parse both.
+		// todo-1: look for other places where we only call parseTags(text) or parseTags(node) but needed to
+		// parse both.
 		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
 		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
 		if (ok(nodePropTags)) {

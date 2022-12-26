@@ -70,7 +70,7 @@ public class PushService extends ServiceBase {
 						usersSharedToSet.contains(sc.getUserName())) {
 					/* build our push message payload */
 					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false,
-							true, true, null);
+							true, true, null, false);
 
 					if (ok(info)) {
 						FeedPushInfo pushInfo = new FeedPushInfo(info);
@@ -107,7 +107,7 @@ public class PushService extends ServiceBase {
 
 				/* build our push message payload */
 				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false, true,
-						true, null);
+						true, null, false);
 				if (ok(info)) {
 					FeedPushInfo pushInfo = new FeedPushInfo(info);
 

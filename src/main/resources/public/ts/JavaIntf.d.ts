@@ -969,6 +969,7 @@ export interface NodeInfo {
     parent: NodeInfo;
     children: NodeInfo[];
     parents: NodeInfo[];
+    linkedNodes: NodeInfo[];
     likes: string[];
     imgId: string;
     displayName: string;

@@ -104,7 +104,7 @@ public class NodeSearchService extends ServiceBase {
 
 		for (SubNode n : nodes) {
 			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
-					false, false, false, true, null);
+					false, false, false, true, null, false);
 
 			if (ok(info)) {
 				if (truncates.contains(n.getIdStr())) {
@@ -138,7 +138,7 @@ public class NodeSearchService extends ServiceBase {
 			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
-						false, false, false, true, null);
+						false, false, false, true, null, false);
 				if (ok(info)) {
 					searchResults.add(info);
 				}
@@ -155,7 +155,7 @@ public class NodeSearchService extends ServiceBase {
 			SubNode node = read.getNode(ms, searchText, true, null);
 			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
-						false, false, false, true, null);
+						false, false, false, true, null, false);
 				if (ok(info)) {
 					searchResults.add(info);
 				}
@@ -192,7 +192,7 @@ public class NodeSearchService extends ServiceBase {
 						req.isRequirePriority())) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, counter + 1,
-								false, false, false, false, false, true, null);
+								false, false, false, false, false, true, null, false);
 						if (ok(info)) {
 							searchResults.add(info);
 						}
@@ -252,7 +252,7 @@ public class NodeSearchService extends ServiceBase {
 			for (SubNode node : accountNodes.getVal()) {
 				try {
 					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-							false, false, false, false, false, null);
+							false, false, false, false, false, null, false);
 					if (ok(info)) {
 						searchResults.add(info);
 					}
@@ -275,7 +275,7 @@ public class NodeSearchService extends ServiceBase {
 				if (ok(userNode)) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false, counter + 1,
-								false, false, false, false, false, false, null);
+								false, false, false, false, false, false, null, false);
 						if (ok(info)) {
 							searchResults.add(info);
 						}
@@ -346,7 +346,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
-					false, false, false, true, null);
+					false, false, false, true, null, false);
 			if (ok(info)) {
 				searchResults.add(info);
 			}

@@ -200,6 +200,8 @@ export class NodeCompRow extends Div {
         ]);
     }
 
+    // todo-0: this link panel isn't showing up on root node. Move this method into common location
+    // and then call it from NodeCompMainRow.ts?
     renderLinks = (): Div => {
         if (!this.node.links) return null;
 

@@ -231,7 +231,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
-				false, false, null));
+				false, false, null, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -322,7 +322,7 @@ public class NodeEditService extends ServiceBase {
 		update.save(ms, newNode);
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
-				false, false, null));
+				false, false, null, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -628,7 +628,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, true,
-				false, true, true, null);
+				false, true, true, null, false);
 		if (ok(newNodeInfo)) {
 			res.setNode(newNodeInfo);
 		}

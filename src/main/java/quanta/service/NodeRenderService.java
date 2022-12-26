@@ -119,7 +119,7 @@ public class NodeRenderService extends ServiceBase {
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
 			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false, false,
-					true, false, true, true, null);
+					true, false, true, true, null, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -196,7 +196,7 @@ public class NodeRenderService extends ServiceBase {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (ok(highestUpParent)) {
 					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false, 0,
-							false, false, false, false, true, true, null);
+							false, false, false, false, true, true, null, false);
 
 					if (ok(nodeInfo)) {
 						// each parent up goes on top of list for correct rendering order on client.
@@ -230,7 +230,7 @@ public class NodeRenderService extends ServiceBase {
 	public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
 			SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
 		NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal, level > 0,
-				false, true, false, true, true, null);
+				false, true, false, true, true, null, false);
 
 		if (no(nodeInfo)) {
 			return null;
@@ -545,7 +545,7 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, -1, false, false, true, false,
-				false, false, null);
+				false, false, null, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
