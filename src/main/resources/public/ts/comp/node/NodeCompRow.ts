@@ -11,7 +11,6 @@ import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Span } from "../core/Span";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
@@ -194,30 +193,9 @@ export class NodeCompRow extends Div {
             jumpButton,
             new NodeCompContent(this.node, this.tabData, true, true, null, null, true, this.isLinkedNode, null),
             this.internalComp,
-            this.renderLinks(),
+            S.render.renderLinks(this.node),
             this.allowHeaders ? new NodeCompRowFooter(this.node) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
-    }
-
-    // todo-0: this link panel isn't showing up on root node. Move this method into common location
-    // and then call it from NodeCompMainRow.ts?
-    renderLinks = (): Div => {
-        if (!this.node.links) return null;
-
-        const linkComps: CompIntf[] = [];
-        if (this.node.links) {
-            Object.keys(this.node.links).forEach(key => {
-                const nodeId = this.node.links[key].i; // i == nodeId
-                const linkName = this.node.links[key].n;
-                linkComps.push(new Span(linkName, {
-                    className: "nodeLink",
-                    onClick: () => {
-                        window.open(window.location.origin + "?id=" + nodeId, "_blank");
-                    }
-                }));
-            });
-        }
-        return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 }

@@ -218,23 +218,28 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		if (attachLinkedNodes) {
-			if (ok(node.getLinks())) {
-				LinkedList<NodeInfo> linkedNodes = new LinkedList<>();
-				nodeInfo.setLinkedNodes(linkedNodes);
+		// -----------------------
+		// DO NOT DELETE: This code works, but for now we don't use it. However this is important and VERY 
+		// likely we'll be needing this, once we have some use case where we want the linked node
+		// to be embedded/displayed in the node that links to it.
+		// if (attachLinkedNodes) {
+		// 	if (ok(node.getLinks())) {
+		// 		LinkedList<NodeInfo> linkedNodes = new LinkedList<>();
+		// 		nodeInfo.setLinkedNodes(linkedNodes);
 
-				node.getLinks().forEach((k, v) -> {
-					SubNode linkNode = read.getNode(ms, v.getNodeId());
-					if (ok(linkNode)) {
-						NodeInfo info = convertToNodeInfo(false, sc, ms, linkNode, false, 0, false, false, false, false, false,
-								false, null, false);
-						if (ok(info)) {
-							linkedNodes.add(info);
-						}
-					}
-				});
-			}
-		}
+		// 		node.getLinks().forEach((k, v) -> {
+		// 			SubNode linkNode = read.getNode(ms, v.getNodeId());
+		// 			if (ok(linkNode)) {
+		// 				NodeInfo info = convertToNodeInfo(false, sc, ms, linkNode, false, 0, false, false, false, false, false,
+		// 						false, null, false);
+		// 				if (ok(info)) {
+		// 					linkedNodes.add(info);
+		// 				}
+		// 			}
+		// 		});
+		// 	}
+		// }
+		// -----------------------
 
 		if (attachBoosted) {
 			SubNode boostedNode = null;

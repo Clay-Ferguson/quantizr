@@ -5,6 +5,7 @@ import { toArray } from "react-emoji-render";
 import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
+import { CompIntf } from "./comp/base/CompIntf";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
@@ -782,5 +783,24 @@ export class Render {
 
             ], "userInfo")
         ]);
+    }
+
+    renderLinks = (node: J.NodeInfo): Div => {
+        if (!node.links) return null;
+
+        const linkComps: CompIntf[] = [];
+        if (node.links) {
+            Object.keys(node.links).forEach(key => {
+                const nodeId = node.links[key].i; // i == nodeId
+                const linkName = node.links[key].n;
+                linkComps.push(new Span(linkName, {
+                    className: "nodeLink",
+                    onClick: () => {
+                        window.open(window.location.origin + "?id=" + nodeId, "_blank");
+                    }
+                }));
+            });
+        }
+        return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 }

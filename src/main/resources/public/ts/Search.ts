@@ -596,24 +596,28 @@ export class Search {
             ])
         }
 
-        let linkedNodesComp: Div = null;
-        if (node.linkedNodes) {
-            // all the styles etc in here need to be changed from boost to nodeLinks
-            node.linkedNodes.forEach(n => {
-                const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
+        // ------------------------------------
+        // DO NOT DELETE (This can display actual linkedNodes inline, but I decided for now we should just
+        // render the link text (clickable links) and not embed any content like this)
+        // let linkedNodesComp: Div = null;
+        // if (node.linkedNodes) {
+        //     // all the styles etc in here need to be changed from boost to nodeLinks
+        //     node.linkedNodes.forEach(n => {
+        //         const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feed-boost");
 
-                let allowFooter = isFeed;
-                if (isFeed) {
-                    allowFooter = ast.showAllRowDetails.has(n.id);
-                }
-                linkedNodesComp = new Div(null, { className: "boost-row" }, [
-                    allowHeader ? new NodeCompRowHeader(n, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
-                    linkContent,
-                    allowFooter ? new NodeCompRowFooter(n) : null,
-                    allowFooter ? new Clearfix() : null
-                ])
-            });
-        }
+        //         let allowFooter = isFeed;
+        //         if (isFeed) {
+        //             allowFooter = ast.showAllRowDetails.has(n.id);
+        //         }
+        //         linkedNodesComp = new Div(null, { className: "boost-row" }, [
+        //             allowHeader ? new NodeCompRowHeader(n, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
+        //             linkContent,
+        //             allowFooter ? new NodeCompRowFooter(n) : null,
+        //             allowFooter ? new Clearfix() : null
+        //         ])
+        //     });
+        // }
+        // ------------------------------------
 
         // this divClass goes on the parent if we have a parentItem, or else on the 'itemDiv' itself if we don't
         let divClass: string = ast.highlightSearchNodeId === node.id ? outterClassHighlight : outterClass;
@@ -639,7 +643,7 @@ export class Search {
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
-            linkedNodesComp,
+            S.render.renderLinks(node),
             allowFooter ? new NodeCompRowFooter(node) : null,
             allowFooter ? new Clearfix() : null
         ]);

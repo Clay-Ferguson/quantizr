@@ -125,6 +125,7 @@ export class NodeCompMainNode extends Div {
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),
                 boostComp,
+                S.render.renderLinks(node),
                 new NodeCompRowFooter(node),
                 new Clearfix()
             ]);
