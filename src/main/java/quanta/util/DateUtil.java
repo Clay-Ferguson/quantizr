@@ -20,10 +20,11 @@ import quanta.exception.base.RuntimeEx;
  * Date-related functions
  */
 public class DateUtil {
-	public static final int SECOND_MILLIS = 1000;
-	public static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
-	public static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
-	public static final int DAY_MILLIS = 24 * HOUR_MILLIS;
+	public static final long SECOND_MILLIS = 1000;
+	public static final long MINUTE_MILLIS = 60 * SECOND_MILLIS;
+	public static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
+	public static final long DAY_MILLIS = 24 * HOUR_MILLIS;
+	public static final long YEAR_MILLIS = 365 * DAY_MILLIS;
 
 	/** Used to format date values */
 	// public static final String ECMA_DATE_FORMAT = "EEE MMM dd yyyy HH:mm:ss
@@ -170,6 +171,9 @@ public class DateUtil {
 	public static String formatDurationMillis(long different, boolean showMillis) {
 		StringBuilder sb = new StringBuilder();
 
+		long years = different / YEAR_MILLIS;
+		different = different % YEAR_MILLIS;
+
 		long days = different / DAY_MILLIS;
 		different = different % DAY_MILLIS;
 
@@ -182,12 +186,20 @@ public class DateUtil {
 		long seconds = different / SECOND_MILLIS;
 		long millis = different % SECOND_MILLIS;
 
-		if (days > 0) {
+		if (years > 0) {
+			sb.append(String.valueOf(years));
+			sb.append("y");
+		}
+
+		if (years < 5 && days > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
 			sb.append(String.valueOf(days));
 			sb.append("d");
 		}
 
-		if (hours > 0) {
+		// only show resolution of hours if days less than 4
+		if (years == 0 && days < 4 && hours > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(hours));
@@ -195,7 +207,7 @@ public class DateUtil {
 		}
 
 		// only show resolution of minutes if not over a day
-		if (days == 0 && minutes > 0) {
+		if (years == 0 && days == 0 && hours < 4 && minutes > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(minutes));
@@ -204,13 +216,13 @@ public class DateUtil {
 
 		boolean msDone = false;
 		// only show seconds if not over a day or hour.
-		if (days == 0 && hours == 0 && seconds > 0) {
+		if (years == 0 && days == 0 && hours == 0 && seconds > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 
 			// Always show like 1.5s rather than '1s 500ms'
 			if (showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
-				sb.append(String.format("%.2f", (float)seconds + (float)millis / 1000f));
+				sb.append(String.format("%.2f", (float) seconds + (float) millis / 1000f));
 				msDone = true;
 			} else {
 				sb.append(String.valueOf(seconds));
@@ -220,7 +232,7 @@ public class DateUtil {
 		}
 
 		// only show milliseconds if not over a minute
-		if (!msDone && showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
+		if (!msDone && showMillis && years == 0 &&  days == 0 && hours == 0 && minutes == 0 && millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));

@@ -955,6 +955,7 @@ export interface NodeInfo {
     renderContent: string;
     tags: string;
     lastModified: Date;
+    timeAgo: string;
     logicalOrdinal: number;
     ordinal: number;
     type: string;

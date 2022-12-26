@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeLink;
+import quanta.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
@@ -27,17 +28,14 @@ public class NodeInfo {
 	private String path;
 	private String name;
 	private String content;
-	
+
 	// This is the markdown to RENDER and MAY be different from 'content'
 	private String renderContent;
 
 	private String tags;
 
 	private Date lastModified;
-
-	// todo-2: make this show something like 1hr ago or 2d ago, etc using DateUtil.formatDurationMillis,
-	// and then let the GUI show that instad of the time, unless hovered over
-	// private String timeAgo;
+	private String timeAgo;
 
 	// This is the 0-offset position (index) of the node within the resultset that
 	// queried it, and is relative not to a specific page
@@ -102,11 +100,11 @@ public class NodeInfo {
 
 	public NodeInfo() {}
 
-	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName, String owner,
-			String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
-			HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links, List<AccessControlInfo> ac, List<String> likes, boolean hasChildren,
-			String type, long logicalOrdinal, boolean lastChild, String cipherKey, String avatarVer, String apAvatar,
-			String apImage) {
+	public NodeInfo(String id, String path, String name, String content, String renderContent, String tags, String displayName,
+			String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified, List<PropertyInfo> properties,
+			HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links, List<AccessControlInfo> ac,
+			List<String> likes, boolean hasChildren, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
+			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -114,6 +112,9 @@ public class NodeInfo {
 		this.renderContent = renderContent;
 		this.tags = tags;
 		this.lastModified = lastModified;
+		if (ok(lastModified)) {
+			this.timeAgo = DateUtil.formatDurationMillis(System.currentTimeMillis() - lastModified.getTime(), false);
+		}
 		this.displayName = displayName;
 		this.owner = owner;
 		this.ownerId = ownerId;
@@ -206,6 +207,14 @@ public class NodeInfo {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	public String getTimeAgo() {
+		return timeAgo;
+	}
+
+	public void setTimeAgo(String timeAgo) {
+		this.timeAgo = timeAgo;
 	}
 
 	public List<NodeInfo> safeGetChildren() {

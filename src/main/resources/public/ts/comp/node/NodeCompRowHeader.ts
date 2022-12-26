@@ -25,7 +25,7 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         const ast = useAppState();
-        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id);
+        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id) || ast.isAdminUser;
         const children = [];
         let avatarImg: Img = null;
 
@@ -218,8 +218,10 @@ export class NodeCompRowHeader extends Div {
             className: "float-end floatRightHeaderDiv"
         });
 
-        if (showInfo && this.node.lastModified) {
-            floatUpperRightDiv.addChild(new Span(S.util.formatDateTime(new Date(this.node.lastModified))));
+        if (showInfo && this.node.timeAgo) {
+            floatUpperRightDiv.addChild(new Span(this.node.timeAgo, {
+                title: "Last Modified: " + S.util.formatDateTime(new Date(this.node.lastModified))
+            }));
         }
 
         const type = S.plugin.getType(this.node.type);
