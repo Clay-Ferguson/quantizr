@@ -410,6 +410,7 @@ export interface NodeSearchRequest extends RequestBase {
     timeRangeType: string;
     recursive: boolean;
     requirePriority: boolean;
+    requireAttachment: boolean;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {

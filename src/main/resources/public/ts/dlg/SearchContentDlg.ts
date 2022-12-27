@@ -20,11 +20,12 @@ import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 interface LS { // Local State
     searchRoot?: string;
     sortField?: string;
-    requirePriority?: boolean;
     caseSensitive?: boolean;
     fuzzy?: boolean;
     recursive?: boolean;
     sortDir?: string;
+    requirePriority?: boolean;
+    requireAttachment?: boolean;
 }
 
 export class SearchContentDlg extends DialogBase {
@@ -32,10 +33,11 @@ export class SearchContentDlg extends DialogBase {
     static dlgState: any = {
         fuzzy: false,
         caseSensitive: false,
-        requirePriority: false,
         recursive: true,
         sortField: "0",
-        sortDir: ""
+        sortDir: "",
+        requirePriority: false,
+        requireAttachment: false
     };
 
     searchTextField: TextField;
@@ -89,6 +91,13 @@ export class SearchContentDlg extends DialogBase {
                             this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().recursive
+                    }),
+                    new Checkbox("Has Attachment", null, {
+                        setValue: (checked: boolean) => {
+                            SearchContentDlg.dlgState.requireAttachment = checked;
+                            this.mergeState<LS>({ requireAttachment: checked });
+                        },
+                        getValue: (): boolean => this.getState<LS>().requireAttachment
                     })
                 ], "displayTable marginBottom"),
 
@@ -223,6 +232,7 @@ export class SearchContentDlg extends DialogBase {
             state.sortField,
             state.sortDir,
             requirePriority,
+            state.requireAttachment,
             this.close);
     }
 }

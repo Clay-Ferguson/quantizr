@@ -108,6 +108,6 @@ export class SearchUsersDlg extends DialogBase {
             desc,
             null,
             this.getState<LS>().fuzzy,
-            this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, this.close);
+            this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, false, this.close);
     }
 }

@@ -17,4 +17,5 @@ export class ResultSetInfo {
     public sortField: string;
     public sortDir: string;
     public requirePriority: boolean;
+    public requireAttachment: boolean;
 }

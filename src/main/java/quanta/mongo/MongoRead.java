@@ -799,7 +799,7 @@ public class MongoRead extends ServiceBase {
     @PerfMon(category = "read")
     public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
-            boolean requirePriority) {
+            boolean requirePriority, boolean requireAttachment) {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
@@ -867,6 +867,10 @@ public class MongoRead extends ServiceBase {
 
         if (requirePriority) {
             criterias.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
+        }
+
+        if (requireAttachment) {
+            criterias.add(Criteria.where(SubNode.ATTACHMENTS).ne(null));
         }
 
         if (!StringUtils.isEmpty(sortField)) {

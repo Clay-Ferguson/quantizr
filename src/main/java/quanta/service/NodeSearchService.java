@@ -189,7 +189,7 @@ public class NodeSearchService extends ServiceBase {
 				for (SubNode node : read.searchSubGraph(ms, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
-						req.isRequirePriority())) {
+						req.isRequirePriority(), req.isRequireAttachment())) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, counter + 1,
 								false, false, false, false, false, true, null, false);

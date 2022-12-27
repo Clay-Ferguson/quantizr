@@ -40,6 +40,8 @@ public class NodeSearchRequest extends RequestBase {
 
 	private boolean requirePriority;
 
+	private boolean requireAttachment;
+
 	public String getSearchRoot() {
 		return searchRoot;
 	}
@@ -150,5 +152,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setRequirePriority(boolean requirePriority) {
 		this.requirePriority = requirePriority;
+	}
+
+	public boolean isRequireAttachment() {
+		return requireAttachment;
+	}
+
+	public void setRequireAttachment(boolean requireAttachment) {
+		this.requireAttachment = requireAttachment;
 	}
 }

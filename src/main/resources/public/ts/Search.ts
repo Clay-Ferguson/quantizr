@@ -141,10 +141,14 @@ export class Search {
             return;
         }
         this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
-            J.NodeProp.PRIORITY_FULL, "asc", true, null);
+            J.NodeProp.PRIORITY_FULL, "asc", true, false, null);
     }
 
-    search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string, searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function) => {
+    // todo-1: We should make this method return a Promise<boolean> for success and get rid of the successCallback arg.
+    search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
+        searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
+        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean,
+        successCallback: Function) => {
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
             page,
@@ -159,7 +163,8 @@ export class Search {
             searchDefinition: "",
             timeRangeType: null,
             recursive,
-            requirePriority
+            requirePriority,
+            requireAttachment
         });
 
         if (res.searchResults && res.searchResults.length > 0) {
@@ -186,6 +191,7 @@ export class Search {
                 data.props.recursive = recursive;
                 data.props.sortField = sortField;
                 data.props.requirePriority = requirePriority;
+                data.props.requireAttachment = requireAttachment;
                 data.props.sortDir = sortDir;
                 data.props.prop = prop;
                 data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
@@ -279,7 +285,8 @@ export class Search {
             searchType: null,
             timeRangeType,
             recursive,
-            requirePriority: false
+            requirePriority: false,
+            requireAttachment: false
         });
 
         if (page === 0 && (!res.searchResults || res.searchResults.length === 0)) {

@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAppState, useAppState } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
@@ -72,6 +72,9 @@ export class HistoryPanel extends Div {
     }
 
     dragStart = (ev: any, draggingId: string) => {
+        // don't allow drag while editing.
+        if (getAppState().editNode) return;
+
         ev.currentTarget.classList.add("dragBorderSource");
         S.quanta.dragElm = ev.target;
         S.quanta.draggingId = draggingId;

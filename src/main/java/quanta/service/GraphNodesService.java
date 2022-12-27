@@ -51,7 +51,7 @@ public class GraphNodesService extends ServiceBase {
 			else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
 				results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false, null,
-						true, false);
+						true, false, false);
 			}
 
 			// Construct the GraphNode object for each result and add to mapByPath
