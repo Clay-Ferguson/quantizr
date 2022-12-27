@@ -1218,6 +1218,7 @@ Will come back later and study this more. todo-3 */
 .markdown-codespan {
     color: var(--bs-green);
     word-wrap: break-word;
+    cursor: pointer;
     // font-family: var(--bs-font-monospace)
     // font-weight: bold;
 
@@ -1352,7 +1353,6 @@ Will come back later and study this more. todo-3 */
 .markdown-content samp {
     width: 100%;
     border: 1px solid olivedrab;
-    padding: 8px;
     background-color: $baseBgColor;
 }
 

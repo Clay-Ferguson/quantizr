@@ -2,6 +2,7 @@ import { dispatch, getAppState } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { S } from "./Singletons";
 
@@ -430,5 +431,25 @@ export class DomUtil {
                 }
             }
         });
+    }
+
+    // Allow copy to clipboard when backtick text clicked.
+    codeSpanClick = (elm: HTMLElement) => {
+        // if user just selected some text we don't do anything, because it won't make sense
+        // becuase this code is incompatable and not appliable to that scenario
+        if (window.getSelection()?.toString()) return;
+
+        const save = elm.style.border;
+        elm.style.border = "3px solid yellow";
+
+        // we need a timeout here so the yellow border will be on the screen
+        setTimeout(async () => {
+            const dlg = new ConfirmDlg("Copy to Clipboard?", "Clipboard");
+            await dlg.open();
+            if (dlg.yes) {
+                S.util.copyToClipboard(elm.innerText);
+            }
+            elm.style.border = save;
+        }, 1000);
     }
 }

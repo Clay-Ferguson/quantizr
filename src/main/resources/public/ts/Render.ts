@@ -141,7 +141,7 @@ export class Render {
         this.markedRenderer = new marked.Renderer();
 
         this.markedRenderer.codespan = (code: string) => {
-            return `<span class='markdown-codespan'>${code}</span>`;
+            return `<span class='markdown-codespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
         }
 
         // From Stack Overflow
@@ -166,6 +166,8 @@ export class Render {
             renderer: this.markedRenderer,
 
             highlight: (code, language) => {
+                if (!language) language = "txt";
+
                 // Check whether the given language is valid for highlight.js.
                 const validLang: boolean = !!(language && highlightjs.getLanguage(language));
 
@@ -174,6 +176,7 @@ export class Render {
 
                 // Render the highlighted code with `hljs` class.
                 // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+                // console.log("highlighted [lang=" + language + "]: " + highlighted);
                 return highlighted;
             },
 

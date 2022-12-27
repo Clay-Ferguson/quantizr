@@ -105,7 +105,7 @@ export class LoginDlg extends DialogBase {
 
     resetPassword = async (): Promise<any> => {
         const usr = this.userState.getValue();
-        const dlg = new ConfirmDlg("Reset your password ?", "Confirm", null, null);
+        const dlg = new ConfirmDlg("Reset your password ?", "Confirm");
         await dlg.open();
         if (dlg.yes) {
             this.close();

@@ -1,6 +1,7 @@
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 import { NodeCompBinary } from "../node/NodeCompBinary";
+import { S } from "../../Singletons";
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq
@@ -57,14 +58,21 @@ export class Html extends Comp {
     }
 
     domPreUpdateEvent = (): void => {
+        const elm = this.getRef();
+        if (!elm) return;
+
         // make all "a" tags inside this div to have a target=_blank
-        this.getRef()?.querySelectorAll("a").forEach(e => e.setAttribute("target", "_blank"));
+        elm.querySelectorAll("a").forEach(e => e.setAttribute("target", "_blank"));
 
         // adds the click handler function to all .enlargable-img images
-        this.getRef()?.querySelectorAll(".enlargable-img").forEach(e => {
+        elm.querySelectorAll(".enlargable-img").forEach(e => {
             e.addEventListener("click", (evt: MouseEvent) => {
                 NodeCompBinary.clickOnImage(e.getAttribute("nodeid"), e.getAttribute("attkey"), false, false);
             });
+        });
+
+        elm.querySelectorAll(".hljs").forEach((e: HTMLElement) => {
+            e.addEventListener("click", () => S.domUtil.codeSpanClick(e));
         });
     }
 }

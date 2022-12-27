@@ -1064,7 +1064,7 @@ export class Edit {
 
     insertBookWarAndPeace = async (ast: AppState) => {
         const dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
-            "Confirm", null, null);
+            "Confirm");
         await dlg.open();
         if (dlg.yes) {
             /* inserting under whatever node user has focused */

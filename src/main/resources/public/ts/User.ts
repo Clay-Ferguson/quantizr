@@ -16,15 +16,13 @@ declare let g_urlIdFailMsg: string;
 
 export class User {
     closeAccount = async () => {
-        let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
-            null, null);
+        let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account");
         await dlg.open();
         if (!dlg.yes) {
             return;
         }
 
-        dlg = new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Close Account",
-            null, null);
+        dlg = new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Close Account");
         await dlg.open();
         if (dlg.yes) {
             await this.deleteAllUserLocalDbEntries();
