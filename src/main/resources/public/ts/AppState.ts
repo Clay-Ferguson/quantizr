@@ -74,6 +74,9 @@ export class AppState {
     /* holds array of all parent items all the way up the tree (as far as user is authorized) */
     breadcrumbs: J.BreadcrumbInfo[];
 
+    speechPaused: boolean = false;
+    speechSpeaking: boolean = false;
+
     userPrefs: J.UserPreferences = {
         editMode: false,
         showMetaData: false,

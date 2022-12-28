@@ -452,4 +452,19 @@ export class DomUtil {
             elm.style.border = save;
         }, 1000);
     }
+
+    highlightBrowserText = (text: string) => {
+        if (!text) return;
+        if ((window as any).find) {
+            // get this string here, becasue the delay timer would invalidate the idx.
+            let findText = text.trim();
+            // if the exact text being read happens to be onscreen highlight it!
+
+            // trying to find strings longer than about 30 seems to just intermittently fail, but strings
+            // under 30 always work. This appers to be a bug in the browser.
+            findText = findText.substring(0, 30);
+            findText = S.util.chopAtLastChar(findText, " ");
+            (window as any).find(findText, true, false, true);
+        }
+    }
 }

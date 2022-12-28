@@ -680,7 +680,7 @@ export class EditNodeDlg extends DialogBase {
     super_close = this.close;
     close = () => {
         this.super_close();
-        S.speech.stop();
+        S.speech.stopListening();
 
         EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {

@@ -89,7 +89,7 @@ export class RightNavPanel extends Div {
         // }) : null;
 
         const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
-            className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable float-end",
+            className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 let content = null;
@@ -122,6 +122,42 @@ export class RightNavPanel extends Div {
             });
         }
 
+        const textToSpeech = !ast.speechSpeaking && !ast.mobileMode ? new Icon({
+            className: "fa fa-volume-up fa-lg marginRight clickable",
+            onClick: S.speech.speakClipboard,
+            title: "Text to Speech"
+        }) : null;
+
+        if (textToSpeech) {
+            S.domUtil.setDropHandler(textToSpeech.attribs, (evt: DragEvent) => {
+                for (const item of evt.dataTransfer.items) {
+                    // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
+                    if (item.kind === "string") {
+                        item.getAsString(async (s) => S.speech.speakText(s));
+                        return;
+                    }
+                }
+            });
+        }
+
+        const stopTextToSpeech = ast.speechSpeaking && !ast.mobileMode ? new Icon({
+            className: "fa fa-stop fa-lg marginRight clickable",
+            onClick: S.speech.stopSpeaking,
+            title: "Stop Speaking Text"
+        }) : null;
+
+        const pauseTextToSpeech = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
+            className: "fa fa-pause fa-lg marginRight clickable",
+            onClick: S.speech.pauseSpeaking,
+            title: "Pause Speaking Text"
+        }) : null;
+
+        const resumeTextToSpeech = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
+            className: "fa fa-play fa-lg marginRight clickable",
+            onClick: S.speech.resumeSpeaking,
+            title: "Resume Speaking Text"
+        }) : null;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -137,7 +173,13 @@ export class RightNavPanel extends Div {
                     }) : null,
 
                     new Div(null, { className: "bigMarginBottom" }, [
-                        addNoteButton,
+                        textToSpeech || stopTextToSpeech || pauseTextToSpeech || resumeTextToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
+                            textToSpeech,
+                            stopTextToSpeech,
+                            resumeTextToSpeech,
+                            pauseTextToSpeech,
+                            addNoteButton]) : null,
+
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
                             setValue: (checked: boolean) => S.edit.toggleEditMode(ast),
                             getValue: (): boolean => ast.userPrefs.editMode

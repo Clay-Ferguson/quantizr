@@ -24,7 +24,7 @@ import { RpcUtil } from "./RpcUtil";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
 import { S } from "./Singletons";
-import { SpeechRecog } from "./SpeechRecog";
+import { SpeechEngine } from "./SpeechEngine";
 import { TabUtil } from "./TabUtil";
 import { User } from "./User";
 import { Util } from "./Util";
@@ -59,7 +59,7 @@ export class Factory {
             S.user = new User();
             S.view = new View();
             S.localDB = new LocalDB();
-            S.speech = new SpeechRecog();
+            S.speech = new SpeechEngine();
 
             console.log("Factory.ts instances ready.");
         }

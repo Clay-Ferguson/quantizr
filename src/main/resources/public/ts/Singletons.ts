@@ -12,7 +12,7 @@ import type { Render } from "./Render";
 import { RpcUtil } from "./RpcUtil";
 import type { Search } from "./Search";
 import type { ServerPush } from "./ServerPush";
-import type { SpeechRecog } from "./SpeechRecog";
+import type { SpeechEngine } from "./SpeechEngine";
 import type { TabUtil } from "./TabUtil";
 import type { User } from "./User";
 import type { Util } from "./Util";
@@ -39,7 +39,7 @@ export interface Singletons {
     user: User;
     view: View;
     localDB: LocalDB;
-    speech: SpeechRecog;
+    speech: SpeechEngine;
 }
 
 const S: Singletons = {} as any;
