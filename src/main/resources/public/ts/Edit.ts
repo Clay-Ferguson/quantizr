@@ -146,11 +146,15 @@ export class Edit {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, ast: AppState) => {
         if (S.util.checkSuccess("Move nodes", res)) {
-            if (res.signaturesRemoved) {
-                setTimeout(() => {
-                    S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
-                }, 1000);
-            }
+
+            // todo-1: We DO need to do something to indicate to user that signatures got removed, but this way
+            // ended up being an annoyance when I'm doing a lot of editing back to back pasting every minute or two.
+            // if (res.signaturesRemoved) {
+            //     setTimeout(() => {
+            //         S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
+            //     }, 1000);
+            // }
+
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
                 return s;

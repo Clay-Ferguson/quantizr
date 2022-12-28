@@ -197,6 +197,13 @@ export class Search {
                 data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
                 S.tabUtil.selectTabStateOnly(data.id, s);
+
+                // DO NOT DELETE
+                // This was an experiment an it does work, but it only highlights one thing at a time, when I
+                // was hoping it would highlight ALL search results at once. So I think CTRL-F is superior.
+                // if (searchText) {
+                //     setTimeout(() => (window as any).find(searchText, false), 1000); //window.find
+                // }
                 return s;
             });
         }
