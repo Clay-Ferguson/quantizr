@@ -1,19 +1,28 @@
 import { S } from "./Singletons";
-import { dispatch } from "./AppContext";
+import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { Constants as C } from "./Constants";
 
 declare let webkitSpeechRecognition: any;
 declare let SpeechRecognition: any;
 
 export class SpeechEngine {
     queuedSpeech: string[] = null;
+    private voices: SpeechSynthesisVoice[] = null;
 
     // this is a guess (and recommendation from online sources) at how long a sentence we can get away with
     // and still avoid the Chrome bug which cuts off long sentences. If sentence is short enough we push the
-    // whole thing
-    MAX_UTTERANCE_CHARS: number = 200;
+    // whole thing. There's a tradeoff here where you can set a large number for this (like well over 200), which causes
+    // the ttsTimer (below) to activate a lot with "i think" can cause a slight speaker popping, --OR-- you can set this
+    // value to like 200, and the popping will definitely not happen, but the sentence structure won't be perfect (meaning
+    // the speaking voice may pause at awkward times every now and then)
+    MAX_UTTERANCE_CHARS: number = 500;
 
+    // add type-safety here (TS can find type easily)
     recognition: any = null;
-    tts: any = window.speechSynthesis;
+
+    tts: SpeechSynthesis = window.speechSynthesis;
+    ttsTimer: any = null;
+    ttsSpeakingTime: number = 0;
     speechActive: boolean = false;
     private callback: (text: string) => void;
 
@@ -50,9 +59,9 @@ export class SpeechEngine {
         this.recognition.onend = () => {
             // console.log("speech onEnd.");
             if (this.speechActive) {
-                setTimeout(() => {
-                    this.recognition.start();
-                }, 250);
+                // todo-0: this was a bug. Check for similar bugs there you have "() => functionName" because that
+                // won't call the function
+                setTimeout(this.recognition.start, 250);
             }
         };
 
@@ -98,12 +107,6 @@ export class SpeechEngine {
         // hack to be able to know NOW that we are running speech, so isSpeaking() is already correct.
         this.queuedSpeech = [];
 
-        // const voices = window.speechSynthesis.getVoices();
-        // need a config dialog that can open up a selection for voices, and speed of speech UX
-        // voices?.forEach(voice => {
-        //     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
-        // });
-
         const clipTxt = await (navigator as any)?.clipboard?.readText();
         if (clipTxt) {
             this.speakText(clipTxt);
@@ -115,92 +118,215 @@ export class SpeechEngine {
 
     speakText = async (text: string) => {
         if (!this.tts || !text) return;
+        const interval = 1000;
 
-        dispatch("speechEngineStateChange", s => {
+        // create timer that runs forever and fixes the Chrome bug whenever speech has been
+        // running more than ten seconds.
+        if (!this.ttsTimer) {
+            // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
+            this.ttsTimer = setInterval(() => {
+                if (getAppState().speechSpeaking) {
+                    this.ttsSpeakingTime += interval;
+                    if (this.ttsSpeakingTime > 9000) {
+                        this.ttsSpeakingTime = 0;
+                        this.tts.pause();
+                        this.tts.resume();
+                    }
+                }
+            }, interval);
+        }
+
+        await promiseDispatch("speechEngineStateChange", s => {
+            s.speechText = text;
             s.speechPaused = false;
             s.speechSpeaking = true;
+            s.ttsRan = true;
             return s;
         });
+
+        S.tabUtil.selectTab(C.TAB_TTS);
 
         // only becasue speech has had bugs over the years and one bug report I saw claimed putting the call
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
         // else make the claim.
         setTimeout(() => {
+            this.ttsSpeakingTime = 0;
             this.tts.cancel();
+            text = this.preProcessText(text);
             this.fragmentizeToQueue(text);
 
             this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
             if (this.queuedSpeech.length === 0) return;
 
             let idx = 0;
-            let utter: any = null;
+            let utter: SpeechSynthesisUtterance = null;
             const utterFunc = () => {
+                const ast = getAppState();
                 if (!this.queuedSpeech) return;
 
-                // If we have more stuff to speak
-                if (idx < this.queuedSpeech.length) {
-                    const sayThis = this.queuedSpeech[idx++];
-                    S.domUtil.highlightBrowserText(sayThis);
-                    utter = new SpeechSynthesisUtterance(sayThis);
-                    utter.onend = utterFunc;
-
-                    // NOTE: It's possible to submit multiple utterances, and the voice engine
-                    // will queue them up and perform them. Not sure which is the best way to go
-                    // and be sure to avoid overloading the speech engine with too much content, so for
-                    // now we just submit one at a time, but the BEST approach is probably to que at least
-                    // two at a time.
-                    this.tts.speak(utter);
-                }
                 // If we're out of stuff to speak
-                else {
+                if (idx >= this.queuedSpeech.length) {
                     this.queuedSpeech = null;
+                    this.ttsSpeakingTime = 0;
                     this.tts.cancel();
                     dispatch("speechEngineStateChange", s => {
                         s.speechPaused = false;
                         s.speechSpeaking = false;
                         return s;
                     });
+                    return;
+                }
+
+                // If we have more stuff to speak
+                if (idx < this.queuedSpeech.length) {
+                    const sayThis = this.queuedSpeech[idx];
+                    S.domUtil.highlightBrowserText(sayThis);
+                    utter = new SpeechSynthesisUtterance(sayThis);
+
+                    if (ast.speechVoice >= 0) {
+                        const voices = this.getVoices();
+                        utter.voice = voices[ast.speechVoice < voices.length ? ast.speechVoice : 0];
+                    }
+                    if (ast.speechRate) {
+                        utter.rate = this.parseRateValue(ast.speechRate);
+                    }
+
+                    utter.onend = () => {
+                        this.ttsSpeakingTime = 0;
+                        utterFunc();
+                    }
+                    // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
+                    idx++;
+                    this.ttsSpeakingTime = 0;
+                    this.tts.speak(utter);
                 }
             };
             // Get started by uttering idx=0, and the rest of the sentences will follow
-            // in a chin reaction every time utterFunc gets called via the 'onend' listener
+            // in a chain reaction every time utterFunc gets called via the 'onend' listener
             utterFunc();
         }, 100);
     }
 
-    // The Chrome Speech engine will stop working unless you send it relatively short chunks of text,
-    // and also feeding too much at once overloads it and causes a long delay before it can start speaking
-    // wo we break the text into smaller chunks.
+    parseRateValue = (rate: string) => {
+        switch (rate) {
+            case "slowest":
+                return 0.7;
+            case "slower":
+                return 0.8;
+            case "slow":
+                return 0.9;
+            case "normal":
+                return 1;
+            case "fast":
+                return 1.1;
+            case "faster":
+                return 1.2;
+            case "faster_1":
+                return 1.3;
+            case "fastest":
+                return 1.4;
+            default:
+                return 1;
+        }
+    }
+
+    getVoices = () => {
+        if (this.voices) return this.voices;
+        this.voices = this.tts.getVoices();
+    }
+
+    preProcessText = (text: string): string => {
+        // engine will SAY the 'quote' if you leave this here.
+        text = text.replaceAll(".\"", ".");
+        text = text.replaceAll(".'", ".");
+
+        text = text.replaceAll("!\"", "!");
+        text = text.replaceAll("!'", "!");
+
+        text = text.replaceAll("?\"", "?");
+        text = text.replaceAll("?'", "?");
+
+        // need to create a list to iterate thru for these.
+        text = text.replaceAll("Rep.", "Rep");
+        text = text.replaceAll("D.C.", "DC");
+        text = text.replaceAll("U.S.", "US");
+
+        return text;
+    }
+
+    // as a last resort we just break string at spaces to create an array of unser MAX_UTTERANCE_CHARS
+    // chunks of text
+    fragmentBySpaces = (text: string): string[] => {
+        const ret: string[] = [];
+        const ast = getAppState();
+        const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
+
+        // first split into sentences.
+        const words = text.split(/[ ]+/);
+
+        // scan each word appendingn to frag until it gets too long and then
+        // adding to ret
+        let frag = "";
+        words?.forEach(word => {
+            if (frag.length + word.length < maxChars) {
+                frag += " " + word;
+            }
+            else {
+                ret.push(frag.trim());
+                frag = word;
+            }
+        });
+
+        if (frag.length > 0) {
+            ret.push(frag.trim());
+        }
+
+        return ret;
+    }
+
+    // The Chrome Speech engine will stop working unless you send it relatively short chunks of text. It's basically
+    // a time related thing where if it speaks for more than about 10 seconds at a time it hangs.
+    //
+    // todo-0: Currently we're loosing the punctuation when we can add the entire sentence and there is a way to use
+    // REGEX that includes the delimiters.
     fragmentizeToQueue = (text: string) => {
         this.queuedSpeech = [];
+        const ast = getAppState();
+        const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // first split into sentences.
         const sentences = text.split(/[.!?\n\r]+/);
 
         // scan each sentence
         sentences?.forEach(sentence => {
-            if (sentence.length < this.MAX_UTTERANCE_CHARS) {
+            // if this sentence itself is short enough just add to queue
+            if (sentence.length < maxChars) {
                 this.queuedSpeech.push(sentence);
             }
-            // if sentence is too long get it's fragments
+            // Otherwise we have to break the sentence apart.
             else {
-                const fragments = sentence.split(/[,;:]+/);
+                const fragments = sentence.split(/[,;]+/);
                 let fragMerge = "";
                 fragments?.forEach(frag => {
-                    // todo-1: one final improvement here would be to check if 'frag' itself
-                    // is longer than 300 chars, and if so break it up at separator words
-                    // like "and", "but", "or", "however", etc..., but I haven't ever seen this be needed
-                    // for for now the code is ok as is.
-
                     // if we can fit more onto the fragMerge then append.
-                    if (fragMerge.length + frag.length < this.MAX_UTTERANCE_CHARS) {
+                    if (fragMerge.length + frag.length < maxChars) {
                         fragMerge += frag;
                     }
-                    else {
+                    // if frag is short enough to make the new fragMerge do that.
+                    else if (frag.length < maxChars) {
                         if (fragMerge) {
                             this.queuedSpeech.push(fragMerge);
                         }
                         fragMerge = frag;
+                    }
+                    // else 'frag' would would make fragMerge too large, so we commit the current
+                    // fragMerge to the queue, first, and then queue by breaking the sentence by words.
+                    else {
+                        if (fragMerge) {
+                            this.queuedSpeech.push(fragMerge);
+                        }
+                        fragMerge = "";
+                        this.queuedSpeech = this.queuedSpeech.concat(this.fragmentBySpaces(frag));
                     }
                 });
 
@@ -218,6 +344,7 @@ export class SpeechEngine {
     stopSpeaking = () => {
         if (!this.tts) return;
         this.queuedSpeech = null;
+        this.ttsSpeakingTime = 0;
         this.tts.cancel();
         dispatch("speechEngineStateChange", s => {
             s.speechPaused = false;

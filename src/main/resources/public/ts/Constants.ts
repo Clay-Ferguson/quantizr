@@ -34,7 +34,8 @@ export class Constants {
     static TAB_THREAD: string = "threadTab";
     static TAB_SERVERINFO: string = "serverInfoTab";
     static TAB_IPFSVIEW: string = "ipfsFilesTab";
-    static TAB_LOG: string = "logTab"
+    static TAB_LOG: string = "logTab";
+    static TAB_TTS: string = "ttsTab";
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
 
@@ -83,4 +84,7 @@ export class Constants {
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
 
     static readonly ID_PREFIX_EDIT: string = "edit_";
+
+    static readonly LOCALDB_VOICE_INDEX: string = "voiceIndex";
+    static readonly LOCALDB_VOICE_RATE: string = "voiceRate";
 }

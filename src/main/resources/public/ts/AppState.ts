@@ -74,8 +74,12 @@ export class AppState {
     /* holds array of all parent items all the way up the tree (as far as user is authorized) */
     breadcrumbs: J.BreadcrumbInfo[];
 
+    speechText: string = null;
     speechPaused: boolean = false;
     speechSpeaking: boolean = false;
+    speechVoice: number = -1; // index into speech.voices array (-1 means not set)
+    speechRate: string = "normal"; // slow, normal, fast
+    ttsRan: boolean = false;
 
     userPrefs: J.UserPreferences = {
         editMode: false,

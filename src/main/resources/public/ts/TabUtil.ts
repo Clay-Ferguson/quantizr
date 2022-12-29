@@ -13,6 +13,7 @@ import { IPFSTab } from "./tabs/data/IPFSTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
+import { TTSTab } from "./tabs/data/TTSTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
@@ -87,6 +88,7 @@ export class TabUtil {
                 new TrendingTab(),
                 new ThreadTab(),
                 new ServerInfoTab(),
+                new TTSTab(),
                 new IPFSTab()
 
                 // this is throwing a react error, but we don't need this now anyaay

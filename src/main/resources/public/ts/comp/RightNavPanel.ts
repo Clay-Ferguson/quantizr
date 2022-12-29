@@ -140,24 +140,6 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const stopTextToSpeech = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-lg marginRight clickable",
-            onClick: S.speech.stopSpeaking,
-            title: "Stop Speaking Text"
-        }) : null;
-
-        const pauseTextToSpeech = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-pause fa-lg marginRight clickable",
-            onClick: S.speech.pauseSpeaking,
-            title: "Pause Speaking Text"
-        }) : null;
-
-        const resumeTextToSpeech = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-play fa-lg marginRight clickable",
-            onClick: S.speech.resumeSpeaking,
-            title: "Resume Speaking Text"
-        }) : null;
-
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -173,11 +155,8 @@ export class RightNavPanel extends Div {
                     }) : null,
 
                     new Div(null, { className: "bigMarginBottom" }, [
-                        textToSpeech || stopTextToSpeech || pauseTextToSpeech || resumeTextToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
+                        textToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
                             textToSpeech,
-                            stopTextToSpeech,
-                            resumeTextToSpeech,
-                            pauseTextToSpeech,
                             addNoteButton]) : null,
 
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
