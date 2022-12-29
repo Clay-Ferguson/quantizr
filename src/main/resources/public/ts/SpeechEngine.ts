@@ -15,7 +15,7 @@ export class SpeechEngine {
     // the ttsTimer (below) to activate a lot with "i think" can cause a slight speaker popping, --OR-- you can set this
     // value to like 200, and the popping will definitely not happen, but the sentence structure won't be perfect (meaning
     // the speaking voice may pause at awkward times every now and then)
-    MAX_UTTERANCE_CHARS: number = 500;
+    MAX_UTTERANCE_CHARS: number = 300;
 
     // add type-safety here (TS can find type easily)
     recognition: any = null;
@@ -23,8 +23,24 @@ export class SpeechEngine {
     tts: SpeechSynthesis = window.speechSynthesis;
     ttsTimer: any = null;
     ttsSpeakingTime: number = 0;
+    utter: SpeechSynthesisUtterance = null;
     speechActive: boolean = false;
     private callback: (text: string) => void;
+
+    constructor() {
+
+        // todo-0: put this in a function called 'initVoices'
+        const interval = setInterval(() => {
+            this.getVoices();
+            if (this.voices) {
+                clearInterval(interval);
+                console.log("tts loaded " + this.voices.length + " voices");
+            }
+            else {
+                console.log("can't get voices yet from tts. Still trying.");
+            }
+        }, 1000);
+    }
 
     // --------------------------------------------------------------
     // Speech Recognition
@@ -117,7 +133,26 @@ export class SpeechEngine {
     }
 
     speakText = async (text: string) => {
+        const ast = getAppState();
+
+        // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
+        // but it would be better to use a listener or something to know precisely when it's ready
+        // to start speaking again.
+        if (ast.speechSpeaking) {
+            this.stopSpeaking(text);
+            setTimeout(() => {
+                this.speakTextNow(text);
+            }, 1200);
+        }
+        else {
+            this.speakTextNow(text);
+        }
+    }
+
+    // you can pass null, and this method will repeat it's current text.
+    speakTextNow = async (text: string) => {
         if (!this.tts || !text) return;
+
         const interval = 1000;
 
         // create timer that runs forever and fixes the Chrome bug whenever speech has been
@@ -127,7 +162,7 @@ export class SpeechEngine {
             this.ttsTimer = setInterval(() => {
                 if (getAppState().speechSpeaking) {
                     this.ttsSpeakingTime += interval;
-                    if (this.ttsSpeakingTime > 9000) {
+                    if (this.ttsSpeakingTime > 10000) {
                         this.ttsSpeakingTime = 0;
                         this.tts.pause();
                         this.tts.resume();
@@ -150,9 +185,14 @@ export class SpeechEngine {
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
         // else make the claim.
         setTimeout(() => {
-            this.ttsSpeakingTime = 0;
-            this.tts.cancel();
+            this.getVoices();
+            if (!this.voices) {
+                console.warn("Voices not loaded. Can't speak text");
+                return;
+            }
+
             text = this.preProcessText(text);
+            this.queuedSpeech = [];
             this.fragmentizeToQueue(text);
 
             this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
@@ -193,11 +233,13 @@ export class SpeechEngine {
 
                     utter.onend = () => {
                         this.ttsSpeakingTime = 0;
+                        this.utter = null;
                         utterFunc();
                     }
                     // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
                     idx++;
                     this.ttsSpeakingTime = 0;
+                    this.utter = utter;
                     this.tts.speak(utter);
                 }
             };
@@ -284,18 +326,43 @@ export class SpeechEngine {
         return ret;
     }
 
+    fragmentizeToQueue = (text: string) => {
+        const ast = getAppState();
+        const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
+
+        // first split into sentences.
+        // todo-0: need to review the '+' in this REGEX and fully understand that.
+        const paragraphs = text.split(/[\n\r]+/);
+
+        // todo-0: verify that this works on text with NO newlines. It should.
+        paragraphs?.forEach(para => {
+            // if entire paragraph can fit
+            if (para.length < maxChars) {
+                this.queuedSpeech.push(para);
+            }
+            else {
+                this.fragmentizeSentencesToQueue(para);
+            }
+        });
+    }
+
     // The Chrome Speech engine will stop working unless you send it relatively short chunks of text. It's basically
     // a time related thing where if it speaks for more than about 10 seconds at a time it hangs.
     //
     // todo-0: Currently we're loosing the punctuation when we can add the entire sentence and there is a way to use
     // REGEX that includes the delimiters.
-    fragmentizeToQueue = (text: string) => {
-        this.queuedSpeech = [];
+    fragmentizeSentencesToQueue = (text: string) => {
         const ast = getAppState();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
+        // This is a dirty but clever hack to fix lots of initials like (J.F.K., or even John F. Kennedy)
+        // and make them not do any sentence breaks there.
+        for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+            text = text.replaceAll(char + ".", char + " ");
+        }
+
         // first split into sentences.
-        const sentences = text.split(/[.!?\n\r]+/);
+        const sentences = text.split(/[.!?]+/);
 
         // scan each sentence
         sentences?.forEach(sentence => {
@@ -339,9 +406,9 @@ export class SpeechEngine {
     }
 
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
-    // states correct, because TRUST ME at least on Chrome the states are unreliable
-
-    stopSpeaking = () => {
+    // states correct, because TRUST ME at least on Chrome the states are unreliable.
+    // If you know you're about to speak some new text you can pass in that text to update screen ASAP
+    stopSpeaking = (nextText?: string) => {
         if (!this.tts) return;
         this.queuedSpeech = null;
         this.ttsSpeakingTime = 0;
@@ -349,6 +416,9 @@ export class SpeechEngine {
         dispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
+            if (nextText) {
+                s.speechText = nextText;
+            }
             return s;
         });
     }

@@ -5,6 +5,7 @@ import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
+import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
@@ -36,24 +37,26 @@ export class TTSView extends AppTab {
         const ast = useAppState();
         this.attribs.className = this.getClass(ast);
 
-        const speakBtn = !ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-volume-up fa-lg marginRight clickable",
-            onClick: S.speech.speakClipboard,
-            title: "Text to Speech"
-        }) : null;
+        const speakBtn = new IconButton("fa-volume-up", "Speak Clipboard", {
+            onClick: S.speech.speakClipboard
+        }, "btn-primary", "off");
 
-        if (speakBtn) {
-            // make the entire tab area a drop target for speaking text.
-            S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
-                for (const item of evt.dataTransfer.items) {
-                    // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
-                    if (item.kind === "string") {
-                        item.getAsString(async (s) => S.speech.speakText(s));
-                        return;
-                    }
+        // make the entire tab area a drop target for speaking text.
+        S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
+            for (const item of evt.dataTransfer.items) {
+                // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
+                if (item.kind === "string") {
+                    item.getAsString(async (s) => S.speech.speakText(s));
+                    return;
                 }
-            });
-        }
+            }
+        });
+
+        const speakAgainBtn = ast.speechText && !ast.mobileMode ? new Icon({
+            className: "fa fa-refresh fa-lg marginRight clickable",
+            onClick: () => S.speech.speakText(ast.speechText),
+            title: "Restart from the top"
+        }) : null;
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
             className: "fa fa-stop fa-lg marginRight clickable",
@@ -95,7 +98,8 @@ export class TTSView extends AppTab {
             new Div(null, { className: "headingBar" }, [
                 new Div("Text-to-Speech", { className: "tabTitle" })
             ]),
-            new Div(null, { className: "float-end" }, [speakBtn, stopBtn, pauseBtn, resumeBtn]),
+            new Div("Drag-and-Drop text into this window to Speak It!", { className: "marginAll" }),
+            new Div(null, { className: "float-end" }, [stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
             new FlexRowLayout([
                 this.makeVoiceChooser(),
                 this.makeRateChooser()
