@@ -124,7 +124,9 @@ export class RightNavPanel extends Div {
 
         const textToSpeech = !ast.speechSpeaking && !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-lg marginRight clickable",
-            onClick: S.speech.speakClipboard,
+            // we use onMouseDown instead of onClick, because by the time onClick runs the focus
+            // is lost and selected text will be gone (or maybe it's a rerender), but this woks.
+            onMouseDown: S.speech.speakSelOrClipboard,
             title: "Text to Speech"
         }) : null;
 

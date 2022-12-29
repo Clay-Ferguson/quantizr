@@ -87,6 +87,12 @@ export class TTSView extends AppTab {
             heading = "Ready to Speak";
         }
 
+        // todo-0: instead of splitting here, we can let the SpeechEngine analyze text, and it also
+        // will be able to hand us PARAGRAPHs (or boundaries) so that we can basically create a DIV
+        // to hold all the content of each paragraph, and then inside that div have span tags that are simply
+        // "flow left to right". This means as the engine is playing the actual INDEX of the utterance
+        // will be able to correlate precisely to the ID on the SPAN for that exact spoken thing.
+        // This is MUCH better than relying on the browser text highlighing!!!
         const paragraphs = ast.speechText.split(/[\n\r]+/);
         const paraComps: CompIntf[] = [];
         // scan each sentence

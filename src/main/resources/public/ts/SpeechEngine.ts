@@ -118,6 +118,17 @@ export class SpeechEngine {
     // Text to Speech
     // --------------------------------------------------------------
 
+    speakSelOrClipboard = () => {
+        const sel = window.getSelection().toString();
+        if (sel) {
+            // when speaking our selected text we pass false so tab doesn't chagne.
+            this.speakText(sel, false);
+        }
+        else {
+            this.speakClipboard();
+        }
+    }
+
     speakClipboard = async () => {
         if (!this.tts) return;
         // hack to be able to know NOW that we are running speech, so isSpeaking() is already correct.
@@ -132,7 +143,7 @@ export class SpeechEngine {
         }
     }
 
-    speakText = async (text: string) => {
+    speakText = async (text: string, selectTab: boolean = true) => {
         const ast = getAppState();
 
         // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
@@ -141,16 +152,16 @@ export class SpeechEngine {
         if (ast.speechSpeaking) {
             this.stopSpeaking(text);
             setTimeout(() => {
-                this.speakTextNow(text);
+                this.speakTextNow(text, selectTab);
             }, 1200);
         }
         else {
-            this.speakTextNow(text);
+            this.speakTextNow(text, selectTab);
         }
     }
 
     // you can pass null, and this method will repeat it's current text.
-    speakTextNow = async (text: string) => {
+    speakTextNow = async (text: string, selectTab: boolean = true) => {
         if (!this.tts || !text) return;
 
         const interval = 1000;
@@ -179,7 +190,9 @@ export class SpeechEngine {
             return s;
         });
 
-        S.tabUtil.selectTab(C.TAB_TTS);
+        if (selectTab) {
+            S.tabUtil.selectTab(C.TAB_TTS);
+        }
 
         // only becasue speech has had bugs over the years and one bug report I saw claimed putting the call
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
@@ -220,7 +233,14 @@ export class SpeechEngine {
                 // If we have more stuff to speak
                 if (idx < this.queuedSpeech.length) {
                     const sayThis = this.queuedSpeech[idx];
-                    S.domUtil.highlightBrowserText(sayThis);
+
+                    // This can jump over to the Highlight panel, and also now that we have
+                    // the option to Speak the acuall hilighted text on the page we will need
+                    // some other way if we want to try to indicate to the user what's being read
+                    // in realtime.
+                    // todo-0: Here's the solution. We can already generate one div
+                    // S.domUtil.highlightBrowserText(sayThis);
+
                     utter = new SpeechSynthesisUtterance(sayThis);
 
                     if (ast.speechVoice >= 0) {
