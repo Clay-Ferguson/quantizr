@@ -252,7 +252,7 @@ export class SpeechEngine {
                     let sayThis = this.queuedSpeech[this.ttsIdx];
 
                     // if this is a paragraph break skip it, with idx++
-                    if (sayThis === C.TTS_BREAK) {
+                    while (sayThis === C.TTS_BREAK) {
                         // no more left?
                         if (++this.ttsIdx >= this.queuedSpeech.length) {
                             this.stopSpeaking();
@@ -309,6 +309,11 @@ export class SpeechEngine {
                     this.ttsSpeakingTime += interval;
                     if (this.ttsSpeakingTime > 10000) {
                         this.ttsSpeakingTime = 0;
+
+                        // todo-0: need to research this "fix" even more, because it appears even
+                        // pausing vor 10 seconds makes the TTS engine break, and if the only fix
+                        // to that breaking is a resume again, that means we simply CANNOT use pause.
+                        // Must stop and restart to simulate a pause
                         this.tts.pause();
                         this.tts.resume();
                     }
@@ -424,6 +429,8 @@ export class SpeechEngine {
         const paragraphs = text.split(/[\n\r]+/);
 
         paragraphs?.forEach(para => {
+            if (para.length < 3) return;
+
             // if entire paragraph can fit
             if (para.length < maxChars) {
                 this.queuedSpeech.push(para);
@@ -539,38 +546,58 @@ export class SpeechEngine {
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
-            console.log("cancel state change");
             return s;
         });
         this.tts.cancel();
     }
 
+    // Using "tts.cancel()" instead of "tts.pause()" to work around Chrome Bug
     pauseSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;
-        if (this.utter) {
-            this.utter.volume = 0;
-        }
 
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = true;
             return s;
         });
-        this.tts.pause();
+        this.tts.cancel();
     }
 
+    // Using "jumpToIdx()" instead of "tts.resume()" to work around Chrome Bug
     resumeSpeaking = async () => {
-        if (!this.tts) return;
-        this.ttsRunning = true;
-        if (this.utter) {
-            this.utter.volume = 1;
-        }
-
-        await promiseDispatch("speechEngineStateChange", s => {
-            s.speechPaused = false;
-            s.speechSpeaking = true;
-            return s;
-        });
-        this.tts.resume();
+        // we use ttsIdx-1 as out starting point because this index is always kind of 'pre-advanced'
+        // to the next utterance once a given utterance is stated.
+        this.jumpToIdx(this.ttsIdx-1);
     }
+
+    // DO NOT DELETE:
+    // These pauseSpeaking() and resumeSpeaking() functions works, until the "10 second Chrome Bug" but breaks
+    // it again in chrome. So if Chrome ever fixes their bug these two methods will be able to work because they
+    // ARE correct (if Chrome worked)
+    // pauseSpeaking = async () => {
+    //     if (!this.tts) return;
+    //     this.ttsRunning = false;
+    //     if (this.utter) {
+    //         this.utter.volume = 0;
+    //     }
+    //     await promiseDispatch("speechEngineStateChange", s => {
+    //         s.speechPaused = true;
+    //         return s;
+    //     });
+    //     this.tts.pause();
+    // }
+    // DO NOT DELETE:
+    // resumeSpeaking = async () => {
+    //     if (!this.tts) return;
+    //     this.ttsRunning = true;
+    //     if (this.utter) {
+    //         this.utter.volume = 1;
+    //     }
+    //     await promiseDispatch("speechEngineStateChange", s => {
+    //         s.speechPaused = false;
+    //         s.speechSpeaking = true;
+    //         return s;
+    //     });
+    //     this.tts.resume();
+    // }
 }
