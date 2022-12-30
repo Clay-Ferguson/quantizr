@@ -5,7 +5,6 @@ import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
-import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
@@ -34,9 +33,11 @@ export class TTSView extends AppTab {
         const ast = useAppState();
         this.attribs.className = this.getClass(ast);
 
-        const speakBtn = new IconButton("fa-volume-up", "Speak Clipboard", {
-            onClick: () => S.speech.speakClipboard()
-        }, "btn-primary", "off");
+        const speakBtn = !ast.mobileMode ? new Icon({
+            className: "fa fa-volume-up fa-2x clickable bigMarginTop",
+            onClick: S.speech.speakClipboard,
+            title: "Text-to-Speech: From Clipboard"
+        }) : null;
 
         // make the entire tab area a drop target for speaking text.
         S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
@@ -50,25 +51,25 @@ export class TTSView extends AppTab {
         });
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
-            className: "fa fa-refresh fa-lg marginRight clickable",
+            className: "fa fa-refresh fa-2x bigMarginRight bigMarginTop clickable",
             onClick: () => S.speech.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-lg marginRight clickable",
+            className: "fa fa-stop fa-2x bigMarginRight bigMarginTop clickable",
             onClick: () => S.speech.stopSpeaking(),
             title: "Stop Speaking Text"
         }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-pause fa-lg marginRight clickable",
+            className: "fa fa-pause fa-2x bigMarginRight bigMarginTop clickable",
             onClick: () => S.speech.pauseSpeaking(),
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-play fa-lg marginRight clickable",
+            className: "fa fa-play fa-2x bigMarginRight bigMarginTop clickable",
             onClick: () => S.speech.resumeSpeaking(),
             title: "Resume Speaking Text"
         }) : null;
@@ -116,9 +117,9 @@ export class TTSView extends AppTab {
 
         this.setChildren([
             new Div(null, { className: "headingBar" }, [
+                new Div("Tip: Drag-and-Drop text to this panel!", { className: "marginAll float-end" }),
                 new Div("Text-to-Speech", { className: "tabTitle" })
             ]),
-            new Div("Drag-and-Drop text into this window to Speak It!", { className: "marginAll" }),
             new Div(null, { className: "float-end" }, [stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
             new FlexRowLayout([
                 this.makeVoiceChooser(),

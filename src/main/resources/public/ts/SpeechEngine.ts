@@ -129,17 +129,18 @@ export class SpeechEngine {
         }, 1000);
     }
 
-    speakSelOrClipboard = () => {
-        // todo-0: be sure to document how you can speak highlighted text.
-        const sel = window.getSelection().toString();
-        if (sel) {
-            // when speaking our selected text we pass false so tab doesn't chagne.
-            this.speakText(sel, false);
-        }
-        else {
-            this.speakClipboard();
-        }
-    }
+    // DO NOT DELETE. I'm not using this because i've seen it bizarrely claim my entire Main Menu was the
+    // selected text which is DEFINITELY wrong, so I'm not sure how this is happening, and we can just be simple
+    // and ONLY play from the clipboard or Drag-and-Drop. That simple rule is easier for users to remember too.
+    // speakSelOrClipboard = () => {
+    //     const sel = window.getSelection().toString();
+    //     if (sel) {
+    //         this.speakText(sel);
+    //     }
+    //     else {
+    //         this.speakClipboard();
+    //     }
+    // }
 
     speakClipboard = async () => {
         if (!this.tts) return;
@@ -171,7 +172,7 @@ export class SpeechEngine {
     }
 
     jumpToIdx = (idx: number) => {
-        if (this.queuedSpeech?.length > 0 && idx >= 0 && idx < this.queuedSpeech?.length) {
+        if (this.queuedSpeech?.length > 1 && idx >= 0 && idx < this.queuedSpeech?.length) {
 
             this.stopSpeaking();
             this.highlightByIndex(idx);
@@ -529,6 +530,10 @@ export class SpeechEngine {
     stopSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;
+        if (this.utter) {
+            this.utter.volume = 0;
+        }
+        this.removeHighlight();
         this.ttsSpeakingTime = 0;
 
         await promiseDispatch("speechEngineStateChange", s => {
@@ -538,12 +543,14 @@ export class SpeechEngine {
             return s;
         });
         this.tts.cancel();
-        this.removeHighlight();
     }
 
     pauseSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;
+        if (this.utter) {
+            this.utter.volume = 0;
+        }
 
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = true;
@@ -555,6 +562,9 @@ export class SpeechEngine {
     resumeSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = true;
+        if (this.utter) {
+            this.utter.volume = 1;
+        }
 
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;

@@ -76,7 +76,9 @@ export class NodeCompMainNode extends Div {
             }
 
             this.attribs.nid = node.id;
-            this.attribs.onClick = S.nav.clickTreeNode;
+
+            // Don't use onClick, because it's breaks browser selection text
+            this.attribs.onMouseDown = S.nav.clickTreeNode;
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;

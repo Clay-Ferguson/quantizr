@@ -767,6 +767,8 @@ export class Util {
         }
     }
 
+    // todo-1: We need to accumulate these alerts into a list that's only displayed if the user clicks a
+    // notification icon at the top of page. Pull them up in a listbox dialog.
     showPageMessage = (message: string) => {
         // This outter timer is a very slight hack because when the page re-renders currently it resets pageMessage, so we sneak in
         // here behind that to set this.
