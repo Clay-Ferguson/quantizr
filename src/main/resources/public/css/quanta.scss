@@ -279,7 +279,14 @@ td {
     font-size: large;
     padding-top: 4px;
     padding-bottom: 4px;
+    cursor: pointer;
 }
+
+// Spend 45mins trying to make this work. Nothing shows up. I'm giving up for now. Not worth the effort. This \
+// idea was really just to help people realize they can click anyway.
+// .tss-span:hover {
+//     border: 1px dotted gray !important;
+// }
 
 .tts-hlt {
     background: blue;

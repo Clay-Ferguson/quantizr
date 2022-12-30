@@ -1,4 +1,4 @@
-import { dispatch, getAppState, promiseDispatch, useAppState } from "../AppContext";
+import { dispatch, getAppState, useAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
@@ -17,20 +17,16 @@ export class TTSView extends AppTab {
     constructor(data: TabIntf) {
         super(data);
         data.inst = this;
+    }
 
-        // todo-0: probably need to move this logic into speech engine.
-        const ast = getAppState();
-        if (ast.speechVoice < 0) {
-            const func = async () => {
-                const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
-                const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
-                promiseDispatch("Selecting Voice", (s) => {
-                    s.speechVoice = voice || 0;
-                    s.speechRate = rate || "normal";
-                    return s;
-                });
+    spanClick = (evt: Event) => {
+        let clickId = S.domUtil.getPropFromDom(evt, "id");
+        if (clickId && clickId.startsWith("tts")) {
+            clickId = clickId.substring(3);
+            const idx = parseInt(clickId);
+            if (idx >= 0) {
+                S.speech.jumpToIdx(idx);
             }
-            func();
         }
     }
 
@@ -55,7 +51,7 @@ export class TTSView extends AppTab {
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
             className: "fa fa-refresh fa-lg marginRight clickable",
-            onClick: () => S.speech.speakText(null, false, true),
+            onClick: () => S.speech.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
@@ -105,6 +101,7 @@ export class TTSView extends AppTab {
                 }
                 else {
                     curDiv.addChild(new Span(utter, {
+                        onClick: this.spanClick, // <--- special function KNOWS how to work with no args
                         id: "tts" + idx,
                         className: "tts-span" + (S.speech.ttsHighlightIdx === idx ? " tts-hlt" : "")
                     }));

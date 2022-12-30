@@ -25,9 +25,10 @@ export class SpeechEngine {
 
     tts: SpeechSynthesis = window.speechSynthesis;
     ttsTimer: any = null;
+    ttsIdx: number = 0;
 
     // we need this to have instantly fast (independent of AppState) way to detect
-    // if we are tunning speech
+    // if we are tunning speech. ttsRunning means it's actively speaking now.
     ttsRunning: boolean = false;
     ttsSpeakingTime: number = 0;
     utter: SpeechSynthesisUtterance = null;
@@ -152,7 +153,7 @@ export class SpeechEngine {
         }
     }
 
-    speakText = async (text: string, selectTab: boolean = true, replaySame: boolean = false) => {
+    speakText = async (text: string, selectTab: boolean = true, replayFromIdx: number = -1) => {
         const ast = getAppState();
 
         // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
@@ -161,17 +162,31 @@ export class SpeechEngine {
         if (ast.speechSpeaking) {
             this.stopSpeaking();
             setTimeout(() => {
-                this.speakTextNow(text, selectTab, replaySame);
+                this.speakTextNow(text, selectTab, replayFromIdx);
             }, 1200);
         }
         else {
-            this.speakTextNow(text, selectTab, replaySame);
+            this.speakTextNow(text, selectTab, replayFromIdx);
+        }
+    }
+
+    jumpToIdx = (idx: number) => {
+        if (this.queuedSpeech?.length > 0 && idx >= 0 && idx < this.queuedSpeech?.length) {
+
+            this.stopSpeaking();
+            this.highlightByIndex(idx);
+
+            // Timeout to give the engine time to stop what it's doing. We could use PubSub, or a faster
+            // polling to make this timer be a bit safer, in case 500ms isn't ok on slower machines.
+            setTimeout(() => {
+                this.speakTextNow(null, false, idx);
+            }, 500);
         }
     }
 
     // you can pass null, and this method will repeat it's current text.
-    speakTextNow = async (text: string, selectTab: boolean = true, replaySame: boolean = false) => {
-        if (!this.tts || (!text && !replaySame)) return;
+    speakTextNow = async (text: string, selectTab: boolean = true, replayFromIdx: number = -1) => {
+        if (!this.tts || (!text && replayFromIdx === -1)) return;
         this.ttsRunning = true;
         this.createTtsTimer();
 
@@ -189,10 +204,19 @@ export class SpeechEngine {
                 return;
             }
 
-            if (!replaySame) {
+            // Just use 0 idx if the one passed in is out of range somehow.
+            if (replayFromIdx >= this.queuedSpeech?.length) {
+                replayFromIdx = 0;
+            };
+
+            if (replayFromIdx === -1) {
                 text = this.preProcessText(text);
                 this.queuedSpeech = [];
                 this.fragmentizeToQueue(text);
+                this.ttsIdx = 0;
+            }
+            else {
+                this.ttsIdx = replayFromIdx;
             }
 
             await promiseDispatch("speechEngineStateChange", s => {
@@ -208,7 +232,6 @@ export class SpeechEngine {
                 return;
             }
 
-            let idx = 0;
             let utter: SpeechSynthesisUtterance = null;
 
             /* NOTE: This utterFunc gets used over and over in a daisy chain type way to process the
@@ -218,25 +241,25 @@ export class SpeechEngine {
                 const ast = getAppState();
 
                 // If we're out of stuff to speak
-                if (idx >= this.queuedSpeech.length) {
+                if (this.ttsIdx >= this.queuedSpeech.length) {
                     this.stopSpeaking();
                     return;
                 }
 
                 // If we have more stuff to speak
-                if (idx < this.queuedSpeech.length) {
-                    let sayThis = this.queuedSpeech[idx];
+                if (this.ttsIdx < this.queuedSpeech.length) {
+                    let sayThis = this.queuedSpeech[this.ttsIdx];
 
                     // if this is a paragraph break skip it, with idx++
                     if (sayThis === C.TTS_BREAK) {
                         // no more left?
-                        if (++idx >= this.queuedSpeech.length) {
+                        if (++this.ttsIdx >= this.queuedSpeech.length) {
                             this.stopSpeaking();
                             return;
                         }
 
                         // keep going, with this sayThis.
-                        sayThis = this.queuedSpeech[idx];
+                        sayThis = this.queuedSpeech[this.ttsIdx];
                     }
 
                     utter = new SpeechSynthesisUtterance(sayThis);
@@ -259,8 +282,8 @@ export class SpeechEngine {
                     // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
                     this.ttsSpeakingTime = 0;
                     this.utter = utter;
-                    this.highlightByIndex(idx);
-                    idx++;
+                    this.highlightByIndex(this.ttsIdx);
+                    this.ttsIdx++;
                     this.tts.speak(utter);
                 }
             };
