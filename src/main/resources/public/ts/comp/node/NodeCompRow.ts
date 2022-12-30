@@ -61,8 +61,7 @@ export class NodeCompRow extends Div {
 
         if (this.allowHeaders) {
             this.attribs.nid = this.node.id;
-             // Don't use onClick, because it's breaks browser selection text
-            this.attribs.onMouseDown = S.nav.clickTreeNode;
+            this.attribs.onClick = S.nav.clickTreeNode;
         }
 
         let insertInlineButton = null;
