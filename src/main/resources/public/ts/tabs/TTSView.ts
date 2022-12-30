@@ -8,7 +8,6 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
-import { Spinner } from "../comp/core/Spinner";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
@@ -19,7 +18,7 @@ export class TTSView extends AppTab {
         super(data);
         data.inst = this;
 
-        // probably just need to move this logic into speech engine.
+        // todo-0: probably need to move this logic into speech engine.
         const ast = getAppState();
         if (ast.speechVoice < 0) {
             const func = async () => {
@@ -118,8 +117,6 @@ export class TTSView extends AppTab {
             }
         }
 
-        const content = paraComps ? paraComps : [new Spinner()];
-
         this.setChildren([
             new Div(null, { className: "headingBar" }, [
                 new Div("Text-to-Speech", { className: "tabTitle" })
@@ -130,10 +127,11 @@ export class TTSView extends AppTab {
                 this.makeVoiceChooser(),
                 this.makeRateChooser()
             ]),
-            new Div(null, { className: "speech-text-area" }, [
-                new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),
-                ...content
-            ])
+            paraComps?.length > 0
+                ? new Div(null, { className: "speech-text-area" }, [
+                    new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),
+                    ...paraComps
+                ]) : null
         ]);
     }
 

@@ -16,12 +16,14 @@ export class TTSTab implements TabIntf<any> {
     topmostVisibleElmId: string = null;
 
     static inst: TTSTab = null;
+    static ttsTabSelected: boolean = false;
+
     constructor() {
         TTSTab.inst = this;
     }
 
     isVisible = (ast: AppState) => {
-        return ast.ttsRan;
+        return ast.ttsRan || TTSTab.ttsTabSelected;
     };
 
     constructView = (data: TabIntf) => new TTSView(data);

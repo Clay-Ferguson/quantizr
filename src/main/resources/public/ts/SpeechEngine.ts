@@ -172,27 +172,8 @@ export class SpeechEngine {
     // you can pass null, and this method will repeat it's current text.
     speakTextNow = async (text: string, selectTab: boolean = true, replaySame: boolean = false) => {
         if (!this.tts || (!text && !replaySame)) return;
-        const interval = 1000;
         this.ttsRunning = true;
-
-        // todo-0: put this timer create in a function.
-        // create timer that runs forever and fixes the Chrome bug whenever speech has been
-        // running more than ten seconds.
-        if (!this.ttsTimer) {
-            // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
-            this.ttsTimer = setInterval(() => {
-                if (!this.ttsRunning) return;
-                const ast = getAppState();
-                if (ast.speechSpeaking && !ast.speechPaused) {
-                    this.ttsSpeakingTime += interval;
-                    if (this.ttsSpeakingTime > 10000) {
-                        this.ttsSpeakingTime = 0;
-                        this.tts.pause();
-                        this.tts.resume();
-                    }
-                }
-            }, interval);
-        }
+        this.createTtsTimer();
 
         if (selectTab) {
             S.tabUtil.selectTab(C.TAB_TTS);
@@ -289,6 +270,27 @@ export class SpeechEngine {
             // the most recently completed utterance
             utterFunc();
         }, 100);
+    }
+
+    createTtsTimer = () => {
+        // create timer that runs forever and fixes the Chrome bug whenever speech has been
+        // running more than ten seconds.
+        if (!this.ttsTimer) {
+            const interval = 1000;
+            // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
+            this.ttsTimer = setInterval(() => {
+                if (!this.ttsRunning) return;
+                const ast = getAppState();
+                if (ast.speechSpeaking && !ast.speechPaused) {
+                    this.ttsSpeakingTime += interval;
+                    if (this.ttsSpeakingTime > 10000) {
+                        this.ttsSpeakingTime = 0;
+                        this.tts.pause();
+                        this.tts.resume();
+                    }
+                }
+            }, interval);
+        }
     }
 
     removeHighlight = () => {

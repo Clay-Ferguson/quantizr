@@ -28,6 +28,7 @@ import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { TTSTab } from "./tabs/data/TTSTab";
 
 export class MenuPanel extends Div {
     static activeMenu: Set<string> = new Set<string>();
@@ -142,6 +143,14 @@ export class MenuPanel extends Div {
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(getAppState(null));
     static export = () => S.edit.openExportDlg(getAppState(null));
     static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
+
+    static openTtsTab = () => {
+        // this ttsTabSelected var is a quick hack to make tab show up, but we really need common
+        // forceSelectTab for thsi purpose (or maybe selectTab SHOULD naturally force things? probably so)
+        TTSTab.ttsTabSelected = true;
+        S.tabUtil.selectTab(C.TAB_TTS);
+    };
+
     static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
     static mouseEffects = () => { S.domUtil.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, getAppState(null));
@@ -254,6 +263,7 @@ export class MenuPanel extends Div {
                 new MenuItem("My Posts", MenuPanel.openPostsNode),
                 ast.isAdminUser ? new MenuItem("Users Node", MenuPanel.openUsersNode) : null,
                 new MenuItemSeparator(),
+                new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
                 new MenuItem("Notes", MenuPanel.openNotesNode),
                 new MenuItem("Exports", MenuPanel.openExportsNode)
