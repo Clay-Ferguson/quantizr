@@ -1,12 +1,15 @@
-import { S } from "./Singletons";
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { getAppState, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
+import { S } from "./Singletons";
 
 declare let webkitSpeechRecognition: any;
 declare let SpeechRecognition: any;
 
 export class SpeechEngine {
-    queuedSpeech: string[] = null;
+    // we keep this array here and not in AppState, because changes to this will never need to directly
+    // trigger a DOM change.
+    public queuedSpeech: string[] = null;
+
     private voices: SpeechSynthesisVoice[] = null;
 
     // this is a guess (and recommendation from online sources) at how long a sentence we can get away with
@@ -22,24 +25,19 @@ export class SpeechEngine {
 
     tts: SpeechSynthesis = window.speechSynthesis;
     ttsTimer: any = null;
+
+    // we need this to have instantly fast (independent of AppState) way to detect
+    // if we are tunning speech
+    ttsRunning: boolean = false;
     ttsSpeakingTime: number = 0;
     utter: SpeechSynthesisUtterance = null;
+
     speechActive: boolean = false;
+    ttsHighlightIdx: number = 0;
     private callback: (text: string) => void;
 
     constructor() {
-
-        // todo-0: put this in a function called 'initVoices'
-        const interval = setInterval(() => {
-            this.getVoices();
-            if (this.voices) {
-                clearInterval(interval);
-                console.log("tts loaded " + this.voices.length + " voices");
-            }
-            else {
-                console.log("can't get voices yet from tts. Still trying.");
-            }
-        }, 1000);
+        this.initVoices();
     }
 
     // --------------------------------------------------------------
@@ -75,9 +73,7 @@ export class SpeechEngine {
         this.recognition.onend = () => {
             // console.log("speech onEnd.");
             if (this.speechActive) {
-                // todo-0: this was a bug. Check for similar bugs there you have "() => functionName" because that
-                // won't call the function
-                setTimeout(this.recognition.start, 250);
+                setTimeout(() => this.recognition.start(), 250);
             }
         };
 
@@ -118,6 +114,20 @@ export class SpeechEngine {
     // Text to Speech
     // --------------------------------------------------------------
 
+    initVoices = () => {
+        // need to google "how to verify all voices loaded"
+        const interval = setInterval(() => {
+            this.getVoices();
+            if (this.voices) {
+                clearInterval(interval);
+                console.log("tts loaded " + this.voices.length + " voices");
+            }
+            else {
+                console.log("can't get voices yet from tts. Still trying.");
+            }
+        }, 1000);
+    }
+
     speakSelOrClipboard = () => {
         const sel = window.getSelection().toString();
         if (sel) {
@@ -131,8 +141,6 @@ export class SpeechEngine {
 
     speakClipboard = async () => {
         if (!this.tts) return;
-        // hack to be able to know NOW that we are running speech, so isSpeaking() is already correct.
-        this.queuedSpeech = [];
 
         const clipTxt = await (navigator as any)?.clipboard?.readText();
         if (clipTxt) {
@@ -163,15 +171,17 @@ export class SpeechEngine {
     // you can pass null, and this method will repeat it's current text.
     speakTextNow = async (text: string, selectTab: boolean = true) => {
         if (!this.tts || !text) return;
-
         const interval = 1000;
+        this.ttsRunning = true;
 
         // create timer that runs forever and fixes the Chrome bug whenever speech has been
         // running more than ten seconds.
         if (!this.ttsTimer) {
             // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
             this.ttsTimer = setInterval(() => {
-                if (getAppState().speechSpeaking) {
+                if (!this.ttsRunning) return;
+                const ast = getAppState();
+                if (ast.speechSpeaking && !ast.speechPaused) {
                     this.ttsSpeakingTime += interval;
                     if (this.ttsSpeakingTime > 10000) {
                         this.ttsSpeakingTime = 0;
@@ -182,14 +192,6 @@ export class SpeechEngine {
             }, interval);
         }
 
-        await promiseDispatch("speechEngineStateChange", s => {
-            s.speechText = text;
-            s.speechPaused = false;
-            s.speechSpeaking = true;
-            s.ttsRan = true;
-            return s;
-        });
-
         if (selectTab) {
             S.tabUtil.selectTab(C.TAB_TTS);
         }
@@ -197,7 +199,7 @@ export class SpeechEngine {
         // only becasue speech has had bugs over the years and one bug report I saw claimed putting the call
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
         // else make the claim.
-        setTimeout(() => {
+        setTimeout(async () => {
             this.getVoices();
             if (!this.voices) {
                 console.warn("Voices not loaded. Can't speak text");
@@ -208,38 +210,50 @@ export class SpeechEngine {
             this.queuedSpeech = [];
             this.fragmentizeToQueue(text);
 
+            await promiseDispatch("speechEngineStateChange", s => {
+                s.speechText = text;
+                s.speechPaused = false;
+                s.speechSpeaking = true;
+                s.ttsRan = true;
+                return s;
+            });
+
             this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
-            if (this.queuedSpeech.length === 0) return;
+            if (this.queuedSpeech.length === 0) {
+                this.queuedSpeech = null;
+                return;
+            }
 
             let idx = 0;
             let utter: SpeechSynthesisUtterance = null;
+
+            /* NOTE: This utterFunc gets used over and over in a daisy chain type way to process the
+            next utterance every time the previous one completes. */
             const utterFunc = () => {
+                if (!this.ttsRunning || !this.queuedSpeech) return;
                 const ast = getAppState();
-                if (!this.queuedSpeech) return;
 
                 // If we're out of stuff to speak
                 if (idx >= this.queuedSpeech.length) {
-                    this.queuedSpeech = null;
-                    this.ttsSpeakingTime = 0;
-                    this.tts.cancel();
-                    dispatch("speechEngineStateChange", s => {
-                        s.speechPaused = false;
-                        s.speechSpeaking = false;
-                        return s;
-                    });
+                    this.stopSpeaking();
                     return;
                 }
 
                 // If we have more stuff to speak
                 if (idx < this.queuedSpeech.length) {
-                    const sayThis = this.queuedSpeech[idx];
+                    let sayThis = this.queuedSpeech[idx];
 
-                    // This can jump over to the Highlight panel, and also now that we have
-                    // the option to Speak the acuall hilighted text on the page we will need
-                    // some other way if we want to try to indicate to the user what's being read
-                    // in realtime.
-                    // todo-0: Here's the solution. We can already generate one div
-                    // S.domUtil.highlightBrowserText(sayThis);
+                    // if this is a paragraph break skip it, with idx++
+                    if (sayThis === C.TTS_BREAK) {
+                        // no more left?
+                        if (++idx >= this.queuedSpeech.length) {
+                            this.stopSpeaking();
+                            return;
+                        }
+
+                        // keep going, with this sayThis.
+                        sayThis = this.queuedSpeech[idx];
+                    }
 
                     utter = new SpeechSynthesisUtterance(sayThis);
 
@@ -254,19 +268,42 @@ export class SpeechEngine {
                     utter.onend = () => {
                         this.ttsSpeakingTime = 0;
                         this.utter = null;
+                        if (!this.ttsRunning) return;
                         utterFunc();
                     }
+                    if (!this.ttsRunning) return;
                     // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
-                    idx++;
                     this.ttsSpeakingTime = 0;
                     this.utter = utter;
+                    this.highlightByIndex(idx);
+                    idx++;
                     this.tts.speak(utter);
                 }
             };
+            this.ttsRunning = true;
             // Get started by uttering idx=0, and the rest of the sentences will follow
             // in a chain reaction every time utterFunc gets called via the 'onend' listener
             utterFunc();
         }, 100);
+    }
+
+    removeHighlight = () => {
+        if (this.ttsHighlightIdx !== -1) {
+            const lastElm = document.getElementById("tts" + this.ttsHighlightIdx);
+            lastElm?.classList.remove("tts-hlt");
+            this.ttsHighlightIdx = -1; // keep this consistent just for best practice
+        }
+    }
+
+    highlightByIndex = (idx: number) => {
+        // remove any previous highlighting
+        this.removeHighlight();
+
+        const elm = document.getElementById("tts" + idx);
+        if (elm) {
+            elm.classList.add("tts-hlt");
+        }
+        this.ttsHighlightIdx = idx;
     }
 
     parseRateValue = (rate: string) => {
@@ -295,9 +332,14 @@ export class SpeechEngine {
     getVoices = () => {
         if (this.voices) return this.voices;
         this.voices = this.tts.getVoices();
+        this.tts.onvoiceschanged = () => {
+            this.voices = this.tts.getVoices();
+            console.log("VoicesChanged ran. Now we have " + this.voices?.length + " voices.");
+        };
     }
 
     preProcessText = (text: string): string => {
+        if (!text) return;
         // engine will SAY the 'quote' if you leave this here.
         text = text.replaceAll(".\"", ".");
         text = text.replaceAll(".'", ".");
@@ -354,7 +396,6 @@ export class SpeechEngine {
         // todo-0: need to review the '+' in this REGEX and fully understand that.
         const paragraphs = text.split(/[\n\r]+/);
 
-        // todo-0: verify that this works on text with NO newlines. It should.
         paragraphs?.forEach(para => {
             // if entire paragraph can fit
             if (para.length < maxChars) {
@@ -363,14 +404,16 @@ export class SpeechEngine {
             else {
                 this.fragmentizeSentencesToQueue(para);
             }
+
+            // This is a harmless trick/hack where we avoid a significant complexity jump by doing something
+            // slightly anti-patternish, but is good in this case, for now
+            this.queuedSpeech.push(C.TTS_BREAK);
         });
     }
 
     // The Chrome Speech engine will stop working unless you send it relatively short chunks of text. It's basically
     // a time related thing where if it speaks for more than about 10 seconds at a time it hangs.
-    //
-    // todo-0: Currently we're loosing the punctuation when we can add the entire sentence and there is a way to use
-    // REGEX that includes the delimiters.
+    // See the setInterval function in this class for more on the tradeoffs/workarounds related to this.
     fragmentizeSentencesToQueue = (text: string) => {
         const ast = getAppState();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
@@ -382,21 +425,50 @@ export class SpeechEngine {
         }
 
         // first split into sentences.
-        const sentences = text.split(/[.!?]+/);
+        // DO NOT DELETE (this example is how to NOT return punctuation)
+        // const sentences = text.split(/[.!?;]+/);
+        // todo-0: some example have a 'g' after the final '/' in the parameter. What's that?
+        // NOTE: I'm using the REGEX version with no '+' at the end.
+        const sentences = text.split(/(?=[.!?;])|(?<=[.!?;])/);
 
         // scan each sentence
         sentences?.forEach(sentence => {
+
+            // Handle Punctuation
+            // it's harmless to always tack on a single character to the most recent chunk, and
+            // this IS how we get punctuation in at end of sentences (.!?;)
+            if (sentence.length === 1) {
+                if (this.queuedSpeech.length > 0) {
+                    this.queuedSpeech[this.queuedSpeech.length - 1] += sentence;
+                    return;
+                }
+                // Yes right here, we fall thru and don't return. Not a bug. Don't want to loose any chars.
+            }
+
             // if this sentence itself is short enough just add to queue
             if (sentence.length < maxChars) {
                 this.queuedSpeech.push(sentence);
             }
             // Otherwise we have to break the sentence apart.
             else {
-                const fragments = sentence.split(/[,;]+/);
+                const fragments = sentence.split(/[,]+/);
                 let fragMerge = "";
                 fragments?.forEach(frag => {
+                    // handle the comma delimiter
+                    if (sentence.length === 1) {
+
+                        // if we're building a fragMerge, add delimiter in
+                        if (fragMerge.length > 0) {
+                            fragMerge += frag;
+                        }
+                        // otherwise et put the comma onto the end of the last known content
+                        else if (this.queuedSpeech.length > 0) {
+                            this.queuedSpeech[this.queuedSpeech.length - 1] += sentence;
+                            return;
+                        }
+                    }
                     // if we can fit more onto the fragMerge then append.
-                    if (fragMerge.length + frag.length < maxChars) {
+                    else if (fragMerge.length + frag.length < maxChars) {
                         fragMerge += frag;
                     }
                     // if frag is short enough to make the new fragMerge do that.
@@ -428,38 +500,44 @@ export class SpeechEngine {
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
     // states correct, because TRUST ME at least on Chrome the states are unreliable.
     // If you know you're about to speak some new text you can pass in that text to update screen ASAP
-    stopSpeaking = (nextText?: string) => {
+    stopSpeaking = async (nextText?: string) => {
         if (!this.tts) return;
-        this.queuedSpeech = null;
+        this.ttsRunning = false;
         this.ttsSpeakingTime = 0;
-        this.tts.cancel();
-        dispatch("speechEngineStateChange", s => {
+
+        await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
             if (nextText) {
                 s.speechText = nextText;
             }
+            console.log("cancel state change");
             return s;
         });
+        this.tts.cancel();
+        this.removeHighlight();
     }
 
-    pauseSpeaking = () => {
+    pauseSpeaking = async () => {
         if (!this.tts) return;
-        this.tts.pause();
-        dispatch("speechEngineStateChange", s => {
+        this.ttsRunning = false;
+
+        await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = true;
-            s.speechSpeaking = true;
             return s;
         });
+        this.tts.pause();
     }
 
-    resumeSpeaking = () => {
+    resumeSpeaking = async () => {
         if (!this.tts) return;
-        this.tts.resume();
-        dispatch("speechEngineStateChange", s => {
+        this.ttsRunning = true;
+
+        await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = true;
             return s;
         });
+        this.tts.resume();
     }
 }

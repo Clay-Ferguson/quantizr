@@ -7,6 +7,8 @@ import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
+import { Span } from "../comp/core/Span";
+import { Spinner } from "../comp/core/Spinner";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
@@ -38,7 +40,7 @@ export class TTSView extends AppTab {
         this.attribs.className = this.getClass(ast);
 
         const speakBtn = new IconButton("fa-volume-up", "Speak Clipboard", {
-            onClick: S.speech.speakClipboard
+            onClick: () => S.speech.speakClipboard()
         }, "btn-primary", "off");
 
         // make the entire tab area a drop target for speaking text.
@@ -60,19 +62,19 @@ export class TTSView extends AppTab {
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
             className: "fa fa-stop fa-lg marginRight clickable",
-            onClick: S.speech.stopSpeaking,
+            onClick: () => S.speech.stopSpeaking(),
             title: "Stop Speaking Text"
         }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-pause fa-lg marginRight clickable",
-            onClick: S.speech.pauseSpeaking,
+            onClick: () => S.speech.pauseSpeaking(),
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-play fa-lg marginRight clickable",
-            onClick: S.speech.resumeSpeaking,
+            onClick: () => S.speech.resumeSpeaking(),
             title: "Resume Speaking Text"
         }) : null;
 
@@ -87,18 +89,36 @@ export class TTSView extends AppTab {
             heading = "Ready to Speak";
         }
 
-        // todo-0: instead of splitting here, we can let the SpeechEngine analyze text, and it also
-        // will be able to hand us PARAGRAPHs (or boundaries) so that we can basically create a DIV
-        // to hold all the content of each paragraph, and then inside that div have span tags that are simply
-        // "flow left to right". This means as the engine is playing the actual INDEX of the utterance
-        // will be able to correlate precisely to the ID on the SPAN for that exact spoken thing.
-        // This is MUCH better than relying on the browser text highlighing!!!
-        const paragraphs = ast.speechText.split(/[\n\r]+/);
-        const paraComps: CompIntf[] = [];
-        // scan each sentence
-        paragraphs?.forEach(p => {
-            paraComps.push(new Div(p, { className: "tts-paragraph" }));
-        });
+        let paraComps: CompIntf[];
+        if (S.speech.queuedSpeech?.length > 0) {
+            paraComps = [];
+            let curDiv = new Div(null, { className: "tts-paragraph" });
+
+            let idx = 0;
+            // scan each utterance
+            S.speech.queuedSpeech.forEach(utter => {
+                // if we hit a paragraph break
+                if (utter === C.TTS_BREAK) {
+                    if (curDiv.hasChildren()) {
+                        paraComps.push(curDiv);
+                    }
+                    curDiv = new Div(null, { className: "tts-paragraph" });
+                }
+                else {
+                    curDiv.addChild(new Span(utter, {
+                        id: "tts" + idx,
+                        className: "tts-span" + (S.speech.ttsHighlightIdx === idx ? " tts-hlt" : "")
+                    }));
+                }
+                idx++;
+            });
+
+            if (curDiv.hasChildren()) {
+                paraComps.push(curDiv);
+            }
+        }
+
+        const content = paraComps ? paraComps : [new Spinner()];
 
         this.setChildren([
             new Div(null, { className: "headingBar" }, [
@@ -112,7 +132,7 @@ export class TTSView extends AppTab {
             ]),
             new Div(null, { className: "speech-text-area" }, [
                 new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),
-                ...paraComps
+                ...content
             ])
         ]);
     }

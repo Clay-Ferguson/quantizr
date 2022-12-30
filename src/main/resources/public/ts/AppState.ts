@@ -75,6 +75,7 @@ export class AppState {
     breadcrumbs: J.BreadcrumbInfo[];
 
     speechText: string = null;
+
     speechPaused: boolean = false;
     speechSpeaking: boolean = false;
     speechVoice: number = -1; // index into speech.voices array (-1 means not set)

@@ -13,6 +13,8 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
+// todo-0: Can I use these large icons on the TTSView?
+
 /**
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing
  * the collection of the time-offsets of the begin/end array of commercial segments has not yet been implemented. Also I decided

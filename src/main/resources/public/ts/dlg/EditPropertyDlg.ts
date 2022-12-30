@@ -10,7 +10,7 @@ import { Validator, ValidatorRuleName } from "../Validator";
 
 /*
  * Property Editor Dialog (Edits Node Properties)
- * todo-0: Rename this to EditProperyNameDlg
+ * todo-1: Rename this to EditProperyNameDlg
  */
 export class EditPropertyDlg extends DialogBase {
 

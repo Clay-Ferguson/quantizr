@@ -9,7 +9,7 @@ import { Comp } from "./base/Comp";
 import * as J from "../JavaIntf";
 import { Checkbox } from "./core/Checkbox";
 
-// todo-0: This really needs to be part of the fullscreen viewer classes themselves since each one
+// todo-1: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
 export class FullScreenControlBar extends Div {
 

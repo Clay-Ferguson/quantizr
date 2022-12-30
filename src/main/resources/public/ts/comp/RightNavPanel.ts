@@ -122,7 +122,7 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const textToSpeech = !ast.speechSpeaking && !ast.mobileMode ? new Icon({
+        const textToSpeech = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-lg marginRight clickable",
             // we use onMouseDown instead of onClick, because by the time onClick runs the focus
             // is lost and selected text will be gone (or maybe it's a rerender), but this woks.
