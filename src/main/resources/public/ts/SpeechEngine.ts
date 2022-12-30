@@ -129,6 +129,7 @@ export class SpeechEngine {
     }
 
     speakSelOrClipboard = () => {
+        // todo-0: be sure to document how you can speak highlighted text.
         const sel = window.getSelection().toString();
         if (sel) {
             // when speaking our selected text we pass false so tab doesn't chagne.
@@ -151,29 +152,30 @@ export class SpeechEngine {
         }
     }
 
-    speakText = async (text: string, selectTab: boolean = true) => {
+    speakText = async (text: string, selectTab: boolean = true, replaySame: boolean = false) => {
         const ast = getAppState();
 
         // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
         // but it would be better to use a listener or something to know precisely when it's ready
         // to start speaking again.
         if (ast.speechSpeaking) {
-            this.stopSpeaking(text);
+            this.stopSpeaking();
             setTimeout(() => {
-                this.speakTextNow(text, selectTab);
+                this.speakTextNow(text, selectTab, replaySame);
             }, 1200);
         }
         else {
-            this.speakTextNow(text, selectTab);
+            this.speakTextNow(text, selectTab, replaySame);
         }
     }
 
     // you can pass null, and this method will repeat it's current text.
-    speakTextNow = async (text: string, selectTab: boolean = true) => {
-        if (!this.tts || !text) return;
+    speakTextNow = async (text: string, selectTab: boolean = true, replaySame: boolean = false) => {
+        if (!this.tts || (!text && !replaySame)) return;
         const interval = 1000;
         this.ttsRunning = true;
 
+        // todo-0: put this timer create in a function.
         // create timer that runs forever and fixes the Chrome bug whenever speech has been
         // running more than ten seconds.
         if (!this.ttsTimer) {
@@ -206,12 +208,13 @@ export class SpeechEngine {
                 return;
             }
 
-            text = this.preProcessText(text);
-            this.queuedSpeech = [];
-            this.fragmentizeToQueue(text);
+            if (!replaySame) {
+                text = this.preProcessText(text);
+                this.queuedSpeech = [];
+                this.fragmentizeToQueue(text);
+            }
 
             await promiseDispatch("speechEngineStateChange", s => {
-                s.speechText = text;
                 s.speechPaused = false;
                 s.speechSpeaking = true;
                 s.ttsRan = true;
@@ -282,7 +285,8 @@ export class SpeechEngine {
             };
             this.ttsRunning = true;
             // Get started by uttering idx=0, and the rest of the sentences will follow
-            // in a chain reaction every time utterFunc gets called via the 'onend' listener
+            // in a chain reaction every time utterFunc gets called via the 'onend' listener of
+            // the most recently completed utterance
             utterFunc();
         }, 100);
     }
@@ -352,9 +356,6 @@ export class SpeechEngine {
 
         // need to create a list to iterate thru for these.
         text = text.replaceAll("Rep.", "Rep");
-        text = text.replaceAll("D.C.", "DC");
-        text = text.replaceAll("U.S.", "US");
-
         return text;
     }
 
@@ -500,7 +501,7 @@ export class SpeechEngine {
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
     // states correct, because TRUST ME at least on Chrome the states are unreliable.
     // If you know you're about to speak some new text you can pass in that text to update screen ASAP
-    stopSpeaking = async (nextText?: string) => {
+    stopSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;
         this.ttsSpeakingTime = 0;
@@ -508,9 +509,6 @@ export class SpeechEngine {
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
-            if (nextText) {
-                s.speechText = nextText;
-            }
             console.log("cancel state change");
             return s;
         });

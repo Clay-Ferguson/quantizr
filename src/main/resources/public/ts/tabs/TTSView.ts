@@ -54,9 +54,9 @@ export class TTSView extends AppTab {
             }
         });
 
-        const speakAgainBtn = ast.speechText && !ast.mobileMode ? new Icon({
+        const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
             className: "fa fa-refresh fa-lg marginRight clickable",
-            onClick: () => S.speech.speakText(ast.speechText),
+            onClick: () => S.speech.speakText(null, false, true),
             title: "Restart from the top"
         }) : null;
 
