@@ -310,7 +310,7 @@ export class SpeechEngine {
                     if (this.ttsSpeakingTime > 10000) {
                         this.ttsSpeakingTime = 0;
 
-                        // todo-0: need to research this "fix" even more, because it appears even
+                        // todo-1: need to research this "fix" even more, because it appears even
                         // pausing vor 10 seconds makes the TTS engine break, and if the only fix
                         // to that breaking is a resume again, that means we simply CANNOT use pause.
                         // Must stop and restart to simulate a pause
@@ -397,8 +397,8 @@ export class SpeechEngine {
         const ast = getAppState();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
-        // first split into sentences.
-        const words = text.split(/[ ]+/);
+        // first split into 'words'. All things separated by spaces.
+        const words = text.split(/[ ]+/g);
 
         // scan each word appendingn to frag until it gets too long and then
         // adding to ret
@@ -425,8 +425,10 @@ export class SpeechEngine {
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // first split into sentences.
-        // todo-0: need to review the '+' in this REGEX and fully understand that.
-        const paragraphs = text.split(/[\n\r]+/);
+        // 1) Match a single character present in [\n\r]
+        // 2) '+' matches the previous token between one and unlimited times, as many
+        //    times as possible, giving back as needed (greedy)
+        const paragraphs = text.split(/[\n\r]+/g);
 
         paragraphs?.forEach(para => {
             if (para.length < 3) return;
@@ -461,9 +463,7 @@ export class SpeechEngine {
         // first split into sentences.
         // DO NOT DELETE (this example is how to NOT return punctuation)
         // const sentences = text.split(/[.!?;]+/);
-        // todo-0: some example have a 'g' after the final '/' in the parameter. What's that?
-        // NOTE: I'm using the REGEX version with no '+' at the end.
-        const sentences = text.split(/(?=[.!?;])|(?<=[.!?;])/);
+        const sentences = text.split(/(?=[.!?;]+)|(?<=[.!?;]+)/g);
 
         // scan each sentence
         sentences?.forEach(sentence => {
@@ -483,9 +483,9 @@ export class SpeechEngine {
             if (sentence.length < maxChars) {
                 this.queuedSpeech.push(sentence);
             }
-            // Otherwise we have to break the sentence apart.
+            // Otherwise we have to break the sentence apart, so we break by commas first
             else {
-                const fragments = sentence.split(/[,]+/);
+                const fragments = sentence.split(/[,]+/g);
                 let fragMerge = "";
                 fragments?.forEach(frag => {
                     // handle the comma delimiter

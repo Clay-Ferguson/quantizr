@@ -48,6 +48,7 @@ export class SelectTagsDlg extends DialogBase {
         const tagSet = new Set<string>();
 
         if (this.curTags) {
+            // todo-0: is this better with "/ /g" ?
             const tags = this.curTags.split(/ /);
             tags?.forEach(t => {
                 t = S.util.replaceAll(t, "\"", "");
@@ -148,6 +149,7 @@ export class SelectTagsDlg extends DialogBase {
     parseTags = (): Tag[] => {
         if (!getAppState().userProfile?.userTags) return null;
         const tags: Tag[] = [];
+        // todo-0: in the TTS engine we have something like this done differently. Research which is best
         const lines: string[] = getAppState().userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             if (line?.startsWith("#")) {
