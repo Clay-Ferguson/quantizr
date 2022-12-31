@@ -124,7 +124,12 @@ export class RightNavPanel extends Div {
 
         const textToSpeech = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-lg marginRight clickable",
-            onClick: S.speech.speakClipboard,
+
+            // This mouseover stuff is compensating for the fact that when the onClick gets called
+            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+            onMouseOut: () => { S.quanta.selectedForTts = null; },
+            onClick: S.speech.speakSelOrClipboard,
             title: "Text-to-Speech: Selected text or clipboard"
         }) : null;
 

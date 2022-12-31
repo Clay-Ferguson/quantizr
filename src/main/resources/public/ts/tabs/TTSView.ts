@@ -35,7 +35,11 @@ export class TTSView extends AppTab {
 
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable bigMarginTop",
-            onClick: S.speech.speakClipboard,
+            // This mouseover stuff is compensating for the fact that when the onClick gets called
+            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+            onMouseOut: () => { S.quanta.selectedForTts = null; },
+            onClick: S.speech.speakSelOrClipboard,
             title: "Text-to-Speech: From Clipboard"
         }) : null;
 

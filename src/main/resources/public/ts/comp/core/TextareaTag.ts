@@ -19,7 +19,7 @@ export class TextareaTag extends Comp {
     }
 
     splitLines = (str: string): string[] => {
-        // todo-0: in the TTS engine we have something like this done differently. Research which is best
+        // todo-1: in the TTS engine we have something like this done differently. Research which is best
         return str.split(/\r?\n/);
     }
 

@@ -75,6 +75,8 @@ export class Quanta {
     dragImg: any = null;
     dragElm: any = null;
 
+    selectedForTts: string = null;
+
     refresh = (ast: AppState) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
