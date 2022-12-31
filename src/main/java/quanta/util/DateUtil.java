@@ -216,7 +216,7 @@ public class DateUtil {
 
 		boolean msDone = false;
 		// only show seconds if not over a day or hour.
-		if (years == 0 && days == 0 && hours == 0 && seconds > 0) {
+		if (years == 0 && days == 0 && hours == 0 && minutes < 4 && seconds > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 
