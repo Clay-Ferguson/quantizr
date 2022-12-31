@@ -104,14 +104,10 @@ export class Quanta {
             }
             Log.log("quanta.initApp()");
 
-            const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
-            const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "allUsers");
             if (mobileMode) {
                 dispatch("SetMobileMode", s => {
                     s.mobileMode = mobileMode === "true";
-                    s.speechVoice = voice || 0;
-                    s.speechRate = rate || "normal";
                     return s;
                 });
             }

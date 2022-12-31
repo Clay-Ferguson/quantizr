@@ -897,14 +897,19 @@ export class Util {
         return val.split(char).length - 1;
     }
 
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse) => {
+    setStateVarsUsingLoginResponse = async (res: J.LoginResponse) => {
         if (!res) return;
+
+        const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
+        const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
 
         dispatch("LoginResponse", s => {
             s.userProfile = res.userProfile;
             s.userName = res.userProfile.userName;
             s.isAdminUser = res.userProfile.userName === J.PrincipalName.ADMIN;
             s.isAnonUser = res.userProfile.userName === J.PrincipalName.ANON;
+            s.speechVoice = voice || 0;
+            s.speechRate = rate || "normal";
 
             // allow for everyone for now
             s.allowedFeatures = "web3"; // res.allowedFeatures;
