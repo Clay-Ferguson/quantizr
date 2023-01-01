@@ -129,7 +129,8 @@ export class TTSView extends AppTab {
             ]),
             new Div(null, { className: "float-end" }, [stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
             new FlexRowLayout([
-                this.makeVoiceChooser(),
+                this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
+                this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false),
                 this.makeRateChooser()
             ]),
             paraComps?.length > 0
@@ -140,7 +141,7 @@ export class TTSView extends AppTab {
         ]);
     }
 
-    makeVoiceChooser = (): Selection => {
+    makeVoiceChooser = (voiceKey: string, primaryVoice: boolean): Selection => {
         const data: any[] = [];
         let idx = 0;
         S.speech.getVoices()?.forEach(voice => {
@@ -148,16 +149,22 @@ export class TTSView extends AppTab {
             idx++;
         });
 
-        return new Selection(null, "Voice", data, null, "selectVoiceDropDown", {
+        return new Selection(null, primaryVoice ? "Narration Voice" : "Quotation Voice",
+            data, null, "selectVoiceDropDown", {
             setValue: (val: string) => {
                 const voiceInt = parseInt(val);
-                S.localDB.setVal(C.LOCALDB_VOICE_INDEX, voiceInt, "allUsers");
+                S.localDB.setVal(voiceKey, voiceInt, "allUsers");
                 dispatch("ChangeSpeechVoice", s => {
-                    s.speechVoice = voiceInt;
+                    if (primaryVoice) {
+                        s.speechVoice = voiceInt;
+                    }
+                    else {
+                        s.speechVoice2 = voiceInt;
+                    }
                     return s;
                 })
             },
-            getValue: (): string => "" + getAppState().speechVoice
+            getValue: (): string => "" + (primaryVoice ? getAppState().speechVoice : getAppState().speechVoice2)
         });
     }
 
@@ -174,7 +181,7 @@ export class TTSView extends AppTab {
         ], null, "rateChooserDropDown", {
             setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_VOICE_RATE, val, "allUsers");
-                dispatch("ChangeSpeechVoice", s => {
+                dispatch("ChangeSpeechRate", s => {
                     s.speechRate = val;
                     return s;
                 })

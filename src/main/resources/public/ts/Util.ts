@@ -901,6 +901,7 @@ export class Util {
         if (!res) return;
 
         const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
+        const voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX, "allUsers");
         const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
 
         dispatch("LoginResponse", s => {
@@ -909,6 +910,7 @@ export class Util {
             s.isAdminUser = res.userProfile.userName === J.PrincipalName.ADMIN;
             s.isAnonUser = res.userProfile.userName === J.PrincipalName.ANON;
             s.speechVoice = voice || 0;
+            s.speechVoice2 = voice2 || 0;
             s.speechRate = rate || "normal";
 
             // allow for everyone for now

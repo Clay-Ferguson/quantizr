@@ -131,7 +131,7 @@ export class SpeechEngine {
 
     speakSelOrClipboard = () => {
         if (S.quanta.selectedForTts) {
-            this.speakText(S.quanta.selectedForTts);
+            this.speakText(S.quanta.selectedForTts, false);
         }
         else {
             this.speakClipboard();
@@ -261,15 +261,16 @@ export class SpeechEngine {
 
                     utter = new SpeechSynthesisUtterance(sayThis);
 
-                    // todo-0: Final Step to enable this feature, is to add another voice selection called "Quotations Voice",
-                    // and call the main one "Narration Voice"
-                    // const isQuote = sayThis.startsWith("\"");
-                    if (ast.speechVoice >= 0) {
+                    const isQuote = sayThis.startsWith("\"");
+                    if (isQuote && ast.speechVoice2 >= 0) {
                         const voices = this.getVoices();
-                        utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)
-                            // + (isQuote ? 1 : 0)
-                        ];
+                        utter.voice = voices[(ast.speechVoice2 < voices.length ? ast.speechVoice2 : 0)];
                     }
+                    else if (ast.speechVoice >= 0) {
+                        const voices = this.getVoices();
+                        utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)];
+                    }
+
                     if (ast.speechRate) {
                         utter.rate = this.parseRateValue(ast.speechRate);
                     }
