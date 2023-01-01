@@ -179,6 +179,9 @@ public class ActPubFactory extends ServiceBase {
 			}
 		}
 
+		// todo-0: need to double-check that all toActors AND ccActors here are mentioned in the content text,
+		// (for when we're sending this as an outbound object) because it's confusing as hell for stuff to show up
+		// in peoples inbox who aren't even mentioned in the text.
 		if (toActors.size() > 0) {
 			object.put(APObj.to, new APList().vals(toActors));
 		}

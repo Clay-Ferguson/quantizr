@@ -1207,7 +1207,12 @@ public class ActPubService extends ServiceBase {
         // newNode.setProp("lang", lang);
 
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
-        shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
+
+        // todo-0: This needs more thought. Will come back to this. This is kind of an emergency fix. I looked in this 
+        // method and didn't see HOW it can be adding sharing to non-local accounts, but really those don't need
+        // to be added to the node sharing just becasue they're CCed. We can let CCs NOT be shared to.
+        // shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
+
         addAttachments(ms, newNode, obj);
 
         update.save(ms, newNode, false);
