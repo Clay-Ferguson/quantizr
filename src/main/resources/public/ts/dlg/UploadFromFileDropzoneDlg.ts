@@ -61,9 +61,16 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
-                    this.importMode ? null : new Button("URL", this.uploadFromUrl),
+                    this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {
+                        onClick: () => this.uploadFromUrl,
+                        title: "Upload from Web/URL"
+                    }),
+
                     this.importMode || !ast.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
-                    this.importMode || !S.util.clipboardReadable() ? null : new Button("Clipboard", this.uploadFromClipboard),
+                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
+                        onClick: this.uploadFromClipboard,
+                        title: "Upload from Clipboard"
+                    }),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {

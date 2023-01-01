@@ -628,9 +628,14 @@ export class EditNodeDlg extends DialogBase {
             new Button("Save", this.save, { title: "Save this node and close editor." }, "attentionButton"),
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
-            allowUpload ? new IconButton("fa-paperclip", "Attach", {
+            allowUpload ? new IconButton("fa-upload", "File", {
                 onClick: () => this.utl.upload(null, this),
                 title: "Upload file attachment"
+            }) : null,
+
+            allowUpload && S.util.clipboardReadable() ? new IconButton("fa-paperclip", "Clip", {
+                onClick: () => this.utl.uploadFromClipboard(this),
+                title: "Upload from Clipboard"
             }) : null,
 
             allowShare ? new IconButton("fa-share-alt", "Share", {
