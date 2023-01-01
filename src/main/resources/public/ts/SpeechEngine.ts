@@ -261,9 +261,14 @@ export class SpeechEngine {
 
                     utter = new SpeechSynthesisUtterance(sayThis);
 
+                    // todo-0: Final Step to enable this feature, is to add another voice selection called "Quotations Voice",
+                    // and call the main one "Narration Voice"
+                    // const isQuote = sayThis.startsWith("\"");
                     if (ast.speechVoice >= 0) {
                         const voices = this.getVoices();
-                        utter.voice = voices[ast.speechVoice < voices.length ? ast.speechVoice : 0];
+                        utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)
+                            // + (isQuote ? 1 : 0)
+                        ];
                     }
                     if (ast.speechRate) {
                         utter.rate = this.parseRateValue(ast.speechRate);
@@ -431,7 +436,7 @@ export class SpeechEngine {
 
             // if entire paragraph can fit
             if (para.length < maxChars) {
-                this.queuedSpeech.push(para);
+                this.pushTextToQueue(para);
             }
             else {
                 this.fragmentizeSentencesToQueue(para);
@@ -441,6 +446,42 @@ export class SpeechEngine {
             // slightly anti-patternish, but is good in this case, for now
             this.queuedSpeech.push(C.TTS_BREAK);
         });
+    }
+
+    splitByQuotations = (text: string): string[] => {
+        text = text.replaceAll("“", "\"");
+        text = text.replaceAll("”", "\"");
+        const quoteCount = S.util.countChars(text, "\"");
+
+        let ret: string[] = null;
+        if (quoteCount % 2 === 0) {
+            ret = [];
+            let inQuote = false;
+
+            // Split by quote char, and also return the delimiters (using lookback).
+            const chunk = text.split(/(?=["]+)|(?<=["]+)/g);
+            chunk?.forEach(frag => {
+                if (frag === "\"") {
+                    // finishing a quote
+                    if (inQuote) {
+                        inQuote = false;
+                        // wrap previous string in quotes, because this is the correct text AND becasue the
+                        // engine will be detecting that during playback to use quoted voice.
+                        if (ret.length > 0) {
+                            ret[ret.length - 1] = "\"" + ret[ret.length - 1] + "\"";
+                        }
+                    }
+                    // starting a quote
+                    else {
+                        inQuote = true;
+                    }
+                }
+                else {
+                    ret.push(frag);
+                }
+            });
+        }
+        return ret;
     }
 
     // The Chrome Speech engine will stop working unless you send it relatively short chunks of text. It's basically
@@ -513,7 +554,7 @@ export class SpeechEngine {
 
             // if this sentence itself is short enough just add to queue
             if (sentence.length < maxChars) {
-                this.queuedSpeech.push(sentence);
+                this.pushTextToQueue(sentence);
             }
             // Otherwise we have to break the sentence apart, so we break by commas first
             else {
@@ -540,7 +581,7 @@ export class SpeechEngine {
                     // if frag is short enough to make the new fragMerge do that.
                     else if (frag.length < maxChars) {
                         if (fragMerge) {
-                            this.queuedSpeech.push(fragMerge);
+                            this.pushTextToQueue(fragMerge);
                         }
                         fragMerge = frag;
                     }
@@ -548,7 +589,7 @@ export class SpeechEngine {
                     // fragMerge to the queue, first, and then queue by breaking the sentence by words.
                     else {
                         if (fragMerge) {
-                            this.queuedSpeech.push(fragMerge);
+                            this.pushTextToQueue(fragMerge);
                         }
                         fragMerge = "";
                         this.queuedSpeech = this.queuedSpeech.concat(this.fragmentBySpaces(frag));
@@ -557,10 +598,23 @@ export class SpeechEngine {
 
                 // push whatever was left.
                 if (fragMerge) {
-                    this.queuedSpeech.push(fragMerge);
+                    this.pushTextToQueue(fragMerge);
                 }
             }
         });
+    }
+
+    // We have this push function basically so we can split up quotations. This splitting is what allows
+    // us to switch voices if we went to (for quotations) but is also a way to keep the utterances as short
+    // ass possible, which is needed to help Chrome not hang.
+    pushTextToQueue = (text: string) => {
+        const textWithQuotes = this.splitByQuotations(text);
+        if (textWithQuotes) {
+            this.queuedSpeech = this.queuedSpeech.concat(textWithQuotes)
+        }
+        else {
+            this.queuedSpeech.push(text);
+        }
     }
 
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those

@@ -105,10 +105,13 @@ export class TTSView extends AppTab {
                     curDiv = new Div(null, { className: "tts-paragraph" });
                 }
                 else {
-                    curDiv.addChild(new Span(utter, {
+                    const utterTrim = utter.trim();
+                    const isQuote = utterTrim.startsWith("\"") && utterTrim.endsWith("\"");
+                    curDiv.addChild(new Span(utter + "  ", {
                         onClick: this.spanClick, // <--- special function KNOWS how to work with no args
                         id: "tts" + idx,
-                        className: "tts-span" + (S.speech.ttsHighlightIdx === idx ? " tts-hlt" : "")
+                        className: "tts-span" + (S.speech.ttsHighlightIdx === idx ? " tts-hlt" : "") +
+                            (isQuote ? " tts-quote" : "")
                     }));
                 }
                 idx++;
