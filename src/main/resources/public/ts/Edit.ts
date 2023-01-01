@@ -184,6 +184,17 @@ export class Edit {
     private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, ast: AppState) => {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
+
+            // todo-0: we probably need a PubSub desing here to let all kinds of different things listen
+            // for node changes and do anything that might need to be done, for better decoupling, and
+            // same for node DELETE, CREATE, UPDATE (we already have one place where this is being replicated
+            // and it's basically an UPDATE) ?
+            const node = S.nodeUtil.findNode(ast, id);
+            if (node && node.type === J.NodeType.BOOKMARK) {
+                setTimeout(() => {
+                    S.util.loadBookmarks();
+                }, 100);
+            }
         }
     }
 

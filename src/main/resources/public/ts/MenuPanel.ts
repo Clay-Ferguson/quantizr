@@ -41,7 +41,7 @@ export class MenuPanel extends Div {
             className: (ast.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
         MenuPanel.inst = this;
-        this.mergeState<MenuPanelState>({ lastAction: null, lastClicked: null, expanded: MenuPanel.activeMenu });
+        this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
     }
 
     // leaving for reference how to open this.
@@ -692,18 +692,23 @@ export class MenuPanel extends Div {
     }
 }
 
-PubSub.sub(C.PUBSUB_menuClicked, (name: string) => {
+// Object will have 'op' and 'name' props
+// todo-0: Add typesafety to payload, just by using interface in "Interfaces.ts"?
+PubSub.sub(C.PUBSUB_menuClicked, (payload: any) => {
     MenuPanel.inst?.onMount(() => {
-        const state: MenuPanelState = MenuPanel.inst.getState();
-        if (state.expanded.has(name)) {
-            state.expanded.delete(name);
-            state.lastAction = "collapse";
+        const state = MenuPanel.inst.getState();
+        if (payload.op === "toggle") {
+            if (state.expanded.has(payload.name)) {
+                state.expanded.delete(payload.name);
+            }
+            else {
+                state.expanded.add(payload.name);
+            }
         }
-        else {
-            state.expanded.add(name);
-            state.lastAction = "expand";
+        else if (payload.op === "expand") {
+            state.expanded.add(payload.name);
         }
-        state.lastClicked = name;
+        // NOTE: We don't have the need for a "collapse" option currently
         MenuPanel.inst.mergeState(state);
     });
 });

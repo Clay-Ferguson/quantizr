@@ -74,8 +74,8 @@ export class EditNodeDlgUtil {
         editNode.name = dlg.nameState.getValue();
         editNode.tags = dlg.tagsState.getValue();
 
-        const askToSplit = editNode.content && ((editNode as J.NodeInfo).content.indexOf("{split}") !== -1 ||
-            (editNode as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
+        const askToSplit = editNode.content && (editNode.content.indexOf("{split}") !== -1 ||
+            editNode.content.indexOf("\n\n\n") !== -1);
 
         this.savePropsToNode(editNode, dlg);
         this.saveAttFileNamesToNode(editNode, dlg);
@@ -110,25 +110,21 @@ export class EditNodeDlgUtil {
          afterEditAction we'd have to call that logic inside the afterEditAction function. */
         if (dlg.afterEditAction) return true;
 
-        // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
-        // page refreshing after the edit.
-        if (res.node?.type === J.NodeType.BOOKMARK && editNode.type !== J.NodeType.BOOKMARK_LIST) {
-            // do nothing.
-        }
-        else {
-            S.render.fadeInId = editNode.id;
-            S.edit.saveNodeResponse(editNode, res, true, newNodeTargetId, newNodeTargetOffset, getAppState());
+        S.render.fadeInId = editNode.id;
+        S.edit.saveNodeResponse(editNode, res, true, newNodeTargetId, newNodeTargetOffset, getAppState());
 
-            if (askToSplit) {
-                new SplitNodeDlg(editNode).open();
-            }
+        // Only ask to split for ordinary nodes (non special)
+        const type = S.plugin.getType(editNode.type);
+        if (askToSplit && !(type && type.isSpecialAccountNode())) {
+            new SplitNodeDlg(editNode).open();
         }
 
         // if we just saved a bookmark, reload bookmarks menu
-        if ((editNode as J.NodeInfo).type === J.NodeType.BOOKMARK) {
+        // todo-0: in node moveUp and moveDown operations this never gets called.
+        if (editNode.type === J.NodeType.BOOKMARK) {
             setTimeout(() => {
                 S.util.loadBookmarks();
-            }, 250);
+            }, 100);
         }
 
         return true;

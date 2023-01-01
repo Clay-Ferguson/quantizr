@@ -102,7 +102,8 @@ export class NodeCompMainList extends Div {
             }
         }
         else {
-            if (!pageTop && !S.nav.displayingRepositoryRoot(ast)) {
+            const pageRootType = S.plugin.getType(ast.node.type);
+            if (!pageTop && !(pageRootType && pageRootType.isSpecialAccountNode()) && !S.nav.displayingRepositoryRoot(ast)) {
                 prevNodeButton = new IconButton("fa-chevron-circle-left", "Prev", {
                     onClick: S.nav.navToPrev,
                     title: "Prev"

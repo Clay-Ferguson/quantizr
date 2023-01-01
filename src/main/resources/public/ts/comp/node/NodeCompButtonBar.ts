@@ -229,7 +229,8 @@ export class NodeCompButtonBar extends Div {
                 }, "btn-primary");
             }
 
-            if (!S.nav.displayingRepositoryRoot(ast)) {
+            const pageRootType = S.plugin.getType(ast.node.type);
+            if (!(pageRootType && pageRootType.isSpecialAccountNode()) && !S.nav.displayingRepositoryRoot(ast)) {
                 prevButton = new Button(null, S.nav.navToPrev, {
                     className: "fa fa-chevron-circle-left",
                     title: "Prev"

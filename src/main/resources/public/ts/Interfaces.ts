@@ -70,9 +70,4 @@ export interface NodePrivilegesInfo {
 
 export interface MenuPanelState {
     expanded: Set<string>;
-
-    // we only have these two values to ensure the state change happens even when 'activeMenu' object doesn't itself change
-    // because only it's conteined set changes.
-    lastClicked: string;
-    lastAction: string;
 }

@@ -797,9 +797,10 @@ export class Util {
 
                 // use a timer to let this dispatch completely finish setting bookmarks before we sent the click to expand.
                 setTimeout(() => {
-                    // if user has not yet clicked any menus and we just loaded bookmarks, then open up and display the bookmarks menu
+                    // if user has not yet clicked any menus and we just loaded bookmarks,
+                    // then open up and display the bookmarks menu.
                     if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
-                        PubSub.pub(C.PUBSUB_menuClicked, C.BOOKMARKS_MENU_TEXT);
+                        PubSub.pub(C.PUBSUB_menuClicked, { op: "expand", name: C.BOOKMARKS_MENU_TEXT });
                     }
                 }, 250);
                 return s;
