@@ -45,7 +45,6 @@ export class MenuPanel extends Div {
     }
 
     // leaving for reference how to open this.
-    // static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
 
     static openFriendsNode = () => {
@@ -266,7 +265,10 @@ export class MenuPanel extends Div {
                 new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
                 new MenuItem("Notes", MenuPanel.openNotesNode),
-                new MenuItem("Exports", MenuPanel.openExportsNode)
+                new MenuItem("Exports", MenuPanel.openExportsNode),
+                new MenuItemSeparator(),
+                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide")),
+                new MenuItem("Portal Home", () => S.nav.openContentNode(":home"))
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
