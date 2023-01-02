@@ -185,16 +185,7 @@ export class Edit {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
 
-            // todo-0: we probably need a PubSub desing here to let all kinds of different things listen
-            // for node changes and do anything that might need to be done, for better decoupling, and
-            // same for node DELETE, CREATE, UPDATE (we already have one place where this is being replicated
-            // and it's basically an UPDATE) ?
-            const node = S.nodeUtil.findNode(ast, id);
-            if (node && node.type === J.NodeType.BOOKMARK) {
-                setTimeout(() => {
-                    S.util.loadBookmarks();
-                }, 100);
-            }
+            S.util.notifyNodeMoved();
         }
     }
 
@@ -315,7 +306,6 @@ export class Edit {
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean,
         newNodeTargetId: string, newNodeTargetOffset: number, ast: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
-
             await this.distributeKeys(node, res.aclEntries);
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
@@ -355,7 +345,10 @@ export class Edit {
                 }
                 // any kind of insert that's not a new node injected into the page ends up here.
                 else {
-                    if (!S.nodeUtil.displayingOnTree(ast, node.id)) {
+                    // Note the special case here for bookmark. We never want to jump to a bookmark just
+                    // because it got updated. That would take us away from whatever we're working on and
+                    // is never right.
+                    if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(ast, node.id)) {
                         S.view.jumpToId(node.id);
                     }
                 }
@@ -924,7 +917,7 @@ export class Edit {
     deleteSelNodes = async (evt: Event = null, id: string = null) => {
         id = S.util.allowIdFromEvent(evt, id);
 
-        // if a nodeId was specified we use it as the selected nodes to delete
+        // if a nodeId was specified we use it as the selected node to delete
         if (id) {
             await promiseDispatch("SelectNode", s => {
                 S.nav.setNodeSel(true, id, s);
@@ -934,7 +927,7 @@ export class Edit {
 
         const ast = getAppState();
         // note: the setNodeSel above isn't causing this to get anything here
-        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(ast);
+        const selNodesArray: string[] = S.nodeUtil.getSelNodeIdsArray(ast);
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to delete.", "Warning");
@@ -968,6 +961,8 @@ export class Edit {
 
             /* Node: state.node can be null if we've never been to the tree view yet */
             if (ast.node && S.util.checkSuccess("Delete node", res)) {
+                S.util.notifyNodeDeleted();
+
                 if (ast.node.children) {
                     ast.node.children = ast.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
                 }
@@ -995,13 +990,6 @@ export class Edit {
                     });
                 }
             }
-
-            /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
-             we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
-            the added complexity to achieve that for recursive tree deletes doesn't pay off */
-            setTimeout(() => {
-                S.util.loadBookmarks();
-            }, 500);
         }
     }
 

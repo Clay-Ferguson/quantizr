@@ -693,8 +693,7 @@ export class MenuPanel extends Div {
 }
 
 // Object will have 'op' and 'name' props
-// todo-0: Add typesafety to payload, just by using interface in "Interfaces.ts"?
-PubSub.sub(C.PUBSUB_menuClicked, (payload: any) => {
+PubSub.sub(C.PUBSUB_menuExpandChanged, (payload: any) => {
     MenuPanel.inst?.onMount(() => {
         const state = MenuPanel.inst.getState();
         if (payload.op === "toggle") {

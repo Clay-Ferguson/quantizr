@@ -800,7 +800,7 @@ export class Util {
                     // if user has not yet clicked any menus and we just loaded bookmarks,
                     // then open up and display the bookmarks menu.
                     if (!Menu.userClickedMenu && s.bookmarks?.length > 0) {
-                        PubSub.pub(C.PUBSUB_menuClicked, { op: "expand", name: C.BOOKMARKS_MENU_TEXT });
+                        PubSub.pub(C.PUBSUB_menuExpandChanged, { op: "expand", name: C.BOOKMARKS_MENU_TEXT });
                     }
                 }, 250);
                 return s;
@@ -816,6 +816,28 @@ export class Util {
             setTimeout(() => {
                 new AudioPlayerDlg(null, null, null, audioUrl, startTime).open();
             }, 500);
+        }
+    }
+
+    // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
+    notifyNodeUpdated = (id: string, type: string) => {
+        if (type === J.NodeType.BOOKMARK) {
+            setTimeout(S.util.loadBookmarks, 100);
+        }
+    }
+
+    notifyNodeDeleted = () => {
+        const ast = getAppState();
+        // Update bookmarks, but only if user is viewing the bookmarks page.
+        if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
+            setTimeout(S.util.loadBookmarks, 100);
+        }
+    }
+
+    notifyNodeMoved = () => {
+        const ast = getAppState();
+        if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
+            setTimeout(S.util.loadBookmarks, 100);
         }
     }
 

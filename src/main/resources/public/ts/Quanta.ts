@@ -192,6 +192,7 @@ export class Quanta {
                 }
                 clearInterval(interval);
 
+                // todo-0: Put all these event listeners in an "initEventListeners()" method
                 document.body.addEventListener("mousemove", function (e: any) {
                     S.domUtil.mouseX = e.clientX;
                     S.domUtil.mouseY = e.clientY;

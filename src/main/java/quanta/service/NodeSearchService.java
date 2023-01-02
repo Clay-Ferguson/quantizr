@@ -561,7 +561,9 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
-						if (token.endsWith("#") || token.length() == 1)
+						// Tallship is google bombing my stats, so until I have a "block tags" feature
+						// he's manually blocked.
+						if (token.endsWith("#") || token.length() == 1 || token.equalsIgnoreCase("#tallship"))
 							continue;
 
 						// ignore stuff like #1 #23

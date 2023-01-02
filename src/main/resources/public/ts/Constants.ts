@@ -59,9 +59,7 @@ export class Constants {
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";
     static readonly PUBSUB_closeNavPanel = "PUBSUB_closeNavPanel";
-
-    // todo-0: rename to menuExpandStateChange
-    static readonly PUBSUB_menuClicked = "PUBSUB_menuClicked";
+    static readonly PUBSUB_menuExpandChanged = "PUBSUB_menuExpandChanged";
     static readonly PUBSUB_dispatcherReady = "PUBSUB_dispatcherReady";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";

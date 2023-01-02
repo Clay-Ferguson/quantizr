@@ -119,14 +119,7 @@ export class EditNodeDlgUtil {
             new SplitNodeDlg(editNode).open();
         }
 
-        // if we just saved a bookmark, reload bookmarks menu
-        // todo-0: in node moveUp and moveDown operations this never gets called.
-        if (editNode.type === J.NodeType.BOOKMARK) {
-            setTimeout(() => {
-                S.util.loadBookmarks();
-            }, 100);
-        }
-
+        S.util.notifyNodeUpdated(editNode.id, editNode.type);
         return true;
     }
 

@@ -24,7 +24,7 @@ export class Menu extends Comp {
                 className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (ast.mobileMode ? " mobileMenuText" : ""),
                 id: this.getId("heading"),
                 onClick: () => {
-                    PubSub.pub(C.PUBSUB_menuClicked, { op: "toggle", name: this.name });
+                    PubSub.pub(C.PUBSUB_menuExpandChanged, { op: "toggle", name: this.name });
                     Menu.userClickedMenu = true;
                     if (this.func) {
                         this.func();
