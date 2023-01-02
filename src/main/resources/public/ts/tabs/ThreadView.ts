@@ -5,10 +5,12 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
+import { Constants as C } from "../Constants";
 
 export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
@@ -34,6 +36,26 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         children.push(new Div(null, null, [
             new Div(null, { className: "headingBar" }, [
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
+                new IconButton("fa-arrow-left", null, {
+                    onClick: () => {
+                        const ast = getAppState();
+                        if (ast.threadViewFromTab === C.TAB_MAIN) {
+                            // the jumpToId is the best way to get to a node on the main tab.
+                            S.view.jumpToId(ast.threadViewNodeId);
+                        }
+                        else {
+                            S.tabUtil.selectTab(ast.threadViewFromTab);
+                            setTimeout(() => {
+                                const data: TabIntf = S.tabUtil.getAppTabData(ast, ast.threadViewFromTab);
+                                if (data) {
+                                    const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(data, ast.threadViewNodeId));
+                                    elm?.scrollIntoView(true);
+                                }
+                            }, 700);
+                        }
+                    },
+                    title: "Go back..."
+                }, "bigMarginLeft "),
                 !this.data.props.endReached ? new Div("More of this thread can be displayed", { className: "float-end" }) : null,
                 new Clearfix(),
                 !this.data.props.endReached ? new Button("Load More...", () => { this.moreHistory() },

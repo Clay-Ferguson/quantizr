@@ -108,6 +108,7 @@ export class Search {
                 const data = ThreadTab.inst;
                 if (!data) return;
 
+                s.threadViewFromTab = s.activeTab;
                 s.threadViewNodeId = node.id;
                 data.openGraphComps = [];
 
@@ -640,7 +641,7 @@ export class Search {
         const attrs: any = {
             // yes the 'tabData.id' looks odd here as a class, and it's only used for lookups for scrolling logic.
             className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
-            id: tabData.id + "_" + node.id,
+            id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             nid: node.id
         };
 

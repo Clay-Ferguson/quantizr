@@ -21,6 +21,7 @@ import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class TabUtil {
     selectTab = (tabName: string) => {
+        if (!tabName) return;
         /* if tab is already active no need to update state now
 
         SOME codepaths like (openNode) are currently relying on selectTab
@@ -37,6 +38,10 @@ export class TabUtil {
             }
             return s;
         });
+    }
+
+    makeDomIdForNode = (tabData: TabIntf<any>, id: string) => {
+       return tabData.id + "_" + id;
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */

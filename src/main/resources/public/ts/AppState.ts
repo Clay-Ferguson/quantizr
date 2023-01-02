@@ -135,6 +135,9 @@ export class AppState {
     // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
     threadViewNodeId: string = null;
 
+    // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
+    threadViewFromTab: string = null;
+
     serverInfoCommand: string = null;
     serverInfoTitle: string = null;
 
