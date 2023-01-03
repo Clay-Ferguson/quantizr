@@ -216,6 +216,9 @@ td {
     margin-left: $smallGap;
     max-height: 600px;
     overflow-y: auto;
+    border-radius: $border-radius;
+    border: 2px solid olivedrab;
+    margin-top: 12px;
 }
 
 .statsWord {

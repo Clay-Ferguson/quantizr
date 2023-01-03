@@ -2,6 +2,7 @@ import { getAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
+import { Markdown } from "../comp/core/Markdown";
 import { Pre } from "../comp/core/Pre";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
@@ -15,7 +16,7 @@ export class CalcType extends TypeBase {
 
     constructor() {
         // false=disabling user's ability to select
-        super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", false);
+        super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", true);
     }
 
     getEditorHelp(): string {
@@ -45,18 +46,36 @@ export class CalcType extends TypeBase {
             formatCurrency: S.util.formatCurrency
         };
 
+        let script = "";
+        let markdown = "";
+        let markdownFinished = false;
+
+        const lines: string[] = node.content.split(/\r?\n/);
+        lines.forEach(line => {
+            line = line.trim();
+            if (!markdownFinished && line.startsWith("//") && line.length > 2) {
+                markdown += line.substring(2) + "\n";
+            }
+            else {
+                markdownFinished = true;
+                script += line + "\n";
+            }
+        });
+
+        let outputComp: Pre = null;
         try {
-            let script = node.content;
             script = this.addFinalScript(script);
             win.eval(script);
-            return new Pre(win.q.logs.join("\n"), { className: "calcOutputArea" });
+            outputComp = new Pre(win.q.logs.join("\n"), { className: "calcOutputArea" });
         }
         catch (e) {
-            return new Pre(e.message + "\n" + e.stack, { className: "calcOutputArea" });
+            outputComp = new Pre(e.message + "\n" + e.stack, { className: "calcOutputArea" });
         }
         finally {
             win.q = null;
         }
+
+        return new Div(null, null, [markdown ? new Markdown(markdown) : null, outputComp]);
     }
 
     // Prints the values of all properts that were assigned to 'qc' during the running of the script, so that

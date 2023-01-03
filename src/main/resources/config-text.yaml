@@ -51,11 +51,22 @@ help:
         Enter any valid JS and log output onto the node like this:
         
         ```
-        var sum = 2 + 3;
-        q.log("Hello world!");
-        q.log("Two plus Three equals "+sum);
+        q.a = 2;
+        q.b = 3;
+        q.total = (q.a + q.b) * 2;
+        q.log("This is some output...");
         ```
-        The 'q.log' function is automatically available.
+        The above will render as this:
+
+        ```
+        This is some output
+        a: 2
+        b: 3
+        total: 10
+        ```
+
+        Note: The 'q.log' function is automatically available for use, and any variables you add to
+        the 'q' object are automatically printed with their final values after the script has ran.
 
     friend:    
       editor: |
