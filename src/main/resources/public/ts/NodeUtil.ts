@@ -306,6 +306,7 @@ export class NodeUtil {
         }
 
         let showMore = "";
+        let moreCount: number = 0;
         let numShares = 0;
         for (const ac of node.ac) {
             const suffix = this.getPublicPrivilegsSuffix(ac.principalName, node);
@@ -349,6 +350,7 @@ export class NodeUtil {
                 }
 
                 if (numShares > 5) {
+                    moreCount++;
                     showMore += "@" + ac.principalName;
                     if (ac.displayName) {
                         showMore += " (" + ac.displayName + ")"
@@ -373,7 +375,7 @@ export class NodeUtil {
         }
 
         if (showMore) {
-            ret.push(new Span("more...", { className: "sharingName", title: "Also shared to...\n" + showMore }));
+            ret.push(new Span(`${moreCount} more...`, { className: "sharingName", title: "Also shared to...\n" + showMore }));
         }
 
         return ret;
