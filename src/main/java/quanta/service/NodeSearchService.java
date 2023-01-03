@@ -176,8 +176,7 @@ public class NodeSearchService extends ServiceBase {
 				// todo-1: make this 'allNodes' a constant
 				if ("allNodes".equals(req.getSearchRoot())) {
 					searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
-				}
-				else {
+				} else {
 					searchRoot = read.getNode(ms, req.getNodeId());
 				}
 				boolean adminOnly = acl.isAdminOwned(searchRoot);
@@ -478,6 +477,7 @@ public class NodeSearchService extends ServiceBase {
 		int signedNodeCount = 0;
 		int unsignedNodeCount = 0;
 		int failedSigCount = 0;
+
 		HashSet<String> uniqueUsersSharedTo = new HashSet<>();
 		HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
 
@@ -563,7 +563,7 @@ public class NodeSearchService extends ServiceBase {
 					else if (token.startsWith("#")) {
 						// Tallship is google bombing my stats, so until I have a "block tags" feature
 						// he's manually blocked.
-						if (token.endsWith("#") || token.length() == 1 || token.equalsIgnoreCase("#tallship"))
+						if (token.endsWith("#") || token.length() == 1 || token.toLowerCase().contains("tallship"))
 							continue;
 
 						// ignore stuff like #1 #23
@@ -738,7 +738,7 @@ public class NodeSearchService extends ServiceBase {
 					if (ok(knownTokens) && knownTokens.contains(_name))
 						continue;
 
-					// counting Mentions
+					// Mentions
 					if (type.equals("Mention")) {
 						/*
 						 * Technically the fully qualified name would be the perfect identification for user, but to avoid
@@ -753,14 +753,16 @@ public class NodeSearchService extends ServiceBase {
 						}
 						ws.count++;
 					}
-					// counting Hashtags
+					// Hashtags
 					else if (type.equals("Hashtag")) {
-						WordStats ws = tagMap.get(_name);
-						if (no(ws)) {
-							ws = new WordStats(_name);
-							tagMap.put(_name, ws);
+						if (!_name.toLowerCase().contains("tallship")) {
+							WordStats ws = tagMap.get(_name);
+							if (no(ws)) {
+								ws = new WordStats(_name);
+								tagMap.put(_name, ws);
+							}
+							ws.count++;
 						}
-						ws.count++;
 					}
 				}
 			} catch (Exception e) {

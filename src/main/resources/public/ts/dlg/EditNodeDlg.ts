@@ -325,7 +325,7 @@ export class EditNodeDlg extends DialogBase {
             sharingDiv = new Div(null, {
                 className: "float-end clickable marginBottom"
             }, [
-                new Span("Shared to: ", { onClick: () => this.utl.share() }),
+                new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
                 ...shareComps,
                 !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
@@ -639,7 +639,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             allowShare ? new IconButton("fa-share-alt", "Share", {
-                onClick: () => this.utl.share(),
+                onClick: () => this.utl.share(this),
                 title: "Share Node"
             }) : null,
 
@@ -906,7 +906,7 @@ export class EditNodeDlg extends DialogBase {
                     const insertName = "@" + ac.principalName;
                     if (content.indexOf(insertName) === -1) {
                         if (!newLine) {
-                            content += "\n";
+                            content += "\n\n";
                             newLine = true;
                         }
                         content += insertName + " ";
@@ -921,5 +921,22 @@ export class EditNodeDlg extends DialogBase {
             }
             this.contentEditorState.setValue(content.trim());
         }
+    }
+
+    // returns true if all the shares on the node ARE mentioned in the text.
+    areAllSharesInContent = () => {
+        const content: string = this.contentEditorState.getValue();
+        const ast = getAppState();
+        if (ast.editNode.ac?.length > 0) {
+            for (const ac of ast.editNode.ac) {
+                if (ac.principalName !== J.PrincipalName.PUBLIC) {
+                    const insertName = "@" + ac.principalName;
+                    if (!content || content.indexOf(insertName) === -1) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }

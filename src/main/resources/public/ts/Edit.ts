@@ -1389,15 +1389,24 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (ast: AppState, node: J.NodeInfo) => {
+    editNodeSharing = async (ast: AppState, dlg: EditNodeDlg, node: J.NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode(ast);
-
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
         }
 
-        await new SharingDlg().open();
+        const sharingDlg = new SharingDlg();
+        await sharingDlg.open();
+
+        // if not all the shares are mentioned in the text ask the user about putting them the content automatically
+        if (!dlg.areAllSharesInContent()) {
+            const confDlg = new ConfirmDlg("Add to Sharing/Mentions to content text?", "Add Mentions ?");
+            await confDlg.open();
+            if (confDlg.yes) {
+                await dlg.addSharingToContentText();
+            }
+        }
     }
 
     /* Whenever we share an encrypted node to a another user, this is the final operation we run which

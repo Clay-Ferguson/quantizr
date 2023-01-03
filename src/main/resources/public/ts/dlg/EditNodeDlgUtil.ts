@@ -196,9 +196,9 @@ export class EditNodeDlgUtil {
         dlg.mergeState<LS>(state);
     }
 
-    share = async () => {
+    share = async (dlg: EditNodeDlg) => {
         const ast = getAppState();
-        await S.edit.editNodeSharing(getAppState(), ast.editNode);
+        await S.edit.editNodeSharing(getAppState(), dlg, ast.editNode);
         S.edit.updateNode(ast.editNode);
     }
 
