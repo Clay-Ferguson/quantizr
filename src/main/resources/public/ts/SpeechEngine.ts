@@ -138,6 +138,31 @@ export class SpeechEngine {
         }
     }
 
+    // Append more text to buffer of what's being read.
+    appendSelOrClipboard = async () => {
+        let textToAdd: string = null;
+
+        if (S.quanta.selectedForTts) {
+            textToAdd = S.quanta.selectedForTts;
+        }
+        else {
+            textToAdd = await (navigator as any)?.clipboard?.readText();
+        }
+
+        if (textToAdd) {
+            this.appendTextToBuffer(textToAdd);
+            await promiseDispatch("speechEngineStateChange", s => {
+                setTimeout(() => {
+                    this.highlightByIndex(this.ttsIdx);
+                }, 500);
+                return s;
+            });
+        }
+        else {
+            S.util.showMessage("Neither Selected text nor Clipboard text is available.", "Warning");
+        }
+    }
+
     speakClipboard = async () => {
         if (!this.tts) return;
 
@@ -207,9 +232,8 @@ export class SpeechEngine {
             };
 
             if (replayFromIdx === -1) {
-                text = this.preProcessText(text);
                 this.queuedSpeech = [];
-                this.fragmentizeToQueue(text);
+                this.appendTextToBuffer(text);
                 this.ttsIdx = 0;
             }
             else {
@@ -422,7 +446,9 @@ export class SpeechEngine {
         return ret;
     }
 
-    fragmentizeToQueue = (text: string) => {
+    appendTextToBuffer = (text: string) => {
+        if (!text) return;
+        text = this.preProcessText(text);
         const ast = getAppState();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 

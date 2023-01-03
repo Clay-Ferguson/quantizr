@@ -1,6 +1,7 @@
 import { dispatch, getAppState, useAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
@@ -34,13 +35,13 @@ export class TTSView extends AppTab {
         this.attribs.className = this.getClass(ast);
 
         const speakBtn = !ast.mobileMode ? new Icon({
-            className: "fa fa-volume-up fa-2x clickable bigMarginTop",
+            className: "fa fa-volume-up fa-2x clickable",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
             onClick: S.speech.speakSelOrClipboard,
-            title: "Text-to-Speech: From Clipboard"
+            title: "Text-to-Speech: From Selected text or Clipboard"
         }) : null;
 
         // make the entire tab area a drop target for speaking text.
@@ -54,26 +55,36 @@ export class TTSView extends AppTab {
             }
         });
 
+        const appendTextBtn = !ast.mobileMode && S.speech.queuedSpeech?.length > 0 ? new Icon({
+            className: "fa fa-plus-circle fa-2x clickable bigMarginRight",
+            // This mouseover stuff is compensating for the fact that when the onClick gets called
+            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+            onMouseOut: () => { S.quanta.selectedForTts = null; },
+            onClick: S.speech.appendSelOrClipboard,
+            title: "Text-to-Speech: Append more text Highlighted content or Clipboard"
+        }) : null;
+
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
-            className: "fa fa-refresh fa-2x bigMarginRight bigMarginTop clickable",
+            className: "fa fa-refresh fa-2x bigMarginRight clickable",
             onClick: () => S.speech.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-2x bigMarginRight bigMarginTop clickable",
+            className: "fa fa-stop fa-2x bigMarginRight clickable",
             onClick: () => S.speech.stopSpeaking(),
             title: "Stop Speaking Text"
         }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-pause fa-2x bigMarginRight bigMarginTop clickable",
+            className: "fa fa-pause fa-2x bigMarginRight clickable",
             onClick: () => S.speech.pauseSpeaking(),
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-play fa-2x bigMarginRight bigMarginTop clickable",
+            className: "fa fa-play fa-2x bigMarginRight clickable",
             onClick: () => S.speech.resumeSpeaking(),
             title: "Resume Speaking Text"
         }) : null;
@@ -127,7 +138,8 @@ export class TTSView extends AppTab {
                 new Div("Tip: Drag-and-Drop text to this panel!", { className: "marginAll float-end" }),
                 new Div("Text-to-Speech", { className: "tabTitle" })
             ]),
-            new Div(null, { className: "float-end" }, [stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+            new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+            new Clearfix(),
             new FlexRowLayout([
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                 this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false),
