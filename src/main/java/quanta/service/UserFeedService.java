@@ -459,7 +459,7 @@ public class UserFeedService extends ServiceBase {
 			if (!allowNonEnglish || !allowBadWords) {
 				String boostTargetId = node.getStr(NodeProp.BOOST);
 				if (ok(boostTargetId)) {
-					SubNode boostedNode = read.getNode(ms, boostTargetId);
+					SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
 
 					// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
 					// even if boostedNode is null here, indicating it's not found.
