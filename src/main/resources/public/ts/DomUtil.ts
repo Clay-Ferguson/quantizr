@@ -1,6 +1,5 @@
 import { dispatch, getAppState } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
-import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
@@ -184,6 +183,28 @@ export class DomUtil {
         delete attribs.onDragOver;
         delete attribs.onDragLeave;
         delete attribs.onDrop;
+    }
+
+    setNodeDragHandler = (attribs: any, nodeId: string) => {
+        attribs.draggable = "true";
+
+        attribs.onDragStart = function (ev: any) {
+            const ast = getAppState();
+            if (ast.editNode) {
+                return;
+            }
+            ev.currentTarget.classList.add("dragBorderSource");
+            S.quanta.dragElm = ev.target;
+            S.quanta.draggingId = nodeId;
+            ev.dataTransfer.setData(C.DND_TYPE_NODEID, nodeId);
+            ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
+        };
+
+        attribs.onDragEnd = function (ev: any) {
+            ev.currentTarget.classList.remove("dragBorderSource");
+            S.quanta.dragElm = null;
+            S.quanta.draggingId = null;
+        };
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
@@ -396,9 +417,9 @@ export class DomUtil {
         }
     }
 
-    makeDropTarget = (comp: CompIntf, id: string) => {
-        comp.attribs.nid = id;
-        S.domUtil.setDropHandler(comp.attribs, (evt: DragEvent) => {
+    makeDropTarget = (attribs: any, id: string) => {
+        attribs.nid = id;
+        S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(b) kind=" + item.kind + " type=" + item.type);
@@ -420,7 +441,7 @@ export class DomUtil {
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
-                        if (comp.attribs.nid === s) {
+                        if (attribs.nid === s) {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }

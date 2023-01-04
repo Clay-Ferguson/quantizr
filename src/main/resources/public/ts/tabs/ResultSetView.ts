@@ -81,6 +81,10 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             else {
                 const c = this.renderItem(node, i, rowCount, jumpButton, ast);
                 if (c) {
+                    if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+                        S.domUtil.setNodeDragHandler(c.attribs, node.id);
+                        S.domUtil.makeDropTarget(c.attribs, node.id);
+                    }
                     children.push(c);
                 }
             }

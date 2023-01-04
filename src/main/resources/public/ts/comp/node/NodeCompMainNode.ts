@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../../AppContext";
+import { useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -28,27 +28,9 @@ export class NodeCompMainNode extends Div {
         const type = S.plugin.getType(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.inlineEditId) {
-            this.attribs.draggable = "true";
-            this.attribs.onDragStart = (evt: any) => this.dragStart(evt, ast.node.id);
-            this.attribs.onDragEnd = this.dragEnd;
+        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+            S.domUtil.setNodeDragHandler(this.attribs, ast.node.id)
         }
-    }
-
-    dragStart = (ev: any, draggingId: string) => {
-        const ast = getAppState();
-        if (ast.editNode) {
-            return;
-        }
-        ev.currentTarget.classList.add("dragBorderSource");
-        S.quanta.dragElm = ev.target;
-        S.quanta.draggingId = draggingId;
-        ev.dataTransfer.setData(C.DND_TYPE_NODEID, draggingId);
-        ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
-    }
-
-    dragEnd = (ev: any) => {
-        ev.currentTarget.classList.remove("dragBorderSource");
     }
 
     preRender(): void {

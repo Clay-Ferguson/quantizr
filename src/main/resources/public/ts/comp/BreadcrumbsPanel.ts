@@ -38,7 +38,7 @@ export class BreadcrumbsPanel extends Div {
                         onClick: () => S.view.jumpToId(bc.id),
                         className: "breadcrumbItem"
                     });
-                    S.domUtil.makeDropTarget(span, bc.id);
+                    S.domUtil.makeDropTarget(span.attribs, bc.id);
 
                     return span;
                 }

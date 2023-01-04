@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppContext";
+import { useAppState } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
@@ -49,11 +49,10 @@ export class HistoryPanel extends Div {
                 }
             }
 
-            const dragProps = ast.userPrefs.editMode ? {
-                draggable: "true",
-                onDragStart: (evt: any) => this.dragStart(evt, h.id),
-                onDragEnd: this.dragEnd
-            } : {};
+            const dragProps = {};
+            if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+                S.domUtil.setNodeDragHandler(dragProps, h.id)
+            }
 
             children.push(parentDropTarg = new Div(null, {
                 id: h.id + "_hist",
@@ -66,26 +65,9 @@ export class HistoryPanel extends Div {
                 new Span(h.content, null, null, true)
             ]));
 
-            S.domUtil.makeDropTarget(parentDropTarg, h.id);
+            S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
         });
         this.setChildren(children);
-    }
-
-    dragStart = (ev: any, draggingId: string) => {
-        // don't allow drag while editing.
-        if (getAppState().editNode) return;
-
-        ev.currentTarget.classList.add("dragBorderSource");
-        S.quanta.dragElm = ev.target;
-        S.quanta.draggingId = draggingId;
-
-        ev.dataTransfer.setData(C.DND_TYPE_NODEID, draggingId); // was "text" type
-        ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
-    }
-
-    dragEnd = (ev: any) => {
-        ev.currentTarget.classList.remove("dragBorderSource");
-        S.quanta.dragElm = null;
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
