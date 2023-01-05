@@ -241,7 +241,9 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		if (allowEmailParse && "message/rfc822".equals(mimeType)) { // this is EML file format.
-			attachEmailContent(ms, node, is);
+			String mkdown = mail.convertEmailToMarkdown(is);
+			node.setContent(mkdown);
+			update.save(ms, node);
 		} //
 		else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
 			/*
@@ -254,38 +256,6 @@ public class AttachmentService extends ServiceBase {
 			saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
 					calcImageSize, closeStream, storeLocally, sourceUrl);
 		}
-	}
-
-	public void attachEmailContent(MongoSession ms, SubNode node, LimitedInputStream is) {
-		try {
-			StringBuilder cont = new StringBuilder();
-			mail.init();
-			MimeMessage message = new MimeMessage(mail.getMailSession(), is);
-
-			// todo-1: would be better to have a 'type' for emails.
-			cont.append("#### " + message.getSubject());
-			cont.append("\n");
-			cont.append("From: " + message.getFrom()[0]);
-			cont.append("\n\n");
-			Object obj = message.getContent();
-			if (obj instanceof MimeMultipart) {
-				MimeMultipart mm = (MimeMultipart) obj;
-				for (int i = 0; i < mm.getCount(); i++) {
-					BodyPart part = mm.getBodyPart(i);
-					if (part.getContentType().startsWith("text/plain;")) {
-						cont.append(part.getContent().toString());
-						cont.append("\n\n");
-					}
-				}
-			}
-			node.setContent(cont.toString());
-		} catch (Exception e) {
-			log.error("Failed to upload", e);
-		} finally {
-			mail.close();
-		}
-
-		update.save(ms, node);
 	}
 
 	public void pinLocalIpfsAttachments(SubNode node) {

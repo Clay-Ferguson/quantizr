@@ -4,12 +4,14 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.Properties;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import com.sun.mail.smtp.SMTPTransport;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
+import quanta.util.LimitedInputStream;
 
 /**
  * Component that sends emails
@@ -175,5 +178,36 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	@Override
 	public void messagePartiallyDelivered(TransportEvent arg) {
 		log.trace("messagePartiallyDelivered.");
+	}
+
+	// Converts a stream of EML file text to Markdown
+	public String convertEmailToMarkdown(LimitedInputStream is) {
+		StringBuilder cont = new StringBuilder();
+		try {
+			mail.init();
+			MimeMessage message = new MimeMessage(mail.getMailSession(), is);
+
+			// todo-1: would be better to have a 'type' for emails.
+			cont.append("#### " + message.getSubject());
+			cont.append("\n");
+			cont.append("From: " + message.getFrom()[0]);
+			cont.append("\n\n");
+			Object obj = message.getContent();
+			if (obj instanceof MimeMultipart) {
+				MimeMultipart mm = (MimeMultipart) obj;
+				for (int i = 0; i < mm.getCount(); i++) {
+					BodyPart part = mm.getBodyPart(i);
+					if (part.getContentType().startsWith("text/plain;")) {
+						cont.append(part.getContent().toString());
+						cont.append("\n\n");
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("Failed to upload", e);
+		} finally {
+			mail.close();
+		}
+		return cont.toString();
 	}
 }
