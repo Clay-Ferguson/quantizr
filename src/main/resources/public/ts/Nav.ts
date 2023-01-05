@@ -437,7 +437,7 @@ export class Nav {
         const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
-            let selAtt: J.Attachment = list[list.length-1];
+            let selAtt: J.Attachment = list[list.length - 1];
             let takeNext = false;
             list.forEach(att => {
                 if (takeNext) {
@@ -605,6 +605,27 @@ export class Nav {
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMME
+        });
+    }
+
+    messagesFindMentions = (userName: string) => {
+        // expand so users can see what's going on with the search string and know they can clear it.
+        // If feed tab exists, expand the filter part
+        if (FeedTab.inst) {
+            FeedTab.inst.props.searchTextState.setValue("@" + userName);
+        }
+
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToUser: null,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null,
+            applyAdminBlocks: false,
+            name: J.Constant.FEED_PUB
         });
     }
 
