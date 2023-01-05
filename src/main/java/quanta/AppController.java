@@ -1239,11 +1239,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "attName", required = false) String attName, //
 			@RequestParam(value = "explodeZips", required = false) String explodeZips, //
-
-			// remove this from client side too (todo-0);
-			// @RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
 			@RequestParam(value = "ipfs", required = false) String ipfs, //
-			@RequestParam(value = "createAsChildren", required = false) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 
@@ -1253,8 +1249,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			// log.debug("Uploading as user: "+ms.getUser());
 			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
 					"true".equalsIgnoreCase(explodeZips), //
-					"true".equalsIgnoreCase(ipfs), //
-					"true".equalsIgnoreCase(createAsChildren));
+					"true".equalsIgnoreCase(ipfs));
 		});
 	}
 

@@ -168,22 +168,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 if (done) break;
             }
         });
-
-        // DO NOT DELETE (yet)
-        // #saveAsPdf work in progress:
-        // todo-2: temp check to verify we can get HTML, in preparation for the new
-        // button to upload from clipboard HTML to PDF.
-        // const items = await (navigator as any).clipboard.read();
-        // for (let item of items) {
-        //     const blob = await item.getType("text/html");
-        //     if (blob) {
-        //         // let html = await blob.text();
-        //         // clipText = "```html\n" + html + "\n```\n";
-        //         this.dropzone.addFile(blob);
-        //         this.runButtonEnablement();
-        //         break;
-        //     }
-        // }
     }
 
     upload = async (): Promise<boolean> => {
@@ -279,9 +263,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("attName", dlg.attName);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("saveAsPdf", false); // todo-2: fix (work in progress: Save HTML from clipboard as PDF) #saveAsPdf work in progress:
                         formData.append("ipfs", dlg.toIpfs ? "true" : "false");
-                        formData.append("createAsChildren", "false"); // dlg.numFiles > 1 ? "true" : "false");
                     }
 
                     dlg.zipQuestionAnswered = false;

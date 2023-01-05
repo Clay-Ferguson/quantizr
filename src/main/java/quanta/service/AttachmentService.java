@@ -111,7 +111,7 @@ public class AttachmentService extends ServiceBase {
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
 	 */
 	public ResponseEntity<?> uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] uploadFiles,
-			boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
+			boolean explodeZips, boolean toIpfs) {
 		if (toIpfs) {
 			checkIpfs();
 		}
@@ -193,7 +193,7 @@ public class AttachmentService extends ServiceBase {
 
 					// attaches AND closes the stream.
 					attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
-							addAsChildren, explodeZips, toIpfs, true, true, true, null);
+							explodeZips, toIpfs, true, true, true, null);
 				}
 			}
 
@@ -221,7 +221,7 @@ public class AttachmentService extends ServiceBase {
 	 * specified in 'nodeId'
 	 */
 	public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
-			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild,
+			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
 			boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
 			String sourceUrl) {
 
@@ -232,33 +232,6 @@ public class AttachmentService extends ServiceBase {
 			node = read.getNode(ms, nodeId);
 		}
 		auth.ownerAuth(ms, node);
-
-		/*
-		 * Multiple file uploads always attach children for each file uploaded (correction: addAsChild is
-		 * currently never sending true ever from client becasue for now we always add multiple files to
-		 * SAME node)
-		 */
-		if (addAsChild) {
-			try {
-				SubNode newNode = create.createNode(ms, node, null, null, null, CreateNodeLocation.LAST, null, null, true);
-				newNode.setContent(fileName);
-				newNode.touch();
-
-				/*
-				 * Note: Since the parent node we're creating under might have a "pending" path (unsaved), which is
-				 * a path starting withi /r/p/ we have to set this new node to NON pending to change it. It's ok if
-				 * the user abandons and never saves because this node will get orpaned if it's parent does so we
-				 * don't need to worry about pending path for this one, and just can go with non-pending for the
-				 * correct safe behavior
-				 */
-				mongoUtil.setPendingPath(newNode, false);
-
-				update.save(ms, newNode);
-				node = newNode;
-			} catch (Exception ex) {
-				throw ExUtil.wrapEx(ex);
-			}
-		}
 
 		/* mimeType can be passed as null if it's not yet determined */
 		if (no(mimeType)) {
@@ -1001,7 +974,7 @@ public class AttachmentService extends ServiceBase {
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
+				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
 						false, true, true, storeLocally, sourceUrl);
 			}
 			/*
@@ -1023,7 +996,7 @@ public class AttachmentService extends ServiceBase {
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
+					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
 							false, true, true, storeLocally, sourceUrl);
 				}
 			}
@@ -1070,7 +1043,7 @@ public class AttachmentService extends ServiceBase {
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
 					attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, true, storeLocally,
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
 							sourceUrl);
 
 					return true;
@@ -1106,15 +1079,6 @@ public class AttachmentService extends ServiceBase {
 			 */
 			deleteBinary(ms, attName, node, userNode, true);
 		}
-
-		// #saveAsPdf work in progress:
-		// todo-2: right here if saveAsPdf is true we need to convert the HTML to PDF
-		// and write that stream.
-		// read stream into html as a string.
-		// create new outputstream (in memory) to write to (byte array stream)
-		// PdfConverterExtension.exportToPdf(out, html, "", options);
-		// get an inputstream that reads what was written, and put it in 'stream',
-		// then the rest fo the code remains as is.
 
 		String id = grid.store(stream, fileName, mimeType, metaData).toString();
 

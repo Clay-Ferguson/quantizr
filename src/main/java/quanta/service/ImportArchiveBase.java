@@ -170,7 +170,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 		LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 		// log.debug("Attaching binary to nodeId: " + node.getIdStr());
-		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false, false,
+		attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1, false,
 				false, true, false, true, null);
 		return true;
 	}
