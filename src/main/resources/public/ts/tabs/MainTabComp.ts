@@ -5,7 +5,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Html } from "../comp/core/Html";
-import { SimpleUploadPanel } from "../comp/core/SimpleUploadPanel";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
@@ -64,16 +63,22 @@ export class MainTabComp extends AppTab {
             ]);
         }
 
+        let header: Div = null;
         this.setChildren([
             new FlexRowLayout([
-                new Div(g_brandingAppName, {
-                    className: "tabTitle",
+                header = new Div(g_brandingAppName, {
+                    className: "tabTitle headerUploadPanel",
                     onClick: () => S.util.loadAnonPageHome(),
-                    title: "Go to Portal Home Node"
-                }),
-                new SimpleUploadPanel()
+                    title: "Go to Portal Home Node\n\n(or Drop Files here to upload)"
+                })
             ], "headingBar"),
             contentDiv
         ]);
+
+        S.domUtil.setDropHandler(header.attribs, (evt: DragEvent) => {
+            if (evt.dataTransfer.files) {
+                S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]", true);
+            }
+        });
     }
 }

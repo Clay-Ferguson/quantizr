@@ -1,15 +1,10 @@
-.simpleUploadPanel {
-    flex-grow: 1; // makes panel fill space horizontally
-    overflow: hidden;
+.headerUploadPanel {
     border: 2px solid transparent;
-    margin-left: 12px;
-    padding: 6px;
-    color: transparent;
+    width: 100%;
 }
 
-.simpleUploadPanel:hover {
+.headerUploadPanel:hover {
     border: 2px dotted gray;
-    color: white;
 }
 
 .dropzone-in-panel {
