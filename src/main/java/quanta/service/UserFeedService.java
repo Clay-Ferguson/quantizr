@@ -168,6 +168,7 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		SubNode myAcntNode = null;
+		String searchForUserName = null;
 
 		// includes shares TO me (but not in the context of a 'bidirectional' query)
 		if (!testQuery && doAuth && req.getToMe()) {
@@ -175,6 +176,8 @@ public class UserFeedService extends ServiceBase {
 
 			if (ok(myAcntNode)) {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
+
+				searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
 
 				SubNode _myAcntNode = myAcntNode;
 				MongoSession _s = ms;
@@ -384,8 +387,13 @@ public class UserFeedService extends ServiceBase {
 		// the feeds.
 		crit = crit.and(SubNode.NAME).ne(NodeName.HOME);
 
+		TextCriteria textCriteria = null;
 		if (!StringUtils.isEmpty(req.getSearchText())) {
-			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+
+			// Just being consistent here, this check is not needed.
+			if (no(textCriteria)) {
+				textCriteria = TextCriteria.forDefaultLanguage();
+			}
 			String text = req.getSearchText();
 			/*
 			 * If searching for a tag name or a username, be smart enough to enclose it in quotes for user,
@@ -395,8 +403,17 @@ public class UserFeedService extends ServiceBase {
 			if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
 				text = "\"" + text + "\"";
 			}
-
 			textCriteria.matching(text);
+		}
+
+		if (ok(searchForUserName)) {
+			if (no(textCriteria)) {
+				textCriteria = TextCriteria.forDefaultLanguage();
+			}
+			textCriteria.matching("\"@" + searchForUserName + "\"");
+		}
+
+		if (ok(textCriteria)) {
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
 		}
