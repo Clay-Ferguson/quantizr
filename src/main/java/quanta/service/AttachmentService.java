@@ -278,7 +278,7 @@ public class AttachmentService extends ServiceBase {
 			}
 			node.setContent(cont.toString());
 		} catch (Exception e) {
-			// todo-0: handle.
+			log.error("Failed to upload", e);
 		} finally {
 			mail.close();
 		}

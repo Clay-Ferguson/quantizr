@@ -10,7 +10,7 @@ export class SimpleUploadPanel extends Div {
     addHandlers = (): void => {
         S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
             if (evt.dataTransfer.files) {
-                S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]");
+                S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]", true);
             }
         });
     }

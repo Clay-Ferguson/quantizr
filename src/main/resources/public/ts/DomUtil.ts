@@ -207,7 +207,7 @@ export class DomUtil {
         };
     }
 
-    uploadFilesToNode = (files: any, nodeId: string) => {
+    uploadFilesToNode = async (files: any, nodeId: string, showConfirm: boolean): Promise<Response> => {
         if (!files) return;
         const formData = new FormData();
 
@@ -218,20 +218,24 @@ export class DomUtil {
         const url = S.rpcUtil.getRpcPath() + "upload";
         formData.append("nodeId", nodeId);
 
-        fetch(url, {
+        const promise = fetch(url, {
             method: "POST",
             body: formData,
             headers: {
                 Bearer: S.quanta.authToken || "",
                 Sig: S.quanta.userSignature || ""
             }
-        })
-            .then(() => {
+        });
+
+        promise.then(() => {
+            if (showConfirm) {
                 S.util.showMessage("Upload complete", "Success");
-            })
+            }
+        })
             .catch(() => {
                 S.util.showMessage("Upload failed", "Warning");
-            })
+            });
+        return promise;
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
@@ -246,19 +250,22 @@ export class DomUtil {
 
         attribs.onDragOver = function (event: any) {
             if (event.currentTarget === S.quanta.dragElm ||
-
                 // we do a tiny bit of tight-coupling here and assume that if the attribs has a 'nid' property
                 // then that represents the nodeId (pretty standard in this app tho)
-                S.quanta.draggingId === attribs.nid) return;
+                S.quanta.draggingId === attribs.nid) {
+                return;
+            }
 
             event.stopPropagation();
             event.preventDefault();
-            event.dataTransfer.dropEffect = "move"; // See the section on the DataTransfer object.
+
+            // WARNING: Using 'copy' is very important or drops from outside browser can intermittently fail.
+            event.dataTransfer.dropEffect = "copy";
             event.currentTarget.classList.add("dragTarget");
         };
 
         attribs.onDragLeave = function (event: any) {
-            if (event.currentTarget === S.quanta.dragElm) return;
+            // if (event.currentTarget === S.quanta.dragElm) return;
             event.stopPropagation();
             event.preventDefault();
             event.currentTarget.classList.remove("dragTarget");
@@ -267,7 +274,6 @@ export class DomUtil {
         attribs.onDrop = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
-
             event.currentTarget.classList.remove("dragTarget");
             func(event);
         };

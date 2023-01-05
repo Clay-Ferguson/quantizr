@@ -393,18 +393,26 @@ export class EditNodeDlg extends DialogBase {
         //
         // todo-0: For all places we run an "automatic upload" of a file currently using an instance of the UploadDialog
         // flashing up on the screen momentarily we can now do this instead!
-        // S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
-        //    S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]");
-        // });
-        S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
-            for (const item of evt.dataTransfer.items) {
-                if (item.kind === "file") {
-                    const file = item.getAsFile();
-                    this.utl.upload(file, this);
-                    return;
-                }
-            }
+        S.domUtil.setDropHandler(this.attribs, async (evt: DragEvent) => {
+            await S.domUtil.uploadFilesToNode(evt.dataTransfer.files, ast.editNode.id, false);
+            await this.utl.refreshFromServer(ast.editNode);
+            S.edit.updateNode(ast.editNode);
+            this.binaryDirty = true;
         });
+
+        // -------------------------
+        // DO NOT DELETE:
+        // This kind of code pattern *might* be needed at some point again.
+        // S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
+        //     for (const item of evt.dataTransfer.items) {
+        //         if (item.kind === "file") {
+        //             const file = item.getAsFile();
+        //             this.utl.upload(file, this);
+        //             return;
+        //         }
+        //     }
+        // });
+        // -------------------------
 
         propEditFieldContainer.setChildren([editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
             propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
