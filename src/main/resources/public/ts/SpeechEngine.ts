@@ -6,6 +6,9 @@ declare let webkitSpeechRecognition: any;
 declare let SpeechRecognition: any;
 
 export class SpeechEngine {
+    // I'm disabling the dual voice thing for now
+    public USE_VOICE2: boolean = false;
+
     // we keep this array here and not in AppState, because changes to this will never need to directly
     // trigger a DOM change.
     public queuedSpeech: string[] = null;
@@ -635,6 +638,11 @@ export class SpeechEngine {
     // us to switch voices if we went to (for quotations) but is also a way to keep the utterances as short
     // ass possible, which is needed to help Chrome not hang.
     pushTextToQueue = (text: string) => {
+        if (!this.USE_VOICE2) {
+            this.queuedSpeech.push(text);
+            return;
+        }
+
         const textWithQuotes = this.splitByQuotations(text);
         if (textWithQuotes) {
             this.queuedSpeech = this.queuedSpeech.concat(textWithQuotes)

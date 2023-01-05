@@ -142,7 +142,7 @@ export class TTSView extends AppTab {
             new Clearfix(),
             new FlexRowLayout([
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
-                this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false),
+                S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
                 this.makeRateChooser()
             ]),
             paraComps?.length > 0
