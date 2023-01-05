@@ -202,10 +202,10 @@ export class EditNodeDlgUtil {
         S.edit.updateNode(ast.editNode);
     }
 
-    uploadFromClipboard = async (dlg: EditNodeDlg) => {
+    uploadFromClipboard = async (ast: AppState, dlg: EditNodeDlg) => {
         const blob = await S.util.readClipboardFile();
         if (blob) {
-            await dlg.utl.upload(blob, dlg);
+            dlg.immediateUploadFiles(ast, [blob]);
         }
         else {
             S.util.showMessage("Unable to get Clipboard content.", "Warning");

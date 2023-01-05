@@ -653,7 +653,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             allowUpload && S.util.clipboardReadable() ? new IconButton("fa-paperclip", "Clip", {
-                onClick: () => this.utl.uploadFromClipboard(this),
+                onClick: () => this.utl.uploadFromClipboard(ast, this),
                 title: "Upload from Clipboard"
             }) : null,
 
