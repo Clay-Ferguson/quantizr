@@ -129,6 +129,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
+            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: true,

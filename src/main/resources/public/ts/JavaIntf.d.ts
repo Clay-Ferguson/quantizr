@@ -383,6 +383,7 @@ export interface NodeFeedRequest extends RequestBase {
     nodeId: string;
     toUser: string;
     toMe: boolean;
+    myMentions: boolean;
     fromMe: boolean;
     fromFriends: boolean;
     toPublic: boolean;
@@ -1043,6 +1044,7 @@ export const enum Constant {
     FEED_PUB = "publicFediverse",
     FEED_TOFROMME = "toFromMe",
     FEED_TOME = "toMe",
+    FEED_MY_MENTIONS = "myMentions",
     FEED_FROMMETOUSER = "fromMeToUser",
     FEED_FROMME = "fromMe",
     FEED_FROMFRIENDS = "fromFriends",

@@ -306,6 +306,10 @@ export class FeedView extends AppTab<FeedViewProps> {
                     subHeading = "To Me";
                     break;
 
+                case J.Constant.FEED_MY_MENTIONS:
+                    subHeading = "My Mentions";
+                    break;
+
                 case J.Constant.FEED_FROMME:
                     subHeading = "From Me";
                     break;

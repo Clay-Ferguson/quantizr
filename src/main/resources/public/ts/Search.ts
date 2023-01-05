@@ -405,6 +405,7 @@ export class Search {
             page,
             nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
             toMe: FeedTab.inst.props.feedFilterToMe,
+            myMentions: FeedTab.inst.props.feedFilterMyMentions,
             fromMe: FeedTab.inst.props.feedFilterFromMe,
             toUser: FeedTab.inst.props.feedFilterToUser,
             toPublic: FeedTab.inst.props.feedFilterToPublic,

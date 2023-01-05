@@ -12,6 +12,7 @@ public class NodeFeedRequest extends RequestBase {
 	private String toUser;
 
 	private Boolean toMe;
+	private Boolean myMentions;
 	private Boolean fromMe;
 	private Boolean fromFriends;
 	private Boolean toPublic;
@@ -44,6 +45,14 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setToMe(Boolean toMe) {
 		this.toMe = toMe;
+	}
+
+	public Boolean getMyMentions() {
+		return myMentions;
+	}
+
+	public void setMyMentions(Boolean myMentions) {
+		this.myMentions = myMentions;
 	}
 
 	public Boolean getFromMe() {

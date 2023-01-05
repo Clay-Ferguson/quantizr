@@ -50,6 +50,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         }
         else {
             return new Div(null, { className: "tabSubOptions" }, [
+                ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
                 ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
                 ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
                 ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),

@@ -170,14 +170,15 @@ public class UserFeedService extends ServiceBase {
 		SubNode myAcntNode = null;
 		String searchForUserName = null;
 
+		if (doAuth && req.getMyMentions()) {
+			searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
+		}
 		// includes shares TO me (but not in the context of a 'bidirectional' query)
-		if (!testQuery && doAuth && req.getToMe()) {
+		else if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 
 			if (ok(myAcntNode)) {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
-
-				searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
 
 				SubNode _myAcntNode = myAcntNode;
 				MongoSession _s = ms;
@@ -194,6 +195,7 @@ public class UserFeedService extends ServiceBase {
 				});
 			}
 		}
+
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 

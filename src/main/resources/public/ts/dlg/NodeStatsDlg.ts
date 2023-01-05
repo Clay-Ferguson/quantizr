@@ -96,6 +96,7 @@ export class NodeStatsDlg extends DialogBase {
             S.nav.messages({
                 feedFilterFriends: false,
                 feedFilterToMe: false,
+                feedFilterMyMentions: false,
                 feedFilterFromMe: false,
                 feedFilterToUser: null,
                 feedFilterToPublic: true,

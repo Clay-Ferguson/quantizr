@@ -7,6 +7,7 @@ export class FeedViewProps {
     searchTextState = new Validator();
     feedFilterFriends = false;
     feedFilterToMe = false;
+    feedFilterMyMentions = false;
     feedFilterFromMe = false;
     feedFilterToUser: string = null;
     feedFilterToPublic = true;
