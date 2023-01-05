@@ -126,9 +126,11 @@ public class AttachmentService extends ServiceBase {
 			 * which will be even more strict.
 			 */
 			SubNode node = null;
+			boolean allowEmailParse = false;
 
 			// if auto then get the node and make nodeId be that id.
 			if (nodeId.equals("[auto]")) {
+				allowEmailParse = true;
 				SubNode parent = read.getNode(ms, "~" + NodeType.NOTES, false, null);
 				if (no(parent)) {
 					throw ExUtil.wrapEx("Node not found.");
@@ -193,7 +195,7 @@ public class AttachmentService extends ServiceBase {
 
 					// attaches AND closes the stream.
 					attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1, -1,
-							explodeZips, toIpfs, true, true, true, null);
+							explodeZips, toIpfs, true, true, true, null, allowEmailParse);
 				}
 			}
 
@@ -223,7 +225,7 @@ public class AttachmentService extends ServiceBase {
 	public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
 			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
 			boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-			String sourceUrl) {
+			String sourceUrl, boolean allowEmailParse) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
@@ -238,7 +240,7 @@ public class AttachmentService extends ServiceBase {
 			mimeType = getMimeFromFileType(fileName);
 		}
 
-		if ("message/rfc822".equals(mimeType)) { // this is EML file format.
+		if (allowEmailParse && "message/rfc822".equals(mimeType)) { // this is EML file format.
 			attachEmailContent(ms, node, is);
 		} //
 		else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
@@ -975,7 +977,7 @@ public class AttachmentService extends ServiceBase {
 
 				// insert 0L for size now, because we don't know it yet
 				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
-						false, true, true, storeLocally, sourceUrl);
+						false, true, true, storeLocally, sourceUrl, false);
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but we want to try to
@@ -997,7 +999,7 @@ public class AttachmentService extends ServiceBase {
 
 					// insert 0L for size now, because we don't know it yet
 					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-							false, true, true, storeLocally, sourceUrl);
+							false, true, true, storeLocally, sourceUrl, false);
 				}
 			}
 		} catch (Exception e) {
@@ -1044,7 +1046,7 @@ public class AttachmentService extends ServiceBase {
 
 					attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
 							bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
-							sourceUrl);
+							sourceUrl, false);
 
 					return true;
 				}
