@@ -1238,10 +1238,12 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "attName", required = false) String attName, //
-			@RequestParam(value = "explodeZips", required = true) String explodeZips, //
-			@RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
-			@RequestParam(value = "ipfs", required = true) String ipfs, //
-			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
+			@RequestParam(value = "explodeZips", required = false) String explodeZips, //
+
+			// remove this from client side too (todo-0);
+			// @RequestParam(value = "saveAsPdf", required = true) String saveAsPdf, //
+			@RequestParam(value = "ipfs", required = false) String ipfs, //
+			@RequestParam(value = "createAsChildren", required = false) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 
@@ -1249,8 +1251,10 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		return callProc.run("upload", true, true, null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
-					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
+			return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
+					"true".equalsIgnoreCase(explodeZips), //
+					"true".equalsIgnoreCase(ipfs), //
+					"true".equalsIgnoreCase(createAsChildren));
 		});
 	}
 
@@ -1311,9 +1315,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	}
 
 	/*
-	 * This function is similar to getPeople, but since getPeople is for a picker dialog we can
-	 * consider it to be the odd man out which will eventually need to support paging (currently
-	 * doesn't) and go ahead and duplicate that functionality here in a way analogous to getFollowers
+	 * This function is similar to getPeople, but since getPeople is for a picker dialog we can consider
+	 * it to be the odd man out which will eventually need to support paging (currently doesn't) and go
+	 * ahead and duplicate that functionality here in a way analogous to getFollowers
 	 */
 	@RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {

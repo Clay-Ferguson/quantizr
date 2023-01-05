@@ -84,6 +84,10 @@ public class EmailSender extends ServiceBase implements TransportListener {
 		}
 	}
 
+	public Session getMailSession() {
+		return mailSession;
+	}
+
 	public boolean mailEnabled() {
 		return !StringUtils.isEmpty(appProp.getMailPassword());
 	}

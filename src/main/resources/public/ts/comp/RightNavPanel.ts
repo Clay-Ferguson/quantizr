@@ -97,6 +97,8 @@ export class RightNavPanel extends Div {
                     content = await (navigator as any)?.clipboard?.readText();
 
                     if (!content) {
+                        // todo-0: Everywhere we assume we can just upload a clipboard file we should actually
+                        // ask the user that in a yes/no question dialog.
                         const blob = await S.util.readClipboardFile();
                         if (blob) {
                             EditNodeDlg.pendingUploadFile = blob;

@@ -116,6 +116,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (EditNodeDlg.pendingUploadFile) {
             setTimeout(async () => {
+                // todo-0: we can use our new pure TS uploader here.
                 await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
                 EditNodeDlg.pendingUploadFile = null;
             }, 250);
@@ -389,6 +390,12 @@ export class EditNodeDlg extends DialogBase {
 
         this.attribs.nid = ast.editNode.id;
         // Allows user to drag-n-drop files onto editor to upload
+        //
+        // todo-0: For all places we run an "automatic upload" of a file currently using an instance of the UploadDialog
+        // flashing up on the screen momentarily we can now do this instead!
+        // S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
+        //    S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]");
+        // });
         S.domUtil.setDropHandler(this.attribs, (evt: DragEvent) => {
             for (const item of evt.dataTransfer.items) {
                 if (item.kind === "file") {

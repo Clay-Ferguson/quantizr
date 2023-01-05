@@ -2226,7 +2226,7 @@ audio::-webkit-media-controls-play-button {
     font-size: 90%;
 }
 
-.dragBorderSource {
+.dragSource {
     background: repeating-linear-gradient(-45deg,
             orange,
             orange 2px,
@@ -2234,7 +2234,7 @@ audio::-webkit-media-controls-play-button {
             transparent 14px);
 }
 
-.dragBorderTarget {
+.dragTarget {
     background: repeating-linear-gradient(-45deg,
             green,
             green 2px,

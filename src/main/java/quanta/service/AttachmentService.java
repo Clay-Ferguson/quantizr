@@ -20,6 +20,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.mail.BodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -63,11 +66,11 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.UploadFromIPFSRequest;
@@ -118,17 +121,26 @@ public class AttachmentService extends ServiceBase {
 
 		try {
 			/*
-			 * OLD LOGIC: Uploading a single file attaches to the current node, but uploading multiple files
-			 * creates each file on it's own subnode (child nodes)
-			 */
-			// boolean addAsChildren = countFileUploads(uploadFiles) > 1;
-
-			/*
 			 * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
 			 * UNDERNEATH this current node. Pass allowAuth=false here becasue below we check the ownerAuth
 			 * which will be even more strict.
 			 */
-			SubNode node = read.getNode(ms, nodeId, false, null);
+			SubNode node = null;
+
+			// if auto then get the node and make nodeId be that id.
+			if (nodeId.equals("[auto]")) {
+				SubNode parent = read.getNode(ms, "~" + NodeType.NOTES, false, null);
+				if (no(parent)) {
+					throw ExUtil.wrapEx("Node not found.");
+				}
+
+				node = create.createNode(ms, parent, null, NodeType.NONE.s(), //
+						0L, CreateNodeLocation.FIRST, null, null, true);
+				nodeId = node.getIdStr();
+			} else {
+				node = read.getNode(ms, nodeId, false, null);
+			}
+
 			if (no(node)) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
@@ -175,7 +187,7 @@ public class AttachmentService extends ServiceBase {
 
 				long size = uploadFile.getSize();
 				if (!StringUtils.isEmpty(fileName)) {
-					// log.debug("Uploading file: " + fileName + " contentType=" + contentType);
+					log.debug("Uploading file: " + fileName + " contentType=" + contentType);
 
 					LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
 
@@ -253,16 +265,52 @@ public class AttachmentService extends ServiceBase {
 			mimeType = getMimeFromFileType(fileName);
 		}
 
-		if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
+		if ("message/rfc822".equals(mimeType)) { // this is EML file format.
+			attachEmailContent(ms, node, is);
+		} //
+		else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
 			/*
 			 * This is a prototype-scope bean, with state for processing one import at a time
 			 */
 			ImportZipService importZipStreamService = (ImportZipService) context.getBean(ImportZipService.class);
 			importZipStreamService.importFromStream(ms, is, node, false);
-		} else {
+		} //
+		else {
 			saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
 					calcImageSize, closeStream, storeLocally, sourceUrl);
 		}
+	}
+
+	public void attachEmailContent(MongoSession ms, SubNode node, LimitedInputStream is) {
+		try {
+			StringBuilder cont = new StringBuilder();
+			mail.init();
+			MimeMessage message = new MimeMessage(mail.getMailSession(), is);
+
+			// todo-1: would be better to have a 'type' for emails.
+			cont.append("#### " + message.getSubject());
+			cont.append("\n");
+			cont.append("From: " + message.getFrom()[0]);
+			cont.append("\n\n");
+			Object obj = message.getContent();
+			if (obj instanceof MimeMultipart) {
+				MimeMultipart mm = (MimeMultipart) obj;
+				for (int i = 0; i < mm.getCount(); i++) {
+					BodyPart part = mm.getBodyPart(i);
+					if (part.getContentType().startsWith("text/plain;")) {
+						cont.append(part.getContent().toString());
+						cont.append("\n\n");
+					}
+				}
+			}
+			node.setContent(cont.toString());
+		} catch (Exception e) {
+			// todo-0: handle.
+		} finally {
+			mail.close();
+		}
+
+		update.save(ms, node);
 	}
 
 	public void pinLocalIpfsAttachments(SubNode node) {
@@ -388,6 +436,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			int maxAttOrdinal = getMaxAttachmentOrdinal(node);
+
 			att = node.getAttachment(attName, true, true);
 			att.setOrdinal(maxAttOrdinal + 1);
 		}
@@ -473,7 +522,7 @@ public class AttachmentService extends ServiceBase {
 			}
 		}
 
-		log.debug("Node to save: " + XString.prettyPrint(node));
+		// log.debug("Node to save: " + XString.prettyPrint(node));
 		update.save(ms, node);
 	}
 

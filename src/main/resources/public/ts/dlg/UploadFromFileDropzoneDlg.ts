@@ -322,7 +322,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         };
 
-        S.domUtil.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
+        this.dropzoneDiv.domPreUpdateEvent = (): void => {
+            // console.log("Setting up Dropzone for ID: " + this.dropzoneDiv.getId());
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
             const maxUploadSize = getAppState().userPrefs.maxUploadFileSize;
 
@@ -341,7 +342,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.upload();
                 }, 250);
             }
-        });
+        }
     }
 
     updateFileList = async (dropzoneEvt: any) => {

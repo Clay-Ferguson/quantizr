@@ -193,7 +193,7 @@ export class DomUtil {
             if (ast.editNode) {
                 return;
             }
-            ev.currentTarget.classList.add("dragBorderSource");
+            ev.currentTarget.classList.add("dragSource");
             S.quanta.dragElm = ev.target;
             S.quanta.draggingId = nodeId;
             ev.dataTransfer.setData(C.DND_TYPE_NODEID, nodeId);
@@ -201,10 +201,37 @@ export class DomUtil {
         };
 
         attribs.onDragEnd = function (ev: any) {
-            ev.currentTarget.classList.remove("dragBorderSource");
+            ev.currentTarget.classList.remove("dragSource");
             S.quanta.dragElm = null;
             S.quanta.draggingId = null;
         };
+    }
+
+    uploadFilesToNode = (files: any, nodeId: string) => {
+        if (!files) return;
+        const formData = new FormData();
+
+        ([...files]).forEach((file: any) => {
+            console.log("Uploading File: " + file.name);
+            formData.append("files", file);
+        });
+        const url = S.rpcUtil.getRpcPath() + "upload";
+        formData.append("nodeId", nodeId);
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+            headers: {
+                Bearer: S.quanta.authToken || "",
+                Sig: S.quanta.userSignature || ""
+            }
+        })
+            .then(() => {
+                S.util.showMessage("Upload complete", "Success");
+            })
+            .catch(() => {
+                S.util.showMessage("Upload failed", "Warning");
+            })
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
@@ -214,6 +241,7 @@ export class DomUtil {
             // maybe we wouldn't need onDragOver in that case?
             event.stopPropagation();
             event.preventDefault();
+            event.currentTarget.classList.add("dragTarget");
         };
 
         attribs.onDragOver = function (event: any) {
@@ -226,22 +254,21 @@ export class DomUtil {
             event.stopPropagation();
             event.preventDefault();
             event.dataTransfer.dropEffect = "move"; // See the section on the DataTransfer object.
-            event.currentTarget.classList.add("dragBorderTarget");
+            event.currentTarget.classList.add("dragTarget");
         };
 
         attribs.onDragLeave = function (event: any) {
             if (event.currentTarget === S.quanta.dragElm) return;
             event.stopPropagation();
             event.preventDefault();
-            event.currentTarget.classList.remove("dragBorderTarget");
+            event.currentTarget.classList.remove("dragTarget");
         };
 
         attribs.onDrop = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
 
-            event.currentTarget.classList.remove("dragBorderTarget");
-            event.currentTarget.classList.remove("dragBorder");
+            event.currentTarget.classList.remove("dragTarget");
             func(event);
         };
     }

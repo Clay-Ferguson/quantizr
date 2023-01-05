@@ -214,6 +214,8 @@ export class Edit {
             let blob = null;
             const clipboardText = await (navigator as any)?.clipboard?.readText();
             if (!clipboardText) {
+                // todo-0: Everywhere we assume we can just upload a clipboard file we should actually
+                // ask the user that in a yes/no question dialog.
                 blob = await S.util.readClipboardFile();
                 if (blob) {
                     EditNodeDlg.pendingUploadFile = blob;
@@ -790,6 +792,8 @@ export class Edit {
 
         id = S.util.allowIdFromEvent(evt, id);
         const ast = getAppState();
+
+        // todo-0: almost all of thest productivity features are undocumented and also need a video dedicated to them.
         if (S.util.ctrlKeyCheck()) {
             this.saveClipboardToChildNode(id);
         }
@@ -1094,6 +1098,8 @@ export class Edit {
 
         let blob = null;
         if (!clipText) {
+            // todo-0: Everywhere we assume we can just upload a clipboard file we should actually
+            // ask the user that in a yes/no question dialog.
             blob = await S.util.readClipboardFile();
             if (blob) {
                 EditNodeDlg.pendingUploadFile = blob;

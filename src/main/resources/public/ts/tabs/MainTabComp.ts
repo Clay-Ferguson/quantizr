@@ -3,7 +3,9 @@ import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Html } from "../comp/core/Html";
+import { SimpleUploadPanel } from "../comp/core/SimpleUploadPanel";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
@@ -63,13 +65,14 @@ export class MainTabComp extends AppTab {
         }
 
         this.setChildren([
-            new Div(null, { className: "headingBar" }, [
+            new FlexRowLayout([
                 new Div(g_brandingAppName, {
                     className: "tabTitle",
                     onClick: () => S.util.loadAnonPageHome(),
                     title: "Go to Portal Home Node"
-                })
-            ]),
+                }),
+                new SimpleUploadPanel()
+            ], "headingBar"),
             contentDiv
         ]);
     }
