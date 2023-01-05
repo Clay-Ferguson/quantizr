@@ -97,8 +97,6 @@ export class RightNavPanel extends Div {
                     content = await (navigator as any)?.clipboard?.readText();
 
                     if (!content) {
-                        // todo-0: Everywhere we assume we can just upload a clipboard file we should actually
-                        // ask the user that in a yes/no question dialog.
                         const blob = await S.util.readClipboardFile();
                         if (blob) {
                             EditNodeDlg.pendingUploadFile = blob;
@@ -107,7 +105,7 @@ export class RightNavPanel extends Div {
                 }
                 S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, null, () => S.util.showPageMessage("Saved (Go to: Menu -> Quanta -> Notes)"), null, false, ast);
             },
-            title: "Create new Private Note"
+            title: "Create new Private Note\n(Hold down CTRL key to attach from clipboard)"
         }) : null;
 
         if (addNoteButton) {

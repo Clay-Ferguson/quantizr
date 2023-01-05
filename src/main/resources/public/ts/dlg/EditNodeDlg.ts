@@ -1,4 +1,5 @@
 import { dispatch, getAppState } from "../AppContext";
+import { AppState } from "../AppState";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -116,8 +117,10 @@ export class EditNodeDlg extends DialogBase {
 
         if (EditNodeDlg.pendingUploadFile) {
             setTimeout(async () => {
-                // todo-0: we can use our new pure TS uploader here.
-                await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
+                // DO NOT DELETE. Leave this here as an FYI.
+                // await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
+
+                this.immediateUploadFiles(ast, [EditNodeDlg.pendingUploadFile]);
                 EditNodeDlg.pendingUploadFile = null;
             }, 250);
         }
@@ -135,6 +138,13 @@ export class EditNodeDlg extends DialogBase {
                 });
             }, 5000);
         }
+    }
+
+    immediateUploadFiles = async (ast: AppState, files: any) => {
+        await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
+        await this.utl.refreshFromServer(ast.editNode);
+        S.edit.updateNode(ast.editNode);
+        this.binaryDirty = true;
     }
 
     resetAutoSaver = async () => {
@@ -390,14 +400,8 @@ export class EditNodeDlg extends DialogBase {
 
         this.attribs.nid = ast.editNode.id;
         // Allows user to drag-n-drop files onto editor to upload
-        //
-        // todo-0: For all places we run an "automatic upload" of a file currently using an instance of the UploadDialog
-        // flashing up on the screen momentarily we can now do this instead!
         S.domUtil.setDropHandler(this.attribs, async (evt: DragEvent) => {
-            await S.domUtil.uploadFilesToNode(evt.dataTransfer.files, ast.editNode.id, false);
-            await this.utl.refreshFromServer(ast.editNode);
-            S.edit.updateNode(ast.editNode);
-            this.binaryDirty = true;
+            this.immediateUploadFiles(ast, evt.dataTransfer.files);
         });
 
         // -------------------------

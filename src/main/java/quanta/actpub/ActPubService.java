@@ -1214,7 +1214,6 @@ public class ActPubService extends ServiceBase {
         // shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
 
         addAttachments(ms, newNode, obj);
-
         update.save(ms, newNode, false);
 
         try {

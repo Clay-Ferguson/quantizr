@@ -3,7 +3,7 @@ import { S } from "../../Singletons";
 
 export class SimpleUploadPanel extends Div {
     constructor() {
-        super("Drop Files Here....", { className: "simpleUploadPanel" });
+        super("Drop Files Here (Saves to Notes Folder)", { className: "simpleUploadPanel" });
         this.addHandlers();
     }
 
