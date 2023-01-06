@@ -160,7 +160,7 @@ export class TTSView extends AppTab {
             idx++;
         });
 
-        return new Selection(null, primaryVoice ? "Narration Voice" : "Quotation Voice",
+        return new Selection(null, primaryVoice ? "Voice" : "Quotation Voice",
             data, null, "selectVoiceDropDown", {
             setValue: (val: string) => {
                 const voiceInt = parseInt(val);

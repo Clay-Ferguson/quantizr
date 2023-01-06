@@ -924,7 +924,12 @@ export class Util {
         if (!res) return;
 
         const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX, "allUsers");
-        const voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX, "allUsers");
+        let voice2 = voice;
+
+        if (S.speech.USE_VOICE2) {
+            voice2 = await S.localDB.getVal(C.LOCALDB_VOICE2_INDEX, "allUsers");
+        }
+
         const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
 
         dispatch("LoginResponse", s => {

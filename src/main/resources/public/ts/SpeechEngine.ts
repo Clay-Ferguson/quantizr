@@ -289,7 +289,7 @@ export class SpeechEngine {
                     utter = new SpeechSynthesisUtterance(sayThis);
 
                     const isQuote = sayThis.startsWith("\"");
-                    if (isQuote && ast.speechVoice2 >= 0) {
+                    if (isQuote && this.USE_VOICE2 && ast.speechVoice2 >= 0) {
                         const voices = this.getVoices();
                         utter.voice = voices[(ast.speechVoice2 < voices.length ? ast.speechVoice2 : 0)];
                     }
