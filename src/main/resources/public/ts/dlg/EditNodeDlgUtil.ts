@@ -107,7 +107,10 @@ export class EditNodeDlgUtil {
 
         /* IMPORTANT: If there's an after edit action function specified on the dialog then that will be the ONLY
          action performed after the saveNode, so if we ever need any of the below logic to be run, in the case with
-         afterEditAction we'd have to call that logic inside the afterEditAction function. */
+         afterEditAction we'd have to call that logic inside the afterEditAction function.
+
+         todo-0: this afterEditAction seems kind of ugly. Check if this can be done better now.
+         */
         if (dlg.afterEditAction) return true;
 
         S.render.fadeInId = editNode.id;

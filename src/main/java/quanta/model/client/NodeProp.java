@@ -193,6 +193,7 @@ public enum NodeProp {
     // node is s boost.
     BOOST("boost"), //
     DURATION("duration"), //
+    IN_PENDING_PATH("pendingPath"), //
 
     TRUNCATED("trunc");
 

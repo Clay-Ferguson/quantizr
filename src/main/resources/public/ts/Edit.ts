@@ -325,18 +325,15 @@ export class Edit {
                 }
             }
 
-            // find and update the history item if it exists.
-            const histItem = S.quanta.nodeHistory.find(h => h.id === node.id);
-            if (histItem) {
-                histItem.content = S.nodeUtil.getShortContent(node);
-            }
-
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
             // and so before refreshing the screen we check for that edge case.
             const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
+            // todo-0: we should alter the "SaveNode" to make it send BACK the 'newNode' so we don't
+            // evern need to make THIS call?
             const newNode = await this.refreshNodeFromServer(node.id, newNodeTargetId);
+            S.util.updateNodeHistory(newNode);
 
             if (ast.activeTab === C.TAB_MAIN) {
                 // Inject the new node right into the page children

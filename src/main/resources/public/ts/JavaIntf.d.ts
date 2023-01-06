@@ -1155,6 +1155,7 @@ export const enum NodeProp {
     UNPUBLISHED = "unpub",
     BOOST = "boost",
     DURATION = "duration",
+    IN_PENDING_PATH = "pendingPath",
     TRUNCATED = "trunc",
 }
 
