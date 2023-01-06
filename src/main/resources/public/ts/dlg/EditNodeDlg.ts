@@ -926,6 +926,14 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-lg fa-user editorIcon",
                 title: "Insert Username(s) at cursor",
                 onClick: () => this.utl.insertUserNames(this)
+            }),
+
+             new Icon({
+                className: "fa fa-lg fa-volume-up editorIcon",
+                onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                onMouseOut: () => { S.quanta.selectedForTts = null; },
+                onClick: () => this.utl.speakEditorText(this),
+                title: "Text-to-Speech: Editor Text or Selection"
             })
         ], "float-end microMarginBottom bigMarginRight"));
         editItems.push(this.contentEditor as any as Comp);
