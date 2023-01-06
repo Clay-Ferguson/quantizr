@@ -262,11 +262,21 @@ td {
 
 .speech-text-area {
     border: 2px solid $nodeBorderBottomColor;
-    margin-top: $smallGap;
     margin-bottom: 24px;
     border-radius: $border-radius;
     background-color: $baseBgColor;
     padding: 16px;
+}
+
+.stickySpeechButtons {
+    position: sticky;
+    top: 0px;
+    right: 0px;
+    z-index: 15000000;
+    background: $primary;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    padding: 6px 12px 6px 12px;
 }
 
 .speech-area-title {
@@ -309,7 +319,7 @@ td {
 
 .rateChooserDropDown {
     margin-bottom: 12px;
-    width: 8rem;
+    width: 7rem;
     margin-right: $smallGap;
 }
 
