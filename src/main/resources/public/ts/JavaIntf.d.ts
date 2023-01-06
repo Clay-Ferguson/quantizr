@@ -937,6 +937,10 @@ export interface UploadFromIPFSResponse extends ResponseBase {
 export interface UploadFromUrlResponse extends ResponseBase {
 }
 
+export interface UploadResponse extends ResponseBase {
+    payloads: string[];
+}
+
 export interface ResponseBase {
     success: boolean;
     message: string;

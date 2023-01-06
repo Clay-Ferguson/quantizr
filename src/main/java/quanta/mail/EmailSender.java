@@ -184,8 +184,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	public String convertEmailToMarkdown(LimitedInputStream is) {
 		StringBuilder cont = new StringBuilder();
 		try {
-			mail.init();
-			MimeMessage message = new MimeMessage(mail.getMailSession(), is);
+			MimeMessage message = new MimeMessage(null /* mail.getMailSession() */, is);
 
 			// todo-1: would be better to have a 'type' for emails.
 			cont.append("#### " + message.getSubject());
@@ -205,9 +204,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
 			}
 		} catch (Exception e) {
 			log.error("Failed to upload", e);
-		} finally {
-			mail.close();
-		}
+		} 
 		return cont.toString();
 	}
 }

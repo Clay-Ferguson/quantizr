@@ -3,6 +3,7 @@ import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
+import { UploadResponse } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class DomUtil {
@@ -207,17 +208,78 @@ export class DomUtil {
         };
     }
 
+    enterFetch = () => {
+        S.rpcUtil.rpcCounter++;
+        S.quanta.setOverlay(true);
+    }
+
+    exitFetch = () => {
+        S.quanta.setOverlay(false);
+        S.rpcUtil.rpcCounter--;
+        S.rpcUtil.progressInterval();
+    }
+
+    parseFiles = async (files: FileList, showConfirm: boolean): Promise<UploadResponse> => {
+        if (!files) return;
+
+        return new Promise<UploadResponse>((resolve, reject) => {
+            const formData = new FormData();
+
+            ([...files]).forEach((file: File) => {
+                formData.append("files", file);
+            });
+            const url = S.rpcUtil.getRpcPath() + "parseFiles";
+
+            this.enterFetch();
+            fetch(url, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    Bearer: S.quanta.authToken || "",
+                    Sig: S.quanta.userSignature || ""
+                }
+            })
+                .then((res: any) => {
+                    if (res.status !== 200) {
+                        return null;
+                    }
+                    else {
+                        S.util.showMessage("Upload complete", "Success");
+                        return res.text();
+                    }
+                })
+                .then((json: string) => {
+                    console.log("Upload Response: " + json);
+                    /* if we did a reject above in the first 'then' we will get here with json undefined
+                    so we ignore that */
+                    this.exitFetch();
+                    if (json) {
+                        // console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
+                        resolve(JSON.parse(json));
+                    }
+                    else {
+                        reject(null);
+                    }
+                }).catch(() => {
+                    this.exitFetch();
+                    S.util.showMessage("Upload failed", "Warning");
+                    reject(null);
+                })
+        });
+    }
+
     uploadFilesToNode = async (files: any, nodeId: string, showConfirm: boolean): Promise<Response> => {
         if (!files) return;
         const formData = new FormData();
 
         ([...files]).forEach((file: any) => {
-            console.log("Uploading File: " + file.name);
+            // console.log("Uploading File: " + file.name);
             formData.append("files", file);
         });
         const url = S.rpcUtil.getRpcPath() + "upload";
         formData.append("nodeId", nodeId);
 
+        this.enterFetch();
         const promise = fetch(url, {
             method: "POST",
             body: formData,
@@ -228,11 +290,13 @@ export class DomUtil {
         });
 
         promise.then(() => {
+            this.exitFetch();
             if (showConfirm) {
                 S.util.showMessage("Upload complete", "Success");
             }
         })
             .catch(() => {
+                this.exitFetch();
                 S.util.showMessage("Upload failed", "Warning");
             });
         return promise;

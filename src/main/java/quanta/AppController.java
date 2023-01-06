@@ -1234,6 +1234,17 @@ public class AppController extends ServiceBase implements ErrorController {
 	// }
 	//
 
+	@RequestMapping(value = API_PATH + "/parseFiles", method = RequestMethod.POST)
+	public @ResponseBody Object parseFiles(//
+			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
+			HttpSession session) {
+
+		return callProc.run("parseFiles", true, true, null, session, ms -> {
+			// log.debug("Parsing as user: "+ms.getUser());
+			return attach.parseUploadFiles(ms, uploadFiles);
+		});
+	}
+
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //

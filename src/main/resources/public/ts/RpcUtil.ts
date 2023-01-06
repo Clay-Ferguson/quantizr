@@ -1,4 +1,3 @@
-import { AppState } from "./AppState";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -15,7 +14,7 @@ export class RpcUtil {
     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
     * session is only allowed one concurrent call and simultaneous calls just "queue up".
     */
-    private rpcCounter: number = 0;
+    rpcCounter: number = 0;
 
     timeoutMessageShown: boolean = false;
     waitCounter: number = 0;
@@ -41,6 +40,8 @@ export class RpcUtil {
         let reqPromise: Promise<ResponseType> = null;
 
         try {
+            // todo-1: We *could* now get rid of this wrapper promise and always just return the
+            // final thing that gets resolved.
             reqPromise = new Promise<ResponseType>((resolve, reject) => {
                 if (this.logRpc) {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + S.util.prettyPrint(postData));
@@ -90,6 +91,9 @@ export class RpcUtil {
                             // console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
                             resolve(JSON.parse(json));
                         }
+                        else {
+                            reject(null); // <-- NOTE: 1/5/23
+                        }
                     })
                     .catch((error) => {
                         console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
@@ -113,7 +117,7 @@ export class RpcUtil {
         try {
             if (!background) {
                 this.rpcCounter--;
-                this.progressInterval(null);
+                this.progressInterval();
             }
 
             if (this.logRpc) {
@@ -151,7 +155,7 @@ export class RpcUtil {
         try {
             if (!background) {
                 this.rpcCounter--;
-                this.progressInterval(null);
+                this.progressInterval();
             }
             let status = error.response ? error.response.status : "";
             const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
@@ -200,7 +204,7 @@ export class RpcUtil {
         setInterval(this.progressInterval, 1000);
     }
 
-    progressInterval = (ast: AppState) => {
+    progressInterval = () => {
         /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
          querying server like the APP would do (index.html) */
         if (__page !== "index") return;

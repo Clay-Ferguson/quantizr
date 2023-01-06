@@ -16,13 +16,11 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.mail.BodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -78,6 +76,7 @@ import quanta.request.UploadFromUrlRequest;
 import quanta.response.DeleteAttachmentResponse;
 import quanta.response.UploadFromIPFSResponse;
 import quanta.response.UploadFromUrlResponse;
+import quanta.response.UploadResponse;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
@@ -106,6 +105,35 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	public GridFSBucket gridBucket;
+
+	public UploadResponse parseUploadFiles(MongoSession ms, MultipartFile[] uploadFiles) {
+		UploadResponse resp = new UploadResponse();
+		List<String> payloads = new LinkedList<String>();
+		resp.setPayloads(payloads);
+
+		int maxFileSize = user.getMaxUploadSize(ms);
+
+		for (MultipartFile uploadFile : uploadFiles) {
+			String contentType = uploadFile.getContentType();
+
+			// Right now we only support parsing EML files.
+			if (!"message/rfc822".equals(contentType)) {
+				continue;
+			}
+
+			// log.debug("Parsing Upload file: " + uploadFile.getOriginalFilename() + " contentType=" + contentType);
+			try {
+				LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
+				String mkdown = mail.convertEmailToMarkdown(limitedIs);
+				resp.setSuccess(true);
+				payloads.add(mkdown);
+			} //
+			catch (Exception e) {
+				throw ExUtil.wrapEx(e);
+			}
+		}
+		return resp;
+	}
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
@@ -223,9 +251,9 @@ public class AttachmentService extends ServiceBase {
 	 * specified in 'nodeId'
 	 */
 	public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
-			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
-			boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-			String sourceUrl, boolean allowEmailParse) {
+			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height, boolean explodeZips,
+			boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally, String sourceUrl,
+			boolean allowEmailParse) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
@@ -946,8 +974,8 @@ public class AttachmentService extends ServiceBase {
 				limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 				// insert 0L for size now, because we don't know it yet
-				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false,
-						false, true, true, storeLocally, sourceUrl, false);
+				attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1, false, false,
+						true, true, storeLocally, sourceUrl, false);
 			}
 			/*
 			 * if not an image extension, we can just stream directly into the database, but we want to try to
@@ -968,8 +996,8 @@ public class AttachmentService extends ServiceBase {
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-							false, true, true, storeLocally, sourceUrl, false);
+					attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false,
+							true, true, storeLocally, sourceUrl, false);
 				}
 			}
 		} catch (Exception e) {
@@ -1015,8 +1043,8 @@ public class AttachmentService extends ServiceBase {
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
 					attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
-							sourceUrl, false);
+							bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally, sourceUrl,
+							false);
 
 					return true;
 				}

@@ -401,7 +401,30 @@ export class EditNodeDlg extends DialogBase {
         this.attribs.nid = ast.editNode.id;
         // Allows user to drag-n-drop files onto editor to upload
         S.domUtil.setDropHandler(this.attribs, async (evt: DragEvent) => {
-            this.immediateUploadFiles(ast, evt.dataTransfer.files);
+
+            let hasEmail = false;
+            // todo-0: add "File" as all types for these and btw the 'files' type is FileList
+            ([...evt.dataTransfer.files]).forEach((file: File) => {
+                const name = file.name;
+                const lcName = name.toLowerCase();
+                if (lcName.endsWith(".eml")) {
+                    hasEmail = true;
+                }
+                console.log("Uploading File: " + file.name);
+            });
+
+            if (hasEmail) {
+                // todo-0: everywhere we have 'files' as an arg make it typesafe FileList
+                const ret: J.UploadResponse = await S.domUtil.parseFiles(evt.dataTransfer.files, false);
+                let val = this.contentEditorState.getValue();
+                ret.payloads?.forEach((payload: any) => {
+                    val += "\n" + payload;
+                });
+                this.contentEditorState.setValue(val);
+            }
+            else {
+                this.immediateUploadFiles(ast, evt.dataTransfer.files);
+            }
         });
 
         // -------------------------
