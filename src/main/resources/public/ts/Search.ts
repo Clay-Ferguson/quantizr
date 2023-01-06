@@ -604,7 +604,17 @@ export class Search {
             if (isFeed) {
                 allowBoostFooter = ast.showAllRowDetails.has(node.boostedNode.id);
             }
-            boostComp = new Div(null, { className: "boost-row" }, [
+            boostComp = new Div(null, {
+                onClick: () => {
+                    S.util.updateNodeHistory(node.boostedNode);
+
+                    // todo-0: force state update, hack until we move the node history data into AppState.
+                    dispatch("ResultSetClick", s => {
+                        return s;
+                    });
+                },
+                className: "boost-row"
+            }, [
                 allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
                 allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
@@ -643,7 +653,15 @@ export class Search {
             // yes the 'tabData.id' looks odd here as a class, and it's only used for lookups for scrolling logic.
             className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
-            nid: node.id
+            nid: node.id,
+            onClick: () => {
+                S.util.updateNodeHistory(node);
+
+                // todo-0: force state update, hack until we move the node history data into AppState.
+                dispatch("ResultSetClick", s => {
+                    return s;
+                });
+            }
         };
 
         if (extraStyle) {
