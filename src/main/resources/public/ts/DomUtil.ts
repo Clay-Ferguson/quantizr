@@ -219,15 +219,13 @@ export class DomUtil {
         S.rpcUtil.progressInterval();
     }
 
-    parseFiles = async (files: FileList, showConfirm: boolean): Promise<UploadResponse> => {
+    parseFiles = async (files: File[]): Promise<UploadResponse> => {
         if (!files) return;
 
         return new Promise<UploadResponse>((resolve, reject) => {
             const formData = new FormData();
 
-            ([...files]).forEach((file: File) => {
-                formData.append("files", file);
-            });
+            files.forEach((file: File) => formData.append("files", file));
             const url = S.rpcUtil.getRpcPath() + "parseFiles";
 
             this.enterFetch();
@@ -268,14 +266,11 @@ export class DomUtil {
         });
     }
 
-    uploadFilesToNode = async (files: any, nodeId: string, showConfirm: boolean): Promise<Response> => {
+    uploadFilesToNode = async (files: File[], nodeId: string, showConfirm: boolean): Promise<Response> => {
         if (!files) return;
         const formData = new FormData();
 
-        ([...files]).forEach((file: any) => {
-            // console.log("Uploading File: " + file.name);
-            formData.append("files", file);
-        });
+        files.forEach((file: File) => formData.append("files", file));
         const url = S.rpcUtil.getRpcPath() + "upload";
         formData.append("nodeId", nodeId);
 

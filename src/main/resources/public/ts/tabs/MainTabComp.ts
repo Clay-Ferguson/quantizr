@@ -77,7 +77,7 @@ export class MainTabComp extends AppTab {
 
         S.domUtil.setDropHandler(header.attribs, (evt: DragEvent) => {
             if (evt.dataTransfer.files) {
-                S.domUtil.uploadFilesToNode(evt.dataTransfer.files, "[auto]", true);
+                S.domUtil.uploadFilesToNode([...evt.dataTransfer.files], "[auto]", true);
             }
         });
     }
