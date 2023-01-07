@@ -286,6 +286,10 @@ export class SpeechEngine {
                         sayThis = this.queuedSpeech[this.ttsIdx];
                     }
 
+                    // Let's rip out all the hashtags and at symbols mainly just so we can read
+                    // text full of hashtags and have it sound good.
+                    sayThis = sayThis.replaceAll("#", " ");
+
                     utter = new SpeechSynthesisUtterance(sayThis);
 
                     const isQuote = sayThis.startsWith("\"");

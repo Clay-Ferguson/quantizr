@@ -932,7 +932,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
-                onClick: () => this.utl.speakEditorText(this),
+                onClick: () => this.utl.speakerClickInEditor(ast, this),
                 title: "Text-to-Speech: Editor Text or Selection"
             })
         ], "float-end microMarginBottom bigMarginRight"));

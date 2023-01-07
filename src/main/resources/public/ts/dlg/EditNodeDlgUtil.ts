@@ -506,10 +506,15 @@ an upload has been added or removed.
         }
     }
 
-    speakEditorText = (dlg: EditNodeDlg) => {
-        const content = S.quanta.selectedForTts ? S.quanta.selectedForTts : dlg.contentEditorState.getValue();
-        if (content) {
-            S.speech.speakText(content, false);
+    speakerClickInEditor = (ast: AppState, dlg: EditNodeDlg) => {
+        if (ast.speechSpeaking) {
+            S.speech.stopSpeaking();
+        }
+        else {
+            const content = S.quanta.selectedForTts ? S.quanta.selectedForTts : dlg.contentEditorState.getValue();
+            if (content) {
+                S.speech.speakText(content, false);
+            }
         }
     }
 
