@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAppState, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -143,5 +143,16 @@ export class App extends Main {
             return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);
         }
         return null;
+    }
+
+    domPreUpdateEvent = (): void => {
+        const elm = this.getRef();
+        if (!elm) return;
+
+        const ast = getAppState();
+
+        if (ast.highlightText) {
+            S.domUtil.highlightText(elm /* document.body */, ast.highlightText);
+        }
     }
 }

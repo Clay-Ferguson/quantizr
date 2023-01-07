@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { dispatch, getAppState } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -156,7 +156,13 @@ export class SearchContentDlg extends DialogBase {
 
     createSearchFieldIconButtons = (): Comp => {
         return new ButtonBar([
-            new Button("Clear", () => this.searchTextState.setValue("")),
+            new Button("Clear", () => {
+                this.searchTextState.setValue("");
+                dispatch("clearSearch", s => {
+                    s.highlightText = null;
+                    return s;
+                })
+            }),
             !getAppState().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
                     const dlg = new SelectTagsDlg("search", this.searchTextState.getValue());

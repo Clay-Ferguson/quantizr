@@ -65,6 +65,7 @@ export class AppState {
     fullScreenConfig: FullScreenConfig = { type: FullScreenType.NONE };
 
     graphSearchText: string = null;
+    highlightText: string = null;
 
     calendarData: EventInput[];
     calendarShowWeekends: boolean = false;

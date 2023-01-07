@@ -583,4 +583,40 @@ export class DomUtil {
             (window as any).find(findText, true, false, true);
         }
     }
+
+    // todo-0: Check ALL uses of RegExp, and remember that they won't work if the input string
+    // has special characters in it that regex will interpret (or need escaped?)
+    //
+    // todo-0: Verify all thes character replacements (the long special char strings below), are correct
+    // because they came from StackOverflow and aren't yet vetted.
+    // const regex = new RegExp(text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), "i");
+    // const allRegex = new RegExp("(" + text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + ")", "gi");
+
+    /* Highlights 'text' everywhere it's found in the DOM. Pass 'document.body' as rootElm
+       to replace on your whole web page */
+    public highlightText = (rootElm: HTMLElement, text: string) => {
+        const reg = this.escapeRegEx(text);
+        const regex = new RegExp(reg, "i"); // case insensitive search
+        const allRegex = new RegExp(`(${reg})`, "gi"); // case insensitive replacer
+
+        this.domHighlight(rootElm, regex, allRegex);
+    }
+
+    public escapeRegEx = (text: string): string => {
+        // todo-0: from StackOverflow (not yet fully vetted)
+        return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    }
+
+    private domHighlight = (elm: HTMLElement, regex: RegExp, allRegex: RegExp): void => {
+        if (elm.hasChildNodes()) {
+            elm.childNodes.forEach((e: HTMLElement) => this.domHighlight(e, regex, allRegex));
+        }
+        else if (elm.nodeType === 3) { // 3 == Text.TEXT_NODE
+            if (elm.textContent.search(regex) !== -1 && !elm.classList?.contains("highlight-text")) {
+                const newElement = document.createElement("span");
+                newElement.innerHTML = elm.textContent.replace(allRegex, '<span class="highlight-text">$1</span>');
+                elm.replaceWith(newElement)
+            }
+        }
+    }
 }

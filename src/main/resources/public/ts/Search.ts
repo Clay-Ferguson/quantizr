@@ -179,6 +179,8 @@ export class Search {
                 const data = SearchTab.inst;
                 if (!data) return;
 
+                s.highlightText = searchText;
+
                 data.openGraphComps = [];
 
                 data.props.results = res.searchResults;
