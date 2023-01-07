@@ -1208,10 +1208,12 @@ public class ActPubService extends ServiceBase {
 
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
 
-        // todo-0: This needs more thought. Will come back to this. This is kind of an emergency fix. I looked in this 
-        // method and didn't see HOW it can be adding sharing to non-local accounts, but really those don't need
-        // to be added to the node sharing just becasue they're CCed. We can let CCs NOT be shared to.
-        // shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
+        // note: I was temporarily think this was doing too much sharing, but 
+        // I now think we do need it, especially becasue sometimes the only place
+        // some posts put their 'public' designation is in the CC, so let's process
+        // all ccs. The risk (I thought I had was that a 'reply to node', will cause these CCs
+        // to be included when they shouldn't). We'll see.
+        shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
 
         addAttachments(ms, newNode, obj);
         update.save(ms, newNode, false);
