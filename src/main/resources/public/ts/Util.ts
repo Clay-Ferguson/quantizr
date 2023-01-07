@@ -595,6 +595,9 @@ export class Util {
     }
 
     updateNodeHistory = (node: J.NodeInfo) => {
+        if (!node.id) {
+            return;
+        }
         if (S.quanta.nodeHistoryLocked || !node ||
             S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) return;
 

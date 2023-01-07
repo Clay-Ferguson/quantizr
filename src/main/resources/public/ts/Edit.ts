@@ -1330,7 +1330,7 @@ export class Edit {
 
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string) => {
         /* if node being dropped on itself, then ignore */
-        if (targetNodeId === sourceNodeId) {
+        if (!sourceNodeId || targetNodeId === sourceNodeId) {
             return;
         }
 

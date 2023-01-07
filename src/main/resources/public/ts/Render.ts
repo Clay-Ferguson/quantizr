@@ -236,6 +236,10 @@ export class Render {
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
+                        if (!s) {
+                            return;
+                        }
+
                         // we check both ways if we're doing a self drop.
                         if (S.quanta.draggingId === node.id ||
                             attribs.nid === s) {
@@ -243,7 +247,7 @@ export class Render {
                             return;
                         }
 
-                        const dlg = new PasteOrLinkDlg(node.id, S.quanta.draggingId);
+                        const dlg = new PasteOrLinkDlg(node.id, s);
                         await dlg.open();
 
                         S.quanta.draggingId = null;

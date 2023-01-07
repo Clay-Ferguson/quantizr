@@ -187,6 +187,9 @@ export class DomUtil {
     }
 
     setNodeDragHandler = (attribs: any, nodeId: string) => {
+        if (!nodeId) {
+            return;
+        }
         attribs.draggable = "true";
 
         attribs.onDragStart = function (ev: any) {
