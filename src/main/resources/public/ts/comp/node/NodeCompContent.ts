@@ -160,5 +160,43 @@ export class NodeCompContent extends Div {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }
+
+        const elm = this.getRef();
+        if (!elm) return;
+
+        // DO NOT DELETE
+        // Experimenting with ContentEditable HTML Attribute.
+        // This would work great, but consolidating changes from the HTML back into any
+        // Markdown formatted text is a challenge, and probably never doable, so we might
+        // eventually use this just for plain (non-markdown) editing in the future in some
+        // future use case.
+        //
+        // elm.querySelectorAll(".markdown-content").forEach((e: Element) => {
+        //     if (!this.node?.content) return;
+        //     // let text = e.textContent;
+        //     // todo-0: put this in a method
+        //     let text = "";
+        //     for (let i = 0; i < e.childNodes.length; ++i) {
+        //         if (e.childNodes[i].nodeType === Node.TEXT_NODE) {
+        //             text += e.childNodes[i].textContent;
+        //         }
+        //     }
+        //     console.log("e.text[" + text + "] content [" + this.node.content + "]");
+        //     const matches = this.node.content.match(new RegExp(text, "g"));
+        //     if (matches) {
+        //         console.log("matches=" + matches.length);
+        //         if (matches.length !== 1) return;
+        //     }
+        //     e.setAttribute("contentEditable", "true");
+        //     e.addEventListener("input", (evt) => {
+        //         // console.log("changed.");
+        //     }, false);
+        //     // Don't allow ENTER key because that makes DOM changes and we don't handle that.
+        //     e.addEventListener("keydown", (evt: any) => {
+        //         if (evt.code === "Enter") {
+        //             evt.preventDefault();
+        //         }
+        //     }, false);
+        // });
     }
 }
