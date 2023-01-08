@@ -32,4 +32,8 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
     extraPagingComps = (): Comp[] => {
         return null;
     }
+
+    getFloatRightHeaderComp = (): Comp => {
+        return null;
+    }
 }

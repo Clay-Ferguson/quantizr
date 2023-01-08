@@ -37,4 +37,8 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
     extraPagingComps = (): Comp[] => {
         return null;
     }
+
+    getFloatRightHeaderComp = (): Comp => {
+        return null;
+    }
 }

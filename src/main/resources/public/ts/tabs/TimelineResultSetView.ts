@@ -27,4 +27,8 @@ export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetVi
     extraPagingComps = (): Comp[] => {
         return null;
     }
+
+    getFloatRightHeaderComp = (): Comp => {
+        return null;
+    }
 }

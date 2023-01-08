@@ -31,9 +31,8 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
          */
         let rowCount = 0;
         let i = 0;
-        const children: CompIntf[] = [];
-
-        children.push(new Div(null, null, [
+        const children: CompIntf[] = [
+            // todo-0: WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             new Div(null, { className: "headingBar" }, [
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
@@ -63,7 +62,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                 new Clearfix()
             ]),
             this.data.props.description ? new Div(this.data.props.description) : null
-        ]));
+        ];
 
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 

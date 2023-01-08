@@ -272,7 +272,7 @@ td {
     position: sticky;
     top: 0px;
     right: 0px;
-    z-index: 15000000;
+    z-index: 15000001;
     background: $primary;
     border: 2px solid $nodeBorderBottomColor;
     
@@ -440,14 +440,14 @@ a {
 }
 
 .smallLogoButton {
-    border: 2px solid lightgray;
+    border: 1px solid gray;
     cursor: pointer;
     padding: 5px;
     background-color: black;
 }
 
 .leftNavLogoImg {
-    border: 2px solid lightgray;
+    border: 1px solid gray;
     cursor: pointer;
     padding: 5px;
     border-radius: $border-radius;
@@ -558,6 +558,10 @@ a {
     // top: -40px;
     // left: 30px;
     // position: relative;
+}
+
+.lhsHeaderPanel {
+    margin-bottom: $smallGap;
 }
 
 .friendLhs {
@@ -753,7 +757,7 @@ strong em {
 .app-embed-content {
     background-color: $modal-content-bg;
     border: 2px solid gray;
-    
+    border-radius: $border-radius;
     width: 100%;
     margin-bottom: 10px;
     margin-top: 12px;
@@ -1302,7 +1306,7 @@ Will come back later and study this more. todo-3 */
 .pre-textfield {
     //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
     //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    padding: 3px 3px 3px 10px;
+    padding: 5px 5px 5px 10px;
     font-family: inherit;
     border-radius: 0px !important;
     border: 1px solid gray;
@@ -1310,7 +1314,7 @@ Will come back later and study this more. todo-3 */
 
 .formSelect {
     border: 1px solid gray !important;
-    padding: 3px 3px 3px 10px;
+    padding: 5px 5px 5px 10px;
 }
 
 .tagIndent {
@@ -1637,11 +1641,11 @@ Will come back later and study this more. todo-3 */
 }
 
 .systemNodeContent {
-    border: 1px solid $nodeBorderBottomColor;
-    
-    background-color: $secondary;
-    margin: $tinyGap $smallGap $tinyGap $smallGap;
+    border: 1px solid gray;
     padding: $tinyGap;
+    background-color: $secondary;
+    margin: $tinyGap $smallGap $smallGap $smallGap;
+    width: 97%;
 }
 
 // todo-1: once I'm certain about it I can remove these
@@ -2030,10 +2034,16 @@ audio::-webkit-media-controls-play-button {
     
 }
 
+// WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
 .headingBar {
-    margin-top: 12px;
+    padding-top: 8px;
     margin-bottom: 8px;
-    border-bottom: 6px solid $nodeBorderBottomColor;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    background-color: $body-bg;
+    position: sticky;
+    top: 0px;
+    z-index: 15000000;
+    height: 4em;
 }
 
 .tabTitle {
@@ -2042,7 +2052,7 @@ audio::-webkit-media-controls-play-button {
     font-weight: bold;
     vertical-align: middle;
     color: var(--bs-green);
-    margin-bottom: 6px;
+    // margin-bottom: 6px;
 }
 
 .monospace {

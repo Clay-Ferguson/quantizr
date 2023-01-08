@@ -34,4 +34,8 @@ export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSet
     extraPagingComps = (): Comp[] => {
         return null;
     }
+
+    getFloatRightHeaderComp = (): Comp => {
+        return null;
+    }
 }

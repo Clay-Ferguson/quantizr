@@ -82,6 +82,8 @@ export class AppState {
     speechRate: string = "normal"; // slow, normal, fast
     ttsRan: boolean = false;
 
+    anonShowLHSMenu = false;
+
     userPrefs: J.UserPreferences = {
         editMode: false,
         showMetaData: false,

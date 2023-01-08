@@ -3,7 +3,7 @@
     background-color: darkolivegreen;
     border: 1px solid gray;
     padding: 0 6px 0 6px;
-    margin-left: 8px;
+    margin-left: 4px;
     margin-top: 8px;
 }
 
@@ -147,7 +147,7 @@
     // warning: don't be tempted again to make this less than 2em!
     min-height: 2rem;
 
-    border: 1px solid $nodeBorderBottomColor;
+    border: 1px solid gray;
     background-color: $secondary;
     padding: 4px;
     margin-bottom: $tinyGap;
@@ -222,9 +222,8 @@ i'm backing out for now
 
 .node-grid-cell {
     border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
     display: table-cell;
-    padding-top: 8px;
-    padding-bottom: 5px;
     overflow: hidden;
     vertical-align: top;
 }
@@ -240,7 +239,7 @@ i'm backing out for now
 }
 
 .boost-row {
-    border: 2px solid gray;
+    border: 1px solid gray;
     
     margin: 4px 12px 4px 12px;
     padding-bottom: $tinyGap;
@@ -343,11 +342,10 @@ i'm backing out for now
 }
 
 .dateTimeDisplay {
-    margin: $tinyGap;
     padding: 0px 8px 0px 8px;
     display: inline-block;
-    
-    background-color: cadetblue;
+    margin-bottom: $tinyGap;
+    background-color: darkgoldenrod;
     color: black;
 }
 

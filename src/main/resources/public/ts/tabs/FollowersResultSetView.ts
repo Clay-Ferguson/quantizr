@@ -75,4 +75,8 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
     extraPagingComps = (): Comp[] => {
         return null;
     }
+
+    getFloatRightHeaderComp = (): Comp => {
+        return null;
+    }
 }

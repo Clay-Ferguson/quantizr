@@ -141,7 +141,8 @@ export class RightNavPanel extends Div {
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [
-                new Div(null, { className: "rightNavPanelInner" }, [
+                // for anon user float this more to the right so the main view looks less jammed up
+                new Div(null, { className: "rightNavPanelInner" + (ast.isAnonUser ? " float-end" : "") }, [
                     !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
                     // Not showing login on this panel in mobileMode, because it's shown at top of page instead

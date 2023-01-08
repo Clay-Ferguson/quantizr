@@ -64,7 +64,7 @@ export class MainTab implements TabIntf<any> {
             !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home")) : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
             ...this.customAnonRHSLinks(ast),
-            ...this.buildCustomLinks(ast, ast.config.rhsLinks)
+            ...S.render.buildCustomLinks(ast, ast.config.rhsLinks)
         ]);
     };
 
@@ -74,48 +74,6 @@ export class MainTab implements TabIntf<any> {
         // if not anon user return empty items
         if (!ast.isAnonUser) return [];
 
-        return this.buildCustomLinks(ast, ast.config.rhsAnonLinks);
-    }
-
-    buildCustomLinks = (ast: AppState, configArray: any): CompIntf[] => {
-        const items: CompIntf[] = [];
-
-        if (configArray) {
-            for (const menuItem of configArray) {
-                if (menuItem.name === "separator") {
-                    // items.push(new MenuItemSeparator());
-                }
-                else {
-                    const link: string = menuItem.link;
-                    let func: Function = null;
-
-                    if (link) {
-                        // allows ability to select a tab
-                        if (link.startsWith("tab:")) {
-                            const tab = link.substring(4);
-
-                            /* special case for feed tab */
-                            if (tab === C.TAB_FEED) {
-                                func = S.nav.messagesFediverse;
-                            }
-                            else {
-                                func = () => S.tabUtil.selectTab(tab);
-                            }
-                        }
-                        // covers http and https
-                        else if (link.startsWith("http")) {
-                            func = () => window.open(link);
-                        }
-                        // named nodes like ":myName"
-                        else {
-                            func = () => S.nav.openContentNode(link);
-                        }
-                    }
-
-                    items.push(new AppNavLink(menuItem.name, func));
-                }
-            }
-        }
-        return items;
+        return S.render.buildCustomLinks(ast, ast.config.rhsAnonLinks);
     }
 }

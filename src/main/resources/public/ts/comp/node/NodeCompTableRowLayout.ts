@@ -59,7 +59,7 @@ export class NodeCompTableRowLayout extends Div {
                 const type = S.plugin.getType(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
-                if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
+                if (type?.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
                 }
                 else {
                     lastNode = n;

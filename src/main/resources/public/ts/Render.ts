@@ -6,6 +6,7 @@ import { dispatch, getAppState } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
+import { AppNavLink } from "./comp/core/AppNavLink";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
@@ -817,5 +818,47 @@ export class Render {
             });
         }
         return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
+    }
+
+    buildCustomLinks = (ast: AppState, configArray: any): CompIntf[] => {
+        const items: CompIntf[] = [];
+
+        if (configArray) {
+            for (const menuItem of configArray) {
+                if (menuItem.name === "separator") {
+                    // items.push(new MenuItemSeparator());
+                }
+                else {
+                    const link: string = menuItem.link;
+                    let func: Function = null;
+
+                    if (link) {
+                        // allows ability to select a tab
+                        if (link.startsWith("tab:")) {
+                            const tab = link.substring(4);
+
+                            /* special case for feed tab */
+                            if (tab === C.TAB_FEED) {
+                                func = S.nav.messagesFediverse;
+                            }
+                            else {
+                                func = () => S.tabUtil.selectTab(tab);
+                            }
+                        }
+                        // covers http and https
+                        else if (link.startsWith("http")) {
+                            func = () => window.open(link);
+                        }
+                        // named nodes like ":myName"
+                        else {
+                            func = () => S.nav.openContentNode(link);
+                        }
+                    }
+
+                    items.push(new AppNavLink(menuItem.name, func));
+                }
+            }
+        }
+        return items;
     }
 }

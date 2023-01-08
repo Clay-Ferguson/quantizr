@@ -607,13 +607,16 @@ export class Search {
                 allowBoostFooter = ast.showAllRowDetails.has(node.boostedNode.id);
             }
             boostComp = new Div(null, {
-                onClick: () => {
+                onClick: async () => {
                     S.util.updateNodeHistory(node.boostedNode);
 
                     // todo-0: force state update, hack until we move the node history data into AppState.
-                    dispatch("ResultSetClick", s => {
+                    await promiseDispatch("ResultSetClick", s => {
                         return s;
                     });
+
+                    // after updating state we need this to ensure this click also focused this window.
+                    S.domUtil.focusId(tabData.id);
                 },
                 className: "boost-row"
             }, [
@@ -656,13 +659,16 @@ export class Search {
             className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             nid: node.id,
-            onClick: () => {
+            onClick: async () => {
                 S.util.updateNodeHistory(node);
 
                 // todo-0: force state update, hack until we move the node history data into AppState.
-                dispatch("ResultSetClick", s => {
+                await promiseDispatch("ResultSetClick", s => {
                     return s;
                 });
+
+                // after updating state we need this to ensure this click also focused this window.
+                S.domUtil.focusId(tabData.id);
             }
         };
 

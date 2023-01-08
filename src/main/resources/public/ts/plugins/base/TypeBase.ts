@@ -153,7 +153,7 @@ export class TypeBase implements TypeIntf {
             if (node.tags && (ast.userPrefs.showMetaData || ast.userPrefs.editMode)) {
                 return new Div(null, null, [
                     comp,
-                    S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : ""),
+                    S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
                     new Clearfix()
                 ])
             }

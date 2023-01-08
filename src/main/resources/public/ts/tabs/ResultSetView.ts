@@ -43,7 +43,6 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
          * client side for various reasons.
          */
         let rowCount = 0;
-        const children: CompIntf[] = [];
 
         let content = null;
         if (this.showContentHeading && //
@@ -52,7 +51,8 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             content = this.data.props.node ? S.nodeUtil.getShortContent(this.data.props.node) : null;
         }
 
-        children.push(new Div(null, null, [
+        // todo-0: WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
+        const children: CompIntf[] = [
             new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(ast),
@@ -60,11 +60,12 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
                         title: "Back to Tree View"
-                    }, "bigMarginLeft") : null
+                    }, "bigMarginLeft") : null,
+                this.getFloatRightHeaderComp()
             ]),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.props.description ? new Div(this.data.props.description) : null
-        ]));
+        ];
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
@@ -172,4 +173,5 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
     abstract pageChange(delta: number): void;
     abstract extraPagingComps(): Comp[];
+    abstract getFloatRightHeaderComp(): Comp;
 }

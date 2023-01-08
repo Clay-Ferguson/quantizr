@@ -12,7 +12,14 @@ rhsAnonLinks:
   - name: "Explore Features"
     link: ":features"
 
-rhsLinks:
+# These links will show up under MAIN section
+# rhsLinks:
+#   - name: "separator"
+#     link: ""
+#   - name: "News"
+#     link: ":quanta-news"
+
+rhsFeedLinks:
   - name: "separator"
     link: ""
   - name: "News"

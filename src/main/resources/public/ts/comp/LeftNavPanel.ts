@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppContext";
+import { dispatch, getAppState, useAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
+import { Icon } from "./core/Icon";
 import { TabPanelButtons } from "./TabPanelButtons";
 
 // declare const g_brandingAppName: string;
@@ -63,13 +64,13 @@ export class LeftNavPanel extends Div {
         }
 
         this.setChildren([
-            new Div(null, { id: "appLHSHeaderPanelId" }, [
-                new Img({
+            new Div(null, { id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
+                !ast.isAnonUser || ast.anonShowLHSMenu ? new Img({
                     className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
-                }),
+                }) : null,
                 // new Span(g_brandingAppName, {
                 //     className: "logo-text",
                 //     onClick: () => S.util.loadAnonPageHome(),
@@ -77,14 +78,26 @@ export class LeftNavPanel extends Div {
                 // }),
                 // todo-2: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
+                ast.isAnonUser ? new Icon({
+                    className: "fa fa-bars fa-2x clickable float-end",
+                    onClick: () => {
+                        dispatch("ToggleLHS", s => {
+                            s.anonShowLHSMenu = !s.anonShowLHSMenu;
+                            return s;
+                        })
+                    },
+                    title: "Show Menu"
+                }) : null,
                 messages ? new Span(messages, {
-                    className: "newMessagesNote float-end",
+                    className: "newMessagesNote",
                     onClick: S.nav.showMyNewMessages,
                     title: "Show new messages"
                 }) : null
             ]),
-            new MenuPanel(ast),
-            ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
+            ast.isAnonUser ? null : new MenuPanel(ast),
+
+            // if anon user
+            ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
         ]);
     }
 

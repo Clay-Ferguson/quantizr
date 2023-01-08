@@ -67,6 +67,23 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         }, 500);
     }
 
+    getFloatRightHeaderComp = (): Comp => {
+        return new Div(null, { className: "float-end" }, [
+            new Icon({
+                className: "fa fa-search fa-lg buttonBarIcon",
+                title: "Search Subnodes",
+                nid: this.data.props.node.id,
+                onClick: S.nav.runSearch
+            }),
+            new Icon({
+                className: "fa fa-clock-o fa-lg buttonBarIcon",
+                title: "View Timeline (by Mod Time)",
+                nid: this.data.props.node.id,
+                onClick: S.nav.runTimeline
+            })
+        ]);
+    }
+
     extraPagingComps = (): Comp[] => {
         return [
             new Div(null, { className: "extraPagingComps" }, [
@@ -100,18 +117,6 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                     getValue: (): boolean => {
                         return getAppState().userPrefs.showReplies;
                     }
-                }),
-                new Icon({
-                    className: "fa fa-search fa-lg buttonBarIcon",
-                    title: "Search Subnodes",
-                    nid: this.data.props.node.id,
-                    onClick: S.nav.runSearch
-                }),
-                new Icon({
-                    className: "fa fa-clock-o fa-lg buttonBarIcon",
-                    title: "View Timeline (by Mod Time)",
-                    nid: this.data.props.node.id,
-                    onClick: S.nav.runTimeline
                 })
             ])
         ];

@@ -81,18 +81,18 @@
     cursor: pointer;
     background-color: transparent;
     padding: 5px 5px 5px 15px; 
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 }
 
 .menuHeading:hover {
     background-color: $primary; // $menuItemHoverBackgroundColor;
-    border: 2px solid gray;
+    border: 1px solid gray;
 }
 
 .menuHeadingExpanded {
     @extend .menuHeading;
     background-color: $secondary;
-    border: 2px solid gray;
+    border: 1px solid gray;
 }
 
 .mobileMenuText {
