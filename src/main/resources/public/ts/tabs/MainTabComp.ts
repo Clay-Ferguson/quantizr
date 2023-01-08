@@ -87,7 +87,7 @@ export class MainTabComp extends AppTab {
         }
         // if we're not showing the header we do at least need some margin at the top
         else {
-            this.attribs.className = "marginTop";
+            this.attribs.className += " mediumPaddingTop";
         }
     }
 }

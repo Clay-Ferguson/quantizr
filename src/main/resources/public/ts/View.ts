@@ -74,7 +74,7 @@ export class View {
             });
 
             if (!res || !res.success) {
-                console.log("Unable to access node: "+a.nodeId);
+                console.log("Unable to access node: " + a.nodeId);
                 return;
             }
 
@@ -261,7 +261,9 @@ export class View {
                 }
 
                 const elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
-                elm?.scrollIntoView(true);
+                if (elm) {
+                    elm.scrollIntoView(true);
+                }
             }, delay);
         };
 

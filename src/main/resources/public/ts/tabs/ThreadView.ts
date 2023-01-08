@@ -48,7 +48,9 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                                 const data: TabIntf = S.tabUtil.getAppTabData(ast, ast.threadViewFromTab);
                                 if (data) {
                                     const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(data, ast.threadViewNodeId));
-                                    elm?.scrollIntoView(true);
+                                    if (elm) {
+                                        elm.scrollIntoView(true);
+                                    }
                                 }
                             }, 700);
                         }
