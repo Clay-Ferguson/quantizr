@@ -149,7 +149,7 @@
 
     border: 1px solid $nodeBorderBottomColor;
     background-color: $secondary;
-    padding: $microGap;
+    padding: 4px;
     margin-bottom: $tinyGap;
 }
 
@@ -343,8 +343,8 @@ i'm backing out for now
 }
 
 .dateTimeDisplay {
-    margin-right: 5px;
-    padding: 0 8px 0 8px;
+    margin: $tinyGap;
+    padding: 0px 8px 0px 8px;
     display: inline-block;
     
     background-color: cadetblue;
