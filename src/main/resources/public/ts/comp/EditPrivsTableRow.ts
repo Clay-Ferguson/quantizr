@@ -49,19 +49,6 @@ export class EditPrivsTableRow extends ListBoxRow {
             src = this.aclEntry.foreignAvatarUrl;
         }
 
-        let img: Div = null;
-        if (src) {
-            img = new Div(null, { className: "friendListImgDiv" }, [
-                new Img({
-                    className: "friendListImage",
-                    src,
-                    onClick: () => {
-                        new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                    }
-                })
-            ]);
-        }
-
         const displayName = this.aclEntry.displayName
             ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
             : ("@" + this.aclEntry.principalName);
@@ -70,7 +57,15 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         this.setChildren([
             new Div(null, null, [
-                img,
+                new Div(null, { className: "friendListImgDiv" }, [
+                    src ? new Img({
+                        className: "friendListImage",
+                        src,
+                        onClick: () => {
+                            new UserProfileDlg(this.aclEntry.principalNodeId).open();
+                        }
+                    }) : null
+                ]),
                 isPublic ? new Div(null, { className: "friendListImgDiv" }, [
                     new Icon({
                         className: "fa fa-globe fa-lg sharingIcon marginAll",

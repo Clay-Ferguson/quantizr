@@ -29,7 +29,7 @@ export class RoomType extends TypeBase {
                 new Button("View Room Feed", () => {
                     S.nav.openNodeFeed(null, node.id);
                 }, null, "btn-primary")
-            ], "marginLeft systemNodeContent")
+            ], "marginLeft")
         ]);
     }
 }

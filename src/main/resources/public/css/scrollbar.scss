@@ -17,14 +17,12 @@ $scrollBarWidth: 20px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	background-color: $scrollTrack;
-    // border-radius: 20px;
 }
 
 .customScrollbar::-webkit-scrollbar-thumb {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: $scrollThumb;
-    // border-radius: 20px;
 }
 
 textarea::-webkit-scrollbar {
@@ -38,7 +36,6 @@ textarea::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	background-color: $scrollTrack;
-    // border-radius: 4px;
     cursor: pointer;
 }
 
@@ -46,7 +43,6 @@ textarea::-webkit-scrollbar-thumb {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: $scrollThumb;
-    // border-radius: 4px;
     cursor: pointer;
 }
 

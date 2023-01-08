@@ -58,14 +58,8 @@ export class RightNavPanel extends Div {
             this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
         }
 
-        // DO NOT DELETE
-        // show header image only if not super narrow.
-        // let headerImg = rightCols > 2 ? this.makeHeaderDiv(state) : null;
-
-        // hack for now. I decided showing the header image isn't very attractive when user has a narrow
-        // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
         const headerImg: Div = null;
-        const avatarImg = this.makeAvatarDiv(ast, !!headerImg);
+        const avatarImg = this.makeRHSAvatarDiv(ast);
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
         if (displayName && ast.node) {
@@ -228,7 +222,7 @@ export class RightNavPanel extends Div {
         }
     }
 
-    makeAvatarDiv = (ast: AppState, offset: boolean): CompIntf => {
+    makeRHSAvatarDiv = (ast: AppState): CompIntf => {
         let src: string = null;
         if (!ast.userProfile) return null;
 
@@ -242,7 +236,7 @@ export class RightNavPanel extends Div {
 
         if (src) {
             const attr: any = {
-                className: offset ? "profileImageRHS" : "profileImageRHSNoOffset",
+                className: "profileImageRHS",
                 src
             };
 

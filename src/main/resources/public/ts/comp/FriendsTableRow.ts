@@ -33,17 +33,6 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        let img: Div = null;
-        if (src) {
-            img = new Div(null, { className: "friendListImgDiv" }, [
-                new Img({
-                    className: "friendListImage",
-                    src,
-                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
-                })
-            ]);
-        }
-
         const tagsSuffix = this.friend.tags ? (" (" + this.friend.tags + ")") : "";
 
         this.setChildren([
@@ -61,7 +50,13 @@ export class FriendsTableRow extends ListBoxRow {
                     },
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
                 }) : null,
-                img,
+                new Div(null, { className: "friendListImgDiv" }, [
+                    src ? new Img({
+                        className: "friendListImage",
+                        src,
+                        onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
+                    }) : null
+                ]),
                 new Div(null, {
                     className: "friendListText",
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()

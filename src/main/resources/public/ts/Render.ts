@@ -655,7 +655,7 @@ export class Render {
         return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    makeAvatarImage = (node: J.NodeInfo, ast: AppState) => {
+    makeHeaderAvatar = (node: J.NodeInfo, ast: AppState) => {
         const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;

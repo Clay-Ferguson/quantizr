@@ -416,7 +416,7 @@ export class UserProfileDlg extends DialogBase {
         else {
             if (this.readOnly) {
                 return new Div("No avatar image", {
-                    className: "userProfileDlgAvatar"
+                    className: "userProfileDlgAvatarNone"
                 });
 
             }

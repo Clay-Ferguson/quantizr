@@ -134,7 +134,7 @@ export class TypeBase implements TypeIntf {
             let count = 0;
             comp.urls.forEach(url => {
                 // allow max of 10 urls.
-                if (count++ < 10) {
+                if (count++ < 20) {
                     const og = new OpenGraphPanel(ast, tabData, comp.getId("og" + count + "_"), url,
                         isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);

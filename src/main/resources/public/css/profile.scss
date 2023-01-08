@@ -2,19 +2,21 @@
     background-color: $modal-content-bg;
     max-width: 120px;
     min-width: 120px;
-    border-radius: $border-radius;
+    
     border: 1px solid gray;
     cursor: pointer;
+    border-radius: $border-radius;
 }
 
 .userProfileDlgAvatarNone {
     background-color: $modal-content-bg;
-    border-radius: $border-radius;
+    
     cursor: pointer;
     border: 2px dotted gray;
     width: 120px;
     height: 120px;
     padding: 12px;
+    border-radius: $border-radius;
 }
 
 .userProfileDlgHeader {
@@ -23,19 +25,21 @@
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: $border-radius;
+    
     border: 1px solid gray;
     margin-bottom: $smallGap;
+    border-radius: $border-radius;
 }
 
 .userProfileDlgHeaderNone {
     background-color: $modal-content-bg;
     cursor: pointer;
-    border-radius: $border-radius;
+    
     margin-bottom: $smallGap;
     width: 100%;
     height: 200px;
     border: 2px dotted gray;
+    border-radius: $border-radius;
     padding: 12px;
 }
 
@@ -53,43 +57,14 @@
     width: 40rem;
 }
 
-.profileImageBase {
-    cursor: pointer;
-    top: -55px;
-    left: 30px;
-    position: relative;
-    background-color: $modal-content-bg;
-    max-width: 120px;
-    border-radius: $border-radius;
-}
-
-.profileImageBaseNoHeader {
-    cursor: pointer;
-    background-color: $modal-content-bg;
-    max-width: 120px;
-    border-radius: $border-radius;
-}
-
-.profileImageBaseNoHeaderSmall {
+.profileImageRHS {
     cursor: pointer;
     background-color: $modal-content-bg;
     max-width: 80px;
-    border-radius: $border-radius;
-}
-
-.profileImageRHS {
-    @extend .profileImageBaseNoHeaderSmall;
-    top: -45px;
-    left: 30px;
-    position: relative;
-    border: 2px solid $body-bg; 
-}
-
-.profileImageRHSNoOffset {
-    @extend .profileImageBaseNoHeaderSmall;
     position: relative;
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 20px;
+    border-radius: $border-radius;
 }
 
 .userBio {

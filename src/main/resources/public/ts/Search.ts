@@ -617,7 +617,7 @@ export class Search {
                 },
                 className: "boost-row"
             }, [
-                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
+                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
                 allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
                 allowBoostFooter ? new Clearfix() : null
@@ -638,7 +638,7 @@ export class Search {
         //             allowFooter = ast.showAllRowDetails.has(n.id);
         //         }
         //         linkedNodesComp = new Div(null, { className: "boost-row" }, [
-        //             allowHeader ? new NodeCompRowHeader(n, true, false, isFeed, jumpButton, showThreadButton, true, allowDelete) : null,
+        //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
         //             linkContent,
         //             allowFooter ? new NodeCompRowFooter(n) : null,
         //             allowFooter ? new Clearfix() : null
@@ -676,7 +676,7 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton, false, allowDelete) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
             S.render.renderLinks(node),

@@ -2,7 +2,6 @@
     display: inline-block;
     background-color: darkolivegreen;
     border: 1px solid gray;
-    border-radius: 5px;
     padding: 0 6px 0 6px;
     margin-left: 8px;
     margin-top: 8px;
@@ -12,7 +11,6 @@
     display: inline-block;
     background-color: darkolivegreen;
     border: 1px solid gray;
-    border-radius: 5px;
     padding: 0 6px 0 6px;
     margin-right: 8px;
     margin-bottom: 8px;
@@ -24,7 +22,7 @@
     padding: 0px 4px 0px 4px;
     white-space: nowrap;
     display: inline-block;
-    border-radius: $border-radius;
+    
 }
 
 .treeFriendImage {
@@ -32,13 +30,13 @@
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 0px 10px;
-    border-radius: $border-radius;
+    
 }
 
 .commentMarkdownClass {
     border: 2px solid darkkhaki;
     margin: 8px;
-    border-radius: $border-radius;
+    
     background-color: #17202A;
 }
 
@@ -54,6 +52,7 @@
 
 .nodeCompButtonBar {
     margin-left: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .nodeCompBinary {
@@ -69,6 +68,7 @@
     cursor: pointer;
     vertical-align: top;
     border-radius: $border-radius;
+    
     border: 1px solid $gray-700;
     // we size this to 100% becasue the DIV it's inside is the one that actually has the specified sizing
     width: 100%;
@@ -76,18 +76,18 @@
 
 .attachmentLinksPanel {
     border: 1px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
+    
     padding-left: $smallGap;
     padding-right: $smallGap;
     margin-bottom: $smallGap;
 }
 
 .created-by {
-    padding: 6px;
+    padding: 4px;
     margin-right: 10px;
-    margin-left: 10px;
+    margin-left: $microGap;
     margin-bottom: 8px;
-    border-radius: $border-radius;
+    
     border: 1px solid gray;
     display: inline-block;
 }
@@ -126,18 +126,31 @@
     padding: 6px;
     margin-right: 8px;
     margin-left: 6px;
-    border-radius: $border-radius;
+    
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
 }
 
 .row-header {
-    font-size: small;
+    // font-size: small;
     margin-left: $smallGap;
-    cursor: pointer;
 
     // warning: don't be tempted again to make this less than 2em!
     min-height: 2rem;
+    margin-bottom: $tinyGap;
+    margin-right: $smallGap;
+}
+
+.row-header-edit {
+    margin-left: $smallGap;
+
+    // warning: don't be tempted again to make this less than 2em!
+    min-height: 2rem;
+
+    border: 1px solid $nodeBorderBottomColor;
+    background-color: $secondary;
+    padding: $microGap;
+    margin-bottom: $tinyGap;
 }
 
 .row-footer {
@@ -149,19 +162,16 @@
     padding: 6px;
     margin-right: 10px;
     cursor: pointer;
-    border-radius: $border-radius;
+    
 }
 
 .node-table-row {
     position: relative;
-    padding-right: 10px;
-    padding-top: 10px;
+    padding-top: $tinyGap;
 }
 
 .node-table-row-edit {
     position: relative;
-    padding-right: 10px;
-    padding-top: 8px;
 }
 
 .row-border {
@@ -174,10 +184,14 @@
     border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
-/* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
 .row-border-edit {
     border-bottom: 1px solid $nodeBorderBottomColor;
 }
+
+.row-border-edit-info {
+    // border-bottom: 1px solid $nodeBorderBottomColor;
+}
+
 
 /*
 With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
@@ -211,7 +225,6 @@ i'm backing out for now
     display: table-cell;
     padding-top: 8px;
     padding-bottom: 5px;
-    border-radius: 6px;
     overflow: hidden;
     vertical-align: top;
 }
@@ -228,7 +241,7 @@ i'm backing out for now
 
 .boost-row {
     border: 2px solid gray;
-    border-radius: $border-radius;
+    
     margin: 4px 12px 4px 12px;
     padding-bottom: $tinyGap;
     padding-top: $smallGap;
@@ -333,7 +346,7 @@ i'm backing out for now
     margin-right: 5px;
     padding: 0 8px 0 8px;
     display: inline-block;
-    border-radius: $border-radius;
+    
     background-color: cadetblue;
     color: black;
 }
@@ -343,7 +356,7 @@ i'm backing out for now
     margin-right: 8px;
     padding: 4px;
     border: 1px solid gray;
-    border-radius: $border-radius;
+    
     background-color: $primary;
 }
 
@@ -353,7 +366,6 @@ i'm backing out for now
 
 .sharingName {
     border: 1px solid gray;
-    border-radius: 6px;
     margin-left: 3px;
     display: inline-block;
     padding: 0px 3px 0px 3px;
@@ -365,7 +377,6 @@ i'm backing out for now
 
 .sharingNamePublic {
     border: 1px solid cyan;
-    border-radius: 6px;
     margin-left: 3px;
     display: inline-block;
     padding: 0px 3px 0px 3px;

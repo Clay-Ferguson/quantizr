@@ -93,8 +93,9 @@ export class NodeCompRow extends Div {
             buttonBar = new NodeCompButtonBar(this.node, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 
-        let layoutClass = this.isTableCell ? "node-grid-item" : (ast.userPrefs.editMode ? "node-table-row-edit" : "node-table-row");
-        layoutClass += " " + this.tabData.id
+        let layoutClass = this.isTableCell ? "node-grid-item" : (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData ? "node-table-row-edit" : "node-table-row");
+        layoutClass += " " + this.tabData.id;
+
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
@@ -105,11 +106,19 @@ export class NodeCompRow extends Div {
         // else if (layout && layout.indexOf("c") === 0 && (isInlineChildren || this.node.id === state.node.id)) {
         // }
         else {
-            if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
-                layoutClass += ast.userPrefs.editMode || ast.userPrefs.showMetaData ? " row-border-edit" : " row-border-inline-children";
+            // special class if BOTH edit and info is on
+            if (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
+                layoutClass += " row-border-edit-info";
+            }
+            // else if either is on
+            else if (ast.userPrefs.editMode || ast.userPrefs.showMetaData) {
+                layoutClass += " row-border-edit";
+            }
+            else if (isInlineChildren && this.node.hasChildren && !isPageRootNode) {
+                layoutClass += " row-border-inline-children";
             }
             else {
-                layoutClass += ast.userPrefs.editMode || ast.userPrefs.showMetaData ? " row-border-edit" : " row-border";
+                layoutClass += " row-border";
             }
         }
 
@@ -150,7 +159,7 @@ export class NodeCompRow extends Div {
             // show orphans on the page when something is deleted. Other panels don't have this problem
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(this.node, true, true, false, showJumpButton, true, false, allowDelete);
+            header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

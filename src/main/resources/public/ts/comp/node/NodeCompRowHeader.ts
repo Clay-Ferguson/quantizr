@@ -7,20 +7,23 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { UserProfileDlg } from "../../dlg/UserProfileDlg";
+import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Button } from "../core/Button";
+import { Constants as C } from "../../Constants";
 
 export class NodeCompRowHeader extends Div {
 
     constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
-        private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean,
+        public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
         private isBoost: boolean, private allowDelete: boolean) {
-        super(null, {
-            className: "row-header"
-        });
+        super(null);
+
+        const ast = useAppState();
+        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "row-header-edit" : "row-header";
     }
 
     preRender(): void {
@@ -30,10 +33,10 @@ export class NodeCompRowHeader extends Div {
         let avatarImg: Img = null;
 
         const isMine = S.props.isMine(this.node, ast);
-        const showInfo = ast.userPrefs.showMetaData || this.isFeed;
+        const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_FEED;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
-            avatarImg = S.render.makeAvatarImage(this.node, ast);
+            avatarImg = S.render.makeHeaderAvatar(this.node, ast);
             if (avatarImg) {
                 children.push(avatarImg);
             }
@@ -57,7 +60,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             children.push(new Span(displayName, {
-                className: "mediumMarginRight " + (this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other")),
+                className: (this.node.transferFromId ? "transfer-pending" : (isMine ? "created-by-me" : "created-by-other")),
                 title: "Show Profile:\n\n" + this.node.owner,
                 onClick: () => {
                     new UserProfileDlg(this.node.ownerId).open();

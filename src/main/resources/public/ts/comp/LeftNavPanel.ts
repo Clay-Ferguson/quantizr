@@ -8,6 +8,7 @@ import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { TabPanelButtons } from "./TabPanelButtons";
 
+// declare const g_brandingAppName: string;
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
     public static inst: LeftNavPanel = null;

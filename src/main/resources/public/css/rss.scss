@@ -39,14 +39,14 @@
     margin: 8px;
     display: inline-block;
     cursor: pointer;
-    border-radius: $border-radius;
+    
 }
 
 .rssChapterPanel {
     border: 2px solid $nodeBorderBottomColor;
     margin-top: 12px;
     padding: 13px;
-    border-radius: $border-radius;
+    
 }
 
 .rssAnchor {
@@ -77,7 +77,7 @@
 .rss-feed-image {
     border: 1px solid $nodeBorderBottomColor;
     margin-bottom: 10px 0px 10px 0px;
-    border-radius: $border-radius;
+    
     margin-top: 12px;
     max-width: 50%;
 }
