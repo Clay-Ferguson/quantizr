@@ -8,7 +8,6 @@ import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
-import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
 
 declare const g_requireCrypto: string;
@@ -68,9 +67,6 @@ export class Quanta {
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, J.OpenGraph> = new Map<string, J.OpenGraph>();
     brokenImages: Set<string> = new Set<string>();
-
-    nodeHistory: NodeHistoryItem[] = [];
-    nodeHistoryLocked: boolean;
 
     dragImg: any = null;
     dragElm: any = null;

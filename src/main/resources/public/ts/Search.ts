@@ -610,11 +610,6 @@ export class Search {
                 onClick: async () => {
                     S.util.updateNodeHistory(node.boostedNode);
 
-                    // todo-0: force state update, hack until we move the node history data into AppState.
-                    await promiseDispatch("ResultSetClick", s => {
-                        return s;
-                    });
-
                     // after updating state we need this to ensure this click also focused this window.
                     S.domUtil.focusId(tabData.id);
                 },
@@ -661,11 +656,6 @@ export class Search {
             nid: node.id,
             onClick: async () => {
                 S.util.updateNodeHistory(node);
-
-                // todo-0: force state update, hack until we move the node history data into AppState.
-                await promiseDispatch("ResultSetClick", s => {
-                    return s;
-                });
 
                 // after updating state we need this to ensure this click also focused this window.
                 S.domUtil.focusId(tabData.id);

@@ -954,7 +954,7 @@ export class Edit {
             });
 
             // todo-1: need a more pub-sub[ish] way to do this.
-            this.removeNodesFromHistory(selNodesArray, ast);
+            this.removeNodesFromHistory(selNodesArray);
             this.removeNodesFromCalendarData(selNodesArray, ast);
 
             /* Node: state.node can be null if we've never been to the tree view yet */
@@ -992,25 +992,28 @@ export class Edit {
     }
 
     /* Updates 'nodeHistory' when nodes are deleted */
-    removeNodesFromHistory = (selNodesArray: string[], ast: AppState) => {
+    removeNodesFromHistory = (selNodesArray: string[]) => {
         if (!selNodesArray) return;
-        selNodesArray.forEach(id => {
-            // remove any top level history item that matches 'id'
-            S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== id);
+        dispatch("removeNodesFromHistory", s => {
+            selNodesArray.forEach(id => {
+                // remove any top level history item that matches 'id'
+                s.nodeHistory = s.nodeHistory.filter(h => h.id !== id);
+            });
+            return s;
         });
     }
 
     removeNodesFromCalendarData = (selNodesArray: string[], ast: AppState) => {
         if (!ast.calendarData) return;
 
-        selNodesArray.forEach(id => {
-            ast.calendarData = ast.calendarData.filter((item: EventInput) => item.id !== id);
+        // todo-0: this is new needing testing, this filter was being done OUTSIDE of the dispatch
+        // and shouldn't have even worked.
+        dispatch("UpdateCalendarData", s => {
+            selNodesArray.forEach(id => {
+                s.calendarData = s.calendarData.filter((item: EventInput) => item.id !== id);
+            });
+            return s;
         });
-
-        // I'll leave this here commented until I actually TEST deleting calendar items again.
-        // dispatch("UpdateCalendarData", s => {
-        //     return ast;
-        // });
     }
 
     undoCutSelNodes = () => {

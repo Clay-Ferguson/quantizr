@@ -598,14 +598,18 @@ export class Util {
         if (!node.id) {
             return;
         }
-        if (S.quanta.nodeHistoryLocked || !node ||
-            S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) return;
 
-        // remove node if it exists in history (so we can add to top)
-        S.quanta.nodeHistory = S.quanta.nodeHistory.filter(h => h.id !== node.id);
+        dispatch("removeNodesFromHistory", s => {
+            if (s.nodeHistoryLocked || !node ||
+                S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) return;
 
-        // now add to top.
-        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
+            // remove node if it exists in history (so we can add to top)
+            s.nodeHistory = s.nodeHistory.filter(h => h.id !== node.id);
+
+            // now add to top.
+            s.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
+            return s;
+        });
     }
 
     removeHtmlTags = (text: string) => {
