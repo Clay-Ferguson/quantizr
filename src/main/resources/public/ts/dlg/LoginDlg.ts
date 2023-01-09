@@ -1,6 +1,7 @@
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
@@ -27,8 +28,8 @@ export class LoginDlg extends DialogBase {
                 new TextField({ label: "User", enter: this.login, val: this.userState }),
                 new TextField({ label: "Password", pwd: true, enter: this.login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
-                    new Span("Signup", { className: "clickable", onClick: this.signup }),
-                    new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword })
+                    new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword }),
+                    new Clearfix()
                 ])
             ]),
             new ButtonBar([
@@ -47,11 +48,6 @@ export class LoginDlg extends DialogBase {
 
         this.userState.setValue(user);
         this.pwdState.setValue(pwd);
-    }
-
-    signup = () => {
-        this.close();
-        S.user.userSignup();
     }
 
     login = async () => {

@@ -194,8 +194,10 @@ export abstract class DialogBase extends Comp {
         }
 
         this.setChildren([
-            this.title ? (this.titleDiv = new Div(null, {
-                className: (this.mode === DialogMode.POPUP ? "app-modal-title-popup " : "app-modal-title-normal ") + extraTitleClass
+            // todo-1: it's tricky but 'closeByOutsideClick' means this is a "menu", so, no title.
+            this.title && !this.closeByOutsideClick ? (this.titleDiv = new Div(null, {
+                className: (this.mode === DialogMode.POPUP ? "app-modal-title-popup " : "app-modal-title-normal ") +
+                    extraTitleClass
             },
                 [
                     new Div(null, { className: "dlg-title-content" }, titleChildren),

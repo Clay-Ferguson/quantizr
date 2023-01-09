@@ -10,6 +10,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Clearfix } from "./core/Clearfix";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
@@ -116,7 +117,7 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const textToSpeech = !ast.mobileMode ? new Icon({
+        const textToSpeech = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-lg marginRight clickable",
 
             // This mouseover stuff is compensating for the fact that when the onClick gets called
@@ -145,20 +146,30 @@ export class RightNavPanel extends Div {
                 new Div(null, { className: "rightNavPanelInner" + (ast.isAnonUser ? " float-end" : "") }, [
                     !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
-                    // Not showing login on this panel in mobileMode, because it's shown at top of page instead
-                    ast.isAnonUser && !ast.mobileMode ? new Div("Login / Signup", {
-                        className: "signupLinkText",
-                        onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            S.user.userLogin();
-                        }
-                    }) : null,
+                    new Div(null, { className: "float-end" }, [
+                        // Not showing login on this panel in mobileMode, because it's shown at top of page instead
+                        ast.isAnonUser && !ast.mobileMode ? new Span("Login", {
+                            className: "signupLinkText",
+                            onClick: () => {
+                                PubSub.pub(C.PUBSUB_closeNavPanel);
+                                S.user.userLogin();
+                            }
+                        }) : null,
 
-                    new Div(null, { className: "bigMarginBottom" }, [
-                        textToSpeech || addNoteButton ? new Span(null, { className: "float-end" }, [
-                            textToSpeech,
-                            addNoteButton]) : null,
+                        ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
+                            className: "signupLinkText float-end",
+                            onClick: () => {
+                                // todo-0: lets' split apart Login and Signup. Will be SUPER trivial
+                                PubSub.pub(C.PUBSUB_closeNavPanel);
+                                S.user.userSignup();
+                            }
+                        }) : null
+                    ]),
 
+                    // kinda this clearfix makes sure the following stuff is BELOW Login/Signup text.
+                    ast.isAnonUser && !ast.mobileMode ? new Clearfix() : null,
+
+                    new Div(null, { className: "bigMarginBottom float-end" }, [
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Create posts, edit, and delete content" }, {
                             setValue: (checked: boolean) => S.edit.toggleEditMode(ast),
                             getValue: (): boolean => ast.userPrefs.editMode
@@ -167,8 +178,12 @@ export class RightNavPanel extends Div {
                         !fullScreenViewer ? new Checkbox("Info", { title: "Display of avatars, timestamps, etc." }, {
                             setValue: (checked: boolean) => S.edit.toggleShowMetaData(ast),
                             getValue: (): boolean => ast.userPrefs.showMetaData
-                        }, "form-switch form-check-inline") : null
+                        }, "form-switch form-check-inline") : null,
+                        textToSpeech || addNoteButton ? new Span(null, null, [
+                            textToSpeech,
+                            addNoteButton]) : null
                     ]),
+                    new Clearfix(),
 
                     // new Div(null, { className: "marginBottom" }, [
                     //     new ButtonBar([

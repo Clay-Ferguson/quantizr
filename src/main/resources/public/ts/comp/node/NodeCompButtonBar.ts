@@ -220,7 +220,8 @@ export class NodeCompButtonBar extends Div {
         let prevButton: Button;
         let nextButton: Button;
 
-        if (isPageRootNode) {
+        // Note we only allow 'Up Level' on home node if we're the admin.
+        if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
             if (S.nav.parentVisibleToUser(ast)) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     nid: this.node.id,
@@ -252,12 +253,12 @@ export class NodeCompButtonBar extends Div {
         }
 
         if (isPageRootNode && this.node.hasChildren) {
-            docIcon = new Icon({
+            docIcon = !ast.isAnonUser ? new Icon({
                 className: "fa fa-book fa-lg buttonBarIcon",
                 title: "Show Document View",
                 nid: this.node.id,
                 onClick: S.nav.openDocumentView
-            });
+            }) : null;
 
             searchIcon = new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
@@ -266,12 +267,12 @@ export class NodeCompButtonBar extends Div {
                 onClick: S.nav.runSearch
             });
 
-            timelineIcon = new Icon({
+            timelineIcon = !ast.isAnonUser ? new Icon({
                 className: "fa fa-clock-o fa-lg buttonBarIcon",
                 title: "View Timeline (by Mod Time)",
                 nid: this.node.id,
                 onClick: S.nav.runTimeline
-            });
+            }) : null;
         }
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
