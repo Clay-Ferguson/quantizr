@@ -57,7 +57,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         this.setChildren([
             new Div(null, null, [
-                new Div(null, { className: "friendListImgDiv" }, [
+                !isPublic ? new Div(null, { className: "friendListImgDiv" }, [
                     src ? new Img({
                         className: "friendListImage",
                         src,
@@ -65,7 +65,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
                     }) : null
-                ]),
+                ]) : null,
                 isPublic ? new Div(null, { className: "friendListImgDiv" }, [
                     new Icon({
                         className: "fa fa-globe fa-lg sharingIcon marginAll",

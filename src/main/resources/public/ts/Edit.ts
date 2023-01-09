@@ -331,7 +331,8 @@ export class Edit {
             if (!parentPath) return;
 
             // todo-0: we should alter the "SaveNode" to make it send BACK the 'newNode' so we don't
-            // evern need to make THIS call?
+            // ever need to make THIS call? Also the res (response) already DOES have a 'node' on it so
+            // just be careful deciding if that this method can use that or not.
             const newNode = await this.refreshNodeFromServer(node.id, newNodeTargetId);
             S.util.updateNodeHistory(newNode);
 

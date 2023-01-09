@@ -3,8 +3,8 @@ import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Html } from "../comp/core/Html";
+import { Icon } from "../comp/core/Icon";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
@@ -68,13 +68,34 @@ export class MainTabComp extends AppTab {
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
-            ast.isAnonUser ? null : new FlexRowLayout([
+            ast.isAnonUser ? null : new Div(null, { className: "headingBar" }, [
+                new Div(null, { className: "tinyMarginTop float-end" }, [
+                    !ast.isAnonUser ? new Icon({
+                        className: "fa fa-book fa-lg buttonBarIcon",
+                        title: "Show Document View",
+                        nid: ast.node.id,
+                        onClick: S.nav.openDocumentView
+                    }) : null,
+
+                    new Icon({
+                        className: "fa fa-search fa-lg buttonBarIcon",
+                        title: "Search Subnodes",
+                        nid: ast.node.id,
+                        onClick: S.nav.runSearch
+                    }),
+
+                    !ast.isAnonUser ? new Icon({
+                        className: "fa fa-clock-o fa-lg buttonBarIcon",
+                        title: "View Timeline (by Mod Time)",
+                        nid: ast.node.id,
+                        onClick: S.nav.runTimeline
+                    }) : null
+                ]),
                 header = new Div(g_brandingAppName, {
                     className: "tabTitle headerUploadPanel",
-                    onClick: () => S.util.loadAnonPageHome(),
-                    title: "Go to Portal Home Node\n\n(or Drop Files here to upload)"
+                    title: "Drop Files here to upload"
                 })
-            ], "headingBar"),
+            ]),
             contentDiv
         ]);
 

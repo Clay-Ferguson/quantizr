@@ -33,7 +33,7 @@ export class NodeCompRowHeader extends Div {
         let avatarImg: Img = null;
 
         const isMine = S.props.isMine(this.node, ast);
-        const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_FEED;
+        const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeHeaderAvatar(this.node, ast);
@@ -203,14 +203,7 @@ export class NodeCompRowHeader extends Div {
                 className: "fa fa-ellipsis-h fa-lg mediumMarginRight",
                 onClick: () => {
                     dispatch("SetHeaderDetailsState", s => {
-                        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id);
-                        if (!showDetails) {
-                            s.showAllRowDetails.add(this.node.id);
-                        }
-                        // leaving this code as example of "turn off" logic.
-                        // else {
-                        //     s.showAllRowDetails.delete(this.node.id);
-                        // }
+                        s.showAllRowDetails.add(this.node.id);
                         return s;
                     });
                 }

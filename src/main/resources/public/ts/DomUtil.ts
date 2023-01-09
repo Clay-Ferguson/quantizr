@@ -585,9 +585,6 @@ export class DomUtil {
         }
     }
 
-    // todo-0: Check ALL uses of RegExp, and remember that they won't work if the input string
-    // has special characters in it that regex will interpret (or need escaped?)
-
     /* Highlights 'text' everywhere it's found in the DOM. Pass 'document.body' as rootElm
        to replace on your whole web page */
     public highlightText = (rootElm: HTMLElement, text: string) => {
@@ -599,7 +596,7 @@ export class DomUtil {
     }
 
     public escapeRegEx = (text: string): string => {
-        // todo-0: from StackOverflow (not yet fully vetted)
+        // todo-1: from StackOverflow (not yet fully vetted)
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
 

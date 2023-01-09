@@ -175,7 +175,7 @@ td {
     padding-top: $smallGap;
     padding-left: $smallGap;
     padding-right: $smallGap;
-    
+
 }
 
 .mainAppRow {
@@ -217,7 +217,7 @@ td {
     margin-left: $smallGap;
     max-height: 600px;
     overflow-y: auto;
-    
+
     border: 2px solid olivedrab;
     margin-top: 12px;
     padding: 8px;
@@ -230,7 +230,7 @@ td {
     display: inline-block;
     cursor: pointer;
     font-size: x-large;
-    
+
 }
 
 .statsWord:hover {
@@ -248,7 +248,7 @@ td {
     margin-bottom: $smallGap;
     max-height: 200px;
     overflow-y: auto;
-    
+
     background-color: $baseBgColor;
 }
 
@@ -256,7 +256,7 @@ td {
     border: 2px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
-    
+
     background-color: $baseBgColor;
     padding: 12px;
 }
@@ -264,7 +264,7 @@ td {
 .speech-text-area {
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 24px;
-    
+
     background-color: $baseBgColor;
     padding: 16px;
 }
@@ -276,7 +276,7 @@ td {
     z-index: 15000001;
     background: $primary;
     border: 2px solid $nodeBorderBottomColor;
-    
+
     padding: 6px 12px 6px 12px;
 }
 
@@ -298,7 +298,7 @@ td {
 }
 
 .tts-quote {
-    color: var(--bs-green); 
+    color: var(--bs-green);
 }
 
 // Spend 45mins trying to make this work. Nothing shows up. I'm giving up for now. Not worth the effort. This \
@@ -336,7 +336,7 @@ td {
 .graphPopup {
     background-color: $modal-content-bg;
     border: 2px solid gray;
-    
+
     max-width: 30%;
     margin: $smallGap !important;
     padding: $smallGap !important;
@@ -514,7 +514,7 @@ a {
     padding: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
-    
+
     border: 1px solid gray;
 }
 
@@ -534,7 +534,7 @@ a {
     object-fit: cover;
     border: 2px solid $nodeBorderBottomColor;
     min-height: 60px;
-    
+
     max-height: 200px;
 }
 
@@ -578,7 +578,7 @@ a {
     max-width: 70px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
-    
+
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -599,7 +599,7 @@ strong em {
 
 .form-group-border {
     border: 1px solid $gray-600;
-    
+
 }
 
 .edit-props-table {
@@ -782,7 +782,7 @@ strong em {
     background-color: $modal-content-bg;
     margin: $smallGap auto;
     max-width: 800px;
-    
+
 }
 
 .dlg-content-border-topmost {
@@ -838,7 +838,7 @@ Will come back later and study this more. todo-3 */
     display: block;
     width: 75%;
     border: 2px solid gray;
-    
+
     margin: 0 auto;
 }
 
@@ -1095,7 +1095,7 @@ Will come back later and study this more. todo-3 */
     margin-bottom: 12px;
     display: block;
     border: 1px solid $gray-700;
-    
+
 }
 
 // WARNING: This class is used for finding in the DOM also, and isn't just for styling.
@@ -1111,7 +1111,7 @@ Will come back later and study this more. todo-3 */
     float: left !important;
     border: 1px solid $gray-700;
     vertical-align: top;
-    
+
 }
 
 .img-upper-right {
@@ -1121,7 +1121,7 @@ Will come back later and study this more. todo-3 */
     float: right !important;
     border: 1px solid $gray-700;
     vertical-align: top;
-    
+
 }
 
 .img-upper-center {
@@ -1131,7 +1131,7 @@ Will come back later and study this more. todo-3 */
     margin-bottom: $smallGap;
     margin-top: $smallGap;
     border: 1px solid $gray-700;
-    
+
 }
 
 .microMarginTop {
@@ -1188,7 +1188,7 @@ Will come back later and study this more. todo-3 */
     margin-left: 20px;
     padding: $tinyGap;
     border: 1px solid gray;
-    
+
     cursor: pointer;
 }
 
@@ -1352,7 +1352,7 @@ Will come back later and study this more. todo-3 */
     vertical-align: middle;
     border: 1px solid gray;
     padding: 6px;
-    
+
     cursor: pointer;
 }
 
@@ -1445,7 +1445,7 @@ Will come back later and study this more. todo-3 */
     cursor: pointer;
     border: 1px solid gray;
     vertical-align: top;
-    
+
     width: 75px;
 }
 
@@ -1502,7 +1502,7 @@ Will come back later and study this more. todo-3 */
 
 .parentNodeContentStyle {
     // border: 1px solid $gray-700;
-    
+
 
     padding-right: 8px;
     padding-top: 8px;
@@ -1805,7 +1805,7 @@ Will come back later and study this more. todo-3 */
     margin-top: 8px;
     padding-top: 10px;
     border: 1px solid $nodeBorderBottomColor;
-    
+
 }
 
 .threadFeedSubItem {
@@ -1827,7 +1827,7 @@ Will come back later and study this more. todo-3 */
     margin-top: 5px;
     padding-top: 10px;
     border: 1px solid olivedrab;
-    
+
 }
 
 .userFeedItem {
@@ -1921,7 +1921,7 @@ Will come back later and study this more. todo-3 */
 
 .binaryEditorSection {
     border: 1px solid gray;
-    
+
     margin-bottom: $smallGap;
     margin-top: $tinyGap;
     padding: $smallGap;
@@ -1943,7 +1943,7 @@ Will come back later and study this more. todo-3 */
     margin-left: 1px;
     margin-right: $smallGap;
     border: 2px solid $gray-700;
-    
+
 }
 
 .heading5 {
@@ -1977,7 +1977,7 @@ Will come back later and study this more. todo-3 */
     vertical-align: top;
     margin: $tinyGap;
     border: 1px solid gray;
-    
+
 }
 
 .friendListImage {
@@ -2036,7 +2036,7 @@ audio::-webkit-media-controls-play-button {
     display: inline-block;
     padding: 12px;
     border: 6px solid lightGray;
-    
+
 }
 
 // WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
@@ -2183,7 +2183,8 @@ audio::-webkit-media-controls-play-button {
 .likedByMeIcon {
     color: yellow;
     border: 2px solid yellow;
-    padding: 4px;
+    padding: 6px;
+    border-radius: 8px;
 }
 
 .apObjIconContainer {
@@ -2281,7 +2282,7 @@ audio::-webkit-media-controls-play-button {
 .dragTargetDlgSection {
     margin-top: $smallGap;
     border: 1px solid gray;
-    
+
     padding: $smallGap;
 }
 

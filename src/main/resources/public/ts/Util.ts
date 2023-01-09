@@ -600,6 +600,10 @@ export class Util {
         }
 
         dispatch("removeNodesFromHistory", s => {
+
+            // todo-0: this is a hack to put this cross-cutting concern in here, but is only short term.
+            s.showAllRowDetails.add(node.id);
+
             if (s.nodeHistoryLocked || !node ||
                 S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) return;
 

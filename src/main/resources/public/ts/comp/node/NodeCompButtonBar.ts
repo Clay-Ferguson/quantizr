@@ -213,9 +213,6 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let searchIcon: Icon = null;
-        let timelineIcon: Icon = null;
-        let docIcon: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: Button;
         let nextButton: Button;
@@ -252,32 +249,37 @@ export class NodeCompButtonBar extends Div {
             // -----------------------
         }
 
-        if (isPageRootNode && this.node.hasChildren) {
-            docIcon = !ast.isAnonUser ? new Icon({
-                className: "fa fa-book fa-lg buttonBarIcon",
-                title: "Show Document View",
-                nid: this.node.id,
-                onClick: S.nav.openDocumentView
-            }) : null;
+        // ---------------------------
+        // DO NOT DELETE
+        // These buttons were moved to the main tree header bar, BUT if we ever decide to bring these back
+        // for ALL nodes, rather than just the page root node, we can just re-enable this code.
+        // if (isPageRootNode && this.node.hasChildren) {
+        //     docIcon = !ast.isAnonUser ? new Icon({
+        //         className: "fa fa-book fa-lg buttonBarIcon",
+        //         title: "Show Document View",
+        //         nid: this.node.id,
+        //         onClick: S.nav.openDocumentView
+        //     }) : null;
 
-            searchIcon = new Icon({
-                className: "fa fa-search fa-lg buttonBarIcon",
-                title: "Search Subnodes",
-                nid: this.node.id,
-                onClick: S.nav.runSearch
-            });
+        //     searchIcon = new Icon({
+        //         className: "fa fa-search fa-lg buttonBarIcon",
+        //         title: "Search Subnodes",
+        //         nid: this.node.id,
+        //         onClick: S.nav.runSearch
+        //     });
 
-            timelineIcon = !ast.isAnonUser ? new Icon({
-                className: "fa fa-clock-o fa-lg buttonBarIcon",
-                title: "View Timeline (by Mod Time)",
-                nid: this.node.id,
-                onClick: S.nav.runTimeline
-            }) : null;
-        }
+        //     timelineIcon = !ast.isAnonUser ? new Icon({
+        //         className: "fa fa-clock-o fa-lg buttonBarIcon",
+        //         title: "View Timeline (by Mod Time)",
+        //         nid: this.node.id,
+        //         onClick: S.nav.runTimeline
+        //     }) : null;
+        // }
+        // ---------------------------
 
         let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
             new Span(null, { className: "float-end" }, [moveNodeUpIcon, //
-                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, docIcon, searchIcon, timelineIcon, pasteSpan])];
+                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */ pasteSpan])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);
