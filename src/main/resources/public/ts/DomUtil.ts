@@ -587,11 +587,6 @@ export class DomUtil {
 
     // todo-0: Check ALL uses of RegExp, and remember that they won't work if the input string
     // has special characters in it that regex will interpret (or need escaped?)
-    //
-    // todo-0: Verify all thes character replacements (the long special char strings below), are correct
-    // because they came from StackOverflow and aren't yet vetted.
-    // const regex = new RegExp(text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), "i");
-    // const allRegex = new RegExp("(" + text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + ")", "gi");
 
     /* Highlights 'text' everywhere it's found in the DOM. Pass 'document.body' as rootElm
        to replace on your whole web page */

@@ -159,7 +159,6 @@ export class RightNavPanel extends Div {
                         ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
                             className: "signupLinkText float-end",
                             onClick: () => {
-                                // todo-0: lets' split apart Login and Signup. Will be SUPER trivial
                                 PubSub.pub(C.PUBSUB_closeNavPanel);
                                 S.user.userSignup();
                             }

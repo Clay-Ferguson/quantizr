@@ -74,8 +74,6 @@ export class NodeCompMainNode extends Div {
             }
 
             if (allowHeader) {
-                // todo-0: if these parameters are always defined this way we can just put then INSIDE
-                // NodeCompRowHeader, becasue we're now passing tabData in.
                 const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
                 const showJumpButton = this.tabData.id !== C.TAB_MAIN;
 

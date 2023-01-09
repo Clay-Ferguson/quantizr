@@ -100,7 +100,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
         }
 
         this.setChildren([
-            // todo-0: WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
+            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             new Div(null, { className: "headingBar" }, [
                 new Div("Trending", { className: "tabTitle" })
             ]),

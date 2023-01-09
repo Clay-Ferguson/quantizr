@@ -174,7 +174,6 @@ export class NodeCompContent extends Div {
         // elm.querySelectorAll(".markdown-content").forEach((e: Element) => {
         //     if (!this.node?.content) return;
         //     // let text = e.textContent;
-        //     // todo-0: put this in a method
         //     let text = "";
         //     for (let i = 0; i < e.childNodes.length; ++i) {
         //         if (e.childNodes[i].nodeType === Node.TEXT_NODE) {

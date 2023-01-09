@@ -267,7 +267,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
 
         this.setChildren([
-            // todo-0: WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
+            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             new Div(null, { className: "headingBar" }, [
                 this.renderHeading(ast),
                 this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
