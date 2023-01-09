@@ -52,9 +52,8 @@ export class TutorialApp extends Comp {
             new Button("My Button", () => {
                 this.mergeState<LS>({ content: "You clicked a button!" });
                 dispatch("ButtonClick",
-                    (ast: AppState) => {
-                        ast.userName = "clay";
-                        return ast;
+                    (s: AppState) => {
+                        s.userName = "clay";
                     });
             })
         ]);

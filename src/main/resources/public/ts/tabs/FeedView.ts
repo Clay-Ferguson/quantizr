@@ -101,7 +101,6 @@ export class FeedView extends AppTab<FeedViewProps> {
                             else {
                                 dispatch("DisplayFeedSearch", s => {
                                     s.displayFeedSearch = true;
-                                    return s;
                                 });
                             }
                         },
@@ -346,7 +345,6 @@ export class FeedView extends AppTab<FeedViewProps> {
     //             setValue: (checked: boolean) => {
     //                 dispatch("SetFeedFilterType", s => {
     //                     this.data.props.feedFilterFriends = checked;
-    //                     return s;
     //                 });
     //             },
     //             getValue: (): boolean => this.data.props.feedFilterFriends
@@ -358,7 +356,6 @@ export class FeedView extends AppTab<FeedViewProps> {
     //             setValue: (checked: boolean) => {
     //                 dispatch("SetFeedFilterType", s => {
     //                     this.data.props.feedFilterToMe = checked;
-    //                     return s;
     //                 });
     //             },
     //             getValue: (): boolean => this.data.props.feedFilterToMe
@@ -370,7 +367,6 @@ export class FeedView extends AppTab<FeedViewProps> {
     //             setValue: (checked: boolean) => {
     //                 dispatch("SetFeedFilterType", s => {
     //                     this.data.props.feedFilterFromMe = checked;
-    //                     return s;
     //                 });
     //             },
     //             getValue: (): boolean => this.data.props.feedFilterFromMe
@@ -382,7 +378,6 @@ export class FeedView extends AppTab<FeedViewProps> {
     //             setValue: (checked: boolean) => {
     //                 dispatch("SetFeedFilterType", s => {
     //                     this.data.props.feedFilterToPublic = checked;
-    //                     return s;
     //                 });
     //             },
     //             getValue: (): boolean => this.data.props.feedFilterToPublic
@@ -400,7 +395,6 @@ export class FeedView extends AppTab<FeedViewProps> {
     //                     if (checked) {
     //                         this.data.props.feedFilterToPublic = true;
     //                     }
-    //                     return s;
     //                 });
     //             },
     //             getValue: (): boolean => this.data.props.feedFilterLocalServer

@@ -364,7 +364,6 @@ export class UserProfileDlg extends DialogBase {
         this.close();
         dispatch("SaveUserPerferences", s => {
             s.displayName = this.displayNameState.getValue();
-            return s;
         });
     }
 

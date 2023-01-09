@@ -22,10 +22,9 @@ export class TabPanel extends Div {
         }
     }
 
-    setVisibility = async (visible: boolean): Promise<AppState> => {
+    setVisibility = async (visible: boolean): Promise<void> => {
         return promiseDispatch("SetTabPanelVis", s => {
             s.tabPanelVisible = visible;
-            return s;
         });
     }
 

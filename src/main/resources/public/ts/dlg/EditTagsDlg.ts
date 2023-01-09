@@ -47,7 +47,6 @@ export class EditTagsDlg extends DialogBase {
 
         dispatch("SetUserProfile", s => {
             s.userProfile = ast.userProfile;
-            return s;
         });
 
         S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {

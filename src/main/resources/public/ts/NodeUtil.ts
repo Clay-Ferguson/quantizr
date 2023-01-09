@@ -51,7 +51,6 @@ export class NodeUtil {
         ast = getAppState(ast);
         dispatch("ClearSelections", s => {
             s.selectedNodes.clear();
-            return s;
         });
     }
 

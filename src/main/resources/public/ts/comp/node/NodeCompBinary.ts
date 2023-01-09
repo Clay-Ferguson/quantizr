@@ -116,7 +116,6 @@ export class NodeCompBinary extends Div {
                 }
             }
             s.fullScreenConfig.nodeId = id;
-            return s;
         });
     }
 

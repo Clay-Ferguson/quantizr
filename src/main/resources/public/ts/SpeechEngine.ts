@@ -158,7 +158,6 @@ export class SpeechEngine {
                 setTimeout(() => {
                     this.highlightByIndex(this.ttsIdx);
                 }, 500);
-                return s;
             });
         }
         else {
@@ -247,7 +246,6 @@ export class SpeechEngine {
                 s.speechPaused = false;
                 s.speechSpeaking = true;
                 s.ttsRan = true;
-                return s;
             });
 
             this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
@@ -671,7 +669,6 @@ export class SpeechEngine {
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = false;
             s.speechSpeaking = false;
-            return s;
         });
         this.tts.cancel();
     }
@@ -683,7 +680,6 @@ export class SpeechEngine {
 
         await promiseDispatch("speechEngineStateChange", s => {
             s.speechPaused = true;
-            return s;
         });
         this.tts.cancel();
     }
@@ -707,7 +703,6 @@ export class SpeechEngine {
     //     }
     //     await promiseDispatch("speechEngineStateChange", s => {
     //         s.speechPaused = true;
-    //         return s;
     //     });
     //     this.tts.pause();
     // }
@@ -721,7 +716,6 @@ export class SpeechEngine {
     //     await promiseDispatch("speechEngineStateChange", s => {
     //         s.speechPaused = false;
     //         s.speechSpeaking = true;
-    //         return s;
     //     });
     //     this.tts.resume();
     // }

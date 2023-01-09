@@ -192,7 +192,6 @@ export class User {
                 await promiseDispatch("unknownPubKeys", s => {
                     s.unknownPubEncKey = res.unknownPubEncKey;
                     s.unknownPubSigKey = res.unknownPubSigKey;
-                    return s;
                 });
 
                 S.localDB.userName = usr;
@@ -236,7 +235,6 @@ export class User {
             if (g_urlIdFailMsg) {
                 dispatch("setAccessFailed", s => {
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
-                    return s;
                 });
                 return;
             }
@@ -297,7 +295,6 @@ export class User {
         if (res) {
             dispatch("SetNewMessageCount", s => {
                 s.newMessageCount = res.numNew;
-                return s;
             });
         }
     }
@@ -310,7 +307,6 @@ export class User {
         if (res?.userProfile) {
             await promiseDispatch("SetUserProfile", s => {
                 s.userProfile = res.userProfile;
-                return s;
             });
         }
     }

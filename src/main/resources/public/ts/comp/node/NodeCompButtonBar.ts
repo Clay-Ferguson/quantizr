@@ -126,7 +126,6 @@ export class NodeCompButtonBar extends Div {
                             } else {
                                 s.selectedNodes.delete(this.node.id);
                             }
-                            return s;
                         });
                     },
                     getValue: (): boolean => ast.selectedNodes.has(this.node.id)

@@ -70,7 +70,6 @@ export class MenuPanel extends Div {
             if (node) {
                 s.linkSource = node.id;
             }
-            return s;
         });
     };
 
@@ -89,7 +88,6 @@ export class MenuPanel extends Div {
                 run();
             }
             s.linkSource = null;
-            return s;
         });
     };
 
@@ -176,7 +174,6 @@ export class MenuPanel extends Div {
             setTimeout(() => {
                 // S.tabUtil.selectTab(C.TAB_IPSM);
             }, 250);
-            return s;
         });
 
         const state = getAppState(null);
@@ -206,7 +203,6 @@ export class MenuPanel extends Div {
 
     static widerView = () => dispatch("widthAdjust", s => {
         S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
-        return s;
     });
 
     preRender(): void {

@@ -352,7 +352,6 @@ export class DomUtil {
         dispatch("ToggleMouseEffect", s => {
             this.mouseEffect = !this.mouseEffect;
             S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0", "allUsers");
-            return s;
         });
     }
 

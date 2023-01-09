@@ -223,7 +223,6 @@ export class View {
     //     if (newNode) {
     //         dispatch("HighlightAndScrollToNode", s => {
     //             S.nodeUtil.highlightNode(newNode, true, s);
-    //             return s;
     //         });
     //     }
     // }
@@ -349,7 +348,6 @@ export class View {
                     s.serverInfoText = m.message;
                     s.serverInfoCommand = command;
                     s.serverInfoTitle = dlgTitle;
-                    return s;
                 });
             });
         }

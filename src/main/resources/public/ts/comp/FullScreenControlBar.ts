@@ -57,7 +57,6 @@ export class FullScreenControlBar extends Div {
                 setValue: (checked: boolean) => {
                     dispatch("OpenDialog", s => {
                         s.showNodeLinksInGraph = checked;
-                        return s;
                     });
                 },
                 getValue: (): boolean => ast.showNodeLinksInGraph
@@ -68,7 +67,6 @@ export class FullScreenControlBar extends Div {
                     setValue: (checked: boolean) => {
                         dispatch("OpenDialog", s => {
                             s.attractionLinksInGraph = checked;
-                            return s;
                         });
                     },
                     getValue: (): boolean => ast.attractionLinksInGraph

@@ -151,7 +151,6 @@ export class Nav {
             if (node) {
                 dispatch("HighlightNode", s => {
                     S.nodeUtil.highlightNode(node, false, s);
-                    return s;
                 });
             }
             else {
@@ -411,7 +410,6 @@ export class Nav {
         dispatch("CloseFullScreenViewer", s => {
             s.fullScreenConfig = { type: FullScreenType.NONE };
             s.graphData = null;
-            return s;
         });
     }
 
@@ -430,7 +428,6 @@ export class Nav {
 
             dispatch("PrevFullScreenImgViewer", s => {
                 s.fullScreenConfig.ordinal = selAtt.o;
-                return s;
             });
         }
     }
@@ -453,7 +450,6 @@ export class Nav {
 
             dispatch("PrevFullScreenImgViewer", s => {
                 s.fullScreenConfig.ordinal = selAtt.o;
-                return s;
             });
         }
     }
@@ -472,7 +468,6 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             FeedTab.inst.props = { ...FeedTab.inst.props, ...props };
-            return s;
         });
 
         setTimeout(() => {
@@ -535,7 +530,6 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             TrendingTab.inst.props = { ...TrendingTab.inst.props };
-            return s;
         });
     }
 

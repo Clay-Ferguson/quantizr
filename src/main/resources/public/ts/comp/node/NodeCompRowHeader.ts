@@ -204,7 +204,6 @@ export class NodeCompRowHeader extends Div {
                 onClick: () => {
                     dispatch("SetHeaderDetailsState", s => {
                         s.showAllRowDetails.add(this.node.id);
-                        return s;
                     });
                 }
             }));

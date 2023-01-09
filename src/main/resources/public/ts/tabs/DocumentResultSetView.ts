@@ -94,7 +94,6 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                     setValue: (checked: boolean) => {
                         dispatch("DocIndent", s => {
                             s.docIndent = checked;
-                            return s;
                         });
                     },
                     getValue: (): boolean => {
@@ -108,7 +107,6 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                     setValue: (checked: boolean) => {
                         dispatch("SetIncludeComments", s => {
                             S.edit.setShowComments(checked, getAppState());
-                            return s;
                         });
 
                         // refresh the view.

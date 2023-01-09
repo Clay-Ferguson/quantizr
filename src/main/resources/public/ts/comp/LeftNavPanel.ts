@@ -83,7 +83,6 @@ export class LeftNavPanel extends Div {
                     onClick: () => {
                         dispatch("ToggleLHS", s => {
                             s.anonShowLHSMenu = !s.anonShowLHSMenu;
-                            return s;
                         })
                     },
                     title: "Show Menu"

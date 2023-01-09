@@ -50,7 +50,6 @@ export class Search {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
                 S.tabUtil.selectTabStateOnly(SharesTab.inst.id, s);
-                return s;
             });
         }
         else {
@@ -80,14 +79,12 @@ export class Search {
                 data.props.results = [...moreResults, ...data.props.results];
                 data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
-                return s;
             });
         }
         else {
             dispatch("RenderThreadResults", s => {
                 if (!ThreadTab.inst) return;
                 ThreadTab.inst.props.endReached = true;
-                return s;
             });
         }
     }
@@ -115,7 +112,6 @@ export class Search {
                 data.props.results = res.nodes;
                 data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
-                return s;
             });
         }
         else {
@@ -207,7 +203,6 @@ export class Search {
                 // if (searchText) {
                 //     setTimeout(() => (window as any).find(searchText, false), 1000); //window.find
                 // }
-                return s;
             });
         }
         else {
@@ -243,7 +238,6 @@ export class Search {
                 DocumentTab.inst.openGraphComps = [];
                 const info = DocumentTab.inst.props as DocumentRSInfo;
                 info.endReached = true;
-                return s;
             });
             return;
         }
@@ -264,7 +258,6 @@ export class Search {
             info.results = growPage ? info.results.concat(res.searchResults) : res.searchResults;
             info.node = node;
             S.tabUtil.selectTabStateOnly(DocumentTab.inst.id, s);
-            return s;
         });
     }
 
@@ -322,7 +315,6 @@ export class Search {
             info.page = page;
 
             S.tabUtil.selectTabStateOnly(TimelineTab.inst.id, s);
-            return s;
         });
     }
 
@@ -359,7 +351,6 @@ export class Search {
             if (!searchText) {
                 s.displayFeedSearch = false;
             }
-            return s;
         });
 
         this.feed(FeedTab.inst.props.page, searchText, false, false);
@@ -389,7 +380,6 @@ export class Search {
                 S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
 
                 S.domUtil.focusId(C.TAB_FEED);
-                return s;
             });
         }
     }
@@ -473,7 +463,6 @@ export class Search {
             }
 
             S.domUtil.focusId(C.TAB_FEED);
-            return s;
         });
     }
 
@@ -508,7 +497,6 @@ export class Search {
                 info.showingFollowersOfUser = userName;
 
                 S.tabUtil.selectTabStateOnly(data.id, s);
-                return s;
             });
         }
         else {
@@ -547,7 +535,6 @@ export class Search {
                 info.showingFollowingOfUser = userName;
 
                 S.tabUtil.selectTabStateOnly(data.id, s);
-                return s;
             });
         }
         else {
@@ -699,7 +686,6 @@ export class Search {
 
         dispatch("RenderSearchResults", s => {
             s.highlightSearchNodeId = id;
-            return s;
         });
     }
 

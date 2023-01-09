@@ -360,7 +360,6 @@ export class EditNodeDlg extends DialogBase {
                 (expanded: boolean) => {
                     dispatch("setPropsPanelExpanded", s => {
                         s.propsPanelExpanded = expanded;
-                        return s;
                     });
                 }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
@@ -386,7 +385,6 @@ export class EditNodeDlg extends DialogBase {
             (expanded: boolean) => {
                 dispatch("setMorePanelExpanded", s => {
                     s.morePanelExpanded = expanded;
-                    return s;
                 });
             }, getAppState().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
@@ -735,7 +733,6 @@ export class EditNodeDlg extends DialogBase {
             S.quanta.newNodeTargetOffset = -1;
             s.editShowJumpButton = false;
             s.editEncrypt = false;
-            return s;
         });
     }
 

@@ -349,7 +349,6 @@ export class EditNodeDlgUtil {
             if (dlg.mode === DialogMode.EMBED) {
                 dispatch("uploadDeleted", s => {
                     s.editNode = ast.editNode;
-                    return s;
                 });
             }
             dlg.binaryDirty = true;

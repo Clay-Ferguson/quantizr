@@ -160,7 +160,6 @@ export class SearchContentDlg extends DialogBase {
                 this.searchTextState.setValue("");
                 dispatch("clearSearch", s => {
                     s.highlightText = null;
-                    return s;
                 })
             }),
             !getAppState().isAnonUser ? new IconButton("fa-tag fa-lg", "", {

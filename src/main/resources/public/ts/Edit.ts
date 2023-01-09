@@ -116,7 +116,6 @@ export class Edit {
                         s.editNode = res.nodeInfo;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
-                        return s;
                     });
                 }
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
@@ -124,7 +123,6 @@ export class Edit {
                 else if (editInPopup) {
                     await promiseDispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
-                        return s;
                     });
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null, afterEditAction);
                     dlg.open();
@@ -134,7 +132,6 @@ export class Edit {
                         s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
-                        return s;
                     });
                 }
             } else {
@@ -157,7 +154,6 @@ export class Edit {
 
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
-                return s;
             });
 
             // if pasting do a kind of refresh which will maintain us at the same page parent.
@@ -319,9 +315,7 @@ export class Edit {
                     FeedTab.inst.props.feedDirtyList = null;
 
                     // all the data in feedData will have been updated by forceFeedItem so force react to render now.
-                    dispatch("ForceFeedResults", s => {
-                        return s;
-                    });
+                    dispatch("ForceFeedResults", s => {});
                 }
             }
 
@@ -358,7 +352,7 @@ export class Edit {
         }
     }
 
-    injectNewNodeIntoChildren = (newNode: J.NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<AppState> => {
+    injectNewNodeIntoChildren = (newNode: J.NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
         // we return the promise from the dispatch and to not wait for it here.
         return promiseDispatch("InjectNewNodeIntoChildren", s => {
             if (s.node.children) {
@@ -396,7 +390,6 @@ export class Edit {
             else {
                 s.node.children = [newNode];
             }
-            return s;
         });
     }
 
@@ -437,8 +430,6 @@ export class Edit {
 
                     // make all tabs update their copy of the node of they have it
                     ast.tabData.forEach(td => td.replaceNode(s, res.node));
-
-                    return s;
                 });
             }
         });
@@ -551,7 +542,6 @@ export class Edit {
             await promiseDispatch("modUserPref", (s) => {
                 func(s);
                 S.util.saveUserPreferences(s);
-                return s;
             });
         });
     }
@@ -592,7 +582,6 @@ export class Edit {
         // update render state
         dispatch("setShowReplies", (s) => {
             s.userPrefs.showReplies = showReplies;
-            return s;
         });
 
         // update our db
@@ -618,7 +607,6 @@ export class Edit {
             // update render state (using local state), this way if we're not refreshing the tree.
             dispatch("setShowReplies", (s) => {
                 s.userPrefs.showReplies = ast.userPrefs.showReplies;
-                return s;
             });
         }
     }
@@ -920,7 +908,6 @@ export class Edit {
         if (id) {
             await promiseDispatch("SelectNode", s => {
                 S.nav.setNodeSel(true, id, s);
-                return s;
             });
         }
 
@@ -974,7 +961,6 @@ export class Edit {
                             S.srch.removeNodeById(id, s);
                         });
                         s.selectedNodes.clear();
-                        return s;
                     });
                     S.view.jumpToId(ast.node.id);
                 }
@@ -985,7 +971,6 @@ export class Edit {
                         });
                         s.selectedNodes.clear();
                         s.node.children = ast.node.children;
-                        return s;
                     });
                 }
             }
@@ -1000,7 +985,6 @@ export class Edit {
                 // remove any top level history item that matches 'id'
                 s.nodeHistory = s.nodeHistory.filter(h => h.id !== id);
             });
-            return s;
         });
     }
 
@@ -1013,14 +997,12 @@ export class Edit {
             selNodesArray.forEach(id => {
                 s.calendarData = s.calendarData.filter((item: EventInput) => item.id !== id);
             });
-            return s;
         });
     }
 
     undoCutSelNodes = () => {
         dispatch("SetNodesToMove", s => {
             s.nodesToMove = null;
-            return s;
         });
     }
 
@@ -1031,7 +1013,6 @@ export class Edit {
             S.nav.setNodeSel(true, id, s);
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray(s);
             s.selectedNodes.clear();
-            return s;
         });
     }
 
@@ -1220,7 +1201,6 @@ export class Edit {
                 // remove userName from likes
                 node.likes = node.likes.filter(u => u !== ast.userName);
             }
-            return s;
         });
     }
 
@@ -1348,7 +1328,6 @@ export class Edit {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
-                return s;
             });
             const ast = getAppState();
             S.view.refreshTree({
@@ -1442,7 +1421,6 @@ export class Edit {
     updateNode = (node: J.NodeInfo) => {
         dispatch("UpdateNode", s => {
             s.editNode = node;
-            return s;
         });
     }
 }

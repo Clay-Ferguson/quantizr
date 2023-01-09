@@ -173,7 +173,6 @@ export class TTSView extends AppTab {
                     else {
                         s.speechVoice2 = voiceInt;
                     }
-                    return s;
                 })
             },
             getValue: (): string => "" + (primaryVoice ? getAppState().speechVoice : getAppState().speechVoice2)
@@ -195,7 +194,6 @@ export class TTSView extends AppTab {
                 S.localDB.setVal(C.LOCALDB_VOICE_RATE, val, "allUsers");
                 dispatch("ChangeSpeechRate", s => {
                     s.speechRate = val;
-                    return s;
                 })
             },
             getValue: (): string => getAppState().speechRate

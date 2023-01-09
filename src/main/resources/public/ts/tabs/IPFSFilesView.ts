@@ -97,7 +97,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                         setValue: (checked: boolean) => {
                             dispatch("setListCids", s => {
                                 this.data.props.listCids = checked;
-                                return s;
                             });
                         },
                         getValue: (): boolean => this.data.props.listCids
@@ -261,7 +260,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
             s.serverInfoText = shortName + "\n" + hash + "\n\n" + res.content;
             s.serverInfoCommand = "IPFS File Content";
             s.serverInfoTitle = "IPFS File Content";
-            return s;
         });
     }
 
@@ -269,7 +267,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // DO NOT DELETE (may decide to do this some day)
         // dispatch("deleteMFSFile", s => {
         //     this.data.props.loading = true;
-        //     return s;
         // });
 
         setTimeout(async () => {
@@ -285,7 +282,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         // DO NOT DELETE (may decide to do this some day)
         // dispatch("RefreshMFSFiles", s => {
         //     this.data.props.loading = true;
-        //     return s;
         // });
 
         setTimeout(async () => {
@@ -305,7 +301,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
                 this.data.props.mfsFiles = res.files;
                 this.data.props.cidField.setValue(res.folder);
                 this.data.props.mfsFolderCid = res.cid;
-                return s;
             });
         }, 100);
     }

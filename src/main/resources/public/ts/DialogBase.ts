@@ -83,7 +83,6 @@ export abstract class DialogBase extends Comp {
                 if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 1) {
                     document.body.style.overflow = "hidden";
                 }
-                return s;
             });
 
             this.resolve = resolve;
@@ -126,7 +125,6 @@ export abstract class DialogBase extends Comp {
             if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 0) {
                 document.body.style.overflow = "auto";
             }
-            return s;
         });
     }
 

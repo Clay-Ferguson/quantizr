@@ -106,7 +106,6 @@ export class Quanta {
             if (mobileMode) {
                 dispatch("SetMobileMode", s => {
                     s.mobileMode = mobileMode === "true";
-                    return s;
                 });
             }
 
@@ -184,9 +183,7 @@ export class Quanta {
 
             window.addEventListener("orientationchange", () => {
                 // we force the page to re-render with an all new state.
-                dispatch("orientationChange", s => {
-                    return s;
-                });
+                dispatch("orientationChange", s => {});
             });
 
             // not used. do not delete.
@@ -244,7 +241,6 @@ export class Quanta {
                                 g_displayUserProfileId = null;
                             }
                         }, 100);
-                        return s;
                     });
                 }
             }, 250);

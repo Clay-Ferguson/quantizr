@@ -74,7 +74,6 @@ export class ServerPush {
                         // now add to the top of the list.
                         data.props.results.unshift(nodeInfo);
                     }
-                    return s;
                 });
             }
         });
@@ -147,7 +146,6 @@ export class ServerPush {
 
         //     // add to head of array (rev-chron view)
         //     feedData.props.events.unshift(payload);
-        //     return s;
         // });
     }
 
@@ -207,7 +205,6 @@ export class ServerPush {
                 keep it simple and only set a dirty flag */
                 FeedTab.inst.props.feedDirty = true;
             }
-            return s;
         });
     }
 }

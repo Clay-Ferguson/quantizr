@@ -36,7 +36,6 @@ export class TabUtil {
                 this.tabChanging(s.activeTab, tabName, s);
                 s.activeTab = S.quanta.activeTab = tabName;
             }
-            return s;
         });
     }
 
@@ -110,7 +109,6 @@ export class TabUtil {
                 //     props: {}
                 // }
             ];
-            return s;
         });
     }
 

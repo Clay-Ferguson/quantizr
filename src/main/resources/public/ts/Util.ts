@@ -610,7 +610,6 @@ export class Util {
 
             // now add to top.
             s.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
-            return s;
         });
     }
 
@@ -724,7 +723,6 @@ export class Util {
         dispatch("SwitchBrowsingMode", s => {
             s.mobileMode = !s.mobileMode;
             S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false", "allUsers");
-            return s;
         });
     }
 
@@ -786,12 +784,10 @@ export class Util {
         setTimeout(() => {
             dispatch("ShowPageMessage", s => {
                 s.pageMessage = message;
-                return s;
             });
             setTimeout(() => {
                 dispatch("ClearPageMessage", s => {
                     s.pageMessage = null;
-                    return s;
                 });
             }, 5000);
         }, 500);
@@ -813,7 +809,6 @@ export class Util {
                         PubSub.pub(C.PUBSUB_menuExpandChanged, { op: "expand", name: C.BOOKMARKS_MENU_TEXT });
                     }
                 }, 250);
-                return s;
             });
         }
     }
@@ -920,7 +915,6 @@ export class Util {
                 if (!s.userPrefs.showParents && s.node) {
                     s.node.parents = null;
                 }
-                return s;
             });
         }
     }
@@ -966,7 +960,6 @@ export class Util {
             s.userPrefs = res.userPreferences;
             // s.title = !s.isAnonUser ? res.userName : "";
             s.displayName = !s.isAnonUser ? res.userProfile.displayName : "";
-            return s;
         });
     }
 

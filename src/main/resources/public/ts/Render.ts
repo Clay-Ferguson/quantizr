@@ -279,7 +279,6 @@ export class Render {
         dispatch("ShowCalendar", s => {
             s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
             s.calendarData = S.util.buildCalendarData(res.items);
-            return s;
         });
     }
 
@@ -502,7 +501,6 @@ export class Render {
                                         s.rssFeedCache[feedSrcHash] = "loading";
                                         s.rssFeedPage[feedSrcHash] = 1;
                                         RssType.loadFeed(s, feedSrcHash, feedSrc);
-                                        return s;
                                     });
                                 }, 250);
                             }
@@ -595,7 +593,6 @@ export class Render {
                                 dispatch("settingVisible", s => {
                                     s.rendering = false;
                                     this.allowFadeInId = true;
-                                    return s;
                                 });
                             },
                                 /* This delay has to be long enough to be sure scrolling has taken place already, so if we
@@ -616,7 +613,6 @@ export class Render {
                         S.domUtil.focusId(C.TAB_MAIN);
                     }
                 }
-                return s;
             });
         }
         catch (err) {
@@ -698,7 +694,6 @@ export class Render {
             s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
             s.graphData = res.rootNode;
-            return s;
         });
     }
 

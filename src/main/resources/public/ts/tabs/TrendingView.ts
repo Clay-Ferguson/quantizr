@@ -46,7 +46,6 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         dispatch("RenderSearchResults", s => {
             this.data.props.res = res;
-            return s;
         });
     }
 

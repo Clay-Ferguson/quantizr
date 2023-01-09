@@ -7,25 +7,39 @@ import { PubSub } from "./PubSub";
 
 We are dropping Redux and using useReducer+useContext instead,
 because Redux is no longer needed, now that React can do that all the
-state management we need and do it better (i.e. simpler) than Redux. */
+state management we need and do it better (i.e. simpler) than Redux.
 
-/* NOTE: dispatcher doesn't get set until the root component calls initDispatch WHILE BEING
- rendered. This is a requirement becasue it comes from useReducer which can only be called
- inside a react function */
-
-// todo-0: * rename 'payload' to func.
-//         * add interface for "{type: func}"
-//         * stop requiring func to RETURN anything. It's never needed
+NOTE: dispatcher doesn't get set until the root component calls initDispatch WHILE BEING
+rendered. This is a requirement becasue it comes from useReducer which can only be called
+inside a react function */
 
 let dispatcher: Function = null;
 
 export let state = new AppState();
 export const AppContext = createContext(state);
 
-/* Our architecture is to always have the payload as a function, and do that pattern everywhere */
-export function reducer(s: AppState, action: any) {
-    state = { ...action.payload(s) };
-    return state;
+function reducer(s: AppState, action: any) {
+    const saveState = s;
+    try {
+        const newState = { ...s };
+
+        // ============================
+        // WARNING!!!! Normally dispatch methods return NOTHING, and so returning exactly 'false' is the only
+        // case we need to detect here. Do not change this to handle any "falsy" type becasue that will
+        // break the entier app.
+        // ============================
+        if (action.func(newState) === false) {
+            // if func itself requested rollback, then rollback
+            return saveState;
+        }
+        state = newState;
+        return state;
+    }
+    // if an error happens we can rollback the state to exactly what it was before (saveState)
+    catch (e) {
+        console.error(e.message + "(State rolled back)", e.stack);
+        return saveState;
+    }
 }
 
 /* Use this to get state when NOT inside a react function */
@@ -51,30 +65,39 @@ export function initDispatch(): void {
 /**
  * Simple dispatch to transform state. When using this you have no way, however, to wait for
  * the state transform to complete, so use the 'promiseDispatch' for that. Our design pattern is to
- * always do state changes (dispatches) only thru this 'dispatcher', local to this module, and we also
- * allow a function to be passed, rather than an object payload.
+ * always do state changes (dispatches) only thru this 'dispatcher', local to this module
  */
-export function dispatch(type: string, func: (s: AppState) => AppState) {
+export function dispatch(type: string, func: (s: AppState) => any) {
     if (!dispatcher) {
         throw new Error("Called dispatch before first render. type: " + type);
     }
-    dispatcher({ type, payload: func });
+    dispatcher({ type, func });
 }
 
 /**
  * Schedules a dispatch to run, and returns a promise that will resolve only AFTER the state
- * change has completed.
+ * change has completed. We accomplish this simply by wrapping 'func' in a new function
+ * that we can inject the reject/resolve into, to be sure we've waited at least until
+ * the state has transformed.
  */
-export function promiseDispatch(type: string, func: (s: AppState) => AppState): Promise<AppState> {
-    return new Promise<AppState>(async (resolve, reject) => {
+export function promiseDispatch(type: string, func: (s: AppState) => any): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
         if (!dispatcher) {
             throw new Error("Called dispatch before first render. type: " + type);
         }
         dispatcher({
-            type, payload: function (s: AppState): AppState {
-                const state = func(s);
-                resolve(state);
-                return state;
+            type, func: function (s: AppState): any {
+                // ============================
+                // WARNING!!!! Normally dispatch methods return NOTHING, and so returning exactly 'false' is the only
+                // case we need to detect here. Do not change this to handle any "falsy" type becasue that will
+                // break the entier app.
+                // ============================
+                if (func(s) === false) {
+                    reject();
+                }
+                else {
+                    resolve();
+                }
             }
         });
     });

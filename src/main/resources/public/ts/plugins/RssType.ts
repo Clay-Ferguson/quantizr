@@ -108,7 +108,6 @@ export class RssType extends TypeBase {
                     dispatch("LoadingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
                         RssType.loadFeed(ast, feedSrcHash, feedSrc);
-                        return s;
                     });
                 }, null, "btn-primary marginAll");
             }
@@ -146,7 +145,6 @@ export class RssType extends TypeBase {
             // console.log(err.message || "RSS Feed failed to load.");
             dispatch("RSSUpdated", s => {
                 s.rssFeedCache[feedSrcHash] = "failed";
-                return s;
             });
         }
         else {
@@ -169,7 +167,6 @@ export class RssType extends TypeBase {
                     RssType.lastGoodFeed = res.feed;
                     RssType.lastGoodPage = s.rssFeedPage[feedSrcHash];
                 }
-                return s;
             });
         }
     }
@@ -190,7 +187,6 @@ export class RssType extends TypeBase {
             setValue: (checked: boolean) => {
                 dispatch("SetHeadlinesFlag", s => {
                     S.edit.setRssHeadlinesOnly(s, checked);
-                    return s;
                 });
             },
             getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
@@ -294,7 +290,6 @@ export class RssType extends TypeBase {
             s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
             RssType.loadFeed(ast, feedSrcHash, feedSrc);
-            return s;
         });
     }
 
