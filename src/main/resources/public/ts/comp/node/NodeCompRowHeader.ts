@@ -199,7 +199,7 @@ export class NodeCompRowHeader extends Div {
 
         if (!showDetails) {
             children.push(new Icon({
-                title: "More",
+                title: "More node actions",
                 className: "fa fa-ellipsis-h fa-lg mediumMarginRight",
                 onClick: () => {
                     dispatch("SetHeaderDetailsState", s => {

@@ -12,6 +12,11 @@ state management we need and do it better (i.e. simpler) than Redux. */
 /* NOTE: dispatcher doesn't get set until the root component calls initDispatch WHILE BEING
  rendered. This is a requirement becasue it comes from useReducer which can only be called
  inside a react function */
+
+// todo-0: * rename 'payload' to func.
+//         * add interface for "{type: func}"
+//         * stop requiring func to RETURN anything. It's never needed
+
 let dispatcher: Function = null;
 
 export let state = new AppState();
@@ -57,7 +62,7 @@ export function dispatch(type: string, func: (s: AppState) => AppState) {
 }
 
 /**
- * Schedules a dispatch to run, and returns a promise that will resolve only after the state
+ * Schedules a dispatch to run, and returns a promise that will resolve only AFTER the state
  * change has completed.
  */
 export function promiseDispatch(type: string, func: (s: AppState) => AppState): Promise<AppState> {

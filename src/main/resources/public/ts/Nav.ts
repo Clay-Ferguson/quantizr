@@ -151,7 +151,6 @@ export class Nav {
             if (node) {
                 dispatch("HighlightNode", s => {
                     S.nodeUtil.highlightNode(node, false, s);
-                    s.showAllRowDetails.add(node.id);
                     return s;
                 });
             }

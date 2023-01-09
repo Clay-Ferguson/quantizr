@@ -599,9 +599,7 @@ export class Util {
             return;
         }
 
-        dispatch("removeNodesFromHistory", s => {
-
-            // todo-0: this is a hack to put this cross-cutting concern in here, but is only short term.
+        dispatch("updateNodeHistory", s => {
             s.showAllRowDetails.add(node.id);
 
             if (s.nodeHistoryLocked || !node ||
