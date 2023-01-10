@@ -67,7 +67,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }),
 
                     this.importMode || !ast.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
-                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
+                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
                         onClick: this.uploadFromClipboard,
                         title: "Upload from Clipboard"
                     }),

@@ -148,7 +148,7 @@
     min-height: 2rem;
 
     border: 1px solid gray;
-    background-color: $secondary;
+    background-color: darken($secondary, 10%);
     padding: 4px;
     margin-bottom: $tinyGap;
 }

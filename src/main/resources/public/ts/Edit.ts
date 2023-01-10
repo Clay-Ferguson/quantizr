@@ -299,8 +299,7 @@ export class Edit {
         }
     }
 
-    // todo-0: dead param: allowScroll
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean,
+    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse,
         newNodeTargetId: string, newNodeTargetOffset: number, ast: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
@@ -444,7 +443,6 @@ export class Edit {
     //                 }
 
     //                 // make all tabs update their copy of the node of they have it
-    //                 // todo-0: this needs to be called for ALL tabs right?
     //                 ast.tabData.forEach(td => td.replaceNode(s, res.node));
     //             });
     //         }
