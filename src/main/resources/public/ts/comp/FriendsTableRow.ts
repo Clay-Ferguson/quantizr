@@ -50,12 +50,14 @@ export class FriendsTableRow extends ListBoxRow {
                     },
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
                 }) : null,
-                new Div(null, { className: "friendListImgDiv" }, [
-                    src ? new Img({
-                        className: "friendListImage",
-                        src,
-                        onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
-                    }) : null
+                new Div(null, { className: "friendListImgDivCont" }, [
+                    new Div(null, { className: "friendListImgDiv centerChild" }, [
+                        src ? new Img({
+                            className: "friendListImage",
+                            src,
+                            onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
+                        }) : null
+                    ])
                 ]),
                 new Div(null, {
                     className: "friendListText",

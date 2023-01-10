@@ -36,9 +36,7 @@ export class FriendsDlg extends DialogBase {
             nodeId: this.nodeId
         });
 
-        await promiseDispatch("SetFriendHashTags", s => {
-            s.friendHashTags = res.friendHashTags;
-        });
+        await promiseDispatch("SetFriendHashTags", s => { s.friendHashTags = res.friendHashTags; });
 
         let friends: J.FriendInfo[] = [];
         if (res.nodeOwner) {

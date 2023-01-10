@@ -2,7 +2,6 @@ import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
-import { Span } from "../comp/core/Span";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -57,23 +56,27 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         this.setChildren([
             new Div(null, null, [
-                !isPublic ? new Div(null, { className: "friendListImgDiv" }, [
-                    src ? new Img({
-                        className: "friendListImage",
-                        src,
-                        onClick: () => {
-                            new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                        }
-                    }) : null
-                ]) : null,
-                isPublic ? new Div(null, { className: "friendListImgDiv" }, [
-                    new Icon({
-                        className: "fa fa-globe fa-lg sharingIcon marginAll",
-                        title: "Node is Public"
-                    })
-                ]) : null,
-                isPublic ? new Span("Public (Everyone)", { className: "largeFont sharingDisplayName" })
-                    : new Span(displayName, {
+                new Div(null, { className: "friendListImgDivCont" }, [
+                    !isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
+                        src ? new Img({
+                            className: "friendListImage",
+                            src,
+                            onClick: () => {
+                                new UserProfileDlg(this.aclEntry.principalNodeId).open();
+                            }
+                        }) : null
+                    ]) : null,
+                    isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
+                        new Icon({
+                            className: "fa fa-globe fa-3x sharingIcon marginAll",
+                            title: "Node is Public"
+                        })
+                    ]) : null
+                ]),
+                // todo-1: I tried for 30min to get spacing to show up at bottom of of 'sharingDisplayName'
+                // and failed. welp, I guess I'm done on that for a minute. I must be missing something.
+                isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
+                    : new Div(displayName, {
                         className: "sharingDisplayName",
                         onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();

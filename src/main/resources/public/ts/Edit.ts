@@ -299,6 +299,7 @@ export class Edit {
         }
     }
 
+    // todo-0: dead param: allowScroll
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean,
         newNodeTargetId: string, newNodeTargetOffset: number, ast: AppState) => {
         if (S.util.checkSuccess("Save node", res)) {
@@ -315,7 +316,7 @@ export class Edit {
                     FeedTab.inst.props.feedDirtyList = null;
 
                     // all the data in feedData will have been updated by forceFeedItem so force react to render now.
-                    dispatch("ForceFeedResults", s => {});
+                    dispatch("ForceFeedResults", s => { });
                 }
             }
 
@@ -324,10 +325,23 @@ export class Edit {
             const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
-            // todo-0: we should alter the "SaveNode" to make it send BACK the 'newNode' so we don't
-            // ever need to make THIS call? Also the res (response) already DOES have a 'node' on it so
-            // just be careful deciding if that this method can use that or not.
-            const newNode = await this.refreshNodeFromServer(node.id, newNodeTargetId);
+            const newNode = res.node;
+            if (!newNodeTargetId) {
+                promiseDispatch("nodeUpdated", s => {
+                    // if the node is our page parent (page root)
+                    if (newNode.id === s.node?.id) {
+                        // preserve the children, when updating the root node, because they will not have been obtained
+                        // due to the 'singleNode=true' in the request
+                        newNode.children = s.node.children;
+                        s.node = newNode;
+                    }
+
+                    // make all tabs update their copy of the node of they have it
+                    // todo-0: this needs to be called for ALL tabs right?
+                    ast.tabData.forEach(td => td.replaceNode(s, newNode));
+                });
+            }
+
             S.util.updateNodeHistory(newNode);
 
             if (ast.activeTab === C.TAB_MAIN) {
@@ -393,47 +407,49 @@ export class Edit {
         });
     }
 
-    refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
-        return new Promise<J.NodeInfo>(async (resolve, reject) => {
-            const ast = getAppState();
+    // todo-0: will be deleting this soon.
+    // refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
+    //     return new Promise<J.NodeInfo>(async (resolve, reject) => {
+    //         const ast = getAppState();
 
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: false,
-                forceRenderParent: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: true,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
-            });
+    //         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+    //             nodeId,
+    //             upLevel: false,
+    //             siblingOffset: 0,
+    //             renderParentIfLeaf: false,
+    //             forceRenderParent: false,
+    //             offset: 0,
+    //             goToLastPage: false,
+    //             forceIPFSRefresh: false,
+    //             singleNode: true,
+    //             parentCount: ast.userPrefs.showParents ? 1 : 0
+    //         });
 
-            if (!res || !res.node) {
-                resolve(null);
-                return;
-            }
+    //         if (!res || !res.node) {
+    //             resolve(null);
+    //             return;
+    //         }
 
-            resolve(res.node);
+    //         resolve(res.node);
 
-            // we only need to update/dispatch here if we're NOT doing an 'insert into page' type insert
-            if (!newNodeTargetId) {
-                await promiseDispatch("RefreshNodeFromServer", s => {
-                    // if the node is our page parent (page root)
-                    if (res.node.id === s.node?.id) {
-                        // preserve the children, when updating the root node, because they will not have been obtained
-                        // due to the 'singleNode=true' in the request
-                        res.node.children = s.node.children;
-                        s.node = res.node;
-                    }
+    //         // we only need to update/dispatch here if we're NOT doing an 'insert into page' type insert
+    //         if (!newNodeTargetId) {
+    //             await promiseDispatch("RefreshNodeFromServer", s => {
+    //                 // if the node is our page parent (page root)
+    //                 if (res.node.id === s.node?.id) {
+    //                     // preserve the children, when updating the root node, because they will not have been obtained
+    //                     // due to the 'singleNode=true' in the request
+    //                     res.node.children = s.node.children;
+    //                     s.node = res.node;
+    //                 }
 
-                    // make all tabs update their copy of the node of they have it
-                    ast.tabData.forEach(td => td.replaceNode(s, res.node));
-                });
-            }
-        });
-    }
+    //                 // make all tabs update their copy of the node of they have it
+    //                 // todo-0: this needs to be called for ALL tabs right?
+    //                 ast.tabData.forEach(td => td.replaceNode(s, res.node));
+    //             });
+    //         }
+    //     });
+    // }
 
     distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]) => {
         if (!aclEntries || !S.props.isEncrypted(node)) {

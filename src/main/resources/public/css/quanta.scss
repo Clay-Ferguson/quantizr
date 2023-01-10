@@ -1963,21 +1963,30 @@ Will come back later and study this more. todo-3 */
 
 .sharingDisplayName {
     display: inline-block;
-    margin-left: $smallGap;
-    margin-top: $smallGap;
+    padding: $smallGap;
     cursor: pointer;
 }
 
-.friendListImgDiv {
+.friendListImgDivCont {
     display: inline-block;
+}
+
+.friendListImgDiv {
     width: 70px;
     max-width: 70px;
     min-height: 70px; // min hight needed to make list boxes look good.
     cursor: pointer;
-    vertical-align: top;
     margin: $tinyGap;
     border: 1px solid gray;
+}
 
+// centers the child that's inside this div (both vertically and horizontall centering)
+.centerChild {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
 
 .friendListImage {
