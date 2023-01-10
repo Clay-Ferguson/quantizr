@@ -96,7 +96,7 @@ export class FullScreenCalendar extends Main {
     }
 
     handleEventClick = (clickInfo: EventClickArg) => {
-        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, null, false);
+        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, false);
     }
 
     domUpdateEvent = (): void => {

@@ -102,7 +102,7 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, null, true, ast);
+                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true, ast);
                     }
                 }
             }));
@@ -118,7 +118,7 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, null, false, null, null, null, null, this.node.id, false, ast)
+                            S.edit.addNode(null, null, false, null, null, null, this.node.id, false, ast)
                         }
                     }
                 }));

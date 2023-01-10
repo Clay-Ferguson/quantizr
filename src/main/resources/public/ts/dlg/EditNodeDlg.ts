@@ -69,7 +69,7 @@ export class EditNodeDlg extends DialogBase {
     contentScrollPos = new ScrollPos();
     tagTextField: TextField;
 
-    constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode, public afterEditAction: Function) {
+    constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
         super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
         const ast = getAppState();
 
@@ -632,9 +632,6 @@ export class EditNodeDlg extends DialogBase {
         const savedOk: boolean = await this.utl.saveNode(this);
         if (savedOk) {
             this.close();
-            if (this.afterEditAction) {
-                this.afterEditAction();
-            }
         }
     }
 

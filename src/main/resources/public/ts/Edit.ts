@@ -85,7 +85,7 @@ export class Edit {
     }
 
     public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, afterEditAction: Function, ast: AppState) => {
+        showJumpButton: boolean, replyToId: string, ast: AppState) => {
         if (S.util.checkSuccess("Editing node", res)) {
             if (ast.mobileMode) forceUsePopup = true;
 
@@ -124,7 +124,7 @@ export class Edit {
                     await promiseDispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
                     });
-                    const dlg = new EditNodeDlg(encrypt, showJumpButton, null, afterEditAction);
+                    const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
@@ -243,7 +243,7 @@ export class Edit {
                     fediSend: false
                 });
                 if (blob) {
-                    this.createSubNodeResponse(res, false, null, null, ast);
+                    this.createSubNodeResponse(res, false, null, ast);
                 }
             }
 
@@ -276,7 +276,7 @@ export class Edit {
                     boostTarget: null,
                     fediSend: false
                 });
-                this.createSubNodeResponse(res, false, null, null, ast);
+                this.createSubNodeResponse(res, false, null, ast);
             }
         }
     }
@@ -284,17 +284,17 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse, ast: AppState) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, ast);
-            this.runEditNode(null, res.newNode.id, false, false, false, null, null, false);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, false);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditAction: Function, ast: AppState) => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, ast: AppState) => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh(ast);
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, afterEditAction, false);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, false);
             }
         }
     }
@@ -335,8 +335,6 @@ export class Edit {
                         s.node = newNode;
                     }
 
-                    // make all tabs update their copy of the node of they have it
-                    // todo-0: this needs to be called for ALL tabs right?
                     ast.tabData.forEach(td => td.replaceNode(s, newNode));
                 });
             }
@@ -721,7 +719,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, null, false);
+        this.runEditNode(null, id, false, false, false, null, false);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -730,7 +728,7 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, afterEditAction: Function, editMyFriendNode: boolean) => {
+    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
         if (g_requireCrypto === "true" && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -758,7 +756,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditAction, ast);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, ast);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {
@@ -1118,7 +1116,7 @@ export class Edit {
 
         if (blob) {
             const state = getAppState(null);
-            this.createSubNodeResponse(res, false, null, null, state);
+            this.createSubNodeResponse(res, false, null, state);
         }
         else {
             setTimeout(() => {
@@ -1194,7 +1192,7 @@ export class Edit {
             boostTarget: null,
             fediSend: false
         });
-        this.createSubNodeResponse(res, true, null, null, ast);
+        this.createSubNodeResponse(res, true, null, ast);
     }
 
     // like==false means 'unlike'
@@ -1220,7 +1218,7 @@ export class Edit {
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
-        afterEditAction: Function, boostTarget: string, fediSend: boolean, ast: AppState) => {
+        boostTarget: string, fediSend: boolean, ast: AppState) => {
         ast = getAppState(ast);
 
         // auto-enable edit mode
@@ -1245,7 +1243,7 @@ export class Edit {
         });
 
         if (!boostTarget) {
-            this.createSubNodeResponse(res, false, replyToId, afterEditAction, ast);
+            this.createSubNodeResponse(res, false, replyToId, ast);
         }
         else {
             S.util.flashMessageQuick("Post was boosted!", "Boost");
@@ -1275,7 +1273,7 @@ export class Edit {
         if (!ast.userPrefs.editMode) {
             await this.toggleEditMode(ast);
         }
-        this.createSubNodeResponse(res, forceUsePopup, null, null, ast);
+        this.createSubNodeResponse(res, forceUsePopup, null, ast);
     }
 
     addCalendarEntry = async (initDate: number, ast: AppState) => {
@@ -1294,7 +1292,7 @@ export class Edit {
             boostTarget: null,
             fediSend: false
         });
-        this.createSubNodeResponse(res, false, null, null, ast);
+        this.createSubNodeResponse(res, false, null, ast);
     }
 
     linkNodes = async (sourceNodeId: string, targetNodeId: string, name: string, type: string) => {

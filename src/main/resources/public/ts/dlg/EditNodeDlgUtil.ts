@@ -105,13 +105,8 @@ export class EditNodeDlgUtil {
         }
         dlg.resetAutoSaver();
 
-        /* IMPORTANT: If there's an after edit action function specified on the dialog then that will be the ONLY
-         action performed after the saveNode, so if we ever need any of the below logic to be run, in the case with
-         afterEditAction we'd have to call that logic inside the afterEditAction function.
-
-         todo-0: this afterEditAction seems kind of ugly. Check if this can be done better now.
-         */
-        if (dlg.afterEditAction) return true;
+        // todo-0: retest this with the postit note icon, because we used to have the rest of this
+        // method (below) bypassed in this scenario.
 
         S.render.fadeInId = editNode.id;
         S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset, getAppState());

@@ -302,7 +302,7 @@ export class UserProfileDlg extends DialogBase {
 
     editFriendNode = async () => {
         if (this.currentlyEditingWarning()) return;
-        S.edit.runEditNode(null, this.userNodeId, true, false, true, null, null, true);
+        S.edit.runEditNode(null, this.userNodeId, true, false, true, null, true);
     }
 
     currentlyEditingWarning = (): boolean => {
@@ -318,7 +318,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, false, null, this.userNodeId, null, null, null, false, getAppState());
+            S.edit.addNode(null, null, false, null, this.userNodeId, null, null, false, getAppState());
         }, 10);
     }
 

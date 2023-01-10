@@ -161,7 +161,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         // if editing a new post (not a reply)
         if (!editingExistingItem && ast.editNode && ast.editNodeOnTab === C.TAB_FEED && !ast.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
+            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
@@ -207,7 +207,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
                 if (editingExistingItem && node.id === ast.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
+                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                 }
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
@@ -219,7 +219,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     // editing a reply inline.
                     if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED && ast.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED, null));
+                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                     }
                 }
             });
@@ -273,7 +273,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Tree View"
                 }, "bigMarginLeft ") : null,
-                ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, null, true, ast), {
+                ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, true, ast), {
                     title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                 }, "attentionButton float-end")
             ]),
