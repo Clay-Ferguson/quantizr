@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
@@ -43,7 +43,7 @@ export class EditAttachmentsPanel extends Div {
     }
 
     makeAttachmentPanel = (att: J.Attachment, isFirst: boolean): Div => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!att) return null;
         const key = (att as any).key;
         const ipfsLink = att.il;

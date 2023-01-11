@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
@@ -153,7 +153,7 @@ export class AudioPlayerDlg extends DialogBase {
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
                         new Button("Copy", this.copyToClipboard),
-                        !getAppState().isAnonUser ? new Button("Post", this.postComment) : null,
+                        !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
                     new Div(null, { className: "col-3 float-end" }, [
@@ -227,7 +227,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     postComment = () => {
         const link = this.getLink();
-        S.edit.addNode(null, null, false, "\n\n" + link, null, null, null, true, getAppState());
+        S.edit.addNode(null, null, false, "\n\n" + link, null, null, null, true, getAs());
     }
 
     copyToClipboard = () => {

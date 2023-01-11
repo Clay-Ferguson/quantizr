@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
@@ -22,7 +22,7 @@ export class RightNavPanel extends Div {
     public static inst: RightNavPanel = null;
 
     constructor() {
-        const ast = getAppState();
+        const ast = getAs();
         super(null, {
             id: C.ID_RHS,
             className: ast.mobileMode ? "mobileRHSPanel" : null,
@@ -41,7 +41,7 @@ export class RightNavPanel extends Div {
     }
 
     preRender(): void {
-        const ast = getAppState();
+        const ast = getAs();
 
         if (!ast.mobileMode) {
             let panelCols = ast.userPrefs.mainPanelCols || 6;

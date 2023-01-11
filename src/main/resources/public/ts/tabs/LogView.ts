@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
@@ -32,7 +32,7 @@ export class LogView extends AppTab implements LogViewIntf {
     }
 
     preRender(): void {
-        const ast = getAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass(ast);
 
         this.setChildren([

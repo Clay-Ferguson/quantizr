@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Tag } from "./Tag";
 
@@ -35,7 +35,7 @@ export class Button extends Comp {
         // this.attribs.className += " btn $$testClass clickable " + moreClasses;
         this.attribs.className += " btn clickable " + moreClasses;
 
-        this.attribs.className += getAppState().mobileMode ? " mobileButton" : "";
+        this.attribs.className += getAs().mobileMode ? " mobileButton" : "";
         this.mergeState<LS>({ text, enabled: true });
     }
 

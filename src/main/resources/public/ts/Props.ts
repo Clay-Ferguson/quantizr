@@ -1,4 +1,4 @@
-import { getAppState } from "./AppContext";
+import { getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -95,7 +95,7 @@ export class Props {
 
     isWritableByMe = (node: J.NodeInfo): boolean => {
         if (!node) return false;
-        const ast = getAppState();
+        const ast = getAs();
 
         // anonymous can never write
         if (ast.isAnonUser) return false;

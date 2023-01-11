@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../../AppContext";
+import { getAs, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -76,7 +76,7 @@ export class NodeCompMainList extends Div {
                     const observer = new IntersectionObserver(entries => {
                         /* We have to STILL check these conditions because this observer can be getting called any time
                          and these conditions will always apply about control if we want to grow page or not. */
-                        const ast = getAppState();
+                        const ast = getAs();
 
                         if (!ast.editNode) {
                             entries.forEach(entry => {

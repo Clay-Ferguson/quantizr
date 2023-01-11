@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 
 export class Icon extends Comp {
 
     constructor(attribs: Object = null, private label: string = null) {
         super(attribs);
-        this.attribs.className += getAppState().mobileMode ? " mobileIcon" : "";
+        this.attribs.className += getAs().mobileMode ? " mobileIcon" : "";
     }
 
     compRender = (): ReactNode => {

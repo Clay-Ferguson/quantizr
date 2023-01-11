@@ -1,4 +1,4 @@
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -386,7 +386,7 @@ export class Search {
 
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!FeedTab.inst) {
             return;
         }
@@ -467,7 +467,7 @@ export class Search {
     }
 
     showFollowers = async (page: number, userName: string) => {
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.isAnonUser) return;
         userName = userName || ast.userName;
 
@@ -505,7 +505,7 @@ export class Search {
     }
 
     showFollowing = async (page: number, userName: string) => {
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.isAnonUser) return;
         userName = userName || ast.userName;
 
@@ -714,7 +714,7 @@ export class Search {
 
     /* If target is non-null we only return shares to that particlar person (or public) */
     findShares = (ast: AppState = null, shareTarget: string = null, accessOption: string = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         const focusNode = S.nodeUtil.getHighlightedNode(ast);
         if (!focusNode) {
             return;

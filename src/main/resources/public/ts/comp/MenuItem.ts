@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
@@ -37,7 +37,7 @@ export class MenuItem extends Div {
             ...{
                 style: { display: (state.visible ? "" : "none") },
                 className: "list-group-menu-item list-group-item-action " + enablementClass + "  list-group-transparent" +
-                    (getAppState().mobileMode ? " mobileMenuText" : ""),
+                    (getAs().mobileMode ? " mobileMenuText" : ""),
                 onClick: this.onClick
             }
         });

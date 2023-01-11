@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -117,7 +117,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     updateSuggestTags = async () => {
-        const node = getAppState().node;
+        const node = getAs().node;
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -147,10 +147,10 @@ export class SelectTagsDlg extends DialogBase {
     </pre>
     */
     parseTags = (): Tag[] => {
-        if (!getAppState().userProfile?.userTags) return null;
+        if (!getAs().userProfile?.userTags) return null;
         const tags: Tag[] = [];
         // todo-1: in the TTS engine we have something like this done differently. Research which is best
-        const lines: string[] = getAppState().userProfile.userTags.split(/\r?\n/);
+        const lines: string[] = getAs().userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             if (line?.startsWith("#")) {
                 let tag = null;

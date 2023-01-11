@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppContext";
+import { getAs, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -37,7 +37,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
-                        const ast = getAppState();
+                        const ast = getAs();
                         if (ast.threadViewFromTab === C.TAB_MAIN) {
                             // the jumpToId is the best way to get to a node on the main tab.
                             S.view.jumpToId(ast.threadViewNodeId);
@@ -92,7 +92,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     moreHistory = () => {
-        const ast = getAppState();
+        const ast = getAs();
         const results = this.data?.props?.results;
         if (!results || results.length === 0) return;
         S.srch.showThreadAddMore(results[0].id, ast);

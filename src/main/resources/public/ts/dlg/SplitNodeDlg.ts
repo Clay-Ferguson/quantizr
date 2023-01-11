@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -22,7 +22,7 @@ export class SplitNodeDlg extends DialogBase {
 
     constructor(private node: J.NodeInfo) {
         super("Split Node");
-        this.node = this.node || S.nodeUtil.getHighlightedNode(getAppState());
+        this.node = this.node || S.nodeUtil.getHighlightedNode(getAs());
 
         let splitMode: string;
         if (this.node.content.indexOf("\n\n\n") !== -1) {
@@ -115,7 +115,7 @@ export class SplitNodeDlg extends DialogBase {
             delim = this.delimiterState.getValue();
         }
 
-        S.edit.splitNode(this.node, state.splitType, delim, getAppState());
+        S.edit.splitNode(this.node, state.splitType, delim, getAs());
         this.close();
     }
 }

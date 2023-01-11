@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
@@ -14,7 +14,7 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
     }
 
     pageChange(delta: number): void {
-        const ast = getAppState();
+        const ast = getAs();
 
         let page = this.data.props.page;
         if (delta !== null) {

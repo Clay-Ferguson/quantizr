@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -36,7 +36,7 @@ export class TransferNodeDlg extends DialogBase {
             new Div(null, null, [
                 this.operation === "transfer" ? new HorizontalLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
-                    getAppState().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
+                    getAs().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
                     new TextField({ label: "To User", val: this.toUserState })
                 ]) : null,
                 new HorizontalLayout([
@@ -73,7 +73,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        const node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAs());
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;
@@ -97,7 +97,7 @@ export class TransferNodeDlg extends DialogBase {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast: getAppState()
+            ast: getAs()
         });
         S.util.showMessage(res.message, "Success");
         this.close();

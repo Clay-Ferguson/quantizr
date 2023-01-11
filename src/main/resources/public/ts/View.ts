@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
@@ -15,7 +15,7 @@ export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
-        const ast = getAppState();
+        const ast = getAs();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -273,7 +273,7 @@ export class View {
 
     scrollToTop = async () => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            this.scrollActiveToTop(getAppState());
+            this.scrollActiveToTop(getAs());
         });
     }
 

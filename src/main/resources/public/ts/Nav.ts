@@ -1,4 +1,4 @@
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Button } from "./comp/core/Button";
 import { ButtonBar } from "./comp/core/ButtonBar";
@@ -63,7 +63,7 @@ export class Nav {
     }
 
     navToSibling = async (siblingOffset: number, state?: AppState): Promise<string> => {
-        state = state || getAppState();
+        state = state || getAs();
         if (!state.node) return null;
 
         try {
@@ -94,7 +94,7 @@ export class Nav {
     }
 
     navUpLevel = async (processingDelete: boolean): Promise<void> => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!ast.node) return null;
 
         if (!this.parentVisibleToUser(ast)) {
@@ -135,7 +135,7 @@ export class Nav {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
-            state = state || getAppState();
+            state = state || getAs();
 
             /* First check if this node is already highlighted and if so just return */
             const hltNode = S.nodeUtil.getHighlightedNode();
@@ -162,7 +162,7 @@ export class Nav {
     }
 
     openContentNode = async (nodePathOrId: string, ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -187,7 +187,7 @@ export class Nav {
 
     openNodeById = (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        ast = ast || getAppState();
+        ast = ast || getAs();
         const node = MainTab.inst?.findNode(ast, id);
 
         if (!node) {
@@ -214,7 +214,7 @@ export class Nav {
 
     setNodeSel = (selected: boolean, id: string, ast: AppState) => {
         if (!id) return;
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (selected) {
             ast.selectedNodes.add(id);
         } else {
@@ -260,7 +260,7 @@ export class Nav {
     }
 
     navToMyAccntRoot = async (ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         S.view.scrollActiveToTop(ast);
 
         if (ast.isAnonUser) {
@@ -302,7 +302,7 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAppState();
+        const ast = getAs();
 
         setTimeout(async () => {
             let node = MainTab.inst?.findNode(ast, id);
@@ -333,7 +333,7 @@ export class Nav {
 
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        const ast = getAppState();
+        const ast = getAs();
         this.clickTreeNode(null, id);
 
         setTimeout(() => {
@@ -347,7 +347,7 @@ export class Nav {
 
     openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAppState();
+        const ast = getAs();
         const node = MainTab.inst?.findNode(ast, id);
         if (node) {
             setTimeout(() => {

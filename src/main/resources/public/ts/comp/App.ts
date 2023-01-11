@@ -1,4 +1,4 @@
-import { getAppState, useAppState } from "../AppContext";
+import { getAs, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -149,7 +149,7 @@ export class App extends Main {
         const elm = this.getRef();
         if (!elm) return;
 
-        const ast = getAppState();
+        const ast = getAs();
 
         if (ast.highlightText) {
             S.domUtil.highlightText(elm /* document.body */, ast.highlightText);

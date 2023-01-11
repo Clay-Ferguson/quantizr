@@ -1,4 +1,4 @@
-import { dispatch, getAppState, useAppState } from "../AppContext";
+import { dispatch, getAs, useAppState } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
@@ -21,7 +21,7 @@ export class LeftNavPanel extends Div {
             tabIndex: "1"
         });
 
-        const ast = getAppState();
+        const ast = getAs();
 
         let cols = ast.userPrefs.mainPanelCols || 6;
         if (cols < 4) cols = 4;

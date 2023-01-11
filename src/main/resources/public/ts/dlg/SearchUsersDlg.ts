@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -40,7 +40,7 @@ export class SearchUsersDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const adminOptions = new RadioButtonGroup([
-            getAppState().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
+            getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
                         this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
@@ -83,7 +83,7 @@ export class SearchUsersDlg extends DialogBase {
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new HelpButton(() => getAppState().config.help?.search?.dialog),
+                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
                     // todo: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
                     // possible and not even all that difficult based on the existing code already written.

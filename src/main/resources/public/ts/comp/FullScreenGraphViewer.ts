@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -19,7 +19,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent = () => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!ast.graphData) return;
         const customForceDirectedTree = this.forceDirectedTree();
 
@@ -33,7 +33,7 @@ export class FullScreenGraphViewer extends Main {
         /* We use 'thiz' to capture 'this' becasue the methods below to expect to have their own 'this'
          that will be set based on code outside our control that is expected by the Graph Implementation itself. */
         const thiz = this;
-        const ast = getAppState();
+        const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
 
         return function (selection: any) {

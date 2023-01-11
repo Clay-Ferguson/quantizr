@@ -42,7 +42,7 @@ function reducer(s: AppState, action: any) {
     }
 }
 
-export function getAppState(): AppState {
+export function getAs(): AppState {
     return state;
 }
 

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
@@ -45,7 +45,7 @@ export abstract class DialogBase extends Comp {
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
-        const ast = getAppState();
+        const ast = getAs();
         this.title = this.title || "Message";
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
@@ -147,7 +147,7 @@ export abstract class DialogBase extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const ast = getAppState();
+        const ast = getAs();
         const isTopmost = this.isTopmost(ast);
         let ret: ReactNode = null;
 

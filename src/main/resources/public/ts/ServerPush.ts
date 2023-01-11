@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
@@ -79,13 +79,13 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
-            const ast = getAppState();
+            const ast = getAs();
             const data: J.FeedPushInfo = JSON.parse(e.data);
             this.feedPushItem(data.nodeInfo, ast);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            const ast = getAppState();
+            const ast = getAs();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
             this.ipsmPushItem(data.payload, ast);
         }, false);

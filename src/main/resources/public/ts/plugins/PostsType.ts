@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -23,7 +23,7 @@ export class PostsType extends TypeBase {
     }
 
     getEditorHelp(): string {
-        const ast = getAppState();
+        const ast = getAs();
         return ast.config.help?.editor?.dialog;
     }
 }

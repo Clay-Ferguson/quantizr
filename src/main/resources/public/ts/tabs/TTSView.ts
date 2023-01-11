@@ -1,4 +1,4 @@
-import { dispatch, getAppState, useAppState } from "../AppContext";
+import { dispatch, getAs, useAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
@@ -175,7 +175,7 @@ export class TTSView extends AppTab {
                     }
                 })
             },
-            getValue: (): string => "" + (primaryVoice ? getAppState().speechVoice : getAppState().speechVoice2)
+            getValue: (): string => "" + (primaryVoice ? getAs().speechVoice : getAs().speechVoice2)
         });
     }
 
@@ -196,7 +196,7 @@ export class TTSView extends AppTab {
                     s.speechRate = val;
                 })
             },
-            getValue: (): string => getAppState().speechRate
+            getValue: (): string => getAs().speechRate
         });
     }
 }

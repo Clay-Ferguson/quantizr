@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -194,7 +194,7 @@ export class DomUtil {
         attribs.draggable = "true";
 
         attribs.onDragStart = function (ev: any) {
-            const ast = getAppState();
+            const ast = getAs();
             if (ast.editNode) {
                 return;
             }
@@ -527,7 +527,7 @@ export class DomUtil {
                     //     return;
                     // }
 
-                    const ast = getAppState();
+                    const ast = getAs();
                     // todo-1: this is an ugly solution because it displays the upload dialog
                     // and takes the user to the node that got uploade onto. I'd like to NOT do that,
                     // but just make it behind the scenes automatic.

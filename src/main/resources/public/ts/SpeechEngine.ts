@@ -1,4 +1,4 @@
-import { getAppState, promiseDispatch } from "./AppContext";
+import { getAs, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { S } from "./Singletons";
 
@@ -178,7 +178,7 @@ export class SpeechEngine {
     }
 
     speakText = async (text: string, selectTab: boolean = true, replayFromIdx: number = -1) => {
-        const ast = getAppState();
+        const ast = getAs();
 
         // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
         // but it would be better to use a listener or something to know precisely when it's ready
@@ -260,7 +260,7 @@ export class SpeechEngine {
             next utterance every time the previous one completes. */
             const utterFunc = () => {
                 if (!this.ttsRunning || !this.queuedSpeech) return;
-                const ast = getAppState();
+                const ast = getAs();
 
                 // If we're out of stuff to speak
                 if (this.ttsIdx >= this.queuedSpeech.length) {
@@ -335,7 +335,7 @@ export class SpeechEngine {
             // https://stackoverflow.com/questions/21947730/chrome-speech-synthesis-with-longer-texts
             this.ttsTimer = setInterval(() => {
                 if (!this.ttsRunning) return;
-                const ast = getAppState();
+                const ast = getAs();
                 if (ast.speechSpeaking && !ast.speechPaused) {
                     this.ttsSpeakingTime += interval;
                     if (this.ttsSpeakingTime > 10000) {
@@ -425,7 +425,7 @@ export class SpeechEngine {
     // chunks of text
     fragmentBySpaces = (text: string): string[] => {
         const ret: string[] = [];
-        const ast = getAppState();
+        const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // first split into 'words'. All things separated by spaces.
@@ -454,7 +454,7 @@ export class SpeechEngine {
     appendTextToBuffer = (text: string) => {
         if (!text) return;
         text = this.preProcessText(text);
-        const ast = getAppState();
+        const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // first split into sentences.
@@ -520,7 +520,7 @@ export class SpeechEngine {
     // a time related thing where if it speaks for more than about 10 seconds at a time it hangs.
     // See the setInterval function in this class for more on the tradeoffs/workarounds related to this.
     fragmentizeSentencesToQueue = (text: string) => {
-        const ast = getAppState();
+        const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // This is a dirty but clever hack to fix lots of initials like (J.F.K., or even John F. Kennedy)

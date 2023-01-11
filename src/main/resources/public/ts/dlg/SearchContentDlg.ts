@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -147,7 +147,7 @@ export class SearchContentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph),
-                    new HelpButton(() => getAppState().config.help?.search?.dialog),
+                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -162,7 +162,7 @@ export class SearchContentDlg extends DialogBase {
                     s.highlightText = null;
                 })
             }),
-            !getAppState().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
+            !getAs().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
                     const dlg = new SelectTagsDlg("search", this.searchTextState.getValue());
                     await dlg.open();
@@ -201,7 +201,7 @@ export class SearchContentDlg extends DialogBase {
 
     graph = () => {
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAs());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -209,12 +209,12 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
         this.close();
-        S.render.showGraph(null, SearchContentDlg.defaultSearchText, getAppState());
+        S.render.showGraph(null, SearchContentDlg.defaultSearchText, getAs());
     }
 
     search = () => {
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAs());
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

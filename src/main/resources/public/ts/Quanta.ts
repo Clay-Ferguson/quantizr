@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
@@ -130,7 +130,7 @@ export class Quanta {
             console.log("createTabs");
             S.tabUtil.createAppTabs();
 
-            const ast = getAppState();
+            const ast = getAs();
             ast.pendingLocationHash = window.location.hash;
 
             console.log("createPlugins");
@@ -171,7 +171,7 @@ export class Quanta {
                         allowScroll: true,
                         setTab: true,
                         forceRenderParent: false,
-                        ast: getAppState()
+                        ast: getAs()
                     });
                     S.tabUtil.selectTab(C.TAB_MAIN);
                 }
@@ -210,7 +210,7 @@ export class Quanta {
              * This call checks the server to see if we have a session already, and gets back the login information from
              * the session, and then renders page content, after that.
              */
-            await S.user.refreshLogin(getAppState());
+            await S.user.refreshLogin(getAs());
             console.log("refreshLogin completed.");
 
             S.rpcUtil.initProgressMonitor();
@@ -290,7 +290,7 @@ export class Quanta {
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                let ast = getAppState();
+                let ast = getAs();
 
                 if (event.code === "Backquote") {
                     if (S.util.ctrlKeyCheck()) {
@@ -312,13 +312,13 @@ export class Quanta {
 
                         // case "ArrowDown":
                         //     if (this.keyDebounce()) return;
-                        //     ast = getAppState()
+                        //     ast = getAst()
                         //     S.view.scrollRelativeToNode("down", ast);
                         //     break;
 
                         // case "ArrowUp":
                         //     if (this.keyDebounce()) return;
-                        //     ast = getAppState()
+                        //     ast = getAst()
                         //     S.view.scrollRelativeToNode("up", ast);
                         //     break;
 
@@ -332,7 +332,7 @@ export class Quanta {
 
                         case "ArrowRight":
                             if (this.keyDebounce()) return;
-                            ast = getAppState();
+                            ast = getAs();
                             // S.nav.navOpenSelectedNode(state);
                             if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
                                 S.nav.nextFullScreenImgViewer(ast);

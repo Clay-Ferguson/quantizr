@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -20,7 +20,7 @@ export class NodeStatsDlg extends DialogBase {
 
     renderDlg = (): CompIntf[] => {
         const tagPanel = new Div(null, { className: "wordStatsArea" });
-        const ast = getAppState();
+        const ast = getAs();
 
         if (this.res.topVotes?.length > 0) {
             tagPanel.addChild(new Heading(4, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
@@ -77,7 +77,7 @@ export class NodeStatsDlg extends DialogBase {
                 new Button("Ok", () => {
                     this.close();
                 }, null, "btn-primary"),
-                new HelpButton(() => getAppState().config.help?.nodeStats?.dialog)
+                new HelpButton(() => getAs().config.help?.nodeStats?.dialog)
             ], "marginTop")
         ];
     }

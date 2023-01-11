@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -49,13 +49,13 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        const node = S.nodeUtil.getHighlightedNode(getAppState());
+        const node = S.nodeUtil.getHighlightedNode(getAs());
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;
         }
 
-        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), getAppState());
+        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), getAs());
         this.close();
     }
 }

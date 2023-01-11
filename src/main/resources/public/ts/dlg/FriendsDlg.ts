@@ -1,4 +1,4 @@
-import { getAppState, promiseDispatch } from "../AppContext";
+import { getAs, promiseDispatch } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -55,7 +55,7 @@ export class FriendsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state: LS = this.getState();
-        const ast = getAppState();
+        const ast = getAs();
         let message = null;
         if (state.loading) {
             message = "Loading...";

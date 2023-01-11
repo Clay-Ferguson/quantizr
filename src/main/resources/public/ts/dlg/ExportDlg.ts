@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -41,7 +41,7 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const ast = getAppState();
+        const ast = getAs();
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
@@ -131,7 +131,7 @@ export class ExportDlg extends DialogBase {
                 ]), false, 0, null
             ).open();
 
-            S.view.scrollToNode(getAppState());
+            S.view.scrollToNode(getAs());
         }
     }
 }

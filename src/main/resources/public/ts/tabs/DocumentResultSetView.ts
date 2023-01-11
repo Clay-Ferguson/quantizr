@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -63,7 +63,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
     pageChange(delta: number): void {
         setTimeout(() => {
             const growPage = delta !== null && delta > 0;
-            S.srch.showDocument(this.data.props.node, growPage, getAppState());
+            S.srch.showDocument(this.data.props.node, growPage, getAs());
         }, 500);
     }
 
@@ -97,7 +97,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                         });
                     },
                     getValue: (): boolean => {
-                        return getAppState().docIndent;
+                        return getAs().docIndent;
                     }
                 }),
                 new Checkbox("Comments", {
@@ -106,14 +106,14 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("SetIncludeComments", s => {
-                            S.edit.setShowComments(checked, getAppState());
+                            S.edit.setShowComments(checked, getAs());
                         });
 
                         // refresh the view.
                         this.pageChange(null);
                     },
                     getValue: (): boolean => {
-                        return getAppState().userPrefs.showReplies;
+                        return getAs().userPrefs.showReplies;
                     }
                 })
             ])

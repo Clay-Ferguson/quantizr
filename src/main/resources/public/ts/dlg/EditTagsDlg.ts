@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -33,7 +33,7 @@ export class EditTagsDlg extends DialogBase {
 
     reload = async () => {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId: getAppState().userProfile.userNodeId
+            userId: getAs().userProfile.userNodeId
         });
 
         if (res?.userProfile) {
@@ -42,7 +42,7 @@ export class EditTagsDlg extends DialogBase {
     }
 
     save = () => {
-        const ast = getAppState();
+        const ast = getAs();
         ast.userProfile.userTags = this.tagsState.getValue();
 
         dispatch("SetUserProfile", s => {

@@ -1,5 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
@@ -66,7 +66,7 @@ export class Edit {
     }
 
     private joinNodesResponse = (res: J.JoinNodesResponse, ast: AppState): any => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (S.util.checkSuccess("Join node", res)) {
             S.nodeUtil.clearSelNodes(ast);
             S.view.refreshTree({
@@ -407,7 +407,7 @@ export class Edit {
     // todo-0: will be deleting this soon.
     // refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
     //     return new Promise<J.NodeInfo>(async (resolve, reject) => {
-    //         const ast = getAppState();
+    //         const ast = getAst();
 
     //         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
     //             nodeId,
@@ -464,7 +464,7 @@ export class Edit {
 
     setMainPanelCols = (val: number) => {
         setTimeout(() => {
-            const ast = getAppState();
+            const ast = getAs();
             if (val < 4) val = 4;
             if (val > 8) val = 8;
             ast.userPrefs.mainPanelCols = val;
@@ -474,7 +474,7 @@ export class Edit {
 
     setMetadataOption = (val: boolean) => {
         setTimeout(() => {
-            const ast = getAppState();
+            const ast = getAs();
             ast.userPrefs.showMetaData = val;
             S.util.saveUserPreferences(ast);
         }, 100);
@@ -573,8 +573,8 @@ export class Edit {
 
     // #add-prop
     setAutoRefreshFeed = async (autoRefreshFeed: boolean) => {
-        getAppState().userPrefs.autoRefreshFeed = autoRefreshFeed;
-        return S.util.saveUserPreferences(getAppState(), true);
+        getAs().userPrefs.autoRefreshFeed = autoRefreshFeed;
+        return S.util.saveUserPreferences(getAs(), true);
     }
 
     toggleShowProps = async (ast: AppState) => {
@@ -612,7 +612,7 @@ export class Edit {
         else if (ast.activeTab === C.TAB_DOCUMENT) {
             const data: TabIntf = S.tabUtil.getAppTabData(ast, C.TAB_DOCUMENT);
             if (data) {
-                S.srch.showDocument(data.props.node, false, getAppState());
+                S.srch.showDocument(data.props.node, false, getAs());
             }
         }
         else {
@@ -625,7 +625,7 @@ export class Edit {
 
     moveNodeUp = async (evt: Event, id: string, state?: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        state = state || getAppState();
+        state = state || getAs();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode?.id;
@@ -642,7 +642,7 @@ export class Edit {
 
     moveNodeDown = async (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -658,7 +658,7 @@ export class Edit {
     }
 
     moveNodeToTop = async (id: string = null, ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -674,7 +674,7 @@ export class Edit {
     }
 
     moveNodeToBottom = async (id: string = null, ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -700,10 +700,10 @@ export class Edit {
     }
 
     checkEditPending = (): boolean => {
-        const state = getAppState();
+        const ast = getAs();
 
         // state.editNode holds non-null always whenever there is editing underway.
-        if (state.editNode) {
+        if (ast.editNode) {
             S.util.showMessage("You're already editing a node. Finish that edit first. Tip: Use `Menu -> Edit -> Continue Editing` if you forgot which node you're editing.", "Warning");
             return true;
         }
@@ -734,7 +734,7 @@ export class Edit {
             return;
         }
 
-        const ast = getAppState();
+        const ast = getAs();
         if (!id) {
             const node = S.nodeUtil.getHighlightedNode(ast);
             if (node) {
@@ -762,7 +762,7 @@ export class Edit {
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {
         if (this.checkEditPending()) return;
 
-        state = state || getAppState();
+        state = state || getAs();
         if (!state.node || !state.node.children) return;
 
         /*
@@ -787,7 +787,7 @@ export class Edit {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAppState();
+        const ast = getAs();
 
         if (S.util.ctrlKeyCheck()) {
             this.saveClipboardToChildNode(id);
@@ -798,7 +798,7 @@ export class Edit {
     }
 
     createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, ast: AppState): any => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
@@ -847,7 +847,7 @@ export class Edit {
     }
 
     subGraphHash = async () => {
-        const ast = getAppState();
+        const ast = getAs();
         const node = S.nodeUtil.getHighlightedNode(ast);
 
         if (!node) {
@@ -870,10 +870,10 @@ export class Edit {
         S.util.showMessage("Request sumitted. Check the node for property " + J.NodeProp.SUBGRAPH_HASH);
     }
 
-    joinNodes = async (state?: AppState) => {
-        state = state || getAppState();
+    joinNodes = async () => {
+        const ast = getAs();
 
-        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
+        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(ast);
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to join.", "Warning");
             return;
@@ -887,7 +887,7 @@ export class Edit {
             const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
                 nodeIds: selNodesArray
             });
-            this.joinNodesResponse(res, state);
+            this.joinNodesResponse(res, ast);
         }
     }
 
@@ -923,7 +923,7 @@ export class Edit {
             });
         }
 
-        const ast = getAppState();
+        const ast = getAs();
         // note: the setNodeSel above isn't causing this to get anything here
         const selNodesArray: string[] = S.nodeUtil.getSelNodeIdsArray(ast);
 
@@ -1030,13 +1030,13 @@ export class Edit {
 
     pasteSelNodesInside = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAppState();
+        const ast = getAs();
         this.pasteSelNodes(id, "inside", ast);
     }
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
     pasteSelNodes = async (nodeId: string, location: string, state?: AppState) => {
-        state = state || getAppState();
+        state = state || getAs();
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
@@ -1115,12 +1115,11 @@ export class Edit {
         });
 
         if (blob) {
-            const state = getAppState();
-            this.createSubNodeResponse(res, false, null, state);
+            this.createSubNodeResponse(res, false, null, getAs());
         }
         else {
             setTimeout(() => {
-                const ast = getAppState();
+                const ast = getAs();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: true,
@@ -1176,7 +1175,7 @@ export class Edit {
     }
 
     addLinkBookmark = async (content: any, audioUrl: string, ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
@@ -1219,7 +1218,7 @@ export class Edit {
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
         boostTarget: string, fediSend: boolean, ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         // auto-enable edit mode
         if (!boostTarget && !ast.userPrefs.editMode) {
@@ -1252,7 +1251,7 @@ export class Edit {
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
         pendingEdit: boolean, payloadType: string, content: string, ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
@@ -1277,7 +1276,7 @@ export class Edit {
     }
 
     addCalendarEntry = async (initDate: number, ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
@@ -1308,7 +1307,7 @@ export class Edit {
         });
 
         if (S.util.checkSuccess("LinkNodes Response", res)) {
-            const ast = getAppState();
+            const ast = getAs();
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
@@ -1341,7 +1340,7 @@ export class Edit {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
             });
-            const ast = getAppState();
+            const ast = getAs();
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
@@ -1358,7 +1357,7 @@ export class Edit {
     }
 
     updateHeadings = async (ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         const node = S.nodeUtil.getHighlightedNode(ast);
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {

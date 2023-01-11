@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { getAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Img } from "./Img";
 import { Italic } from "./Italic";
@@ -26,7 +26,7 @@ export class IconButton extends Comp {
         }
 
         this.attribs.className = "btn align-middle clickable " + specialClasses +
-            (getAppState().mobileMode ? " mobileIconButton" : "");
+            (getAs().mobileMode ? " mobileIconButton" : "");
         this.mergeState({ visible: true });
     }
 

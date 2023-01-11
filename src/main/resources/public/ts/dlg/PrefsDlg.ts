@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,8 +21,8 @@ export class PrefsDlg extends DialogBase {
             new Div(null, null, [
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
-                        setValue: (checked: boolean) => getAppState().userPrefs.showMetaData = checked,
-                        getValue: (): boolean => getAppState().userPrefs.showMetaData
+                        setValue: (checked: boolean) => getAs().userPrefs.showMetaData = checked,
+                        getValue: (): boolean => getAs().userPrefs.showMetaData
                     })
                 ]),
                 new ButtonBar([
@@ -34,7 +34,7 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = async () => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: ast.userProfile.userNodeId,
@@ -59,7 +59,7 @@ export class PrefsDlg extends DialogBase {
 
     savePreferencesResponse = (res: J.SaveUserPreferencesResponse) => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
-            S.quanta.refresh(getAppState());
+            S.quanta.refresh(getAs());
         }
     }
 }

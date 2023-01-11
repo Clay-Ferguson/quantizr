@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { ValueIntf } from "../Interfaces";
 import { S } from "../Singletons";
@@ -21,7 +21,7 @@ export class NodeTypeListBox extends ListBox {
         const types = S.plugin.getAllTypes();
 
         types.forEach((type, k) => {
-            if (getAppState().isAdminUser || type.getAllowUserSelect()) {
+            if (getAs().isAdminUser || type.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(type, () => {
                     this.updateVal(type.getTypeName());
                 }, this.valueIntf.getValue() === type.getTypeName()));

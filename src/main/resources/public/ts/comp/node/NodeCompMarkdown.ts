@@ -1,4 +1,4 @@
-import { getAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Html } from "../../comp/core/Html";
 import * as J from "../../JavaIntf";
@@ -147,7 +147,7 @@ export class NodeCompMarkdown extends Html {
         if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
-        const ast = getAppState();
+        const ast = getAs();
         const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 

@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
@@ -18,7 +18,7 @@ export class FriendType extends TypeBase {
     }
 
     getEditorHelp(): string {
-        const ast = getAppState();
+        const ast = getAs();
         return ast.config.help?.type?.friend?.editor;
     }
 

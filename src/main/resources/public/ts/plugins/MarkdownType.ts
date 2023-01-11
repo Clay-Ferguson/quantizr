@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
@@ -11,7 +11,7 @@ export class MarkdownType extends TypeBase {
     }
 
     getEditorHelp(): string {
-        const ast = getAppState();
+        const ast = getAs();
         return ast.config.help?.editor?.dialog;
     }
 

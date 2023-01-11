@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -31,7 +31,7 @@ export class SearchFileSystemDlg extends DialogBase {
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField({
                     label: "Search",
-                    enter: () => this.searchNodes(getAppState()),
+                    enter: () => this.searchNodes(getAs()),
                     val: this.searchTextState
                 }),
                 new ButtonBar([

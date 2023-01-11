@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
@@ -77,7 +77,7 @@ export class TabUtil {
                 //     name: "IPSM Console",
                 //     id: C.TAB_IPSM,
                 //     isVisible: () => {
-                //         let ast = getAppState();
+                //         let ast = getAst();
                 //         return ast.ipsmActive;
                 //     },
                 //     constructView: (data: TabIntf) => new IPSMView(s, data),
@@ -101,7 +101,7 @@ export class TabUtil {
                 //     id: C.TAB_LOG,
                 //     isVisible: () => {
                 //         // this function needs to get the state itself.
-                //         let ast = getAppState();
+                //         let ast = getAst();
                 //         return ast.isAdminUser;
                 //     },
                 //     constructView: (data: TabIntf) => new LogView(data),
@@ -141,7 +141,7 @@ export class TabUtil {
 
     // WARNING: This won't apply to (or work) for feed view which has different prop than 'results'
     resultSetHasData = (id: string) => {
-        const ast = getAppState();
+        const ast = getAs();
         const data = ast.tabData.find(d => d.id === id);
         return data?.props?.results?.length > 0;
     }

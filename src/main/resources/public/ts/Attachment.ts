@@ -1,4 +1,4 @@
-import { getAppState } from "./AppContext";
+import { getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
@@ -8,7 +8,7 @@ import { S } from "./Singletons";
 
 export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File, ast: AppState) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
 
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode(ast);

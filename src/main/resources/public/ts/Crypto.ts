@@ -1,4 +1,4 @@
-import { getAppState } from "./AppContext";
+import { getAs } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -647,7 +647,7 @@ export class Crypto {
      * and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
-        if (getAppState().unknownPubEncKey) {
+        if (getAs().unknownPubEncKey) {
             console.warn("Unrecognized key");
             return { cipherText: null, cipherKey: null }
         }
@@ -782,7 +782,7 @@ export class Crypto {
     /* This method will simply sign all the strings in 'dataToSign' and then send it up to the server when done */
     generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
 
-        if (getAppState().unknownPubSigKey) {
+        if (getAs().unknownPubSigKey) {
             console.warn("Unrecognized key");
             return null;
         }
@@ -799,7 +799,7 @@ export class Crypto {
     }
 
     signNode = async (node: J.NodeInfo): Promise<void> => {
-        if (getAppState().unknownPubSigKey) {
+        if (getAs().unknownPubSigKey) {
             console.warn("Unrecognized key");
             return;
         }
@@ -847,7 +847,7 @@ export class Crypto {
     // returns true if key is ok to use
     warnIfEncKeyUnknown = () => {
         let ret = true;
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.unknownPubEncKey) {
             ret = false;
             this.showEncryptionKeyProblem("Encryption Key (Asymmetric Key)", "Encryption");
@@ -858,7 +858,7 @@ export class Crypto {
     // returns true of key is ok to use
     warnIfSigKeyUnknown = () => {
         let ret = true;
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.unknownPubSigKey) {
             ret = false;
             this.showEncryptionKeyProblem("Signature Key", "Signature")

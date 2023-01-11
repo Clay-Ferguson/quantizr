@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -71,7 +71,7 @@ export class EditNodeDlg extends DialogBase {
 
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
         super("[none]", (mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content") + " " + C.TAB_MAIN, false, mode);
-        const ast = getAppState();
+        const ast = getAs();
 
         // need a deterministic id here, that can be found across renders, for scrolling.
         this.setId("EditNodeDlg_" + ast.editNode.id);
@@ -103,7 +103,7 @@ export class EditNodeDlg extends DialogBase {
             encryptCheckboxVal
         });
 
-        this.allowEditAllProps = getAppState().isAdminUser;
+        this.allowEditAllProps = getAs().isAdminUser;
         this.utl.initStates(this);
         this.initialProps = S.util.arrayClone(ast.editNode.properties);
 
@@ -130,7 +130,7 @@ export class EditNodeDlg extends DialogBase {
             // save editor state every few seconds so user can recover editing if anything goes wrong.
             // This should be CLEARED upon successful saves only, and have this static var set back to null
             EditNodeDlg.autoSaveTimer = setInterval(async () => {
-                const ast = getAppState();
+                const ast = getAs();
                 if (!ast || !ast.editNode) return;
                 await S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: ast.editNode.id,
@@ -156,7 +156,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createLayoutSelection = (): Selection => {
-        const ast = getAppState();
+        const ast = getAs();
         const selection: Selection = new Selection(null, "Subnode Layout", [
             { key: "v", val: "1 column" },
             { key: "c2", val: "2 columns" },
@@ -169,7 +169,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     createPrioritySelection = (): Selection => {
-        const ast = getAppState();
+        const ast = getAs();
         return new Selection(null, "Priority", [
             { key: "0", val: "none" },
             { key: "1", val: "Top" },
@@ -181,7 +181,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getTitleIconComp(): CompIntf {
-        const ast = getAppState();
+        const ast = getAs();
         let span: Span = null;
 
         const type = S.plugin.getType(ast.editNode.type);
@@ -212,7 +212,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit(this);
-                    S.nav.closeFullScreenViewer(getAppState());
+                    S.nav.closeFullScreenViewer(getAs());
                     S.view.jumpToId(ast.editNode.id);
                 }
             }));
@@ -229,7 +229,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Crypto Signature Verified",
                 className: "fa fa-certificate fa-lg bigSignatureIcon iconMarginLeft"
             }));
-            if (getAppState().isAdminUser) {
+            if (getAs().isAdminUser) {
                 comps.push(new Span("<-Admin"));
             }
         }
@@ -246,7 +246,7 @@ export class EditNodeDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state = this.getState<LS>();
-        const ast = getAppState();
+        const ast = getAs();
         const hasAttachment: boolean = S.props.hasBinary(ast.editNode);
 
         this.editorHelp = null;
@@ -310,7 +310,7 @@ export class EditNodeDlg extends DialogBase {
 
         let propsVisible: boolean = false;
         if (allowContentEdit) {
-            const rows = editorOpts.contentEditorRows || (getAppState().mobileMode ? "8" : "10");
+            const rows = editorOpts.contentEditorRows || (getAs().mobileMode ? "8" : "10");
 
             mainPropsTable.addChild(this.makeContentEditor(rows));
             this.contentEditor.setWordWrap(isWordWrap);
@@ -361,7 +361,7 @@ export class EditNodeDlg extends DialogBase {
                     dispatch("setPropsPanelExpanded", s => {
                         s.propsPanelExpanded = expanded;
                     });
-                }, getAppState().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+                }, getAs().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [
@@ -386,7 +386,7 @@ export class EditNodeDlg extends DialogBase {
                 dispatch("setMorePanelExpanded", s => {
                     s.morePanelExpanded = expanded;
                 });
-            }, getAppState().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
+            }, getAs().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
         const morePanel = new Div(null, { className: "marginBottom" }, [
             collapsePanel
@@ -462,7 +462,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePublic = async (allowAppends: boolean) => {
-        const ast = getAppState();
+        const ast = getAs();
         if (this.getState().encryptCheckboxVal) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
@@ -486,7 +486,7 @@ export class EditNodeDlg extends DialogBase {
     buildPropsEditing = (propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[]): boolean => {
         let numPropsShowing: number = 0;
         let ret = false;
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.editNode.properties) {
             const durationProp = S.props.getProp(J.NodeProp.DURATION, ast.editNode);
 
@@ -495,7 +495,7 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("prop=" + S.util.prettyPrint(prop));
                 if (prop.name === durationProp?.name) return;
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAppState())) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAs())) {
                     // console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -521,7 +521,7 @@ export class EditNodeDlg extends DialogBase {
                 const propsButtonBar: ButtonBar = new ButtonBar([
                     new IconButton("fa-plus-circle", null, {
                         onClick: async () => {
-                            getAppState().propsPanelExpanded = true;
+                            getAs().propsPanelExpanded = true;
                             await this.utl.addProperty(this);
                         },
                         title: "Add property"
@@ -582,7 +582,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
-        const ast = getAppState();
+        const ast = getAs();
         const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.warnIfEncKeyUnknown()) {
@@ -619,7 +619,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
-        const ast = getAppState();
+        const ast = getAs();
         return {
             setValue: (checked: boolean) => S.props.setPropVal(propName, ast.editNode, checked ? "1" : null),
             getValue: (): boolean => S.props.getPropStr(propName, ast.editNode) === "1"
@@ -636,7 +636,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     renderButtons(): CompIntf {
-        const ast = getAppState();
+        const ast = getAs();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         const type = S.plugin.getType(ast.editNode.type);
@@ -648,8 +648,8 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        const allowUpload: boolean = type ? (getAppState().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode, getAppState())) : true;
-        const allowShare: boolean = type ? (getAppState().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode, getAppState())) : true;
+        const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode, getAs())) : true;
+        const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode, getAs())) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);
@@ -679,7 +679,7 @@ export class EditNodeDlg extends DialogBase {
 
             allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
                 onClick: async () => {
-                    getAppState().propsPanelExpanded = true;
+                    getAs().propsPanelExpanded = true;
                     await this.utl.addProperty(this);
                 },
                 title: "Add Property"
@@ -695,7 +695,7 @@ export class EditNodeDlg extends DialogBase {
             }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
-            S.util.fullscreenViewerActive(getAppState())
+            S.util.fullscreenViewerActive(getAs())
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, ast.editNode.id);
                     this.close();
@@ -734,15 +734,15 @@ export class EditNodeDlg extends DialogBase {
     }
 
     openChangeNodeTypeDlg = () => {
-        const ast = getAppState();
+        const ast = getAs();
         new ChangeNodeTypeDlg(ast.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
     makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
-        const ast = getAppState();
+        const ast = getAs();
         const tableRow = new Div(null, { className: "marginBottomIfNotLast" });
 
-        const allowEditAllProps: boolean = getAppState().isAdminUser;
+        const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems = [];
         const label = type ? type.getEditLabelForProp(propEntry.name) : propEntry.name;
@@ -830,7 +830,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     async initContent(): Promise<void> {
-        const ast = getAppState();
+        const ast = getAs();
         const value = ast.editNode.content || "";
         const encrypted = value.startsWith(J.Constant.ENC_TAG);
         if (!encrypted) {
@@ -875,7 +875,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makeContentEditor = (rows: string): Div => {
-        const ast = getAppState();
+        const ast = getAs();
         const editItems: Comp[] = [];
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
@@ -937,7 +937,7 @@ export class EditNodeDlg extends DialogBase {
 
     // NOTE: Be careful renaming this method. It's referenced in an "as any" way in one place.
     addSharingToContentText = () => {
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.editNode.ac?.length > 0) {
             let content: string = this.contentEditorState.getValue();
             let newLine = false;
@@ -967,7 +967,7 @@ export class EditNodeDlg extends DialogBase {
     // returns true if all the shares on the node ARE mentioned in the text.
     areAllSharesInContent = () => {
         const content: string = this.contentEditorState.getValue();
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.editNode.ac?.length > 0) {
             for (const ac of ast.editNode.ac) {
                 if (ac.principalName !== J.PrincipalName.PUBLIC) {

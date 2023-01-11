@@ -1,4 +1,4 @@
-import { getAppState, promiseDispatch, useAppState } from "../AppContext";
+import { getAs, promiseDispatch, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
@@ -11,7 +11,7 @@ export class TabPanel extends Div {
     constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB });
         TabPanel.inst = this;
-        const ast = getAppState();
+        const ast = getAs();
 
         if (ast.mobileMode) {
             this.attribs.className = "col-12 tabPanelMobile";

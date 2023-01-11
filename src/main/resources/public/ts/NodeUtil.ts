@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Icon } from "./comp/core/Icon";
@@ -48,7 +48,7 @@ export class NodeUtil {
     }
 
     clearSelNodes = (ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         dispatch("ClearSelections", s => {
             s.selectedNodes.clear();
         });
@@ -65,7 +65,7 @@ export class NodeUtil {
     }
 
     getHighlightedNode = (ast: AppState = null): J.NodeInfo => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
         if (id) {
@@ -278,7 +278,7 @@ export class NodeUtil {
         });
 
         if (editorDlg) {
-            const ast = getAppState();
+            const ast = getAs();
             ast.editNode.ac = res.aclEntries;
             S.edit.updateNode(ast.editNode);
         }

@@ -1,4 +1,4 @@
-import { dispatch, getAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -33,7 +33,7 @@ export class UserProfileDlg extends DialogBase {
     some other user, and this dialog should be readOnly */
     constructor(private userNodeId: string) {
         super("User Profile", "app-modal-content");
-        const ast = getAppState();
+        const ast = getAs();
         userNodeId = userNodeId || ast.userProfile.userNodeId;
         this.readOnly = !ast.userProfile || ast.userProfile.userNodeId !== userNodeId;
         this.mergeState<LS>({ userProfile: null });
@@ -55,7 +55,7 @@ export class UserProfileDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const state = this.getState<LS>();
-        const ast = getAppState();
+        const ast = getAs();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
@@ -169,8 +169,8 @@ export class UserProfileDlg extends DialogBase {
                 web3Div,
 
                 new ButtonBar([
-                    getAppState().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    (getAppState().isAnonUser || this.readOnly || !ast.config.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
+                    getAs().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    (getAs().isAnonUser || this.readOnly || !ast.config.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
 
@@ -183,26 +183,26 @@ export class UserProfileDlg extends DialogBase {
                         this.openUserHomePage(state, "posts");
                     }), //
 
-                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
-                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
                         ? new Button("Mentions", () => this.searchMentions(this.getUserName()), { title: "Find all Public Mentions of this person" }) : null,
 
                     // only show editFriend node if we're NOT currently editing.
-                    !ast.editNode && !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.editNode && !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Friend Settings", this.editFriendNode) : null,
 
-                    !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Follow", this.addFriend) : null,
 
-                    !ast.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAppState().userName
+                    !ast.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Block", this.blockUser) : null,
 
-                    ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAppState())) : null,
+                    ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "", getAs())) : null,
 
                     state.userProfile.actorUrl || state.userProfile.actorId ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
@@ -263,7 +263,7 @@ export class UserProfileDlg extends DialogBase {
         const state = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: getAppState().userProfile.userTags,
+            userTags: getAs().userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: false,
@@ -276,7 +276,7 @@ export class UserProfileDlg extends DialogBase {
         const state = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userTags: getAppState().userProfile.userTags,
+            userTags: getAs().userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
             publish: true,
@@ -306,7 +306,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     currentlyEditingWarning = (): boolean => {
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.editNode) {
             S.util.showMessage("You must first finish editing the node.", "Warning");
             return true;
@@ -318,7 +318,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, false, null, this.userNodeId, null, null, false, getAppState());
+            S.edit.addNode(null, null, false, null, this.userNodeId, null, null, false, getAs());
         }, 10);
     }
 

@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -26,7 +26,7 @@ export class SharingDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        const ast = getAppState();
+        const ast = getAs();
         const isPublic = S.props.isPublic(ast.editNode);
         const state: LS = this.getState<LS>();
         const numShares: number = ast.editNode.ac?.length;
@@ -77,14 +77,14 @@ export class SharingDlg extends DialogBase {
                     }, null, "btn-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(J.PrincipalName.PUBLIC, false), null, "btn-secondary"),
                     new Button("Done", () => this.close(), null, "btn-secondary float-end"),
-                    new HelpButton(() => getAppState().config.help?.sharing?.dialog)
+                    new HelpButton(() => getAs().config.help?.sharing?.dialog)
                 ], "marginTop")
             ])
         ];
     }
 
     shareImmediate = async (names: string[]) => {
-        const ast = getAppState();
+        const ast = getAs();
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: ast.editNode.id,
             principals: names,
@@ -101,7 +101,7 @@ export class SharingDlg extends DialogBase {
      * Gets privileges from server and saves into state.
      */
     reload = async () => {
-        const ast = getAppState();
+        const ast = getAs();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: ast.editNode.id
         });
@@ -111,7 +111,7 @@ export class SharingDlg extends DialogBase {
 
     removeAllPrivileges = async () => {
         this.dirty = true;
-        const ast = getAppState();
+        const ast = getAs();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: ast.editNode.id,
             principalNodeId: "*",
@@ -128,12 +128,12 @@ export class SharingDlg extends DialogBase {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(async () => {
-                    const ast = getAppState();
+                    const ast = getAs();
                     await S.rpcUtil.rpc<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: ast.editNode.id
                     });
 
-                    S.quanta.refresh(getAppState());
+                    S.quanta.refresh(getAs());
                 }, 100);
             }
         }
@@ -141,7 +141,7 @@ export class SharingDlg extends DialogBase {
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        const ast = getAppState();
+        const ast = getAs();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: ast.editNode.id,
             principalNodeId,
@@ -151,7 +151,7 @@ export class SharingDlg extends DialogBase {
     }
 
     removePrivilegeResponse = async () => {
-        const ast = getAppState();
+        const ast = getAs();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: ast.editNode.id
         });
@@ -163,7 +163,7 @@ export class SharingDlg extends DialogBase {
     // userName="public", or a username
     shareNodeToUser = async (userName: string, allowAppends: boolean) => {
         this.dirty = true;
-        const ast = getAppState();
+        const ast = getAs();
         if (S.props.isEncrypted(ast.editNode)) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;

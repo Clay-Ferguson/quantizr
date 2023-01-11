@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -34,7 +34,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        const hltNode = S.nodeUtil.getHighlightedNode(getAppState());
+        const hltNode = S.nodeUtil.getHighlightedNode(getAs());
         if (!hltNode) {
             new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null).open();
             return;
@@ -62,9 +62,9 @@ export class ImportDlg extends DialogBase {
                 allowScroll: true,
                 setTab: true,
                 forceRenderParent: false,
-                ast: getAppState()
+                ast: getAs()
             });
-            S.view.scrollToNode(getAppState());
+            S.view.scrollToNode(getAs());
         }
     }
 }

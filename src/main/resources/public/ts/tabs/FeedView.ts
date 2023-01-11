@@ -1,4 +1,4 @@
-import { dispatch, getAppState, useAppState } from "../AppContext";
+import { dispatch, getAs, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
@@ -119,7 +119,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     }) : null,
                     new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
                         setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
-                        getValue: (): boolean => getAppState().userPrefs.autoRefreshFeed
+                        getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     }),
                     friendsTagDropDown
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.

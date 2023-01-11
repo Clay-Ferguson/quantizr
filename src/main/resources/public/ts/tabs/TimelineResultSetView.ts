@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
@@ -13,7 +13,7 @@ export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetVi
     }
 
     pageChange(delta: number): void {
-        const ast = getAppState();
+        const ast = getAs();
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;

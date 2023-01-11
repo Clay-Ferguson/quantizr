@@ -1,4 +1,4 @@
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -244,7 +244,7 @@ export class User {
             }
 
             // we may have just processed a dispatch so we need to get the current state now.
-            const ast = getAppState();
+            const ast = getAs();
 
             if (g_nodeId) {
                 id = g_nodeId;
@@ -316,7 +316,7 @@ export class User {
     }
 
     userLogout = (ast: AppState = null) => {
-        ast = ast || getAppState();
+        ast = ast || getAs();
         this.logout(true, ast);
     }
 

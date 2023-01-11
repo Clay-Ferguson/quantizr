@@ -1,4 +1,4 @@
-import { getAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { FriendsDlgState } from "../dlg/FriendsDlgState";
@@ -18,7 +18,7 @@ export class FriendsTableRow extends ListBoxRow {
     }
 
     preRender(): void {
-        const ast = getAppState();
+        const ast = getAs();
         let src: string = null;
 
         // local users will have this kind of avatar

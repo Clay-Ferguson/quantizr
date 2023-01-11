@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
-import { dispatch, getAppState, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -794,7 +794,7 @@ export class Util {
     }
 
     loadBookmarks = async () => {
-        const ast = getAppState();
+        const ast = getAs();
         if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
@@ -832,7 +832,7 @@ export class Util {
     }
 
     notifyNodeDeleted = () => {
-        const ast = getAppState();
+        const ast = getAs();
         // Update bookmarks, but only if user is viewing the bookmarks page.
         if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
             setTimeout(S.util.loadBookmarks, 100);
@@ -840,7 +840,7 @@ export class Util {
     }
 
     notifyNodeMoved = () => {
-        const ast = getAppState();
+        const ast = getAs();
         if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
             setTimeout(S.util.loadBookmarks, 100);
         }

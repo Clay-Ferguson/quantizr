@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch, getAppState } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
@@ -210,7 +210,7 @@ export class Render {
 
         attribs.nid = node.id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
-            const ast = getAppState();
+            const ast = getAs();
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
                 // console.log("DROP(a) kind=" + item.kind + " type=" + item.type);
