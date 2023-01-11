@@ -118,7 +118,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, getAs());
+        });
     }
 
     uploadFromIPFS = () => {
@@ -127,7 +127,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, getAs());
+        });
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read

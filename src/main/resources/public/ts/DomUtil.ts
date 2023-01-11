@@ -527,11 +527,10 @@ export class DomUtil {
                     //     return;
                     // }
 
-                    const ast = getAs();
                     // todo-1: this is an ugly solution because it displays the upload dialog
                     // and takes the user to the node that got uploade onto. I'd like to NOT do that,
                     // but just make it behind the scenes automatic.
-                    S.attachment.openUploadFromFileDlg(false, id, file, ast);
+                    S.attachment.openUploadFromFileDlg(false, id, file);
                     return;
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {

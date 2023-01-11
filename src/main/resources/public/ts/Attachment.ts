@@ -1,5 +1,4 @@
 import { getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
@@ -7,11 +6,9 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Attachment {
-    openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File, ast: AppState) => {
-        ast = ast || getAs();
-
+    openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode(getAs());
             nodeId = node?.id;
         }
 
@@ -25,9 +22,9 @@ export class Attachment {
         }).open();
     };
 
-    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, ast: AppState) => {
+    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode(getAs());
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -38,9 +35,9 @@ export class Attachment {
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
     };
 
-    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, ast: AppState) => {
+    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode();
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
