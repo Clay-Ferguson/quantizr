@@ -42,9 +42,8 @@ function reducer(s: AppState, action: any) {
     }
 }
 
-/* Use this to get state when NOT inside a react function */
-export function getAppState(s: AppState = null): AppState {
-    return s || state;
+export function getAppState(): AppState {
+    return state;
 }
 
 /* Must be called from a react function */

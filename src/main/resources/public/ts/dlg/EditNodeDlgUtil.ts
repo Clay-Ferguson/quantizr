@@ -105,9 +105,6 @@ export class EditNodeDlgUtil {
         }
         dlg.resetAutoSaver();
 
-        // todo-0: retest this with the postit note icon, because we used to have the rest of this
-        // method (below) bypassed in this scenario.
-
         S.render.fadeInId = editNode.id;
         S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset, getAppState());
 

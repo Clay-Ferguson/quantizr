@@ -316,7 +316,7 @@ export class User {
     }
 
     userLogout = (ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         this.logout(true, ast);
     }
 

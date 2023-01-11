@@ -63,7 +63,7 @@ export class Nav {
     }
 
     navToSibling = async (siblingOffset: number, state?: AppState): Promise<string> => {
-        state = getAppState(state);
+        state = state || getAppState();
         if (!state.node) return null;
 
         try {
@@ -135,7 +135,7 @@ export class Nav {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
-            state = getAppState(state);
+            state = state || getAppState();
 
             /* First check if this node is already highlighted and if so just return */
             const hltNode = S.nodeUtil.getHighlightedNode();
@@ -162,7 +162,7 @@ export class Nav {
     }
 
     openContentNode = async (nodePathOrId: string, ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -187,7 +187,7 @@ export class Nav {
 
     openNodeById = (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         const node = MainTab.inst?.findNode(ast, id);
 
         if (!node) {
@@ -214,7 +214,7 @@ export class Nav {
 
     setNodeSel = (selected: boolean, id: string, ast: AppState) => {
         if (!id) return;
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (selected) {
             ast.selectedNodes.add(id);
         } else {
@@ -260,7 +260,7 @@ export class Nav {
     }
 
     navToMyAccntRoot = async (ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         S.view.scrollActiveToTop(ast);
 
         if (ast.isAnonUser) {

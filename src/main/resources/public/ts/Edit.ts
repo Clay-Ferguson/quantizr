@@ -66,7 +66,7 @@ export class Edit {
     }
 
     private joinNodesResponse = (res: J.JoinNodesResponse, ast: AppState): any => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (S.util.checkSuccess("Join node", res)) {
             S.nodeUtil.clearSelNodes(ast);
             S.view.refreshTree({
@@ -625,7 +625,7 @@ export class Edit {
 
     moveNodeUp = async (evt: Event, id: string, state?: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        state = getAppState(state);
+        state = state || getAppState();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(state);
             id = selNode?.id;
@@ -642,7 +642,7 @@ export class Edit {
 
     moveNodeDown = async (evt: Event, id: string, ast: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -658,7 +658,7 @@ export class Edit {
     }
 
     moveNodeToTop = async (id: string = null, ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -674,7 +674,7 @@ export class Edit {
     }
 
     moveNodeToBottom = async (id: string = null, ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode(ast);
             id = selNode?.id;
@@ -700,7 +700,7 @@ export class Edit {
     }
 
     checkEditPending = (): boolean => {
-        const state = getAppState(null);
+        const state = getAppState();
 
         // state.editNode holds non-null always whenever there is editing underway.
         if (state.editNode) {
@@ -762,7 +762,7 @@ export class Edit {
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState) => {
         if (this.checkEditPending()) return;
 
-        state = getAppState(state);
+        state = state || getAppState();
         if (!state.node || !state.node.children) return;
 
         /*
@@ -798,7 +798,7 @@ export class Edit {
     }
 
     createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, ast: AppState): any => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
@@ -871,7 +871,7 @@ export class Edit {
     }
 
     joinNodes = async (state?: AppState) => {
-        state = getAppState(state);
+        state = state || getAppState();
 
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
         if (!selNodesArray || selNodesArray.length === 0) {
@@ -1036,7 +1036,7 @@ export class Edit {
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
     pasteSelNodes = async (nodeId: string, location: string, state?: AppState) => {
-        state = getAppState(state);
+        state = state || getAppState();
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
@@ -1115,7 +1115,7 @@ export class Edit {
         });
 
         if (blob) {
-            const state = getAppState(null);
+            const state = getAppState();
             this.createSubNodeResponse(res, false, null, state);
         }
         else {
@@ -1176,7 +1176,7 @@ export class Edit {
     }
 
     addLinkBookmark = async (content: any, audioUrl: string, ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
@@ -1219,7 +1219,7 @@ export class Edit {
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
         boostTarget: string, fediSend: boolean, ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         // auto-enable edit mode
         if (!boostTarget && !ast.userPrefs.editMode) {
@@ -1252,7 +1252,7 @@ export class Edit {
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
         pendingEdit: boolean, payloadType: string, content: string, ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
@@ -1277,7 +1277,7 @@ export class Edit {
     }
 
     addCalendarEntry = async (initDate: number, ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
@@ -1358,7 +1358,7 @@ export class Edit {
     }
 
     updateHeadings = async (ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         const node = S.nodeUtil.getHighlightedNode(ast);
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {

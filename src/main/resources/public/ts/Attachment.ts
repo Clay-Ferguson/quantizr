@@ -8,7 +8,7 @@ import { S } from "./Singletons";
 
 export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File, ast: AppState) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
 
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode(ast);

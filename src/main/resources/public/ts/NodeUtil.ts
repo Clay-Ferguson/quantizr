@@ -48,7 +48,7 @@ export class NodeUtil {
     }
 
     clearSelNodes = (ast: AppState = null) => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         dispatch("ClearSelections", s => {
             s.selectedNodes.clear();
         });
@@ -65,7 +65,7 @@ export class NodeUtil {
     }
 
     getHighlightedNode = (ast: AppState = null): J.NodeInfo => {
-        ast = getAppState(ast);
+        ast = ast || getAppState();
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
         if (id) {
