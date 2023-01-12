@@ -48,7 +48,7 @@ export class SearchFileSystemDlg extends DialogBase {
         }
 
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

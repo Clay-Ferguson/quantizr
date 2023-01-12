@@ -65,8 +65,8 @@ export class MenuPanel extends Div {
     };
 
     static setLinkSource = () => {
+        const node = S.nodeUtil.getHighlightedNode();
         dispatch("setLinkSourceNodeId", s => {
-            const node = S.nodeUtil.getHighlightedNode(s);
             if (node) {
                 s.linkSource = node.id;
             }
@@ -75,7 +75,7 @@ export class MenuPanel extends Div {
 
     static setLinkTarget = () => {
         dispatch("setLinkSourceNodeId", s => {
-            const node = S.nodeUtil.getHighlightedNode(s);
+            const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 const sourceId = s.linkSource;
                 const run = async () => {
@@ -189,8 +189,8 @@ export class MenuPanel extends Div {
     static toggleMetaData = () => S.edit.toggleShowMetaData();
     static toggleNsfw = () => S.edit.toggleNsfw();
     static toggleShowProps = () => S.edit.toggleShowProps();
-    static toggleParents = () => S.edit.toggleShowParents(getAs());
-    static toggleReplies = () => S.edit.toggleShowReplies(getAs());
+    static toggleParents = () => S.edit.toggleShowParents();
+    static toggleReplies = () => S.edit.toggleShowReplies();
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
 
@@ -207,7 +207,7 @@ export class MenuPanel extends Div {
         const ast = useAppState();
         const state = this.getState();
 
-        const hltNode = S.nodeUtil.getHighlightedNode(ast);
+        const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;

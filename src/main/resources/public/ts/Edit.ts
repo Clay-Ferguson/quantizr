@@ -28,7 +28,7 @@ export class Edit {
     }
 
     openImportDlg = (): any => {
-        const node = S.nodeUtil.getHighlightedNode(getAs());
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -41,7 +41,7 @@ export class Edit {
     }
 
     openExportDlg = (): any => {
-        const node = S.nodeUtil.getHighlightedNode(getAs());
+        const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             new ExportDlg(node).open();
         }
@@ -576,9 +576,9 @@ export class Edit {
         return S.util.saveUserPrefs(s => s.userPrefs.showProps = !s.userPrefs.showProps);
     }
 
-    toggleShowParents = (ast: AppState) => {
-        S.util.saveUserPrefs(s => ast.userPrefs.showParents = !ast.userPrefs.showParents);
-        S.quanta.refresh(ast);
+    toggleShowParents = async () => {
+        await S.util.saveUserPrefs(s => s.userPrefs.showParents = !s.userPrefs.showParents);
+        S.quanta.refresh(getAs());
     }
 
     // This updates userPref without affecting the GUI (no rerendering)
@@ -587,9 +587,10 @@ export class Edit {
         S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
     }
 
-    toggleShowReplies = async (ast: AppState) => {
+    toggleShowReplies = async () => {
         await S.util.saveUserPrefs(s => s.userPrefs.showReplies = !s.userPrefs.showReplies);
 
+        const ast = getAs();
         // todo-1: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
         if (ast.activeTab === C.TAB_MAIN) {
             S.quanta.refresh(ast);
@@ -612,7 +613,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         ast = ast || getAs();
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(ast);
+            const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
         }
 
@@ -629,7 +630,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         ast = ast || getAs();
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(ast);
+            const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
         }
 
@@ -645,7 +646,7 @@ export class Edit {
     moveNodeToTop = async (id: string = null, ast: AppState = null) => {
         ast = ast || getAs();
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(ast);
+            const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
         }
 
@@ -661,7 +662,7 @@ export class Edit {
     moveNodeToBottom = async (id: string = null, ast: AppState = null) => {
         ast = ast || getAs();
         if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode(ast);
+            const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
         }
 
@@ -719,9 +720,8 @@ export class Edit {
             return;
         }
 
-        const ast = getAs();
         if (!id) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 id = node.id;
             }
@@ -756,7 +756,7 @@ export class Edit {
          */
         let node: J.NodeInfo = null;
         if (!id) {
-            node = S.nodeUtil.getHighlightedNode(ast);
+            node = S.nodeUtil.getHighlightedNode();
         } else {
             node = MainTab.inst?.findNode(ast, id);
         }
@@ -789,7 +789,7 @@ export class Edit {
          * node if there is a selected node.
          */
         if (!id) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 parentNode = node;
             }
@@ -808,7 +808,7 @@ export class Edit {
     }
 
     selectAllNodes = async (ast: AppState) => {
-        const highlightNode = S.nodeUtil.getHighlightedNode(ast);
+        const highlightNode = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
@@ -832,8 +832,7 @@ export class Edit {
     }
 
     subGraphHash = async () => {
-        const ast = getAs();
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
 
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -1052,7 +1051,7 @@ export class Edit {
         if (dlg.yes) {
             const ast = getAs();
             /* inserting under whatever node user has focused */
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode();
 
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
@@ -1123,7 +1122,7 @@ export class Edit {
     }
 
     splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, ast: AppState) => {
-        node = node || S.nodeUtil.getHighlightedNode(ast);
+        node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
             S.util.showMessage("You didn't select a node to split.", "Warning");
@@ -1344,7 +1343,7 @@ export class Edit {
 
     updateHeadings = async (ast: AppState) => {
         ast = ast || getAs();
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
@@ -1357,7 +1356,7 @@ export class Edit {
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
     editNodeSharing = async (ast: AppState, dlg: EditNodeDlg, node: J.NodeInfo) => {
-        node = node || S.nodeUtil.getHighlightedNode(ast);
+        node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;

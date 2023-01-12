@@ -46,7 +46,7 @@ export class Nav {
     }
 
     navOpenSelectedNode = (ast: AppState) => {
-        const selNode = S.nodeUtil.getHighlightedNode(ast);
+        const selNode = S.nodeUtil.getHighlightedNode();
         if (!selNode) return;
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
@@ -692,7 +692,7 @@ export class Nav {
     }
 
     messagesNodeFeed = (ast: AppState) => {
-        const hltNode = S.nodeUtil.getHighlightedNode(ast);
+        const hltNode = S.nodeUtil.getHighlightedNode();
         if (!hltNode) return;
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");

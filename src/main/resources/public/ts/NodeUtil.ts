@@ -22,7 +22,7 @@ export class NodeUtil {
         const ret: Object = {};
         const selArray = this.getSelNodesArray(ast);
         if (!selArray || selArray.length === 0) {
-            const node = this.getHighlightedNode(ast);
+            const node = this.getHighlightedNode();
             if (node) {
                 ret[node.id] = node;
                 return ret;
@@ -64,8 +64,8 @@ export class NodeUtil {
         // });
     }
 
-    getHighlightedNode = (ast: AppState = null): J.NodeInfo => {
-        ast = ast || getAs();
+    getHighlightedNode = (): J.NodeInfo => {
+        const ast = getAs();
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
         if (id) {
@@ -81,7 +81,7 @@ export class NodeUtil {
 
         /* If node not known, resort to taking the best, previous node we had */
         if (!node) {
-            node = this.getHighlightedNode(ast);
+            node = this.getHighlightedNode();
         }
 
         if (node) {

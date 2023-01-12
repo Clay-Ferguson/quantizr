@@ -201,7 +201,7 @@ export class SearchContentDlg extends DialogBase {
 
     graph = () => {
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(getAs());
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -214,7 +214,7 @@ export class SearchContentDlg extends DialogBase {
 
     search = () => {
         // until we have better validation
-        const node = S.nodeUtil.getHighlightedNode(getAs());
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

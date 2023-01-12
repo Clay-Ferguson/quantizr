@@ -22,7 +22,7 @@ export class SplitNodeDlg extends DialogBase {
 
     constructor(private node: J.NodeInfo) {
         super("Split Node");
-        this.node = this.node || S.nodeUtil.getHighlightedNode(getAs());
+        this.node = this.node || S.nodeUtil.getHighlightedNode();
 
         let splitMode: string;
         if (this.node.content.indexOf("\n\n\n") !== -1) {

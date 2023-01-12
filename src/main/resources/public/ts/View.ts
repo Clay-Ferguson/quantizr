@@ -42,7 +42,7 @@ export class View {
         }
 
         if (!a.highlightId) {
-            const currentSelNode = S.nodeUtil.getHighlightedNode(a.ast);
+            const currentSelNode = S.nodeUtil.getHighlightedNode();
             a.highlightId = currentSelNode ? currentSelNode.id : a.nodeId;
         }
 
@@ -176,7 +176,7 @@ export class View {
 
     // NOTE: Method not still being used. Let's keep it for future reference
     // scrollRelativeToNode = (dir: string, ast: AppState) => {
-    //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+    //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode();
     //     if (!currentSelNode) return;
 
     //     let newNode: J.NodeInfo = null;
@@ -245,7 +245,7 @@ export class View {
                 /* Check to see if we are rendering the top node (page root), and if so
                 it is better looking to just scroll to zero index, because that will always
                 be what user wants to see */
-                node = node || S.nodeUtil.getHighlightedNode(ast);
+                node = node || S.nodeUtil.getHighlightedNode();
 
                 /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
                  a case where the user is editing a node and we KNOW we don't need to scroll after editing,
@@ -278,7 +278,7 @@ export class View {
     }
 
     getNodeStats = async (ast: AppState, trending: boolean, feed: boolean): Promise<any> => {
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         const isMine = !!node && (node.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
@@ -297,7 +297,7 @@ export class View {
         if (!S.crypto.warnIfEncKeyUnknown()) {
             return null;
         }
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
             nodeId: node ? node.id : null
         });
@@ -305,7 +305,7 @@ export class View {
     }
 
     getNodeSignatureVerify = async (ast: AppState): Promise<any> => {
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending: false,
@@ -319,7 +319,7 @@ export class View {
     }
 
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, ast: AppState) => {
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,

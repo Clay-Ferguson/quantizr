@@ -132,7 +132,7 @@ export class Search {
     }
 
     listSubgraphByPriority = async (ast: AppState) => {
-        const node = S.nodeUtil.getHighlightedNode(ast);
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -211,7 +211,7 @@ export class Search {
     }
 
     showDocument = async (node: J.NodeInfo, growPage: boolean, ast: AppState) => {
-        node = node || S.nodeUtil.getHighlightedNode(ast);
+        node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
             S.util.showMessage("Select a node to render a document", "Document View");
@@ -267,7 +267,7 @@ export class Search {
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
         it's ok to reset node or not */
-        node = node || S.nodeUtil.getHighlightedNode(ast);
+        node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Timeline");
@@ -715,7 +715,7 @@ export class Search {
     /* If target is non-null we only return shares to that particlar person (or public) */
     findShares = (ast: AppState = null, shareTarget: string = null, accessOption: string = null) => {
         ast = ast || getAs();
-        const focusNode = S.nodeUtil.getHighlightedNode(ast);
+        const focusNode = S.nodeUtil.getHighlightedNode();
         if (!focusNode) {
             return;
         }

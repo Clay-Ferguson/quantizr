@@ -73,7 +73,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        const node = S.nodeUtil.getHighlightedNode(getAs());
+        const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;

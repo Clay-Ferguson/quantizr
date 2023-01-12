@@ -1,4 +1,3 @@
-import { getAs } from "./AppContext";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
@@ -8,7 +7,7 @@ import { S } from "./Singletons";
 export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(getAs());
+            const node = S.nodeUtil.getHighlightedNode();
             nodeId = node?.id;
         }
 
@@ -24,7 +23,7 @@ export class Attachment {
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(getAs());
+            const node = S.nodeUtil.getHighlightedNode();
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;

@@ -262,7 +262,7 @@ export class Render {
     /* nodeId is parent node to query for calendar content */
     showCalendar = async (nodeId: string, ast: AppState) => {
         if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode(ast);
+            const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 nodeId = node.id;
             }
@@ -288,7 +288,7 @@ export class Render {
 
     showNodeUrl = (node: J.NodeInfo, ast: AppState) => {
         if (!node) {
-            node = S.nodeUtil.getHighlightedNode(ast);
+            node = S.nodeUtil.getHighlightedNode();
         }
         if (!node) {
             S.util.showMessage("You must first click on a node.", "Warning");
@@ -568,7 +568,7 @@ export class Render {
 
                         s.rendering = true;
                     }
-                    else if (allowScroll && (scrollToTop || !S.nodeUtil.getHighlightedNode(s))) {
+                    else if (allowScroll && (scrollToTop || !S.nodeUtil.getHighlightedNode())) {
                         if (C.DEBUG_SCROLLING) {
                             console.log("rendering highlight: scrollTop");
                         }
@@ -682,7 +682,7 @@ export class Render {
     }
 
     showGraph = async (node: J.NodeInfo, searchText: string, ast: AppState) => {
-        node = node || S.nodeUtil.getHighlightedNode(ast);
+        node = node || S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
             searchText,

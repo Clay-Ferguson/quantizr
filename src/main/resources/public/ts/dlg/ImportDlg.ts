@@ -34,7 +34,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        const hltNode = S.nodeUtil.getHighlightedNode(getAs());
+        const hltNode = S.nodeUtil.getHighlightedNode();
         if (!hltNode) {
             new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null).open();
             return;

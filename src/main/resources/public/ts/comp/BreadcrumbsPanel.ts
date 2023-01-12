@@ -52,7 +52,7 @@ export class BreadcrumbsPanel extends Div {
             children.push(new Icon({
                 className: "fa fa-level-down fa-lg showParentsIcon",
                 title: "Toggle: Show Parent on page",
-                onClick: () => S.edit.toggleShowParents(ast)
+                onClick: () => S.edit.toggleShowParents()
             }));
         }
 

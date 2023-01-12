@@ -46,7 +46,7 @@ export class NodeCompMainNode extends Div {
             this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED)]);
         }
         else {
-            const focusNode = S.nodeUtil.getHighlightedNode(ast);
+            const focusNode = S.nodeUtil.getHighlightedNode();
             const selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = selected ? "active-row-main" : "inactive-row-main";
 

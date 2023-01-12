@@ -123,7 +123,7 @@ export class NodeCompRow extends Div {
         }
 
         const indentLevel = this.isTableCell ? 0 : this.level;
-        const focusNode = S.nodeUtil.getHighlightedNode(ast);
+        const focusNode = S.nodeUtil.getHighlightedNode();
         const selected: boolean = (focusNode && focusNode.id === this.node.id);
 
         if (this.isLinkedNode) {
