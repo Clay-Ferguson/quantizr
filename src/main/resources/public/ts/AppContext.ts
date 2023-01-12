@@ -17,6 +17,7 @@ let dispatcher: Function = null;
 
 export let state = new AppState();
 export const AppContext = createContext(state);
+export type StateModFunc = (s: AppState) => any;
 
 function reducer(s: AppState, action: any) {
     const saveState = s;
@@ -43,7 +44,9 @@ function reducer(s: AppState, action: any) {
 }
 
 export function getAs(): AppState {
-    return state;
+    // Freeze this object because it's always a violation of our architecural design
+    // to ever have an object gotten from getAs() be modified.
+    return Object.freeze(state);
 }
 
 /* Must be called from a react function */
@@ -66,7 +69,7 @@ export function initDispatch(): void {
  * the state transform to complete, so use the 'promiseDispatch' for that. Our design pattern is to
  * always do state changes (dispatches) only thru this 'dispatcher', local to this module
  */
-export function dispatch(type: string, func: (s: AppState) => any) {
+export function dispatch(type: string, func: StateModFunc) {
     if (!dispatcher) {
         throw new Error("Called dispatch before first render. type: " + type);
     }
@@ -79,7 +82,7 @@ export function dispatch(type: string, func: (s: AppState) => any) {
  * that we can inject the reject/resolve into, to be sure we've waited at least until
  * the state has transformed.
  */
-export function promiseDispatch(type: string, func: (s: AppState) => any): Promise<void> {
+export function promiseDispatch(type: string, func: StateModFunc): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
         if (!dispatcher) {
             throw new Error("Called dispatch before first render. type: " + type);

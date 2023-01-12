@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { dispatch, getAs, useAppState } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { CollapsiblePanel } from "../../comp/core/CollapsiblePanel";
@@ -152,9 +152,9 @@ export class NodeCompVerticalRowLayout extends Div {
             // put them in subOrdinal order on the page.
             collapsedComps.sort((a: any, b: any) => a.subOrdinal - b.subOrdinal);
 
-            comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (s: boolean) => {
-                ast.otherAccountNodesExpanded = s;
-            }, ast.otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel", ""));
+            comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (exp: boolean) => {
+                dispatch("OtherNodesExpState", s => s.otherAccountNodesExpanded = exp);
+            }, getAs().otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel", ""));
         }
 
         this.setChildren(comps);

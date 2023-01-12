@@ -78,20 +78,22 @@ export class LeftNavPanel extends Div {
                 // }),
                 // todo-2: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
-                ast.isAnonUser ? new Icon({
-                    className: "fa fa-bars fa-2x clickable float-end",
-                    onClick: () => {
-                        dispatch("ToggleLHS", s => {
-                            s.anonShowLHSMenu = !s.anonShowLHSMenu;
-                        })
-                    },
-                    title: "Show Menu"
-                }) : null,
-                messages ? new Span(messages, {
-                    className: "newMessagesNote",
-                    onClick: S.nav.showMyNewMessages,
-                    title: "Show new messages"
-                }) : null
+                new Span(null, { className: "float-end" }, [
+                    messages ? new Span(messages, {
+                        className: "newMessagesNote",
+                        onClick: S.nav.showMyNewMessages,
+                        title: "Show new messages"
+                    }) : null,
+                    ast.isAnonUser ? new Icon({
+                        className: "fa fa-bars fa-2x clickable",
+                        onClick: () => {
+                            dispatch("ToggleLHS", s => {
+                                s.anonShowLHSMenu = !s.anonShowLHSMenu;
+                            })
+                        },
+                        title: "Show Menu"
+                    }) : null
+                ])
             ]),
             ast.isAnonUser ? null : new MenuPanel(ast),
 

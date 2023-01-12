@@ -277,7 +277,7 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        let editingAllowed = S.edit.isEditAllowed(this.node, ast);
+        let editingAllowed = S.edit.isEditAllowed(this.node);
         let deleteAllowed = false;
         let editableNode = true;
 

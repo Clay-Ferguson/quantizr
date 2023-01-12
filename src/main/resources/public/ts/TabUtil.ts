@@ -55,7 +55,7 @@ export class TabUtil {
         }
         else {
             this.tabChanging(ast.activeTab, tabName, ast);
-            ast.activeTab = S.quanta.activeTab = tabName;
+            dispatch("SetActiveTab", s => s.activeTab = S.quanta.activeTab = tabName);
         }
     }
 

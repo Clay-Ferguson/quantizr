@@ -109,7 +109,7 @@ export class NodeUtil {
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always
         // keys off parentIdToFocusNodeMap actually reading the value.
-        ast.highlightNodeId = node.id;
+        dispatch("highlightNode", s => s.highlightNodeId = node.id);
 
         S.quanta.parentIdToFocusNodeMap.set(ast.node.id, node.id);
 
@@ -221,7 +221,7 @@ export class NodeUtil {
                 spaceIdx = content.indexOf("\n");
             }
             if (spaceIdx > 0) {
-                content = content.substring(spaceIdx+1);
+                content = content.substring(spaceIdx + 1);
             }
         }
         content = content.trim();

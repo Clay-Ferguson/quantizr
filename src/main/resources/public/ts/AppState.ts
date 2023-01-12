@@ -117,8 +117,6 @@ export class AppState {
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
 
-    pendingLocationHash: string;
-
     // Rss feeds (cached by a hash of the feedSrc property text as the key)
     rssFeedCache = {};
 

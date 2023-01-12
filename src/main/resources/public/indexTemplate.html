@@ -43,6 +43,11 @@
         var __initAppStarted = false;
         var browserFailed = false;
 
+        window.onerror = function (message, url, line, col, e) {
+            alert(message);
+            return true;
+        };
+
         function browserFail() {
             if (browserFailed) return;
             browserFailed = true;
@@ -170,6 +175,7 @@
 </head>
 
 <!-- using inline style so it goes into effect immediately -->
+
 <body style="background-color: 'black'; width: 100%; height: 100%;" class="app-body">
     <noscript>
         This app requires JavaScript.

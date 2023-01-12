@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
@@ -416,9 +416,9 @@ export class Render {
             }
 
             if (attachmentComps.length > 0) {
-                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
-                    ast.linksToAttachmentsExpanded = s;
-                }, ast.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
+                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (exp: boolean) => {
+                    dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
+                }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
         }
 
@@ -525,7 +525,7 @@ export class Render {
                         }
 
                         this.fadeInId = targetNodeId;
-                        s.pendingLocationHash = null;
+                        S.quanta.pendingLocationHash = null;
                     }
                     else {
                         if (!this.fadeInId) {
@@ -546,16 +546,16 @@ export class Render {
                         console.log("RENDER NODE: " + s.node.id);
                     }
 
-                    if (s.pendingLocationHash) {
+                    if (S.quanta.pendingLocationHash) {
                         // console.log("highlight: pendingLocationHash");
-                        window.location.hash = s.pendingLocationHash;
+                        window.location.hash = S.quanta.pendingLocationHash;
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
-                            S.nodeUtil.highlightRowById(s.pendingLocationHash.substring(1), true, s);
+                            S.nodeUtil.highlightRowById(S.quanta.pendingLocationHash.substring(1), true, s);
                             s.rendering = true;
                         }
-                        s.pendingLocationHash = null;
+                        S.quanta.pendingLocationHash = null;
                     }
                     else if (allowScroll && targetNodeId) {
                         if (C.DEBUG_SCROLLING) {

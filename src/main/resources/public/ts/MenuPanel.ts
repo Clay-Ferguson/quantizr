@@ -136,9 +136,9 @@ export class MenuPanel extends Div {
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAs(), "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
-    static import = () => S.edit.openImportDlg(getAs());
+    static import = () => S.edit.openImportDlg();
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(getAs());
-    static export = () => S.edit.openExportDlg(getAs());
+    static export = () => S.edit.openExportDlg();
     static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
 
     static openTtsTab = () => {
@@ -176,9 +176,7 @@ export class MenuPanel extends Div {
             }, 250);
         });
 
-        const ast = getAs();
-        ast.userPrefs.enableIPSM = true;
-        S.util.saveUserPreferences(ast);
+        S.util.saveUserPrefs(s => s.userPrefs.enableIPSM = true);
     };
 
     static showKeys = () => { new ManageCryptoKeysDlg().open(); };
@@ -187,10 +185,10 @@ export class MenuPanel extends Div {
     static closeAccount = () => { S.user.closeAccount(); };
     static profile = () => { new UserProfileDlg(null).open(); };
     static storageSpace = () => { new ManageStorageDlg().open(); };
-    static toggleEditMode = () => S.edit.toggleEditMode(getAs());
-    static toggleMetaData = () => S.edit.toggleShowMetaData(getAs());
-    static toggleNsfw = () => S.edit.toggleNsfw(getAs());
-    static toggleShowProps = () => S.edit.toggleShowProps(getAs());
+    static toggleEditMode = () => S.edit.toggleEditMode();
+    static toggleMetaData = () => S.edit.toggleShowMetaData();
+    static toggleNsfw = () => S.edit.toggleNsfw();
+    static toggleShowProps = () => S.edit.toggleShowProps();
     static toggleParents = () => S.edit.toggleShowParents(getAs());
     static toggleReplies = () => S.edit.toggleShowReplies(getAs());
     static browserInfo = () => S.util.showBrowserInfo();
@@ -577,7 +575,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null, ast)), //
                 new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null, ast)), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null, ast)), //
-                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(ast))
+                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace())
             ]));
 
             children.push(new Menu(state, "Admin - DB", [

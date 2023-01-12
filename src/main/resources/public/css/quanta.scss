@@ -467,6 +467,7 @@ a {
 .newMessagesNote {
     cursor: pointer;
     padding: 2px 6px 2px 6px;
+    margin-right: $smallGap;
     color: var(--bs-green);
     border: 2px solid var(--bs-green);
 }
@@ -1052,12 +1053,12 @@ Will come back later and study this more. todo-3 */
 
 .list-group-menu-item {
     background-color: transparent;
-    padding: 5px 5px 5px 10px;
+    padding: 5px 5px 4px 10px;
 }
 
 .list-group-transparent {
     background-color: transparent;
-    padding: 5px 5px 5px 10px;
+    padding: 5px 5px 4px 10px;
 }
 
 .audioPlayer {

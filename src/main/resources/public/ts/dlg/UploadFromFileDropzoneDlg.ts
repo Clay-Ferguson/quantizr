@@ -67,10 +67,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }),
 
                     this.importMode || !ast.config.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
-                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
-                        onClick: this.uploadFromClipboard,
-                        title: "Upload from Clipboard"
-                    }),
+
+                    // LEAVING THIS FOR FUTURE
+                    // (Currently the clipboard upload button on the editor itself is all we need so this button
+                    // is not here since it just repliates that same functionality)
+                    // this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
+                    //     onClick: this.uploadFromClipboard,
+                    //     title: "Upload from Clipboard"
+                    // }),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {

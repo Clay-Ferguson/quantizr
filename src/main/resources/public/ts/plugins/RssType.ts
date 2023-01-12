@@ -185,9 +185,7 @@ export class RssType extends TypeBase {
             className: "float-end"
         }, {
             setValue: (checked: boolean) => {
-                dispatch("SetHeadlinesFlag", s => {
-                    S.edit.setRssHeadlinesOnly(s, checked);
-                });
+                dispatch("SetHeadlinesFlag", s => S.edit.setRssHeadlinesOnly(s, checked));
             },
             getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
         }));

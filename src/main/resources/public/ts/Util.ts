@@ -1,6 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
-import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
@@ -896,25 +896,23 @@ export class Util {
 
     setUserPreferences = (ast: AppState, flag: boolean) => {
         if (flag !== ast.userPrefs.editMode) {
-            ast.userPrefs.editMode = flag;
-            this.saveUserPreferences(ast);
+            this.saveUserPrefs(s => s.userPrefs.editMode = flag);
         }
     }
 
-    saveUserPreferences = async (ast: AppState, dispatchNow: boolean = true) => {
+    saveUserPrefs = async (mod: StateModFunc) => {
+        await promiseDispatch("SetUserPreferences", s => {
+            mod(s);
+            if (!s.userPrefs.showParents && s.node) {
+                s.node.parents = null;
+            }
+        });
+
+        const ast = getAs();
         if (!ast.isAnonUser) {
             await S.rpcUtil.rpc<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userNodeId: ast.userProfile.userNodeId,
                 userPreferences: ast.userPrefs
-            });
-        }
-
-        if (dispatchNow) {
-            await promiseDispatch("SetUserPreferences", s => {
-                s.userPrefs = ast.userPrefs;
-                if (!s.userPrefs.showParents && s.node) {
-                    s.node.parents = null;
-                }
             });
         }
     }

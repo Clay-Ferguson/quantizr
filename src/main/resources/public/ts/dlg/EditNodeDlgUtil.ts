@@ -106,7 +106,7 @@ export class EditNodeDlgUtil {
         dlg.resetAutoSaver();
 
         S.render.fadeInId = editNode.id;
-        S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset, getAs());
+        S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset);
 
         // Only ask to split for ordinary nodes (non special)
         const type = S.plugin.getType(editNode.type);

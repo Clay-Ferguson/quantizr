@@ -11,9 +11,9 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
-        "strictNullChecks": false,
-
-        "noImplicitUseStrict": false,
+        // "strictNullChecks": false,
+        // "noImplicitUseStrict": false,
+        "alwaysStrict": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,

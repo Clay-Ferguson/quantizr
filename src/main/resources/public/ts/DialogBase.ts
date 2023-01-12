@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
@@ -148,7 +147,7 @@ export abstract class DialogBase extends Comp {
 
     compRender = (): ReactNode => {
         const ast = getAs();
-        const isTopmost = this.isTopmost(ast);
+        const isTopmost = this.isTopmost();
         let ret: ReactNode = null;
 
         const width = this.genInitWidth();
@@ -254,7 +253,7 @@ export abstract class DialogBase extends Comp {
                 ]);
 
                 if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
-                    this.makeDraggable(ast, this.dlgFrame, this.titleDiv);
+                    this.makeDraggable(this.dlgFrame, this.titleDiv);
                 }
             }
         }
@@ -295,13 +294,14 @@ export abstract class DialogBase extends Comp {
         return width;
     }
 
-    isTopmost = (ast: AppState) => {
+    isTopmost = () => {
+        const ast = getAs();
         if (ast.dialogStack.length < 2) return true;
         return this === ast.dialogStack[ast.dialogStack.length - 1];
     }
 
-    makeDraggable = (ast: AppState, dragDiv: Div, clickDiv: Div) => {
-        if (!this.isTopmost(ast)) {
+    makeDraggable = (dragDiv: Div, clickDiv: Div) => {
+        if (!this.isTopmost()) {
             return;
         }
         this.isDown = false;
@@ -310,7 +310,7 @@ export abstract class DialogBase extends Comp {
             const clickDivElm: HTMLElement = clickDiv.getRef();
 
             clickDivElm.addEventListener("mousedown", (e) => {
-                if (!this.isTopmost(ast)) return;
+                if (!this.isTopmost()) return;
                 // e.preventDefault();
                 // e.stopPropagation();
 
@@ -357,12 +357,12 @@ export abstract class DialogBase extends Comp {
             if (!elm) return;
 
             elm.addEventListener("mouseup", (e) => {
-                if (!this.isTopmost(ast)) return;
+                if (!this.isTopmost()) return;
                 this.isDown = false;
             }/*, true */);
 
             elm.addEventListener("mousemove", (e) => {
-                if (!this.isTopmost(ast)) return;
+                if (!this.isTopmost()) return;
                 // e.preventDefault();
                 // e.stopPropagation();
 

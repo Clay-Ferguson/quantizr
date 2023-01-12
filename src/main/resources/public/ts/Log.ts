@@ -40,13 +40,3 @@ export class Log {
         console.log(msg);
     }
 }
-
-/*
-Note: This will not get called in the main thread of JavaScript that runs during initialization
-but will get called during normal operation when thing are happening as a result of actual user events
-*/
-// move this to indexTemplate.html
-// window.onerror = function (message, url, line, col, e) {
-//     Log.error(e);
-//     return true;
-// };

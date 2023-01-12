@@ -41,7 +41,7 @@ export class NodeCompButtonBar extends Div {
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
-        let editingAllowed = S.edit.isEditAllowed(this.node, ast);
+        let editingAllowed = S.edit.isEditAllowed(this.node);
         let deleteAllowed = false;
         let editableNode = true;
 

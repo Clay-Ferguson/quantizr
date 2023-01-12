@@ -62,13 +62,13 @@ export class Nav {
         this.navToSibling(1);
     }
 
-    navToSibling = async (siblingOffset: number, state?: AppState): Promise<string> => {
-        state = state || getAs();
-        if (!state.node) return null;
+    navToSibling = async (siblingOffset: number, ast?: AppState): Promise<string> => {
+        ast = ast || getAs();
+        if (!ast.node) return null;
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: state.node.id,
+                nodeId: ast.node.id,
                 upLevel: false,
                 siblingOffset: siblingOffset,
                 renderParentIfLeaf: true,
@@ -77,9 +77,9 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: state.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
-            this.upLevelResponse(res, null, true, state);
+            this.upLevelResponse(res, null, true, ast);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
@@ -131,11 +131,11 @@ export class Nav {
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
-    clickTreeNode = async (evt: Event, id: string, state?: AppState) => {
+    clickTreeNode = async (evt: Event, id: string, ast?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
-            state = state || getAs();
+            ast = ast || getAs();
 
             /* First check if this node is already highlighted and if so just return */
             const hltNode = S.nodeUtil.getHighlightedNode();
@@ -147,7 +147,7 @@ export class Nav {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            const node = MainTab.inst?.findNode(state, id);
+            const node = MainTab.inst?.findNode(ast, id);
             if (node) {
                 dispatch("HighlightNode", s => {
                     S.nodeUtil.highlightNode(node, false, s);

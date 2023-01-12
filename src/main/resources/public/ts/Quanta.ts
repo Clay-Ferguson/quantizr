@@ -19,6 +19,7 @@ export class Quanta {
     mainMenu: MainMenuDlg;
     noScrollToId: string = null;
     activeTab: string;
+    pendingLocationHash: string;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;
@@ -130,8 +131,7 @@ export class Quanta {
             console.log("createTabs");
             S.tabUtil.createAppTabs();
 
-            const ast = getAs();
-            ast.pendingLocationHash = window.location.hash;
+            this.pendingLocationHash = window.location.hash;
 
             console.log("createPlugins");
             S.plugin.initPlugins();
