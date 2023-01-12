@@ -193,7 +193,7 @@ export class EditNodeDlgUtil {
 
     share = async (dlg: EditNodeDlg) => {
         const ast = getAs();
-        await S.edit.editNodeSharing(getAs(), dlg, ast.editNode);
+        await S.edit.editNodeSharing(dlg, ast.editNode);
         S.edit.updateNode(ast.editNode);
     }
 

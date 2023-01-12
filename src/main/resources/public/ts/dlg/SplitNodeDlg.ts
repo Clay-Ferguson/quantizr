@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -115,7 +114,7 @@ export class SplitNodeDlg extends DialogBase {
             delim = this.delimiterState.getValue();
         }
 
-        S.edit.splitNode(this.node, state.splitType, delim, getAs());
+        S.edit.splitNode(this.node, state.splitType, delim);
         this.close();
     }
 }

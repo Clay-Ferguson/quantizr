@@ -62,7 +62,7 @@ export class FullScreenCalendar extends Main {
                         text: "add",
                         click: () => {
                             FullScreenCalendar.lastClickTime = FullScreenCalendar.lastClickTime || new Date();
-                            S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime(), state);
+                            S.edit.addCalendarEntry(FullScreenCalendar.lastClickTime.getTime());
                         }
                     },
                     closeCalendarButton: {

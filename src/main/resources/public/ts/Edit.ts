@@ -581,10 +581,8 @@ export class Edit {
         S.quanta.refresh(getAs());
     }
 
-    // This updates userPref without affecting the GUI (no rerendering)
-    setShowComments = async (showReplies: boolean, ast: AppState) => {
-        // update our db
-        S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
+    setShowComments = async (showReplies: boolean): Promise<void> => {
+        return S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
     }
 
     toggleShowReplies = async () => {
@@ -609,9 +607,8 @@ export class Edit {
         }
     }
 
-    moveNodeUp = async (evt: Event, id: string, ast?: AppState) => {
-        id = S.util.allowIdFromEvent(evt, id);
-        ast = ast || getAs();
+    moveNodeUp = async (evt: Event) => {
+        let id = S.util.allowIdFromEvent(evt, null);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
@@ -626,9 +623,8 @@ export class Edit {
         }
     }
 
-    moveNodeDown = async (evt: Event, id: string, ast: AppState) => {
-        id = S.util.allowIdFromEvent(evt, id);
-        ast = ast || getAs();
+    moveNodeDown = async (evt: Event) => {
+        let id = S.util.allowIdFromEvent(evt, null);
         if (!id) {
             const selNode = S.nodeUtil.getHighlightedNode();
             id = selNode?.id;
@@ -643,12 +639,9 @@ export class Edit {
         }
     }
 
-    moveNodeToTop = async (id: string = null, ast: AppState = null) => {
-        ast = ast || getAs();
-        if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode();
-            id = selNode?.id;
-        }
+    moveNodeToTop = async () => {
+        const selNode = S.nodeUtil.getHighlightedNode();
+        const id = selNode?.id;
 
         if (id) {
             const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
@@ -659,12 +652,9 @@ export class Edit {
         }
     }
 
-    moveNodeToBottom = async (id: string = null, ast: AppState = null) => {
-        ast = ast || getAs();
-        if (!id) {
-            const selNode = S.nodeUtil.getHighlightedNode();
-            id = selNode?.id;
-        }
+    moveNodeToBottom = async () => {
+        const selNode = S.nodeUtil.getHighlightedNode();
+        const id = selNode?.id;
 
         if (id) {
             const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
@@ -675,12 +665,14 @@ export class Edit {
         }
     }
 
-    getFirstChildNode = (ast: AppState): any => {
+    getFirstChildNode = (): any => {
+        const ast = getAs();
         if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
         return ast.node.children[0];
     }
 
-    getLastChildNode = (ast: AppState): J.NodeInfo => {
+    getLastChildNode = (): J.NodeInfo => {
+        const ast = getAs();
         if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
         return ast.node.children[ast.node.children.length - 1];
     }
@@ -778,12 +770,12 @@ export class Edit {
             this.saveClipboardToChildNode(id);
         }
         else {
-            this.createSubNode(id, null, true, ast.node, null);
+            this.createSubNode(id, null, true, ast.node);
         }
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, ast: AppState): any => {
-        ast = ast || getAs();
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo): any => {
+        const ast = getAs();
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
          * node if there is a selected node.
@@ -807,7 +799,8 @@ export class Edit {
         this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0);
     }
 
-    selectAllNodes = async (ast: AppState) => {
+    // todo-1: method is not used?
+    selectAllNodes = async () => {
         const highlightNode = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
@@ -815,7 +808,8 @@ export class Edit {
         S.nodeUtil.selectAllNodes(res.nodeIds);
     }
 
-    clearInbox = async (ast: AppState) => {
+    clearInbox = async () => {
+        const ast = getAs();
         S.nodeUtil.clearSelNodes(ast);
 
         const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
@@ -939,7 +933,7 @@ export class Edit {
 
             // todo-1: need a more pub-sub[ish] way to do this.
             this.removeNodesFromHistory(selNodesArray);
-            this.removeNodesFromCalendarData(selNodesArray, ast);
+            this.removeNodesFromCalendarData(selNodesArray);
 
             /* Node: state.node can be null if we've never been to the tree view yet */
             if (ast.node && S.util.checkSuccess("Delete node", res)) {
@@ -984,13 +978,12 @@ export class Edit {
         });
     }
 
-    removeNodesFromCalendarData = (selNodesArray: string[], ast: AppState) => {
-        if (!ast.calendarData) return;
-
+    removeNodesFromCalendarData = (selNodesArray: string[]) => {
         // todo-0: this is new needing testing, this filter was being done OUTSIDE of the dispatch
         // and shouldn't have even worked.
         dispatch("UpdateCalendarData", s => {
             selNodesArray.forEach(id => {
+                if (!s.calendarData) return;
                 s.calendarData = s.calendarData.filter((item: EventInput) => item.id !== id);
             });
         });
@@ -1002,8 +995,8 @@ export class Edit {
         });
     }
 
-    cutSelNodes = (evt: Event, id: string) => {
-        id = S.util.allowIdFromEvent(evt, null);
+    cutSelNodes = (evt: Event) => {
+        const id = S.util.allowIdFromEvent(evt, null);
 
         dispatch("SetNodesToMove", s => {
             S.nav.setNodeSel(true, id, s);
@@ -1121,7 +1114,7 @@ export class Edit {
         }
     }
 
-    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, ast: AppState) => {
+    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -1134,10 +1127,11 @@ export class Edit {
             nodeId: node.id,
             delimiter
         });
-        this.splitNodeResponse(res, ast);
+        this.splitNodeResponse(res);
     }
 
-    splitNodeResponse = (res: J.SplitNodeResponse, ast: AppState) => {
+    splitNodeResponse = (res: J.SplitNodeResponse) => {
+        const ast = getAs();
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,
@@ -1155,13 +1149,11 @@ export class Edit {
         }
     }
 
-    addBookmark = (node: J.NodeInfo, ast: AppState) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, ast);
+    addBookmark = (node: J.NodeInfo) => {
+        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null);
     }
 
-    addLinkBookmark = async (content: any, audioUrl: string, ast: AppState) => {
-        ast = ast || getAs();
-
+    addLinkBookmark = async (content: any, audioUrl: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
@@ -1180,7 +1172,7 @@ export class Edit {
     }
 
     // like==false means 'unlike'
-    likeNode = async (node: J.NodeInfo, like: boolean, ast: AppState) => {
+    likeNode = async (node: J.NodeInfo, like: boolean) => {
         await S.rpcUtil.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
@@ -1189,24 +1181,23 @@ export class Edit {
         dispatch("likeNode", s => {
             node.likes = node.likes || [];
 
-            if (like && !node.likes.find(u => u === ast.userName)) {
+            if (like && !node.likes.find(u => u === s.userName)) {
                 // add userName to likes
-                node.likes.push(ast.userName);
+                node.likes.push(s.userName);
             }
             else {
                 // remove userName from likes
-                node.likes = node.likes.filter(u => u !== ast.userName);
+                node.likes = node.likes.filter(u => u !== s.userName);
             }
         });
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
-        boostTarget: string, fediSend: boolean, ast: AppState) => {
-        ast = ast || getAs();
+        boostTarget: string, fediSend: boolean) => {
 
         // auto-enable edit mode
-        if (!boostTarget && !ast.userPrefs.editMode) {
+        if (!boostTarget && !getAs().userPrefs.editMode) {
             await this.toggleEditMode();
         }
 
@@ -1235,9 +1226,7 @@ export class Edit {
     }
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
-        pendingEdit: boolean, payloadType: string, content: string, ast: AppState) => {
-        ast = ast || getAs();
-
+        pendingEdit: boolean, payloadType: string, content: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
@@ -1254,18 +1243,16 @@ export class Edit {
         });
 
         // auto-enable edit mode
-        if (!ast.userPrefs.editMode) {
+        if (!getAs().userPrefs.editMode) {
             await this.toggleEditMode();
         }
         this.createSubNodeResponse(res, forceUsePopup, null);
     }
 
-    addCalendarEntry = async (initDate: number, ast: AppState) => {
-        ast = ast || getAs();
-
+    addCalendarEntry = async (initDate: number) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
-            nodeId: ast.fullScreenConfig.nodeId,
+            nodeId: getAs().fullScreenConfig.nodeId,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1341,21 +1328,20 @@ export class Edit {
         }
     }
 
-    updateHeadings = async (ast: AppState) => {
-        ast = ast || getAs();
+    updateHeadings = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
             });
-            S.quanta.refresh(ast);
+            S.quanta.refresh(getAs());
         }
     }
 
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (ast: AppState, dlg: EditNodeDlg, node: J.NodeInfo) => {
+    editNodeSharing = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");

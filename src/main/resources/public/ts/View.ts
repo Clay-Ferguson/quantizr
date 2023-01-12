@@ -48,7 +48,7 @@ export class View {
 
         let offset = 0;
         if (!a.zeroOffset) {
-            const firstChild = S.edit.getFirstChildNode(a.ast);
+            const firstChild = S.edit.getFirstChildNode();
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
@@ -93,7 +93,7 @@ export class View {
     }
 
     prevPage = (ast: AppState) => {
-        const firstChild = S.edit.getFirstChildNode(ast);
+        const firstChild = S.edit.getFirstChildNode();
         if (firstChild && firstChild.logicalOrdinal > 0) {
             let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
@@ -105,7 +105,7 @@ export class View {
     }
 
     nextPage = (ast: AppState) => {
-        const lastChild = S.edit.getLastChildNode(ast);
+        const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, false, ast);
@@ -120,7 +120,7 @@ export class View {
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
     growPage = (ast: AppState) => {
-        const lastChild = S.edit.getLastChildNode(ast);
+        const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
             this.loadPage(false, targetOffset, true, ast);

@@ -115,7 +115,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {
                         title: "Bookmark this Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, ast)
+                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode)
                     }) : null,
                     new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
                         setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
@@ -273,7 +273,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Tree View"
                 }, "bigMarginLeft ") : null,
-                ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, true, ast), {
+                ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, false, null, null, null, null, true), {
                     title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                 }, "attentionButton float-end")
             ]),

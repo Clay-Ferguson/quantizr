@@ -426,7 +426,7 @@ export class RssType extends TypeBase {
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
-                S.edit.addNode(null, null, false, entry.title + "\n\n" + entry.link, null, null, null, false, ast);
+                S.edit.addNode(null, null, false, entry.title + "\n\n" + entry.link, null, null, null, false);
             }
         }) : null;
 
@@ -436,7 +436,7 @@ export class RssType extends TypeBase {
             onClick: () => {
                 let content = "#### " + feed.title + ": " + entry.title + "\n\n" + entry.link;
                 if (audioUrl) content += "\n\n" + audioUrl;
-                S.edit.addLinkBookmark(content, audioUrl, ast);
+                S.edit.addLinkBookmark(content, audioUrl);
             }
         }) : null;
 

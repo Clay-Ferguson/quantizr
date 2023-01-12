@@ -102,7 +102,7 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true, ast);
+                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
                     }
                 }
             }));
@@ -118,7 +118,7 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, null, false, null, null, null, this.node.id, false, ast)
+                            S.edit.addNode(null, null, false, null, null, null, this.node.id, false)
                         }
                     }
                 }));
@@ -150,7 +150,7 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to like and create content.", "Login!");
                     }
                     else {
-                        S.edit.likeNode(this.node, !youLiked, ast);
+                        S.edit.likeNode(this.node, !youLiked);
                     }
                 }
             }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
@@ -178,7 +178,7 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: "fa fa-bookmark fa-lg mediumMarginRight",
                     title: "Bookmark this Node",
-                    onClick: () => S.edit.addBookmark(this.node, ast)
+                    onClick: () => S.edit.addBookmark(this.node)
                 }));
             }
 

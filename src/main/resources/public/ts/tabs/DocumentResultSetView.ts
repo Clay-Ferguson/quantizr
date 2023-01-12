@@ -104,12 +104,8 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
                     className: "marginLeft",
                     title: "Include all the Comment Nodes in the Document"
                 }, {
-                    setValue: (checked: boolean) => {
-                        dispatch("SetIncludeComments", s => {
-                            S.edit.setShowComments(checked, getAs());
-                        });
-
-                        // refresh the view.
+                    setValue: async (checked: boolean) => {
+                        await S.edit.setShowComments(checked);
                         this.pageChange(null);
                     },
                     getValue: (): boolean => {

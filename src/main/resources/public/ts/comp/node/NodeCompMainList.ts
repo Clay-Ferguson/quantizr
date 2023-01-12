@@ -40,7 +40,7 @@ export class NodeCompMainList extends Div {
         let moreButton: IconButton;
         let prevNodeButton: IconButton;
         let nextNodeButton: IconButton;
-        const firstChild = S.edit.getFirstChildNode(ast);
+        const firstChild = S.edit.getFirstChildNode();
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {

@@ -137,7 +137,7 @@ export class OpenGraphPanel extends Div {
 
         const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.ast.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
-            onClick: () => S.edit.addLinkBookmark(state.og.url, null, null)
+            onClick: () => S.edit.addLinkBookmark(state.og.url, null)
         }) : null;
 
         if (state.og?.description?.length > 804) {

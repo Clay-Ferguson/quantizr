@@ -348,7 +348,7 @@ export class MenuPanel extends Div {
         const types = S.plugin.getAllTypes();
         types.forEach((type: TypeIntf, k: string) => {
             if (ast.isAdminUser || type.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null, ast), //
+                createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null, null), //
                     !ast.isAnonUser && !!hltNode));
             }
         });
