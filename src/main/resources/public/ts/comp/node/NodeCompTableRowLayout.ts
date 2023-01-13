@@ -66,7 +66,7 @@ export class NodeCompTableRowLayout extends Div {
                     if (n.children && !inVerticalSpace) {
                         comps.push(new Div(null, { className: "vertical-space" }));
                     }
-                    const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, ast);
+                    const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null);
                     inVerticalSpace = false;
                     comps.push(row);
                 }

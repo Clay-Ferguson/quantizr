@@ -62,7 +62,7 @@ export class Edit {
             forceRenderParent: false,
             ast: getAs()
         });
-        S.view.scrollToNode(getAs());
+        S.view.scrollToNode();
     }
 
     private joinNodesResponse = (res: J.JoinNodesResponse): any => {
@@ -100,7 +100,7 @@ export class Edit {
                         !S.nodeUtil.displayingOnTree(S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
-                    S.util.fullscreenViewerActive(ast);
+                    S.util.fullscreenViewerActive();
 
                 if (S.quanta.activeTab === C.TAB_DOCUMENT || //
                     S.quanta.activeTab === C.TAB_SEARCH || //
@@ -593,7 +593,7 @@ export class Edit {
             S.quanta.refresh();
         }
         else if (ast.activeTab === C.TAB_DOCUMENT) {
-            const data: TabIntf = S.tabUtil.getAppTabData(ast, C.TAB_DOCUMENT);
+            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
             if (data) {
                 S.srch.showDocument(data.props.node, false);
             }
@@ -1039,7 +1039,6 @@ export class Edit {
             "Confirm");
         await dlg.open();
         if (dlg.yes) {
-            const ast = getAs();
             /* inserting under whatever node user has focused */
             const node = S.nodeUtil.getHighlightedNode();
 
@@ -1049,7 +1048,7 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
-                    truncated: S.user.isTestUserAccount(ast)
+                    truncated: S.user.isTestUserAccount()
                 });
                 this.insertBookResponse(res);
             }
@@ -1142,7 +1141,7 @@ export class Edit {
                 forceRenderParent: false,
                 ast
             });
-            S.view.scrollToNode(ast);
+            S.view.scrollToNode();
         }
     }
 
@@ -1398,8 +1397,6 @@ export class Edit {
     }
 
     updateNode = (node: J.NodeInfo) => {
-        dispatch("UpdateNode", s => {
-            s.editNode = node;
-        });
+        dispatch("UpdateNode", s => s.editNode = node);
     }
 }

@@ -23,7 +23,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         const ast = useAppState();
         const results = this.data?.props?.results;
         if (!results) return;
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -45,7 +45,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                         else {
                             S.tabUtil.selectTab(ast.threadViewFromTab);
                             setTimeout(() => {
-                                const data: TabIntf = S.tabUtil.getAppTabData(ast, ast.threadViewFromTab);
+                                const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
                                 if (data) {
                                     const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(data, ast.threadViewNodeId));
                                     if (elm) {

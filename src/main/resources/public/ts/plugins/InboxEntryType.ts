@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
@@ -25,7 +24,7 @@ export class InboxEntryType extends TypeBase {
         return false;
     }
 
-    allowPropertyEdit(propName: string, ast: AppState): boolean {
+    allowPropertyEdit(propName: string): boolean {
         return false;
     }
 }

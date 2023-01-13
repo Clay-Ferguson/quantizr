@@ -1,4 +1,4 @@
-import { dispatch } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -69,7 +69,7 @@ export class RssType extends TypeBase {
         return [J.NodeProp.RSS_FEED_SRC];
     }
 
-    allowPropertyEdit(propName: string, ast: AppState): boolean {
+    allowPropertyEdit(propName: string): boolean {
         return propName === J.NodeProp.RSS_FEED_SRC;
     }
 
@@ -78,8 +78,9 @@ export class RssType extends TypeBase {
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
 
+        const ast = getAs();
         let feedContent: Comp = null;
 
         const feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
@@ -120,7 +121,7 @@ export class RssType extends TypeBase {
             }
         }
 
-        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, ast);
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Div(null, null, [
             baseComp,
             feedContent
@@ -150,9 +151,9 @@ export class RssType extends TypeBase {
         else {
             dispatch("RSSUpdated", s => {
                 S.domUtil.focusId(C.TAB_MAIN);
-                S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
+                S.tabUtil.tabScroll(C.TAB_MAIN, 0);
                 setTimeout(() => {
-                    S.tabUtil.tabScroll(s, C.TAB_MAIN, 0);
+                    S.tabUtil.tabScroll(C.TAB_MAIN, 0);
                 }, 1000);
 
                 if (!res.feed.entries || res.feed.entries.length === 0) {
@@ -405,7 +406,7 @@ export class RssType extends TypeBase {
         }
 
         if (anchor) {
-            const og = new OpenGraphPanel(ast, MainTab.inst, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            const og = new OpenGraphPanel(MainTab.inst, anchor.getId("og_rss_"), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
             if (MainTab.inst) {

@@ -1,12 +1,11 @@
-import { dispatch, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
+import { dispatch, getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { FullScreenType } from "../Interfaces";
+import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import * as J from "../JavaIntf";
 import { Checkbox } from "./core/Checkbox";
 
 // todo-1: This really needs to be part of the fullscreen viewer classes themselves since each one
@@ -19,10 +18,11 @@ export class FullScreenControlBar extends Div {
     }
 
     preRender(): void {
-        this.setChildren(this.getButtons(useAppState()));
+        this.setChildren(this.getButtons());
     }
 
-    getButtons = (ast: AppState): Comp[] => {
+    getButtons = (): Comp[] => {
+        const ast = getAs();
         const buttons = [];
 
         if (ast.fullScreenConfig.type === FullScreenType.IMAGE && ast.activeTab === C.TAB_MAIN) {

@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
@@ -197,10 +196,10 @@ export class EditNodeDlgUtil {
         S.edit.updateNode(ast.editNode);
     }
 
-    uploadFromClipboard = async (ast: AppState, dlg: EditNodeDlg) => {
+    uploadFromClipboard = async (dlg: EditNodeDlg) => {
         const blob = await S.util.readClipboardFile();
         if (blob) {
-            dlg.immediateUploadFiles(ast, [blob]);
+            dlg.immediateUploadFiles([blob]);
         }
         else {
             S.util.showMessage("Unable to get Clipboard content.", "Warning");
@@ -497,8 +496,8 @@ an upload has been added or removed.
         }
     }
 
-    speakerClickInEditor = (ast: AppState, dlg: EditNodeDlg) => {
-        if (ast.speechSpeaking) {
+    speakerClickInEditor = (dlg: EditNodeDlg) => {
+        if (getAs().speechSpeaking) {
             S.speech.stopSpeaking();
         }
         else {
@@ -522,7 +521,8 @@ an upload has been added or removed.
         }
     }
 
-    renderLinksEditing = (ast: AppState): Div => {
+    renderLinksEditing = (): Div => {
+        const ast = getAs();
         if (!ast.editNode.links) return null;
 
         let hasLinks = false;
@@ -535,14 +535,15 @@ an upload has been added or removed.
                 linkComps.push(new Span(linkName, {
                     className: "nodeLink",
                     title: "Click to Remove Link",
-                    onClick: () => this.removeNodeLink(ast, linkName)
+                    onClick: () => this.removeNodeLink(linkName)
                 }));
             });
         }
         return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
     }
 
-    removeNodeLink = (ast: AppState, nodeName: string): void => {
+    removeNodeLink = (nodeName: string): void => {
+        const ast = getAs();
         Object.keys(ast.editNode.links).forEach(key => {
             if (ast.editNode.links[key].n === nodeName) {
                 delete ast.editNode.links[key];

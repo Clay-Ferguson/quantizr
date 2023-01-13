@@ -1,5 +1,4 @@
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
-import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
@@ -41,8 +40,8 @@ export class User {
      * into production, but on my own production these are my "testUserAccounts", so no real user will be able to
      * use these names
      */
-    isTestUserAccount = (ast: AppState): boolean => {
-        const lcUserName = ast.userName.toLowerCase();
+    isTestUserAccount = (): boolean => {
+        const lcUserName = getAs().userName.toLowerCase();
         return lcUserName === "adam" || //
             lcUserName === "bob" || //
             lcUserName === "cory" || //
@@ -69,7 +68,7 @@ export class User {
         return false;
     }
 
-    refreshLogin = async (ast: AppState) => {
+    refreshLogin = async () => {
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
 
         /* if we have *known* state as logged out, then do nothing here */
@@ -146,8 +145,8 @@ export class User {
         }
     }
 
-    logout = async (updateLocalDb: any, ast: AppState) => {
-        if (ast.isAnonUser) {
+    logout = async (updateLocalDb: any) => {
+        if (getAs().isAnonUser) {
             return;
         }
 
@@ -315,9 +314,8 @@ export class User {
         new LoginDlg().open();
     }
 
-    userLogout = (ast: AppState = null) => {
-        ast = ast || getAs();
-        this.logout(true, ast);
+    userLogout = () => {
+        this.logout(true);
     }
 
     userSignup = () => {

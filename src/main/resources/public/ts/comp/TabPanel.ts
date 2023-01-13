@@ -1,5 +1,4 @@
 import { getAs, promiseDispatch, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { AppTab } from "./AppTab";
@@ -43,11 +42,12 @@ export class TabPanel extends Div {
                 className: "row tab-content",
                 role: "main",
                 id: "tabPanelContentId"
-            }, this.buildTabs(ast))
+            }, this.buildTabs())
         ]);
     }
 
-    buildTabs = (ast: AppState): AppTab[] => {
+    buildTabs = (): AppTab[] => {
+        const ast = getAs();
         const tabs = ast.tabData.map(tab => {
             if (tab.isVisible(ast)) {
                 return tab.constructView(tab);

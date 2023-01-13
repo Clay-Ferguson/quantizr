@@ -1,5 +1,4 @@
-import { useAppState } from "../AppContext";
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { S } from "../Singletons";
@@ -15,13 +14,13 @@ export class BreadcrumbsPanel extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
-        this.setChildren([this.createBreadcrumbs(ast)]);
+        this.setChildren([this.createBreadcrumbs()]);
     }
 
-    createBreadcrumbs = (ast: AppState): Comp => {
+    createBreadcrumbs = (): Comp => {
         let children: CompIntf[] = [];
 
+        const ast = getAs();
         if (ast.breadcrumbs?.length > 0) {
             children = ast.breadcrumbs.map(bc => {
                 if (bc.id === ast.node.id) {

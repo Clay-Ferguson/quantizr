@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../AppContext";
+import { dispatch } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -40,8 +40,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
     }
 
     preRender(): void {
-        const ast = useAppState();
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
         const children = [];
 
         if (this.data.props.loading) {

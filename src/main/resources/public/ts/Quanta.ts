@@ -209,11 +209,11 @@ export class Quanta {
              * This call checks the server to see if we have a session already, and gets back the login information from
              * the session, and then renders page content, after that.
              */
-            await S.user.refreshLogin(getAs());
+            await S.user.refreshLogin();
             console.log("refreshLogin completed.");
 
             S.rpcUtil.initProgressMonitor();
-            S.util.processUrlParams(null);
+            S.util.processUrlParams();
             this.setOverlay(false);
             S.util.playAudioIfRequested();
 
@@ -304,7 +304,7 @@ export class Quanta {
                             break;
                         case "Escape":
                             S.domUtil.removeAnnotation();
-                            if (S.util.fullscreenViewerActive(ast)) {
+                            if (S.util.fullscreenViewerActive()) {
                                 S.nav.closeFullScreenViewer();
                             }
                             break;

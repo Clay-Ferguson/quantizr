@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
@@ -13,11 +12,11 @@ import { IPFSTab } from "./tabs/data/IPFSTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
-import { TTSTab } from "./tabs/data/TTSTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
+import { TTSTab } from "./tabs/data/TTSTab";
 
 export class TabUtil {
     selectTab = (tabName: string) => {
@@ -113,28 +112,24 @@ export class TabUtil {
         });
     }
 
-    getActiveTabComp = (ast: AppState): AppTab => {
+    getActiveTabComp = (): AppTab => {
+        const ast = getAs();
         if (!ast.tabData) return null;
         const data = ast.tabData.find(d => d.id === ast.activeTab);
         return data ? data.inst : null;
     }
 
-    getAppTabInst = (ast: AppState, tabId: string): AppTab => {
-        if (!ast.tabData) return null;
-        const data = ast.tabData.find(d => d.id === tabId);
-        return data ? data.inst : null;
-    }
-
-    getAppTabData = (ast: AppState, tabId: string): TabIntf => {
+    getAppTabData = (tabId: string): TabIntf => {
+        const ast = getAs();
         if (!ast.tabData) return null;
         return ast.tabData.find(d => d.id === tabId);
     }
 
-    tabScroll = (ast: AppState, tabName: string, pos: number) => {
+    tabScroll = (tabName: string, pos: number) => {
         if (C.DEBUG_SCROLLING) {
             console.log("Scrolling tab " + tabName + " to offset " + pos);
         }
-        const data = ast.tabData.find(d => d.id === tabName);
+        const data = getAs().tabData.find(d => d.id === tabName);
         if (data) {
             data.scrollPos = pos;
         }

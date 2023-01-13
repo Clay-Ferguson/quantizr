@@ -31,7 +31,7 @@ export class TTSView extends AppTab {
 
     preRender(): void {
         const ast = useAppState();
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
 
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable",

@@ -246,7 +246,7 @@ export class Nav {
 
     navToMyAccntRoot = async () => {
         const ast = getAs();
-        S.view.scrollActiveToTop(ast);
+        S.view.scrollActiveToTop();
 
         if (ast.isAnonUser) {
             S.util.loadAnonPageHome();

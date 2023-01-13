@@ -41,7 +41,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                     const type = S.plugin.getType(n.boostedNode.type);
-                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, ast);
+                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null);
                 }
 
                 if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
@@ -69,14 +69,14 @@ export class NodeCompVerticalRowLayout extends Div {
                          without doing any collapsedComps. */
                         if (type && type.isSpecialAccountNode()) {
                             if (NodeCompVerticalRowLayout.showSpecialNodes) {
-                                row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null, ast);
+                                row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null);
 
                                 // I'm gonna be evil here and do this object without a type.
                                 collapsedComps.push({ comp: row, subOrdinal: type.subOrdinal() });
                             }
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, ast);
+                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp);
                             comps.push(row);
                         }
                         inVerticalSpace = false;

@@ -1,10 +1,9 @@
-import { AppState } from "../AppState";
-import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
+import * as J from "../JavaIntf";
+import { TypeBase } from "./base/TypeBase";
 
 export class NotesNodeType extends TypeBase {
     constructor() {
@@ -15,7 +14,7 @@ export class NotesNodeType extends TypeBase {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, null, [
             new Heading(4, "Notes", { className: "marginAll" })
         ]);

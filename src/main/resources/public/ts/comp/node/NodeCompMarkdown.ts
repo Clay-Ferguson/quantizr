@@ -1,4 +1,4 @@
-import { AppState } from "../../AppState";
+import { getAs } from "../../AppContext";
 import { Html } from "../../comp/core/Html";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -21,7 +21,7 @@ export class NodeCompMarkdown extends Html {
     // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
     urls: string[];
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, ast: AppState) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string) {
         super(null, { key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
 
@@ -29,7 +29,7 @@ export class NodeCompMarkdown extends Html {
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
         this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
 
-        if (!ast.mobileMode) {
+        if (!getAs().mobileMode) {
             const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
             this.attribs.className = "markdown-content " + widthStyle;
         }

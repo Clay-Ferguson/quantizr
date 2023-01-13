@@ -88,11 +88,11 @@ export class View {
         }
     }
 
-    firstPage = (ast: AppState) => {
-        this.loadPage(false, 0, false, ast);
+    firstPage = () => {
+        this.loadPage(false, 0, false);
     }
 
-    prevPage = (ast: AppState) => {
+    prevPage = () => {
         const firstChild = S.edit.getFirstChildNode();
         if (firstChild && firstChild.logicalOrdinal > 0) {
             let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
@@ -100,35 +100,36 @@ export class View {
                 targetOffset = 0;
             }
 
-            this.loadPage(false, targetOffset, false, ast);
+            this.loadPage(false, targetOffset, false);
         }
     }
 
-    nextPage = (ast: AppState) => {
+    nextPage = () => {
         const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
-            this.loadPage(false, targetOffset, false, ast);
+            this.loadPage(false, targetOffset, false);
         }
     }
 
-    lastPage = (ast: AppState) => {
+    lastPage = () => {
         // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
     }
 
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
     need to load more records automatically, and add to existing page records */
-    growPage = (ast: AppState) => {
+    growPage = () => {
         const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
-            this.loadPage(false, targetOffset, true, ast);
+            this.loadPage(false, targetOffset, true);
         }
     }
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
-    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, ast: AppState) => {
+    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean) => {
+        const ast = getAs();
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: ast.node.id,
@@ -175,7 +176,7 @@ export class View {
     }
 
     // NOTE: Method not still being used. Let's keep it for future reference
-    // scrollRelativeToNode = (dir: string, ast: AppState) => {
+    // scrollRelativeToNode = (dir: string, ast : AppState) => {
     //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode();
     //     if (!currentSelNode) return;
 
@@ -227,17 +228,17 @@ export class View {
     //     }
     // }
 
-    scrollActiveToTop = (ast: AppState) => {
+    scrollActiveToTop = () => {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
-        const activeTabComp = S.tabUtil.getActiveTabComp(ast);
+        const activeTabComp = S.tabUtil.getActiveTabComp();
         if (activeTabComp?.getRef()) {
             activeTabComp.setScrollTop(0);
         }
     }
 
-    scrollToNode = (ast: AppState, node: J.NodeInfo = null, delay: number = 100) => {
+    scrollToNode = (node: J.NodeInfo = null, delay: number = 100) => {
         if (!Comp.allowScrollSets) return;
 
         const func = () => {
@@ -254,8 +255,8 @@ export class View {
                     return;
                 }
 
-                if (ast.node.id === node.id) {
-                    this.scrollActiveToTop(ast);
+                if (getAs().node.id === node.id) {
+                    this.scrollActiveToTop();
                     return;
                 }
 
@@ -273,11 +274,12 @@ export class View {
 
     scrollToTop = async () => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            this.scrollActiveToTop(getAs());
+            this.scrollActiveToTop();
         });
     }
 
-    getNodeStats = async (ast: AppState, trending: boolean, feed: boolean): Promise<any> => {
+    getNodeStats = async (trending: boolean, feed: boolean): Promise<any> => {
+        const ast = getAs();
         const node = S.nodeUtil.getHighlightedNode();
         const isMine = !!node && (node.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
 
@@ -293,7 +295,7 @@ export class View {
         new NodeStatsDlg(res, trending, feed).open();
     }
 
-    signSubGraph = async (ast: AppState): Promise<any> => {
+    signSubGraph = async (): Promise<any> => {
         if (!S.crypto.warnIfEncKeyUnknown()) {
             return null;
         }
@@ -304,7 +306,7 @@ export class View {
         S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
     }
 
-    getNodeSignatureVerify = async (ast: AppState): Promise<any> => {
+    getNodeSignatureVerify = async (): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -318,7 +320,7 @@ export class View {
         new NodeStatsDlg(res, false, false).open();
     }
 
-    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string, ast: AppState) => {
+    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string) => {
         const node = S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {

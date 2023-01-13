@@ -1,5 +1,4 @@
-import { useAppState } from "../../AppContext";
-import { AppState } from "../../AppState";
+import { getAs, useAppState } from "../../AppContext";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
 import { Div } from "../core/Div";
@@ -8,9 +7,9 @@ import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompParentNodes extends Div {
 
-    constructor(ast: AppState, public tabData: TabIntf<any>) {
+    constructor(public tabData: TabIntf<any>) {
         super(null, {
-            id: "parent_" + ast.node.id
+            id: "parent_" + getAs().node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });

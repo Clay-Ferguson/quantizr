@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,8 +20,8 @@ export class RoomType extends TypeBase {
     }
 
     super_render = this.render;
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
-        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode, ast);
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Div(null, null, [
             baseComp,
             new ButtonBar([

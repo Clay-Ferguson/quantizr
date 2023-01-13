@@ -13,7 +13,7 @@ export interface TypeIntf {
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo): boolean;
     getAllowRowHeader(): boolean;
-    allowPropertyEdit(typeName: string, ast: AppState): boolean;
+    allowPropertyEdit(typeName: string): boolean;
     domPreUpdateFunction(parent: CompIntf): void;
 
     // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND

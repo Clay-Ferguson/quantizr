@@ -1,5 +1,4 @@
-import { useAppState } from "../../AppContext";
-import { AppState } from "../../AppState";
+import { getAs, useAppState } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -25,13 +24,14 @@ export class NodeCompRow extends Div {
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
     constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div, ast: AppState) {
+        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
 
+        const ast = getAs();
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
         if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
             S.domUtil.setNodeDragHandler(this.attribs, node.id)

@@ -1,5 +1,4 @@
-import { dispatch, useAppState } from "../../AppContext";
-import { AppState } from "../../AppState";
+import { dispatch, getAs } from "../../AppContext";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
@@ -27,7 +26,8 @@ export class NodeCompBinary extends Div {
         this.mergeState<LS>({ node });
     }
 
-    makeImageComp = (node: J.NodeInfo, ast: AppState): Img => {
+    makeImageComp = (node: J.NodeInfo): Img => {
+        const ast = getAs();
         if (!node) return null;
         const att = S.props.getAttachment(this.attName, node);
         if (!att) return null;
@@ -119,7 +119,6 @@ export class NodeCompBinary extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
         const node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);
@@ -128,7 +127,7 @@ export class NodeCompBinary extends Div {
 
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node, this.attName)) {
-            this.setChildren([this.makeImageComp(node, ast)]);
+            this.setChildren([this.makeImageComp(node)]);
         }
         else if (S.props.hasVideo(node, this.attName)) {
             this.setChildren([new HorizontalLayout([

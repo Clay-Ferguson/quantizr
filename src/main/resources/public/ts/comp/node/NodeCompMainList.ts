@@ -1,5 +1,4 @@
 import { getAs, useAppState } from "../../AppContext";
-import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Div } from "../../comp/core/Div";
@@ -19,7 +18,7 @@ export class NodeCompMainList extends Div {
 
         const children: Comp[] = [];
         if (ast.node?.children) {
-            this.addPaginationButtons(children, ast.endReached, "", ast, true);
+            this.addPaginationButtons(children, ast.endReached, "", true);
 
             const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, ast.node);
 
@@ -27,14 +26,14 @@ export class NodeCompMainList extends Div {
             const allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
             children.push(S.render.renderChildren(ast.node, this.tabData, 1, allowNodeMove));
 
-            this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", ast, false);
+            this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", false);
         }
 
         // children.push(new HelpButton(state.config.help?.gettingStarted));
         this.setChildren(children);
     }
 
-    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, ast: AppState, pageTop: boolean) => {
+    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, pageTop: boolean) => {
         let firstButton: IconButton;
         let prevButton: IconButton;
         let moreButton: IconButton;
@@ -44,14 +43,14 @@ export class NodeCompMainList extends Div {
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {
-                onClick: () => S.view.firstPage(ast),
+                onClick: () => S.view.firstPage(),
                 title: "First Page"
             });
         }
 
         if (firstChild && firstChild.logicalOrdinal > 0) {
             prevButton = new IconButton("fa-angle-left", null, {
-                onClick: () => S.view.prevPage(ast),
+                onClick: () => S.view.prevPage(),
                 title: "Previous Page"
             });
         }
@@ -61,7 +60,7 @@ export class NodeCompMainList extends Div {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    S.view.nextPage(ast);
+                    S.view.nextPage();
                 },
                 title: "Next Page"
             });
@@ -91,7 +90,7 @@ export class NodeCompMainList extends Div {
                                     // scrolled to it, so we scroll in the new nodes to display (infinite scrolling)
                                     else {
                                         moreButton.replaceWithWaitIcon();
-                                        S.view.growPage(ast);
+                                        S.view.growPage();
                                     }
                                 }
                             });

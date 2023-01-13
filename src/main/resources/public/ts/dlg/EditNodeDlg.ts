@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -31,7 +30,7 @@ import { Validator } from "../Validator";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
-import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
+import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
 /**
  * Node Editor Dialog
@@ -120,7 +119,7 @@ export class EditNodeDlg extends DialogBase {
                 // DO NOT DELETE. Leave this here as an FYI.
                 // await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
 
-                this.immediateUploadFiles(ast, [EditNodeDlg.pendingUploadFile]);
+                this.immediateUploadFiles([EditNodeDlg.pendingUploadFile]);
                 EditNodeDlg.pendingUploadFile = null;
             }, 250);
         }
@@ -140,7 +139,8 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    immediateUploadFiles = async (ast: AppState, files: File[]) => {
+    immediateUploadFiles = async (files: File[]) => {
+        const ast = getAs();
         await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
         await this.utl.refreshFromServer(ast.editNode);
         S.edit.updateNode(ast.editNode);
@@ -366,7 +366,7 @@ export class EditNodeDlg extends DialogBase {
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [
             this.renderTagsDiv(this.tagsState.getValue()),
-            this.utl.renderLinksEditing(ast)
+            this.utl.renderLinksEditing()
         ]) : null;
 
         let editorSubPanel: Comp = null;
@@ -418,7 +418,7 @@ export class EditNodeDlg extends DialogBase {
                 this.contentEditorState.setValue(val);
             }
             else {
-                this.immediateUploadFiles(ast, files);
+                this.immediateUploadFiles(files);
             }
         });
 
@@ -668,7 +668,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             allowUpload && S.util.clipboardReadable() ? new IconButton("fa-paperclip", "Clip", {
-                onClick: () => this.utl.uploadFromClipboard(ast, this),
+                onClick: () => this.utl.uploadFromClipboard(this),
                 title: "Upload from Clipboard"
             }) : null,
 
@@ -695,7 +695,7 @@ export class EditNodeDlg extends DialogBase {
             }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
-            S.util.fullscreenViewerActive(getAs())
+            S.util.fullscreenViewerActive()
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, ast.editNode.id);
                     this.close();
@@ -926,7 +926,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
-                onClick: () => this.utl.speakerClickInEditor(ast, this),
+                onClick: () => this.utl.speakerClickInEditor(this),
                 title: "Text-to-Speech: Editor Text or Selection"
             })
         ], "float-end microMarginBottom bigMarginRight"));

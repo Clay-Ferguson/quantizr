@@ -1,5 +1,3 @@
-import { getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -31,7 +29,7 @@ export class SearchFileSystemDlg extends DialogBase {
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),
                 this.searchTextField = new TextField({
                     label: "Search",
-                    enter: () => this.searchNodes(getAs()),
+                    enter: this.searchNodes,
                     val: this.searchTextState
                 }),
                 new ButtonBar([
@@ -42,7 +40,7 @@ export class SearchFileSystemDlg extends DialogBase {
         ];
     }
 
-    searchNodes = async (ast: AppState) => {
+    searchNodes = async () => {
         if (!this.validate()) {
             return;
         }

@@ -131,7 +131,7 @@ export class ExportDlg extends DialogBase {
                 ]), false, 0, null
             ).open();
 
-            S.view.scrollToNode(getAs());
+            S.view.scrollToNode();
         }
     }
 }

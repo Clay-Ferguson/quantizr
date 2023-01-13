@@ -64,7 +64,7 @@ export class ImportDlg extends DialogBase {
                 forceRenderParent: false,
                 ast: getAs()
             });
-            S.view.scrollToNode(getAs());
+            S.view.scrollToNode();
         }
     }
 }

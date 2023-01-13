@@ -37,7 +37,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SHARES);
-                S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
+                S.tabUtil.tabScroll(C.TAB_SHARES, 0);
                 if (!SharesTab.inst) return;
                 const info = SharesTab.inst.props as SharesRSInfo;
 
@@ -66,7 +66,7 @@ export class Search {
         if (res.nodes && res.nodes.length > 0) {
             dispatch("RenderThreadResults", s => {
                 S.domUtil.focusId(C.TAB_THREAD);
-                S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
+                S.tabUtil.tabScroll(C.TAB_THREAD, 0);
                 const data = ThreadTab.inst;
                 if (!data) return;
 
@@ -100,7 +100,7 @@ export class Search {
                 s.highlightSearchNodeId = node.id;
 
                 S.domUtil.focusId(C.TAB_THREAD);
-                S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
+                S.tabUtil.tabScroll(C.TAB_THREAD, -1); // -1 scrolls to bottom
 
                 const data = ThreadTab.inst;
                 if (!data) return;
@@ -171,7 +171,7 @@ export class Search {
 
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_SEARCH);
-                S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
+                S.tabUtil.tabScroll(C.TAB_SEARCH, 0);
                 const data = SearchTab.inst;
                 if (!data) return;
 
@@ -250,7 +250,7 @@ export class Search {
 
             if (!growPage) {
                 info.endReached = false;
-                S.tabUtil.tabScroll(s, C.TAB_DOCUMENT, 0);
+                S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
             }
 
             // set 'results' if this is the top of page being rendered, or else append results if we
@@ -299,7 +299,7 @@ export class Search {
 
         dispatch("RenderTimelineResults", s => {
             S.domUtil.focusId(C.TAB_TIMELINE);
-            S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
+            S.tabUtil.tabScroll(C.TAB_TIMELINE, 0);
             if (!TimelineTab.inst) return;
 
             TimelineTab.inst.openGraphComps = [];
@@ -365,7 +365,7 @@ export class Search {
                 FeedTab.inst.props.feedDirty = false;
                 FeedTab.inst.props.feedLoading = false;
 
-                S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
+                S.tabUtil.tabScroll(C.TAB_FEED, 0);
                 S.tabUtil.selectTabStateOnly(C.TAB_FEED);
 
                 S.domUtil.focusId(C.TAB_FEED);
@@ -447,7 +447,7 @@ export class Search {
             }
 
             if (scrollToTop) {
-                S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
+                S.tabUtil.tabScroll(C.TAB_FEED, 0);
                 S.tabUtil.selectTabStateOnly(C.TAB_FEED);
             }
 
@@ -468,7 +468,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
-                S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
+                S.tabUtil.tabScroll(C.TAB_FOLLOWERS, 0);
                 const data = FollowersTab.inst;
                 if (!data) return;
                 const info = data.props as FollowersRSInfo;
@@ -506,7 +506,7 @@ export class Search {
         if (res.searchResults && res.searchResults.length > 0) {
             dispatch("RenderSearchResults", s => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
-                S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
+                S.tabUtil.tabScroll(C.TAB_FOLLOWING, 0);
                 const data = FollowingTab.inst;
                 if (!data) return;
                 const info = data.props as FollowingRSInfo;

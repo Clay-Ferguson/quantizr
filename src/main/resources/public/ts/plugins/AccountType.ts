@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
@@ -27,11 +26,11 @@ export class AccountType extends TypeBase {
         }
     }
 
-    allowPropertyEdit(propName: string, ast: AppState): boolean {
+    allowPropertyEdit(propName: string): boolean {
         return true;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, {
             className: "systemNodeContent"
         }, [

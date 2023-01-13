@@ -1,4 +1,4 @@
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 
@@ -15,7 +15,8 @@ export class AppTab<T = any> extends Div {
         // console.log("Constructed AppTab: " + data.id);
     }
 
-    getClass = (ast: AppState): string => {
+    getClass = (): string => {
+        const ast = getAs();
         const className = (ast.mobileMode ? "my-tab-pane-mobile " : "my-tab-pane ") + "customScrollbar " +
             (ast.userPrefs.editMode && this.extraEditModeClass ? (this.extraEditModeClass) : "") +
             (ast.activeTab === this.getId() ? " visible" : " invisible");

@@ -1,5 +1,4 @@
 import { getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
@@ -60,7 +59,7 @@ export class RightNavPanel extends Div {
         }
 
         const headerImg: Div = null;
-        const avatarImg = this.makeRHSAvatarDiv(ast);
+        const avatarImg = this.makeRHSAvatarDiv();
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
         if (displayName && ast.node) {
@@ -71,7 +70,7 @@ export class RightNavPanel extends Div {
         }
 
         const allowEditMode = !ast.isAnonUser;
-        const fullScreenViewer = S.util.fullscreenViewerActive(ast);
+        const fullScreenViewer = S.util.fullscreenViewerActive();
 
         // const clipboardPasteButton = state.userPrefs.editMode ? new Icon({
         //     className: "fa fa-clipboard fa-lg marginRight clickable",
@@ -213,33 +212,8 @@ export class RightNavPanel extends Div {
         ]);
     }
 
-    makeHeaderDiv = (ast: AppState): CompIntf => {
-        if (!ast.userProfile) return null;
-
-        const src = S.render.getProfileHeaderImgUrl(ast.userProfile.userNodeId, ast.userProfile.headerImageVer);
-        if (src) {
-            const attr: any = {
-                className: "headerImageRHS",
-                src
-            };
-
-            if (!ast.isAnonUser) {
-                attr.onClick = () => {
-                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                    new UserProfileDlg(null).open();
-                };
-                attr.title = "Click to edit your Profile Info";
-            }
-
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img(attr);
-        }
-        else {
-            return null;
-        }
-    }
-
-    makeRHSAvatarDiv = (ast: AppState): CompIntf => {
+    makeRHSAvatarDiv = (): CompIntf => {
+        const ast = getAs();
         let src: string = null;
         if (!ast.userProfile) return null;
 

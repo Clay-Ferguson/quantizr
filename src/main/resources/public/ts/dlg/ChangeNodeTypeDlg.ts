@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -32,7 +31,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new NodeTypeListBox(this.valIntf, getAs()),
+                new NodeTypeListBox(this.valIntf),
                 new ButtonBar([
                     new Button("Set Type", this.setNodeType, null, "btn-primary"),
                     new Button("Cancel", this.close)

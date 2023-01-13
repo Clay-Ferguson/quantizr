@@ -24,7 +24,7 @@ export class MainTabComp extends AppTab {
 
     preRender(): void {
         const ast = useAppState();
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
 
         let contentDiv: Div = null;
         if (g_urlIdFailMsg) {
@@ -54,10 +54,10 @@ export class MainTabComp extends AppTab {
                 ast.pageMessage ? new Clearfix() : null,
 
                 // if we have some parents to display...
-                ast.node.parents?.length > 0 ? new NodeCompParentNodes(ast, this.data) : null,
+                ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
 
                 new Div(null, { className: ast.userPrefs.editMode ? "my-tab-pane-editmode" : null }, [
-                    new NodeCompMainNode(ast, this.data),
+                    new NodeCompMainNode(this.data),
                     new NodeCompMainList(this.data)
                 ])
             ]);

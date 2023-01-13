@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
@@ -32,8 +31,7 @@ export class LogView extends AppTab implements LogViewIntf {
     }
 
     preRender(): void {
-        const ast = getAs();
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
 
         this.setChildren([
             new Heading(3, "Log", { className: "logView" }),

@@ -537,7 +537,7 @@ export class Render {
                         setTimeout(() => {
                             S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
                             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNode?.id);
-                            S.util.updateHistory(targetNode, s);
+                            S.util.updateHistory(targetNode);
                         }, 10);
                     }
 
@@ -579,7 +579,7 @@ export class Render {
                             console.log("highlight: scrollToSelected");
                         }
                         delay = 2000;
-                        S.view.scrollToNode(s, null, delay);
+                        S.view.scrollToNode(null, delay);
                         s.rendering = true;
                     }
                 }
@@ -674,7 +674,7 @@ export class Render {
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
     allowPropertyEdit = (node: J.NodeInfo, propName: string): boolean => {
         const type: TypeIntf = S.plugin.getType(node.type);
-        return type ? type.allowPropertyEdit(propName, getAs()) : true;
+        return type ? type.allowPropertyEdit(propName) : true;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {

@@ -1,5 +1,4 @@
-import { useAppState } from "../../AppContext";
-import { AppState } from "../../AppState";
+import { getAs, useAppState } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -18,13 +17,14 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
 
-    constructor(ast: AppState, public tabData: TabIntf<any>) {
+    constructor(public tabData: TabIntf<any>) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + ast.node.id
+            id: S.nav._UID_ROWID_PREFIX + getAs().node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
 
+        const ast = getAs();
         const type = S.plugin.getType(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
@@ -93,7 +93,7 @@ export class NodeCompMainNode extends Div {
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 const type = S.plugin.getType(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, ast);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null);
             }
 
             // if editMode is on, an this isn't the page root node

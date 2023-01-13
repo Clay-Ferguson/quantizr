@@ -1,4 +1,4 @@
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
@@ -18,7 +18,7 @@ interface LS { // Local State
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(private ast: AppState, private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
+    constructor(private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, private allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
             title: url,
@@ -120,6 +120,7 @@ export class OpenGraphPanel extends Div {
 
     preRender(): void {
         const state = this.getState<LS>();
+        const ast = getAs();
         if (state.loading || !state.og) {
             this.setChildren(null);
             return;
@@ -135,7 +136,7 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !this.ast.isAnonUser ? new Icon({
+        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !ast.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
             onClick: () => S.edit.addLinkBookmark(state.og.url, null)
         }) : null;
@@ -152,7 +153,7 @@ export class OpenGraphPanel extends Div {
             state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
 
             // if mobile portrait mode render image above (not beside) description
-            if (this.ast.mobileMode && window.innerWidth < window.innerHeight) {
+            if (ast.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
                     new Img({
                         className: "openGraphImageVert",

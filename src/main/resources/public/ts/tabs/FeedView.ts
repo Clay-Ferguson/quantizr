@@ -33,7 +33,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     preRender(): void {
         const ast = useAppState();
-        this.attribs.className = this.getClass(ast);
+        this.attribs.className = this.getClass();
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the

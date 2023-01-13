@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -28,11 +27,11 @@ export class InboxNodeType extends TypeBase {
         return false;
     }
 
-    allowPropertyEdit(propName: string, ast: AppState): boolean {
+    allowPropertyEdit(propName: string): boolean {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new HorizontalLayout([
             new Heading(4, "Inbox", { className: "noMargin" }),
             new ButtonBar([

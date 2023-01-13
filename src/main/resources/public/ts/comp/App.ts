@@ -1,5 +1,4 @@
 import { getAs, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
@@ -45,8 +44,8 @@ export class App extends Main {
             }
         }
 
-        const fullScreenViewer = this.getFullScreenViewer(ast);
-        const mobileTopBar = this.getTopMobileBar(ast);
+        const fullScreenViewer = this.getFullScreenViewer();
+        const mobileTopBar = this.getTopMobileBar();
         this.attribs.className = "container-fluid " + (ast.mobileMode ? "mainContainerMobile" : "mainContainer");
 
         if (fullScreenViewer) {
@@ -86,8 +85,8 @@ export class App extends Main {
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
 
-    getFullScreenViewer = (ast: AppState): CompIntf => {
-        switch (ast.fullScreenConfig.type) {
+    getFullScreenViewer = (): CompIntf => {
+        switch (getAs().fullScreenConfig.type) {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
             case FullScreenType.GRAPH:
@@ -99,7 +98,8 @@ export class App extends Main {
         }
     }
 
-    getTopMobileBar = (ast: AppState): CompIntf => {
+    getTopMobileBar = (): CompIntf => {
+        const ast = getAs();
         if (ast.mobileMode) {
             const menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: S.nav.showMainMenu,

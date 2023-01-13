@@ -1,5 +1,4 @@
 import { getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
@@ -44,7 +43,7 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    allowPropertyEdit(propName: string, ast: AppState): boolean {
+    allowPropertyEdit(propName: string): boolean {
         return false;
     }
 
@@ -57,7 +56,7 @@ export class FriendType extends TypeBase {
         return new Heading(3, user);
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

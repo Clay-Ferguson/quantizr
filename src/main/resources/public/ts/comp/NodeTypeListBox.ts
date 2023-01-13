@@ -1,5 +1,4 @@
 import { getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { ValueIntf } from "../Interfaces";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -8,7 +7,7 @@ import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
 export class NodeTypeListBox extends ListBox {
 
-    constructor(valueIntf: ValueIntf, public ast: AppState) {
+    constructor(valueIntf: ValueIntf) {
         super(valueIntf);
 
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.7) : 300;

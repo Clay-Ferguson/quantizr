@@ -73,7 +73,7 @@ export class NodeUtil {
         if (!ust.isAnonUser) {
             S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, ust.node.id);
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
-            S.util.updateHistory(node, ust);
+            S.util.updateHistory(node);
         }
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always
@@ -83,7 +83,7 @@ export class NodeUtil {
         S.quanta.parentIdToFocusNodeMap.set(ust.node.id, node.id);
 
         if (scroll) {
-            S.view.scrollToNode(ust, node);
+            S.view.scrollToNode(node);
         }
     }
 

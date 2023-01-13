@@ -1,5 +1,4 @@
-import { useAppState } from "../AppContext";
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
@@ -18,8 +17,6 @@ export class TabPanelButtons extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
-
         this.setChildren([
             new Div(null, {
                 className: "tab-buttons-container"
@@ -27,15 +24,16 @@ export class TabPanelButtons extends Div {
                 new Ul(null, {
                     className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
                     id: "navTabs"
-                }, this.buildTabButtons(ast))]
+                }, this.buildTabButtons())]
             )
         ]);
     }
 
-    buildTabButtons = (ast: AppState): Comp[] => {
+    buildTabButtons = (): Comp[] => {
+        const ast = getAs();
         const items: Comp[] = [];
         for (const tab of ast.tabData) {
-            items.push(this.getTabButton(ast, tab));
+            items.push(this.getTabButton(tab));
 
             const tabSubOpts = tab.getTabSubOptions(ast);
             if (tabSubOpts) {
@@ -45,7 +43,8 @@ export class TabPanelButtons extends Div {
         return items;
     }
 
-    getTabButton(ast: AppState, data: TabIntf): Li {
+    getTabButton(data: TabIntf): Li {
+        const ast = getAs();
         let tabName = data.name;
 
         // slight hack until we have 'name' as a function and not a string.

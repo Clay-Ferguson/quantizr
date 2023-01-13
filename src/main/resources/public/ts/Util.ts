@@ -1,7 +1,6 @@
 import { EventInput } from "@fullcalendar/react";
 import { marked } from "marked";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
-import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Menu } from "./comp/Menu";
 import { Constants as C } from "./Constants";
@@ -554,9 +553,9 @@ export class Util {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, ast: AppState) => {
+    updateHistory = (node: J.NodeInfo) => {
         if (!node) {
-            node = ast.node;
+            node = getAs().node;
         }
         if (!node) {
             return;
@@ -846,7 +845,7 @@ export class Util {
         }
     }
 
-    processUrlParams = (ast: AppState) => {
+    processUrlParams = () => {
         const passCode = this.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
@@ -894,8 +893,8 @@ export class Util {
         }
     }
 
-    setUserPreferences = (ast: AppState, flag: boolean) => {
-        if (flag !== ast.userPrefs.editMode) {
+    setUserPreferences = (flag: boolean) => {
+        if (flag !== getAs().userPrefs.editMode) {
             this.saveUserPrefs(s => s.userPrefs.editMode = flag);
         }
     }
@@ -977,8 +976,8 @@ export class Util {
         return feedRes.filter(ni => !idSet.has(ni.id));
     }
 
-    fullscreenViewerActive = (ast: AppState): boolean => {
-        return ast.fullScreenConfig.type !== I.FullScreenType.NONE;
+    fullscreenViewerActive = (): boolean => {
+        return getAs().fullScreenConfig.type !== I.FullScreenType.NONE;
     }
 
     ctrlKeyCheck = (): boolean => {

@@ -1,4 +1,4 @@
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
@@ -23,9 +23,9 @@ export class FriendsListType extends TypeBase {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new HelpButton(() => ast.config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
+            new HelpButton(() => getAs().config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", { className: "noMargin" }),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
             new Button("Find People", () => {

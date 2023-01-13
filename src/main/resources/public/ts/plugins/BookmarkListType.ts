@@ -1,11 +1,10 @@
-import { AppState } from "../AppState";
-import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { TypeBase } from "./base/TypeBase";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
+import * as J from "../JavaIntf";
+import { TypeBase } from "./base/TypeBase";
 
 export class BookmarkListType extends TypeBase {
     constructor() {
@@ -20,7 +19,7 @@ export class BookmarkListType extends TypeBase {
         return false;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName, {
                 className: "noMargin"
