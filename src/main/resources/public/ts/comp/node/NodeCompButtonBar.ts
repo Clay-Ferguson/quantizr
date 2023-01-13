@@ -52,9 +52,9 @@ export class NodeCompButtonBar extends Div {
         }
         else if (type) {
             if (editingAllowed) {
-                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, ast);
-                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, ast);
-                editableNode = type.allowAction(NodeActionType.editNode, this.node, ast);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node);
             }
         }
         else {
@@ -110,7 +110,7 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (ast.userPrefs.editMode) {
-            const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node, ast));
+            const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node));
             const checkboxForDelete = ast.isAdminUser || deleteAllowed;
 
             if ((checkboxForEdit || checkboxForDelete) &&
@@ -137,7 +137,7 @@ export class NodeCompButtonBar extends Div {
             // if this is our own account node, we can always leave insertAllowed=true
             if (ast.userProfile?.userNodeId !== this.node.id) {
                 if (type) {
-                    insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node, ast);
+                    insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node);
                 }
             }
             const editInsertAllowed = S.props.isWritableByMe(this.node);
@@ -149,7 +149,7 @@ export class NodeCompButtonBar extends Div {
                 }, null, "fa-plus");
             }
 
-            const userCanPaste = S.props.isMine(this.node, ast) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
+            const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
@@ -218,7 +218,7 @@ export class NodeCompButtonBar extends Div {
 
         // Note we only allow 'Up Level' on home node if we're the admin.
         if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
-            if (S.nav.parentVisibleToUser(ast)) {
+            if (S.nav.parentVisibleToUser()) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     nid: this.node.id,
                     onClick: S.nav.navUpLevelClick,

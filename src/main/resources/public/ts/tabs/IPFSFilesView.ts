@@ -255,7 +255,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
         });
 
         dispatch("showServerInfo", s => {
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO);
             s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
             s.serverInfoText = shortName + "\n" + hash + "\n\n" + res.content;
             s.serverInfoCommand = "IPFS File Content";

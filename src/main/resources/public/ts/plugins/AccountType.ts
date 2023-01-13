@@ -18,7 +18,7 @@ export class AccountType extends TypeBase {
         return false;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.editNode:
                 return false;
@@ -40,7 +40,7 @@ export class AccountType extends TypeBase {
                 onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
                     // their own account this is not a way to do it.
-                    if (!S.props.isMine(node, ast)) {
+                    if (!S.props.isMine(node)) {
                         new UserProfileDlg(node.ownerId).open();
                     }
                 }

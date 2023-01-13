@@ -115,9 +115,9 @@ export class MenuPanel extends Div {
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
-    static showPublicWritableShares = () => { S.srch.findShares(null, J.PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
-    static showPublicReadonlyShares = () => { S.srch.findShares(null, J.PrincipalName.PUBLIC, J.PrivilegeType.READ); }
-    static showAllShares = () => { S.srch.findShares(null, null, null); }
+    static showPublicWritableShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
+    static showPublicReadonlyShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.READ); }
+    static showAllShares = () => { S.srch.findShares(null, null); }
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
@@ -126,18 +126,18 @@ export class MenuPanel extends Div {
     static multiFollow = () => { new MultiFollowDlg().open(); };
     static createUser = () => { new SignupDlg(true).open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
-    static timelineByCreated = () => S.srch.timeline(null, "ctm", getAs(), null, "Rev-chron by Create Time", 0, true);
-    static timelineByModified = () => S.srch.timeline(null, "mtm", getAs(), null, "Rev-chron by Modify Time", 0, true);
-    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", getAs(), null, "Rev-chron by Create Time (top level)", 0, false);
-    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", getAs(), null, "Rev-chron by Modify Time (top level)", 0, false);
-    static showCalendar = () => S.render.showCalendar(null, getAs());
-    static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAs(), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
-    static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAs(), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
-    static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, getAs(), "all", "All calendar dates", 0, true);
+    static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time", 0, true);
+    static timelineByModified = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time", 0, true);
+    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time (top level)", 0, false);
+    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time (top level)", 0, false);
+    static showCalendar = () => S.render.showCalendar(null);
+    static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
+    static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+    static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
     static import = () => S.edit.openImportDlg();
-    static listSubgraphByPriority = () => S.srch.listSubgraphByPriority(getAs());
+    static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
     static export = () => S.edit.openExportDlg();
     static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
 
@@ -150,7 +150,7 @@ export class MenuPanel extends Div {
 
     static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
     static mouseEffects = () => { S.domUtil.toggleMouseEffect(); };
-    static showUrls = () => S.render.showNodeUrl(null, getAs());
+    static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "", getAs());
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "", getAs());
     static nodeStats = () => S.view.getNodeStats(getAs(), false, false);
@@ -391,7 +391,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Timeline", [
-                new MenuItem("Live Rev-Chron (Chat Room)", () => S.nav.messagesNodeFeed(ast), hltNode?.id != null),
+                new MenuItem("Live Rev-Chron (Chat Room)", S.nav.messagesNodeFeed, hltNode?.id != null),
                 new MenuItemSeparator(), //
                 new MenuItem("Created", MenuPanel.timelineByCreated, !!hltNode), //
                 new MenuItem("Modified", MenuPanel.timelineByModified, !!hltNode), //

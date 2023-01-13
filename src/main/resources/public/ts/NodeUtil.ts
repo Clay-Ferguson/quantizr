@@ -11,47 +11,14 @@ import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
-    getSelNodeIdsArray = (ast: AppState): string[] => {
+    getSelNodeIdsArray = (): string[] => {
         const sels: string[] = [];
-        ast.selectedNodes.forEach(id => sels.push(id));
+        getAs().selectedNodes.forEach(id => sels.push(id));
         return sels;
     }
 
-    /* return an object with properties for each NodeInfo where the key is the id */
-    getSelNodesAsMapById = (ast: AppState): Object => {
-        const ret: Object = {};
-        const selArray = this.getSelNodesArray(ast);
-        if (!selArray || selArray.length === 0) {
-            const node = this.getHighlightedNode();
-            if (node) {
-                ret[node.id] = node;
-                return ret;
-            }
-        }
-
-        for (const sel of selArray) {
-            ret[sel.id] = sel;
-        }
-        return ret;
-    }
-
-    /* Gets selected nodes as NodeInfo.java objects array */
-    getSelNodesArray = (ast: AppState): J.NodeInfo[] => {
-        const selArray: J.NodeInfo[] = [];
-        ast.selectedNodes.forEach(id => {
-            const node = MainTab.inst?.findNode(ast, id);
-            if (node) {
-                selArray.push(node);
-            }
-        });
-        return selArray;
-    }
-
-    clearSelNodes = (ast: AppState = null) => {
-        ast = ast || getAs();
-        dispatch("ClearSelections", s => {
-            s.selectedNodes.clear();
-        });
+    clearSelNodes = () => {
+        dispatch("ClearSelections", s => s.selectedNodes.clear());
     }
 
     selectAllNodes = (nodeIds: string[]) => {
@@ -75,7 +42,8 @@ export class NodeUtil {
     }
 
     /* Returns true if successful */
-    highlightRowById = (id: string, scroll: boolean, ast: AppState): boolean => {
+    highlightRowById = (id: string, scroll: boolean): boolean => {
+        const ast = getAs();
         let node = MainTab.inst?.findNode(ast, id);
         let ret = true;
 
@@ -96,30 +64,32 @@ export class NodeUtil {
         return ret;
     }
 
-    highlightNode = (node: J.NodeInfo, scroll: boolean, ast: AppState) => {
-        if (!node || !ast || !ast.node) {
+    highlightNode = (node: J.NodeInfo, scroll: boolean, ust: AppState) => {
+        ust = ust || getAs();
+        if (!node || !ust.node) {
             return;
         }
 
-        if (!ast.isAnonUser) {
-            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, ast.node.id);
+        if (!ust.isAnonUser) {
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, ust.node.id);
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
-            S.util.updateHistory(node, ast);
+            S.util.updateHistory(node, ust);
         }
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always
         // keys off parentIdToFocusNodeMap actually reading the value.
         dispatch("highlightNode", s => s.highlightNodeId = node.id);
 
-        S.quanta.parentIdToFocusNodeMap.set(ast.node.id, node.id);
+        S.quanta.parentIdToFocusNodeMap.set(ust.node.id, node.id);
 
         if (scroll) {
-            S.view.scrollToNode(ast, node);
+            S.view.scrollToNode(ust, node);
         }
     }
 
     /* Find node by looking everywhere we possibly can on local storage for it */
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
+        const ast = getAs();
         for (const data of ast.tabData) {
             const node = data.findNode(ast, nodeId);
             if (node) return node;
@@ -132,48 +102,21 @@ export class NodeUtil {
         S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, null);
     }
 
-    /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
-    getSingleSelectedNode = (ast: AppState): J.NodeInfo => {
-        let ret = null;
-        // note: Set doesn't have a 'findFirst' so we can just use forEach instead
-        ast.selectedNodes.forEach(id => {
-            ret = MainTab.inst?.findNode(ast, id);
-        });
-        return ret;
-    }
-
-    /* Returns true if this node is able to have an effect on the tree, such that if it changed
-    we would need to re-render the tree. For root top level call node==state.node */
-    nodeIdIsVisible = (node: J.NodeInfo, nodeId: string, parentPath: string, ast: AppState): boolean => {
-        if (!nodeId || !node) return false;
-        if (node.id === nodeId || node.path === parentPath) return true;
-
-        let ret = false;
-        if (node.children) {
-            // for now we do ONE level, and this would fail for
-            node.children.forEach(n => {
-                if (this.nodeIdIsVisible(n, nodeId, parentPath, ast)) {
-                    ret = true;
-                }
-            });
-        }
-        return ret;
-    }
-
     /* Returns the node if it's currently displaying on the page. For now we don't have ability */
-    displayingOnTree = (ast: AppState, nodeId: string): J.NodeInfo => {
+    displayingOnTree = (nodeId: string): J.NodeInfo => {
+        const ast = getAs();
         if (!ast.node) return null;
         if (ast.node.id === nodeId) return ast.node;
         if (!ast.node.children) return null;
         return ast.node.children.find(node => node?.id === nodeId);
     }
 
-    getNodeByName = (node: J.NodeInfo, name: string, ast: AppState): J.NodeInfo => {
+    getNodeByName = (node: J.NodeInfo, name: string, ust: AppState): J.NodeInfo => {
         if (!node) return null;
         if (node.name === name) return node;
 
         if (node.children) {
-            return ast.node.children.find(node => node?.name === name);
+            return ust.node.children.find(node => node?.name === name);
         }
         return null;
     }
@@ -284,7 +227,7 @@ export class NodeUtil {
         }
     }
 
-    getSharingNames = (ast: AppState, node: J.NodeInfo, editorDlg: Comp): Comp[] => {
+    getSharingNames = (node: J.NodeInfo, editorDlg: Comp): Comp[] => {
         if (!node?.ac) return null;
 
         const ret: Comp[] = [];

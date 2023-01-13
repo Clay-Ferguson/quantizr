@@ -1,4 +1,3 @@
-import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Html } from "../../comp/core/Html";
 import * as J from "../../JavaIntf";
@@ -147,11 +146,10 @@ export class NodeCompMarkdown extends Html {
         if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
-        const ast = getAs();
         const cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 
-        const cipherKey = S.props.getCryptoKey(this.node, ast);
+        const cipherKey = S.props.getCryptoKey(this.node);
         if (cipherKey) {
             // console.log("CIPHERKEY " + cipherKey);
             let clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });

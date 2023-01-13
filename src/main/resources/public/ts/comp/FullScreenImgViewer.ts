@@ -16,7 +16,7 @@ export class FullScreenImgViewer extends Main {
     preRender(): void {
         const ast = useAppState();
         const nodeId = ast.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNode(ast, nodeId);
+        const node = S.nodeUtil.findNode(nodeId);
         if (!node) {
             console.error("Can't find nodeId " + nodeId);
         }

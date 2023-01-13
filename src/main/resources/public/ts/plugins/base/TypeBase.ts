@@ -170,7 +170,7 @@ export class TypeBase implements TypeIntf {
         return "fa " + this.iconStyle + " fa-lg";
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 

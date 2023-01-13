@@ -133,7 +133,7 @@ export class SharingDlg extends DialogBase {
                         nodeId: ast.editNode.id
                     });
 
-                    S.quanta.refresh(getAs());
+                    S.quanta.refresh();
                 }, 100);
             }
         }

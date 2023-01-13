@@ -102,7 +102,7 @@ export class App extends Main {
     getTopMobileBar = (ast: AppState): CompIntf => {
         if (ast.mobileMode) {
             const menuButton = new IconButton("fa-bars", "Menu", {
-                onClick: () => S.nav.showMainMenu(ast),
+                onClick: S.nav.showMainMenu,
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 

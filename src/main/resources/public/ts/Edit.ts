@@ -68,7 +68,7 @@ export class Edit {
     private joinNodesResponse = (res: J.JoinNodesResponse): any => {
         const ast = getAs();
         if (S.util.checkSuccess("Join node", res)) {
-            S.nodeUtil.clearSelNodes(ast);
+            S.nodeUtil.clearSelNodes();
             S.view.refreshTree({
                 nodeId: ast.node.id,
                 zeroOffset: false,
@@ -96,8 +96,8 @@ export class Edit {
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
                 let editInPopup = forceUsePopup || ast.mobileMode ||
                     // node not found on tree.
-                    (!S.nodeUtil.displayingOnTree(ast, res.nodeInfo.id) &&
-                        !S.nodeUtil.displayingOnTree(ast, S.quanta.newNodeTargetId)) ||
+                    (!S.nodeUtil.displayingOnTree(res.nodeInfo.id) &&
+                        !S.nodeUtil.displayingOnTree(S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
                     S.util.fullscreenViewerActive(ast);
@@ -203,7 +203,6 @@ export class Edit {
     */
     startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo,
         nodeInsertTarget: J.NodeInfo, ordinalOffset: number) => {
-        const ast = getAs();
         if (!S.props.isWritableByMe(parentNode)) {
             // console.log("Rejecting request to edit. Not authorized");
             return;
@@ -252,7 +251,7 @@ export class Edit {
             }
 
             if (!blob) {
-                S.quanta.refresh(ast);
+                S.quanta.refresh();
             }
         }
         else {
@@ -295,7 +294,7 @@ export class Edit {
     createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string) => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
-                S.quanta.refresh(getAs());
+                S.quanta.refresh();
             }
             else {
                 this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, false);
@@ -315,7 +314,7 @@ export class Edit {
                 if (FeedTab.inst?.props?.feedDirtyList) {
                     for (const node of FeedTab.inst.props.feedDirtyList) {
                         // console.log("Force Feed: " + node.content);
-                        S.push.forceFeedItem(node, ast);
+                        S.push.forceFeedItem(node);
                     }
                     FeedTab.inst.props.feedDirtyList = null;
 
@@ -356,14 +355,14 @@ export class Edit {
                     // Note the special case here for bookmark. We never want to jump to a bookmark just
                     // because it got updated. That would take us away from whatever we're working on and
                     // is never right.
-                    if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(ast, node.id)) {
+                    if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(node.id)) {
                         S.view.jumpToId(node.id);
                     }
                 }
             }
 
             if (ast.fullScreenConfig.type === FullScreenType.CALENDAR) {
-                S.render.showCalendar(ast.fullScreenConfig.nodeId, ast);
+                S.render.showCalendar(ast.fullScreenConfig.nodeId);
             }
         }
     }
@@ -578,7 +577,7 @@ export class Edit {
 
     toggleShowParents = async () => {
         await S.util.saveUserPrefs(s => s.userPrefs.showParents = !s.userPrefs.showParents);
-        S.quanta.refresh(getAs());
+        S.quanta.refresh();
     }
 
     setShowComments = async (showReplies: boolean): Promise<void> => {
@@ -591,12 +590,12 @@ export class Edit {
         const ast = getAs();
         // todo-1: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.
         if (ast.activeTab === C.TAB_MAIN) {
-            S.quanta.refresh(ast);
+            S.quanta.refresh();
         }
         else if (ast.activeTab === C.TAB_DOCUMENT) {
             const data: TabIntf = S.tabUtil.getAppTabData(ast, C.TAB_DOCUMENT);
             if (data) {
-                S.srch.showDocument(data.props.node, false, getAs());
+                S.srch.showDocument(data.props.node, false);
             }
         }
         else {
@@ -810,7 +809,7 @@ export class Edit {
 
     clearInbox = async () => {
         const ast = getAs();
-        S.nodeUtil.clearSelNodes(ast);
+        S.nodeUtil.clearSelNodes();
 
         const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
             "btn-danger", "alert alert-danger");
@@ -821,7 +820,7 @@ export class Edit {
                 childrenOnly: true,
                 bulkDelete: false
             });
-            S.nav.openContentNode(ast.userProfile.userNodeId, ast);
+            S.nav.openContentNode(ast.userProfile.userNodeId);
         }
     }
 
@@ -849,9 +848,7 @@ export class Edit {
     }
 
     joinNodes = async () => {
-        const ast = getAs();
-
-        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(ast);
+        const selNodesArray = S.nodeUtil.getSelNodeIdsArray();
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to join.", "Warning");
             return;
@@ -903,7 +900,7 @@ export class Edit {
 
         const ast = getAs();
         // note: the setNodeSel above isn't causing this to get anything here
-        const selNodesArray: string[] = S.nodeUtil.getSelNodeIdsArray(ast);
+        const selNodesArray: string[] = S.nodeUtil.getSelNodeIdsArray();
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to delete.", "Warning");
@@ -1000,7 +997,7 @@ export class Edit {
 
         dispatch("SetNodesToMove", s => {
             S.nav.setNodeSel(true, id, s);
-            s.nodesToMove = S.nodeUtil.getSelNodeIdsArray(s);
+            s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
             s.selectedNodes.clear();
         });
     }
@@ -1334,7 +1331,7 @@ export class Edit {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
             });
-            S.quanta.refresh(getAs());
+            S.quanta.refresh();
         }
     }
 

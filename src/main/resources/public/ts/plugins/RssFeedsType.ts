@@ -21,7 +21,7 @@ export class RssFeedsType extends TypeBase {
         return true;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
                 return true;

@@ -57,11 +57,11 @@ export class NodeCompRow extends Div {
             if (this.level === 1) {
                 const parentType = S.plugin.getType(ast.node.type);
                 if (parentType) {
-                    insertAllowed = ast.isAdminUser || parentType.allowAction(NodeActionType.insert, ast.node, ast);
+                    insertAllowed = ast.isAdminUser || parentType.allowAction(NodeActionType.insert, ast.node);
                 }
             }
 
-            const isMine = S.props.isMine(ast.node, ast);
+            const isMine = S.props.isMine(ast.node);
 
             if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed) {
 

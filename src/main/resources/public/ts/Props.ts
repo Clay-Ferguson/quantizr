@@ -1,5 +1,4 @@
 import { getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -49,12 +48,12 @@ export class Props {
     node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
-    getCryptoKey = (node: J.NodeInfo, ast: AppState) => {
+    getCryptoKey = (node: J.NodeInfo) => {
         if (!node) return null;
         let key = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
-        if (ast.userName === node.owner) {
+        if (getAs().userName === node.owner) {
             key = this.getPropStr(J.NodeProp.ENC_KEY, node);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
@@ -129,7 +128,8 @@ export class Props {
         return !!ace.privileges.find(p => p.privilegeName.indexOf(priv) !== -1);
     }
 
-    isMine = (node: J.NodeInfo, ast: AppState): boolean => {
+    isMine = (node: J.NodeInfo): boolean => {
+        const ast = getAs();
         if (!node || !ast.userName || ast.userName === J.PrincipalName.ANON) return false;
         return ast.userName === node.owner;
     }

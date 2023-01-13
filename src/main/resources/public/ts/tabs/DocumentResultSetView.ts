@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -23,8 +22,9 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         this.pagingContainerClass = "float-end";
     }
 
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, ast: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
 
+        const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either
         // of these user prefs is active we show the header bar.
         const allowHeader = ast.userPrefs.showMetaData || ast.userPrefs.editMode;
@@ -46,7 +46,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
         }
 
         const row = S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false,
-            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style, ast);
+            true, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style);
 
         if (S.props.getClientProp(J.NodeProp.TRUNCATED, node)) {
             // todo-1: We could easily make this icon clickable to render this node as the root of a new document
@@ -63,7 +63,7 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
     pageChange(delta: number): void {
         setTimeout(() => {
             const growPage = delta !== null && delta > 0;
-            S.srch.showDocument(this.data.props.node, growPage, getAs());
+            S.srch.showDocument(this.data.props.node, growPage);
         }, 500);
     }
 

@@ -26,7 +26,7 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
-    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, ast: AppState) => {
+    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) => {
         const res = await S.rpcUtil.rpc<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
@@ -49,7 +49,7 @@ export class Search {
                 info.accessOption = accessOption;
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.tabUtil.selectTabStateOnly(SharesTab.inst.id, s);
+                S.tabUtil.selectTabStateOnly(SharesTab.inst.id);
             });
         }
         else {
@@ -57,7 +57,7 @@ export class Search {
         }
     }
 
-    showThreadAddMore = async (nodeId: string, ast: AppState) => {
+    showThreadAddMore = async (nodeId: string) => {
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             loadOthers: true
@@ -78,7 +78,7 @@ export class Search {
 
                 data.props.results = [...moreResults, ...data.props.results];
                 data.props.endReached = res.topReached;
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id);
             });
         }
         else {
@@ -111,7 +111,7 @@ export class Search {
 
                 data.props.results = res.nodes;
                 data.props.endReached = res.topReached;
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id);
             });
         }
         else {
@@ -131,7 +131,7 @@ export class Search {
         }
     }
 
-    listSubgraphByPriority = async (ast: AppState) => {
+    listSubgraphByPriority = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
@@ -195,7 +195,7 @@ export class Search {
                 data.props.prop = prop;
                 data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id);
 
                 // DO NOT DELETE
                 // This was an experiment an it does work, but it only highlights one thing at a time, when I
@@ -210,7 +210,7 @@ export class Search {
         }
     }
 
-    showDocument = async (node: J.NodeInfo, growPage: boolean, ast: AppState) => {
+    showDocument = async (node: J.NodeInfo, growPage: boolean) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -230,7 +230,7 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
             rootId: node.id,
             startNodeId: startNode ? startNode.id : node.id,
-            includeComments: ast.userPrefs.showReplies
+            includeComments: getAs().userPrefs.showReplies
         });
 
         if (!res.searchResults || res.searchResults.length === 0) {
@@ -257,12 +257,12 @@ export class Search {
             // were pulling down more items at the end of the doc.
             info.results = growPage ? info.results.concat(res.searchResults) : res.searchResults;
             info.node = node;
-            S.tabUtil.selectTabStateOnly(DocumentTab.inst.id, s);
+            S.tabUtil.selectTabStateOnly(DocumentTab.inst.id);
         });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = async (node: J.NodeInfo, prop: string, ast: AppState, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
+    timeline = async (node: J.NodeInfo, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
@@ -314,23 +314,12 @@ export class Search {
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
 
-            S.tabUtil.selectTabStateOnly(TimelineTab.inst.id, s);
+            S.tabUtil.selectTabStateOnly(TimelineTab.inst.id);
         });
     }
 
-    removeNodeById = (id: string, ast: AppState) => {
-        ast.tabData.forEach(td => td.nodeDeleted(ast, id));
-    }
-
-    /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
-    from the server for a refresh */
-    delayedRefreshFeed = (ast: AppState) => {
-        // put in a delay timer since we call this from other state processing functions.
-        setTimeout(() => {
-            if (!FeedTab.inst.props.feedLoading) {
-                this.refreshFeed();
-            }
-        }, 500);
+    removeNodeById = (id: string, ust: AppState) => {
+        ust.tabData.forEach(td => td.nodeDeleted(ust, id));
     }
 
     refreshFeed = async () => {
@@ -377,7 +366,7 @@ export class Search {
                 FeedTab.inst.props.feedLoading = false;
 
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
-                S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
+                S.tabUtil.selectTabStateOnly(C.TAB_FEED);
 
                 S.domUtil.focusId(C.TAB_FEED);
             });
@@ -459,7 +448,7 @@ export class Search {
 
             if (scrollToTop) {
                 S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
-                S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
+                S.tabUtil.selectTabStateOnly(C.TAB_FEED);
             }
 
             S.domUtil.focusId(C.TAB_FEED);
@@ -496,7 +485,7 @@ export class Search {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.showingFollowersOfUser = userName;
 
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id);
             });
         }
         else {
@@ -534,7 +523,7 @@ export class Search {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.showingFollowingOfUser = userName;
 
-                S.tabUtil.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id);
             });
         }
         else {
@@ -548,7 +537,8 @@ export class Search {
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number,
         isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean,
         allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
-        extraStyle: any, ast: AppState): Comp => {
+        extraStyle: any): Comp => {
+        const ast = getAs();
         if (!node) return;
         const prefix = tabData.id;
 
@@ -562,7 +552,7 @@ export class Search {
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle, ast);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, outterClass, outterClassHighlight, extraStyle);
         }
 
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
@@ -681,7 +671,7 @@ export class Search {
         }
     }
 
-    clickSearchNode = (id: string, ast: AppState) => {
+    clickSearchNode = (id: string) => {
         S.view.jumpToId(id);
 
         dispatch("RenderSearchResults", s => {
@@ -689,7 +679,7 @@ export class Search {
         });
     }
 
-    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, ast: AppState) => {
+    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string) => {
         const res = await S.rpcUtil.rpc<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
@@ -707,14 +697,13 @@ export class Search {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast
+            ast: getAs()
         });
         S.util.showMessage(res.message, "Success");
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
-    findShares = (ast: AppState = null, shareTarget: string = null, accessOption: string = null) => {
-        ast = ast || getAs();
+    findShares = (shareTarget: string = null, accessOption: string = null) => {
         const focusNode = S.nodeUtil.getHighlightedNode();
         if (!focusNode) {
             return;
@@ -728,6 +717,6 @@ export class Search {
             type = "appendable";
         }
 
-        this.findSharedNodes(focusNode, 0, type, shareTarget, accessOption, ast);
+        this.findSharedNodes(focusNode, 0, type, shareTarget, accessOption);
     }
 }

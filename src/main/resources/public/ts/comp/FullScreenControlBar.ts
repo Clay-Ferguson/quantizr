@@ -26,7 +26,7 @@ export class FullScreenControlBar extends Div {
         const buttons = [];
 
         if (ast.fullScreenConfig.type === FullScreenType.IMAGE && ast.activeTab === C.TAB_MAIN) {
-            const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
+            const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
             let onFirst = false;
             let onLast = false;
             if (node && node.attachments) {
@@ -38,7 +38,7 @@ export class FullScreenControlBar extends Div {
             if (!onFirst) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: () => S.nav.prevFullScreenImgViewer(ast),
+                        onClick: S.nav.prevFullScreenImgViewer,
                         title: "View Previous Attachment"
                     }, "btn-primary", "off"));
             }
@@ -46,7 +46,7 @@ export class FullScreenControlBar extends Div {
             if (!onLast) {
                 buttons.push(
                     new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: () => S.nav.nextFullScreenImgViewer(ast),
+                        onClick: S.nav.nextFullScreenImgViewer,
                         title: "View Next Attachment"
                     }, "btn-primary", "off"));
             }
@@ -76,7 +76,7 @@ export class FullScreenControlBar extends Div {
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
-                onClick: () => S.nav.closeFullScreenViewer(ast),
+                onClick: () => S.nav.closeFullScreenViewer(),
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 

@@ -16,7 +16,7 @@ export class RoomType extends TypeBase {
         super(J.NodeType.ROOM, "Chat Room", "fa-comments", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 

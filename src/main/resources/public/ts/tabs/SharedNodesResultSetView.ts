@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
@@ -14,8 +13,6 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
     }
 
     pageChange(delta: number): void {
-        const ast = getAs();
-
         let page = this.data.props.page;
         if (delta !== null) {
             page = delta === 0 ? 0 : this.data.props.page + delta;
@@ -25,8 +22,7 @@ export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetV
             page,
             this.data.props.shareNodesType,
             this.data.props.shareTarget,
-            this.data.props.accessOption,
-            ast);
+            this.data.props.accessOption);
     }
 
     extraPagingComps = (): Comp[] => {

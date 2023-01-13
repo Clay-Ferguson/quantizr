@@ -213,7 +213,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 else {
                     // console.log("FEED: node id=" + node.id + " content: " + node.content);
                     children.push(S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount,
-                        false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null, ast));
+                        false, true, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
                     i++;
                     rowCount++;
 

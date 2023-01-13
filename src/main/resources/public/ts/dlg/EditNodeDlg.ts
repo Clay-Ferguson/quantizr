@@ -212,7 +212,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit(this);
-                    S.nav.closeFullScreenViewer(getAs());
+                    S.nav.closeFullScreenViewer();
                     S.view.jumpToId(ast.editNode.id);
                 }
             }));
@@ -326,7 +326,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const binarySection = hasAttachment ? new EditAttachmentsPanel(ast.editNode, this) : null;
-        const shareComps: Comp[] = S.nodeUtil.getSharingNames(ast, ast.editNode, this);
+        const shareComps: Comp[] = S.nodeUtil.getSharingNames(ast.editNode, this);
         const isPublic = S.props.isPublic(ast.editNode);
 
         let sharingDiv = null;
@@ -495,7 +495,7 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("prop=" + S.util.prettyPrint(prop));
                 if (prop.name === durationProp?.name) return;
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAs())) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
                     // console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -648,8 +648,8 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode, getAs())) : true;
-        const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode, getAs())) : true;
+        const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
+        const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);
@@ -841,7 +841,7 @@ export class EditNodeDlg extends DialogBase {
             if (S.crypto.avail) {
                 // console.log("decrypting: " + value);
                 const cipherText = value.substring(J.Constant.ENC_TAG.length);
-                const cipherKey = S.props.getCryptoKey(ast.editNode, ast);
+                const cipherKey = S.props.getCryptoKey(ast.editNode);
                 if (cipherKey) {
                     const clearText: string = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
 

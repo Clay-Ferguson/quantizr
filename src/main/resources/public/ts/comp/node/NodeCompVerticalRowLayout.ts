@@ -30,7 +30,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
         let inVerticalSpace = false;
-        const isMine = S.props.isMine(ast.node, ast);
+        const isMine = S.props.isMine(ast.node);
 
         this.node.children?.forEach(n => {
             if (!n) return;
@@ -86,7 +86,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     // if we have any children on the node they will always have been loaded to be displayed so display them
                     // This is the linline children
                     if (n.children) {
-                        comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove, ast));
+                        comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
                         comps.push(new Div(null, { className: "vertical-space" }));
                         inVerticalSpace = true;
                     }
@@ -140,7 +140,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 });
 
                 if (lastNode) {
-                    const userCanPaste = (S.props.isMine(lastNode, ast) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
+                    const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                     if (!!ast.nodesToMove && userCanPaste) {
                         comps.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton marginLeft"));
                     }

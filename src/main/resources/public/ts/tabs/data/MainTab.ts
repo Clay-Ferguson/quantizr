@@ -60,11 +60,11 @@ export class MainTab implements TabIntf<any> {
 
     getTabSubOptions = (ast: AppState): Div => {
         return new Div(null, { className: "tabSubOptions" }, [
-            !ast.isAnonUser ? new AppNavLink("My Account", () => S.nav.navToMyAccntRoot(ast)) : null,
+            !ast.isAnonUser ? new AppNavLink("My Account", S.nav.navToMyAccntRoot) : null,
             !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home")) : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS)) : null,
             ...this.customAnonRHSLinks(ast),
-            ...S.render.buildCustomLinks(ast, ast.config.rhsLinks)
+            ...S.render.buildCustomLinks(ast.config.rhsLinks)
         ]);
     };
 
@@ -74,6 +74,6 @@ export class MainTab implements TabIntf<any> {
         // if not anon user return empty items
         if (!ast.isAnonUser) return [];
 
-        return S.render.buildCustomLinks(ast, ast.config.rhsAnonLinks);
+        return S.render.buildCustomLinks(ast.config.rhsAnonLinks);
     }
 }

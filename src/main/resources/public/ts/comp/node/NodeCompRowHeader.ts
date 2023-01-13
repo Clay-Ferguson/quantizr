@@ -32,11 +32,11 @@ export class NodeCompRowHeader extends Div {
         const children = [];
         let avatarImg: Img = null;
 
-        const isMine = S.props.isMine(this.node, ast);
+        const isMine = S.props.isMine(this.node);
         const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
-            avatarImg = S.render.makeHeaderAvatar(this.node, ast);
+            avatarImg = S.render.makeHeaderAvatar(this.node);
             if (avatarImg) {
                 children.push(avatarImg);
             }
@@ -169,7 +169,7 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: "fa fa-link fa-lg mediumMarginRight",
                     title: "Show URLs for this node",
-                    onClick: () => S.render.showNodeUrl(this.node, ast)
+                    onClick: () => S.render.showNodeUrl(this.node)
                 }));
             }
 
@@ -262,7 +262,7 @@ export class NodeCompRowHeader extends Div {
             }
             // Show all the share names
             else if (S.props.isShared(this.node)) {
-                const shareComps = S.nodeUtil.getSharingNames(ast, this.node, null);
+                const shareComps = S.nodeUtil.getSharingNames(this.node, null);
                 floatUpperRightDiv.addChildren([
                     new Span(null, {
                         className: "rowHeaderSharingNames"
@@ -288,9 +288,9 @@ export class NodeCompRowHeader extends Div {
         }
         else if (type) {
             if (editingAllowed) {
-                editingAllowed = type.allowAction(NodeActionType.editNode, this.node, ast);
-                editableNode = type.allowAction(NodeActionType.editNode, this.node, ast);
-                deleteAllowed = type.allowAction(NodeActionType.delete, this.node, ast);
+                editingAllowed = type.allowAction(NodeActionType.editNode, this.node);
+                editableNode = type.allowAction(NodeActionType.editNode, this.node);
+                deleteAllowed = type.allowAction(NodeActionType.delete, this.node);
             }
         }
 
@@ -324,7 +324,7 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        const userCanPaste = S.props.isMine(this.node, ast) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
+        const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
         if (!!ast.nodesToMove && userCanPaste) {
             pasteButton = new Button("Paste Inside",
                 S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton")
@@ -355,7 +355,7 @@ export class NodeCompRowHeader extends Div {
         if (showDetails && this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
-                onClick: () => S.srch.clickSearchNode(this.node.id, ast),
+                onClick: () => S.srch.clickSearchNode(this.node.id),
                 title: "Jump to Tree"
             });
         }

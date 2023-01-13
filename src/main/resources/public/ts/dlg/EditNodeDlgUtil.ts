@@ -31,7 +31,7 @@ export class EditNodeDlgUtil {
 
         // This loop creates all the editor input fields for all the properties
         ast.editNode.properties?.forEach(prop => {
-            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name, getAs())) {
+            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
                 return;
             }
 
@@ -59,7 +59,7 @@ export class EditNodeDlgUtil {
             content = dlg.contentEditor.getValue();
 
             if (S.crypto.avail) {
-                const cipherKey = S.props.getCryptoKey(editNode, getAs());
+                const cipherKey = S.props.getCryptoKey(editNode);
                 if (cipherKey) {
                     content = await S.crypto.symEncryptStringWithCipherKey(cipherKey, content);
                     content = J.Constant.ENC_TAG + content;
@@ -448,7 +448,7 @@ an upload has been added or removed.
 
         if (node.properties) {
             node.properties.forEach(prop => {
-                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, getAs())) {
+                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name)) {
                     return;
                 }
 
@@ -518,7 +518,7 @@ an upload has been added or removed.
         ast.editNode.properties = dlg.initialProps;
 
         if (dlg.binaryDirty) {
-            S.quanta.refresh(getAs());
+            S.quanta.refresh();
         }
     }
 

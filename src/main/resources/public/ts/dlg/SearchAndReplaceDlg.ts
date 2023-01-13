@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -55,7 +54,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), getAs());
+        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue());
         this.close();
     }
 }

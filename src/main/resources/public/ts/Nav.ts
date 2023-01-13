@@ -18,13 +18,8 @@ import { TrendingTab } from "./tabs/data/TrendingTab";
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
 
-    displayingRepositoryRoot = (ast: AppState): boolean => {
-        if (!ast.node) return false;
-        // one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
-        return ast.node.id === ast.node.ownerId;
-    }
-
-    displayingHome = (ast: AppState): boolean => {
+    displayingHome = (): boolean => {
+        const ast = getAs();
         if (!ast.node) return false;
         if (ast.isAnonUser) {
             return ast.node.id === ast.anonUserLandingPageNode;
@@ -33,25 +28,16 @@ export class Nav {
         }
     }
 
-    parentVisibleToUser = (ast: AppState): boolean => {
-        return !this.displayingHome(ast);
+    parentVisibleToUser = (): boolean => {
+        return !this.displayingHome();
     }
 
-    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, ast: AppState) => {
+    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean) => {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             S.util.showPageMessage("The node above is not shared.");
         } else {
             S.render.renderPage(res, scrollToTop, id, true, true);
         }
-    }
-
-    navOpenSelectedNode = (ast: AppState) => {
-        const selNode = S.nodeUtil.getHighlightedNode();
-        if (!selNode) return;
-        if (C.DEBUG_SCROLLING) {
-            console.log("navOpenSelectedNode");
-        }
-        this.openNodeById(null, selNode.id, ast);
     }
 
     navToPrev = () => {
@@ -62,8 +48,8 @@ export class Nav {
         this.navToSibling(1);
     }
 
-    navToSibling = async (siblingOffset: number, ast?: AppState): Promise<string> => {
-        ast = ast || getAs();
+    navToSibling = async (siblingOffset: number): Promise<string> => {
+        const ast = getAs();
         if (!ast.node) return null;
 
         try {
@@ -79,7 +65,7 @@ export class Nav {
                 singleNode: false,
                 parentCount: ast.userPrefs.showParents ? 1 : 0
             });
-            this.upLevelResponse(res, null, true, ast);
+            this.upLevelResponse(res, null, true);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
@@ -97,7 +83,7 @@ export class Nav {
         const ast = getAs();
         if (!ast.node) return null;
 
-        if (!this.parentVisibleToUser(ast)) {
+        if (!this.parentVisibleToUser()) {
             S.util.showMessage("The parent of this node isn't shared to you.", "Warning");
             // Already at root. Can't go up.
             return;
@@ -118,10 +104,10 @@ export class Nav {
             });
 
             if (processingDelete) {
-                S.quanta.refresh(ast);
+                S.quanta.refresh();
             }
             else {
-                this.upLevelResponse(res, ast.node.id, false, ast);
+                this.upLevelResponse(res, ast.node.id, false);
             }
         }
         catch (e) {
@@ -161,8 +147,8 @@ export class Nav {
         });
     }
 
-    openContentNode = async (nodePathOrId: string, ast: AppState = null) => {
-        ast = ast || getAs();
+    openContentNode = async (nodePathOrId: string) => {
+        const ast = getAs();
 
         try {
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -178,16 +164,16 @@ export class Nav {
                 parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
-            this.navPageNodeResponse(res, ast);
+            this.navPageNodeResponse(res);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
         }
     }
 
-    openNodeById = (evt: Event, id: string, ast: AppState) => {
-        id = S.util.allowIdFromEvent(evt, id);
-        ast = ast || getAs();
+    openNodeById = (evt: Event) => {
+        const id = S.util.allowIdFromEvent(evt, null);
+        const ast = getAs();
         const node = MainTab.inst?.findNode(ast, id);
 
         if (!node) {
@@ -212,22 +198,21 @@ export class Nav {
         }
     }
 
-    setNodeSel = (selected: boolean, id: string, ast: AppState) => {
+    setNodeSel = (selected: boolean, id: string, ust: AppState) => {
         if (!id) return;
-        ast = ast || getAs();
         if (selected) {
-            ast.selectedNodes.add(id);
+            ust.selectedNodes.add(id);
         } else {
-            ast.selectedNodes.delete(id);
+            ust.selectedNodes.delete(id);
         }
     }
 
-    navPageNodeResponse = (res: J.RenderNodeResponse, ast: AppState) => {
+    navPageNodeResponse = (res: J.RenderNodeResponse) => {
         S.render.renderPage(res, true, null, true, true);
         S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
-    geoLocation = (ast: AppState) => {
+    geoLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 // todo-2: make this string a configurable property template
@@ -254,13 +239,13 @@ export class Nav {
         }
     }
 
-    showMainMenu = (ast: AppState) => {
+    showMainMenu = () => {
         S.quanta.mainMenu = new MainMenuDlg();
         S.quanta.mainMenu.open();
     }
 
-    navToMyAccntRoot = async (ast: AppState = null) => {
-        ast = ast || getAs();
+    navToMyAccntRoot = async () => {
+        const ast = getAs();
         S.view.scrollActiveToTop(ast);
 
         if (ast.isAnonUser) {
@@ -280,7 +265,7 @@ export class Nav {
                     parentCount: ast.userPrefs.showParents ? 1 : 0
                 });
 
-                this.navPageNodeResponse(res, ast);
+                this.navPageNodeResponse(res);
             }
             catch (e) {
                 S.nodeUtil.clearLastNodeIds();
@@ -327,7 +312,7 @@ export class Nav {
                 }
                 node = res.node;
             }
-            S.srch.showDocument(node, false, ast);
+            S.srch.showDocument(node, false);
         }, 250);
     }
 
@@ -341,7 +326,7 @@ export class Nav {
             if (!node) {
                 return;
             }
-            S.srch.timeline(node, "mtm", ast, null, "Rev-chron by Modify Time", 0, true);
+            S.srch.timeline(node, "mtm", null, "Rev-chron by Modify Time", 0, true);
         }, 250);
     }
 
@@ -406,15 +391,16 @@ export class Nav {
         }
     }
 
-    closeFullScreenViewer = (ast: AppState) => {
+    closeFullScreenViewer = () => {
         dispatch("CloseFullScreenViewer", s => {
             s.fullScreenConfig = { type: FullScreenType.NONE };
             s.graphData = null;
         });
     }
 
-    prevFullScreenImgViewer = (ast: AppState) => {
-        const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
+    prevFullScreenImgViewer = () => {
+        const ast = getAs();
+        const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
             let selAtt: J.Attachment = list[0];
@@ -432,8 +418,9 @@ export class Nav {
         }
     }
 
-    nextFullScreenImgViewer = (ast: AppState) => {
-        const node = S.nodeUtil.findNode(ast, ast.fullScreenConfig.nodeId);
+    nextFullScreenImgViewer = () => {
+        const ast = getAs();
+        const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAttachments(node);
             let selAtt: J.Attachment = list[list.length - 1];
@@ -463,7 +450,7 @@ export class Nav {
         FeedTab.inst.props.refreshCounter++;
 
         await promiseDispatch("SelectTab", s => {
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
             // merge props parameter into the feed data props.
@@ -525,7 +512,7 @@ export class Nav {
         }
 
         dispatch("SelectTab", s => {
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING, s);
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
             s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
@@ -691,7 +678,7 @@ export class Nav {
         });
     }
 
-    messagesNodeFeed = (ast: AppState) => {
+    messagesNodeFeed = () => {
         const hltNode = S.nodeUtil.getHighlightedNode();
         if (!hltNode) return;
         if (FeedTab.inst) {

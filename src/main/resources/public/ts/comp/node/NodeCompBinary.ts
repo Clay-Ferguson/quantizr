@@ -1,4 +1,4 @@
-import { dispatch, getAs, useAppState } from "../../AppContext";
+import { dispatch, useAppState } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
@@ -93,8 +93,7 @@ export class NodeCompBinary extends Div {
     /* This method needs to be called statically and we cannot use 'this' in it,
     because it's referenced by the plain HTML text that's used when positioned images are inserted in the content */
     static clickOnImage = (id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
-        const ast = getAs();
-        const node = S.nodeUtil.findNode(ast, id);
+        const node = S.nodeUtil.findNode(id);
         const att = S.props.getAttachment(attName, node);
 
         if (isEditorEmbed) {

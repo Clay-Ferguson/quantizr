@@ -23,9 +23,9 @@ export class NodeCompMainList extends Div {
 
             const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, ast.node);
 
-            const isMineOrImAdmin = ast.isAdminUser || S.props.isMine(ast.node, ast);
+            const isMineOrImAdmin = ast.isAdminUser || S.props.isMine(ast.node);
             const allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
-            children.push(S.render.renderChildren(ast.node, this.tabData, 1, allowNodeMove, ast));
+            children.push(S.render.renderChildren(ast.node, this.tabData, 1, allowNodeMove));
 
             this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", ast, false);
         }

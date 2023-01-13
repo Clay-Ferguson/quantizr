@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import * as J from "./JavaIntf";
@@ -79,15 +78,13 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
-            const ast = getAs();
             const data: J.FeedPushInfo = JSON.parse(e.data);
-            this.feedPushItem(data.nodeInfo, ast);
+            this.feedPushItem(data.nodeInfo);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            const ast = getAs();
             const data: J.IPSMPushInfo = JSON.parse(e.data);
-            this.ipsmPushItem(data.payload, ast);
+            this.ipsmPushItem(data.payload);
         }, false);
 
         // This is where we receive signing requests pushed from the server to be signed by the browser and pushed back up.
@@ -113,7 +110,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo, ast: AppState) => {
+    forceFeedItem = (nodeInfo: J.NodeInfo) => {
         if (!nodeInfo) return;
         FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
 
@@ -136,7 +133,7 @@ export class ServerPush {
         }
     }
 
-    ipsmPushItem = (payload: string, ast: AppState) => {
+    ipsmPushItem = (payload: string) => {
         // IPSM currently disabled
         // const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         // if (!feedData) return;
@@ -149,13 +146,15 @@ export class ServerPush {
         // });
     }
 
-    feedPushItem = (nodeInfo: J.NodeInfo, ast: AppState) => {
+    feedPushItem = (nodeInfo: J.NodeInfo) => {
         if (!nodeInfo || !FeedTab.inst) return;
-        const isMine = S.props.isMine(nodeInfo, ast);
+        const isMine = S.props.isMine(nodeInfo);
 
         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
             nodeInfo.content = "[Encrypted]";
         }
+
+        const ast = getAs();
 
         /* Ignore changes comming in during edit if we're editing on feed tab (inline)
          which will be fine because in this case when we are done editing we always

@@ -3,7 +3,6 @@ import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { AppNavLink } from "./comp/core/AppNavLink";
@@ -260,7 +259,7 @@ export class Render {
     }
 
     /* nodeId is parent node to query for calendar content */
-    showCalendar = async (nodeId: string, ast: AppState) => {
+    showCalendar = async (nodeId: string) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
@@ -286,7 +285,7 @@ export class Render {
         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
     }
 
-    showNodeUrl = (node: J.NodeInfo, ast: AppState) => {
+    showNodeUrl = (node: J.NodeInfo) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode();
         }
@@ -446,8 +445,8 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean => {
-        return !type || type.allowAction(action, node, ast);
+    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo): boolean => {
+        return !type || type.allowAction(action, node);
     }
 
     renderPage = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
@@ -463,7 +462,7 @@ export class Render {
 
             dispatch("RenderPage", s => {
                 if (!s.activeTab || clickTab) {
-                    S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN, s);
+                    S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN);
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 }
 
@@ -552,7 +551,7 @@ export class Render {
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
-                            S.nodeUtil.highlightRowById(S.quanta.pendingLocationHash.substring(1), true, s);
+                            S.nodeUtil.highlightRowById(S.quanta.pendingLocationHash.substring(1), true);
                             s.rendering = true;
                         }
                         S.quanta.pendingLocationHash = null;
@@ -562,7 +561,7 @@ export class Render {
                             console.log("highlight: byId");
                         }
 
-                        if (!S.nodeUtil.highlightRowById(targetNodeId, true, s)) {
+                        if (!S.nodeUtil.highlightRowById(targetNodeId, true)) {
                             // console.log("highlight: byId...didn't find node: " + targetNodeId);
                         }
 
@@ -619,7 +618,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, ast: AppState): Comp => {
+    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         /*
@@ -627,6 +626,7 @@ export class Render {
          * the client side for various reasons.
          */
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, node);
+        const ast = getAs();
 
         /* Note: for edit mode, or on mobile devices, always use vertical layout. */
         if (ast.userPrefs.editMode || ast.mobileMode || !layout || layout === "v") {
@@ -651,7 +651,7 @@ export class Render {
         return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    makeHeaderAvatar = (node: J.NodeInfo, ast: AppState) => {
+    makeHeaderAvatar = (node: J.NodeInfo) => {
         const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
@@ -672,16 +672,16 @@ export class Render {
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
-    allowPropertyEdit = (node: J.NodeInfo, propName: string, ast: AppState): boolean => {
+    allowPropertyEdit = (node: J.NodeInfo, propName: string): boolean => {
         const type: TypeIntf = S.plugin.getType(node.type);
-        return type ? type.allowPropertyEdit(propName, ast) : true;
+        return type ? type.allowPropertyEdit(propName, getAs()) : true;
     }
 
     isReadOnlyProperty = (propName: string): boolean => {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = async (node: J.NodeInfo, searchText: string, ast: AppState) => {
+    showGraph = async (node: J.NodeInfo, searchText: string) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
@@ -814,7 +814,7 @@ export class Render {
         return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 
-    buildCustomLinks = (ast: AppState, configArray: any): CompIntf[] => {
+    buildCustomLinks = (configArray: any): CompIntf[] => {
         const items: CompIntf[] = [];
 
         if (configArray) {

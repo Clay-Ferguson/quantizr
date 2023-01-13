@@ -14,7 +14,7 @@ export class CalendarType extends TypeBase {
         super(J.NodeType.CALENDAR, "Calendar", "fa-calendar", true);
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 
@@ -25,13 +25,13 @@ export class CalendarType extends TypeBase {
             baseComp,
             new ButtonBar([
                 new Button("Past", () => {
-                    S.srch.timeline(node, J.NodeProp.DATE_FULL, ast, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
                 }, null),
                 new Button("Future", () => {
-                    S.srch.timeline(node, J.NodeProp.DATE_FULL, ast, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
                 }, null),
                 new Button("Calendar", () => {
-                    S.render.showCalendar(node.id, ast);
+                    S.render.showCalendar(node.id);
                 }, null)
             ], "marginLeft marginBottom")
         ]);

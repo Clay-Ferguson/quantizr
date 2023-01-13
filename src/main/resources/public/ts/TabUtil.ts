@@ -30,10 +30,10 @@ export class TabUtil {
         */
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
-                S.nav.navToMyAccntRoot(s);
+                S.nav.navToMyAccntRoot();
             }
             else {
-                this.tabChanging(s.activeTab, tabName, s);
+                this.tabChanging(s.activeTab, tabName);
                 s.activeTab = S.quanta.activeTab = tabName;
             }
         });
@@ -44,17 +44,18 @@ export class TabUtil {
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
-    selectTabStateOnly = (tabName: string, ast: AppState) => {
+    selectTabStateOnly = (tabName: string) => {
+        const ast = getAs();
         if (tabName === C.TAB_MAIN && !ast.node) {
 
             // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
             // an error that we did a dispatch in a dispatch.
             setTimeout(() => {
-                S.nav.navToMyAccntRoot(null);
+                S.nav.navToMyAccntRoot();
             }, 1);
         }
         else {
-            this.tabChanging(ast.activeTab, tabName, ast);
+            this.tabChanging(ast.activeTab, tabName);
             dispatch("SetActiveTab", s => s.activeTab = S.quanta.activeTab = tabName);
         }
     }
@@ -149,7 +150,7 @@ export class TabUtil {
     /* This function manages persisting the scroll position when switching
     from one tab to another, to automatically restore the scroll position that was
     last scroll position on any given tab */
-    tabChanging = (prevTab: string, newTab: string, ast: AppState) => {
+    tabChanging = (prevTab: string, newTab: string) => {
 
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {

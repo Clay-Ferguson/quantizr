@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAs, useAppState } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
@@ -80,7 +80,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                 children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
             }
             else {
-                const c = this.renderItem(node, i, rowCount, jumpButton, ast);
+                const c = this.renderItem(node, i, rowCount, jumpButton);
                 if (c) {
                     if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
                         S.domUtil.setNodeDragHandler(c.attribs, node.id);
@@ -105,11 +105,12 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, ast: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
+        const ast = getAs();
         const allowHeader = this.allowHeader && (ast.userPrefs.showMetaData || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false, true,
             jumpButton, allowHeader, this.allowFooter, true, "userFeedItem",
-            "userFeedItemHighlight", null, ast);
+            "userFeedItemHighlight", null);
     }
 
     addPaginationBar = (ast: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {

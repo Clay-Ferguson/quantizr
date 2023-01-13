@@ -24,7 +24,7 @@ export class CalcType extends TypeBase {
         return ast.config.help?.type?.calculator?.editor;
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo, ast: AppState): boolean {
+    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
         return true;
     }
 
@@ -33,7 +33,7 @@ export class CalcType extends TypeBase {
     }
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp => {
-        if (!S.props.isMine(node, ast)) {
+        if (!S.props.isMine(node)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
 

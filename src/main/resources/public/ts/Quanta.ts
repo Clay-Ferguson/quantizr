@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
@@ -74,7 +73,7 @@ export class Quanta {
 
     selectedForTts: string = null;
 
-    refresh = (ast: AppState) => {
+    refresh = () => {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
         }
@@ -89,7 +88,7 @@ export class Quanta {
             allowScroll: true,
             setTab: true,
             forceRenderParent: false,
-            ast
+            ast: getAs()
         });
     }
 
@@ -306,7 +305,7 @@ export class Quanta {
                         case "Escape":
                             S.domUtil.removeAnnotation();
                             if (S.util.fullscreenViewerActive(ast)) {
-                                S.nav.closeFullScreenViewer(ast);
+                                S.nav.closeFullScreenViewer();
                             }
                             break;
 
@@ -326,7 +325,7 @@ export class Quanta {
                             if (this.keyDebounce()) return;
                             // S.nav.navUpLevel();
                             if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                S.nav.prevFullScreenImgViewer(ast);
+                                S.nav.prevFullScreenImgViewer();
                             }
                             break;
 
@@ -335,7 +334,7 @@ export class Quanta {
                             ast = getAs();
                             // S.nav.navOpenSelectedNode(state);
                             if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                S.nav.nextFullScreenImgViewer(ast);
+                                S.nav.nextFullScreenImgViewer();
                             }
                             break;
 

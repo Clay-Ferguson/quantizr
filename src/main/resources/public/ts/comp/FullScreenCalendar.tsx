@@ -22,7 +22,7 @@ export class FullScreenCalendar extends Main {
     compRender = (): ReactNode => {
         const state = useAppState();
         const nodeId = state.fullScreenConfig.nodeId;
-        const node = S.nodeUtil.findNode(state, nodeId);
+        const node = S.nodeUtil.findNode(nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);
@@ -68,7 +68,7 @@ export class FullScreenCalendar extends Main {
                     closeCalendarButton: {
                         text: "Close",
                         click: () => {
-                            S.nav.closeFullScreenViewer(state);
+                            S.nav.closeFullScreenViewer();
                         }
                     },
                     weekendsEventButton: {

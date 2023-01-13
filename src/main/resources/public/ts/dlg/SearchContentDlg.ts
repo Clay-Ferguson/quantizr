@@ -209,7 +209,7 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
         this.close();
-        S.render.showGraph(null, SearchContentDlg.defaultSearchText, getAs());
+        S.render.showGraph(null, SearchContentDlg.defaultSearchText);
     }
 
     search = () => {

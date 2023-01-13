@@ -92,15 +92,14 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     moreHistory = () => {
-        const ast = getAs();
         const results = this.data?.props?.results;
         if (!results || results.length === 0) return;
-        S.srch.showThreadAddMore(results[0].id, ast);
+        S.srch.showThreadAddMore(results[0].id);
     }
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string, ast: AppState): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false,
-            true, jumpButton, true, true, false, clazz, "threadFeedItemHighlight", null, ast);
+            true, jumpButton, true, true, false, clazz, "threadFeedItemHighlight", null);
     }
 }

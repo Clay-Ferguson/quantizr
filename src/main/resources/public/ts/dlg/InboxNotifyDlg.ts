@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -31,7 +30,7 @@ export class InboxNotifyDlg extends DialogBase {
                 new ButtonBar([
                     this.nodeId ? new Button("Go to Node", () => {
                         this.close();
-                        S.nav.openContentNode(this.nodeId, getAs());
+                        S.nav.openContentNode(this.nodeId);
                     }) : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop"),

@@ -40,7 +40,7 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
     This node needs to share as much implementation for item rendering as possible with what's done in the, FriendType
     Probably need a static method on FriendType itself which can do everything based on input parameters only.
     */
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, ast: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
         // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         // let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
