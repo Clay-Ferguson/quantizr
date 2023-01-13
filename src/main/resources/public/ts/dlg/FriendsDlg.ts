@@ -22,7 +22,7 @@ export class FriendsDlg extends DialogBase {
     friendsTagSearch: string;
     searchTextField: TextField;
 
-    constructor(title: string, private nodeId: string) {
+    constructor(title: string, private nodeId: string, private displayOnly: boolean) {
         super(title);
 
         this.mergeState<LS>({
@@ -133,7 +133,7 @@ export class FriendsDlg extends DialogBase {
                 ], "flexRowAlignBottom marginBottom") : null,
                 message ? new Div(message)
                     : new FriendsTable(filteredFriends, !this.nodeId, this),
-                state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {
+                !this.displayOnly && state.friends?.length > 1 ? new Checkbox("Select All", { className: "selectAllPersonsCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: LS = this.getState();
                         state.selectAll = checked;
@@ -143,9 +143,9 @@ export class FriendsDlg extends DialogBase {
                     getValue: (): boolean => state.selectAll
                 }, "float-end") : null,
                 state.friends?.length > 1 ? new Clearfix() : null,
-                !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
+                !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
-                    !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
+                    !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
                     new Button(!this.nodeId ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout

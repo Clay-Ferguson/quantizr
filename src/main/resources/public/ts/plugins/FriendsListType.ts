@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
+import { FriendsDlg } from "../dlg/FriendsDlg";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
@@ -28,8 +29,12 @@ export class FriendsListType extends TypeBase {
             new HelpButton(() => getAs().config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", { className: "noMargin" }),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
-            new Button("Find People", () => {
+            new Button("Add New Friend", () => {
                 new SearchUsersDlg().open();
+            }, null, "btn-primary"),
+            new Button("Search Friends", () => {
+                const friendsDlg = new FriendsDlg("Friends", null, true);
+                friendsDlg.open();
             }, null, "btn-primary")
         ]);
     }

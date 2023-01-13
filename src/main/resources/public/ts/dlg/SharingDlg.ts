@@ -66,7 +66,7 @@ export class SharingDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     new Button("Add People", async () => {
-                        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
+                        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null, false);
                         await friendsDlg.open();
                         if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {
                             this.dirty = true;

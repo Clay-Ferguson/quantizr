@@ -31,12 +31,6 @@ menu:
       link: ":home"
     - name: "User Guide"
       link: ":user-guide"
-    - name: "Features Overview"
-      link: ":features"
-    - name: "Watch Screencasts"
-      link: ":screencast"
-    - name: "Demo Content"
-      link: ":demo-data"
       
 help:
   menu:

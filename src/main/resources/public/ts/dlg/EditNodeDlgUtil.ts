@@ -485,7 +485,7 @@ an upload has been added or removed.
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
         // loose the cursor position.
 
-        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null);
+        const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null, false);
         await friendsDlg.open();
 
         if (friendsDlg.getState<FriendsDlgState>().selections?.size > 0) {

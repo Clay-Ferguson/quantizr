@@ -551,8 +551,16 @@ export class Edit {
         });
     }
 
+    setEditMode = async (val: boolean) => {
+        this.setUserPreferenceVal(s => s.userPrefs.editMode = val);
+    }
+
     toggleEditMode = async () => {
         this.setUserPreferenceVal(s => s.userPrefs.editMode = !s.userPrefs.editMode);
+    }
+
+    setShowMetaData = (val: boolean) => {
+        this.setUserPreferenceVal(s => s.userPrefs.showMetaData = val);
     }
 
     toggleShowMetaData = () => {
@@ -1187,7 +1195,7 @@ export class Edit {
 
         // auto-enable edit mode
         if (!boostTarget && !getAs().userPrefs.editMode) {
-            await this.toggleEditMode();
+            await this.setEditMode(true);
         }
 
         // pending edit will only be true if not a boost, becasue ActPub doesn't support posting content into a boost
@@ -1233,7 +1241,7 @@ export class Edit {
 
         // auto-enable edit mode
         if (!getAs().userPrefs.editMode) {
-            await this.toggleEditMode();
+            await this.setEditMode(true);
         }
         this.createSubNodeResponse(res, forceUsePopup, null);
     }
