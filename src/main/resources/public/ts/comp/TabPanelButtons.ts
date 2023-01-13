@@ -35,7 +35,7 @@ export class TabPanelButtons extends Div {
         for (const tab of ast.tabData) {
             items.push(this.getTabButton(tab));
 
-            const tabSubOpts = tab.getTabSubOptions(ast);
+            const tabSubOpts = tab.getTabSubOptions();
             if (tabSubOpts) {
                 items.push(tabSubOpts);
             }
@@ -54,7 +54,7 @@ export class TabPanelButtons extends Div {
 
         return new Li(null, {
             className: "nav-item",
-            style: { display: data.isVisible(ast) ? "inline" : "none" },
+            style: { display: data.isVisible() ? "inline" : "none" },
             onClick: (event: Event) => {
                 event.stopPropagation();
                 event.preventDefault();

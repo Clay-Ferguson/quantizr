@@ -1,5 +1,4 @@
 import { getAs, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -55,7 +54,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         const children: CompIntf[] = [
             new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
-                this.renderHeading(ast),
+                this.renderHeading(),
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
@@ -69,7 +68,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
-        this.addPaginationBar(ast, children, false, this.allowTopMoreButton, true);
+        this.addPaginationBar(children, false, this.allowTopMoreButton, true);
 
         let i = 0;
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
@@ -93,12 +92,12 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             rowCount++;
         });
 
-        this.addPaginationBar(ast, children, true, true, false);
+        this.addPaginationBar(children, true, true, false);
         this.setChildren(children);
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(ast: AppState): CompIntf {
+    renderHeading(): CompIntf {
         return new Div(this.data.name, { className: "tabTitle" });
     }
 
@@ -113,7 +112,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             "userFeedItemHighlight", null);
     }
 
-    addPaginationBar = (ast: AppState, children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
+    addPaginationBar = (children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
         let moreButton: IconButton = null;
         if (!this.data.props.endReached && allowMoreButton) {
             moreButton = new IconButton("fa-angle-right", "More", {

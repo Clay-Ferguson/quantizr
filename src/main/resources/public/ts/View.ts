@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "./AppContext";
-import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
@@ -15,7 +14,6 @@ export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string, forceRenderParent: boolean = false) => {
-        const ast = getAs();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -28,8 +26,7 @@ export class View {
             scrollToTop: false,
             allowScroll: true,
             setTab: true,
-            forceRenderParent,
-            ast
+            forceRenderParent
         });
     }
 
@@ -37,8 +34,9 @@ export class View {
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = async (a: RefreshTreeArgs) => {
-        if (!a.nodeId && a.ast.node) {
-            a.nodeId = a.ast.node.id;
+        const ast = getAs();
+        if (!a.nodeId && ast.node) {
+            a.nodeId = ast.node.id;
         }
 
         if (!a.highlightId) {
@@ -70,7 +68,7 @@ export class View {
                 goToLastPage: false,
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: a.ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0
             });
 
             if (!res || !res.success) {
@@ -366,5 +364,4 @@ interface RefreshTreeArgs {
     allowScroll: boolean;
     setTab: boolean;
     forceRenderParent: boolean;
-    ast: AppState
 }

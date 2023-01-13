@@ -1,3 +1,4 @@
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
@@ -23,24 +24,25 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         FeedTab.inst = this;
     }
 
-    isVisible = (ast: AppState) => true;
+    isVisible = () => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.feedResults, nodeId);
     }
 
-    nodeDeleted = (ast: AppState, nodeId: string): void => {
+    nodeDeleted = (ust: AppState, nodeId: string): void => {
         this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
         this.props.feedResults = this.props.feedResults?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    getTabSubOptions = (ast: AppState): Div => {
+    getTabSubOptions = (): Div => {
+        const ast = getAs();
         if (this.props?.feedFilterRootNode) {
             return !ast.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [

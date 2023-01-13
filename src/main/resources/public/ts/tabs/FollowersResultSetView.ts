@@ -1,4 +1,4 @@
-import { AppState } from "../AppState";
+import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
@@ -27,8 +27,8 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
         S.srch.showFollowers(page, this.data.props.showingFollowersOfUser);
     }
 
-    renderHeading(ast: AppState): CompIntf {
-        const text = this.data.props.showingFollowersOfUser === ast.userName //
+    renderHeading(): CompIntf {
+        const text = this.data.props.showingFollowersOfUser === getAs().userName //
             ? "Your followers..." //
             : "Followers of @" + this.data.props.showingFollowersOfUser + "...";
         return new Div(text, { className: "tabTitle" });

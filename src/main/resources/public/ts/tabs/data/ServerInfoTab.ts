@@ -1,3 +1,4 @@
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
@@ -20,20 +21,20 @@ export class ServerInfoTab implements TabIntf<any> {
         ServerInfoTab.inst = this;
     }
 
-    isVisible = (ast: AppState) => {
-        return !!ast.serverInfoText;
+    isVisible = () => {
+        return !!getAs().serverInfoText;
     };
 
     constructView = (data: TabIntf) => new ServerInfoView(data);
-    getTabSubOptions = (ast: AppState): Div => { return null; };
+    getTabSubOptions = (): Div => { return null; };
 
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (ast: AppState, nodeId: string): void => {
+    nodeDeleted = (ust: AppState, nodeId: string): void => {
     }
 
-    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
     }
 }

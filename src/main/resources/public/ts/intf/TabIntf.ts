@@ -26,15 +26,15 @@ export interface TabIntf<T = any> {
     topmostVisibleElmId: string;
 
     constructView(data: TabIntf): AppTab;
-    getTabSubOptions(ast: AppState): Div;
+    getTabSubOptions(): Div;
 
     // controls whether to show tab button or not.
-    isVisible(ast: AppState): boolean;
+    isVisible(): boolean;
 
     // tabs are required to be able to search their known nodes and find any that are found, or null if not found
-    findNode(ast: AppState, nodeId: string): J.NodeInfo;
-    nodeDeleted(ast: AppState, nodeId: string): void;
-    replaceNode(ast: AppState, newNode: J.NodeInfo): void;
+    findNode(nodeId: string): J.NodeInfo;
+    nodeDeleted(ust: AppState, nodeId: string): void;
+    replaceNode(ust: AppState, newNode: J.NodeInfo): void;
 
     props: T;
 

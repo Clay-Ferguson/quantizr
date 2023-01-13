@@ -1,16 +1,15 @@
 import { getAs, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
+import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
-import { Constants as C } from "../Constants";
 
 export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
 
@@ -68,7 +67,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
-            const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem", ast);
+            const c = this.renderItem(node, i, rowCount, jumpButton, "threadFeedItem");
             if (c) {
                 children.push(c);
             }
@@ -76,7 +75,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
             if (node.children) {
                 const subComps: CompIntf[] = [];
                 node.children.forEach(child => {
-                    const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", ast);
+                    const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem");
                     if (c) {
                         subComps.push(c);
                     }
@@ -98,7 +97,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string, ast: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, false,
             true, jumpButton, true, true, false, clazz, "threadFeedItemHighlight", null);
     }

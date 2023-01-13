@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -61,8 +60,7 @@ export class ImportDlg extends DialogBase {
                 scrollToTop: true,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false,
-                ast: getAs()
+                forceRenderParent: false
             });
             S.view.scrollToNode();
         }

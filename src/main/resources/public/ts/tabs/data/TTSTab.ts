@@ -1,3 +1,4 @@
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
@@ -22,20 +23,20 @@ export class TTSTab implements TabIntf<any> {
         TTSTab.inst = this;
     }
 
-    isVisible = (ast: AppState) => {
-        return ast.ttsRan || TTSTab.ttsTabSelected;
+    isVisible = () => {
+        return getAs().ttsRan || TTSTab.ttsTabSelected;
     };
 
     constructView = (data: TabIntf) => new TTSView(data);
-    getTabSubOptions = (ast: AppState): Div => { return null; };
+    getTabSubOptions = (): Div => { return null; };
 
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (ast: AppState, nodeId: string): void => {
+    nodeDeleted = (ust: AppState, nodeId: string): void => {
     }
 
-    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
     }
 }

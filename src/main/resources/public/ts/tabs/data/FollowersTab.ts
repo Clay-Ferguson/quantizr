@@ -22,19 +22,19 @@ export class FollowersTab implements TabIntf<FollowersRSInfo> {
         FollowersTab.inst = this;
     }
 
-    isVisible = (ast: AppState) => S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
+    isVisible = () => S.tabUtil.resultSetHasData(C.TAB_FOLLOWERS);
     constructView = (data: TabIntf) => new FollowersResultSetView<FollowersRSInfo>(data);
-    getTabSubOptions = (ast: AppState): Div => { return null; };
+    getTabSubOptions = (): Div => { return null; };
 
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (ast: AppState, nodeId: string): void => {
+    nodeDeleted = (ust: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });

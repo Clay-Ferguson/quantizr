@@ -133,7 +133,7 @@ export class Nav {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            const node = MainTab.inst?.findNode(ast, id);
+            const node = MainTab.inst?.findNode(id);
             if (node) {
                 dispatch("HighlightNode", s => {
                     S.nodeUtil.highlightNode(node, false, s);
@@ -174,7 +174,7 @@ export class Nav {
     openNodeById = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const ast = getAs();
-        const node = MainTab.inst?.findNode(ast, id);
+        const node = MainTab.inst?.findNode(id);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -192,8 +192,7 @@ export class Nav {
                 scrollToTop: true,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false,
-                ast
+                forceRenderParent: false
             });
         }
     }
@@ -287,10 +286,9 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAs();
 
         setTimeout(async () => {
-            let node = MainTab.inst?.findNode(ast, id);
+            let node = MainTab.inst?.findNode(id);
 
             // if we don't have this node locally on our tree, get it from the server.
             if (!node) {
@@ -318,11 +316,10 @@ export class Nav {
 
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
-        const ast = getAs();
         this.clickTreeNode(null, id);
 
         setTimeout(() => {
-            const node = MainTab.inst?.findNode(ast, id);
+            const node = MainTab.inst?.findNode(id);
             if (!node) {
                 return;
             }
@@ -332,8 +329,7 @@ export class Nav {
 
     openNodeFeed = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        const ast = getAs();
-        const node = MainTab.inst?.findNode(ast, id);
+        const node = MainTab.inst?.findNode(id);
         if (node) {
             setTimeout(() => {
                 if (FeedTab.inst) {

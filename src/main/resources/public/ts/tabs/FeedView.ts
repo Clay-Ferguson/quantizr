@@ -1,5 +1,4 @@
 import { dispatch, getAs, useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -268,7 +267,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             new Div(null, { className: "headingBar" }, [
-                this.renderHeading(ast),
+                this.renderHeading(),
                 this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Tree View"
@@ -282,7 +281,7 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(ast: AppState): CompIntf {
+    renderHeading(): CompIntf {
         return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
@@ -337,7 +336,7 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     // DO NOT DELETE - may be needed in the future.
-    // makeFilterButtonsBar = (ast: AppState): Div => {
+    // makeFilterButtonsBar = (ast : AppState): Div => {
     //     return new Div(null, { className: "marginTop" }, [
     //         ast.isAnonUser ? null : new Checkbox("Friends", {
     //             title: "Include nodes posted by your friends"

@@ -48,7 +48,7 @@ export class NodeCompContent extends Div {
             children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
         }
 
-        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode, ast));
+        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
 
         if (ast.userPrefs.showProps && this.node.properties?.length > 0) {
             children.push(new PropTable(this.node));

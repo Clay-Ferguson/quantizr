@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { DialogBase, DialogMode } from "../DialogBase";
 import { MenuPanel } from "../MenuPanel";
@@ -11,7 +10,7 @@ export class MainMenuDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new MenuPanel(getAs())
+            new MenuPanel()
         ];
     }
 }

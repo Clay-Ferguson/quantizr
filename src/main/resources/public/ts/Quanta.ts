@@ -87,8 +87,7 @@ export class Quanta {
             scrollToTop: true,
             allowScroll: true,
             setTab: true,
-            forceRenderParent: false,
-            ast: getAs()
+            forceRenderParent: false
         });
     }
 
@@ -169,8 +168,7 @@ export class Quanta {
                         scrollToTop: false,
                         allowScroll: true,
                         setTab: true,
-                        forceRenderParent: false,
-                        ast: getAs()
+                        forceRenderParent: false
                     });
                     S.tabUtil.selectTab(C.TAB_MAIN);
                 }

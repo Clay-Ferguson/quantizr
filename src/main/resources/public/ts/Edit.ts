@@ -59,8 +59,7 @@ export class Edit {
             scrollToTop: true,
             allowScroll: true,
             setTab: true,
-            forceRenderParent: false,
-            ast: getAs()
+            forceRenderParent: false
         });
         S.view.scrollToNode();
     }
@@ -78,8 +77,7 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false,
-                ast
+                forceRenderParent: false
             });
         }
     }
@@ -168,8 +166,7 @@ export class Edit {
                     scrollToTop: false,
                     allowScroll: true,
                     setTab: true,
-                    forceRenderParent: false,
-                    ast: getAs()
+                    forceRenderParent: false
                 });
             }
             else {
@@ -749,7 +746,7 @@ export class Edit {
         if (!id) {
             node = S.nodeUtil.getHighlightedNode();
         } else {
-            node = MainTab.inst?.findNode(ast, id);
+            node = MainTab.inst?.findNode(id);
         }
 
         if (node) {
@@ -789,7 +786,7 @@ export class Edit {
                 parentNode = ast.node;
             }
         } else {
-            parentNode = MainTab.inst?.findNode(ast, id);
+            parentNode = MainTab.inst?.findNode(id);
             if (!parentNode) {
                 return;
             }
@@ -1093,7 +1090,6 @@ export class Edit {
         }
         else {
             setTimeout(() => {
-                const ast = getAs();
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: true,
@@ -1103,8 +1099,7 @@ export class Edit {
                     scrollToTop: false,
                     allowScroll: true,
                     setTab: true,
-                    forceRenderParent: false,
-                    ast
+                    forceRenderParent: false
                 });
             }, 500);
         }
@@ -1127,7 +1122,6 @@ export class Edit {
     }
 
     splitNodeResponse = (res: J.SplitNodeResponse) => {
-        const ast = getAs();
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,
@@ -1138,8 +1132,7 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false,
-                ast
+                forceRenderParent: false
             });
             S.view.scrollToNode();
         }
@@ -1275,7 +1268,6 @@ export class Edit {
         });
 
         if (S.util.checkSuccess("LinkNodes Response", res)) {
-            const ast = getAs();
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
@@ -1285,8 +1277,7 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: false,
                 setTab: false,
-                forceRenderParent: false,
-                ast
+                forceRenderParent: false
             });
         }
     }
@@ -1308,7 +1299,6 @@ export class Edit {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
             });
-            const ast = getAs();
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
@@ -1318,8 +1308,7 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: false,
                 setTab: false,
-                forceRenderParent: false,
-                ast
+                forceRenderParent: false
             });
         }
     }

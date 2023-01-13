@@ -1,5 +1,4 @@
 import { dispatch, getAs, promiseDispatch, useAppState } from "./AppContext";
-import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Tag } from "./comp/core/Tag";
@@ -34,11 +33,11 @@ export class MenuPanel extends Div {
     static activeMenu: Set<string> = new Set<string>();
     static inst: MenuPanel;
 
-    constructor(ast: AppState) {
+    constructor() {
         super(null, {
             id: C.ID_MENU,
             role: "tablist",
-            className: (ast.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
+            className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
         MenuPanel.inst = this;
         this.mergeState<MenuPanelState>({ expanded: MenuPanel.activeMenu });
@@ -245,7 +244,7 @@ export class MenuPanel extends Div {
         }
 
         if (ast.config.menu?.help) {
-            children.push(new Menu(state, "Help", this.helpMenuItems(ast)));
+            children.push(new Menu(state, "Help", this.helpMenuItems()));
         }
 
         if (!ast.isAnonUser) {
@@ -643,7 +642,8 @@ export class MenuPanel extends Div {
     }
 
     // These are defined externally in config-text.yaml
-    helpMenuItems = (ast: AppState): Div[] => {
+    helpMenuItems = (): Div[] => {
+        const ast = getAs();
         const items: Div[] = [];
         if (ast.config.menu?.help) {
             for (const menuItem of ast.config.menu.help) {

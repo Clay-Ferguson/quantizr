@@ -95,7 +95,7 @@ export class LeftNavPanel extends Div {
                     }) : null
                 ])
             ]),
-            ast.isAnonUser ? null : new MenuPanel(ast),
+            ast.isAnonUser ? null : new MenuPanel(),
 
             // if anon user
             ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null

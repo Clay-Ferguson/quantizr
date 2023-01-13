@@ -108,13 +108,13 @@ export class RssType extends TypeBase {
                 feedContent = new Button("Load Feed", () => {
                     dispatch("LoadingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
-                        RssType.loadFeed(ast, feedSrcHash, feedSrc);
+                        RssType.loadFeed(s, feedSrcHash, feedSrc);
                     });
                 }, null, "btn-primary marginAll");
             }
             /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
             else if (ast.rssFeedCache[feedSrcHash]) {
-                feedContent = this.renderItem(ast.rssFeedCache[feedSrcHash], feedSrc, ast);
+                feedContent = this.renderItem(ast.rssFeedCache[feedSrcHash], feedSrc);
             }
             else {
                 console.error("unknown state in feed runner");
@@ -128,12 +128,12 @@ export class RssType extends TypeBase {
         ]);
     }
 
-    static loadFeed = async (ast: AppState, feedSrcHash: string, feedSrc: string) => {
+    static loadFeed = async (ust: AppState, feedSrcHash: string, feedSrc: string) => {
         /* warning: paging here is not zero offset. First page is number 1 */
-        let page: number = ast.rssFeedPage[feedSrcHash];
+        let page: number = ust.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
-            ast.rssFeedPage[feedSrcHash] = page;
+            ust.rssFeedPage[feedSrcHash] = page;
         }
 
         const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
@@ -172,7 +172,8 @@ export class RssType extends TypeBase {
         }
     }
 
-    renderItem(feed: J.RssFeed, feedSrc: string, ast: AppState): Comp {
+    renderItem(feed: J.RssFeed, feedSrc: string): Comp {
+        const ast = getAs();
         const feedList = new Div("", { className: "rss-feed-listing" });
         const feedOut: Comp[] = [];
 
@@ -191,7 +192,7 @@ export class RssType extends TypeBase {
             getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
         }));
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, ast));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -237,20 +238,20 @@ export class RssType extends TypeBase {
         feedList.addChild(feedOutDiv);
 
         for (const item of feed.entries) {
-            feedList.addChild(this.buildFeedItem(feed, item, ast));
+            feedList.addChild(this.buildFeedItem(feed, item));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, ast));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash));
         return feedList;
     }
 
-    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, ast: AppState): ButtonBar => {
+    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string): ButtonBar => {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.setPage(feedSrc, feedSrcHash, ast, 1);
+                    this.setPage(feedSrc, feedSrcHash, 1);
                 },
                 title: "First Page"
             }) : null,
@@ -258,7 +259,7 @@ export class RssType extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, ast, -1);
+                    this.pageBump(feedSrc, feedSrcHash, -1);
                 },
                 title: "Previous Page"
             }) : null,
@@ -266,7 +267,7 @@ export class RssType extends TypeBase {
                 onClick: (event: Event) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, ast, 1);
+                    this.pageBump(feedSrc, feedSrcHash, 1);
                 },
                 title: "Next Page"
             })
@@ -274,25 +275,27 @@ export class RssType extends TypeBase {
     }
 
     /* cleverly does both prev or next paging */
-    pageBump = (feedSrc: string, feedSrcHash: string, ast: AppState, bump: number) => {
+    pageBump = (feedSrc: string, feedSrcHash: string, bump: number) => {
+        const ast = getAs();
         let page: number = ast.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
         if (page + bump < 1) return;
-        this.setPage(feedSrc, feedSrcHash, ast, page + bump);
+        this.setPage(feedSrc, feedSrcHash, page + bump);
     }
 
-    setPage = (feedSrc: string, feedSrcHash: string, ast: AppState, page: number) => {
+    setPage = (feedSrc: string, feedSrcHash: string, page: number) => {
         dispatch("RSSUpdated", s => {
             // deleting will force a requery from the server
             s.rssFeedCache[feedSrcHash] = "loading";
             s.rssFeedPage[feedSrcHash] = page;
-            RssType.loadFeed(ast, feedSrcHash, feedSrc);
+            RssType.loadFeed(s, feedSrcHash, feedSrc);
         });
     }
 
-    buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, ast: AppState): Comp {
+    buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry): Comp {
+        const ast = getAs();
         const children: Comp[] = [];
         const headerDivChildren = [];
         let imageShown = false;

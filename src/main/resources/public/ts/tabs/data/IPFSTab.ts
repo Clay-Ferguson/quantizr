@@ -1,3 +1,4 @@
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
@@ -25,22 +26,23 @@ export class IPFSTab implements TabIntf<any> {
         IPFSTab.inst = this;
     }
 
-    isVisible = (ast: AppState) => {
+    isVisible = () => {
+        const ast = getAs();
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
         // return state.showIpfsTab;
         return ast.config.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures && ast.allowedFeatures.indexOf("web3") !== -1;
     };
 
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);
-    getTabSubOptions = (ast: AppState): Div => { return null; };
+    getTabSubOptions = (): Div => { return null; };
 
-    findNode = (ast: AppState, nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (ast: AppState, nodeId: string): void => {
+    nodeDeleted = (ust: AppState, nodeId: string): void => {
     }
 
-    replaceNode = (ast: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
     }
 }

@@ -36,7 +36,7 @@ export class NodeUtil {
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
         if (id) {
-            return MainTab.inst?.findNode(ast, id);
+            return MainTab.inst?.findNode(id);
         }
         return null;
     }
@@ -44,7 +44,7 @@ export class NodeUtil {
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean): boolean => {
         const ast = getAs();
-        let node = MainTab.inst?.findNode(ast, id);
+        let node = MainTab.inst?.findNode(id);
         let ret = true;
 
         /* If node not known, resort to taking the best, previous node we had */
@@ -91,7 +91,7 @@ export class NodeUtil {
     findNode = (nodeId: string): J.NodeInfo => {
         const ast = getAs();
         for (const data of ast.tabData) {
-            const node = data.findNode(ast, nodeId);
+            const node = data.findNode(nodeId);
             if (node) return node;
         }
         return null;

@@ -1,5 +1,3 @@
-import { useAppState } from "../AppContext";
-import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -14,13 +12,12 @@ export class IPSMView extends AppTab {
     }
 
     preRender(): void {
-        const ast = useAppState();
         this.attribs.className = this.getClass();
         const children: Comp[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
-                this.renderHeading(ast)
+                this.renderHeading()
             ]),
             new Div("Realtime IPFS PubSub events from ipsm-heartbeat topic..."),
             new HelpButton(() => {
@@ -38,7 +35,7 @@ export class IPSMView extends AppTab {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(ast: AppState): CompIntf {
+    renderHeading(): CompIntf {
         return new Div("IPSM Console", { className: "tabTitle" });
     }
 }

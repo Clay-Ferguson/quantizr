@@ -1,5 +1,4 @@
 import { getAs } from "../AppContext";
-import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
@@ -289,7 +288,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    saveTime = (ast: AppState) => {
+    saveTime = () => {
         if (this.player && !this.player.paused) {
             /* this safety check to be sure no hidden audio can still be playing should no longer be needed
             now that I have the close listener even on the dialog, but i'll leave this here anyway. Can't hurt. */

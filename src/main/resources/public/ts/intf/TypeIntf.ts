@@ -1,15 +1,14 @@
-import { AppState } from "../AppState";
-import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
-import { TabIntf } from "./TabIntf";
 import { EditorOptions } from "../Interfaces";
+import * as J from "../JavaIntf";
+import { TabIntf } from "./TabIntf";
 
 /* This interface is how Type Plugins are handled */
 export interface TypeIntf {
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean, ast: AppState): Comp;
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo): boolean;
     getAllowRowHeader(): boolean;

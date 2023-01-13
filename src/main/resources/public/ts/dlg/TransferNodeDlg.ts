@@ -96,8 +96,7 @@ export class TransferNodeDlg extends DialogBase {
             scrollToTop: true,
             allowScroll: true,
             setTab: true,
-            forceRenderParent: false,
-            ast: getAs()
+            forceRenderParent: false
         });
         S.util.showMessage(res.message, "Success");
         this.close();

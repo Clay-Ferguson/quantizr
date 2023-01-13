@@ -1,4 +1,3 @@
-import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
@@ -27,7 +26,7 @@ export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSet
         S.srch.showFollowing(page, this.data.props.showingFollowingOfUser);
     }
 
-    renderHeading(ast: AppState): CompIntf {
+    renderHeading(): CompIntf {
         return new Div("@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "tabTitle" });
     }
 
