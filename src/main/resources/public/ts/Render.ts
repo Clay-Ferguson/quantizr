@@ -2,7 +2,7 @@ import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
-import { dispatch, getAs } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { AppNavLink } from "./comp/core/AppNavLink";
@@ -449,7 +449,7 @@ export class Render {
         return !type || type.allowAction(action, node);
     }
 
-    renderPage = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
+    renderPage = async (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -460,7 +460,7 @@ export class Render {
                 console.log("renderPage: scrollToTop=" + scrollToTop + " allowScroll=" + allowScroll);
             }
 
-            dispatch("RenderPage", s => {
+            await promiseDispatch("RenderPage", s => {
                 if (!s.activeTab || clickTab) {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN);
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;

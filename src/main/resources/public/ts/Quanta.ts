@@ -127,7 +127,7 @@ export class Quanta {
             S.render.initMarkdown();
 
             console.log("createTabs");
-            S.tabUtil.createAppTabs();
+            await S.tabUtil.createAppTabs();
 
             this.pendingLocationHash = window.location.hash;
 
@@ -180,7 +180,7 @@ export class Quanta {
 
             window.addEventListener("orientationchange", () => {
                 // we force the page to re-render with an all new state.
-                dispatch("orientationChange", s => {});
+                dispatch("orientationChange", s => { });
             });
 
             // not used. do not delete.
@@ -215,32 +215,30 @@ export class Quanta {
             this.setOverlay(false);
             S.util.playAudioIfRequested();
 
-            // This timer delay is just for asthetics and should not be required.
-            setTimeout(async () => {
-                S.push.init();
-                const res = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
-                    appGuid: Quanta.appGuid
-                }, true);
-                if (res.config) {
-                    dispatch("configUpdates", s => {
-                        s.config = res.config || {};
+            S.push.init();
+            const res = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+                appGuid: Quanta.appGuid
+            }, true);
 
-                        // we show the user message after the config is set, but there's no reason to do it here
-                        // other than perhaps have the screen updated with the latest based on the config.
-                        setTimeout(() => {
-                            if (g_userMessage) {
-                                S.util.showMessage(g_userMessage, "");
-                                g_userMessage = null;
-                            }
+            if (res.config) {
+                dispatch("configUpdates", s => {
+                    s.config = res.config || {};
 
-                            if (g_displayUserProfileId) {
-                                new UserProfileDlg(g_displayUserProfileId).open();
-                                g_displayUserProfileId = null;
-                            }
-                        }, 100);
-                    });
-                }
-            }, 250);
+                    // we show the user message after the config is set, but there's no reason to do it here
+                    // other than perhaps have the screen updated with the latest based on the config.
+                    setTimeout(() => {
+                        if (g_userMessage) {
+                            S.util.showMessage(g_userMessage, "");
+                            g_userMessage = null;
+                        }
+
+                        if (g_displayUserProfileId) {
+                            new UserProfileDlg(g_displayUserProfileId).open();
+                            g_displayUserProfileId = null;
+                        }
+                    }, 100);
+                });
+            }
 
             Log.log("initApp complete.");
             S.domUtil.enableMouseEffect();
@@ -249,6 +247,9 @@ export class Quanta {
             console.error(e.message);
             alert("App failed to startup: " + e.message);
             throw e;
+        }
+        finally {
+            dispatch("AppInitComplete", s => s.appInitComplete = true);
         }
     }
 

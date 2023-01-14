@@ -12,6 +12,7 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
+    appInitComplete = false;
     tabPanelVisible: boolean = true;
     stateId: number = 0;
     displayFeedSearch: boolean = false;

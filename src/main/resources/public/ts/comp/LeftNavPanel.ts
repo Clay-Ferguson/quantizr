@@ -84,7 +84,7 @@ export class LeftNavPanel extends Div {
                         onClick: S.nav.showMyNewMessages,
                         title: "Show new messages"
                     }) : null,
-                    ast.isAnonUser ? new Icon({
+                    ast.userName && ast.isAnonUser ? new Icon({
                         className: "fa fa-bars fa-2x clickable",
                         onClick: () => {
                             dispatch("ToggleLHS", s => {

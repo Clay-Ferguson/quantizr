@@ -91,7 +91,7 @@ export class User {
 
         if (!callUsr) {
             if (!this.usingUrlTab()) {
-                this.anonInitialRender();
+                await this.anonInitialRender();
             }
         } else {
             try {
@@ -116,32 +116,32 @@ export class User {
                 if (usingCredentials) {
                     // Note: If user entered wrong case-sentitivity string on login dialog they can still login
                     // but this res.userName however will have the correct name (case-sensitive) here now.
-                    this.loginResponse(res, res.userProfile.userName, callPwd, false);
+                    await this.loginResponse(res, res.userProfile.userName, callPwd, false);
                 } else {
                     if (res.success) {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
 
                     if (!this.usingUrlTab()) {
-                        this.anonInitialRender();
+                        await this.anonInitialRender();
                     }
                 }
             }
             catch (e) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
-                this.anonInitialRender();
+                await this.anonInitialRender();
             }
         }
     }
 
-    anonInitialRender = () => {
+    anonInitialRender = async () => {
         if (g_initialTab) {
             S.tabUtil.selectTab(g_initialTab);
             g_initialTab = null;
         }
         else {
-            S.util.loadAnonPageHome();
+            await S.util.loadAnonPageHome();
         }
     }
 
@@ -222,7 +222,7 @@ export class User {
                 }, 500);
             }
 
-            S.util.setStateVarsUsingLoginResponse(res);
+            await S.util.setStateVarsUsingLoginResponse(res);
 
             /* set ID to be the page we want to show user right after login */
             let id: string = null;
@@ -232,7 +232,7 @@ export class User {
             /* if we know the server already failed to get the content requested on the url then
             default to main tab (tree) and set it up to display an error */
             if (g_urlIdFailMsg) {
-                dispatch("setAccessFailed", s => {
+                await promiseDispatch("setAccessFailed", s => {
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 });
                 return;
@@ -263,7 +263,7 @@ export class User {
                 }
             }
 
-            S.view.refreshTree({
+            await S.view.refreshTree({
                 nodeId: id,
                 zeroOffset: true,
                 renderParentIfLeaf,

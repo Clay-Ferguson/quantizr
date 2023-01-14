@@ -797,7 +797,7 @@ export class Util {
         if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
             // let count = res.bookmarks ? res.bookmarks.length : 0;
-            dispatch("loadBookmarks", s => {
+            await promiseDispatch("loadBookmarks", s => {
                 s.bookmarks = res.bookmarks;
 
                 // use a timer to let this dispatch completely finish setting bookmarks before we sent the click to expand.
@@ -857,7 +857,7 @@ export class Util {
     loadAnonPageHome = async () => {
         try {
             if (this.sendAnonUsersToFeed) {
-                S.nav.messagesFediverse();
+                await S.nav.messagesFediverse();
             }
             else {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
@@ -884,7 +884,7 @@ export class Util {
                     S.user.userLogin();
                     return;
                 }
-                S.render.renderPage(res, false, null, true, true);
+                await S.render.renderPage(res, false, null, true, true);
             }
         }
         catch (e) {
@@ -933,7 +933,7 @@ export class Util {
 
         const rate = await S.localDB.getVal(C.LOCALDB_VOICE_RATE, "allUsers");
 
-        dispatch("LoginResponse", s => {
+        await promiseDispatch("LoginResponse", s => {
             s.userProfile = res.userProfile;
             s.userName = res.userProfile.userName;
             s.isAdminUser = res.userProfile.userName === J.PrincipalName.ADMIN;

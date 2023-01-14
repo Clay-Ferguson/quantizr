@@ -243,9 +243,10 @@ export class MenuPanel extends Div {
             }
         }
 
-        if (ast.config.menu?.help) {
-            children.push(new Menu(state, "Help", this.helpMenuItems()));
-        }
+        // todo-0: no longer needed. These items are available in Navigate menu
+        // if (ast.config.menu?.help) {
+        //     children.push(new Menu(state, "Help", this.helpMenuItems()));
+        // }
 
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Navigate", [

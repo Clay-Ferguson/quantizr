@@ -79,7 +79,7 @@ export class View {
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
             }
-            S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
+            await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();

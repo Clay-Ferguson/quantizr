@@ -695,11 +695,11 @@ export class Nav {
         });
     }
 
-    messagesFediverse = () => {
+    messagesFediverse = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
-        this.messages({
+        await this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterMyMentions: false,

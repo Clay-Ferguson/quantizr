@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
@@ -59,8 +59,8 @@ export class TabUtil {
         }
     }
 
-    createAppTabs = () => {
-        dispatch("initTabs", s => {
+    createAppTabs = async () => {
+        await promiseDispatch("initTabs", s => {
             s.tabData = [
                 new MainTab(),
                 new DocumentTab(),

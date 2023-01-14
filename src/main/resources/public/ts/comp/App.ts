@@ -12,6 +12,7 @@ import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./core/Button";
 import { Heading } from "./core/Heading";
+import { Progress } from "./core/Progress";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -32,6 +33,10 @@ export class App extends Main {
 
     preRender(): void {
         const ast = useAppState();
+        if (!ast.appInitComplete) {
+            this.setChildren([new Progress()]);
+            return;
+        }
 
         /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
         if (ast.mobileMode && ast.dialogStack.length > 0) {
