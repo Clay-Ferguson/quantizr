@@ -167,6 +167,9 @@ public class DateUtil {
 	/*
 	 * Formats this duration into a string that describes the time about the way a human would say it.
 	 * For example if it was a number of days ago you don't include minutes and seconds etc.
+	 * 
+	 * Set showMillis to true, if you need high resolution format for presision times, or leave false
+	 * if this is a more low resolution thing like "time ago" for a social media post, etc. 
 	 */
 	public static String formatDurationMillis(long different, boolean showMillis) {
 		StringBuilder sb = new StringBuilder();
@@ -216,23 +219,28 @@ public class DateUtil {
 
 		boolean msDone = false;
 		// only show seconds if not over a day or hour.
-		if (years == 0 && days == 0 && hours == 0 && minutes < 4 && seconds > 0) {
-			if (sb.length() > 0)
-				sb.append(" ");
-
-			// Always show like 1.5s rather than '1s 500ms'
-			if (showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
-				sb.append(String.format("%.2f", (float) seconds + (float) millis / 1000f));
+		if (years == 0 && days == 0 && hours == 0 && minutes < 4) {
+			if (!showMillis && seconds < 30) {
+				sb.append("Just now");
 				msDone = true;
 			} else {
-				sb.append(String.valueOf(seconds));
-			}
+				if (sb.length() > 0)
+					sb.append(" ");
 
-			sb.append("s");
+				// Always show like 1.5s rather than '1s 500ms'
+				if (showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
+					sb.append(String.format("%.2f", (float) seconds + (float) millis / 1000f));
+					msDone = true;
+				} else {
+					sb.append(String.valueOf(seconds));
+				}
+
+				sb.append("s");
+			}
 		}
 
 		// only show milliseconds if not over a minute
-		if (!msDone && showMillis && years == 0 &&  days == 0 && hours == 0 && minutes == 0 && millis > 0) {
+		if (!msDone && showMillis && years == 0 && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));
