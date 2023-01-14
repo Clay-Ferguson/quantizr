@@ -113,7 +113,7 @@ public class NodeInfo {
 		this.tags = tags;
 		this.lastModified = lastModified;
 		if (ok(lastModified)) {
-			this.timeAgo = DateUtil.formatDurationMillis(System.currentTimeMillis() - lastModified.getTime(), false);
+			this.timeAgo = DateUtil.formatDurationMillis(System.currentTimeMillis() - lastModified.getTime());
 		}
 		this.displayName = displayName;
 		this.owner = owner;

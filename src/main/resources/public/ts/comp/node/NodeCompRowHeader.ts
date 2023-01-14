@@ -215,6 +215,7 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo && this.node.timeAgo) {
             floatUpperRightDiv.addChild(new Span(this.node.timeAgo, {
+                className: "lastModifiedTime",
                 title: "Last Modified: " + S.util.formatDateTime(new Date(this.node.lastModified))
             }));
         }
@@ -244,7 +245,7 @@ export class NodeCompRowHeader extends Div {
 
         const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, this.node);
         const unpublishedIcon = unpublished ? new Icon({
-            className: "fa fa-eye-slash fa-lg sharingIcon marginLeft",
+            className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
             title: "Node is Unpublished\n\nWill not appear in feed"
         }) : null;
 
@@ -254,7 +255,7 @@ export class NodeCompRowHeader extends Div {
                 const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
                 floatUpperRightDiv.addChildren([
                     new Icon({
-                        className: "fa fa-globe fa-lg sharingIcon marginLeft",
+                        className: "fa fa-globe fa-lg sharingIcon marginLeft microMarginRight",
                         title: "Node is Public\n(" + appendNode + ")"
                     }),
                     unpublishedIcon

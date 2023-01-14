@@ -336,11 +336,14 @@ export class EditNodeDlg extends DialogBase {
             sharingDiv = new Div(null, {
                 className: "float-end clickable marginBottom"
             }, [
-                new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
+                new Span("Shared to: ", {
+                    title: "Edit Node Sharing",
+                    onClick: () => this.utl.share(this)
+                }),
                 ...shareComps,
                 !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
-                    className: "fa fa-eye-slash fa-lg sharingIcon marginLeft",
+                    className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
                 }) : null
             ]);

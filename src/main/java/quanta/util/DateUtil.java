@@ -24,6 +24,7 @@ public class DateUtil {
 	public static final long MINUTE_MILLIS = 60 * SECOND_MILLIS;
 	public static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
 	public static final long DAY_MILLIS = 24 * HOUR_MILLIS;
+	public static final long MONTH_MILLIS = 30 * DAY_MILLIS;
 	public static final long YEAR_MILLIS = 365 * DAY_MILLIS;
 
 	/** Used to format date values */
@@ -160,22 +161,18 @@ public class DateUtil {
 		}
 	}
 
-	public static String formatDurationMillis(long different) {
-		return formatDurationMillis(different, false);
-	}
-
 	/*
 	 * Formats this duration into a string that describes the time about the way a human would say it.
 	 * For example if it was a number of days ago you don't include minutes and seconds etc.
-	 * 
-	 * Set showMillis to true, if you need high resolution format for presision times, or leave false
-	 * if this is a more low resolution thing like "time ago" for a social media post, etc. 
 	 */
-	public static String formatDurationMillis(long different, boolean showMillis) {
+	public static String formatDurationMillis(long different) {
 		StringBuilder sb = new StringBuilder();
 
 		long years = different / YEAR_MILLIS;
 		different = different % YEAR_MILLIS;
+
+		long months = different / MONTH_MILLIS;
+		different = different % MONTH_MILLIS;
 
 		long days = different / DAY_MILLIS;
 		different = different % DAY_MILLIS;
@@ -189,58 +186,62 @@ public class DateUtil {
 		long seconds = different / SECOND_MILLIS;
 		long millis = different % SECOND_MILLIS;
 
+		// we only show the largest two time measturement units
+		// For example if we have years and months, we don't provide the days, hours, etc.
+		int units = 0;
+
 		if (years > 0) {
 			sb.append(String.valueOf(years));
 			sb.append("y");
+			units++;
 		}
 
-		if (years < 5 && days > 0) {
+		if (months > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(months));
+			sb.append("mo");
+			if (++units == 2)
+				return sb.toString();
+		}
+
+		if (days > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(days));
 			sb.append("d");
+			if (++units == 2)
+				return sb.toString();
 		}
 
-		// only show resolution of hours if days less than 4
-		if (years == 0 && days < 4 && hours > 0) {
+		if (hours > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(hours));
 			sb.append("h");
+			if (++units == 2)
+				return sb.toString();
 		}
 
-		// only show resolution of minutes if not over a day
-		if (years == 0 && days == 0 && hours < 4 && minutes > 0) {
+		if (minutes > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(minutes));
 			sb.append("m");
+			if (++units == 2)
+				return sb.toString();
 		}
 
-		boolean msDone = false;
-		// only show seconds if not over a day or hour.
-		if (years == 0 && days == 0 && hours == 0 && minutes < 4) {
-			if (!showMillis && seconds < 30) {
-				sb.append("Just now");
-				msDone = true;
-			} else {
-				if (sb.length() > 0)
-					sb.append(" ");
-
-				// Always show like 1.5s rather than '1s 500ms'
-				if (showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
-					sb.append(String.format("%.2f", (float) seconds + (float) millis / 1000f));
-					msDone = true;
-				} else {
-					sb.append(String.valueOf(seconds));
-				}
-
-				sb.append("s");
-			}
+		if (seconds > 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(seconds));
+			sb.append("s");
+			if (++units == 2)
+				return sb.toString();
 		}
 
-		// only show milliseconds if not over a minute
-		if (!msDone && showMillis && years == 0 && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
+		if (millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));
