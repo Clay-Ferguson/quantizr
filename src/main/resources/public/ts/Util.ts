@@ -592,26 +592,25 @@ export class Util {
             // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
         }
 
-        this.updateNodeHistory(node);
+        this.updateNodeHistory(node, false);
     }
 
-    updateNodeHistory = (node: J.NodeInfo) => {
-        if (!node.id) {
+    // If 'addLater=true' this means we can't alter state right now, because it could destroy text
+    // the user is tempting to 'mouse select' and so we just get ready to add to history
+    // the next chance we get.
+    updateNodeHistory = (node: J.NodeInfo, addLater: boolean) => {
+        if (!node.id || getAs().nodeHistoryLocked || !node ||
+            S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) {
             return;
         }
 
         dispatch("updateNodeHistory", s => {
-            s.showAllRowDetails.add(node.id);
-
-            if (s.nodeHistoryLocked || !node ||
-                S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) return;
-
             // remove node if it exists in history (so we can add to top)
             s.nodeHistory = s.nodeHistory.filter(h => h.id !== node.id);
 
             // now add to top.
             s.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
-        });
+        }, addLater);
     }
 
     removeHtmlTags = (text: string) => {

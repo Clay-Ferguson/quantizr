@@ -585,7 +585,7 @@ export class Search {
             }
             boostComp = new Div(null, {
                 onClick: async () => {
-                    S.util.updateNodeHistory(node.boostedNode);
+                    S.util.updateNodeHistory(node.boostedNode, true);
 
                     // after updating state we need this to ensure this click also focused this window.
                     S.domUtil.focusId(tabData.id);
@@ -632,7 +632,7 @@ export class Search {
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             nid: node.id,
             onClick: async () => {
-                S.util.updateNodeHistory(node);
+                S.util.updateNodeHistory(node, true);
 
                 // after updating state we need this to ensure this click also focused this window.
                 S.domUtil.focusId(tabData.id);

@@ -340,7 +340,7 @@ export class Edit {
                 });
             }
 
-            S.util.updateNodeHistory(newNode);
+            S.util.updateNodeHistory(newNode, false);
 
             if (ast.activeTab === C.TAB_MAIN) {
                 // Inject the new node right into the page children

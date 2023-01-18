@@ -19,7 +19,13 @@ export let state = new AppState();
 export const AppContext = createContext(state);
 export type StateModFunc = (s: AppState) => any;
 
-function reducer(s: AppState, action: any) {
+interface DispatchData {
+    type: string;
+    func: StateModFunc;
+}
+let dispatchLaterList: DispatchData[] = [];
+
+function reducer(s: AppState, action: DispatchData) {
     const saveState = s;
     try {
         const newState = { ...s };
@@ -69,11 +75,21 @@ export function initDispatch(): void {
  * the state transform to complete, so use the 'promiseDispatch' for that. Our design pattern is to
  * always do state changes (dispatches) only thru this 'dispatcher', local to this module
  */
-export function dispatch(type: string, func: StateModFunc) {
+export function dispatch(type: string, func: StateModFunc, dispatchLater: boolean = false) {
     if (!dispatcher) {
         throw new Error("Called dispatch before first render. type: " + type);
     }
-    dispatcher({ type, func });
+
+    if (dispatchLater) {
+        dispatchLaterList.push({ type, func });
+    }
+    else {
+        // dispatch any pending actions first.
+        dispatchLaterList.forEach(d => dispatcher(d));
+        dispatchLaterList = [];
+
+        dispatcher({ type, func });
+    }
 }
 
 /**
