@@ -18,8 +18,6 @@ import quanta.mongo.model.SubNode;
 import quanta.response.FeedPushInfo;
 import quanta.response.NodeEditedPushInfo;
 import quanta.response.ServerPushInfo;
-import quanta.response.SessionTimeoutPushInfo;
-import quanta.util.ThreadLocals;
 
 @Component
 public class PushService extends ServiceBase {
@@ -177,14 +175,6 @@ public class PushService extends ServiceBase {
 				} catch (Exception ex) {
 					log.error("FAILED Pushing to Session User: " + sc.getUserName());
 					pushEmitter.completeWithError(ex);
-				} finally {
-					// todo-2: this can be done in a slightly cleaner way (more decoupled)
-					if (info instanceof SessionTimeoutPushInfo) {
-						ThreadLocals.setMongoSession(null);
-						sc.setLive(false);
-						sc.setRootId(null);
-						sc.setUserName(null);
-					}
 				}
 			}
 		});

@@ -1437,6 +1437,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		GetConfigResponse res = new GetConfigResponse();
 		res.setConfig(prop.getConfig());
+		res.setSessionTimeoutMinutes(prop.getSessionTimeoutMinutes());
 		return res;
 	}
 

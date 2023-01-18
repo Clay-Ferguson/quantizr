@@ -220,8 +220,19 @@ export abstract class Comp implements CompIntf {
     wrapClick = (obj: any) => {
         // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to
         // give the animation time to run.
-        if (obj?.onClick && S.domUtil.mouseEffect) {
-            obj.onClick = S.util.delayFunc(obj.onClick);
+        if (obj?.onClick) {
+            const func = obj.onClick;
+
+            // Not fat arrow, because we need 'arguments',
+            // create a new function that injects calls to userActive
+            obj.onClick = function (evt: any) {
+                S.rpcUtil.userActive();
+                func.apply(null, arguments);
+            };
+
+            if (S.domUtil.mouseEffect) {
+                obj.onClick = S.util.delayFunc(obj.onClick);
+            }
         }
     }
 

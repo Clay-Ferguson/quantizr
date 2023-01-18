@@ -35,14 +35,18 @@ public class GlobalFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 
 		try {
 			ThreadLocals.removeAll();
 			HttpServletRequest sreq = null;
 			if (request instanceof HttpServletRequest) {
 				sreq = (HttpServletRequest) request;
-				boolean createSession = true;
+				String uri = sreq.getRequestURI();
+				boolean createSession = "/".equals(uri) || uri.isEmpty();
+
+				// todo-1: This can be done in a cleaner way. Also ONLY create session when accessing "/" (index.htm)
 
 				// Special checks for Cache-Controls
 				if (sreq.getRequestURI().contains("/images/") || //
@@ -52,14 +56,12 @@ public class GlobalFilter extends GenericFilterBean {
 						// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
 						// v param.
 						sreq.getRequestURI().contains("?v=")) {
-					createSession = false;
 					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 				}
 
 				// Special check for CORS
 				if (sreq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
 						sreq.getRequestURI().contains(APConst.PATH_AP + "/")) {
-					createSession = false;
 					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
 				}
 

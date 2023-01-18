@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import quanta.util.LockEx;
@@ -15,6 +16,7 @@ import quanta.util.LockEx;
  */
 @Component
 public class AppSessionListener implements HttpSessionListener {
+	@Autowired private AppProp appProp;
 	private final Logger log = LoggerFactory.getLogger(AppSessionListener.class);
 	private static int sessionCounter = 0;
 
@@ -24,8 +26,8 @@ public class AppSessionListener implements HttpSessionListener {
 
 		// log.debug("sessionCreated: sessionId=" + se.getSession().getId());
 
-		// Use this to test timeout behavior.
-		// session.setMaxInactiveInterval(10);
+		// multiply by 60 to convert minutes to seconds.
+		session.setMaxInactiveInterval(appProp.getSessionTimeoutMinutes() * 60);
 
 		/*
 		 * I'm not sure if certain parts of 'Spring API' are gonna see this LockEx and just synchronize on
@@ -42,8 +44,8 @@ public class AppSessionListener implements HttpSessionListener {
 		HttpSession session = se.getSession();
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 		if (ok(sc)) {
-			session.removeAttribute(SessionContext.QSC);
 			sc.sessionTimeout();
+			session.removeAttribute(SessionContext.QSC);
 
 			// this should trigger the removal of SessionContext.allSessions entry too, however we also
 			// try to remove it manually just to be sure, instead of trusting server HTTP layer

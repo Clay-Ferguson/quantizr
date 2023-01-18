@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.SessionContext;
+import quanta.exception.NotLoggedInException;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -58,6 +59,10 @@ public class AppFilter extends GenericFilterBean {
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				SessionContext sc = ThreadLocals.getSC();
+
+				if (no(sc) || !SessionContext.sessionExists(sc)) { // todo-0: getting this for an insert after just 1 min!!!
+					throw new NotLoggedInException();
+				}
 
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
@@ -108,7 +113,11 @@ public class AppFilter extends GenericFilterBean {
 				log.error("Failed", ex);
 				throw ex;
 			}
-		} catch (Exception e) {
+		} 
+		catch (NotLoggedInException e) {
+			httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+		catch (Exception e) {
 			/*
 			 * we send back the error here, for AJAX calls so we don't bubble up to the default handling and
 			 * cause it to send back the html error page.

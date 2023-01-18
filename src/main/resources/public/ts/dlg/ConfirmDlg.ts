@@ -8,7 +8,7 @@ import { DialogBase } from "../DialogBase";
 export class ConfirmDlg extends DialogBase {
     yes: boolean = false;
 
-    constructor(private text: string, title: string, private yesButtonClass: string=null, private textClass: string=null) {
+    constructor(private text: string, title: string, private yesButtonClass: string=null, private textClass: string=null, private showNoButton: boolean = true) {
         super(title, "app-modal-content-narrow-width");
     }
 
@@ -21,7 +21,7 @@ export class ConfirmDlg extends DialogBase {
                         this.yes = true;
                         this.close();
                     }, null, this.yesButtonClass || "btn-primary"),
-                    new Button("No", this.close)
+                    this.showNoButton ? new Button("No", this.close) : null
                 ], "marginTop")
             ])
         ];

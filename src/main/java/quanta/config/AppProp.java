@@ -162,6 +162,12 @@ public class AppProp {
 		return protocolHostAndPort;
 	}
 
+	public Integer getSessionTimeoutMinutes() {
+		String timeout = env.getProperty("server.session.timeout");
+		Integer timeoutVal = Integer.parseInt(timeout.replace("m", ""));
+		return timeoutVal;
+	}
+
 	public List<String> getRunTests() {
 		List<String> ret = null;
 		String runTests = env.getProperty("runTests");

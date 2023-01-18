@@ -21,7 +21,6 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
-import quanta.response.SessionTimeoutPushInfo;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
@@ -269,6 +268,12 @@ public class SessionContext extends ServiceBase {
 		return false;
 	}
 
+	public static boolean sessionExists(SessionContext sc) {
+		synchronized (allSessions) {
+			return allSessions.contains(sc);
+		}
+	}
+
 	public static boolean validToken(String token) {
 		if (no(token))
 			return false;
@@ -292,12 +297,8 @@ public class SessionContext extends ServiceBase {
 		String bearer = ThreadLocals.getReqBearerToken();
 
 		// otherwise require secure header
-		if (no(bearer)) {
-			throw new RuntimeException("Auth failed. no bearer token.");
-		}
-
-		if (!validToken(bearer, sc.getUserName())) {
-			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
+		if (no(bearer) || !validToken(bearer, sc.getUserName())) {
+			throw new RuntimeException("Auth failed. Bad bearer token.");
 		}
 	}
 
@@ -415,7 +416,6 @@ public class SessionContext extends ServiceBase {
 
 	public void sessionTimeout() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-		push.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 
 		synchronized (allSessions) {
 			/*

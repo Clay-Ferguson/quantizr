@@ -92,6 +92,11 @@ export class Quanta {
     }
 
     initApp = async () => {
+        if (this.appInitialized) {
+            throw new Error("initApp called multiple times.");
+        }
+        this.appInitialized = true;
+
         try {
             this.dragImg = new Image();
             // this.dragImg.src = "/images/favicon-32x32.png";
@@ -113,11 +118,6 @@ export class Quanta {
             // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
             // and if this value isn't set it prints a message just saying the browser isn't supported.
             (window as any).__initAppStarted = true;
-
-            if (this.appInitialized) {
-                throw new Error("initApp called multiple times.");
-            }
-            this.appInitialized = true;
 
             if (history.scrollRestoration) {
                 history.scrollRestoration = "manual";
@@ -210,7 +210,7 @@ export class Quanta {
             await S.user.refreshLogin();
             console.log("refreshLogin completed.");
 
-            S.rpcUtil.initProgressMonitor();
+            S.rpcUtil.initRpcTimer();
             S.util.processUrlParams();
             this.setOverlay(false);
             S.util.playAudioIfRequested();
@@ -221,6 +221,9 @@ export class Quanta {
             }, true);
 
             if (res.config) {
+                S.rpcUtil.SESSION_TIMEOUT_MINS = res.sessionTimeoutMinutes || 30;
+                S.rpcUtil.sessionTimeRemainingMillis = S.rpcUtil.SESSION_TIMEOUT_MINS * 60_000;
+
                 dispatch("configUpdates", s => {
                     s.config = res.config || {};
 
@@ -267,6 +270,7 @@ export class Quanta {
             document.body.addEventListener("mousemove", function (e: any) {
                 S.domUtil.mouseX = e.clientX;
                 S.domUtil.mouseY = e.clientY;
+                S.rpcUtil.userActive();
             });
 
             document.body.addEventListener("click", function (e: any) {
@@ -276,6 +280,7 @@ export class Quanta {
                 // Whenever something is clicked, forget the pending focus data
                 Comp.focusElmId = null;
                 // Log.log("document.body.click target.id=" + target.id);
+                S.rpcUtil.userActive();
             }, false);
 
             document.body.addEventListener("focusin", (e: any) => {

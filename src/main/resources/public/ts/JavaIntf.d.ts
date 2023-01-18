@@ -661,6 +661,7 @@ export interface GetBookmarksResponse extends ResponseBase {
 
 export interface GetConfigResponse extends ResponseBase {
     config: { [index: string]: any };
+    sessionTimeoutMinutes: number;
 }
 
 export interface GetFollowersResponse extends ResponseBase {
@@ -892,9 +893,6 @@ export interface SendTestEmailResponse extends ResponseBase {
 }
 
 export interface ServerPushInfo {
-}
-
-export interface SessionTimeoutPushInfo extends ServerPushInfo {
 }
 
 export interface SetCipherKeyResponse extends ResponseBase {

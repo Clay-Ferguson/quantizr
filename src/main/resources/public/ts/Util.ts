@@ -120,9 +120,11 @@ export class Util {
             return func;
         }
 
-        return (evt: any) => {
-            setTimeout(() => {
-                func(evt);
+        // Not fat arrow, because we need 'arguments'
+        return function (evt: any) {
+            const args = arguments;
+            setTimeout(function () {
+                func.apply(null, args);
             },
                 /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
                 and delayFunc method is to give the animation time to run before we execute whatever was clicked on */

@@ -44,6 +44,11 @@ public class CallProcessor extends ServiceBase {
 			throw ExUtil.wrapEx("Server not available.");
 		}
 
+		SessionContext sc = ThreadLocals.getSC();
+		if (no(sc) || !SessionContext.sessionExists(sc)) {
+			throw new RuntimeException("Unable to get SessionContext to check token.");
+		}
+
 		if (authBearer) {
 			SessionContext.authBearer();
 		}
@@ -55,7 +60,7 @@ public class CallProcessor extends ServiceBase {
 		 * signature key imported into it. And also all the flow around how this can be encountered during
 		 * login/logout needs to be tested and more well thought out.
 		 */
-		if (authSig && ThreadLocals.getSC().isAdmin()) {
+		if (authSig && sc.isAdmin()) {
 			SessionContext.authSig();
 		}
 
@@ -101,8 +106,8 @@ public class CallProcessor extends ServiceBase {
 				// mutexCounter++;
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 				Date now = new Date();
-				ThreadLocals.getSC().setLastActiveTime(startTime = now.getTime());
-				userName = ThreadLocals.getSC().getUserName();
+				sc.setLastActiveTime(startTime = now.getTime());
+				userName = sc.getUserName();
 				MongoSession ms = ThreadLocals.getMongoSession();
 				ret = runner.run(ms);
 				update.saveSession(ms);

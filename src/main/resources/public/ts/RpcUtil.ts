@@ -1,24 +1,32 @@
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 declare const __page: any;
+declare const g_brandingAppName: string;
 
 export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
     logRpc: boolean = false;
     logRpcShort: boolean = true;
+    unauthMessageShowing: boolean = false;
 
     /*
     * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
     * session is only allowed one concurrent call and simultaneous calls just "queue up".
     */
     rpcCounter: number = 0;
-
-    timeoutMessageShown: boolean = false;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
+
+    // note: When the app loads we immediately set this timeout to a value from the server.
+    SESSION_TIMEOUT_MINS = 30;
+    sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
+    sessionTimedOut = false;
+    areYouThereDlg: ConfirmDlg;
+    RPC_TIMER_INTERVAL = 1000;
 
     getRemoteHost = (): string => {
         if (this.rhost) {
@@ -36,6 +44,10 @@ export class RpcUtil {
 
     rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
         background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
+        if (this.sessionTimedOut) {
+            return Promise.resolve(null);
+        }
+
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
 
@@ -60,6 +72,9 @@ export class RpcUtil {
                     console.warn("Request will have no signature.");
                 }
 
+                this.userActive();
+
+                debugger;
                 // const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {
@@ -75,8 +90,13 @@ export class RpcUtil {
                     credentials: "same-origin", // include, *same-origin, omit
                     referrerPolicy: "no-referrer"
                 })
-                    .then((res: any) => {
-                        if (res.status !== 200) {
+                    .then(async (res: any) => {
+                        // Unauthorized refers to the session, and our session has likely timed out.
+                        if (res.status === 401) {
+                            reject({ response: res });
+                            this.authFail();
+                        }
+                        else if (res.status !== 200) {
                             console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                             reject({ response: res });
                         }
@@ -92,7 +112,7 @@ export class RpcUtil {
                             resolve(JSON.parse(json));
                         }
                         else {
-                            reject(null); // <-- NOTE: 1/5/23
+                            reject(null);
                         }
                     })
                     .catch((error) => {
@@ -161,11 +181,9 @@ export class RpcUtil {
             const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
             console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
+            // 401==Unauthorized
             if (error.response?.status === 401) {
-                console.log("Not logged in detected.");
-                if (!this.timeoutMessageShown) {
-                    this.timeoutMessageShown = true;
-                }
+                this.authFail();
                 return;
             }
 
@@ -195,13 +213,61 @@ export class RpcUtil {
         }
     }
 
+    authFail = async () => {
+        if (this.unauthMessageShowing) return;
+        this.unauthMessageShowing = true;
+        await S.util.showMessage("Unauthorized", "Warning");
+        this.unauthMessageShowing = false;
+        // window.location.href = window.location.origin;
+    }
+
     isRpcWaiting = (): boolean => {
         return this.rpcCounter > 0;
     }
 
-    initProgressMonitor = () => {
+    initRpcTimer = () => {
         // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
-        setInterval(this.progressInterval, 1000);
+        setInterval(() => {
+            this.progressInterval();
+            this.timeoutInterval();
+        }, this.RPC_TIMER_INTERVAL);
+    }
+
+    timeoutInterval = async () => {
+        if (this.sessionTimedOut) return;
+
+        this.sessionTimeRemainingMillis -= this.RPC_TIMER_INTERVAL;
+        if (this.sessionTimeRemainingMillis <= 0) {
+            this.sessionTimedOut = true;
+
+            // we don't need to close this but we do just to remove clutter from the screen beneath
+            // the Session Expored message.
+            if (this.areYouThereDlg) {
+                this.areYouThereDlg.close();
+            }
+            await S.util.showMessage("Session expired.", "Warning");
+            window.location.href = window.location.origin;
+            return;
+        }
+
+        if (this.areYouThereDlg) return;
+
+        // is there less than 1 minute before session should timeout?
+        if (this.sessionTimeRemainingMillis < 60_000) {
+            this.areYouThereDlg = new ConfirmDlg("Are you still there?", g_brandingAppName,
+                "btn-info", "alert alert-info", false);
+            await this.areYouThereDlg.open();
+            if (this.areYouThereDlg.yes) {
+                S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
+            }
+
+            this.userActive();
+            this.areYouThereDlg = null;
+        }
+    }
+
+    userActive = () => {
+        this.sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
     }
 
     progressInterval = () => {
