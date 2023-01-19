@@ -1,6 +1,7 @@
 import { dispatch, getAs, useAppState } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
@@ -135,11 +136,10 @@ export class TTSView extends AppTab {
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             new Div(null, { className: "headingBar" }, [
-                new Div("Tip: Drag-and-Drop text to this panel!", { className: "marginAll float-end" }),
-                new Div("Text-to-Speech", { className: "tabTitle" })
+                new Div("Text-to-Speech", { className: "tabTitle" }),
+                new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                new Clearfix()
             ]),
-            new Div(null, { className: "stickySpeechButtons float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
-            // new Clearfix(),
             new FlexRowLayout([
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,

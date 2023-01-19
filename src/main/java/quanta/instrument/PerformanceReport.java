@@ -86,7 +86,7 @@ public class PerformanceReport {
 		sb.append(htmlH(3, "Time Usage by User"));
 		rows = "";
 		for (UserPerf se : upiList) {
-			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime)));
+			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable(htmlTr( //
@@ -100,7 +100,7 @@ public class PerformanceReport {
 		sb.append(htmlH(3, "Avg Time Per Call"));
 		rows = "";
 		for (UserPerf se : upiList) {
-			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls)));
+			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
 		}
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable(htmlTr( //
@@ -147,8 +147,8 @@ public class PerformanceReport {
 			table += htmlTr( //
 					htmlTd(stat.category) + //
 							htmlTdRt(String.valueOf(stat.totalCount)) + //
-							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount)) + //
-							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime)));
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)) + //
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime, true)));
 		}
 
 		return htmlH(3, "Times Per Category") + htmlTable(table);
@@ -190,7 +190,7 @@ public class PerformanceReport {
 		}
 
 		tr += htmlTd(se.event + set);
-		tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration));
+		tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
 
 		if (!isSubItem && ok(se.root)) {
 			tr += htmlTdRt(String.valueOf(se.root.hashCode()));

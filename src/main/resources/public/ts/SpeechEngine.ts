@@ -157,7 +157,7 @@ export class SpeechEngine {
             await promiseDispatch("speechEngineStateChange", s => {
                 setTimeout(() => {
                     this.highlightByIndex(this.ttsIdx);
-                }, 500);
+                }, 250);
             });
         }
         else {
@@ -204,7 +204,7 @@ export class SpeechEngine {
             // polling to make this timer be a bit safer, in case 500ms isn't ok on slower machines.
             setTimeout(() => {
                 this.speakTextNow(null, false, idx);
-            }, 500);
+            }, 250);
         }
     }
 

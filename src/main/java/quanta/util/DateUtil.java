@@ -165,7 +165,7 @@ public class DateUtil {
 	 * Formats this duration into a string that describes the time about the way a human would say it.
 	 * For example if it was a number of days ago you don't include minutes and seconds etc.
 	 */
-	public static String formatDurationMillis(long different) {
+	public static String formatDurationMillis(long different, boolean highRes) {
 		StringBuilder sb = new StringBuilder();
 
 		long years = different / YEAR_MILLIS;
@@ -230,6 +230,12 @@ public class DateUtil {
 			sb.append("m");
 			if (++units == 2)
 				return sb.toString();
+		}
+
+		// If we will only have seconds and/or millis and the time is less than 30 seconds
+		// then we render the time as "Just now" unless this is 'hiRes' formatting.
+		if (units == 0 && seconds < 30) {
+			return "Just now";
 		}
 
 		if (seconds > 0) {
