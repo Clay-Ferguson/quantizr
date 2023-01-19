@@ -50,6 +50,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
 
         let newItems = null;
+
         if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
             newItems = new Icon({
                 className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
@@ -83,7 +84,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         const topChildren: Comp[] = [
 
             new Div(null, null, [
-                newItems,
                 ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                     val: this.data.props.searchTextState,
                     placeholder: "Search for...",
@@ -91,6 +91,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                     outterClass: "marginBottom feedSearchField"
                 }) : null,
                 new FlexRowLayout([
+                    newItems,
                     // we show this button just as an icon unless the search field is displaying
                     new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
                         onClick: () => {

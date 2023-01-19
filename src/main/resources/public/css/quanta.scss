@@ -2058,6 +2058,7 @@ audio::-webkit-media-controls-play-button {
     position: sticky;
     top: 0px;
     z-index: 15000000;
+    min-height: 4em;
 }
 
 .tabTitle {

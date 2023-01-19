@@ -201,7 +201,7 @@ public class DateUtil {
 				sb.append(" ");
 			sb.append(String.valueOf(months));
 			sb.append("mo");
-			if (++units == 2)
+			if (++units == 2 || (!highRes && months > 10))
 				return sb.toString();
 		}
 
@@ -210,7 +210,7 @@ public class DateUtil {
 				sb.append(" ");
 			sb.append(String.valueOf(days));
 			sb.append("d");
-			if (++units == 2)
+			if (++units == 2 || (!highRes && days > 10))
 				return sb.toString();
 		}
 
@@ -219,7 +219,7 @@ public class DateUtil {
 				sb.append(" ");
 			sb.append(String.valueOf(hours));
 			sb.append("h");
-			if (++units == 2)
+			if (++units == 2 || (!highRes && hours > 10))
 				return sb.toString();
 		}
 
@@ -228,13 +228,13 @@ public class DateUtil {
 				sb.append(" ");
 			sb.append(String.valueOf(minutes));
 			sb.append("m");
-			if (++units == 2)
+			if (++units == 2 || (!highRes && minutes > 10))
 				return sb.toString();
 		}
 
 		// If we will only have seconds and/or millis and the time is less than 30 seconds
 		// then we render the time as "Just now" unless this is 'hiRes' formatting.
-		if (units == 0 && seconds < 30) {
+		if (!highRes && units == 0 && seconds < 30) {
 			return "Just now";
 		}
 
@@ -247,7 +247,7 @@ public class DateUtil {
 				return sb.toString();
 		}
 
-		if (millis > 0) {
+		if (!highRes && millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));
