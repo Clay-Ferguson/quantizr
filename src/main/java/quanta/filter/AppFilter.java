@@ -18,6 +18,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.SessionContext;
 import quanta.exception.NotLoggedInException;
 import quanta.model.client.PrincipalName;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -115,6 +116,7 @@ public class AppFilter extends GenericFilterBean {
 			}
 		} 
 		catch (NotLoggedInException e) {
+			ExUtil.warn("Unauthorized. Not logged in.");
 			httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 		catch (Exception e) {

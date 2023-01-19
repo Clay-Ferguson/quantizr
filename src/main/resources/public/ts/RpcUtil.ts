@@ -74,7 +74,6 @@ export class RpcUtil {
 
                 this.userActive();
 
-                debugger;
                 // const startTime = new Date().getTime();
                 // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {
@@ -93,6 +92,7 @@ export class RpcUtil {
                     .then(async (res: any) => {
                         // Unauthorized refers to the session, and our session has likely timed out.
                         if (res.status === 401) {
+                            console.warn("401 error for: " + postName);
                             reject({ response: res });
                             this.authFail();
                         }

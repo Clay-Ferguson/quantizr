@@ -54,11 +54,11 @@ public class CallProcessor extends ServiceBase {
 		}
 
 		/*
-		 * #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way
-		 * to inform the user that this can happen when their key on their browser is different than
-		 * expected, which CAN even happen simply from using a different browser that hasn't had the
-		 * signature key imported into it. And also all the flow around how this can be encountered during
-		 * login/logout needs to be tested and more well thought out.
+		 * #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way to
+		 * inform the user that this can happen when their key on their browser is different than expected,
+		 * which CAN even happen simply from using a different browser that hasn't had the signature key
+		 * imported into it. And also all the flow around how this can be encountered during login/logout
+		 * needs to be tested and more well thought out.
 		 */
 		if (authSig && sc.isAdmin()) {
 			SessionContext.authSig();
@@ -75,7 +75,8 @@ public class CallProcessor extends ServiceBase {
 
 		boolean useLock = true;
 		/*
-		 * #push-locks: do this cleaner. There should be a way to accomplish this without disabling the mutex here.
+		 * #push-locks: do this cleaner. There should be a way to accomplish this without disabling the
+		 * mutex here.
 		 */
 		switch (command) {
 			case "serverPush":
@@ -116,7 +117,7 @@ public class CallProcessor extends ServiceBase {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
 			try {
 				if (ok(res)) {
-					log.debug("Unauthorized. Not logged in.");
+					ExUtil.warn("Unauthorized. Not logged in.");
 					res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 				}
 			} catch (Exception e) {
