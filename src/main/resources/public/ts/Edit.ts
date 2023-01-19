@@ -405,7 +405,8 @@ export class Edit {
         });
     }
 
-    // todo-0: will be deleting this soon.
+    // NOT CURRENTLY USED (but let's keep for future possible needs)
+    //
     // refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
     //     return new Promise<J.NodeInfo>(async (resolve, reject) => {
     //         const ast = getAst();

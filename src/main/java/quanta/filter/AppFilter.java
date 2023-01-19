@@ -61,7 +61,7 @@ public class AppFilter extends GenericFilterBean {
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				SessionContext sc = ThreadLocals.getSC();
 
-				if (no(sc) || !SessionContext.sessionExists(sc)) { // todo-0: getting this for an insert after just 1 min!!!
+				if (no(sc) || !SessionContext.sessionExists(sc)) {
 					throw new NotLoggedInException();
 				}
 
