@@ -98,12 +98,12 @@ export class Render {
                 }
 
                 if (topClass) {
-                    imgHtml += `<img class="${topClass} enlargable-img" width="${imgSize}" src="${imgUrl}" nodeid="${node.id}" attkey="${key}">` + suffix;
+                    imgHtml += `<img class="${topClass} enlargable-img" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">` + suffix;
                 }
 
                 // ft=at file tag
                 else if (a.p === "ft") {
-                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="img-block enlargable-img" width="${imgSize}" src="${imgUrl}" nodeid="${node.id}" attkey="${key}">\n\n`);
+                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="img-block enlargable-img" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
                 }
             }
 

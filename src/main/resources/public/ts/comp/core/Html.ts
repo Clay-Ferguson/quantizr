@@ -67,7 +67,7 @@ export class Html extends Comp {
         // adds the click handler function to all .enlargable-img images
         elm.querySelectorAll(".enlargable-img").forEach(e => {
             e.addEventListener("click", (evt: MouseEvent) => {
-                NodeCompBinary.clickOnImage(e.getAttribute("nodeid"), e.getAttribute("attkey"), false, false);
+                NodeCompBinary.clickOnImage(e.getAttribute("data-nodeid"), e.getAttribute("data-attkey"), false, false);
             });
         });
 
