@@ -36,7 +36,7 @@ public class MongoCreate extends ServiceBase {
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {
-		return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals);
+		return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals, true);
 	}
 
 	public SubNode createNode(MongoSession ms, String path) {
@@ -63,7 +63,8 @@ public class MongoCreate extends ServiceBase {
 	 */
 	@PerfMon(category = "create")
 	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
-			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals) {
+			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
+			boolean updateParent) {
 		if (no(relPath)) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
@@ -98,7 +99,10 @@ public class MongoCreate extends ServiceBase {
 		}
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
-		parent.setHasChildren(true);
+
+		if (updateParent) {
+			parent.setHasChildren(true);
+		}
 
 		if (ok(properties)) {
 			for (PropertyInfo propInfo : properties) {
@@ -149,8 +153,8 @@ public class MongoCreate extends ServiceBase {
 		 * We detect the special case where we're attempting to insert at 'top' ordinals and if we find room
 		 * to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
 		 * leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
-		 * 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we end
-		 * up trying to insert above it.
+		 * 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
+		 * end up trying to insert above it.
 		 */
 
 		// if we're inserting a single node
@@ -159,7 +163,7 @@ public class MongoCreate extends ServiceBase {
 			if (ordinal <= minOrdinal) {
 				// if we have space below the current minimum we can just use it
 				if (minOrdinal > 0) {
-					long ret =  minOrdinal - 1;
+					long ret = minOrdinal - 1;
 
 					// always grab the index at halfway to zero so we can leave room for for future inserts to
 					// get lucky and have a place to land without cusing a multi record node renumbering.
@@ -188,7 +192,7 @@ public class MongoCreate extends ServiceBase {
 		int batchSize = 0;
 
 		for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit)) {
-		
+
 			// lazy create bulkOps
 			if (no(bops)) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);

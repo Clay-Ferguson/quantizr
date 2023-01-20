@@ -152,7 +152,7 @@ public class NodeEditService extends ServiceBase {
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 		SubNode newNode =
-				create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
+				create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true, false);
 
 		if (req.isPendingEdit()) {
 			mongoUtil.setPendingPath(newNode, true);
@@ -215,8 +215,6 @@ public class NodeEditService extends ServiceBase {
 			}
 		}
 
-		parentNode.setHasChildren(true);
-		update.save(ms, parentNode);
 		update.save(ms, newNode);
 
 		/*
@@ -268,7 +266,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-				CreateNodeLocation.ORDINAL, null, null, true);
+				CreateNodeLocation.ORDINAL, null, null, true, true);
 
 		if (ok(req.getInitialValue())) {
 			newNode.setContent(req.getInitialValue());
@@ -346,7 +344,7 @@ public class NodeEditService extends ServiceBase {
 			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
-					properties, parentFriendsList.getOwner(), true);
+					properties, parentFriendsList.getOwner(), true, true);
 			newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
 			String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
@@ -414,7 +412,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		SubNode newNode =
-				create.createNode(ms, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
+				create.createNode(ms, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true, true);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = ok(title) ? "#### " + title + "\n" : "";
@@ -688,6 +686,7 @@ public class NodeEditService extends ServiceBase {
 
 			SubNode parent = read.getParent(ms, node, false);
 			if (ok(parent)) {
+				parent.setHasChildren(true);
 				if (!isAccnt) {
 					HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
 

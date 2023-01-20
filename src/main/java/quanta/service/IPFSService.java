@@ -265,7 +265,7 @@ public class IPFSService extends ServiceBase {
 
         if (ok(exportParent)) {
             SubNode node =
-                    create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
+                    create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true, true);
 
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
@@ -284,7 +284,7 @@ public class IPFSService extends ServiceBase {
             if (ok(childrenFiles)) {
                 for (ExportIpfsFile file : childrenFiles) {
                     SubNode child =
-                            create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
+                            create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true, true);
 
                     // todo-2: make this handle multiple attachments, and all calls to it
                     Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);

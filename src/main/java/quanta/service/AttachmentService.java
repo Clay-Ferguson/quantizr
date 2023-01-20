@@ -165,7 +165,7 @@ public class AttachmentService extends ServiceBase {
 				}
 
 				node = create.createNode(ms, parent, null, NodeType.NONE.s(), //
-						0L, CreateNodeLocation.FIRST, null, null, true);
+						0L, CreateNodeLocation.FIRST, null, null, true, true);
 				nodeId = node.getIdStr();
 			} else {
 				node = read.getNode(ms, nodeId, false, null);

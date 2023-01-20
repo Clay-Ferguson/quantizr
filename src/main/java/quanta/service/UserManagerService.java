@@ -182,7 +182,7 @@ public class UserManagerService extends ServiceBase {
 		if (ok(userNode)) {
 			SubNode userHomeNode = read.getNodeByName(ms, userName + ":" + name);
 			if (no(userHomeNode)) {
-				SubNode node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
+				SubNode node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true, true);
 				node.setOwner(userNode.getId());
 				if (ok(name)) {
 					node.setName(name);

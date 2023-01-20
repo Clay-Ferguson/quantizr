@@ -204,7 +204,7 @@ public class SubNodeUtil extends ServiceBase {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true);
+				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true, true);
 
 				if (no(parent)) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);

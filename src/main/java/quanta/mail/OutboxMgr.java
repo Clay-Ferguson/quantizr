@@ -62,7 +62,7 @@ public class OutboxMgr extends ServiceBase {
 				 */
 				if (no(notifyNode)) {
 					notifyNode = create.createNode(as, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
-							CreateNodeLocation.FIRST, null, null, true);
+							CreateNodeLocation.FIRST, null, null, true, true);
 
 					// trim to 280 like twitter.
 					String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
