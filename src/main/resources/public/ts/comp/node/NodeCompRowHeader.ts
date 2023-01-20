@@ -118,7 +118,7 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, null, false, null, null, null, this.node.id, false)
+                            S.edit.addNode(null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
                         }
                     }
                 }));

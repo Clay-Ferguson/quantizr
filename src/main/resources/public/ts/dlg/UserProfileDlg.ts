@@ -15,6 +15,7 @@ import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { NodeType } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
@@ -318,7 +319,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, false, null, this.userNodeId, null, null, false);
+            S.edit.addNode(null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false);
         }, 10);
     }
 

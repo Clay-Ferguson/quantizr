@@ -790,12 +790,15 @@ public class ActPubUtil extends ServiceBase {
         if (no(node))
             return null;
 
+        // note: I had these two reversed until 1/19/23, which was BAD but somehow it worked most of the time, but
+        // I verified this is correct now where ACT_PUB_ID really should be the thing used always.
+
         // try this property first.
-        String replyTo = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+        String replyTo = node.getStr(NodeProp.ACT_PUB_ID);
 
         // fall back to this...
         if (no(replyTo)) {
-            replyTo = node.getStr(NodeProp.ACT_PUB_ID);
+            replyTo = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
         }
 
         // or finally reference pointing to our own server node, if it's not private
