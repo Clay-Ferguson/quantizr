@@ -8,6 +8,7 @@ import { Icon } from "../comp/core/Icon";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
+import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
@@ -73,21 +74,21 @@ export class MainTabComp extends AppTab {
                     !ast.isAnonUser ? new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
                         title: "Show Document View",
-                        nid: ast.node.id,
+                        [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
                     }) : null,
 
                     new Icon({
                         className: "fa fa-search fa-lg buttonBarIcon",
                         title: "Search Subnodes",
-                        nid: ast.node.id,
+                        [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runSearch
                     }),
 
                     !ast.isAnonUser ? new Icon({
                         className: "fa fa-clock-o fa-lg buttonBarIcon",
                         title: "View Timeline (by Mod Time)",
-                        nid: ast.node.id,
+                        [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runTimeline
                     }) : null
                 ]),

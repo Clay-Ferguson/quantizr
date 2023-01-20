@@ -116,7 +116,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
     static searchWord = (evt: Event, word: string) => {
         if (!word) {
-            word = S.domUtil.getPropFromDom(evt, "word");
+            word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         }
         if (!word) return;
 

@@ -313,9 +313,9 @@ export class DomUtil {
 
         attribs.onDragOver = function (event: any) {
             if (event.currentTarget === S.quanta.dragElm ||
-                // we do a tiny bit of tight-coupling here and assume that if the attribs has a 'nid' property
+                // we do a tiny bit of tight-coupling here and assume that if the attribs has a C.NODE_ID_ATTR property
                 // then that represents the nodeId (pretty standard in this app tho)
-                S.quanta.draggingId === attribs.nid) {
+                S.quanta.draggingId === attribs[C.NODE_ID_ATTR]) {
                 return;
             }
 
@@ -417,7 +417,7 @@ export class DomUtil {
         d.className = "annotationBox";
         d.style.left = `${this.mouseX}px`;
         d.style.top = `${this.mouseY}px`;
-        d.setAttribute("arrowOption", arrowOption);
+        d.setAttribute(C.ARROW_OPTION_ATTR, arrowOption);
         this.annotations.push(d);
         this.annotations.push(a);
         document.body.appendChild(d);
@@ -480,7 +480,7 @@ export class DomUtil {
             elmnt.style.top = targY + "px";
 
             if (arrow) {
-                switch (elmnt.getAttribute("arrowOption")) {
+                switch (elmnt.getAttribute(C.ARROW_OPTION_ATTR)) {
                     case "tl":
                         arrow.style.left = (targX + 15) + "px";
                         arrow.style.top = (targY - 10) + "px";
@@ -513,7 +513,7 @@ export class DomUtil {
     }
 
     makeDropTarget = (attribs: any, id: string) => {
-        attribs.nid = id;
+        attribs[C.NODE_ID_ATTR] = id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
@@ -535,7 +535,7 @@ export class DomUtil {
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(async (s) => {
-                        if (attribs.nid === s) {
+                        if (attribs[C.NODE_ID_ATTR] === s) {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }

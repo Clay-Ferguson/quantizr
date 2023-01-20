@@ -399,7 +399,7 @@ export class EditNodeDlg extends DialogBase {
             propsCollapsePanel
         ]);
 
-        this.attribs.nid = ast.editNode.id;
+        this.attribs[C.NODE_ID_ATTR] = ast.editNode.id;
         // Allows user to drag-n-drop files onto editor to upload
         S.domUtil.setDropHandler(this.attribs, async (evt: DragEvent) => {
             const files: File[] = [...evt.dataTransfer.files];

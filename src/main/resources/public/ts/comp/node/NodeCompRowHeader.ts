@@ -311,7 +311,7 @@ export class NodeCompRowHeader extends Div {
                     className: "marginLeft",
                     onClick: S.edit.runEditNodeByClick,
                     title: "Edit Node",
-                    nid: this.node.id
+                    [C.NODE_ID_ATTR]: this.node.id
                 });
             }
 
@@ -319,7 +319,7 @@ export class NodeCompRowHeader extends Div {
                 floatUpperRightDiv.addChild(new Icon({
                     className: "fa fa-trash fa-lg buttonBarIcon",
                     title: "Delete node(s)",
-                    nid: this.node.id,
+                    [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.deleteSelNodes
                 }));
             }
@@ -328,7 +328,7 @@ export class NodeCompRowHeader extends Div {
         const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
         if (!!ast.nodesToMove && userCanPaste) {
             pasteButton = new Button("Paste Inside",
-                S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton")
+                S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton")
         }
 
         let jumpButtonAdded = false;

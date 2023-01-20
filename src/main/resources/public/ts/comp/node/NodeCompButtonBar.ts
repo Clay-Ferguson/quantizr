@@ -99,7 +99,7 @@ export class NodeCompButtonBar extends Div {
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || ast.userPrefs.editMode)) {
             openButton = new Button(null, S.nav.openNodeById, {
-                nid: this.node.id,
+                [C.NODE_ID_ATTR]: this.node.id,
                 title: "Open Node"
             }, "btn-primary", "fa-folder-open");
         }
@@ -144,7 +144,7 @@ export class NodeCompButtonBar extends Div {
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
-                    nid: this.node.id,
+                    [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new Node (as Subnode of this node)"
                 }, null, "fa-plus");
             }
@@ -155,7 +155,7 @@ export class NodeCompButtonBar extends Div {
                 if (editableNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         title: "Edit Node",
-                        nid: this.node.id
+                        [C.NODE_ID_ATTR]: this.node.id
                     }, null, "fa-edit");
                 }
 
@@ -163,7 +163,7 @@ export class NodeCompButtonBar extends Div {
                     cutNodeIcon = new Icon({
                         className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",
-                        nid: this.node.id,
+                        [C.NODE_ID_ATTR]: this.node.id,
                         onClick: S.edit.cutSelNodes
                     });
                 }
@@ -173,7 +173,7 @@ export class NodeCompButtonBar extends Div {
                         moveNodeUpIcon = new Icon({
                             className: "fa fa-lg fa-arrow-up buttonBarIcon",
                             title: "Move Node Up",
-                            nid: this.node.id,
+                            [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeUp
                         });
                     }
@@ -182,7 +182,7 @@ export class NodeCompButtonBar extends Div {
                         moveNodeDownIcon = new Icon({
                             className: "fa fa-lg fa-arrow-down buttonBarIcon",
                             title: "Move Node Down",
-                            nid: this.node.id,
+                            [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeDown
                         });
                     }
@@ -195,7 +195,7 @@ export class NodeCompButtonBar extends Div {
                     deleteNodeIcon = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
-                        nid: this.node.id,
+                        [C.NODE_ID_ATTR]: this.node.id,
                         onClick: S.edit.deleteSelNodes
                     });
                 }
@@ -204,10 +204,10 @@ export class NodeCompButtonBar extends Div {
             if (!!ast.nodesToMove && userCanPaste) {
                 pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
-                        S.edit.pasteSelNodesInside, { nid: this.node.id }, "btn-secondary pasteButton"),
+                        S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton"),
 
                     this.node.id !== ast.userProfile?.userNodeId
-                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: this.node.id }, "btn-secondary pasteButton") : null
+                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }
         }
@@ -220,7 +220,7 @@ export class NodeCompButtonBar extends Div {
         if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
             if (S.nav.parentVisibleToUser()) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
-                    nid: this.node.id,
+                    [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.navUpLevelClick,
                     title: "Go to Parent Node"
                 }, "btn-primary");
@@ -256,21 +256,21 @@ export class NodeCompButtonBar extends Div {
         //     docIcon = !ast.isAnonUser ? new Icon({
         //         className: "fa fa-book fa-lg buttonBarIcon",
         //         title: "Show Document View",
-        //         nid: this.node.id,
+        //         [C.NODE_ID_ATTR]: this.node.id,
         //         onClick: S.nav.openDocumentView
         //     }) : null;
 
         //     searchIcon = new Icon({
         //         className: "fa fa-search fa-lg buttonBarIcon",
         //         title: "Search Subnodes",
-        //         nid: this.node.id,
+        //         ni[C.NODE_ID_ATTR]d: this.node.id,
         //         onClick: S.nav.runSearch
         //     });
 
         //     timelineIcon = !ast.isAnonUser ? new Icon({
         //         className: "fa fa-clock-o fa-lg buttonBarIcon",
         //         title: "View Timeline (by Mod Time)",
-        //         nid: this.node.id,
+        //         [C.NODE_ID_ATTR]: this.node.id,
         //         onClick: S.nav.runTimeline
         //     }) : null;
         // }

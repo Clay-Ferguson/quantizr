@@ -42,7 +42,7 @@ export class NodeCompRow extends Div {
         const ast = useAppState();
 
         if (this.allowHeaders) {
-            this.attribs.nid = this.node.id;
+            this.attribs[C.NODE_ID_ATTR] = this.node.id;
             this.attribs.onClick = S.nav.clickTreeNode;
         }
 

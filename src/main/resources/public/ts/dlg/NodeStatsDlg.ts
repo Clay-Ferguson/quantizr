@@ -12,6 +12,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { SearchContentDlg } from "./SearchContentDlg";
+import { Constants as C } from "../Constants";
 
 export class NodeStatsDlg extends DialogBase {
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean) {
@@ -27,7 +28,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topVotes.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word: "\"" + word + "\""
+                    [C.WORD_ATTR]: "\"" + word + "\""
                 }));
             });
         }
@@ -37,7 +38,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word: "\"" + word + "\"",
+                    [C.WORD_ATTR]: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -49,7 +50,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topMentions.forEach(word => {
                 mentionPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word: "\"" + word + "\"",
+                    [C.WORD_ATTR]: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -85,7 +86,7 @@ export class NodeStatsDlg extends DialogBase {
     searchWord = (evt: Event) => {
         this.close();
 
-        const word = S.domUtil.getPropFromDom(evt, "word");
+        const word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         if (!word) return;
 
         if (this.feed) {

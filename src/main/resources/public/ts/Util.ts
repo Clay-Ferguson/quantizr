@@ -111,7 +111,7 @@ export class Util {
     function object creates per page render */
     allowIdFromEvent = (evt: Event, id: string): string => {
         if (id) return id;
-        return S.domUtil.getPropFromDom(evt, "nid");
+        return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
     }
 
     // #mouseEffects (do not delete tag)

@@ -5,6 +5,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
+import { Constants as C } from "../Constants";
 import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -72,13 +73,13 @@ export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetVi
             new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search Subnodes",
-                nid: this.data.props.node.id,
+                [C.NODE_ID_ATTR]: this.data.props.node.id,
                 onClick: S.nav.runSearch
             }),
             new Icon({
                 className: "fa fa-clock-o fa-lg buttonBarIcon",
                 title: "View Timeline (by Mod Time)",
-                nid: this.data.props.node.id,
+                [C.NODE_ID_ATTR]: this.data.props.node.id,
                 onClick: S.nav.runTimeline
             })
         ]);

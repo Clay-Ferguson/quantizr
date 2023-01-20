@@ -1,6 +1,12 @@
 console.log("entering Constants.ts");
 export class Constants {
 
+    // NOTE: Browsers can and DO fail sometimes if we don't have 'data-' as the prefix on any 'custom data attributes'
+    // that aren't an official part of HTML Spec.
+    static NODE_ID_ATTR = "data-nid";
+    static WORD_ATTR = "data-word";
+    static ARROW_OPTION_ATTR = "data-arrow-option";
+
     static DND_TYPE_NODEID = "nodeid"; // keep lowercase
     static TTS_BREAK = "([[TTS-BREAK]])";
 

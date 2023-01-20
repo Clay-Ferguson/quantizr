@@ -57,7 +57,7 @@ export class NodeCompMainNode extends Div {
                 S.quanta.fadeStartTime = new Date().getTime();
             }
 
-            this.attribs.nid = node.id;
+            this.attribs[C.NODE_ID_ATTR] = node.id;
             this.attribs.onClick = S.nav.clickTreeNode;
 
             let header: CompIntf = null;

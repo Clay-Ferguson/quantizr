@@ -207,7 +207,7 @@ export class Render {
     setNodeDropHandler = (attribs: any, node: J.NodeInfo) => {
         if (!node) return;
 
-        attribs.nid = node.id;
+        attribs[C.NODE_ID_ATTR] = node.id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
@@ -241,7 +241,7 @@ export class Render {
 
                         // we check both ways if we're doing a self drop.
                         if (S.quanta.draggingId === node.id ||
-                            attribs.nid === s) {
+                            attribs[C.NODE_ID_ATTR] === s) {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }
@@ -755,7 +755,7 @@ export class Render {
                     //     // the showMessagesButton flag.
                     //     showMessageButton ? new Button("Message", S.edit.newSubNode, {
                     //         title: "Send Private Message",
-                    //         nid: nodeId
+                    //         [C.NODE_ID_ATTR]: nodeId
                     //     }) : null,
                     //     actorUrl ? new Button("Go to User Page", () => {
                     //         window.open(actorUrl, "_blank");

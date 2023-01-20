@@ -630,7 +630,7 @@ export class Search {
             // yes the 'tabData.id' looks odd here as a class, and it's only used for lookups for scrolling logic.
             className: clazz + (parentItem ? "" : (" " + divClass)) + " " + tabData.id,
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
-            nid: node.id,
+            [C.NODE_ID_ATTR]: node.id,
             onClick: async () => {
                 S.util.updateNodeHistory(node, true);
 

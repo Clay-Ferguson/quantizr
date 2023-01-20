@@ -56,7 +56,7 @@ export class HistoryPanel extends Div {
 
             children.push(parentDropTarg = new Div(null, {
                 id: h.id + "_hist",
-                nid: h.id,
+                [C.NODE_ID_ATTR]: h.id,
                 onClick: this.jumpToId,
                 className: "nodeHistoryItem",
                 ...dragProps
@@ -72,7 +72,7 @@ export class HistoryPanel extends Div {
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
     jumpToId = (evt: any) => {
-        const id = S.domUtil.getPropFromDom(evt, "nid");
+        const id = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
         PubSub.pub(C.PUBSUB_closeNavPanel);
         S.view.jumpToId(id);
     }
