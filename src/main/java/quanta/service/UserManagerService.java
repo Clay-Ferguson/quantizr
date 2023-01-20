@@ -671,7 +671,7 @@ public class UserManagerService extends ServiceBase {
 					writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
 				}
 
-				edit.processAfterSave(as, userNode);
+				edit.processAfterSave(as, userNode, null);
 			}
 			return null;
 		});

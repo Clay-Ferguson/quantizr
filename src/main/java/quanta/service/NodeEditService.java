@@ -225,7 +225,7 @@ public class NodeEditService extends ServiceBase {
 		 */
 		if (!req.isPendingEdit() && ok(req.getBoostTarget())) {
 			// log.debug("publishing boost: " + newNode.getIdStr());
-			processAfterSave(ms, newNode);
+			processAfterSave(ms, newNode, parentNode);
 		}
 
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
@@ -305,17 +305,20 @@ public class NodeEditService extends ServiceBase {
 
 		// use this is for testing non string types
 		// newNode.set(NodeProp.ACT_PUB_OBJ_URLS, Arrays.asList(//
-		//		new APOUrl("Link", "text/html", "https://drudgereport.com"), 
-		//		new APOUrl("Link", "text/html", "https://cnn.com")));
+		// new APOUrl("Link", "text/html", "https://drudgereport.com"),
+		// new APOUrl("Link", "text/html", "https://cnn.com")));
 		// newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, Arrays.asList(//
-		// 		new APOIcon("Icon", "image/png", "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"), 
-		// 		new APOIcon("Icon", "image/jpg", "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
+		// new APOIcon("Icon", "image/png",
+		// "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"),
+		// new APOIcon("Icon", "image/jpg",
+		// "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
 		// newNode.set(NodeProp.ACT_PUB_OBJ_NAME, "Test Name");
 
 		// createNode might have altered 'hasChildren', so we save if dirty
 		update.saveIfDirty(ms, parentNode);
 
-		// We save this right away, before calling convertToNodeInfo in case that method does any Db related stuff
+		// We save this right away, before calling convertToNodeInfo in case that method does any Db related
+		// stuff
 		// where it's expecting the node to exist.
 		update.save(ms, newNode);
 
@@ -530,7 +533,7 @@ public class NodeEditService extends ServiceBase {
 			}
 
 			SubNode nodeByName = read.getNodeByName(ms, nodeName);
-			
+
 			// delete if orphan (but be safe and double check we aren't deleting `nodeId` node)
 			if (ok(nodeByName) && !nodeId.equals(nodeByName.getIdStr()) && read.isOrphan(nodeByName.getPath())) {
 
@@ -618,11 +621,16 @@ public class NodeEditService extends ServiceBase {
 
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
+		SubNode parent = read.getParent(ms, node, false);
+		if (ok(parent)) {
+			parent.setHasChildren(true);
+		}
+
 		/*
 		 * Send notification to local server or to remote server when a node is added (and not by admin)
 		 */
 		if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
-			processAfterSave(ms, node);
+			processAfterSave(ms, node, parent);
 		}
 
 		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, true,
@@ -665,12 +673,18 @@ public class NodeEditService extends ServiceBase {
 		});
 	}
 
-	public void processAfterSave(MongoSession ms, SubNode node) {
+	// 'parent' (of 'node') can be passed in if already known, or else null can be passed for
+	// parent and we get the parent automatically in here
+	public void processAfterSave(MongoSession ms, SubNode node, SubNode parent) {
 		// never do any of this logic if this is an admin-owned node being saved.
 		if (acl.isAdminOwned(node)) {
 			return;
 		}
 
+		if (no(parent)) {
+			parent = read.getParent(ms, node, false);
+		}
+		final SubNode _parent = parent;
 		arun.run(s -> {
 			HashSet<Integer> sessionsPushed = new HashSet<>();
 			boolean isAccnt = node.isType(NodeType.ACCOUNT);
@@ -684,9 +698,7 @@ public class NodeEditService extends ServiceBase {
 				push.pushNodeToBrowsers(s, sessionsPushed, node);
 			}
 
-			SubNode parent = read.getParent(ms, node, false);
-			if (ok(parent)) {
-				parent.setHasChildren(true);
+			if (ok(_parent)) {
 				if (!isAccnt) {
 					HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, true);
 
@@ -707,7 +719,7 @@ public class NodeEditService extends ServiceBase {
 					// We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
 					if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
 						// This broadcasts out to the shared inboxes of all the followers of the user
-						apub.sendObjOutbound(s, parent, node, forceSendToPublic);
+						apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
 					}
 
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
