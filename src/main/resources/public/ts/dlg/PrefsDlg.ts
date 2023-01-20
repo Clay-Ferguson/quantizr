@@ -1,4 +1,4 @@
-import { getAs } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -21,7 +21,11 @@ export class PrefsDlg extends DialogBase {
             new Div(null, null, [
                 new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
-                        setValue: (checked: boolean) => getAs().userPrefs.showMetaData = checked,
+                        setValue: (checked: boolean) => {
+                            dispatch("setPropsPanelExpanded", s => {
+                                s.userPrefs.showMetaData = checked;
+                            });
+                        },
                         getValue: (): boolean => getAs().userPrefs.showMetaData
                     })
                 ]),

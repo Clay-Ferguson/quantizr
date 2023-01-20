@@ -524,7 +524,9 @@ export class EditNodeDlg extends DialogBase {
                 const propsButtonBar: ButtonBar = new ButtonBar([
                     new IconButton("fa-plus-circle", null, {
                         onClick: async () => {
-                            getAs().propsPanelExpanded = true;
+                            dispatch("setPropsPanelExpanded", s => {
+                                s.propsPanelExpanded = true;
+                            });
                             await this.utl.addProperty(this);
                         },
                         title: "Add property"
@@ -682,7 +684,9 @@ export class EditNodeDlg extends DialogBase {
 
             allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
                 onClick: async () => {
-                    getAs().propsPanelExpanded = true;
+                    dispatch("setPropsPanelExpanded", s => {
+                        s.propsPanelExpanded = true;
+                    });
                     await this.utl.addProperty(this);
                 },
                 title: "Add Property"
