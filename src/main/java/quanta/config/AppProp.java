@@ -163,7 +163,7 @@ public class AppProp {
 	}
 
 	public Integer getSessionTimeoutMinutes() {
-		String timeout = env.getProperty("server.session.timeout");
+		String timeout = env.getProperty("server.servlet.session.timeout");
 		Integer timeoutVal = Integer.parseInt(timeout.replace("m", ""));
 		return timeoutVal;
 	}

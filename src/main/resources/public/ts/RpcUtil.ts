@@ -25,6 +25,7 @@ export class RpcUtil {
     SESSION_TIMEOUT_MINS = 30;
     sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
     sessionTimedOut = false;
+    millisSinceLastRpc = 0;
     areYouThereDlg: ConfirmDlg;
     RPC_TIMER_INTERVAL = 1000;
 
@@ -72,6 +73,7 @@ export class RpcUtil {
                     console.warn("Request will have no signature.");
                 }
 
+                this.millisSinceLastRpc = 0;
                 this.userActive();
 
                 // const startTime = new Date().getTime();
@@ -237,6 +239,7 @@ export class RpcUtil {
         if (this.sessionTimedOut) return;
 
         this.sessionTimeRemainingMillis -= this.RPC_TIMER_INTERVAL;
+        this.millisSinceLastRpc += this.RPC_TIMER_INTERVAL;
         if (this.sessionTimeRemainingMillis <= 0) {
             this.sessionTimedOut = true;
 
@@ -268,6 +271,13 @@ export class RpcUtil {
 
     userActive = () => {
         this.sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
+
+        // if user is still active but hasn't made call to server which is about to cause a timeout
+        // in 10 seconds, then ping the server so the session does not timeout.
+        if (this.millisSinceLastRpc > this.SESSION_TIMEOUT_MINS * 60_000 - 10_000) {
+            this.millisSinceLastRpc = 0;
+            S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
+        }
     }
 
     progressInterval = () => {
