@@ -144,12 +144,15 @@ export class Props {
         const list: J.Attachment[] = [];
 
         // put all attachments in 'list', random order
+        let defaultOrdinal = 0;
         if (node.attachments) {
             Object.keys(node.attachments).forEach(key => {
                 // this is bizarre looking yes, but we need each object returned to know what it's key is
                 (node.attachments[key] as any).key = key;
+
+                // fixing ordinal with defaultOrdinal is just to be resilient against bad/duplicate ordinals.
                 if (!node.attachments[key].o) {
-                    node.attachments[key].o = 0;
+                    node.attachments[key].o = defaultOrdinal++;
                 }
                 list.push(node.attachments[key]);
             });

@@ -926,11 +926,13 @@ public class AttachmentService extends ServiceBase {
 		String attKey = getNextAttachmentKey(node);
 
 		if (!storeLocally) {
+			int maxAttOrdinal = getMaxAttachmentOrdinal(node);
 			Attachment att = node.getAttachment(attKey, true, true);
 			if (ok(mimeType)) {
 				att.setMime(mimeType);
 			}
 			att.setUrl(sourceUrl);
+			att.setOrdinal(maxAttOrdinal + 1);
 			return;
 		}
 
