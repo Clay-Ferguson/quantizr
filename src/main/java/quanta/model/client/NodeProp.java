@@ -179,6 +179,7 @@ public enum NodeProp {
     LAYOUT("layout"), //
     ORDER_BY("orderBy"), //
     NO_OPEN_GRAPH("noOpenGraph"), //
+    NO_EXPORT("noexport"), //
 
     TYPE_LOCK("sn:typLoc"), //
 

@@ -982,8 +982,6 @@ export class Edit {
     }
 
     removeNodesFromCalendarData = (selNodesArray: string[]) => {
-        // todo-0: this is new needing testing, this filter was being done OUTSIDE of the dispatch
-        // and shouldn't have even worked.
         dispatch("UpdateCalendarData", s => {
             selNodesArray.forEach(id => {
                 if (!s.calendarData) return;

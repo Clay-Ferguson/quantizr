@@ -121,15 +121,19 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		if (no(node))
 			return;
 
+		// If a node has a property "noexport" (added by power users) then this node will not be exported.
+		String noExport = node.getStr(NodeProp.NO_EXPORT);
+		if (ok(noExport)) {
+			return;
+		}
+
 		log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
 
 		StringBuilder html = new StringBuilder();
 		html.append("<html>");
-
 		html.append("<head>\n");
 		html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
 		html.append("</head>\n");
-
 		html.append("<body>\n");
 
 		// breadcrumbs at the top of each page.
@@ -175,6 +179,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (SubNode n : iter) {
+				String noExp = n.getStr(NodeProp.NO_EXPORT);
+				if (ok(noExp)) {
+					continue;
+				}
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 
