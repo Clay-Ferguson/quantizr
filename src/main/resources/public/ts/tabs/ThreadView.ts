@@ -32,7 +32,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         let i = 0;
         const children: CompIntf[] = [
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            new Div(null, { className: "headingBar" }, [
+            this.headingBar = new Div(null, { className: "headingBar" }, [
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
@@ -45,12 +45,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
                             S.tabUtil.selectTab(ast.threadViewFromTab);
                             setTimeout(() => {
                                 const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
-                                if (data) {
-                                    const elm = S.domUtil.domElm(S.tabUtil.makeDomIdForNode(data, ast.threadViewNodeId));
-                                    if (elm) {
-                                        elm.scrollIntoView(true);
-                                    }
-                                }
+                                data.inst?.scrollToNode(ast.threadViewNodeId);
                             }, 700);
                         }
                     },

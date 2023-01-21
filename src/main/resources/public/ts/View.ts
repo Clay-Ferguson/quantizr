@@ -2,6 +2,7 @@ import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
@@ -260,7 +261,13 @@ export class View {
 
                 const elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
                 if (elm) {
-                    elm.scrollIntoView(true);
+                    // scrollIntoView works, but is off a bit because we have a 'sticky' header covering up
+                    // part of the window making scrollIntoView appaer not to work.
+                    // elm.scrollIntoView(true);
+                    const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_MAIN);
+                    if (data) {
+                        data.inst.scrollToElm(elm);
+                    }
                 }
             }, delay);
         };

@@ -519,7 +519,10 @@ export class Edit {
                     // have a new actual element.
                     const elm = document.getElementById(data.topmostVisibleElmId);
                     if (elm) {
-                        elm.scrollIntoView(true);
+                        // scrollIntoView works, but is off a bit because we have a 'sticky' header covering up
+                        // part of the window making scrollIntoView appaer not to work.
+                        // elm.scrollIntoView(true);
+                        data.inst.scrollToElm(elm);
                     }
                 }
             }

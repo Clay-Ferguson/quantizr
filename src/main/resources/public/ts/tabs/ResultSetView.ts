@@ -52,7 +52,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
         const children: CompIntf[] = [
-            new Div(null, { className: "headingBar" }, [
+            this.headingBar = new Div(null, { className: "headingBar" }, [
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.node && this.showContentHeading

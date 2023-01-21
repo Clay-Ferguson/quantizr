@@ -69,7 +69,7 @@ export class MainTabComp extends AppTab {
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
-            ast.isAnonUser || !ast.node ? null : new Div(null, { className: "headingBar" }, [
+            ast.isAnonUser || !ast.node ? null : (this.headingBar = new Div(null, { className: "headingBar" }, [
                 new Div(null, { className: "tinyMarginTop float-end" }, [
                     !ast.isAnonUser ? new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
@@ -96,7 +96,7 @@ export class MainTabComp extends AppTab {
                     className: "tabTitle headerUploadPanel",
                     title: "Drop Files here to upload"
                 })
-            ]),
+            ])),
             contentDiv
         ]);
 

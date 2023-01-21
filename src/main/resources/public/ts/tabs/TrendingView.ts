@@ -100,7 +100,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            new Div(null, { className: "headingBar" }, [
+            this.headingBar = new Div(null, { className: "headingBar" }, [
                 new Div("Trending", { className: "tabTitle" })
             ]),
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),

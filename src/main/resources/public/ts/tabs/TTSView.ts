@@ -135,7 +135,7 @@ export class TTSView extends AppTab {
 
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            new Div(null, { className: "headingBar" }, [
+            this.headingBar = new Div(null, { className: "headingBar" }, [
                 new Div("Text-to-Speech", { className: "tabTitle" }),
                 new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
                 new Clearfix()
