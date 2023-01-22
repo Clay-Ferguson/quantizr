@@ -409,7 +409,7 @@ export class Nav {
             });
 
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenConfig.ordinal = selAtt.o;
+                s.fullScreenConfig.ordinal = selAtt.o || 0;
             });
         }
     }
@@ -432,7 +432,7 @@ export class Nav {
             });
 
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenConfig.ordinal = selAtt.o;
+                s.fullScreenConfig.ordinal = selAtt.o || 0;
             });
         }
     }

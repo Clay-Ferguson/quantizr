@@ -31,8 +31,13 @@ export class FullScreenControlBar extends Div {
             let onLast = false;
             if (node && node.attachments) {
                 const list: J.Attachment[] = S.props.getOrderedAttachments(node);
-                onFirst = list[0].o === ast.fullScreenConfig.ordinal;
-                onLast = list[list.length - 1].o === ast.fullScreenConfig.ordinal;
+                // todo-0: remove this soon.
+                console.log("ATTACHMENTS(ordinal=" + ast.fullScreenConfig.ordinal + "): " + S.util.prettyPrint(list));
+
+                if (list.length > 1) {
+                    onFirst = (list[0].o || 0) === ast.fullScreenConfig.ordinal;
+                    onLast = (list[list.length - 1].o || 0) === ast.fullScreenConfig.ordinal;
+                }
             }
 
             if (!onFirst) {

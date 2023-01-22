@@ -111,7 +111,7 @@ export class NodeCompBinary extends Div {
             // if clicking this node first time.
             if (!s.fullScreenConfig.nodeId) {
                 if (node) {
-                    s.fullScreenConfig.ordinal = att.o;
+                    s.fullScreenConfig.ordinal = att.o || 0;
                 }
             }
             s.fullScreenConfig.nodeId = id;
