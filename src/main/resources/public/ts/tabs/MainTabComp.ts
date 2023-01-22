@@ -5,6 +5,7 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
+import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
@@ -69,7 +70,7 @@ export class MainTabComp extends AppTab {
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
-            ast.isAnonUser || !ast.node ? null : (this.headingBar = new Div(null, { className: "headingBar" }, [
+            ast.isAnonUser || !ast.node ? null : (this.headingBar = new TabHeading([
                 new Div(null, { className: "tinyMarginTop float-end" }, [
                     !ast.isAnonUser ? new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",

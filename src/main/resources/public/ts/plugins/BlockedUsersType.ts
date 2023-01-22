@@ -23,9 +23,7 @@ export class BlockedUsersType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, this.displayName, {
-                className: "noMargin"
-            }),
+            new Heading(4, this.displayName),
             new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "marginLeft" })
         ]);
     }

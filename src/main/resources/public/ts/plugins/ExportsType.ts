@@ -26,9 +26,7 @@ export class ExportsType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, "Exports", {
-                className: "noMargin"
-            })
+            new Heading(4, "Exports")
         ]);
     }
 }

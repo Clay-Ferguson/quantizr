@@ -13,6 +13,7 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Spinner } from "../comp/core/Spinner";
+import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
@@ -267,7 +268,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            this.headingBar = new Div(null, { className: "headingBar" }, [
+            this.headingBar = new TabHeading([
                 this.renderHeading(),
                 this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),

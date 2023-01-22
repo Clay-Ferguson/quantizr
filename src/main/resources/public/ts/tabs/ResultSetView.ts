@@ -7,6 +7,7 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
+import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
 import { DialogMode } from "../DialogBase";
@@ -52,7 +53,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
 
         // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
         const children: CompIntf[] = [
-            this.headingBar = new Div(null, { className: "headingBar" }, [
+            this.headingBar = new TabHeading([
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.node && this.showContentHeading

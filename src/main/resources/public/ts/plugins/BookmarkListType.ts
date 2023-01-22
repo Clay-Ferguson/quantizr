@@ -21,9 +21,7 @@ export class BookmarkListType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, this.displayName, {
-                className: "noMargin"
-            }),
+            new Heading(4, this.displayName),
             new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft" })
         ]);
     }

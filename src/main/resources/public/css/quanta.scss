@@ -2062,6 +2062,14 @@ audio::-webkit-media-controls-play-button {
     min-height: 4em;
 }
 
+.headingBarMobile {
+    padding-top: 8px;
+    margin-bottom: 8px;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    background-color: $body-bg;
+    min-height: 4em;
+}
+
 .tabTitle {
     display: inline-block;
     font-size: 1.5rem;

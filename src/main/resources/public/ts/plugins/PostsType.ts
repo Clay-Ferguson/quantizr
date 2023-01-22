@@ -17,7 +17,7 @@ export class PostsType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, "Posts", { className: "noMargin" })
+            new Heading(4, "Posts")
         ]);
     }
 

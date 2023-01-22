@@ -33,7 +33,7 @@ export class InboxNodeType extends TypeBase {
 
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new HorizontalLayout([
-            new Heading(4, "Inbox", { className: "noMargin" }),
+            new Heading(4, "Inbox"),
             new ButtonBar([
                 new Button("Clear Inbox", () => S.edit.clearInbox())
             ], null, "float-end marginBottom"),

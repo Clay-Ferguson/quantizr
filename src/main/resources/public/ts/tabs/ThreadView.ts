@@ -5,6 +5,7 @@ import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
+import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -32,7 +33,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         let i = 0;
         const children: CompIntf[] = [
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            this.headingBar = new Div(null, { className: "headingBar" }, [
+            this.headingBar = new TabHeading([
                 new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {

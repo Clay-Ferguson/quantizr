@@ -4,6 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
+import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -100,7 +101,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
 
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
-            this.headingBar = new Div(null, { className: "headingBar" }, [
+            this.headingBar = new TabHeading([
                 new Div("Trending", { className: "tabTitle" })
             ]),
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),

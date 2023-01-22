@@ -27,7 +27,7 @@ export class FriendsListType extends TypeBase {
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => getAs().config.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
-            new Heading(4, "Friends", { className: "noMargin" }),
+            new Heading(4, "Friends"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
             new Button("Add New Friend", () => {
                 new SearchUsersDlg().open();

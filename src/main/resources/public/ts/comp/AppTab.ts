@@ -44,13 +44,21 @@ export class AppTab<T = any> extends Div {
 
     scrollToElm = (elm: HTMLElement): void => {
         if (!elm) return;
-        // headingBar is not fixed height so we get it's hight in realtime here.
-        const headingBarHeight = this.headingBar?.getRef()?.offsetHeight || 0;
 
-        // we scroll up the additional 12 pixels just to make a slight gap between top row border
-        // and heading border, becasue it's slightly better looking that way.
-        let top = elm.offsetTop - headingBarHeight - 12;
-        if (top < 0) top = 0;
-        this.setScrollTop(top);
+        // Mobile mode doesn't use 'sticky' header in the tab, so we can scroll to the
+        // exact location of offsetTop, without taking into account any sticky header height.
+        if (getAs().mobileMode) {
+            this.setScrollTop(elm.offsetTop);
+        }
+        else {
+            // headingBar is not fixed height so we get it's hight in realtime here.
+            const headingBarHeight = this.headingBar?.getRef()?.offsetHeight || 0;
+
+            // we scroll up the additional 12 pixels just to make a slight gap between top row border
+            // and heading border, becasue it's slightly better looking that way.
+            let top = elm.offsetTop - headingBarHeight - 12;
+            if (top < 0) top = 0;
+            this.setScrollTop(top);
+        }
     }
 }
