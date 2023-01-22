@@ -69,7 +69,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word,
+                    [C.WORD_ATTR]: word,
                     onClick: TrendingView.searchWord
                 }));
             });
@@ -81,7 +81,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             res.topMentions.forEach(word => {
                 mentionPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word,
+                    [C.WORD_ATTR]: word,
                     onClick: TrendingView.searchWord
                 }));
             });
@@ -93,7 +93,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
             res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    word,
+                    [C.WORD_ATTR]: word,
                     onClick: TrendingView.searchWord
                 }));
             });
