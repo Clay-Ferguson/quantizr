@@ -8,11 +8,15 @@ import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
+import { TextArea } from "../comp/core/TextArea";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
+import { Validator } from "../Validator";
 
 export class TTSView extends AppTab {
+
+    textAreaState: Validator = new Validator();
 
     constructor(data: TabIntf) {
         super(data);
@@ -40,8 +44,8 @@ export class TTSView extends AppTab {
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: S.speech.speakSelOrClipboard,
-            title: "Text-to-Speech: From Selected text or Clipboard"
+            onClick: () => S.speech.speakSelOrClipboard(this),
+            title: "Text-to-Speech: Speak from Text Area below, Selected Text, or Clipboard"
         }) : null;
 
         // make the entire tab area a drop target for speaking text.
@@ -61,8 +65,8 @@ export class TTSView extends AppTab {
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: S.speech.appendSelOrClipboard,
-            title: "Text-to-Speech: Append more text Highlighted content or Clipboard"
+            onClick: () => S.speech.appendSelOrClipboard(this),
+            title: "Text-to-Speech: Append more text from...\n\nText Area below, Selected Text, or Clipboard"
         }) : null;
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
@@ -145,6 +149,9 @@ export class TTSView extends AppTab {
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
                 this.makeRateChooser()
             ]),
+            new TextArea("Add Text to Speak", {
+                rows: 3
+            }, this.textAreaState),
             paraComps?.length > 0
                 ? new Div(null, { className: "speech-text-area" }, [
                     new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),

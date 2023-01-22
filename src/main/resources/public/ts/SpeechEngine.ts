@@ -1,6 +1,7 @@
 import { getAs, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { S } from "./Singletons";
+import { TTSView } from "./tabs/TTSView";
 
 declare let webkitSpeechRecognition: any;
 declare let SpeechRecognition: any;
@@ -132,8 +133,12 @@ export class SpeechEngine {
         }, 1000);
     }
 
-    speakSelOrClipboard = () => {
-        if (S.quanta.selectedForTts) {
+    speakSelOrClipboard = (ttsView: TTSView) => {
+        if (ttsView.textAreaState.getValue()) {
+            this.speakText(ttsView.textAreaState.getValue(), false);
+            ttsView.textAreaState.setValue("");
+        }
+        else if (S.quanta.selectedForTts) {
             this.speakText(S.quanta.selectedForTts, false);
         }
         else {
@@ -142,10 +147,14 @@ export class SpeechEngine {
     }
 
     // Append more text to buffer of what's being read.
-    appendSelOrClipboard = async () => {
+    appendSelOrClipboard = async (ttsView: TTSView) => {
         let textToAdd: string = null;
 
-        if (S.quanta.selectedForTts) {
+        if (ttsView.textAreaState.getValue()) {
+            textToAdd = ttsView.textAreaState.getValue();
+            ttsView.textAreaState.setValue("");
+        }
+        else if (S.quanta.selectedForTts) {
             textToAdd = S.quanta.selectedForTts;
         }
         else {

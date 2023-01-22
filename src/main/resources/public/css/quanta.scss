@@ -264,6 +264,7 @@ td {
 .speech-text-area {
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 24px;
+    margin-top: $smallGap;
 
     background-color: $baseBgColor;
     padding: 16px;
