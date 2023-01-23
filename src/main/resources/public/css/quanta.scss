@@ -3,6 +3,7 @@
 $profileImgSize: 200px;
 $highlightActiveMenuItems: false;
 
+$border-radius-small: 3px;
 $border-radius: 6px;
 $border-radius-large: 10px;
 
@@ -230,7 +231,7 @@ td {
     display: inline-block;
     cursor: pointer;
     font-size: x-large;
-
+    border-radius: $border-radius-small;
 }
 
 .statsWord:hover {
@@ -256,7 +257,7 @@ td {
     border: 2px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
-
+    border-radius: $border-radius;
     background-color: $baseBgColor;
     padding: 12px;
 }
@@ -265,7 +266,7 @@ td {
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 24px;
     margin-top: $smallGap;
-
+    border-radius: $border-radius;
     background-color: $baseBgColor;
     padding: 16px;
 }

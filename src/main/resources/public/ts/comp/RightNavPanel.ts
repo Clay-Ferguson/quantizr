@@ -123,7 +123,7 @@ export class RightNavPanel extends Div {
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: S.speech.speakSelOrClipboard,
+            onClick: () => S.speech.speakSelOrClipboard(null),
             title: "Text-to-Speech: Selected text or clipboard"
         }) : null;
 

@@ -134,7 +134,7 @@ export class SpeechEngine {
     }
 
     speakSelOrClipboard = (ttsView: TTSView) => {
-        if (ttsView.textAreaState.getValue()) {
+        if (ttsView?.textAreaState.getValue()) {
             this.speakText(ttsView.textAreaState.getValue(), false);
             ttsView.textAreaState.setValue("");
         }
@@ -150,7 +150,7 @@ export class SpeechEngine {
     appendSelOrClipboard = async (ttsView: TTSView) => {
         let textToAdd: string = null;
 
-        if (ttsView.textAreaState.getValue()) {
+        if (ttsView?.textAreaState.getValue()) {
             textToAdd = ttsView.textAreaState.getValue();
             ttsView.textAreaState.setValue("");
         }
