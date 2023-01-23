@@ -247,7 +247,7 @@ public class DateUtil {
 				return sb.toString();
 		}
 
-		if (!highRes && millis > 0) {
+		if (highRes && millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));

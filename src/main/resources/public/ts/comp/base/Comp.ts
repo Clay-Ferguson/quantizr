@@ -362,9 +362,11 @@ export abstract class Comp implements CompIntf {
                 this.stateMgr.useState();
             }
 
+            // This 'useEffect' with the empty dependency array (last param) is essentially the 'componentDidMount'
+            // effect, and our app maps this to calling the 'domAddEvent'
             useEffect(() => {
-                // Supposedly React 18+ will call useEffect twice on a mount so that's the only reason
-                // I'm checking for !mounted here in this if condition.
+                // Supposedly React 18+ will call useEffect twice on a mount (in strict mode, at least)
+                // so that's the only reason we're checking for !mounted here in this if condition.
                 if (!this.mounted) {
                     this.mounted = true;
                     // because of the empty dependencies array in useEffect this only gets called once when the component mounts.
@@ -376,13 +378,16 @@ export abstract class Comp implements CompIntf {
                     }
                 }
 
-                // the return value of the useEffect function is what will get called when component unmounts
+                // the return value of the useEffect function is what will get called when component unmounts, and was
+                // in the original pre-hooks React analogous to 'compnentWillUnmount'
                 return () => {
                     this.mounted = false;
                     if (this.domRemoveEvent) this.domRemoveEvent();
                 };
             }, []);
 
+            // Note: The useEffect with no array as second parameter (dependencies) is how we capture an update event
+            // for all state changes.
             if (this.domUpdateEvent) useEffect(this.domUpdateEvent);
             if (this.domPreUpdateEvent) useLayoutEffect(this.domPreUpdateEvent);
 
