@@ -106,7 +106,7 @@ public class MongoDelete extends ServiceBase {
 	 * deleted nodes, but this is ok, because what we deleted was just cached nodes from foreign servers
 	 * and if there are still any posts left in the foreign user account then actually the
 	 * 'node.hasChildren' will remain correct. So there's no reason to worry about damaging the
-	 * 'correctness' of 'hasChildren' for this scanrio
+	 * 'correctness' of 'hasChildren' for this scenario
 	 */
 	public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
 		Query q = new Query();

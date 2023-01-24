@@ -99,6 +99,15 @@ export class NodeCompRow extends Div {
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
 
+        let allowHeader: boolean = false;
+        // special case, if node is owned by admin and we're not admin, never show header
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && this.node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
+            // leave allowHeader false.
+        }
+        else {
+            allowHeader = this.allowHeaders && ast.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
+        }
+
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
         // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
         if (this.isTableCell) {
@@ -107,7 +116,7 @@ export class NodeCompRow extends Div {
         // }
         else {
             // special class if BOTH edit and info is on
-            if (this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
+            if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
                 layoutClass += " row-border-edit-info";
             }
             // else if either is on
@@ -144,15 +153,6 @@ export class NodeCompRow extends Div {
 
         let header: NodeCompRowHeader = null;
         let jumpButton: CompIntf = null;
-
-        let allowHeader: boolean = false;
-        // special case, if node is owned by admin and we're not admin, never show header
-        if (!C.ALLOW_ADMIN_NODE_HEADERS && this.node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
-            // leave allowHeader false.
-        }
-        else {
-            allowHeader = this.allowHeaders && ast.userPrefs.showMetaData && (this.type == null || this.type?.getAllowRowHeader())
-        }
 
         if (allowHeader) {
             // slight special case for now until Document View knows how to delete all the subchilren and not
