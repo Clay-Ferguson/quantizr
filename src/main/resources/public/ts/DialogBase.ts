@@ -212,7 +212,7 @@ export abstract class DialogBase extends Comp {
         }
         else if (this.mode === DialogMode.FULLSCREEN) {
             this.attribs.className = "app-modal-content-fullscreen";
-            ret = this.tag("div");
+            ret = this.tag("div", { style: { zIndex: this.zIndex } });
         }
         else {
             const clazzName = ast.mobileMode

@@ -15,7 +15,6 @@ export class VideoPlayerDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            // space is at a premium for mobile, so let's just not even show the header.
             new Div(null, { className: "videoContainer" }, [
                 this.videoPlayer = new VideoPlayer({
                     id: this.domId + "-comp",

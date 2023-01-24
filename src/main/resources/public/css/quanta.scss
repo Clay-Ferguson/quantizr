@@ -2059,7 +2059,7 @@ audio::-webkit-media-controls-play-button {
     background-color: $body-bg;
     position: sticky;
     top: 0px;
-    z-index: 15000000;
+    z-index: 100;
     min-height: 4em;
 }
 
