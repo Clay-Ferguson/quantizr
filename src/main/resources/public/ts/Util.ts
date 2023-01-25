@@ -31,45 +31,45 @@ export class Util {
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    fileExtensionTypes = {
-        md: "md",
-        txt: "txt",
-        sh: "txt",
+    fileExtensionTypes: Map<string, string> = new Map<string, string>([
+        ["md", "md"],
+        ["txt", "txt"],
+        ["sh", "txt"],
 
-        jpg: "img",
-        png: "img",
-        jpeg: "img",
+        ["jpg", "img"],
+        ["png", "img"],
+        ["jpeg", "img"],
 
-        mp3: "audio",
-        ogg: "audio",
-        wma: "audio",
-        opus: "audio",
-        m4a: "audio",
-        aac: "audio",
-        flac: "audio",
-        aiff: "audio",
-        alac: "audio",
-        dsd: "audio",
-        pcm: "audio",
-        wav: "audio",
+        ["mp3", "audio"],
+        ["ogg", "audio"],
+        ["wma", "audio"],
+        ["opus", "audio"],
+        ["m4a", "audio"],
+        ["aac", "audio"],
+        ["flac", "audio"],
+        ["aiff", "audio"],
+        ["alac", "audio"],
+        ["dsd", "audio"],
+        ["pcm", "audio"],
+        ["wav", "audio"],
 
-        mp4: "video",
-        m4p: "video",
-        m4v: "video",
-        mp2: "video",
-        wmv: "video",
-        qt: "video",
-        mpeg: "video",
-        mpe: "video",
-        mpv: "video",
-        webm: "video",
-        mpg: "video",
-        avi: "video",
-        mov: "video",
-        flv: "video",
-        swf: "video",
-        avchd: "video"
-    };
+        ["mp4", "video"],
+        ["m4p", "video"],
+        ["m4v", "video"],
+        ["mp2", "video"],
+        ["wmv", "video"],
+        ["qt", "video"],
+        ["mpeg", "video"],
+        ["mpe", "video"],
+        ["mpv", "video"],
+        ["webm", "video"],
+        ["mpg", "video"],
+        ["avi", "video"],
+        ["mov", "video"],
+        ["flv", "video"],
+        ["swf", "video"],
+        ["avchd", "video"]
+    ]);
 
     editableExtensions = {
         md: true,
@@ -187,7 +187,7 @@ export class Util {
     getFileTypeFormFileName = (fileName: string): string => {
         const ext: string = this.getFileExtensionFromFileName(fileName);
         if (!ext) return;
-        return this.fileExtensionTypes[ext.toLowerCase()];
+        return this.fileExtensionTypes.get(ext.toLowerCase());
     }
 
     getFileExtensionFromFileName = (fileName: string): string => {
