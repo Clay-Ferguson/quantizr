@@ -14,16 +14,16 @@ export class DomUtil {
     mouseY: number;
     mouseEffect: boolean = false;
 
-    static escapeMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-        "/": "&#x2F;",
-        "`": "&#x60;",
-        "=": "&#x3D;"
-    };
+    static escapeMap: Map<string, string> = new Map<string, string>([
+        ["&", "&amp;"],
+        ["<", "&lt;"],
+        [">", "&gt;"],
+        ['"', "&quot;"],
+        ["'", "&#39;"],
+        ["/", "&#x2F;"],
+        ["`", "&#x60;"],
+        ["=", "&#x3D;"]
+    ]);
 
     getPropFromDom = (evt: Event, prop: string): string => {
         let val = null;
@@ -168,7 +168,6 @@ export class DomUtil {
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* this supposedly came from mustache codebase. */
     escapeHtml = (str: string): string => {
         if (!str) return str;
         return String(str).replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
@@ -177,7 +176,7 @@ export class DomUtil {
     // we have this as a separate static function just to avoid the overhead of creating a new function for every call
     // where this is used.
     static escapeMapFunc(s: any) {
-        return DomUtil.escapeMap[s];
+        return DomUtil.escapeMap.get(s) || s;
     }
 
     resetDropHandler = (attribs: any) => {

@@ -1,6 +1,5 @@
 import DOMPurify from "dompurify";
-import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
-import { renderToString } from "react-dom/server";
+import { createElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -191,10 +190,6 @@ export abstract class Comp implements CompIntf {
 
     getAttribs(): Object {
         return this.attribs;
-    }
-
-    renderHtmlElm(elm: ReactElement): string {
-        return renderToString(elm);
     }
 
     create = (): ReactNode => {
