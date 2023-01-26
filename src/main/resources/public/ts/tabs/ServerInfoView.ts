@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
@@ -15,7 +15,7 @@ export class ServerInfoView extends AppTab {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass();
 
         this.setChildren([

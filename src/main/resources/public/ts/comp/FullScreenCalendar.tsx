@@ -1,7 +1,7 @@
 import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode, createElement } from "react";
-import { dispatch, useAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 
 /* ========= WARNING =========
 Do not re-arrange these imports because fullcalendar will have a problem if you do!!! It needs to load them in this order.
@@ -20,7 +20,7 @@ export class FullScreenCalendar extends Main {
     }
 
     compRender = (): ReactNode => {
-        const state = useAppState();
+        const state = getAs();
         const nodeId = state.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
 

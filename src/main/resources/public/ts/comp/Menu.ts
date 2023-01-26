@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { MenuPanelState } from "../Interfaces";
@@ -16,7 +16,7 @@ export class Menu extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const ast = useAppState();
+        const ast = getAs();
         const expanded = this.menuPanelState.expanded.has(this.name);
 
         this.setChildren([

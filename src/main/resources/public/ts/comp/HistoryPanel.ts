@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
@@ -18,7 +18,7 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         if (ast.nodeHistory.length === 0) {
             this.setChildren(null);

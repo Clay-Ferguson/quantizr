@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -33,7 +33,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return;
         this.attribs.className = this.getClass();

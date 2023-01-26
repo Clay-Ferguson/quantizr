@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
 import { Div } from "../core/Div";
@@ -16,7 +16,7 @@ export class NodeCompParentNodes extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         /* Currently our "renderNode" will only ever load a single parent, so we just pull the first element
          from 'parents' array, but the system architecture is such that if we ever want to display

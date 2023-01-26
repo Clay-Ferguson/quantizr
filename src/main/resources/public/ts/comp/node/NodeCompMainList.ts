@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Div } from "../../comp/core/Div";
@@ -14,7 +14,7 @@ export class NodeCompMainList extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         const children: Comp[] = [];
         if (ast.node?.children) {

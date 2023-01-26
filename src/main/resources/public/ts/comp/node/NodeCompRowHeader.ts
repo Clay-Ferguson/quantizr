@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -22,12 +22,12 @@ export class NodeCompRowHeader extends Div {
         private isBoost: boolean, private allowDelete: boolean) {
         super(null);
 
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) ? "row-header-edit" : "row-header";
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const showDetails: boolean = ast.showAllRowDetails.has(this.node.id) || ast.isAdminUser;
         const children = [];
         let avatarImg: Img = null;

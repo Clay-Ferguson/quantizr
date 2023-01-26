@@ -1,4 +1,4 @@
-import { dispatch, getAs, promiseDispatch, useAppState } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Tag } from "./comp/core/Tag";
@@ -202,7 +202,7 @@ export class MenuPanel extends Div {
     });
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const state = this.getState();
 
         const hltNode = S.nodeUtil.getHighlightedNode();

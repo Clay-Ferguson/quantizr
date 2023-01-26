@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
@@ -32,7 +32,7 @@ export class App extends Main {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         if (!ast.appInitComplete) {
             this.setChildren([new Progress()]);
             return;

@@ -1,9 +1,9 @@
-import { useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
-import * as J from "../JavaIntf";
 
 export class FullScreenImgViewer extends Main {
     constructor() {
@@ -14,7 +14,7 @@ export class FullScreenImgViewer extends Main {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
         if (!node) {

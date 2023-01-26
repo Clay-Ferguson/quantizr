@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -20,7 +20,7 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return;
         this.attribs.className = this.getClass();

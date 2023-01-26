@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { dispatch, useAppState } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
 import { Comp } from "../base/Comp";
 import { Anchor } from "./Anchor";
@@ -27,7 +27,7 @@ export class TutorialApp extends Comp {
     }
 
     compRender = (): ReactNode => {
-        const ast = useAppState();
+        const ast = getAs();
 
         return this.tag("div", null, [
             this.getState<LS>().content,

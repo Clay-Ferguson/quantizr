@@ -1,4 +1,4 @@
-import { getAs, promiseDispatch, useAppState } from "../AppContext";
+import { getAs, promiseDispatch } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { AppTab } from "./AppTab";
@@ -28,7 +28,7 @@ export class TabPanel extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         if (!ast.tabPanelVisible) {
             // not sure why, but this had no effect, we're ok without it, but

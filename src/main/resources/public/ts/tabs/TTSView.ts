@@ -1,4 +1,4 @@
-import { dispatch, getAs, useAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -36,7 +36,7 @@ export class TTSView extends AppTab {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass();
 
         const speakBtn = !ast.mobileMode ? new Icon({

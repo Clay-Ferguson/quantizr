@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
@@ -51,7 +51,7 @@ export class TrendingView extends AppTab<TrendingRSInfo> {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass();
         const res = this.data ? this.data.props.res : null;
 

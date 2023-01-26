@@ -1,4 +1,4 @@
-import { dispatch, getAs, useAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -32,7 +32,7 @@ export class FeedView extends AppTab<FeedViewProps> {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass();
 
         /*

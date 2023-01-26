@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useReducer } from "react";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { PubSub } from "./PubSub";
@@ -53,12 +53,6 @@ export function getAs(): AppState {
     // Freeze this object because it's always a violation of our architecural design
     // to ever have an object gotten from getAs() be modified.
     return Object.freeze(state);
-}
-
-/* Must be called from a react function */
-export function useAppState(): AppState {
-    state = useContext(AppContext);
-    return state;
 }
 
 /**

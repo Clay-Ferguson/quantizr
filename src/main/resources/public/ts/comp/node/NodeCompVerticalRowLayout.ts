@@ -1,4 +1,4 @@
-import { dispatch, getAs, useAppState } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { CollapsiblePanel } from "../../comp/core/CollapsiblePanel";
@@ -19,7 +19,7 @@ export class NodeCompVerticalRowLayout extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const childCount: number = this.node.children.length;
         const comps: Comp[] = [];
         const collapsedComps: Object[] = [];

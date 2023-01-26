@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Div } from "../../comp/core/Div";
@@ -15,7 +15,7 @@ export class NodeCompTableRowLayout extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const nodesToMove = ast.nodesToMove;
         let curRow = new Div(null, { className: "node-grid-row" });
         const children: Comp[] = [];

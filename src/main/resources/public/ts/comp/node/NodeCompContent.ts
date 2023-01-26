@@ -1,4 +1,4 @@
-import { useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
@@ -30,7 +30,7 @@ export class NodeCompContent extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         if (!this.node) {
             this.setChildren(null);

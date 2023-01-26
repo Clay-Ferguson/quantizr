@@ -1,4 +1,4 @@
-import { dispatch, useAppState } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { ButtonBar } from "../../comp/core/ButtonBar";
@@ -22,7 +22,7 @@ export class NodeCompButtonBar extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         if (!this.node) {
             this.setChildren(null);
             return;

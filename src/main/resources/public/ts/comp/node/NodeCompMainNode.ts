@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -34,7 +34,7 @@ export class NodeCompMainNode extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         const node = ast.node;
 
         if (!node) {

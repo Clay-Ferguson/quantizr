@@ -1,4 +1,4 @@
-import { dispatch, getAs, useAppState } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
@@ -49,7 +49,7 @@ export class LeftNavPanel extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         const s = ast.newMessageCount > 1 ? "s" : "";
         let messages = ast.newMessageCount > 0

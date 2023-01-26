@@ -1,4 +1,4 @@
-import { useAppState } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -25,7 +25,7 @@ export class MainTabComp extends AppTab {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
         this.attribs.className = this.getClass();
 
         let contentDiv: Div = null;

@@ -1,4 +1,4 @@
-import { getAs, useAppState } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
@@ -39,7 +39,7 @@ export class NodeCompRow extends Div {
     }
 
     preRender(): void {
-        const ast = useAppState();
+        const ast = getAs();
 
         if (this.allowHeaders) {
             this.attribs[C.NODE_ID_ATTR] = this.node.id;
