@@ -403,8 +403,8 @@ export class Util {
      * requires: res.success res.message
      */
     checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
-        if ((!res || !res.success) && res.message) {
-            this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
+        if (!res || !res.success) {
+            this.showMessage(opFriendlyName + " failed: " + (res?.message ? res.message : ""), "Warning");
         }
         return res.success;
     }

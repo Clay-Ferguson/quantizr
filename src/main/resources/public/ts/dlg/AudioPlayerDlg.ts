@@ -53,19 +53,13 @@ export class AudioPlayerDlg extends DialogBase {
             this.oneMinuteTimeslice();
         }, 60000);
 
-        // ping server at 10 minute intervals (if audio playing), to avoid session timeout
-        this.longTimer = setInterval(() => {
-            if (!this.player.paused && !this.player.ended) {
-                S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
-            }
-        }, 600000);
-
         setTimeout(() => {
             this.updatePlayButton();
         }, 750);
     }
 
     preUnmount(): any {
+        S.quanta.audioPlaying = false;
         if (this.intervalTimer) {
             clearInterval(this.intervalTimer);
         }
@@ -81,6 +75,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     // This makes the sleep timer work "Stop After (mins.)"
     oneMinuteTimeslice = () => {
+        if (!S.quanta.audioPlaying) return;
         if (this.timeLeftState.getValue()) {
             try {
                 let timeVal = parseInt(this.timeLeftState.getValue());
@@ -99,7 +94,7 @@ export class AudioPlayerDlg extends DialogBase {
         const children = [
             new Div(null, null, [
                 this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
-                this.audioPlayer = new AudioPlayer({
+                this.audioPlayer = S.rpcUtil.sessionTimedOut ? null : new AudioPlayer({
                     src: this.sourceUrl,
                     className: "audioPlayer",
                     onPause: () => { this.savePlayerInfo(this.player.src, this.player.currentTime); },
@@ -142,11 +137,17 @@ export class AudioPlayerDlg extends DialogBase {
                     this.playButton = new Icon({
                         className: "playerButton fa fa-play fa-3x",
                         style: { display: "none" },
-                        onClick: () => this.player?.play()
+                        onClick: () => {
+                            S.quanta.audioPlaying = true;
+                            this.player?.play();
+                        }
                     }),
                     this.pauseButton = new Icon({
                         className: "playerButton fa fa-pause fa-3x",
-                        onClick: () => this.player?.pause()
+                        onClick: () => {
+                            S.quanta.audioPlaying = false;
+                            this.player?.pause();
+                        }
                     })
                 ]),
                 new Div(null, { className: "row" }, [
@@ -171,6 +172,7 @@ export class AudioPlayerDlg extends DialogBase {
         this.audioPlayer.onMount((elm: HTMLElement) => {
             this.player = elm as HTMLAudioElement;
             if (!this.player) return;
+
             this.player.onpause = (event) => {
                 this.updatePlayButton();
             };
@@ -187,17 +189,25 @@ export class AudioPlayerDlg extends DialogBase {
 
     updatePlayButton = () => {
         if (!this.player) return;
+        this.updatePlayingState();
 
         this.playButton.onMount((elm: HTMLElement) => {
-            elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
+            this.updatePlayingState();
+            elm.style.display = !S.quanta.audioPlaying ? "inline-block" : "none";
         });
 
         this.pauseButton.onMount((elm: HTMLElement) => {
-            elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
+            this.updatePlayingState();
+            elm.style.display = S.quanta.audioPlaying ? "inline-block" : "none";
         });
     }
 
+    updatePlayingState = () => {
+        S.quanta.audioPlaying = !this.player.paused && !this.player.ended;
+    }
+
     cancel(): void {
+        S.quanta.audioPlaying = false;
         this.close();
         if (this.player) {
             this.player.pause();
@@ -218,6 +228,7 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     destroyPlayer = () => {
+        S.quanta.audioPlaying = false;
         if (this.player) {
             this.player.pause();
         }

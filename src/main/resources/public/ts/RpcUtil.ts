@@ -11,6 +11,7 @@ export class RpcUtil {
     rhost: string = null;
     logRpc: boolean = false;
     logRpcShort: boolean = true;
+    timer: any = null;
     unauthMessageShowing: boolean = false;
 
     /*
@@ -25,6 +26,7 @@ export class RpcUtil {
     SESSION_TIMEOUT_MINS = 30;
     sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
     sessionTimedOut = false;
+    rpcEnable = true;
     millisSinceLastRpc = 0;
     areYouThereDlg: ConfirmDlg;
     RPC_TIMER_INTERVAL = 1000;
@@ -45,7 +47,7 @@ export class RpcUtil {
 
     rpc = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
         background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
-        if (this.sessionTimedOut) {
+        if (this.sessionTimedOut || !this.rpcEnable) {
             return Promise.resolve(null);
         }
 
@@ -229,7 +231,7 @@ export class RpcUtil {
 
     initRpcTimer = () => {
         // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
-        setInterval(() => {
+        this.timer = setInterval(() => {
             this.progressInterval();
             this.timeoutInterval();
         }, this.RPC_TIMER_INTERVAL);
@@ -241,22 +243,23 @@ export class RpcUtil {
         this.sessionTimeRemainingMillis -= this.RPC_TIMER_INTERVAL;
         this.millisSinceLastRpc += this.RPC_TIMER_INTERVAL;
         if (this.sessionTimeRemainingMillis <= 0) {
+            console.log("Session Timed Out.");
             this.sessionTimedOut = true;
+            this.rpcEnable = false;
+            clearInterval(this.timer);
 
-            // we don't need to close this but we do just to remove clutter from the screen beneath
-            // the Session Expored message.
-            if (this.areYouThereDlg) {
-                this.areYouThereDlg.close();
+            // if audio player is not playing we can close out the app now
+            if (!S.quanta.audioPlaying) {
+                this.handleSessionTimeout();
+                return;
             }
-            await S.util.showMessage("Session expired.", "Warning");
-            window.location.href = window.location.origin;
             return;
         }
 
         if (this.areYouThereDlg) return;
 
-        // is there less than 1 minute before session should timeout?
-        if (this.sessionTimeRemainingMillis < 60_000) {
+        // is there less than 90 seconds before session should timeout?
+        if (this.sessionTimeRemainingMillis < 90_000) {
             this.areYouThereDlg = new ConfirmDlg("Are you still there?", g_brandingAppName,
                 "btn-info", "alert alert-info", false);
             await this.areYouThereDlg.open();
@@ -267,6 +270,20 @@ export class RpcUtil {
             this.userActive();
             this.areYouThereDlg = null;
         }
+    }
+
+    handleSessionTimeout = async () => {
+        // this is kind of tricky but we set sessionTimedOut to false here so the
+        // dispatcher will keep working just to show the final "Session Expired" message
+        this.sessionTimedOut = false;
+
+        // we don't need to close this but we do just to remove clutter from the screen beneath
+        // the Session Expored message.
+        if (this.areYouThereDlg) {
+            this.areYouThereDlg.close();
+        }
+        await S.util.showMessage("Session expired.", "Warning");
+        window.location.href = window.location.origin;
     }
 
     userActive = () => {

@@ -22,6 +22,7 @@ export class Quanta {
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;
+    audioPlaying = false;
 
     app: CompIntf;
     appInitialized: boolean = false;
