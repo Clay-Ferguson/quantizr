@@ -194,10 +194,6 @@ export class TypeBase implements TypeIntf {
         return false;
     }
 
-    isHiddenNode(): boolean {
-        return false;
-    }
-
     subOrdinal(): number {
         return -1;
     }

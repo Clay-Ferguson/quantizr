@@ -218,7 +218,7 @@ export class NodeCompButtonBar extends Div {
 
         // Note we only allow 'Up Level' on home node if we're the admin.
         if (isPageRootNode && (this.node.name !== "home" || ast.isAdminUser)) {
-            if (S.nav.parentVisibleToUser()) {
+            if (!(type && type.isSpecialAccountNode()) && S.nav.parentVisibleToUser()) {
                 upLevelButton = new IconButton("fa-folder", "Up Level", {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.navUpLevelClick,

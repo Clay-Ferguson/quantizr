@@ -1,7 +1,6 @@
-import { dispatch, getAs } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
-import { CollapsiblePanel } from "../../comp/core/CollapsiblePanel";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { DialogMode } from "../../DialogBase";
@@ -22,7 +21,6 @@ export class NodeCompVerticalRowLayout extends Div {
         const ast = getAs();
         const childCount: number = this.node.children.length;
         const comps: Comp[] = [];
-        const collapsedComps: Object[] = [];
         const allowInsert = S.props.isWritableByMe(this.node);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
@@ -64,21 +62,7 @@ export class NodeCompVerticalRowLayout extends Div {
                             comps.push(new Div(null, { className: "vertical-space" }));
                         }
 
-                        if (type?.isHiddenNode()) {
-                            // do nothing if node is not displayable
-                        }
-                        /* NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
-                         because if the user wants their Account root laid out in a grid just let them do that and show everything
-                         without doing any collapsedComps. */
-                        else if (type?.isSpecialAccountNode()) {
-                            if (NodeCompVerticalRowLayout.showSpecialNodes) {
-                                row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null);
-
-                                // I'm gonna be evil here and do this object without a type.
-                                collapsedComps.push({ comp: row, subOrdinal: type.subOrdinal() });
-                            }
-                        }
-                        else {
+                        if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
                             row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp);
                             comps.push(row);
                         }
@@ -149,15 +133,6 @@ export class NodeCompVerticalRowLayout extends Div {
                     }
                 }
             }
-        }
-
-        if (collapsedComps.length > 0) {
-            // put them in subOrdinal order on the page.
-            collapsedComps.sort((a: any, b: any) => a.subOrdinal - b.subOrdinal);
-
-            comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (exp: boolean) => {
-                dispatch("OtherNodesExpState", s => s.otherAccountNodesExpanded = exp);
-            }, getAs().otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel", ""));
         }
 
         this.setChildren(comps);
