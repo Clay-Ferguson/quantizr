@@ -13,8 +13,6 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
-declare let g_nodeId: string;
-
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
@@ -862,7 +860,7 @@ export class Util {
             }
             else {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {
-                    nodeId: g_nodeId || ":home",
+                    nodeId: S.quanta.initialNodeId || ":home",
                     upLevel: false,
                     siblingOffset: 0,
                     renderParentIfLeaf: false,

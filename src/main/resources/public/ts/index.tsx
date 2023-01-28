@@ -8,6 +8,7 @@ import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 import { Factory } from "./Factory";
 import { ImportTest } from "./ImportTest";
 import TsxApp from "./TsxApp";
+import { S } from "./Singletons";
 
 // we have this as the first import for troubleshooting how browsers are
 // able to handle the 'import' statement.
@@ -16,9 +17,10 @@ console.log("index.tsx finished imports");
 
 // This is how we run the main app (normal flow)
 if ((window as any).__page === "index") {
-    window.addEventListener("load", (event) => {
+    window.addEventListener("load", async (event) => {
         const factory = new Factory();
         if (factory) {
+            await S.quanta.loadConfig();
             const root = createRoot(document.getElementById("app"));
             root.render(<AppContainer />);
             factory.initApp();

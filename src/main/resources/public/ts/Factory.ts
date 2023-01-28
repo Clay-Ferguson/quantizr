@@ -73,7 +73,7 @@ export class Factory {
 
     initApp() {
         try {
-            console.log("calling initApp()");
+            console.log("calling factory.initApp()");
             PubSub.subSingleOnce(C.PUBSUB_dispatcherReady, S.quanta.initApp);
         }
         catch (e) {

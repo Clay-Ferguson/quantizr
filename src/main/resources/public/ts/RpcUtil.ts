@@ -4,7 +4,6 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 declare const __page: any;
-declare const g_brandingAppName: string;
 
 export class RpcUtil {
     rpcPath: string = null;
@@ -260,7 +259,7 @@ export class RpcUtil {
 
         // is there less than 90 seconds before session should timeout?
         if (this.sessionTimeRemainingMillis < 90_000) {
-            this.areYouThereDlg = new ConfirmDlg("Are you still there?", g_brandingAppName,
+            this.areYouThereDlg = new ConfirmDlg("Are you still there?", S.quanta.configRes.brandingAppName,
                 "btn-info", "alert alert-info", false);
             await this.areYouThereDlg.open();
             if (this.areYouThereDlg.yes) {

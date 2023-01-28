@@ -9,12 +9,14 @@ import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
 
-declare const g_requireCrypto: string;
-declare let g_userMessage: string;
-declare let g_displayUserProfileId: string;
-
 export class Quanta {
+    urlParamView: string = null;
+    initialTab: string = null;
+    tagSearch: string = null;
+    initialNodeId: string = null;
+
     static appGuid: string = "appid." + Math.random();
+    configRes: J.GetConfigResponse = null;
     mainMenu: MainMenuDlg;
     noScrollToId: string = null;
     activeTab: string;
@@ -92,7 +94,33 @@ export class Quanta {
         });
     }
 
+    loadConfig = async () => {
+        console.log("loadConfig()");
+        this.configRes = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+            appGuid: Quanta.appGuid
+        }, true);
+    }
+
+    parseUrlParams = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        this.urlParamView = urlParams.get("view");
+
+        if (this.urlParamView === "doc") {
+            this.initialTab = "docRS";
+        } else if (this.urlParamView === "feed") {
+            this.initialTab = "feedTab";
+        } else if (this.urlParamView === "trending") {
+            this.initialTab = "trendingTab";
+        }
+
+        this.tagSearch = urlParams.get("tagSearch");
+        this.initialNodeId = urlParams.get("nodeId");
+    }
+
     initApp = async () => {
+        console.log("quanta.initApp()");
+
+        this.parseUrlParams();
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
         }
@@ -102,10 +130,9 @@ export class Quanta {
             this.dragImg = new Image();
             // this.dragImg.src = "/images/favicon-32x32.png";
 
-            if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
+            if (S.quanta.configRes.requireCrypto && !crypto?.subtle) {
                 return;
             }
-            Log.log("quanta.initApp()");
 
             const mobileMode: string = await S.localDB.getVal(C.LOCALDB_MOBILE_MODE, "allUsers");
             if (mobileMode) {
@@ -217,28 +244,25 @@ export class Quanta {
             S.util.playAudioIfRequested();
 
             S.push.init();
-            const res = await S.rpcUtil.rpc<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
-                appGuid: Quanta.appGuid
-            }, true);
 
-            if (res.config) {
-                S.rpcUtil.SESSION_TIMEOUT_MINS = res.sessionTimeoutMinutes || 30;
+            if (this.configRes.config) {
+                S.rpcUtil.SESSION_TIMEOUT_MINS = this.configRes.sessionTimeoutMinutes || 30;
                 S.rpcUtil.sessionTimeRemainingMillis = S.rpcUtil.SESSION_TIMEOUT_MINS * 60_000;
 
                 dispatch("configUpdates", s => {
-                    s.config = res.config || {};
+                    s.config = this.configRes.config || {};
 
                     // we show the user message after the config is set, but there's no reason to do it here
                     // other than perhaps have the screen updated with the latest based on the config.
                     setTimeout(() => {
-                        if (g_userMessage) {
-                            S.util.showMessage(g_userMessage, "");
-                            g_userMessage = null;
+                        if (S.quanta.configRes.userMsg) {
+                            S.util.showMessage(S.quanta.configRes.userMsg, "");
+                            S.quanta.configRes.userMsg = null;
                         }
 
-                        if (g_displayUserProfileId) {
-                            new UserProfileDlg(g_displayUserProfileId).open();
-                            g_displayUserProfileId = null;
+                        if (S.quanta.configRes.displayUserProfileId) {
+                            new UserProfileDlg(S.quanta.configRes.displayUserProfileId).open();
+                            S.quanta.configRes.displayUserProfileId = null;
                         }
                     }, 100);
                 });

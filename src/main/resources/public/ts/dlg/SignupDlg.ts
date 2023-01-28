@@ -10,8 +10,6 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
 
-declare const g_brandingAppName: string;
-
 export class SignupDlg extends DialogBase {
 
     userNameState: Validator = new Validator("", [
@@ -97,7 +95,7 @@ export class SignupDlg extends DialogBase {
             }
             else {
                 await S.util.showMessage(
-                    "Check your email for verification link.", "Welcome to " + g_brandingAppName + "!"
+                    "Check your email for verification link.", "Welcome to " + S.quanta.configRes.brandingAppName + "!"
                 );
 
                 window.location.href = window.location.origin;

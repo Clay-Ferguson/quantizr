@@ -1,8 +1,10 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
+import { CompIntf } from "../comp/base/CompIntf";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
 import { TabHeading } from "../comp/core/TabHeading";
@@ -12,9 +14,6 @@ import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
-
-declare const g_brandingAppName: string;
-declare const g_urlIdFailMsg: string;
 
 export class MainTabComp extends AppTab {
 
@@ -28,9 +27,9 @@ export class MainTabComp extends AppTab {
         const ast = getAs();
         this.attribs.className = this.getClass();
 
-        let contentDiv: Div = null;
-        if (g_urlIdFailMsg) {
-            contentDiv = new Div(g_urlIdFailMsg);
+        let contentDiv: CompIntf = null;
+        if (S.quanta.configRes.urlIdFailMsg) {
+            contentDiv = new Heading(4, S.quanta.configRes.urlIdFailMsg);
         }
         else if (!ast.node) {
             contentDiv = null;
@@ -93,7 +92,7 @@ export class MainTabComp extends AppTab {
                         onClick: S.nav.runTimeline
                     }) : null
                 ]),
-                header = new Div(g_brandingAppName, {
+                header = new Div(S.quanta.configRes.brandingAppName, {
                     className: "tabTitle headerUploadPanel",
                     title: "Drop Files here to upload"
                 })

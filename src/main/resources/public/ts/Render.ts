@@ -30,10 +30,6 @@ import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
-// eslint-disable-next-line no-unused-vars
-declare let g_urlIdFailMsg: string;
-declare let g_info: string;
-
 export class Render {
     private debug: boolean = false;
     private markedRenderer: any = null;
@@ -466,11 +462,6 @@ export class Render {
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 }
 
-                if (g_info && s.userPrefs) {
-                    s.userPrefs.showMetaData = true;
-                    g_info = null;
-                }
-
                 s.pageMessage = null;
 
                 if (MainTab.inst) {
@@ -483,7 +474,7 @@ export class Render {
                 back to false, no matter what */
                 try {
                     if (res) {
-                        g_urlIdFailMsg = null;
+                        S.quanta.configRes.urlIdFailMsg = null;
                         s.node = res.node;
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;

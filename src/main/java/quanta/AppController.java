@@ -223,8 +223,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		map.put("instanceId", prop.getInstanceId());
 		map.put("brandingAppName", prop.getConfigText("brandingAppName"));
 		map.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
-		map.put("hostUrl", prop.getProtocolHostAndPort());
-		map.put("requireCrypto", prop.isRequireCrypto() ? "true" : "false");
 		return map;
 	}
 
@@ -260,35 +258,12 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			@RequestParam(value = "signupCode", required = false) String signupCode, //
-			@RequestParam(value = "view", required = false) String initialTab, //
-			@RequestParam(value = "tagSearch", required = false) String tagSearch, //
-			@RequestParam(value = "info", required = false) String info, // sets info mode on
 			HttpSession session, //
 			Model model) {
 		HashMap<String, String> attrs = getThymeleafAttribs();
 		try {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
-			SessionContext.init(context, session);
-
-			// Conver tab name if short name given
-			if ("doc".equals(initialTab)) {
-				initialTab = "docRS";
-			} else if ("feed".equals(initialTab)) {
-				initialTab = "feedTab";
-			} else if ("trending".equals(initialTab)) {
-				initialTab = "trendingTab";
-			}
-
-			attrs.put("initialTab", initialTab);
-			attrs.put("tagSearch", tagSearch);
-
-			if (!StringUtils.isEmpty(info)) {
-				attrs.put("info", "on");
-			}
-
-			// log.debug("AppController.index: sessionUser=" +
-			// sessionContext.getUserName());
-
+			SessionContext sc = SessionContext.init(context, session);
 			boolean isHomeNodeRequest = false;
 
 			// Node Names are identified using a colon in front of it, to make it detectable
@@ -327,10 +302,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					node = read.getNode(as, _id, true, accntNode);
 
 					if (no(node) && _isHomeNodeRequest && accntNode.hasVal()) {
-						attrs.put("displayUserProfileId", accntNode.getVal().getIdStr());
+						sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
 					}
 				} catch (Exception e) {
-					attrs.put("urlIdFailMsg", "Unable to access " + _id);
+					sc.setUrlIdFailMsg("Unable to access node: " + _id);
 					ExUtil.warn(log, "Unable to access node: " + _id, e);
 				}
 
@@ -346,15 +321,16 @@ public class AppController extends ServiceBase implements ErrorController {
 				return null;
 			});
 
+			if (ok(signupCode)) {
+				sc.setUserMsg(user.processSignupCode(signupCode));
+			}
+
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.
 			ExUtil.error(log, "exception in call processor", e);
 		}
 
-		if (ok(signupCode)) {
-			attrs.put("userMessage", user.processSignupCode(signupCode));
-		}
 		model.addAllAttributes(attrs);
 		return "index";
 	}
@@ -1426,18 +1402,25 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
-		// NO NOT HERE -> SessionContext.checkReqToken();
+		// NO NOT HERE, this can be called before token will exist -> SessionContext.checkReqToken();
+
+		GetConfigResponse res = new GetConfigResponse();
 
 		// Identifier generated once on Browser, can uniquely identify one single session to associate with
 		// the given webpage/tab
-		if (ok(ThreadLocals.getSC())) {
+		SessionContext sc = ThreadLocals.getSC();
+		if (ok(sc)) {
 			ThreadLocals.getSC().setAppGuid(req.getAppGuid());
 			log.debug("BrowserGuid: " + req.getAppGuid());
+			res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
+			res.setUserMsg(sc.getUserMsg());
+			res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
 		}
 
-		GetConfigResponse res = new GetConfigResponse();
 		res.setConfig(prop.getConfig());
 		res.setSessionTimeoutMinutes(prop.getSessionTimeoutMinutes());
+		res.setBrandingAppName(prop.getConfigText("brandingAppName"));
+		res.setRequireCrypto(prop.isRequireCrypto());
 		return res;
 	}
 

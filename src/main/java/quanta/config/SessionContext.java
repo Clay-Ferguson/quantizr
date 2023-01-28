@@ -34,6 +34,10 @@ import quanta.util.Util;
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
 	private HttpSession session;
+	private String urlIdFailMsg;
+	private String userMsg;
+	private String displayUserProfileId;
+
 	public PublicKey pubSigKey = null;
 
 	// DO NOT DELETE (keep for future ref)
@@ -603,5 +607,29 @@ public class SessionContext extends ServiceBase {
 
 	public void setFriendsTagsDirty(boolean friendsTagsDirty) {
 		this.friendsTagsDirty = friendsTagsDirty;
+	}
+
+	public String getUrlIdFailMsg() {
+		return urlIdFailMsg;
+	}
+
+	public void setUrlIdFailMsg(String urlIdFailMsg) {
+		this.urlIdFailMsg = urlIdFailMsg;
+	}
+
+	public String getUserMsg() {
+		return userMsg;
+	}
+
+	public void setUserMsg(String userMsg) {
+		this.userMsg = userMsg;
+	}
+
+	public String getDisplayUserProfileId() {
+		return displayUserProfileId;
+	}
+
+	public void setDisplayUserProfileId(String displayUserProfileId) {
+		this.displayUserProfileId = displayUserProfileId;
 	}
 }

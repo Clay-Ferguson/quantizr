@@ -22,9 +22,6 @@ import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
 
-declare const g_requireCrypto: string;
-declare const g_brandingAppName: string;
-
 export class App extends Main {
 
     constructor() {
@@ -33,6 +30,8 @@ export class App extends Main {
 
     preRender(): void {
         const ast = getAs();
+
+        // todo-0: this should be redundant, because our HTML already puts a progress component on the page.
         if (!ast.appInitComplete) {
             this.setChildren([new Progress()]);
             return;
@@ -61,8 +60,8 @@ export class App extends Main {
             ]);
         }
         else {
-            if (g_requireCrypto === "true" && (!crypto || !crypto.subtle)) {
-                this.setChildren([new Heading(4, g_brandingAppName + " requires a browser with crypto features.")]);
+            if (S.quanta.configRes.requireCrypto && !crypto?.subtle) {
+                this.setChildren([new Heading(4, S.quanta.configRes.brandingAppName + " requires a browser with crypto features.")]);
                 return;
             }
 
@@ -135,14 +134,6 @@ export class App extends Main {
                 onClick: () => S.nav.navPublicHome(),
                 title: "Main application Landing Page"
             });
-
-            // let messagesSuffix = state.newMessageCount > 0
-            //     ? " (" + state.newMessageCount + ")" : "";
-            // let appName = new Span(g_brandingAppName + messagesSuffix, {
-            //     className: "logo-text",
-            //     onClick: () => { S.util.loadAnonPageHome(null); },
-            //     title: "Go to Portal Home Node"
-            // });
 
             // let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
             return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);

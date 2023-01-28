@@ -9,8 +9,6 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 // reference: https://www.baeldung.com/spring-server-sent-events
 // See also: AppController.java#serverPush
 
-declare const g_brandingAppName: string;
-
 export class ServerPush {
     eventSource: EventSource;
 
@@ -50,7 +48,7 @@ export class ServerPush {
                 message = "<p><p>Click to resume editing.";
             }
 
-            new MessageDlg("Your session has ended due to inactivity." + message, g_brandingAppName,
+            new MessageDlg("Your session has ended due to inactivity." + message, S.quanta.configRes.brandingAppName,
                 () => {
                     history.go(0);
                 }, null, false, 0, "app-modal-content-tiny-width"

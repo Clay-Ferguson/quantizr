@@ -663,6 +663,11 @@ export interface GetBookmarksResponse extends ResponseBase {
 export interface GetConfigResponse extends ResponseBase {
     config: { [index: string]: any };
     sessionTimeoutMinutes: number;
+    brandingAppName: string;
+    requireCrypto: boolean;
+    urlIdFailMsg: string;
+    userMsg: string;
+    displayUserProfileId: string;
 }
 
 export interface GetFollowersResponse extends ResponseBase {

@@ -8,11 +8,6 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { TrendingView } from "./tabs/TrendingView";
 
-declare let g_initialTab: string;
-declare let g_tagSearch: string;
-declare let g_nodeId: string;
-declare let g_urlIdFailMsg: string;
-
 export class User {
     closeAccount = async () => {
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account");
@@ -50,19 +45,19 @@ export class User {
 
     // returns true if we already initialized to a tab specified on url
     usingUrlTab = (): boolean => {
-        if (g_initialTab) {
-            if (g_initialTab === C.TAB_FEED && g_tagSearch) {
-                TrendingView.searchWord(null, "#" + g_tagSearch);
-                g_tagSearch = null;
+        if (S.quanta.initialTab) {
+            if (S.quanta.initialTab === C.TAB_FEED && S.quanta.tagSearch) {
+                TrendingView.searchWord(null, "#" + S.quanta.tagSearch);
+                S.quanta.tagSearch = null;
             }
             else {
-                S.tabUtil.selectTab(g_initialTab);
-                if (g_initialTab === C.TAB_DOCUMENT && g_nodeId) {
-                    S.nav.openDocumentView(null, g_nodeId);
-                    g_nodeId = null;
+                S.tabUtil.selectTab(S.quanta.initialTab);
+                if (S.quanta.initialTab === C.TAB_DOCUMENT && S.quanta.initialNodeId) {
+                    S.nav.openDocumentView(null, S.quanta.initialNodeId);
+                    S.quanta.initialNodeId = null;
                 }
             }
-            g_initialTab = null;
+            S.quanta.initialTab = null;
             return true;
         }
         return false;
@@ -136,9 +131,9 @@ export class User {
     }
 
     anonInitialRender = async () => {
-        if (g_initialTab) {
-            S.tabUtil.selectTab(g_initialTab);
-            g_initialTab = null;
+        if (S.quanta.initialTab) {
+            S.tabUtil.selectTab(S.quanta.initialTab);
+            S.quanta.initialTab = null;
         }
         else {
             await S.util.loadAnonPageHome();
@@ -231,7 +226,7 @@ export class User {
 
             /* if we know the server already failed to get the content requested on the url then
             default to main tab (tree) and set it up to display an error */
-            if (g_urlIdFailMsg) {
+            if (S.quanta.configRes.urlIdFailMsg) {
                 await promiseDispatch("setAccessFailed", s => {
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 });
@@ -245,9 +240,9 @@ export class User {
             // we may have just processed a dispatch so we need to get the current state now.
             const ast = getAs();
 
-            if (g_nodeId) {
-                id = g_nodeId;
-                g_nodeId = null;
+            if (S.quanta.initialNodeId) {
+                id = S.quanta.initialNodeId;
+                S.quanta.initialNodeId = null;
                 if (id && id.startsWith("~")) {
                     renderParentIfLeaf = false;
                 }

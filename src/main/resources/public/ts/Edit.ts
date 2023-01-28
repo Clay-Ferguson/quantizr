@@ -17,8 +17,6 @@ import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 
-declare const g_requireCrypto: string;
-
 export class Edit {
     showReadOnlyProperties: boolean = false;
 
@@ -715,7 +713,10 @@ export class Edit {
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
-        if (g_requireCrypto === "true" && !S.crypto.avail) {
+
+        // todo-0: references to check requireCrypto need to be put into a funciton in crypto class,
+        // using this one line below.
+        if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
         }
