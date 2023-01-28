@@ -7,8 +7,8 @@ import AppContainer from "./comp/core/AppContainer";
 import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 import { Factory } from "./Factory";
 import { ImportTest } from "./ImportTest";
-import TsxApp from "./TsxApp";
 import { S } from "./Singletons";
+import TsxApp from "./TsxApp";
 
 // we have this as the first import for troubleshooting how browsers are
 // able to handle the 'import' statement.
@@ -19,12 +19,15 @@ console.log("index.tsx finished imports");
 if ((window as any).__page === "index") {
     window.addEventListener("load", async (event) => {
         const factory = new Factory();
-        if (factory) {
-            await S.quanta.loadConfig();
-            const root = createRoot(document.getElementById("app"));
-            root.render(<AppContainer />);
-            factory.initApp();
-        }
+        await S.quanta.loadConfig();
+        const root = createRoot(document.getElementById("app"));
+
+        // NOTE: We can use JSX like this if we want...
+        // root.render(<AppContainer />);
+        // But most of this app uses createElement, so we do that here, but it's a trivial choice
+        root.render(React.createElement(AppContainer));
+
+        factory.initApp();
     });
 }
 // This is how we can provide the page at `http://localhost:8182/demo/tsx-test` which is used
