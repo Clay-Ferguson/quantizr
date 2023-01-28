@@ -8,8 +8,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
-import { EditNodeDlg } from "./EditNodeDlg";
-import { LS } from "./EditNodeDlgState";
+import { LS as EditNodeDlgState, EditNodeDlg } from "./EditNodeDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg } from "./FriendsDlg";
@@ -150,7 +149,7 @@ export class EditNodeDlgUtil {
 
     addProperty = async (dlg: EditNodeDlg): Promise<void> => {
         const ast = getAs();
-        const state: LS = dlg.getState<LS>();
+        const state: EditNodeDlgState = dlg.getState<EditNodeDlgState>();
         const propDlg = new EditPropertyDlg(ast.editNode);
         await propDlg.open();
 
@@ -163,7 +162,7 @@ export class EditNodeDlgUtil {
             ast.editNode.properties.push(newProp);
 
             // this forces a rerender, even though it looks like we're doing nothing to state.
-            dlg.mergeState<LS>(state);
+            dlg.mergeState<EditNodeDlgState>(state);
             this.initPropState(dlg, ast.editNode, newProp);
         }
         // we don't need to return an actual promise here
@@ -171,7 +170,7 @@ export class EditNodeDlgUtil {
     }
 
     addDateProperty = (dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
+        const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         ast.editNode.properties = ast.editNode.properties || [];
 
@@ -187,7 +186,7 @@ export class EditNodeDlgUtil {
             value: "01:00"
         });
 
-        dlg.mergeState<LS>(state);
+        dlg.mergeState<EditNodeDlgState>(state);
     }
 
     share = async (dlg: EditNodeDlg) => {
@@ -207,7 +206,7 @@ export class EditNodeDlgUtil {
     }
 
     upload = async (file: File, dlg: EditNodeDlg) => {
-        const state = dlg.getState<LS>();
+        const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", state.toIpfs, file, false, true, async () => {
@@ -232,9 +231,9 @@ export class EditNodeDlgUtil {
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
-            const state = dlg.getState<LS>();
+            const state = dlg.getState<EditNodeDlgState>();
             propNames.forEach(propName => S.props.deleteProp(ast.editNode, propName));
-            dlg.mergeState<LS>(state);
+            dlg.mergeState<EditNodeDlgState>(state);
         }
     }
 
@@ -249,13 +248,13 @@ export class EditNodeDlgUtil {
 
     deleteSelectedProperties = (dlg: EditNodeDlg) => {
         const keys: string[] = [];
-        dlg.getState<LS>().selectedProps.forEach(prop => keys.push(prop));
+        dlg.getState<EditNodeDlgState>().selectedProps.forEach(prop => keys.push(prop));
         this.deleteProperties(dlg, keys);
     }
 
     setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
         dlg.mergeState({ encryptCheckboxVal: encrypt });
-        const state = dlg.getState<LS>();
+        const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         if (encrypt && S.props.isPublic(ast.editNode)) {
             S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
@@ -296,7 +295,7 @@ export class EditNodeDlgUtil {
                         }
                     }
 
-                    dlg.mergeState<LS>(state);
+                    dlg.mergeState<EditNodeDlgState>(state);
                 }
                 finally {
                     dlg.pendingEncryptionChange = false;
@@ -306,7 +305,7 @@ export class EditNodeDlgUtil {
     }
 
     deleteUploads = async (dlg: EditNodeDlg) => {
-        if (dlg.getState<LS>().selectedAttachments?.size === 0) return;
+        if (dlg.getState<EditNodeDlgState>().selectedAttachments?.size === 0) return;
 
         const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
@@ -316,7 +315,7 @@ export class EditNodeDlgUtil {
             const ast = getAs();
 
             let delAttKeys = "";
-            dlg.getState<LS>().selectedAttachments?.forEach(prop => {
+            dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
                 delete ast.editNode.attachments[prop];
 
                 if (delAttKeys) {
@@ -413,7 +412,7 @@ export class EditNodeDlgUtil {
         else {
             S.speech.stopListening();
         }
-        dlg.mergeState<LS>({ speechActive });
+        dlg.mergeState<EditNodeDlgState>({ speechActive });
 
         setTimeout(() => {
             if (dlg.contentEditor) {

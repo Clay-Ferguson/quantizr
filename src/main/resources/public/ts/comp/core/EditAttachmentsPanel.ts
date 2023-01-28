@@ -1,8 +1,7 @@
 import { dispatch, getAs } from "../../AppContext";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
-import { EditNodeDlg } from "../../dlg/EditNodeDlg";
-import { LS } from "../../dlg/EditNodeDlgState";
+import { LS as EditNodeDlgState, EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -27,7 +26,7 @@ export class EditAttachmentsPanel extends Div {
         this.setChildren([]);
         let isFirst = true;
 
-        if (this.editorDlg.getState<LS>().selectedAttachments?.size > 0) {
+        if (this.editorDlg.getState<EditNodeDlgState>().selectedAttachments?.size > 0) {
             this.addChild(new ButtonBar([
                 new IconButton("fa-trash fa-lg", "", {
                     onClick: () => this.editorDlg.utl.deleteUploads(this.editorDlg),
@@ -66,7 +65,7 @@ export class EditAttachmentsPanel extends Div {
 
         const attCheckbox = new Checkbox(null, null, {
             setValue: (checked: boolean) => {
-                const state = this.editorDlg.getState<LS>();
+                const state = this.editorDlg.getState<EditNodeDlgState>();
                 if (checked) {
                     state.selectedAttachments.add((att as any).key);
                 }
@@ -74,9 +73,9 @@ export class EditAttachmentsPanel extends Div {
                     state.selectedAttachments.delete((att as any).key);
                 }
 
-                this.editorDlg.mergeState<LS>({});
+                this.editorDlg.mergeState<EditNodeDlgState>({});
             },
-            getValue: (): boolean => this.editorDlg.getState<LS>().selectedAttachments.has((att as any).key)
+            getValue: (): boolean => this.editorDlg.getState<EditNodeDlgState>().selectedAttachments.has((att as any).key)
         }, "delAttCheckbox");
 
         const imgSizeSelection = S.props.hasImage(ast.editNode, key)
@@ -289,5 +288,4 @@ export class EditAttachmentsPanel extends Div {
 
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
-
 }

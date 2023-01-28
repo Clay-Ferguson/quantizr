@@ -8,6 +8,7 @@ interface LS { // Local State
 }
 
 export class Select extends Comp {
+
     constructor(attribs: any, public selectionOptions: Object[], private valueIntf: ValueIntf) {
         super(attribs);
         this.mergeState({ value: valueIntf.getValue() });

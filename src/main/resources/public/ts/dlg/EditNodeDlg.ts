@@ -28,9 +28,17 @@ import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
-import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
+
+export interface LS {
+    selectedProps?: Set<string>;
+    selectedAttachments?: Set<string>;
+    toIpfs?: boolean;
+    speechActive?: boolean;
+    signCheckboxVal?: boolean;
+    encryptCheckboxVal?: boolean;
+}
 
 /**
  * Node Editor Dialog

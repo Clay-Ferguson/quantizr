@@ -3,6 +3,7 @@ import { Comp } from "../base/Comp";
 import { S } from "../../Singletons";
 
 export class Img extends Comp {
+
     constructor(attribs: Object = {}) {
         super(attribs);
     }

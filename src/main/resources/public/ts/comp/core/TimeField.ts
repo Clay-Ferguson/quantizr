@@ -4,7 +4,6 @@ import { Div } from "./Div";
 import { Input } from "./Input";
 
 export class TimeField extends Div implements I.ValueIntf {
-
     input: Input;
 
     constructor(private valState: Validator, private extraClass: string = null) {

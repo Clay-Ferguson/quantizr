@@ -3,6 +3,7 @@ import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
 export class Tag extends Comp {
+
     constructor(public tagName: string, attribs: Object = {}, children: CompIntf[] = null) {
         super(attribs);
         this.setChildren(children);

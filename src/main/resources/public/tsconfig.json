@@ -11,13 +11,10 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
-        // "strictNullChecks": false,
-        // "noImplicitUseStrict": false,
         "alwaysStrict": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-
         "noEmitOnError": true,
         "allowJs": true,
         "noUnusedLocals": true

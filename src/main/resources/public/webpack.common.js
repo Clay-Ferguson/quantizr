@@ -10,7 +10,7 @@ console.log("TARGET ENV: " + env);
 
 module.exports = {
     entry: {
-        main: "./ts/index.tsx"
+        main: "./ts/index.ts"
     },
 
     // this puts our bundle.js file into current folder "public"
@@ -86,26 +86,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: "../../templates/error.html",
             template: "errorTemplate.html",
-            publicPath: "/dist"
-            // scriptLoading: "blocking",
-            // inject: "head"
-        }),
-
-        new HtmlWebpackPlugin({
-            filename: "../../templates/demo/tsx-test.html",
-            template: "tsx-testTemplate.html",
-
-            // we don't want any path prefix on our bundle fie so this is empty.
-            publicPath: "/dist"
-            // scriptLoading: "blocking",
-            // inject: "head"
-        }),
-
-        new HtmlWebpackPlugin({
-            filename: "../../templates/demo/tutorial.html",
-            template: "tutorialTemplate.html",
-
-            // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
             // scriptLoading: "blocking",
             // inject: "head"

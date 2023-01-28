@@ -8,9 +8,9 @@ export class ButtonBar extends Comp {
     /* WARNING: There's a flawed edge case where if you have only ONE button, and it happens to be 'float-end' then
      the button bar ends up taking up ZERO height, and breaks the layout. The solution is to add a "new Clearfix()"
      after the ButtonBar (below the ButtonBar) */
-    constructor(initialButtons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
+    constructor(buttons: Comp[] = null, private wrapperClass: string = "", private extraClass: string = "") {
         super(null);
-        this.setChildren(initialButtons);
+        this.setChildren(buttons);
     }
 
     compRender = (): ReactNode => {

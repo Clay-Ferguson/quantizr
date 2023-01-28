@@ -3,8 +3,6 @@ import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
-declare const __page: any;
-
 export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
@@ -297,10 +295,6 @@ export class RpcUtil {
     }
 
     progressInterval = () => {
-        /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
-         querying server like the APP would do (index.html) */
-        if (__page !== "index") return;
-
         const isWaiting = S.rpcUtil.isRpcWaiting();
         if (isWaiting) {
             this.waitCounter++;

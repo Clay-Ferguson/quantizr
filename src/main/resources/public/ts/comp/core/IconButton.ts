@@ -15,6 +15,7 @@ interface LS { // Local State
 }
 
 export class IconButton extends Comp {
+
     constructor(public iconClass: string = "", public text: string, attribs: Object = {}, specialClasses: string = "btn-secondary", private toggle: string = "", private imageUrl: string = null) {
         super(attribs);
         this.attribs.type = "button";
