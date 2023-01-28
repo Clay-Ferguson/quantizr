@@ -32,6 +32,10 @@ export class BlockedUsersType extends TypeBase {
         return true;
     }
 
+    isHiddenNode(): boolean {
+        return true;
+    }
+
     subOrdinal(): number {
         return 4;
     }

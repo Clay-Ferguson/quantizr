@@ -64,10 +64,13 @@ export class NodeCompVerticalRowLayout extends Div {
                             comps.push(new Div(null, { className: "vertical-space" }));
                         }
 
+                        if (type?.isHiddenNode()) {
+                            // do nothing if node is not displayable
+                        }
                         /* NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
                          because if the user wants their Account root laid out in a grid just let them do that and show everything
                          without doing any collapsedComps. */
-                        if (type && type.isSpecialAccountNode()) {
+                        else if (type?.isSpecialAccountNode()) {
                             if (NodeCompVerticalRowLayout.showSpecialNodes) {
                                 row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, false, false, null);
 

@@ -43,6 +43,10 @@ export class FriendsListType extends TypeBase {
         return true;
     }
 
+    isHiddenNode(): boolean {
+        return true;
+    }
+
     subOrdinal(): number {
         return 2;
     }

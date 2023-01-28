@@ -28,6 +28,7 @@ export interface TypeIntf {
     hasSelectableProp(prop: string): boolean;
     getEditorHelp(): string;
     isSpecialAccountNode(): boolean;
+    isHiddenNode(): boolean;
 
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;

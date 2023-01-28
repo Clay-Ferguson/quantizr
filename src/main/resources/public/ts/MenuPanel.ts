@@ -7,7 +7,9 @@ import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
+import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
+import { FriendsDlg } from "./dlg/FriendsDlg";
 import { ManageCryptoKeysDlg } from "./dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
@@ -46,8 +48,11 @@ export class MenuPanel extends Div {
     // leaving for reference how to open this.
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
 
-    static openFriendsNode = () => {
-        S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    static editFriends = () => {
+        // DO NOT DELETE (This is good know as the way to access raw friends nodes)
+        // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+        const friendsDlg = new FriendsDlg("Friends", null, true);
+        friendsDlg.open();
     };
 
     static openBookmarksNode = () => {
@@ -99,7 +104,13 @@ export class MenuPanel extends Div {
     static openFeatures = () => S.nav.openContentNode(":features");
     static openScreencasts = () => S.nav.openContentNode(":screencast");
     static openDemoContent = () => S.nav.openContentNode(":demo-data");
-    static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
+
+    static showBlockedUsers = () => {
+        // S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
+        const dlg = new BlockedUsersDlg("Blocked Users");
+        dlg.open();
+    }
+
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home");
@@ -290,9 +301,9 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "People", [
-                new MenuItem("Friends", MenuPanel.openFriendsNode),
+                new MenuItem("Friends", MenuPanel.editFriends),
                 new MenuItem("Followers", MenuPanel.showFollowers),
-                new MenuItem("Blocked", MenuPanel.openBlockedUsersNode),
+                new MenuItem("Blocked", MenuPanel.showBlockedUsers),
                 new MenuItemSeparator(),
                 new MenuItem("Find People", MenuPanel.findUsers), //
 

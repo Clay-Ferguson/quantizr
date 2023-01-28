@@ -1292,7 +1292,8 @@ public class UserManagerService extends ServiceBase {
 					return;
 				// remove '@' prefix
 				user = XString.stripIfStartsWith(user, "@");
-				if (user.equals(_ownerName)) return;
+				if (user.equals(_ownerName))
+					return;
 
 				try {
 					SubNode accntNode = read.getUserNodeByUserName(as, user);
@@ -1368,9 +1369,18 @@ public class UserManagerService extends ServiceBase {
 		return fi;
 	}
 
-	public GetPeopleResponse getPeople(MongoSession ms) {
+	public GetPeopleResponse getPeople(MongoSession ms, String type) {
 		GetPeopleResponse res = new GetPeopleResponse();
-		List<SubNode> friendNodes = getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
+
+		String nodeType = null;
+		if ("friends".equals(type)) {
+			nodeType = NodeType.FRIEND_LIST.s();
+		} else if ("blocks".equals(type)) {
+			nodeType = NodeType.BLOCKED_USERS.s();
+		} else {
+			throw new RuntimeException("Invalid type: " + type);
+		}
+		List<SubNode> friendNodes = getSpecialNodesList(ms, null, nodeType, null, true, null);
 
 		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();

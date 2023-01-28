@@ -273,6 +273,7 @@ export interface GetOpenGraphRequest extends RequestBase {
 
 export interface GetPeopleRequest extends RequestBase {
     nodeId: string;
+    type: string;
 }
 
 export interface GetServerInfoRequest extends RequestBase {
