@@ -130,7 +130,7 @@ export class Quanta {
             this.dragImg = new Image();
             // this.dragImg.src = "/images/favicon-32x32.png";
 
-            if (S.quanta.configRes.requireCrypto && !crypto?.subtle) {
+            if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
                 return;
             }
 

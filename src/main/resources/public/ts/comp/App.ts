@@ -31,7 +31,6 @@ export class App extends Main {
     preRender(): void {
         const ast = getAs();
 
-        // todo-0: this should be redundant, because our HTML already puts a progress component on the page.
         if (!ast.appInitComplete) {
             this.setChildren([new Progress()]);
             return;
@@ -60,7 +59,7 @@ export class App extends Main {
             ]);
         }
         else {
-            if (S.quanta.configRes.requireCrypto && !crypto?.subtle) {
+            if (S.quanta.configRes.requireCrypto && !S.crypto.avail) {
                 this.setChildren([new Heading(4, S.quanta.configRes.brandingAppName + " requires a browser with crypto features.")]);
                 return;
             }
