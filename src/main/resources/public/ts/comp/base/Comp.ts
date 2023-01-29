@@ -101,7 +101,7 @@ export abstract class Comp implements CompIntf {
 
         if (!ret && warn) {
             console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted +
-                "\nELEMENTS Stack: " + this.getElementStack());
+                "\nELEMENTS Stack: " + this.getAncestry());
         }
         return ret;
     }
@@ -412,13 +412,13 @@ export abstract class Comp implements CompIntf {
         }
         catch (e) {
             console.error("Failed to render child (in render method) " + this.getCompClass() + " attribs.key=" + this.attribs.key + "\nError: " + e +
-                "\nELEMENTS Stack: " + this.getElementStack());
+                "\nELEMENTS Stack: " + this.getAncestry());
             return null;
         }
     }
 
     /* Get a printable string that contains the parentage of the component as far as we know it back to the root level */
-    getElementStack() {
+    getAncestry() {
         let stack = "";
         let comp: Comp = this;
         while (comp) {
