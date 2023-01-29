@@ -325,7 +325,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        if (this.buildPropsEditing(propsParent, state, type, customProps)) {
+        if (this.buildPropsEditing({ propsParent, state, type, customProps })) {
             propsVisible = true;
         }
 
@@ -493,8 +493,9 @@ export class EditNodeDlg extends DialogBase {
         S.edit.updateNode(ast.editNode);
     }
 
-    /* returns true if props table is not empty */
-    buildPropsEditing = (propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[]): boolean => {
+    /* returns true if props table is not empty. This method has an "options object" arguments
+    pattern I'm trying out */
+    buildPropsEditing = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[] }): boolean => {
         let numPropsShowing: number = 0;
         let ret = false;
         const ast = getAs();
@@ -515,17 +516,17 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!S.props.isGuiControlBasedProp(prop)) {
-                        const allowSelection = !customProps || type?.hasSelectableProp(prop.name);
-                        const tableRow = this.makePropEditor(type, prop, durationProp, allowSelection, type ? type.getEditorRowsForProp(prop.name) : 1);
+                        const allowSelection = !_.customProps || _.type?.hasSelectableProp(prop.name);
+                        const tableRow = this.makePropEditor(_.type, prop, durationProp, allowSelection, _.type ? _.type.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
-                        propsParent.addChild(tableRow);
+                        _.propsParent.addChild(tableRow);
                         ret = true;
                     }
                 }
             });
         }
 
-        const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
+        const allowPropAdd: boolean = _.type ? _.type.getAllowPropertyAdd() : true;
         if (allowPropAdd) {
             if (numPropsShowing > 0) {
                 const state = this.getState<LS>();
@@ -546,7 +547,7 @@ export class EditNodeDlg extends DialogBase {
                 ], null, "float-end");
 
                 // adds the button bar to the top of the list of children.
-                propsParent.insertFirstChild(propsButtonBar);
+                _.propsParent.insertFirstChild(propsButtonBar);
                 ret = true;
             }
         }
@@ -937,7 +938,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.insertUserNames(this)
             }),
 
-             new Icon({
+            new Icon({
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
