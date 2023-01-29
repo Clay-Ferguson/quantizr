@@ -38,6 +38,7 @@ export class NodeCompTableRowLayout extends Div {
         else if (this.layout === "c6") {
             maxCols = 6;
         }
+
         const cellWidth = 100 / maxCols;
         const allowInsert = S.props.isWritableByMe(this.node);
         let curCols = 0;
