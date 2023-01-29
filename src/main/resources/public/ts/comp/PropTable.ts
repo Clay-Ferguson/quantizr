@@ -18,8 +18,6 @@ export class PropTable extends Comp {
         if (this.node.properties) {
             this.node.properties.forEach(prop => {
                 if (S.props.isGuiControlBasedProp(prop)) return;
-
-                // console.log("Render Prop: "+property.name);
                 this.addChild(new PropTableRow({
                     className: "prop-table-row"
                 }, [

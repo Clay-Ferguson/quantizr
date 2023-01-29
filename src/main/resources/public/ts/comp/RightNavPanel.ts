@@ -54,7 +54,6 @@ export class RightNavPanel extends Div {
             if (panelCols >= 8) {
                 rightCols--;
             }
-            // console.log("right Cols: " + rightCols);
             this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
         }
 

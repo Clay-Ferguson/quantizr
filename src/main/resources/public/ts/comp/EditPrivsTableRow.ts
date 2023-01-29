@@ -22,7 +22,6 @@ export class EditPrivsTableRow extends ListBoxRow {
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
                 new Div(null, null, [
-                    // new Span(privilege.privilegeName), don't need this it's just "rd/wr"
                     new ButtonBar([
                         new Checkbox("Allow Replies", { className: "marginRight" }, {
                             setValue: (checked: boolean) => this.shareNodeToUserFunc(this.aclEntry.principalName, checked),

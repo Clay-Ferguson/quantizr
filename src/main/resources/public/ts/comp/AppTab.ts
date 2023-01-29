@@ -16,7 +16,6 @@ export class AppTab<T = any> extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "2"
         });
-        // console.log("Constructed AppTab: " + data.id);
     }
 
     getClass = (): string => {

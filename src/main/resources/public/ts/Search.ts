@@ -545,7 +545,7 @@ export class Search {
         // render with info bar, etc always, if this is a threaview or freed tab.
         const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED;
         if (isFeed && allowFooter) {
-            allowFooter = ast.showAllRowDetails.has(node.id);
+            allowFooter = true;
         }
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
@@ -581,7 +581,7 @@ export class Search {
 
             let allowBoostFooter = isFeed;
             if (isFeed) {
-                allowBoostFooter = ast.showAllRowDetails.has(node.boostedNode.id);
+                allowBoostFooter = true;
             }
             boostComp = new Div(null, {
                 onClick: async () => {

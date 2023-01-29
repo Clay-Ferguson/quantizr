@@ -106,7 +106,6 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
-    showAllRowDetails: Set<string> = new Set<string>();
 
     highlightSearchNodeId: string;
 

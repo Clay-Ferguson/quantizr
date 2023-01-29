@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "../../AppContext";
+import { getAs } from "../../AppContext";
 import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -28,7 +28,6 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         const ast = getAs();
-        const showDetails: boolean = ast.showAllRowDetails.has(this.node.id) || ast.isAdminUser;
         const children = [];
         let avatarImg: Img = null;
 
@@ -157,7 +156,7 @@ export class NodeCompRowHeader extends Div {
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
             and we need to have a user identity for all the HTTP sigs for that. */
-            if (showDetails && !ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
+            if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 children.push(new Icon({
                     title: "People associated with this Node",
                     className: "fa fa-users fa-lg mediumMarginRight",
@@ -165,7 +164,7 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            if (showInfo && showDetails) {
+            if (showInfo) {
                 children.push(new Icon({
                     className: "fa fa-link fa-lg mediumMarginRight",
                     title: "Show URLs for this node",
@@ -174,7 +173,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             // Allow bookmarking any kind of node other than bookmark nodes.
-            if (showInfo && showDetails && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
+            if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
                 children.push(new Icon({
                     className: "fa fa-bookmark fa-lg mediumMarginRight",
                     title: "Bookmark this Node",
@@ -182,7 +181,7 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            if (showInfo && showDetails && this.showThreadButton) {
+            if (showInfo && this.showThreadButton) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg mediumMarginRight",
                     title: "Show Full Thread History",
@@ -194,18 +193,6 @@ export class NodeCompRowHeader extends Div {
         if (showInfo && priority) {
             children.push(new Span(priority, {
                 className: "mediumMarginRight priorityTag" + priorityVal
-            }));
-        }
-
-        if (!showDetails) {
-            children.push(new Icon({
-                title: "More node actions",
-                className: "fa fa-ellipsis-h fa-lg mediumMarginRight",
-                onClick: () => {
-                    dispatch("SetHeaderDetailsState", s => {
-                        s.showAllRowDetails.add(this.node.id);
-                    });
-                }
             }));
         }
 
@@ -223,7 +210,7 @@ export class NodeCompRowHeader extends Div {
         const type = S.plugin.getType(this.node.type);
         if (type) {
             const iconClass = type.getIconClass();
-            if (showInfo && showDetails && iconClass) {
+            if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
                     className: iconClass + " marginLeft marginRight",
                     title: "Node Type: " + type.getName()
@@ -353,7 +340,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
-        if (showDetails && this.jumpButton && !jumpButtonAdded) {
+        if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
                 onClick: () => S.srch.clickSearchNode(this.node.id),

@@ -114,15 +114,6 @@ export class App extends Main {
                 id: "navMenu"
             }, "btn-primary menuButton", "off");
 
-            // let fullScreenViewer = S.util.fullscreenViewerActive(state);
-
-            // Not needed now that we have the NAV button
-            // let prefsButton = !fullScreenViewer
-            //     ? new Checkbox("Info", { className: "marginLeft" }, {
-            //         setValue: (checked: boolean) => S.edit.toggleShowMetaData(state),
-            //         getValue: (): boolean => state.userPrefs.showMetaData
-            //     }, "form-switch form-check-inline") : null;
-
             const loginButton = ast.isAnonUser ? new Button("Login", S.user.userLogin, {
                 className: "menuButton"
             }, "btn-primary") : null;

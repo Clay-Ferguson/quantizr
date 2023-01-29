@@ -199,7 +199,7 @@ export class Edit {
     startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo,
         nodeInsertTarget: J.NodeInfo, ordinalOffset: number) => {
         if (!S.props.isWritableByMe(parentNode)) {
-            // console.log("Rejecting request to edit. Not authorized");
+            console.log("Rejecting request to edit. Not authorized");
             return;
         }
 

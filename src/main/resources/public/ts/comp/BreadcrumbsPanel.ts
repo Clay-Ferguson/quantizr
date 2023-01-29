@@ -38,7 +38,6 @@ export class BreadcrumbsPanel extends Div {
                         className: "breadcrumbItem"
                     });
                     S.domUtil.makeDropTarget(span.attribs, bc.id);
-
                     return span;
                 }
                 else {
