@@ -10,8 +10,7 @@ import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { FriendsDlg } from "./FriendsDlg";
-import { FriendsDlgState } from "./FriendsDlgState";
+import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 
 interface LS { // Local State
     recursive?: boolean;

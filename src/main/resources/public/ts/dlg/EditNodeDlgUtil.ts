@@ -11,8 +11,7 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { LS as EditNodeDlgState, EditNodeDlg } from "./EditNodeDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
-import { FriendsDlg } from "./FriendsDlg";
-import { FriendsDlgState } from "./FriendsDlgState";
+import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 

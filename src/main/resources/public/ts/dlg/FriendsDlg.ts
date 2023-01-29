@@ -14,7 +14,14 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { FriendsDlgState as LS } from "./FriendsDlgState";
+
+export interface LS { // Local State
+    nodeId?: string;
+    selections?: Set<string>;
+    loading?: boolean;
+    friends?: J.FriendInfo[];
+    selectAll?: boolean;
+}
 
 export class FriendsDlg extends DialogBase {
     userNameState: Validator = new Validator("");

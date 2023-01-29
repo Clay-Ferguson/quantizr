@@ -1,7 +1,7 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
-import { FriendsDlgState } from "../dlg/FriendsDlgState";
+import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
