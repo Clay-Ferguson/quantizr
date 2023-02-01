@@ -1,4 +1,5 @@
 #!/bin/bash
+set +a # makes all functions get exported
 
 makeDirs () {
     mkdir -p ${QUANTA_BASE}/log
@@ -9,4 +10,5 @@ makeDirs () {
     mkdir -p ${ipfs_data}
     mkdir -p ${ipfs_staging}
 }
-export -f makeDirs
+
+set -a

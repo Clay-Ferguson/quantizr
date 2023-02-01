@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Defining Functions..."
+set +a # makes all functions get exported
 
 verifySuccess () {
     if [ $? -eq 0 ]; then
@@ -11,7 +12,6 @@ verifySuccess () {
         exit $?
     fi
 }
-export -f verifySuccess
 
 serviceCheck () {
     if docker service inspect $1 | grep $1; then
@@ -21,7 +21,6 @@ serviceCheck () {
         read -p "service $1 failed to start"
     fi
 }
-export -f serviceCheck
 
 imageCheck () {
     if docker image ls | grep $1; then
@@ -31,14 +30,12 @@ imageCheck () {
         read -p "image $1 does not exist"
     fi
 }
-export -f imageCheck
 
 dockerBuild () {
     echo "dockerBuild: app"
     docker-compose -f ${dc_yaml} build
     verifySuccess "Docker Compose: build app"
 }
-export -f dockerBuild
 
 dockerUp() {
     echo "Deploying stack"
@@ -48,7 +45,6 @@ dockerUp() {
     echo "waiting ${DOCKER_UP_DELAY}, after deploying..."
     sleep ${DOCKER_UP_DELAY}
 }
-export -f dockerUp
 
 dockerDown() {
     # Trying to help docker not blow up (which it has been doing), by giving it as graceful a shutdown as I can
@@ -70,7 +66,6 @@ dockerDown() {
     echo "waiting ${DOCKER_DOWN_DELAY} after stack removed..."
     sleep ${DOCKER_DOWN_DELAY}
 }
-export -f dockerDown
 
 printUrlsMessage() {
     echo ================================================
@@ -79,7 +74,6 @@ printUrlsMessage() {
     echo ================================================
     read -p "Press enter key."
 }
-export -f printUrlsMessage
 
 genMongoConfig() {
     echo "Generating MongoDB Config: ${MONGOD_CONF}"
@@ -93,7 +87,7 @@ security:
     authorization: enabled
 EOM
 }
-export -f genMongoConfig
 
+set -a
 echo "Functions ready"
 
