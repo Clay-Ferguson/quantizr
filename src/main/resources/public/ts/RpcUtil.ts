@@ -284,6 +284,11 @@ export class RpcUtil {
     }
 
     userActive = () => {
+        if (S.rpcUtil.sessionTimedOut) {
+            S.rpcUtil.handleSessionTimeout();
+            return;
+        }
+
         this.sessionTimeRemainingMillis = this.SESSION_TIMEOUT_MINS * 60_000;
 
         // if user is still active but hasn't made call to server which is about to cause a timeout
