@@ -57,6 +57,12 @@ export class AppTab<T = any> extends Div {
             // and heading border, becasue it's slightly better looking that way.
             let top = elm.offsetTop - headingBarHeight - 12;
             if (top < 0) top = 0;
+
+            // If we were gonna scroll somewhere near the top of the page go ahead and scroll to the
+            // the top and the node we're interested in will be no lower than the middle of the screen.
+            if (top < window.innerHeight/2) {
+                top = 0;
+            }
             this.setScrollTop(top);
         }
     }

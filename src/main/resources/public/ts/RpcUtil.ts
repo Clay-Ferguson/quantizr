@@ -252,6 +252,9 @@ export class RpcUtil {
             }
             return;
         }
+        // else {
+        //     console.log("STR: " + this.sessionTimeRemainingMillis);
+        // }
 
         if (this.areYouThereDlg) return;
 
