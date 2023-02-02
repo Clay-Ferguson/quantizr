@@ -261,9 +261,11 @@ export class View {
 
                 const elm = S.domUtil.domElm(S.nav._UID_ROWID_PREFIX + node.id);
                 if (elm) {
+                    // ---------------------------
                     // scrollIntoView works, but is off a bit because we have a 'sticky' header covering up
-                    // part of the window making scrollIntoView appaer not to work.
+                    // part of the window making scrollIntoView appear not to work.
                     // elm.scrollIntoView(true);
+                    // ---------------------------
                     const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_MAIN);
                     if (data) {
                         data.inst.scrollToElm(elm);

@@ -60,10 +60,17 @@ export class AppTab<T = any> extends Div {
 
             // If we were gonna scroll somewhere near the top of the page go ahead and scroll to the
             // the top and the node we're interested in will be no lower than the middle of the screen.
-            if (top < window.innerHeight/2) {
+            if (top < window.innerHeight / 2) {
                 top = 0;
             }
-            this.setScrollTop(top);
+
+            if (this.data.scrollPos <= top && top + elm.offsetHeight < this.data.scrollPos + window.innerHeight) {
+                // if we get here, the entire 'elm' should be visible on the page already
+                // console.log("no scroll needed.");
+            }
+            else {
+                this.setScrollTop(top);
+            }
         }
     }
 }
