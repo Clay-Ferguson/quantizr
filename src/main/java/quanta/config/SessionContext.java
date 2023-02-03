@@ -37,6 +37,7 @@ public class SessionContext extends ServiceBase {
 	private String urlIdFailMsg;
 	private String userMsg;
 	private String displayUserProfileId;
+	private String initialNodeId;
 
 	public PublicKey pubSigKey = null;
 
@@ -631,5 +632,13 @@ public class SessionContext extends ServiceBase {
 
 	public void setDisplayUserProfileId(String displayUserProfileId) {
 		this.displayUserProfileId = displayUserProfileId;
+	}
+
+	public String getInitialNodeId() {
+		return initialNodeId;
+	}
+
+	public void setInitialNodeId(String initialNodeId) {
+		this.initialNodeId = initialNodeId;
 	}
 }

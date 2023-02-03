@@ -114,17 +114,17 @@ export class Quanta {
         }
 
         this.tagSearch = urlParams.get("tagSearch");
-        this.initialNodeId = urlParams.get("nodeId");
     }
 
     initApp = async () => {
         console.log("quanta.initApp()");
-
-        this.parseUrlParams();
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
         }
         this.appInitialized = true;
+
+        this.parseUrlParams();
+        this.initialNodeId = S.quanta.configRes.initialNodeId;
 
         try {
             this.dragImg = new Image();

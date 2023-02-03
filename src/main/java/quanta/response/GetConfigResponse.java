@@ -11,6 +11,7 @@ public class GetConfigResponse extends ResponseBase {
     private String urlIdFailMsg;
     private String userMsg;
     private String displayUserProfileId;
+    private String initialNodeId;
 
     public HashMap<String, Object> getConfig() {
         return config;
@@ -66,5 +67,13 @@ public class GetConfigResponse extends ResponseBase {
 
     public void setDisplayUserProfileId(String displayUserProfileId) {
         this.displayUserProfileId = displayUserProfileId;
+    }
+
+    public String getInitialNodeId() {
+        return initialNodeId;
+    }
+
+    public void setInitialNodeId(String initialNodeId) {
+        this.initialNodeId = initialNodeId;
     }
 }

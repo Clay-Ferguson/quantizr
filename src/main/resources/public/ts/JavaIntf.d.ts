@@ -668,6 +668,7 @@ export interface GetConfigResponse extends ResponseBase {
     urlIdFailMsg: string;
     userMsg: string;
     displayUserProfileId: string;
+    initialNodeId: string;
 }
 
 export interface GetFollowersResponse extends ResponseBase {

@@ -311,7 +311,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 				if (ok(node)) {
 					if (_urlId) {
-						attrs.put("nodeId", _id);
+						sc.setInitialNodeId(_id);
 					}
 
 					if (AclService.isPublic(as, node)) {
@@ -1415,6 +1415,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
 			res.setUserMsg(sc.getUserMsg());
 			res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
+			res.setInitialNodeId(sc.getInitialNodeId());
 		}
 
 		res.setConfig(prop.getConfig());
