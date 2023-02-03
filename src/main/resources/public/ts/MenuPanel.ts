@@ -641,16 +641,20 @@ export class MenuPanel extends Div {
     }
 
     makeHelpIcon = (nodeName: string): Tag => {
-        return new Tag("i", {
-            className: "fa fa-question-circle fa-lg float-end menuIcon",
-            title: "Display Help Information",
-            onClick: (event: Event) => {
-                event.stopPropagation();
-                event.preventDefault();
-                // S.view.jumpToId(bookmark.selfId);
-                S.nav.openContentNode(nodeName);
-            }
-        });
+        // I'm disabling this for now because these named nodes are proprietary to the Quanta.wiki database
+        // and I'll modify this to be something that will be usable by all Quanta-based instances, and
+        // be generated from content that's embedded in the distro itself.
+        return null;
+        // return new Tag("i", {
+        //     className: "fa fa-question-circle fa-lg float-end menuIcon",
+        //     title: "Display Help Information",
+        //     onClick: (event: Event) => {
+        //         event.stopPropagation();
+        //         event.preventDefault();
+        //         // S.view.jumpToId(bookmark.selfId);
+        //         S.nav.openContentNode(nodeName);
+        //     }
+        // });
     }
 
     // These are defined externally in config-text.yaml
