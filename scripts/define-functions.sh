@@ -75,6 +75,7 @@ printUrlsMessage() {
     read -p "Press enter key."
 }
 
+# tip: the "<<" operator below is called a "here document" in Linux terminology.
 genMongoConfig() {
     echo "Generating MongoDB Config: ${MONGOD_CONF}"
 cat > ${MONGOD_CONF} <<- EOM

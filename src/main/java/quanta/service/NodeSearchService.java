@@ -561,8 +561,7 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
-						// Tallship is google bombing my stats, so until I have a "block tags" feature
-						// he's manually blocked.
+						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
 						if (token.endsWith("#") || token.length() == 1 || token.toLowerCase().contains("tallship"))
 							continue;
 
@@ -755,6 +754,7 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// Hashtags
 					else if (type.equals("Hashtag")) {
+						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
 						if (!_name.toLowerCase().contains("tallship")) {
 							WordStats ws = tagMap.get(_name);
 							if (no(ws)) {
