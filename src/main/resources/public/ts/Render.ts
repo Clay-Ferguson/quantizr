@@ -48,6 +48,10 @@ export class Render {
     }
 
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
+        // note: this is only here to get the markdown renderer to have padding in plain text, but also
+        // it means we can leave off the language type and get a plaintext as default
+        val = S.util.replaceAll(val, "```\n", "```plaintext\n");
+
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
 
@@ -136,6 +140,7 @@ export class Render {
         }
         this.markedRenderer = new marked.Renderer();
 
+        // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
         this.markedRenderer.codespan = (code: string) => {
             return `<span class='markdown-codespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
         }
@@ -161,31 +166,17 @@ export class Render {
         marked.setOptions({
             renderer: this.markedRenderer,
 
+            // processes the code fenced blocks (three backticks above and below the block)
             highlight: (code, language) => {
-                if (!language) language = "txt";
+                if (!language) language = "plaintext";
 
                 // Check whether the given language is valid for highlight.js.
                 const validLang: boolean = !!(language && highlightjs.getLanguage(language));
 
                 // Highlight only if the language is valid.
-                const highlighted: string = validLang ? highlightjs.highlight(language, code).value : code;
-
-                // Render the highlighted code with `hljs` class.
-                // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
-                // console.log("highlighted [lang=" + language + "]: " + highlighted);
-                return highlighted;
+                return validLang ? highlightjs.highlight(language, code).value : code;
             },
 
-            // example from marked website...
-            // highlight: function(code, lang) {
-            //     const language = highlightjs.getLanguage(lang) ? lang : "plaintext";
-            //     return highlightjs.highlight(code, { language }).value;
-            // },
-
-            // our original highlight function...
-            // highlight: function (code) {
-            //     return highlightjs.highlightAuto(code).value;
-            // },
             langPrefix: "hljs language-", // highlight.js css expects a top-level 'hljs' class.
 
             gfm: true,
