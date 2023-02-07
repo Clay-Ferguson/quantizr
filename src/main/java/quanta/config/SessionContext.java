@@ -279,19 +279,19 @@ public class SessionContext extends ServiceBase {
 		}
 	}
 
-	public static boolean validToken(String token) {
+	public static SessionContext getSCByToken(String token) {
 		if (no(token))
-			return false;
+			return null;
 
 		synchronized (allSessions) {
 			// great candidate for a stream() here.
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
-					return true;
+					return sc;
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public static void authBearer() {

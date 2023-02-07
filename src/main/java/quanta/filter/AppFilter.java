@@ -1,6 +1,8 @@
 package quanta.filter;
 
+
 import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -59,7 +61,19 @@ public class AppFilter extends GenericFilterBean {
 				httpRes = (HttpServletResponse) res;
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
-				SessionContext sc = ThreadLocals.getSC();
+
+				// Get SessionContext from the 'token' parameter if we can.
+				SessionContext sc = null;
+				String token = httpReq.getParameter("token");
+				if (ok(token)) {
+					sc = SessionContext.getSCByToken(token);
+					if (ok(sc)) {
+						ThreadLocals.setSC(sc);
+					}
+				}
+				else {
+					sc = ThreadLocals.getSC();
+				}
 
 				if (no(sc) || !SessionContext.sessionExists(sc)) {
 					throw new NotLoggedInException();

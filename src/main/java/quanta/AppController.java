@@ -1128,7 +1128,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(name = "token", required = true) String token, //
 			HttpSession session, //
 			HttpServletResponse response) {
-		if (!SessionContext.validToken(token)) {
+		if (no(SessionContext.getSCByToken(token))) {
 			throw new RuntimeException("Invalid token.");
 		}
 		callProc.run("file", false, false, null, session, ms -> {
