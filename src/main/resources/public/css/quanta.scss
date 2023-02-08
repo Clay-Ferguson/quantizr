@@ -1387,34 +1387,29 @@ Will come back later and study this more. todo-3 */
     padding-right: 1rem;
 }
 
-// These borders make the hash-created titles (like '### Title') look really attractive, but it looks ugly 
-// when there's a single line title in the root node which itself has a border (and must for clarity as the root node)
-// so for now let's not do these unless/until we find a better way to indicate to user clearly that the root node
-// is a very special one relative to the page.
-//
-// .markdown-content h1 {
-//     border-bottom: 4px solid $gray-700;
-// }
+.markdown-content h1 {
+    font-size: 2.6rem;
+}
 
-// .markdown-content h2 {
-//     border-bottom: 3px solid $gray-700;
-// }
+.markdown-content h2 {
+    font-size: 2.4rem;
+}
 
-// .markdown-content h3 {
-//     border-bottom: 2px solid $gray-700;
-// }
+.markdown-content h3 {
+    font-size: 2.2rem;
+}
 
-// .markdown-content h4 {
-//     border-bottom: 1px solid $gray-700;
-// }
+.markdown-content h4 {
+    font-size: 2.0rem;
+}
 
-// .markdown-content h5 {
-//     // border-bottom: 1px solid $gray-700;
-// }
+.markdown-content h5 {
+    font-size: 1.8rem;
+}
 
-// .markdown-content h6 {
-//     // border-bottom: 1px solid $gray-700;
-// }
+.markdown-content h6 {
+    font-size: 1.6rem;
+}
 
 // without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
 // amount of spacing we want in the markdown-content style itself so we stop this from messing that up with this 'last-child' style

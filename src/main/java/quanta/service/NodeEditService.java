@@ -1277,16 +1277,19 @@ public class NodeEditService extends ServiceBase {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
 
 		SubNode node = read.getNode(ms, req.getNodeId(), true, null);
+		auth.ownerAuth(ms, node);
+
 		String content = node.getContent();
 		if (ok(content)) {
 			content = content.trim();
-			int baseLevel = XString.getHeadingLevel(content);
+			int baseLevel = XString.getHeadingLevel(content) - 1;
+			int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
-			SubNode parent = read.getParent(ms, node);
-			if (ok(parent)) {
-				for (SubNode n : read.getChildren(ms, parent)) {
-					updateHeadingsForNode(ms, n, baseLevel);
-				}
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
+				int slashCount = StringUtils.countMatches(n.getPath(), "/");
+				int level = baseLevel + (slashCount - baseSlashCount);
+				if (level > 6) level = 6;
+				updateHeadingsForNode(ms, n, level);
 			}
 		}
 		return res;

@@ -1321,7 +1321,7 @@ export class Edit {
         }
     }
 
-    updateHeadings = async () => {
+    setHeadings = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {

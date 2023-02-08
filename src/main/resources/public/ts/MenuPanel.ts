@@ -328,7 +328,7 @@ export class MenuPanel extends Div {
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-                new MenuItem("Update Headings", S.edit.updateHeadings, selNodeIsMine), //
+                new MenuItem("Set Headings", S.edit.setHeadings, selNodeIsMine), //
                 new MenuItem("Search and Replace", MenuPanel.searchAndReplace, selNodeIsMine), //
 
                 new MenuItemSeparator(), //
