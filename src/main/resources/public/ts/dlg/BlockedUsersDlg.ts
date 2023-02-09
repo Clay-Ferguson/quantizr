@@ -60,7 +60,7 @@ export class BlockedUsersDlg extends DialogBase {
             message = "Loading...";
         }
         else if (!state.friends || state.friends.length === 0) {
-            message = "You haven't bllocked anyone";
+            message = "You haven't blocked anyone";
         }
 
         let friendsTagDropDown: Selection = null;
