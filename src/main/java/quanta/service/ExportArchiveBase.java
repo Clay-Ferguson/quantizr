@@ -127,7 +127,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			return;
 		}
 
-		log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
+		// log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
 
 		StringBuilder html = new StringBuilder();
 		html.append("<html>");

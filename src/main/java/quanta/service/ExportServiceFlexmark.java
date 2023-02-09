@@ -26,6 +26,7 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
+import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.mongo.MongoSession;
@@ -258,6 +259,12 @@ public class ExportServiceFlexmark extends ServiceBase {
 		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
+
+			// If a node has a property "noexport" (added by power users) then this node will not be exported.
+			String noExport = n.getStr(NodeProp.NO_EXPORT);
+			if (ok(noExport)) {
+				continue;
+			}
 			recurseNode(n, level + 1);
 		}
 	}

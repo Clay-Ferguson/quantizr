@@ -1388,27 +1388,28 @@ Will come back later and study this more. todo-3 */
 }
 
 .markdown-content h1 {
-    font-size: 2.6rem;
+    font-size: 2.8rem;
 }
 
 .markdown-content h2 {
-    font-size: 2.4rem;
+    font-size: 2.6rem;
 }
 
 .markdown-content h3 {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
 }
 
 .markdown-content h4 {
-    font-size: 2.0rem;
+    font-size: 2.2rem;
 }
 
 .markdown-content h5 {
-    font-size: 1.8rem;
+    font-size: 2.1rem;
 }
 
 .markdown-content h6 {
-    font-size: 1.6rem;
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 // without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
