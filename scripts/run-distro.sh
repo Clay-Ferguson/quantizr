@@ -2,7 +2,7 @@
 
 clear
 # show commands as they are run.
-# set -x
+set -x
 
 # ===================================================================
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}
@@ -30,6 +30,7 @@ mkdir -p ./data
 # Use this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
 # WARNING: This will expose your passwords in the output file!
+# docker-compose -f ${dc_yaml} config --no-cache > final-${dc_yaml}
 docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
 genMongoConfig
