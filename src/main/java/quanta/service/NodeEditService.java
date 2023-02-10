@@ -1282,14 +1282,20 @@ public class NodeEditService extends ServiceBase {
 		String content = node.getContent();
 		if (ok(content)) {
 			content = content.trim();
-			int baseLevel = XString.getHeadingLevel(content) - 1;
+			int baseLevel = XString.getHeadingLevel(content);
 			int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
 			for (SubNode n : read.getSubGraph(ms, node, null, 0, true, false, true)) {
 				int slashCount = StringUtils.countMatches(n.getPath(), "/");
 				int level = baseLevel + (slashCount - baseSlashCount);
-				if (level > 6) level = 6;
+				if (level > 6)
+					level = 6;
 				updateHeadingsForNode(ms, n, level);
+
+				// only cache up to 100 dirty nodes at time time before saving/flushing changes.
+				if (ThreadLocals.getDirtyNodeCount() > 100) {
+					update.saveSession(ms);
+				}
 			}
 		}
 		return res;
