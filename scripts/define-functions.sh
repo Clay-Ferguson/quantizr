@@ -52,8 +52,7 @@ dockerUp() {
 
 dockerDown() {
     # Trying to help docker not blow up (which it has been doing), by giving it as graceful a shutdown as I can
-    if [[ -z ${ipfsEnabled} ]];  
-    then
+    if [[ -z ${ipfsEnabled} ]]; then
         echo "ipfs not enabled"
     else
         # todo-0: not yet tested on PROD. I had added this to try to see if it's the reason IPFS cannot stay up (but always 
