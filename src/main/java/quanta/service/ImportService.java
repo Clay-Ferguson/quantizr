@@ -33,6 +33,12 @@ public class ImportService extends ServiceBase {
 		}
 		auth.ownerAuth(ms, node);
 
+		// This is critical to be correct so we run the actual query based determination of 'hasChildren'
+		boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath(), false);
+		if (hasChildren) {
+			throw ExUtil.wrapEx("You can only import into an empty node.");
+		}
+
 		if (uploadFiles.length != 1) {
 			throw ExUtil.wrapEx("Multiple file import not allowed");
 		}
@@ -72,6 +78,7 @@ public class ImportService extends ServiceBase {
 				} else {
 					throw ExUtil.wrapEx("Only ZIP, TAR, TAR.GZ files are supported for importing.");
 				}
+				node.setHasChildren(true);
 			} catch (Exception ex) {
 				throw ExUtil.wrapEx(ex);
 			} finally {
