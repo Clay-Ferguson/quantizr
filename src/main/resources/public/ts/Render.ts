@@ -50,7 +50,7 @@ export class Render {
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         // note: this is only here to get the markdown renderer to have padding in plain text, but also
         // it means we can leave off the language type and get a plaintext as default
-        val = S.util.replaceAll(val, "```\n", "```plaintext\n");
+        val = S.util.replaceAll(val, "```txt\n", "```plaintext\n");
 
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
