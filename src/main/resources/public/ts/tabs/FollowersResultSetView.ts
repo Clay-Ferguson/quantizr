@@ -29,8 +29,8 @@ export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSet
 
     renderHeading(): CompIntf {
         const text = this.data.props.showingFollowersOfUser === getAs().userName //
-            ? "Your followers..." //
-            : "Followers of @" + this.data.props.showingFollowersOfUser + "...";
+            ? "Your Followers" //
+            : "Followers of @" + this.data.props.showingFollowersOfUser;
         return new Div(text, { className: "tabTitle" });
     }
 
