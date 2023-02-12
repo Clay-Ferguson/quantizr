@@ -33,7 +33,8 @@ public class AuditFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		if (!Util.gracefulReadyCheck(response)) return;
+		if (!Util.gracefulReadyCheck(response))
+			return;
 
 		HttpServletRequest sreq = null;
 		if (request instanceof HttpServletRequest) {

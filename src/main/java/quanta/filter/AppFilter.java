@@ -10,9 +10,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -26,13 +29,16 @@ import quanta.util.Util;
 import quanta.util.XString;
 
 /**
- * This is Web Filter for processing AppController.API_PATH endpoints(path configured in
- * AppConfiguration.java)
+ * This is the filter that executes FIRST (higheds @Order is the reason) This is Web Filter for
+ * processing AppController.API_PATH endpoints(path configured in AppConfiguration.java)
  */
 @Component
 @Order(5)
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
+
+	@Autowired
+	private ApplicationContext context;
 
 	private static int reqId = 0;
 	private static boolean logRequests = false;
@@ -46,7 +52,8 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-		if (!Util.gracefulReadyCheck(res)) return;
+		if (!Util.gracefulReadyCheck(res))
+			return;
 
 		HttpServletResponse httpRes = null;
 		try {
@@ -70,13 +77,17 @@ public class AppFilter extends GenericFilterBean {
 					if (ok(sc)) {
 						ThreadLocals.setSC(sc);
 					}
-				}
-				else {
+				} else {
 					sc = ThreadLocals.getSC();
 				}
 
 				if (no(sc) || !SessionContext.sessionExists(sc)) {
-					throw new NotLoggedInException();
+					if (Util.allowInsecureUrl(httpReq.getRequestURI())) {
+						HttpSession session = httpReq.getSession(true);
+						sc = SessionContext.init(context, session);
+					} else {
+						throw new NotLoggedInException();
+					}
 				}
 
 				sc.addAction(httpReq.getRequestURI());
@@ -128,12 +139,10 @@ public class AppFilter extends GenericFilterBean {
 				log.error("Failed", ex);
 				throw ex;
 			}
-		} 
-		catch (NotLoggedInException e) {
+		} catch (NotLoggedInException e) {
 			ExUtil.warn("Unauthorized. Not logged in.");
 			httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			/*
 			 * we send back the error here, for AJAX calls so we don't bubble up to the default handling and
 			 * cause it to send back the html error page.

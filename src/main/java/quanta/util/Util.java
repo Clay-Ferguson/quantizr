@@ -23,6 +23,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import quanta.AppController;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoRepository;
 
@@ -36,6 +37,12 @@ public class Util {
 
 	public static boolean ok(Object o) {
 		return o != null;
+	}
+
+	public static boolean allowInsecureUrl(String url) {
+		return url.contains("/bin/profileHeader") || //
+				url.contains("/bin/avatar") || //
+				!url.contains(AppController.API_PATH);
 	}
 
 	public static boolean gracefulReadyCheck(ServletResponse res) throws RuntimeException, IOException {
