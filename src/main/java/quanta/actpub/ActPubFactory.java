@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ import quanta.instrument.PerfMon;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
+import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Convert;
@@ -168,17 +170,27 @@ public class ActPubFactory extends ServiceBase {
 		if (!privateMessage) {
 			toActors.add(APConst.CONTEXT_STREAMS_PUBLIC);
 
-			/*
-			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
-			 * attributedTo)
-			 */
-			APOActor fromActorObj = (APOActor) arun.run(as -> apUtil.getActorByUrl(as, userDoingAction, fromActor));
+			// if this is a local user sending a message, we can build the followersUrl this way.
+			// todo-0: However originally I had this doing ONLY what's currently in the 'else' block, and it 
+			// was for some reason failing to get the fromActorObj using a local URL, and I need to figure out why.
+			if (apUtil.isLocalUrl(fromActor) && !StringUtils.isEmpty(userDoingAction) && !userDoingAction.equals(PrincipalName.ANON.s())) {
+				String followersUrl = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userDoingAction;
+				ccActors.add(followersUrl);
+			} else {
+				/*
+				 * public posts should always cc the followers of the person doing the post (the actor pointed to by
+				 * attributedTo)
+				 */
+				APOActor fromActorObj = (APOActor) arun.run(as -> {
+					return apUtil.getActorByUrl(as, userDoingAction, fromActor);
+				});
 
-			if (ok(fromActorObj)) {
-				ccActors.add(fromActorObj.getFollowers());
+				if (ok(fromActorObj)) {
+					ccActors.add(fromActorObj.getFollowers());
+				}
 			}
 		}
-		
+
 		if (toActors.size() > 0) {
 			object.put(APObj.to, new APList().vals(toActors));
 		}

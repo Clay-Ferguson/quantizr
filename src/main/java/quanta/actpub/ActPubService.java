@@ -144,9 +144,18 @@ public class ActPubService extends ServiceBase {
         exec.run(() -> {
             try {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
+
                 // Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
                 // what the local server version of it is.
-                String inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
+                String inReplyTo = null;
+
+                // When someone posts using the "Post" button, instead of "Reply To" button, we will end up
+                // with the POSTS type as the parent, and we don't want an inReplyTo on the node, because this "Post"
+                // node would never be considered as being replied to.
+                if (!NodeType.POSTS.s().equals(parent.getType())) {
+                    inReplyTo = !isAccnt ? apUtil.buildUrlForReplyTo(ms, parent) : null;
+                }
+
                 APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
                 String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
                 String boostTarget = node.getStr(NodeProp.BOOST);
@@ -1208,7 +1217,7 @@ public class ActPubService extends ServiceBase {
 
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
 
-        // note: I was temporarily think this was doing too much sharing, but 
+        // note: I was temporarily think this was doing too much sharing, but
         // I now think we do need it, especially becasue sometimes the only place
         // some posts put their 'public' designation is in the CC, so let's process
         // all ccs. The risk (I thought I had was that a 'reply to node', will cause these CCs
