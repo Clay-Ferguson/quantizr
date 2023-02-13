@@ -49,12 +49,22 @@ export class NodeCompRowHeader extends Div {
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
         if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== J.PrincipalName.ADMIN) {
-            let displayName = this.node.displayName || ("@" + this.node.owner);
+            let displayName = null;
 
-            displayName = S.util.insertActPubTags(displayName, this.node);
+            // if user has set their displayName
+            if (this.node.displayName) {
+                displayName = S.util.insertActPubTags(this.node.displayName, this.node);
+            }
 
-            // If user had nothin but ":tags:" in their display name, then display there userName
-            displayName = displayName || this.node.owner;
+            // Warning: after running insertActPubTags above that may put us back at an empty displayName,
+            // so we DO need to check for displayName here rather than putting this in an else block.
+            if (!displayName) {
+                displayName = this.node.owner;
+                const atIdx = displayName.indexOf("@");
+                if (atIdx !== -1) {
+                    displayName = displayName.substring(0, atIdx);
+                }
+            }
 
             if (this.node.transferFromId) {
                 displayName = "PENDING XFER -> " + displayName;
