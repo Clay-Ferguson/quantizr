@@ -237,7 +237,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    fediSend: false
+                    fediSend: false,
+                    boosterUserId: null
                 });
 
                 if (blob) {
@@ -272,7 +273,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     boostTarget: null,
-                    fediSend: false
+                    fediSend: false,
+                    boosterUserId: null
                 });
                 this.createSubNodeResponse(res, false, null);
             }
@@ -1090,7 +1092,8 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             boostTarget: null,
-            fediSend: false
+            fediSend: false,
+            boosterUserId: null
         });
 
         if (blob) {
@@ -1163,7 +1166,8 @@ export class Edit {
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
             boostTarget: null,
-            fediSend: false
+            fediSend: false,
+            boosterUserId: null
         });
         this.createSubNodeResponse(res, true, null);
     }
@@ -1190,8 +1194,10 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
+    addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
         boostTarget: string, fediSend: boolean) => {
+
+        console.log("boosterUserId: " + boosterUserId);
 
         // auto-enable edit mode
         if (!boostTarget && !getAs().userPrefs.editMode) {
@@ -1211,7 +1217,8 @@ export class Edit {
             properties: null,
             shareToUserId,
             boostTarget,
-            fediSend
+            fediSend,
+            boosterUserId
         });
 
         if (!boostTarget) {
@@ -1236,7 +1243,8 @@ export class Edit {
             payloadType,
             shareToUserId: null,
             boostTarget: null,
-            fediSend: false
+            fediSend: false,
+            boosterUserId: null
         });
 
         // auto-enable edit mode
@@ -1258,7 +1266,8 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
             boostTarget: null,
-            fediSend: false
+            fediSend: false,
+            boosterUserId: null
         });
         this.createSubNodeResponse(res, false, null);
     }
@@ -1346,6 +1355,8 @@ export class Edit {
 
         // if not all the shares are mentioned in the text ask the user about putting them the content automatically
         if (!dlg.areAllSharesInContent()) {
+
+            // todo-0: need to go back to also haing a button that can do this WITHOUT opening the sharing dlg.
             const confDlg = new ConfirmDlg("Add to Sharing/Mentions to content text?", "Add Mentions ?");
             await confDlg.open();
             if (confDlg.yes) {

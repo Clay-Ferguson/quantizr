@@ -319,7 +319,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false);
+            S.edit.addNode(null, null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false);
         }, 10);
     }
 

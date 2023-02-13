@@ -159,7 +159,7 @@ export class NodeCompRow extends Div {
             // show orphans on the page when something is deleted. Other panels don't have this problem
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
+            header = new NodeCompRowHeader(null, this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

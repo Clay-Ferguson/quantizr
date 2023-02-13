@@ -96,7 +96,7 @@ export class RightNavPanel extends Div {
                         }
                     }
                 }
-                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, null, null, false);
+                S.edit.addNode(null, "~" + J.NodeType.NOTES, null, false, content, null, null, null, false);
             },
             title: "Create new Private Note\n(Hold down CTRL key to attach from clipboard)"
         }) : null;
@@ -108,7 +108,7 @@ export class RightNavPanel extends Div {
 
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
-                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, null, null, false);
+                        S.edit.addNode(null, "~" + J.NodeType.NOTES, null, false, null, null, null, null, false);
                         return;
                     }
                 }

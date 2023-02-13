@@ -173,6 +173,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
+    boosterUserId: string;
     fediSend: boolean;
     payloadType?: string;
 }

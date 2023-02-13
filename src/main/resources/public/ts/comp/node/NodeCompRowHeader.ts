@@ -17,7 +17,9 @@ import { Constants as C } from "../../Constants";
 
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
+    // NOTE: If boostingNode is non-null it's the node that is boosting 'node'. In other words the rendered page will show
+    // node boostingNode as the top/outter level and the 'node' will be the actual node that got boosted by 'boostingNode'
+    constructor(private boostingNode: J.NodeInfo, private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
         private isBoost: boolean, private allowDelete: boolean) {
         super(null);
@@ -92,7 +94,9 @@ export class NodeCompRowHeader extends Div {
 
         // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
         // Also we don't allow admin user to do any replies
-        if (!ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
+        // WARNING: Mastodon can't cope with the concept of replying to the actual booster node but only the booseted node,
+        // do don'w allow replying to boosts.
+        if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg mediumMarginRight",
@@ -101,14 +105,17 @@ export class NodeCompRowHeader extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
+                        // when replying to a boost, we want to be able to additionally add to the sharing the person
+                        // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
+                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT, true, null, null, this.node.id, null, true);
                     }
                 }
             }));
         }
 
         if (showInfo) {
-            if (!ast.isAdminUser) {
+            // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
+            if (!ast.isAdminUser && !this.node.boostedNode) {
                 children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg mediumMarginRight",
@@ -117,7 +124,7 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
+                            S.edit.addNode(null, null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
                         }
                     }
                 }));
@@ -136,23 +143,26 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            children.push(new Icon({
-                title: likeDisplay ? likeDisplay : "Like this Node",
-                className: "fa fa-star fa-lg mediumMarginRight " + (youLiked ? "likedByMeIcon" : ""),
-                onClick: () => {
-                    if (ast.isAdminUser) {
-                        S.util.showMessage("Admin user can't do Likes.", "Admin");
-                        return;
-                    }
+            // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
+            if (!this.node.boostedNode) {
+                children.push(new Icon({
+                    title: likeDisplay ? likeDisplay : "Like this Node",
+                    className: "fa fa-star fa-lg mediumMarginRight " + (youLiked ? "likedByMeIcon" : ""),
+                    onClick: () => {
+                        if (ast.isAdminUser) {
+                            S.util.showMessage("Admin user can't do Likes.", "Admin");
+                            return;
+                        }
 
-                    if (ast.isAnonUser) {
-                        S.util.showMessage("Login to like and create content.", "Login!");
+                        if (ast.isAnonUser) {
+                            S.util.showMessage("Login to like and create content.", "Login!");
+                        }
+                        else {
+                            S.edit.likeNode(this.node, !youLiked);
+                        }
                     }
-                    else {
-                        S.edit.likeNode(this.node, !youLiked);
-                    }
-                }
-            }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
+                }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
+            }
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
             and we need to have a user identity for all the HTTP sigs for that. */

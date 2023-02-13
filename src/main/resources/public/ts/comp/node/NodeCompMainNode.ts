@@ -77,7 +77,7 @@ export class NodeCompMainNode extends Div {
                 const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
                 const showJumpButton = this.tabData.id !== C.TAB_MAIN;
 
-                header = new NodeCompRowHeader(node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
+                header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
             }
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

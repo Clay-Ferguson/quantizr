@@ -28,16 +28,18 @@ export class NodeCompRowFooter extends Div {
                 }
             }
 
-            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
 
             // some servers might have sent an ID and not the URL to our server, and so we detect this case
             // and assume if there's an "https://" link specified we can build out link to that.
-            if (!objUrl) {
-                const idUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
-                if (idUrl?.startsWith("https://")) {
-                    objUrl = idUrl;
-                }
-            }
+            // I don't think it was good to try to link to IDs, take one more look before permanently
+            // deleting this logic (todo-0)
+            // if (!objUrl) {
+            //     const idUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, this.node);
+            //     if (idUrl?.startsWith("https://")) {
+            //         objUrl = idUrl;
+            //     }
+            // }
 
             if (objUrl) {
                 // check to see if it's a link to our server, and don't show 'foreign link' link if so.
@@ -46,7 +48,7 @@ export class NodeCompRowFooter extends Div {
                     children.push(new Anchor(objUrl, "Link", {
                         className: "footerLink",
                         target: "_blank",
-                        title: "Go to post on it's home Fediverse instance"
+                        title: "Go to Original Post/Instance"
                     }));
                 }
             }

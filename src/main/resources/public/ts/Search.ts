@@ -592,7 +592,7 @@ export class Search {
                 },
                 className: "boost-row"
             }, [
-                allowHeader ? new NodeCompRowHeader(node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
+                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
                 allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
                 allowBoostFooter ? new Clearfix() : null
@@ -649,7 +649,7 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
+            allowHeader ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
             S.render.renderLinks(node),

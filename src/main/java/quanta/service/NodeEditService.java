@@ -194,6 +194,10 @@ public class NodeEditService extends ServiceBase {
 				// we always determine the access controls from the parent for any new nodes
 				auth.setDefaultReplyAcl(parentNode, newNode);
 
+				if (ok(req.getBoosterUserId())) {
+					newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
+				}
+
 				// inherit UNPUBLISHED prop from parent, if we own the parent
 				if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
 					newNode.set(NodeProp.UNPUBLISHED, true);

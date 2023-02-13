@@ -23,8 +23,12 @@ public class CreateSubNodeRequest extends RequestBase {
 	// default properties to add, or null if none
 	private List<PropertyInfo> properties;
 
-	// for a DM this can be optionally provided to share the node with this person immeidately.
+	// for a DM this can be optionally provided to share the node with this person immediately
 	private String shareToUserId;
+
+	// If this node is a reply to a boosted node, then we will recieve the booster id here so the node can
+	// also be shared with that person as well.
+	private String boosterUserId;
 
 	// send out over Fediverse only if this is true. Will generally be either something created by a
 	// "Post" button or a "Reply" button only
@@ -36,6 +40,14 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setShareToUserId(String shareToUserId) {
 		this.shareToUserId = shareToUserId;
+	}
+
+	public String getBoosterUserId() {
+		return boosterUserId;
+	}
+
+	public void setBoosterUserId(String boosterUserId) {
+		this.boosterUserId = boosterUserId;
 	}
 
 	/* special purpose values for when creating special types of nodes */
