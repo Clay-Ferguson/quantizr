@@ -138,6 +138,9 @@ export class RpcUtil {
         try {
             if (!background) {
                 this.rpcCounter--;
+                if (this.rpcCounter < 0) {
+                    this.rpcCounter = 0;
+                }
                 this.progressInterval();
             }
 
@@ -176,6 +179,9 @@ export class RpcUtil {
         try {
             if (!background) {
                 this.rpcCounter--;
+                if (this.rpcCounter < 0) {
+                    this.rpcCounter = 0;
+                }
                 this.progressInterval();
             }
             let status = error.response ? error.response.status : "";
@@ -300,6 +306,14 @@ export class RpcUtil {
             this.millisSinceLastRpc = 0;
             S.rpcUtil.rpc<J.PingRequest, J.PingResponse>("ping");
         }
+    }
+
+    startBlockingProcess = () => {
+        S.quanta.setOverlay(true);
+    }
+
+    stopBlockingProcess = () => {
+        S.quanta.setOverlay(false);
     }
 
     progressInterval = () => {

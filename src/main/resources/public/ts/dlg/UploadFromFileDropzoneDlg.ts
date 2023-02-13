@@ -179,7 +179,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             const files = this.dropzone.getAcceptedFiles();
             if (files) {
                 this.numFiles = files.length;
-                this.dropzone.processQueue();
+                if (this.numFiles) {
+                    S.rpcUtil.startBlockingProcess();
+                    this.dropzone.processQueue();
+                }
             }
         }
         return true;
@@ -274,6 +277,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("error", function (param1: any, param2: any, param3: any) {
+                    S.rpcUtil.stopBlockingProcess();
                     if (dlg.sent) {
                         dlg.uploadFailed = true;
                         S.util.showMessage("Upload failed.", "Warning");
@@ -282,7 +286,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 // not needed (this does work however)
                 this.on("uploadprogress", function (file: any, progress: any) {
-                    // console.log("File progress", progress);
+                    console.log("File progress" + progress);
                 });
 
                 this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
@@ -298,6 +302,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 this.on("queuecomplete", function (arg: any) {
+                    S.rpcUtil.stopBlockingProcess();
                     if (dlg.sent) {
                         dlg.close();
                         if (dlg.afterUploadFunc) {

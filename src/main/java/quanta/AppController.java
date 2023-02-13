@@ -823,7 +823,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
 
-		return callProc.run("upload", true, true, null, session, ms -> {
+		return callProc.run("streamImport", true, true, null, session, ms -> {
 			return importService.streamImport(ms, nodeId, uploadFiles);
 		});
 	}
