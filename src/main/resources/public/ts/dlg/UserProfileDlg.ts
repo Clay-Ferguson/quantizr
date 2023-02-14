@@ -193,10 +193,6 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser
                         ? new Button("Mentions", () => this.searchMentions(this.getUserName()), { title: "Find all Public Mentions of this person" }) : null,
 
-                    // only show editFriend node if we're NOT currently editing.
-                    !ast.editNode && !ast.isAnonUser && state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Friend Settings", this.editFriendNode) : null,
-
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Follow", this.addFriend) : null,
 
@@ -299,11 +295,6 @@ export class UserProfileDlg extends DialogBase {
                 userProfile: state.userProfile
             });
         }
-    }
-
-    editFriendNode = async () => {
-        if (this.currentlyEditingWarning()) return;
-        S.edit.runEditNode(null, this.userNodeId, true, false, true, null, true);
     }
 
     currentlyEditingWarning = (): boolean => {
