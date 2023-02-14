@@ -1958,6 +1958,12 @@ Will come back later and study this more. todo-3 */
     cursor: pointer;
 }
 
+.friendName {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-right: $smallGap;
+}
+
 .sharingDisplayName {
     display: inline-block;
     padding: $smallGap;
@@ -1973,7 +1979,7 @@ Will come back later and study this more. todo-3 */
     max-width: 70px;
     min-height: 70px; // min hight needed to make list boxes look good.
     cursor: pointer;
-    margin: $tinyGap;
+    margin: $tinyGap 2px 2px $tinyGap;
     border: 1px solid gray;
 }
 

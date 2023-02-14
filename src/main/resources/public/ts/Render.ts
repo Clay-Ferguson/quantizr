@@ -839,7 +839,7 @@ export class Render {
         return items;
     }
 
-    renderTagsStrDiv = (tagsStr: string, extraClass: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
+    renderTagsStrDiv = (tagsStr: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
         if (!tagsStr) tagsStr = "";
         const tags = tagsStr.split(" ");
         const spans: Span[] = tags.map(tag => {
@@ -861,7 +861,7 @@ export class Render {
                     labelClickFunc();
                 },
                 title: "Select Hashtags"
-            }, extraClass + " marginRight"),
+            }, "marginRight"),
             new Div(null, { className: "inlineBlock" }, [
                 new Div(null, {
                     className: "tagsFlexContainer"

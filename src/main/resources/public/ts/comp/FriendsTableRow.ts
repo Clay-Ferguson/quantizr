@@ -10,6 +10,7 @@ import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
 import { Icon } from "./core/Icon";
+import { Span } from "./core/Span";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class FriendsTableRow extends ListBoxRow {
@@ -33,14 +34,6 @@ export class FriendsTableRow extends ListBoxRow {
         }
         else {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
-        }
-
-        let fullDisplayName = this.friend.displayName;
-        if (fullDisplayName) {
-            fullDisplayName += "  (@" + this.friend.userName + ")";
-        }
-        else {
-            fullDisplayName = "@" + this.friend.userName;
         }
 
         this.setChildren([
@@ -71,8 +64,11 @@ export class FriendsTableRow extends ListBoxRow {
                     className: "friendListText",
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
-                    new Div(fullDisplayName),
-                    S.render.renderTagsStrDiv(this.friend.tags, "marginTop", this.removeTag, this.editTags)
+                    new Div(null, null, [
+                        this.friend.displayName ? new Span(this.friend.displayName, { className: "friendName" }) : null,
+                        this.friend.userName ? new Span("(" + this.friend.userName + ")") : null
+                    ]),
+                    S.render.renderTagsStrDiv(this.friend.tags, this.removeTag, this.editTags)
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
