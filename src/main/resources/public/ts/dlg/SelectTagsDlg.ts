@@ -33,7 +33,7 @@ export class SelectTagsDlg extends DialogBase {
     editFieldState: Validator = new Validator();
 
     /* modeOption = search | edit */
-    constructor(private modeOption: string, private curTags: string) {
+    constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean) {
         super("Select Hashtags", "app-modal-content-medium-width");
 
         this.mergeState<LS>({
@@ -94,7 +94,7 @@ export class SelectTagsDlg extends DialogBase {
                     val: this.editFieldState,
                     labelClass: "txtFieldLabelShort"
                 }),
-                new Checkbox("Suggest Tags", { className: "float-end" }, {
+                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "float-end" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState().suggestedTags.length === 0) {
@@ -102,7 +102,7 @@ export class SelectTagsDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => this.getState().suggestTags
-                }, "form-switch form-check-inline"),
+                }, "form-switch form-check-inline") : null,
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,

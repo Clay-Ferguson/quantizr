@@ -1945,12 +1945,16 @@ Will come back later and study this more. todo-3 */
     line-height: 1.2;
 }
 
+.inlineBlock {
+    display: inline-block;
+}
+
 .friendListText {
     display: inline-block;
     font-weight: 500;
-    margin-left: 12px;
     padding-left: 8px;
     padding-top: 6px;
+    vertical-align: top;
     cursor: pointer;
 }
 

@@ -376,7 +376,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [
-            this.renderTagsDiv(this.tagsState.getValue()),
+            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), "", this.removeTag, this.selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
 
@@ -451,25 +451,6 @@ export class EditNodeDlg extends DialogBase {
             propsPanel, morePanel, new Clearfix(), this.renderButtons()]);
 
         return children;
-    }
-
-    renderTagsDiv = (tagsStr: string): Div => {
-        const tags = tagsStr.split(" ");
-        let tagCount = 0;
-        const spans: Span[] = tags.map(tag => {
-            if (!tag) return null;
-            tagCount++;
-            return new Span(tag, {
-                title: "Click to Remove",
-                onClick: () => this.removeTag(tag),
-                className: "nodeTagInEditor"
-            })
-        });
-
-        if (tagCount === 0) return null;
-        return new Div(null, {
-            className: "tagsFlexContainer"
-        }, [new Span("Tags: ", { className: "tagsPrompt" }), ...spans]);
     }
 
     makePublic = async (allowAppends: boolean) => {
@@ -701,14 +682,10 @@ export class EditNodeDlg extends DialogBase {
                 title: "Add Property"
             }) : null,
 
-            new IconButton("fa-tag fa-lg", "", {
-                onClick: async () => {
-                    const dlg = new SelectTagsDlg("edit", this.tagsState.getValue());
-                    await dlg.open();
-                    this.addTagsToTextField(dlg);
-                },
+            !this.tagsState.getValue() ? new IconButton("fa-tag fa-lg", "", {
+                onClick: this.selectTags,
                 title: "Select Hashtags"
-            }),
+            }) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()
@@ -724,6 +701,12 @@ export class EditNodeDlg extends DialogBase {
 
             this.editorHelp ? new HelpButton(() => this.editorHelp) : null
         ]);
+    }
+
+    selectTags = async () => {
+        const dlg = new SelectTagsDlg("edit", this.tagsState.getValue(), false);
+        await dlg.open();
+        this.addTagsToTextField(dlg);
     }
 
     super_closeByUser = this.closeByUser;

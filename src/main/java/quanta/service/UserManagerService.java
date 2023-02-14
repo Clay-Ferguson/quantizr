@@ -1401,6 +1401,7 @@ public class UserManagerService extends ServiceBase {
 		FriendInfo fi = null;
 		if (ok(userName)) {
 			fi = new FriendInfo();
+			fi.setFriendNodeId(friendNode.getIdStr());
 			fi.setUserName(userName);
 			fi.setTags(friendNode.getTags());
 

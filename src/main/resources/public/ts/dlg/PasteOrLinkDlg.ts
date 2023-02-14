@@ -52,7 +52,7 @@ export class PasteOrLinkDlg extends DialogBase {
                     }),
                     new IconButton("fa-tag fa-lg", "", {
                         onClick: async () => {
-                            const dlg = new SelectTagsDlg("edit", "");
+                            const dlg = new SelectTagsDlg("edit", "", false);
                             await dlg.open();
                             let val: string = null;
                             dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {

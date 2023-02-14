@@ -164,7 +164,7 @@ export class SearchContentDlg extends DialogBase {
             }),
             !getAs().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
                 onClick: async () => {
-                    const dlg = new SelectTagsDlg("search", this.searchTextState.getValue());
+                    const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true);
                     await dlg.open();
                     this.addTagsToSearchField(dlg);
                 },

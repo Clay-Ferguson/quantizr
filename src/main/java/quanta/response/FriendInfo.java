@@ -6,6 +6,7 @@ public class FriendInfo {
     private String userName;
     private String avatarVer;
     private String userNodeId;
+    private String friendNodeId;
     private String foreignAvatarUrl;
     private String tags;
 
@@ -34,6 +35,14 @@ public class FriendInfo {
 
     public void setUserNodeId(String userNodeId) {
         this.userNodeId = userNodeId;
+    }
+
+    public String getFriendNodeId() {
+        return friendNodeId;
+    }
+
+    public void setFriendNodeId(String friendNodeId) {
+        this.friendNodeId = friendNodeId;
     }
 
     public String getDisplayName() {

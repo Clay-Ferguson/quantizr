@@ -51,6 +51,7 @@ import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
+import quanta.request.UpdateFriendNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.response.AppDropResponse;
 import quanta.response.CreateSubNodeResponse;
@@ -63,6 +64,7 @@ import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
+import quanta.response.UpdateFriendNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
 import quanta.util.IntVal;
@@ -477,6 +479,21 @@ public class NodeEditService extends ServiceBase {
 				return null;
 			});
 		});
+		return res;
+	}
+
+	public UpdateFriendNodeResponse updateFriendNode(MongoSession ms, UpdateFriendNodeRequest req) {
+		UpdateFriendNodeResponse res = new UpdateFriendNodeResponse();
+
+		SubNode node = read.getNode(ms, req.getNodeId());
+		auth.ownerAuth(ms, node);
+
+		if (!NodeType.FRIEND.s().equals(node.getType())) {
+			throw new RuntimeException("Not a Friend node.");
+		}
+
+		node.setTags(req.getTags());
+		res.setSuccess(true);
 		return res;
 	}
 

@@ -553,6 +553,11 @@ export interface TransferNodeRequest extends RequestBase {
     operation: string;
 }
 
+export interface UpdateFriendNodeRequest extends RequestBase {
+    nodeId: string;
+    tags: string;
+}
+
 export interface UpdateHeadingsRequest extends RequestBase {
     nodeId: string;
 }
@@ -648,6 +653,7 @@ export interface FriendInfo {
     userName: string;
     avatarVer: string;
     userNodeId: string;
+    friendNodeId: string;
     foreignAvatarUrl: string;
     tags: string;
     liked: boolean;
@@ -932,6 +938,9 @@ export interface SubGraphHashResponse extends ResponseBase {
 }
 
 export interface TransferNodeResponse extends ResponseBase {
+}
+
+export interface UpdateFriendNodeResponse extends ResponseBase {
 }
 
 export interface UpdateHeadingsResponse extends ResponseBase {

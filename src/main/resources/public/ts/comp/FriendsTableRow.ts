@@ -2,7 +2,9 @@ import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
+import { LS as SelectTagsDlgLS, SelectTagsDlg } from "../dlg/SelectTagsDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
+import * as J from "../JavaIntf";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -33,7 +35,13 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        const tagsSuffix = this.friend.tags ? (" (" + this.friend.tags + ")") : "";
+        let fullDisplayName = this.friend.displayName;
+        if (fullDisplayName) {
+            fullDisplayName += "  (@" + this.friend.userName + ")";
+        }
+        else {
+            fullDisplayName = "@" + this.friend.userName;
+        }
 
         this.setChildren([
             new Div(null, null, [
@@ -63,8 +71,8 @@ export class FriendsTableRow extends ListBoxRow {
                     className: "friendListText",
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
-                    new Div(this.friend.displayName),
-                    new Div("@" + this.friend.userName + tagsSuffix)
+                    new Div(fullDisplayName),
+                    S.render.renderTagsStrDiv(this.friend.tags, "marginTop", this.removeTag, this.editTags)
                 ]),
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
@@ -73,5 +81,62 @@ export class FriendsTableRow extends ListBoxRow {
                 }) : null
             ])
         ]);
+    }
+
+    editTags = async () => {
+        const dlg = new SelectTagsDlg("edit", this.friend.tags, false);
+        await dlg.open();
+        this.addTags(dlg);
+    }
+
+    addTags = (dlg: SelectTagsDlg) => {
+        let val = this.friend.tags || "";
+        val = val.trim();
+        const tags: string[] = val.split(" ");
+        dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(tag => {
+            if (!tag.startsWith("#")) {
+                tag = "#" + tag;
+            }
+            if (!tags.includes(tag)) {
+                if (val) val += " ";
+                val += tag;
+            }
+        });
+
+        this.friend.tags = this.sortTags(val);
+        S.rpcUtil.rpc<J.UpdateFriendNodeRequest, J.UpdateFriendNodeResponse>("updateFriendNode", {
+            nodeId: this.friend.friendNodeId,
+            tags: this.friend.tags
+        });
+
+        this.dlg.mergeState({});
+    }
+
+    sortTags = (tagStr: string): string => {
+        if (!tagStr) return tagStr;
+        const tags: string[] = tagStr.split(" ");
+        tags.sort();
+        return tags.join(" ");
+    }
+
+    removeTag = (removeTag: string) => {
+        let val = this.friend.tags || "";
+        val = val.trim();
+        const tags: string[] = val.split(" ");
+        let newTags = "";
+
+        tags.forEach(tag => {
+            if (removeTag !== tag) {
+                if (newTags) newTags += " ";
+                newTags += tag;
+            }
+        });
+
+        this.friend.tags = newTags;
+        S.rpcUtil.rpc<J.UpdateFriendNodeRequest, J.UpdateFriendNodeResponse>("updateFriendNode", {
+            nodeId: this.friend.friendNodeId,
+            tags: this.friend.tags
+        });
+        this.dlg.mergeState({});
     }
 }

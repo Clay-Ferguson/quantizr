@@ -126,6 +126,7 @@ import quanta.request.SignupRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
+import quanta.request.UpdateFriendNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
@@ -921,6 +922,14 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		return callProc.run("deleteProperties", true, true, req, session, ms -> {
 			return edit.deleteProperties(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/updateFriendNode", method = RequestMethod.POST)
+	public @ResponseBody Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
+
+		return callProc.run("updateFriendNode", true, true, req, session, ms -> {
+			return edit.updateFriendNode(ms, req);
 		});
 	}
 

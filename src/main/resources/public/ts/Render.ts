@@ -11,6 +11,7 @@ import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
+import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -836,5 +837,36 @@ export class Render {
             }
         }
         return items;
+    }
+
+    renderTagsStrDiv = (tagsStr: string, extraClass: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
+        if (!tagsStr) tagsStr = "";
+        const tags = tagsStr.split(" ");
+        const spans: Span[] = tags.map(tag => {
+            if (!tag) return null;
+            return new Span(tag, {
+                title: "Click to Remove",
+                onClick: (evt: Event) => {
+                    evt.stopPropagation();
+                    removeTag(tag);
+                },
+                className: "nodeTagInEditor"
+            })
+        });
+
+        return new Div(null, null, [
+            new IconButton("fa-tag", "", {
+                onClick: (evt: Event) => {
+                    evt.stopPropagation();
+                    labelClickFunc();
+                },
+                title: "Select Hashtags"
+            }, extraClass + " marginRight"),
+            new Div(null, { className: "inlineBlock" }, [
+                new Div(null, {
+                    className: "tagsFlexContainer"
+                }, spans)
+            ])
+        ]);
     }
 }
