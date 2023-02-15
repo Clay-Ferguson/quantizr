@@ -297,6 +297,10 @@ export class SpeechEngine {
                     // text full of hashtags and have it sound good.
                     sayThis = sayThis.replaceAll("#", " ");
 
+                    // replace backquote or else the engine will pronounce the actual word 'backquote' which we of courose
+                    // do not want.
+                    sayThis = sayThis.replaceAll("`", "\"");
+
                     utter = new SpeechSynthesisUtterance(sayThis);
 
                     const isQuote = sayThis.startsWith("\"");
@@ -319,6 +323,7 @@ export class SpeechEngine {
                         if (!this.ttsRunning) return;
                         utterFunc();
                     }
+
                     if (!this.ttsRunning) return;
                     // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
                     this.ttsSpeakingTime = 0;
