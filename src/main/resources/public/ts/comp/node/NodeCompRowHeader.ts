@@ -30,10 +30,41 @@ export class NodeCompRowHeader extends Div {
 
     preRender(): void {
         const ast = getAs();
+
+        let displayName = null;
+
+        // if user has set their displayName
+        if (this.node.displayName) {
+            displayName = S.util.insertActPubTags(this.node.displayName, this.node);
+        }
+
+        // Warning: after running insertActPubTags above that may put us back at an empty displayName,
+        // so we DO need to check for displayName here rather than putting this in an else block.
+        if (!displayName) {
+            displayName = this.node.owner;
+            const atIdx = displayName.indexOf("@");
+            if (atIdx !== -1) {
+                displayName = displayName.substring(0, atIdx);
+            }
+        }
+        const isMine = S.props.isMine(this.node);
+
+        // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
+        if (this.node.boostedNode) {
+            this.setChildren([new Div("Boosted By: " + displayName, {
+                className: "clickable", // isMine ? "created-by-me" : "created-by-other",
+                title: "Show Profile:\n\n" + this.node.owner,
+                onClick: () => {
+                    new UserProfileDlg(this.node.ownerId).open();
+                }
+            })]);
+            this.attribs.className = "row-header-compact";
+            return;
+        }
+
         const children = [];
         let avatarImg: Img = null;
 
-        const isMine = S.props.isMine(this.node);
         const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
@@ -49,23 +80,6 @@ export class NodeCompRowHeader extends Div {
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
         if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== J.PrincipalName.ADMIN) {
-            let displayName = null;
-
-            // if user has set their displayName
-            if (this.node.displayName) {
-                displayName = S.util.insertActPubTags(this.node.displayName, this.node);
-            }
-
-            // Warning: after running insertActPubTags above that may put us back at an empty displayName,
-            // so we DO need to check for displayName here rather than putting this in an else block.
-            if (!displayName) {
-                displayName = this.node.owner;
-                const atIdx = displayName.indexOf("@");
-                if (atIdx !== -1) {
-                    displayName = displayName.substring(0, atIdx);
-                }
-            }
-
             if (this.node.transferFromId) {
                 displayName = "PENDING XFER -> " + displayName;
             }
