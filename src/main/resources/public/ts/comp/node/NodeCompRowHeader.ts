@@ -123,7 +123,7 @@ export class NodeCompRowHeader extends Div {
         if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
             children.push(new Icon({
                 title: "Reply to this Post",
-                className: "fa fa-reply fa-lg mediumMarginRight",
+                className: "fa fa-reply fa-lg row-header-icon",
                 onClick: () => {
                     if (ast.isAnonUser) {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -142,7 +142,7 @@ export class NodeCompRowHeader extends Div {
             if (!ast.isAdminUser && !this.node.boostedNode) {
                 children.push(new Icon({
                     title: "Boost this Node",
-                    className: "fa fa-retweet fa-lg mediumMarginRight",
+                    className: "fa fa-retweet fa-lg row-header-icon",
                     onClick: () => {
                         if (ast.isAnonUser) {
                             S.util.showMessage("Login to boost nodes.", "Login!");
@@ -171,7 +171,7 @@ export class NodeCompRowHeader extends Div {
             if (!this.node.boostedNode) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
-                    className: "fa fa-star fa-lg mediumMarginRight " + (youLiked ? "likedByMeIcon" : ""),
+                    className: "fa fa-star fa-lg row-header-icon " + (youLiked ? "likedByMeIcon" : ""),
                     onClick: () => {
                         if (ast.isAdminUser) {
                             S.util.showMessage("Admin user can't do Likes.", "Admin");
@@ -193,14 +193,14 @@ export class NodeCompRowHeader extends Div {
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 children.push(new Icon({
                     title: "People associated with this Node",
-                    className: "fa fa-users fa-lg mediumMarginRight",
+                    className: "fa fa-users fa-lg row-header-icon",
                     onClick: () => S.user.showUsersList(this.node)
                 }));
             }
 
             if (showInfo) {
                 children.push(new Icon({
-                    className: "fa fa-link fa-lg mediumMarginRight",
+                    className: "fa fa-link fa-lg row-header-icon",
                     title: "Show URLs for this node",
                     onClick: () => S.render.showNodeUrl(this.node)
                 }));
@@ -209,7 +209,7 @@ export class NodeCompRowHeader extends Div {
             // Allow bookmarking any kind of node other than bookmark nodes.
             if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
                 children.push(new Icon({
-                    className: "fa fa-bookmark fa-lg mediumMarginRight",
+                    className: "fa fa-bookmark fa-lg row-header-icon",
                     title: "Bookmark this Node",
                     onClick: () => S.edit.addBookmark(this.node)
                 }));
@@ -217,9 +217,29 @@ export class NodeCompRowHeader extends Div {
 
             if (showInfo && this.showThreadButton) {
                 children.push(new Icon({
-                    className: "fa fa-th-list fa-lg mediumMarginRight",
-                    title: "Show Full Thread History",
+                    className: "fa fa-th-list fa-lg row-header-icon",
+                    title: "Show Thread History",
                     onClick: () => S.srch.showThread(this.node)
+                }));
+            }
+
+            // Don't try to read Foreign server content (by checking actPubId to detect remote)
+            // because the content is likely to be loaded with HTML
+            // and won't read well by TTS, whereas local posts will be JSON and should read ok.
+            if (!actPubId) {
+                children.push(new Icon({
+                    className: "fa fa-lg fa-volume-up row-header-icon",
+                    onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                    onMouseOut: () => { S.quanta.selectedForTts = null; },
+                    onClick: async () => {
+                        if (getAs().speechSpeaking) {
+                            await S.speech.stopSpeaking();
+                        }
+                        if (this.node.content) {
+                            S.speech.speakText(this.node.content, false);
+                        }
+                    },
+                    title: "Text-to-Speech: Read this Node"
                 }));
             }
         }

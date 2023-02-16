@@ -131,6 +131,11 @@
     color: $createdByAnotherTextColor;
 }
 
+.row-header-icon {
+    margin-right: $mediumGap;
+    cursor: pointer;
+}   
+
 .row-header {
     // font-size: small;
     margin-left: $smallGap;
