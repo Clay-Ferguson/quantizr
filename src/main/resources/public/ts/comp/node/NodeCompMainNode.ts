@@ -102,6 +102,7 @@ export class NodeCompMainNode extends Div {
             }
 
             this.setChildren([
+                S.render.renderLinkLabel(node.id),
                 header,
                 !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
                 new Clearfix(),

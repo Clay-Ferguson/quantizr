@@ -178,6 +178,7 @@ export class NodeCompRow extends Div {
 
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
+            S.render.renderLinkLabel(this.node.id),
             header,
             buttonBar,
             buttonBar ? new Clearfix() : null,

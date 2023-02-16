@@ -192,6 +192,21 @@ export class Render {
         });
     }
 
+    renderLinkLabel = (id: string) => {
+        const ast = getAs();
+        let linkText = null;
+        if (id === ast.linkSource) {
+            linkText = "Link Source";
+        }
+        else if (id === ast.linkTarget) {
+            linkText = "Link Target";
+        }
+        return linkText ? new Div(linkText, {
+            className: "linkLabel",
+            title: "Choose 'Link Nodes' after you pick Source & Target"
+        }) : null;
+    }
+
     setNodeDropHandler = (attribs: any, node: J.NodeInfo) => {
         if (!node) return;
 

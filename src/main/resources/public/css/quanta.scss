@@ -2319,6 +2319,17 @@ audio::-webkit-media-controls-play-button {
     text-align: right;
 }
 
+.linkLabel {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    background-color: cadetblue;
+    color: black;
+    padding: $microGap;
+    border-radius: $border-radius;
+}
+
 .nodeLink {
     display: inline-block;
     background-color: $primary;

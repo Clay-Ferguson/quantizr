@@ -77,20 +77,32 @@ export class MenuPanel extends Div {
     };
 
     static setLinkTarget = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        dispatch("setLinkTargetNodeId", s => {
+            if (node) {
+                s.linkTarget = node.id;
+            }
+        });
+    };
+
+    static linkNodes = () => {
         dispatch("setLinkSourceNodeId", s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 const sourceId = s.linkSource;
+                const targetId = s.linkTarget;
+
                 const run = async () => {
                     const dlg = new AskNodeLinkNameDlg();
                     await dlg.open();
                     if (dlg.nameEntered) {
-                        S.edit.linkNodes(sourceId, node.id, dlg.nameEntered, "forward-link");
+                        S.edit.linkNodes(sourceId, targetId, dlg.nameEntered, "forward-link");
                     }
                 };
                 run();
             }
             s.linkSource = null;
+            s.linkTarget = null;
         });
     };
 
@@ -317,8 +329,9 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Edit", [
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
-                new MenuItem("Link From", MenuPanel.setLinkSource, ast.userPrefs.editMode && !ast.linkSource && selNodeIsMine), //
-                new MenuItem("Link To", MenuPanel.setLinkTarget, ast.userPrefs.editMode && ast.linkSource && selNodeIsMine), //
+                new MenuItem("Set Link Source", MenuPanel.setLinkSource, ast.userPrefs.editMode && selNodeIsMine), //
+                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, ast.userPrefs.editMode), //
+                new MenuItem("Link Nodes", MenuPanel.linkNodes, ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget), //
                 new MenuItemSeparator(), //
 
                 new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
