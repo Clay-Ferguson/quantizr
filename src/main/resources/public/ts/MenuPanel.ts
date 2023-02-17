@@ -272,7 +272,7 @@ export class MenuPanel extends Div {
         // }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Navigate", [
+            children.push(new Menu(state, "Folders", [
                 new MenuItem("My Account", S.nav.navToMyAccntRoot),
                 new MenuItem("My Home", MenuPanel.openHomeNode),
                 new MenuItem("My Posts", MenuPanel.openPostsNode),

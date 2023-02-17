@@ -11,8 +11,8 @@ import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
 export class MainTab implements TabIntf<any> {
-    name = "Navigate";
-    tooltip = "Navigate Content Tree";
+    name = "Folders";
+    tooltip = "Content Tree";
     id = C.TAB_MAIN;
     scrollPos = 0;
     props = {};
