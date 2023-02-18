@@ -147,10 +147,10 @@ export class NodeUtil {
         let content = node.content;
         if (!content) {
             if (node.name) {
-                return "Node Name: " + node.name;
+                return "Name:" + node.name;
             }
             else {
-                return "Node ID: " + node.id;
+                return "ID:" + node.id;
             }
         }
 
@@ -166,8 +166,15 @@ export class NodeUtil {
             if (spaceIdx > 0) {
                 content = content.substring(spaceIdx + 1);
             }
+            else break;
         }
         content = content.trim();
+
+        // if content was empty or we weren't able to stip off all the mentions at the front
+        // of it and end up with some other text than just render this as the node id.
+        if (!content || content.startsWith("@")) {
+            return "ID:" + node.id;
+        }
 
         const idx = content.indexOf("\n");
         if (idx !== -1) {

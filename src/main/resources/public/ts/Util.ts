@@ -561,7 +561,10 @@ export class Util {
             return;
         }
 
-        const content = S.nodeUtil.getShortContent(node);
+        let content = S.nodeUtil.getShortContent(node);
+        if (!content) {
+            content = node.id;
+        }
         let url, title, newHistObj;
         if (node.name) {
             const queryPath = S.nodeUtil.getPathPartForNamedNode(node);
@@ -583,11 +586,11 @@ export class Util {
 
         if (newHistObj.nodeId === history.state?.nodeId) {
             history.replaceState(newHistObj, title, url);
-            // console.log("REPLACED STATE: url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
+            // console.log("REPLACED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
         }
         else {
             history.pushState(newHistObj, title, url);
-            // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
+            // console.log("PUSHED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
         }
 
         this.updateNodeHistory(node, false);
@@ -597,7 +600,7 @@ export class Util {
     // the user is tempting to 'mouse select' and so we just get ready to add to history
     // the next chance we get.
     updateNodeHistory = (node: J.NodeInfo, addLater: boolean) => {
-        if (!node.id || getAs().nodeHistoryLocked || !node ||
+        if (!node || !node.id || getAs().nodeHistoryLocked ||
             S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) {
             return;
         }

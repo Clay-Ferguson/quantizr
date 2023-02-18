@@ -135,15 +135,6 @@ public class NodeEditService extends ServiceBase {
 			throw new RuntimeException("unable to locate parent for insert");
 		}
 
-		/*
-		 * We don't allow the admin user to create nodes under someone elses account. This is mainly being
-		 * done as a last resort catch because I sometimes forget I'm logged in as 'admin' and start to
-		 * reply to something when I meant to be in as a normal user.
-		 */
-		if (ms.isAdmin() && !acl.isAdminOwned(parentNode)) {
-			throw new RuntimeException("Admin not allowed to create nodes under non-admin nodes.");
-		}
-
 		auth.authForChildNodeCreate(ms, parentNode);
 		parentNode.adminUpdate = true;
 
@@ -252,15 +243,6 @@ public class NodeEditService extends ServiceBase {
 		SubNode parentNode = read.getNode(ms, parentNodeId);
 		if (no(parentNode)) {
 			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
-		}
-
-		/*
-		 * We don't allow the admin user to create nodes under someone elses account. This is mainly being
-		 * done as a last resort catch because I sometimes forget I'm logged in as 'admin' and start to
-		 * reply to something when I meant to be in as a normal user.
-		 */
-		if (ms.isAdmin() && !acl.isAdminOwned(parentNode)) {
-			throw new RuntimeException("Admin not allowed to create nodes under non-admin nodes.");
 		}
 
 		auth.authForChildNodeCreate(ms, parentNode);
