@@ -133,9 +133,14 @@ public class SystemService extends ServiceBase {
 	// metadata: <boolean> // Optional, added in MongoDB 5.0.4
 	// })
 	public String validateDb() {
-		String ret = runMongoDbCommand(MongoAppConfig.databaseName, new Document("validate", "nodes").append("full", true));
+		String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName, //
+				new Document("validate", "nodes")//
+				.append("full", true));
 
-		ret += "\n\n" + runMongoDbCommand("admin", new Document("usersInfo", 1));
+		ret += "\n\ndbStats: " + runMongoDbCommand(MongoAppConfig.databaseName, //
+				new Document("dbStats", 1).append("scale", 1024));
+
+		ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
 
 		if (prop.ipfsEnabled()) {
 			ret += ipfsRepo.verify();

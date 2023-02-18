@@ -933,6 +933,12 @@ public class MongoUtil extends ServiceBase {
 					// the properties array attached to each node.
 					.onAllFields()
 
+					// Using 'none' as default language allows `stop words` to be indexed, which are words usually
+					// not searched for like "and, of, the, about, over" etc, however if you index without stop words
+					// that also means searching for these basic words in the content fails. But if you do index them
+					// (by using "none" here) then the index will be larger.
+					//.withDefaultLanguage("none")
+
 					// .onField(SubNode.CONTENT) //
 					// .onField(SubNode.TAGS) //
 					.build();
