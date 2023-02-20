@@ -649,7 +649,8 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            allowHeader ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
+            S.render.renderBoostHeader(node),
+            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,
             S.render.renderLinks(node),

@@ -22,9 +22,11 @@ export class NodeCompRow extends Div {
 
     // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
-    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
+        public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div) {
+        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div,
+        private renderingBoost: boolean) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -117,7 +119,7 @@ export class NodeCompRow extends Div {
         else {
             // special class if BOTH edit and info is on
             if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && ast.userPrefs.showMetaData) {
-                layoutClass += " row-border-edit-info";
+                layoutClass += this.node.boostedNode ? " row-border-edit-info-boost" : " row-border-edit-info";
             }
             // else if either is on
             else if (ast.userPrefs.editMode || ast.userPrefs.showMetaData) {
@@ -154,7 +156,7 @@ export class NodeCompRow extends Div {
         let header: NodeCompRowHeader = null;
         let jumpButton: CompIntf = null;
 
-        if (allowHeader) {
+        if (allowHeader && !this.node.boostedNode) {
             // slight special case for now until Document View knows how to delete all the subchilren and not
             // show orphans on the page when something is deleted. Other panels don't have this problem
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
@@ -178,6 +180,7 @@ export class NodeCompRow extends Div {
 
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
+            this.renderingBoost ? null : S.render.renderBoostHeader(this.node),
             S.render.renderLinkLabel(this.node.id),
             header,
             buttonBar,

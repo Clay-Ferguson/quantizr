@@ -39,7 +39,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 if (n.boostedNode) {
                     // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                     const type = S.plugin.getType(n.boostedNode.type);
-                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null);
+                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, true);
                 }
 
                 if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
@@ -63,7 +63,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         }
 
                         if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
-                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp);
+                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
                             comps.push(row);
                         }
                         inVerticalSpace = false;

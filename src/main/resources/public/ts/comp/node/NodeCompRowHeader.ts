@@ -49,19 +49,6 @@ export class NodeCompRowHeader extends Div {
         }
         const isMine = S.props.isMine(this.node);
 
-        // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
-        if (this.node.boostedNode) {
-            this.setChildren([new Div("Boosted By: " + displayName, {
-                className: "clickable", // isMine ? "created-by-me" : "created-by-other",
-                title: "Show Profile:\n\n" + this.node.owner,
-                onClick: () => {
-                    new UserProfileDlg(this.node.ownerId).open();
-                }
-            })]);
-            this.attribs.className = "row-header-compact";
-            return;
-        }
-
         const children = [];
         let avatarImg: Img = null;
 

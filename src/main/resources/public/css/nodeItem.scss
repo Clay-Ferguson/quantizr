@@ -22,7 +22,7 @@
     padding: 0px 4px 0px 4px;
     white-space: nowrap;
     display: inline-block;
-    
+
 }
 
 .treeFriendImage {
@@ -30,13 +30,13 @@
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 0px 10px;
-    
+
 }
 
 .commentMarkdownClass {
     border: 2px solid darkkhaki;
     margin: 8px;
-    
+
     background-color: #17202A;
 }
 
@@ -61,14 +61,14 @@
 }
 
 .boost-row .nodeCompBinary {
-	padding-right: 0px !important;
+    padding-right: 0px !important;
 }
 
 .img-in-row {
     cursor: pointer;
     vertical-align: top;
     border-radius: $border-radius;
-    
+
     border: 1px solid $gray-700;
     // we size this to 100% becasue the DIV it's inside is the one that actually has the specified sizing
     width: 100%;
@@ -76,7 +76,7 @@
 
 .attachmentLinksPanel {
     border: 1px solid $nodeBorderBottomColor;
-    
+
     padding-left: $smallGap;
     padding-right: $smallGap;
     margin-bottom: $smallGap;
@@ -86,8 +86,8 @@
     padding: 3px 6px 3px 6px;
     margin-right: 10px;
     margin-left: $microGap;
-    margin-bottom: 8px;
-    
+    // margin-bottom: 8px;
+
     border: 1px solid gray;
     display: inline-block;
 }
@@ -100,6 +100,22 @@
 
 .created-by-me:first-child {
     margin-left: 0px;
+}
+
+.boosted-by-me {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    background: $createdByMeBackgroundColor;
+    color: $createdByMeTextColor;
+    border: 1px solid gray;
+    margin: 0 0 $tinyGap $smallGap;
+}
+
+.boosted-by-other {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    margin-left: $smallGap;
+    margin: 0 0 $tinyGap $smallGap;
 }
 
 .transfer-pending {
@@ -126,7 +142,7 @@
     padding: 6px;
     margin-right: 8px;
     margin-left: 6px;
-    
+
     background: $createdByAnotherBackgroundColor;
     color: $createdByAnotherTextColor;
 }
@@ -134,7 +150,7 @@
 .row-header-icon {
     margin-right: $mediumGap;
     cursor: pointer;
-}   
+}
 
 .row-header {
     // font-size: small;
@@ -172,7 +188,7 @@
     padding: 6px;
     margin-right: 10px;
     cursor: pointer;
-    
+
 }
 
 .node-table-row {
@@ -199,10 +215,14 @@
     padding-top: 4px;
 }
 
+.row-border-edit-info-boost {
+    border-top: 1px solid $nodeBorderBottomColor;
+    margin-bottom: $smallGap;
+}
+
 .row-border-edit-info {
     // border-bottom: 1px solid $nodeBorderBottomColor;
 }
-
 
 /*
 With "Display: table", the only way to get the internal 'node-grid-item' cell content to render with the SAME
@@ -250,7 +270,7 @@ i'm backing out for now
 
 .boost-row {
     border: 1px solid gray;
-    
+
     margin: 4px 12px 4px 12px;
     padding-bottom: $tinyGap;
     padding-top: $smallGap;
@@ -364,7 +384,7 @@ i'm backing out for now
     margin-right: 8px;
     padding: 4px;
     border: 1px solid gray;
-    
+
     background-color: $primary;
 }
 

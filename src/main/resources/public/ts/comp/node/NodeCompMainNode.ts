@@ -73,7 +73,7 @@ export class NodeCompMainNode extends Div {
                 allowHeader = ast.userPrefs.showMetaData && (type == null || type?.getAllowRowHeader())
             }
 
-            if (allowHeader) {
+            if (allowHeader && !node.boostedNode) {
                 const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
                 const showJumpButton = this.tabData.id !== C.TAB_MAIN;
 
@@ -93,7 +93,7 @@ export class NodeCompMainNode extends Div {
             if (node.boostedNode) {
                 // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
                 const type = S.plugin.getType(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null);
+                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, true);
             }
 
             // if editMode is on, an this isn't the page root node
@@ -102,6 +102,7 @@ export class NodeCompMainNode extends Div {
             }
 
             this.setChildren([
+                S.render.renderBoostHeader(node),
                 S.render.renderLinkLabel(node.id),
                 header,
                 !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,

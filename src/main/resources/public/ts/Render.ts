@@ -639,6 +639,40 @@ export class Render {
         }
     }
 
+    renderBoostHeader = (node: J.NodeInfo) => {
+        if (!node.boostedNode) return null;
+        let displayName = null;
+
+        const isMine = S.props.isMine(node);
+        if (isMine) {
+            displayName = "me";
+        }
+        else {
+            // if user has set their displayName
+            if (node.displayName) {
+                displayName = S.util.insertActPubTags(node.displayName, node);
+            }
+
+            // Warning: after running insertActPubTags above that may put us back at an empty displayName,
+            // so we DO need to check for displayName here rather than putting this in an else block.
+            if (!displayName) {
+                displayName = node.owner;
+                const atIdx = displayName.indexOf("@");
+                if (atIdx !== -1) {
+                    displayName = displayName.substring(0, atIdx);
+                }
+            }
+        }
+        // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
+        return new Div("Boosted By: " + displayName, {
+            className: isMine ? "boosted-by-me" : "boosted-by-other",
+            title: "Show Profile:\n\n" + node.owner,
+            onClick: () => {
+                new UserProfileDlg(node.ownerId).open();
+            }
+        });
+    }
+
     getAvatarImgUrl = (ownerId: string, avatarVer: string) => {
         if (!avatarVer) return null;
         return S.rpcUtil.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;

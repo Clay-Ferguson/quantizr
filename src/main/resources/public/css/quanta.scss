@@ -2362,3 +2362,8 @@ audio::-webkit-media-controls-play-button {
 .lastModifiedTime {
     margin-right: $microGap;
 }
+
+.boost-header {
+    cursor: pointer;
+    margin-left: $smallGap;
+}
