@@ -299,6 +299,12 @@ public class ExportServiceFlexmark extends ServiceBase {
 			String imgSize = att.getCssSize();
 			if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
 				style = " style='width:" + imgSize + "'";
+			} else {
+				// For large enough images if they're left to actual size that can clip in the final PDF output
+				// so we set any images big enough that we know they're not a thubnail or icon depiction to 100% always
+				if (att.getWidth() > 500) {
+					style = " style='width:100%'";
+				}
 			}
 
 			String src = null;
