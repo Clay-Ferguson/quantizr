@@ -43,7 +43,6 @@ import quanta.util.XString;
 /**
  * https://github.com/vsch/flexmark-java
  */
-
 @Component
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
@@ -301,7 +300,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 				style = " style='width:" + imgSize + "'";
 			} else {
 				// For large enough images if they're left to actual size that can clip in the final PDF output
-				// so we set any images big enough that we know they're not a thubnail or icon depiction to 100% always
+				// so we set any images big enough that we know they're not a thubnail or icon depiction to 100%
+				// always
 				if (att.getWidth() > 500) {
 					style = " style='width:100%'";
 				}
