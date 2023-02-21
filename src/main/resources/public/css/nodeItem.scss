@@ -102,18 +102,24 @@
     margin-left: 0px;
 }
 
-.boosted-by-me {
+.boosted-by {
     display: inline-block;
     padding: 3px 6px 3px 6px;
+    border: 1px solid gray;
+    margin: 0 0 0 $smallGap;
+    border-radius: $border-radius $border-radius 0 0;
+}
+
+.boosted-by-me {
+    @extend .boosted-by;
     background: $createdByMeBackgroundColor;
     color: $createdByMeTextColor;
-    border: 1px solid gray;
-    margin: 0 0 $tinyGap $smallGap;
 }
 
 .boosted-by-other {
-    display: inline-block;
-    margin-left: $smallGap;
+    @extend .boosted-by;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
 }
 
 .transfer-pending {
