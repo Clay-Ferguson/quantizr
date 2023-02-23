@@ -151,7 +151,7 @@ export class NodeCompBinary extends Div {
                 new Span("", {
                     className: "downloadLink"
                 }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
-            ])]);
+            ], "horizontalLayoutCompCompact")]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
