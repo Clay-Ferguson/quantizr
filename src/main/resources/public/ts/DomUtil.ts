@@ -585,6 +585,9 @@ export class DomUtil {
     /* Highlights 'text' everywhere it's found in the DOM. Pass 'document.body' as rootElm
        to replace on your whole web page */
     public highlightText = (rootElm: HTMLElement, text: string) => {
+        if (text.startsWith("\"") && text.endsWith("\"")) {
+            text = text.replaceAll("\"", "");
+        }
         const reg = this.escapeRegEx(text);
         const regex = new RegExp(reg, "i"); // case insensitive search
         const allRegex = new RegExp(`(${reg})`, "gi"); // case insensitive replacer
