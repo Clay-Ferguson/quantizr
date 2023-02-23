@@ -276,7 +276,7 @@ export class MenuPanel extends Div {
                 new MenuItem("My Account", S.nav.navToMyAccntRoot),
                 new MenuItem("My Home", MenuPanel.openHomeNode),
                 new MenuItem("My Posts", MenuPanel.openPostsNode),
-                ast.isAdminUser ? new MenuItem("Users Node", MenuPanel.openUsersNode) : null,
+                ast.isAdminUser ? new MenuItem("All Users", MenuPanel.openUsersNode) : null,
                 new MenuItemSeparator(),
                 new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),

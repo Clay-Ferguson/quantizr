@@ -2,10 +2,8 @@ import { getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { HelpButton } from "../comp/core/HelpButton";
-import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
@@ -15,9 +13,7 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
 interface LS { // Local State
-    fuzzy?: boolean;
     searchType?: string;
-    caseSensitive?: boolean;
 }
 
 export class SearchUsersDlg extends DialogBase {
@@ -31,9 +27,7 @@ export class SearchUsersDlg extends DialogBase {
         this.onMount(() => this.searchTextField?.focus());
 
         this.mergeState<LS>({
-            fuzzy: false,
-            searchType: J.Constant.SEARCH_TYPE_USER_LOCAL,
-            caseSensitive: false
+            searchType: J.Constant.SEARCH_TYPE_USER_LOCAL
         });
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
@@ -64,22 +58,11 @@ export class SearchUsersDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
             })
-        ], "marginBottom");
+        ], "marginBottom marginTop");
 
         return [
             new Div(null, null, [
                 this.searchTextField = new TextField({ label: "User Name", enter: this.search, val: this.searchTextState }),
-                new HorizontalLayout([
-                    // Allow fuzzy search for admin only. It's cpu intensive.
-                    new Checkbox("Regex", null, {
-                        setValue: (checked: boolean) => this.mergeState<LS>({ fuzzy: checked }),
-                        getValue: (): boolean => this.getState<LS>().fuzzy
-                    }),
-                    new Checkbox("Case Sensitive", null, {
-                        setValue: (checked: boolean) => this.mergeState<LS>({ caseSensitive: checked }),
-                        getValue: (): boolean => this.getState<LS>().caseSensitive
-                    })
-                ], "displayTable marginBottom"),
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -107,7 +90,7 @@ export class SearchUsersDlg extends DialogBase {
             this.getState<LS>().searchType,
             desc,
             null,
-            this.getState<LS>().fuzzy,
-            this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, false, this.close);
+            false,
+            false, 0, true, "mtm", "DESC", false, false, this.close);
     }
 }

@@ -1358,7 +1358,7 @@ public class MongoRead extends ServiceBase {
         // return ret;
     }
 
-    public Iterable<SubNode> getAccountNodes(MongoSession ms, TextCriteria textCriteria, Sort sort, Integer limit, int skip, boolean remote, boolean local) {
+    public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit, int skip, boolean remote, boolean local) {
         if (!remote && !local) {
             throw new RuntimeException("Accont query needs local and/or remote specified.");
         }

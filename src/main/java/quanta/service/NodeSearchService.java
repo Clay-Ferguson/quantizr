@@ -207,38 +207,18 @@ public class NodeSearchService extends ServiceBase {
 	}
 
 	private void userSearch(MongoSession ms, String userDoingAction, NodeSearchRequest req, List<NodeInfo> searchResults) {
-		String findUserName = null;
 		int counter = 0;
 
-		TextCriteria textCriteria = null;
-		if (!StringUtils.isEmpty(req.getSearchText())) {
-			findUserName = req.getSearchText();
-			textCriteria = TextCriteria.forDefaultLanguage();
-
-			// make sure name is quoted for exact search, since it will contain delimiters
-			// which would other wise mess up a search
-			String name = findUserName;
-			if (!name.startsWith("\"")) {
-				name = "\"" + name;
-			}
-			if (!name.endsWith("\"")) {
-				name = name + "\"";
-			}
-			textCriteria.matching(name);
-			textCriteria.caseSensitive(req.getCaseSensitive());
-		}
-
-
 		Val<Iterable<SubNode>> accountNodes = new Val<>();;
-		final TextCriteria _textCriteria = textCriteria;
 
 		// Run this as admin because ordinary users don't have access to account nodes.
 		arun.run(as -> {
-			accountNodes.setVal(read.getAccountNodes(as, _textCriteria, null, //
-					ConstantInt.ROWS_PER_PAGE.val(), //
-					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
-					Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
-					Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())));
+			accountNodes.setVal(
+					read.getAccountNodes(as, Criteria.where("p." + NodeProp.USER.s()).regex(req.getSearchText(), "i"), null, //
+							ConstantInt.ROWS_PER_PAGE.val(), //
+							ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
+							Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
+							Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())));
 
 			return null;
 		});
@@ -263,9 +243,10 @@ public class NodeSearchService extends ServiceBase {
 
 		/*
 		 * If we didn't find any results and we aren't searching locally only then try to look this up as a
-		 * username
+		 * username, over the web (internet, fediverse)
 		 */
 		if (searchResults.size() == 0 && !Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
+			String findUserName = req.getSearchText();
 			findUserName = findUserName.replace("\"", "");
 			findUserName = XString.stripIfStartsWith(findUserName, "@");
 			final String _findUserName = findUserName;
