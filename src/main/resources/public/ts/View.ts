@@ -14,11 +14,11 @@ declare const PROFILE: string;
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    jumpToId = (id: string, forceRenderParent: boolean = false) => {
+    jumpToId = async (id: string, forceRenderParent: boolean = false) => {
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
-        this.refreshTree({
+        await this.refreshTree({
             nodeId: id,
             zeroOffset: true,
             renderParentIfLeaf: true,

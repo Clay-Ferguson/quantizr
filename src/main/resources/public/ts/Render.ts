@@ -452,7 +452,8 @@ export class Render {
         return !type || type.allowAction(action, node);
     }
 
-    renderPage = async (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
+    renderPage = async (res: J.RenderNodeResponse, scrollToTop: boolean,
+        targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -549,7 +550,7 @@ export class Render {
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
-                            S.nodeUtil.highlightRowById(S.quanta.pendingLocationHash.substring(1), true);
+                            S.nodeUtil.highlightRowById(s, S.quanta.pendingLocationHash.substring(1), true);
                             s.rendering = true;
                         }
                         S.quanta.pendingLocationHash = null;
@@ -559,10 +560,7 @@ export class Render {
                             console.log("highlight: byId");
                         }
 
-                        if (!S.nodeUtil.highlightRowById(targetNodeId, true)) {
-                            // console.log("highlight: byId...didn't find node: " + targetNodeId);
-                        }
-
+                        S.nodeUtil.highlightRowById(s, targetNodeId, true);
                         s.rendering = true;
                     }
                     else if (allowScroll && (scrollToTop || !S.nodeUtil.getHighlightedNode())) {

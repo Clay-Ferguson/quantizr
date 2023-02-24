@@ -758,7 +758,7 @@ export class Edit {
         if (!id) {
             node = S.nodeUtil.getHighlightedNode();
         } else {
-            node = MainTab.inst?.findNode(id);
+            node = MainTab.inst?.findNode(id, ast);
         }
 
         if (node) {
@@ -798,7 +798,7 @@ export class Edit {
                 parentNode = ast.node;
             }
         } else {
-            parentNode = MainTab.inst?.findNode(id);
+            parentNode = MainTab.inst?.findNode(id, ast);
             if (!parentNode) {
                 return;
             }

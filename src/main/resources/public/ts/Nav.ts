@@ -133,7 +133,7 @@ export class Nav {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            const node = MainTab.inst?.findNode(id);
+            const node = MainTab.inst?.findNode(id, ast);
             if (node) {
                 dispatch("HighlightNode", s => {
                     S.nodeUtil.highlightNode(node, false, s);
@@ -174,7 +174,7 @@ export class Nav {
     openNodeById = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const ast = getAs();
-        const node = MainTab.inst?.findNode(id);
+        const node = MainTab.inst?.findNode(id, ast);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -324,7 +324,7 @@ export class Nav {
                 return;
             }
             S.srch.timeline(node, "mtm", null, "Rev-chron by Modify Time", 0, true);
-        }, 250);
+        }, 750);
     }
 
     openNodeFeed = async (evt: Event, id: string) => {

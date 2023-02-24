@@ -42,26 +42,35 @@ export class NodeUtil {
     }
 
     /* Returns true if successful */
-    highlightRowById = (id: string, scroll: boolean): boolean => {
-        const ast = getAs();
-        let node = MainTab.inst?.findNode(id);
-        let ret = true;
-
-        /* If node not known, resort to taking the best, previous node we had */
-        if (!node) {
-            node = this.getHighlightedNode();
-        }
+    highlightRowById = (ast: AppState, id: string, scroll: boolean): void => {
+        let node = MainTab.inst?.findNode(id, ast);
 
         if (node) {
             this.highlightNode(node, scroll, ast);
         } else {
-            // if we can't find that node, best behvior is at least to scroll to top.
-            if (scroll) {
-                S.view.scrollToTop();
-            }
-            ret = false;
+            // This code path should really never happen, but we're looking out for future cases where
+            // the 'ast' passed into here might not yet have a findable node 'in findNode' below and we
+            // try again on a delay.
+            setTimeout(() => {
+                ast = getAs();
+                node = MainTab.inst?.findNode(id, ast);
+
+                /* If node not known, resort to taking the best, previous node we had */
+                if (!node) {
+                    node = this.getHighlightedNode();
+                }
+
+                if (node) {
+                    this.highlightNode(node, scroll, ast);
+                }
+                else {
+                    // if we can't find that node, best behvior is at least to scroll to top.
+                    if (scroll) {
+                        S.view.scrollToTop();
+                    }
+                }
+            }, 750);
         }
-        return ret;
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, ust: AppState) => {

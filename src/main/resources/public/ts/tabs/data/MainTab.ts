@@ -27,7 +27,8 @@ export class MainTab implements TabIntf<any> {
     isVisible = () => true;
     constructView = (data: TabIntf) => new MainTabComp(data);
 
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string, ast: AppState = null): J.NodeInfo => {
+        ast = ast || getAs();
         return this.findNodeRecursive(getAs().node, nodeId, 0);
     }
 

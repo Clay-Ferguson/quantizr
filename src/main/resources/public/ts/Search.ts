@@ -672,8 +672,8 @@ export class Search {
         }
     }
 
-    clickSearchNode = (id: string) => {
-        S.view.jumpToId(id);
+    clickSearchNode = async (id: string) => {
+        await S.view.jumpToId(id);
 
         dispatch("RenderSearchResults", s => {
             s.highlightSearchNodeId = id;
