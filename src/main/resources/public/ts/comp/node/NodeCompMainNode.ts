@@ -102,7 +102,7 @@ export class NodeCompMainNode extends Div {
             }
 
             this.setChildren([
-                S.render.renderBoostHeader(node),
+                S.render.renderBoostHeader(node, true),
                 S.render.renderLinkLabel(node.id),
                 header,
                 !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null,
