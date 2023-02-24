@@ -590,7 +590,7 @@ export class Search {
                     // after updating state we need this to ensure this click also focused this window.
                     S.domUtil.focusId(tabData.id);
                 },
-                className: "boost-row"
+                className: "boost-row-onfeed"
             }, [
                 allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
                 boostContent,
@@ -649,7 +649,7 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            S.render.renderBoostHeader(node),
+            S.render.renderBoostHeader(node, false),
             allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
             content,
             boostComp,

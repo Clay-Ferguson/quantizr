@@ -121,6 +121,27 @@
     color: $createdByAnotherTextColor;
 }
 
+.boosted-by-onfeed {
+    display: inline-block;
+    padding: 3px 6px 3px 6px;
+    border: 1px solid gray;
+    border-radius: 6px 6px 0 0;
+    margin: 0 $tinyGap 0 $smallGap;
+}
+
+.boosted-by-me-onfeed {
+    @extend .boosted-by-onfeed;
+    background: $createdByMeBackgroundColor;
+    color: $createdByMeTextColor;
+}
+
+.boosted-by-other-onfeed {
+    @extend .boosted-by-onfeed;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
+}
+
+
 .transfer-pending {
     @extend .created-by;
     background: darkkhaki;
@@ -275,6 +296,15 @@ i'm backing out for now
     border: 1px solid gray;
 
     margin: 4px 12px 4px 12px;
+    padding: $smallGap $smallGap $tinyGap 0;
+    background-color: #17202A;
+    cursor: pointer;
+}
+
+.boost-row-onfeed {
+    border: 1px solid gray;
+
+    margin: -1px 12px 4px 12px;
     padding-bottom: $tinyGap;
     padding-top: $smallGap;
     background-color: #17202A;

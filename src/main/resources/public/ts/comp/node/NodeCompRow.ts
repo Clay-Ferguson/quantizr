@@ -180,7 +180,7 @@ export class NodeCompRow extends Div {
 
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
-            this.renderingBoost ? null : S.render.renderBoostHeader(this.node),
+            this.renderingBoost ? null : S.render.renderBoostHeader(this.node, true),
             S.render.renderLinkLabel(this.node.id),
             header,
             buttonBar,

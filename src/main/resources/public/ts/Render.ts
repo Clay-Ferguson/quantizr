@@ -637,7 +637,7 @@ export class Render {
         }
     }
 
-    renderBoostHeader = (node: J.NodeInfo) => {
+    renderBoostHeader = (node: J.NodeInfo, treeRender: boolean) => {
         if (!node.boostedNode) return null;
         let displayName = null;
 
@@ -661,9 +661,18 @@ export class Render {
                 }
             }
         }
+
+        let clazz = null;
+        if (treeRender) {
+            clazz = isMine ? "boosted-by-me" : "boosted-by-other";
+        }
+        else {
+            clazz = isMine ? "boosted-by-me-onfeed" : "boosted-by-other-onfeed";
+        }
+
         // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
         return new Div("Boosted By: " + displayName, {
-            className: isMine ? "boosted-by-me" : "boosted-by-other",
+            className: clazz,
             title: "Show Profile:\n\n" + node.owner,
             onClick: () => {
                 new UserProfileDlg(node.ownerId).open();
