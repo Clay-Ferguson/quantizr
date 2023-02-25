@@ -180,11 +180,11 @@ export class EditNodeDlg extends DialogBase {
         const ast = getAs();
         return new Selection(null, "Priority", [
             { key: "0", val: "none" },
-            { key: "1", val: "Top" },
-            { key: "2", val: "High" },
-            { key: "3", val: "Medium" },
-            { key: "4", val: "Low" },
-            { key: "5", val: "Backlog" }
+            { key: "1", val: "Top (P1)" },
+            { key: "2", val: "High (P2)" },
+            { key: "3", val: "Medium (P3)" },
+            { key: "4", val: "Low (P4)" },
+            { key: "5", val: "Backlog (P5)" }
         ], null, "col-3", new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
     }
 

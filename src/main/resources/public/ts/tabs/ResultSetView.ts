@@ -59,7 +59,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
                 this.data.props.node && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => S.view.jumpToId(this.data.props.node.id),
-                        title: "Back to Tree View"
+                        title: "Back to Folders View"
                     }, "bigMarginLeft") : null,
                 this.getFloatRightHeaderComp()
             ]),

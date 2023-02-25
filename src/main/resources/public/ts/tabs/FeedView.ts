@@ -272,7 +272,7 @@ export class FeedView extends AppTab<FeedViewProps> {
                 this.renderHeading(),
                 this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
-                    title: "Back to Tree View"
+                    title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,
                 ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
                     title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"

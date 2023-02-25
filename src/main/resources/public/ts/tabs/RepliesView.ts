@@ -2,6 +2,7 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
@@ -64,6 +65,8 @@ export class RepliesView<T extends RepliesRSInfo> extends AppTab<T> {
             if (c) {
                 children.push(c);
             }
+
+            children.push(new Heading(5, "All Replies to the node..."));
 
             if (node.children) {
                 const subComps: CompIntf[] = [];
