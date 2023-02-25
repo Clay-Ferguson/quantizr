@@ -30,7 +30,7 @@ export class IPFSTab implements TabIntf<any> {
         const ast = getAs();
         // This flag can now be turned on in the tools menu, and stays on. Doesn't persiste like profile setting [yet]
         // return state.showIpfsTab;
-        return ast.config.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures && ast.allowedFeatures.indexOf("web3") !== -1;
+        return ast.config.ipfsEnabled && ast.userProfile?.mfsEnable && ast.allowedFeatures?.indexOf("web3") !== -1;
     };
 
     constructView = (data: TabIntf<IPFSFilesViewProps>) => new IPFSFilesView(data);

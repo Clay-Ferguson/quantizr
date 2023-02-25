@@ -10,6 +10,7 @@ import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
 import { IPFSTab } from "./tabs/data/IPFSTab";
 import { MainTab } from "./tabs/data/MainTab";
+import { RepliesTab } from "./tabs/data/RepliesTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
 import { SharesTab } from "./tabs/data/SharesTab";
@@ -89,8 +90,9 @@ export class TabUtil {
                 //     }
                 // },
 
-                new TrendingTab(),
+                new RepliesTab(),
                 new ThreadTab(),
+                new TrendingTab(),
                 new ServerInfoTab(),
                 new TTSTab(),
                 new IPFSTab()

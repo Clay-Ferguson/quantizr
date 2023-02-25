@@ -545,6 +545,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@RequestMapping(value = API_PATH + "/getNodeRepliesView", method = RequestMethod.POST)
+	public @ResponseBody Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
+		return callProc.run("getNodeRepliesView", false, false, req, session, ms -> {
+			GetThreadViewResponse res = apUtil.getNodeReplies(ms, req.getNodeId());
+			return res;
+		});
+	}
+
 	@RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
 	public @ResponseBody Object renderNode(@RequestBody RenderNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {

@@ -1798,7 +1798,12 @@ Will come back later and study this more. todo-3 */
     margin-top: 8px;
     padding-top: 10px;
     border: 1px solid $nodeBorderBottomColor;
+}
 
+.threadFeedItemTarget {
+    margin-top: 8px;
+    padding-top: 10px;
+    border: 4px solid $nodeBorderBottomColor;
 }
 
 .threadFeedSubItem {
@@ -1820,7 +1825,12 @@ Will come back later and study this more. todo-3 */
     margin-top: 5px;
     padding-top: 10px;
     border: 1px solid olivedrab;
+}
 
+.threadFeedItemHighlightTarget {
+    margin-top: 5px;
+    padding-top: 10px;
+    border: 4px solid olivedrab;
 }
 
 .userFeedItem {

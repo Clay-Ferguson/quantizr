@@ -110,8 +110,8 @@ public class ActPubUtil extends ServiceBase {
      * 
      * output: clay
      * 
-     * todo-1: make this still work even if input is (@clay@server.com) and also make sure this fix won't
-     * simultaneously break something else.
+     * todo-1: make this still work even if input is (@clay@server.com) and also make sure this fix
+     * won't simultaneously break something else.
      */
     public String stripHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
@@ -790,7 +790,8 @@ public class ActPubUtil extends ServiceBase {
         if (no(node))
             return null;
 
-        // note: I had these two reversed until 1/19/23, which was BAD but somehow it worked most of the time, but
+        // note: I had these two reversed until 1/19/23, which was BAD but somehow it worked most of the
+        // time, but
         // I verified this is correct now where ACT_PUB_ID really should be the thing used always.
 
         // try this property first.
@@ -840,7 +841,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     // todo-1: method is part of a work in progress and is not complete
-    public void readForeignReplies(MongoSession ms, SubNode node) {
+    public void readForeignReplies(MongoSession ms, SubNode node, LinkedList<NodeInfo> replyNodes) {
         String apId = node.getStr(NodeProp.ACT_PUB_ID);
         if (no(apId)) {
             // if no apId exists this isn't a foreign node, nothing to do here.
@@ -858,11 +859,55 @@ public class ActPubUtil extends ServiceBase {
 
         String userDoingAction = ThreadLocals.getSC().getUserName();
 
-        // todo-1: what to do about max count here?
         apUtil.iterateCollection(ms, userDoingAction, repliesObj, 100, obj -> {
-            log.debug("REPLY: " + XString.prettyPrint(obj));
+            // log.debug("REPLY: " + XString.prettyPrint(obj));
+
+            // If a reply is the string assume that's the URL to the object
+            if (obj instanceof String) {
+                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
+                if (ok(replyNodeInfo)) {
+                    // log.debug("reply (BY URL): " + XString.prettyPrint(replyNodeInfo));
+                    replyNodes.add(replyNodeInfo);
+                }
+            }
+            // else we try as a data object
+            else if (obj instanceof Map) {
+                APObj apObj = new APObj((Map) obj);
+                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
+                if (ok(replyNodeInfo)) {
+                    // log.debug("reply (BY OBJ): " + XString.prettyPrint(replyNodeInfo));
+                    replyNodes.add(replyNodeInfo);
+                }
+            } else {
+                log.debug("Unhandled Reply Type: " + obj.getClass().getName());
+            }
             return true;
         });
+    }
+
+    public GetThreadViewResponse getNodeReplies(MongoSession ms, String nodeId) {
+        GetThreadViewResponse res = new GetThreadViewResponse();
+        LinkedList<NodeInfo> nodes = new LinkedList<>();
+
+        // get node that's going to have it's ancestors gathered
+        SubNode node = read.getNode(ms, nodeId);
+        if (no(node))
+            return res;
+
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, false, false,
+                true, true, null, false);
+        nodes.add(info);
+
+        String apReplies = node.getStr(NodeProp.ACT_PUB_REPLIES);
+        if (ok(apReplies)) {
+            readForeignReplies(ms, node, nodes);
+        }
+
+        if (nodes.size() > 1) {
+            res.setSuccess(true);
+            res.setNodes(nodes);
+        }
+        return res;
     }
 
     /*
@@ -991,12 +1036,23 @@ public class ActPubUtil extends ServiceBase {
 
         res.setTopReached(topReached);
         res.setNodes(nodes);
-        res.setSuccess(true);
+        if (nodes.size() > 1) {
+            res.setSuccess(true);
+        }
         return res;
     }
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
+        // todo-0: do we need childrenCheck EVER here? (if only in feeds or list views no) -- ditto below
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
+                true, true, null, false);
+        return info;
+    }
+
+    public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
+        SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
+        // todo-0: do we need childrenCheck EVER here? (if only in feeds or list views no)
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
                 true, true, null, false);
         return info;
@@ -1023,8 +1079,11 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // Try to look up the node first from the DB.
+        // todo-0: is this correct to search for url in ACT_PUB_ID instead of ACT_PUB_URL? This is very
+        // likely a bug.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
         if (ok(nodeFound)) {
+            log.debug("loadObject(): Node found by ID: " + url);
             return nodeFound;
         }
 
@@ -1033,6 +1092,19 @@ public class ActPubUtil extends ServiceBase {
         if (no(obj)) {
             log.debug("unable to get json: " + url);
             return null;
+        }
+
+        return loadObjectFromObj(ms, userDoingAction, obj);
+    }
+
+    public SubNode loadObjectFromObj(MongoSession ms, String userDoingAction, APObj obj) {
+        String id = apStr(obj, APObj.id);
+
+        // todo-0: Make sure this IS finding already cached nodes and returning here.
+        SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), id);
+        if (ok(nodeFound)) {
+            log.debug("loadObjectFromObj(): Node found by ID: " + id);
+            return nodeFound;
         }
 
         // todo-1: we only support "Note" for now.

@@ -277,6 +277,10 @@ export interface GetPeopleRequest extends RequestBase {
     type: string;
 }
 
+export interface GetRepliesViewRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface GetServerInfoRequest extends RequestBase {
     command: string;
     parameter: string;
@@ -724,6 +728,10 @@ export interface GetPeopleResponse extends ResponseBase {
 
 export interface GetPublicServerInfoResponse extends ResponseBase {
     serverInfo: string;
+}
+
+export interface GetRepliesViewResponse extends ResponseBase {
+    nodes: NodeInfo[];
 }
 
 export interface GetServerInfoResponse extends ResponseBase {

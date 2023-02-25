@@ -1356,7 +1356,7 @@ export class Edit {
         // if not all the shares are mentioned in the text ask the user about putting them the content automatically
         if (!dlg.areAllSharesInContent()) {
 
-            // todo-0: need to go back to also haing a button that can do this WITHOUT opening the sharing dlg.
+            // todo-0: need to go back to also having a button that can do this WITHOUT opening the sharing dlg.
             const confDlg = new ConfirmDlg("Add to Sharing/Mentions to content text?", "Add Mentions ?");
             await confDlg.open();
             if (confDlg.yes) {

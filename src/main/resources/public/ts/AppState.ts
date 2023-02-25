@@ -140,6 +140,9 @@ export class AppState {
     // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
     threadViewFromTab: string = null;
 
+    repliesViewNodeId: string = null;
+    repliesViewFromTab: string = null;
+
     serverInfoCommand: string = null;
     serverInfoTitle: string = null;
 

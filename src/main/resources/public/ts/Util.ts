@@ -945,9 +945,7 @@ export class Util {
             s.speechRate = rate || "normal";
 
             // allow for everyone for now
-            s.allowedFeatures = "web3"; // res.allowedFeatures;
-            // s.allowedFeatures = res.allowedFeatures;
-
+            s.allowedFeatures = res.allowedFeatures;
             // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm

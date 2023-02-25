@@ -52,7 +52,7 @@ export class NodeCompRowHeader extends Div {
         const children = [];
         let avatarImg: Img = null;
 
-        const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD;
+        const showInfo = ast.userPrefs.showMetaData || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
 
         if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeHeaderAvatar(this.node);
@@ -202,11 +202,26 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            if (showInfo && this.showThreadButton) {
+            // Because the POSTS node will be at a depth like this: "/r/usr/L/b/q", we require
+            // the path to be at least deeper than that to show the history button.
+            // L = Local Users, then: [UserNode]/[PostsNode]/[ActualNode]
+            // Also if we have 'inReplyTo' that will also enable the button.
+            const inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
+            const slashCount = S.util.countChars(this.node.path, "/");
+            if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg row-header-icon",
                     title: "Show Thread History",
                     onClick: () => S.srch.showThread(this.node)
+                }));
+            }
+
+            const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
+            if (showInfo && ast.allowedFeatures?.indexOf("ap:replies") !== -1 && repliesProp) {
+                children.push(new Icon({
+                    className: "fa fa-commenting fa-lg row-header-icon",
+                    title: "Show Replies",
+                    onClick: () => S.srch.showReplies(this.node)
                 }));
             }
 

@@ -65,7 +65,7 @@ export class UserProfileDlg extends DialogBase {
         const profileImg = this.makeProfileImg(!!profileHeaderImg);
         const localUser = S.util.isLocalUserName(state.userProfile.userName);
         let web3Div: Div = null;
-        const web3Enabled = ast.allowedFeatures && ast.allowedFeatures.indexOf("web3") !== -1;
+        const web3Enabled = ast.allowedFeatures?.indexOf("web3") !== -1;
 
         if (ast.config.ipfsEnabled && web3Enabled) {
             const web3Comps: CompIntf[] = [];

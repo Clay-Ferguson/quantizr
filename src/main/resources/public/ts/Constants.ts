@@ -39,6 +39,7 @@ export class Constants {
     // static TAB_IPSM: string = "ipsmTab";
     static TAB_TRENDING: string = "trendingTab";
     static TAB_THREAD: string = "threadTab";
+    static TAB_REPLIES: string = "repliesTab";
     static TAB_SERVERINFO: string = "serverInfoTab";
     static TAB_IPFSVIEW: string = "ipfsFilesTab";
     static TAB_LOG: string = "logTab";

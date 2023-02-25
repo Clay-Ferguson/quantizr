@@ -19,6 +19,7 @@ import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
+import { RepliesTab } from "./tabs/data/RepliesTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
@@ -110,6 +111,8 @@ export class Search {
                 data.openGraphComps = [];
 
                 data.props.results = res.nodes;
+
+                // if apReplies then we set endReached to 'true' always.
                 data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id);
             });
@@ -123,11 +126,52 @@ export class Search {
             const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
             if (objUrl) {
                 if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    msg = "Top-level post. No conversation to display. Click `Remote Link` instead.";
+                    msg = "Top-level post. No conversation to display.";
                 }
             }
 
             S.util.showMessage(msg, "Thread");
+        }
+    }
+
+    showReplies = async (node: J.NodeInfo) => {
+        const res = await S.rpcUtil.rpc<J.GetRepliesViewRequest, J.GetRepliesViewResponse>("getNodeRepliesView", {
+            nodeId: node.id
+        });
+
+        if (res.nodes && res.nodes.length > 0) {
+            dispatch("RenderRepliesResults", s => {
+                s.highlightSearchNodeId = node.id;
+
+                S.domUtil.focusId(C.TAB_REPLIES);
+                S.tabUtil.tabScroll(C.TAB_REPLIES, -1); // -1 scrolls to bottom
+
+                const data = RepliesTab.inst;
+                if (!data) return;
+
+                s.repliesViewFromTab = s.activeTab;
+                s.repliesViewNodeId = node.id;
+                data.openGraphComps = [];
+
+                data.props.results = res.nodes;
+                data.props.endReached = true;
+                S.tabUtil.selectTabStateOnly(data.id);
+            });
+        }
+        else {
+            // The most common known reason we can get here due to lack of feature support is when something like
+            // a "object.type=Video", or "Question" type, (a type not yet supported) is encountered as we attempted to read the thread.
+            const msg = "Replies not available, or contains unsupported post types.";
+
+            // make 'msg' a little more specific if we know there's a 'remote link' showing.
+            // const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
+            // if (objUrl) {
+            //     if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
+            //         msg = "Top-level post. No conversation to display.";
+            //     }
+            // }
+
+            S.util.showMessage(msg, "Replies");
         }
     }
 
@@ -543,7 +587,7 @@ export class Search {
         const prefix = tabData.id;
 
         // render with info bar, etc always, if this is a threaview or freed tab.
-        const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED;
+        const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED || tabData.id === C.TAB_REPLIES;
         if (isFeed && allowFooter) {
             allowFooter = true;
         }

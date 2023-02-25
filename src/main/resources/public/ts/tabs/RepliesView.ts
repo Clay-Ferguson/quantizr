@@ -1,18 +1,16 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/core/Button";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { RepliesRSInfo } from "../RepliesRSInfo";
 import { S } from "../Singletons";
-import { ThreadRSInfo } from "../ThreadRSInfo";
 
-export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
+export class RepliesView<T extends RepliesRSInfo> extends AppTab<T> {
 
     constructor(data: TabIntf) {
         super(data);
@@ -34,28 +32,24 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         const children: CompIntf[] = [
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
-                new Div(this.data.name + " / Hierarchy", { className: "tabTitle" }),
+                new Div(this.data.name, { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
                         const ast = getAs();
-                        if (ast.threadViewFromTab === C.TAB_MAIN) {
+                        if (ast.repliesViewFromTab === C.TAB_MAIN) {
                             // the jumpToId is the best way to get to a node on the main tab.
-                            S.view.jumpToId(ast.threadViewNodeId);
+                            S.view.jumpToId(ast.repliesViewNodeId);
                         }
                         else {
-                            S.tabUtil.selectTab(ast.threadViewFromTab);
+                            S.tabUtil.selectTab(ast.repliesViewFromTab);
                             setTimeout(() => {
-                                const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
-                                data.inst?.scrollToNode(ast.threadViewNodeId);
+                                const data: TabIntf = S.tabUtil.getAppTabData(ast.repliesViewFromTab);
+                                data.inst?.scrollToNode(ast.repliesViewNodeId);
                             }, 700);
                         }
                     },
                     title: "Go back..."
-                }, "bigMarginLeft "),
-                !this.data.props.endReached ? new Button("More History...", () => { this.moreHistory() },
-                    { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
-
-                new Clearfix()
+                }, "bigMarginLeft ")
             ]),
             this.data.props.description ? new Div(this.data.props.description) : null
         ];
@@ -63,8 +57,8 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
-            const clazzName = ast.repliesViewNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
-            const highlightClazzName = ast.repliesViewNodeId === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
+            const clazzName = ast.threadViewNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
+            const highlightClazzName = ast.threadViewNodeId === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
 
             const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, highlightClazzName);
             if (c) {
@@ -87,12 +81,6 @@ export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
         });
 
         this.setChildren(children);
-    }
-
-    moreHistory = () => {
-        const results = this.data?.props?.results;
-        if (!results || results.length === 0) return;
-        S.srch.showThreadAddMore(results[0].id);
     }
 
     /* overridable (don't use arrow function) */
