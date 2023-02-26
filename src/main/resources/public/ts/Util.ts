@@ -551,8 +551,6 @@ export class Util {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + year;
     }
 
-    /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
-    the current location is. */
     updateHistory = (node: J.NodeInfo) => {
         if (!node) {
             node = getAs().node;
