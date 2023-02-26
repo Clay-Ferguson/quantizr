@@ -1037,6 +1037,10 @@ public class ActPubUtil extends ServiceBase {
         res.setTopReached(topReached);
         res.setNodes(nodes);
         if (nodes.size() > 1) {
+
+            // todo-0: need to sort 'nodes', and within each one (only one level deep, not recursive)
+            // also sort the children, and make it a chronological sort (oldest on top)
+
             res.setSuccess(true);
         }
         return res;
@@ -1100,7 +1104,6 @@ public class ActPubUtil extends ServiceBase {
     public SubNode loadObjectFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         String id = apStr(obj, APObj.id);
 
-        // todo-0: Make sure this IS finding already cached nodes and returning here.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), id);
         if (ok(nodeFound)) {
             log.debug("loadObjectFromObj(): Node found by ID: " + id);

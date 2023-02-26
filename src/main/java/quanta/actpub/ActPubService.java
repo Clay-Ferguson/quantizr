@@ -230,8 +230,10 @@ public class ActPubService extends ServiceBase {
                         if (no(content)) {
                             content = node.getContent();
                         }
+
+                        String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + node.getIdStr();
                         message = apFactory.newCreateForNote(fromUser, toUserNames, fromActor, inReplyTo, replyToType, content,
-                                objUrl, privateMessage, attachments);
+                                objUrl, repliesUrl, privateMessage, attachments);
 
                         // log.debug("Outbound Note: " + XString.prettyPrint(message));
                     }

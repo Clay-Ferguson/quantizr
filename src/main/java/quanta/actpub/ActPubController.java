@@ -86,7 +86,9 @@ public class ActPubController extends ServiceBase {
 		res.sendRedirect(url);
 	}
 
-	/* This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page */
+	/*
+	 * This redirects HTTP requests by an ActorID to show the 'home' node of the user as html web page
+	 */
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_HTML})
 	public void getHTMLForUserId(//
@@ -276,6 +278,25 @@ public class ActPubController extends ServiceBase {
 
 		if (ok(ret)) {
 			apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
+			HttpHeaders hdr = new HttpHeaders();
+			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Replies GET
+	 */
+	@RequestMapping(value = APConst.PATH_REPLIES + "/{nodeId}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_LD_JSON})
+	public @ResponseBody Object getReplies(//
+			@PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
+
+		APObj ret = apReplies.generateReplies(nodeId);
+		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);

@@ -58,12 +58,12 @@ public class ActPubFactory extends ServiceBase {
 	 * Creates a new 'note' message
 	 */
 	public APObj newCreateForNote(String userDoingAction, HashSet<String> toUserNames, String fromActor, String inReplyTo,
-			String replyToType, String content, String noteUrl, boolean privateMessage, APList attachments) {
+			String replyToType, String content, String noteUrl, String repliesUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 
-		APObj payload = newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now,
-				privateMessage, attachments);
+		APObj payload = newNote(userDoingAction, toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, repliesUrl,
+				now, privateMessage, attachments);
 
 		return newCreate(userDoingAction, payload, fromActor, toUserNames, noteUrl, now, privateMessage);
 	}
@@ -81,16 +81,16 @@ public class ActPubFactory extends ServiceBase {
 	 * Creates a new 'Note' object, depending on what's being replied to.
 	 */
 	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
-			String inReplyTo, String replyToType, String content, String noteUrl, ZonedDateTime now, boolean privateMessage,
-			APList attachments) {
+			String inReplyTo, String replyToType, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
+			boolean privateMessage, APList attachments) {
 		if (ok(content)) {
 			// convert all double and single spaced lines to <br> for formatting, for servers that don't
 			// understand Markdown
 			content = content.replace("\n", "<br>");
 		}
 
-		APObj ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content,
-				null);
+		APObj ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, repliesUrl,
+				false, content, null);
 
 		if (ok(inReplyTo)) {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);
@@ -210,8 +210,26 @@ public class ActPubFactory extends ServiceBase {
 		return ret;
 	}
 
-	public APObj makeAPONote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
-		SubNode parent = read.getParent(as, child, false);
+	// Wraps an array of SubNodes into APONote Objects */
+	public List<APObj> makeAPONotes(MongoSession as, List<SubNode> nodes, SubNode parent) {
+		LinkedList<APObj> items = new LinkedList<>();
+		if (no(nodes) || nodes.isEmpty())
+			return items;
+
+		for (SubNode node : nodes) {
+			items.add(makeAPONote(as, node, parent));
+		}
+		return items;
+	}
+
+	// If 'parent' (of child) is known, it can be passed in, to help performance
+	public APObj makeAPONote(MongoSession as, SubNode child, SubNode parent) {
+		String userName = read.getNodeOwner(as, child);
+		String host = prop.getProtocolHostAndPort();
+		String nodeIdBase = host + "?id=";
+		if (no(parent)) {
+			parent = read.getParent(as, child, false);
+		}
 
 		String hexId = child.getIdStr();
 		String published = DateUtil.isoStringFromDate(child.getModifyTime());
@@ -222,7 +240,9 @@ public class ActPubFactory extends ServiceBase {
 			content = child.getContent();
 		}
 
-		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, content,
+		String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + hexId;
+
+		APONote ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, repliesUrl, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 
@@ -257,7 +277,9 @@ public class ActPubFactory extends ServiceBase {
 			content = child.getContent();
 		}
 
-		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, content,
+		String repliesUrl = prop.getProtocolHostAndPort() + APConst.PATH_REPLIES + "/" + hexId;
+
+		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, repliesUrl, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 		if (ok(parent)) {

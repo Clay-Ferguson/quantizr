@@ -1,6 +1,7 @@
 package quanta.actpub.model;
 
 import static quanta.util.Util.ok;
+import org.apache.commons.lang3.StringUtils;
 import quanta.actpub.APConst;
 
 /**
@@ -20,14 +21,18 @@ public class APONote extends APObj {
         put(type, APType.Note);
     }
 
-    public APONote(String id, String published, String attributedTo, String summary, String url, boolean sensitive,
+    public APONote(String id, String published, String attributedTo, String summary, String url, String repliesUrl, boolean sensitive,
             String content, APList to) {
         this();
         put(APObj.id, id);
         put(APObj.published, published);
         put(APObj.attributedTo, attributedTo);
-        put(APObj.summary, summary);
+
+        if (!StringUtils.isEmpty(summary)) {
+            put(APObj.summary, summary);
+        }
         put(APObj.url, url);
+        put(APObj.replies, repliesUrl);
         put(APObj.sensitive, sensitive);
         put(APObj.content, content);
         if (ok(to)) {

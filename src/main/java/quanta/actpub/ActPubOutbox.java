@@ -394,9 +394,6 @@ public class ActPubOutbox extends ServiceBase {
         log.debug("getResource: " + nodeId);
 
         return (APObj) arun.run(as -> {
-            String host = prop.getProtocolHostAndPort();
-            String nodeIdBase = host + "?id=";
-
             SubNode node = read.getNode(as, nodeId);
             if (!ok(node)) {
                 throw new RuntimeException("Node not found: " + nodeId);
@@ -467,13 +464,11 @@ public class ActPubOutbox extends ServiceBase {
                 throw new NodeAuthFailedException();
             }
 
-            String userName = read.getNodeOwner(as, node);
-
             /*
              * todo-1: We should be able to get an object as whatever actual type it is based on the type (not
              * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
              */
-            APObj ret = apFactory.makeAPONote(as, userName, nodeIdBase, node);
+            APObj ret = apFactory.makeAPONote(as, node, null);
             if (ok(ret)) {
                 apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
             }

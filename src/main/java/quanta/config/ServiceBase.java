@@ -14,6 +14,7 @@ import quanta.actpub.ActPubFactory;
 import quanta.actpub.ActPubFollower;
 import quanta.actpub.ActPubFollowing;
 import quanta.actpub.ActPubOutbox;
+import quanta.actpub.ActPubReplies;
 import quanta.actpub.ActPubService;
 import quanta.actpub.ActPubUtil;
 import quanta.lucene.FileIndexer;
@@ -128,6 +129,7 @@ public class ServiceBase {
 	public static ActPubUtil apUtil;
 	public static ActPubFollower apFollower;
 	public static ActPubFollowing apFollowing;
+	public static ActPubReplies apReplies;
 	public static GraphNodesService graphNodes;
 	public static ActPubOutbox apOutbox;
 	public static EnglishDictionary english;
@@ -215,6 +217,7 @@ public class ServiceBase {
 			apUtil = getBean(ctx, ActPubUtil.class);
 			apFollower = getBean(ctx, ActPubFollower.class);
 			apFollowing = getBean(ctx, ActPubFollowing.class);
+			apReplies = getBean(ctx, ActPubReplies.class);
 			graphNodes = getBean(ctx, GraphNodesService.class);
 			apOutbox = getBean(ctx, ActPubOutbox.class);
 			english = getBean(ctx, EnglishDictionary.class);

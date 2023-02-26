@@ -14,6 +14,7 @@ public class APConst {
     public static final String PATH_OUTBOX = "/ap/outbox";
     public static final String PATH_FOLLOWERS = "/ap/followers";
     public static final String PATH_FOLLOWING = "/ap/following";
+    public static final String PATH_REPLIES = "/ap/replies";
     public static final String ACTOR_PATH = "/ap/u";
 
     public static final String CONTEXT_STREAMS = "https://www.w3.org/ns/activitystreams";
