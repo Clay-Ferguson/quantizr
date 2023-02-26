@@ -1054,7 +1054,6 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
-        // todo-0: do we need childrenCheck EVER here? (if only in feeds or list views no) -- ditto below
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
                 true, true, null, false);
         return info;
@@ -1062,7 +1061,6 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
-        // todo-0: do we need childrenCheck EVER here? (if only in feeds or list views no)
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
                 true, true, null, false);
         return info;
@@ -1089,8 +1087,6 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // Try to look up the node first from the DB.
-        // todo-0: is this correct to search for url in ACT_PUB_ID instead of ACT_PUB_URL? This is very
-        // likely a bug.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
         if (ok(nodeFound)) {
             log.debug("loadObject(): Node found by ID: " + url);
