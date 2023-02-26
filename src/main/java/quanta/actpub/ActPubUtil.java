@@ -1037,9 +1037,15 @@ public class ActPubUtil extends ServiceBase {
         res.setTopReached(topReached);
         res.setNodes(nodes);
         if (nodes.size() > 1) {
+            // sort the array
+            nodes.sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
 
-            // todo-0: need to sort 'nodes', and within each one (only one level deep, not recursive)
-            // also sort the children, and make it a chronological sort (oldest on top)
+            // sort all children also
+            for (NodeInfo n : nodes) {
+                if (ok(n.getChildren())) {
+                    n.getChildren().sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
+                }
+            }
 
             res.setSuccess(true);
         }
