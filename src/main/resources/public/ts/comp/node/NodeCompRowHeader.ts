@@ -179,7 +179,7 @@ export class NodeCompRowHeader extends Div {
             and we need to have a user identity for all the HTTP sigs for that. */
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 children.push(new Icon({
-                    title: "People associated with this Node",
+                    title: "People mentioned or shared related to this node",
                     className: "fa fa-users fa-lg row-header-icon",
                     onClick: () => S.user.showUsersList(this.node)
                 }));

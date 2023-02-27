@@ -317,7 +317,7 @@ export class User {
     }
 
     showUsersList = (node: J.NodeInfo) => {
-        const friendsDlg = new FriendsDlg("People Associated with Node", node.id, true);
+        const friendsDlg = new FriendsDlg("Mentions & Shares", node.id, true);
         friendsDlg.open();
     }
 }
