@@ -2,7 +2,7 @@
 
 # Quanta Web Platform
 
-### Content Mangement, Micro Blogging, and Social Media
+### Content Management, Micro Blogging, and Social Media
 
 Welcome to the Fediverse!
 
