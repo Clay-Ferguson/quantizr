@@ -71,7 +71,7 @@ export class Html extends Comp {
             });
         });
 
-        elm.querySelectorAll(".hljs").forEach((e: HTMLElement) => {
+        elm.querySelectorAll(".hljs-copy").forEach((e: HTMLElement) => {
             e.addEventListener("click", () => S.domUtil.codeSpanClick(e));
         });
     }

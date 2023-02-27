@@ -167,15 +167,21 @@ export class Render {
         marked.setOptions({
             renderer: this.markedRenderer,
 
-            // processes the code fenced blocks (three backticks above and below the block)
+            // processes the "fenced code blocks? (three backticks above and below the block)
             highlight: (code, language) => {
                 if (!language) language = "plaintext";
-
-                // Check whether the given language is valid for highlight.js.
-                const validLang: boolean = !!(language && highlightjs.getLanguage(language));
+                const lang = highlightjs.getLanguage(language);
 
                 // Highlight only if the language is valid.
-                return validLang ? highlightjs.highlight(language, code).value : code;
+                if (lang) {
+                    // NOTE: This 'hljs-copy' is picked up by the Html components and that's where the magic is done,
+                    // to make this 'copy text to clipboard' icon work.
+                    return `<i class='hljs-copy fa fa-clipboard fa-lg float-end clickable' title='Copy to Clipboard (${lang.name})'></i>` +
+                    highlightjs.highlight(language, code).value;
+                }
+                else {
+                    return code;
+                }
             },
 
             langPrefix: "hljs language-", // highlight.js css expects a top-level 'hljs' class.

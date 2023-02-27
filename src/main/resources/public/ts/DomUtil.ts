@@ -1,7 +1,6 @@
 import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { UploadResponse } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -553,18 +552,10 @@ export class DomUtil {
         // becuase this code is incompatable and not appliable to that scenario
         if (window.getSelection()?.toString()) return;
 
-        const save = elm.style.border;
-        elm.style.border = "3px solid yellow";
-
-        // we need a timeout here so the yellow border will be on the screen
-        setTimeout(async () => {
-            const dlg = new ConfirmDlg("Copy to Clipboard?", "Clipboard");
-            await dlg.open();
-            if (dlg.yes) {
-                S.util.copyToClipboard(elm.innerText);
-            }
-            elm.style.border = save;
-        }, 1000);
+        if (elm.parentElement.innerText) {
+            S.util.copyToClipboard(elm.parentElement.innerText?.trim());
+            S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
+        }
     }
 
     highlightBrowserText = (text: string) => {
