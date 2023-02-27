@@ -1,5 +1,5 @@
 import highlightjs from "highlight.js";
-import "highlight.js/styles/github.css";
+import "highlight.js/styles/dark.css";
 import { marked } from "marked";
 import { toArray } from "react-emoji-render";
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
