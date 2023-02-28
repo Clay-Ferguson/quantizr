@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { State } from "../../State";
+import { Validator } from "../../Validator";
 import { Comp, ScrollPos } from "../base/Comp";
 
 interface LS { // Local State
@@ -11,8 +11,8 @@ export class TextareaTag extends Comp {
     static MIN_ROWS = 3;
     static MAX_ROWS = 15;
 
-    constructor(attribs: Object = {}, s?: State, private calcRows: boolean = false, private scrollPos: ScrollPos = null) {
-        super(attribs, s);
+    constructor(attribs: Object = {}, private valState: Validator, private calcRows: boolean = false, private scrollPos: ScrollPos = null) {
+        super(attribs, valState.v);
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
@@ -72,15 +72,10 @@ export class TextareaTag extends Comp {
         this.attribs.onKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Tab") {
                 e.preventDefault();
-                e.stopPropagation();
                 const textarea: any = this.getRef();
                 if (textarea) {
-                    textarea.setRangeText(
-                        "    ",
-                        textarea.selectionStart,
-                        textarea.selectionStart,
-                        "end"
-                    );
+                    textarea.setRangeText("    ", textarea.selectionStart, textarea.selectionStart, "end");
+                    this.valState.setValue(textarea.value);
                 }
             }
         };
