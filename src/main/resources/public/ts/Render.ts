@@ -177,7 +177,7 @@ export class Render {
                     // NOTE: This 'hljs-copy' is picked up by the Html components and that's where the magic is done,
                     // to make this 'copy text to clipboard' icon work.
                     return `<i class='hljs-copy fa fa-clipboard fa-lg float-end clickable' title='Copy to Clipboard (${lang.name})'></i>` +
-                    highlightjs.highlight(language, code).value;
+                        highlightjs.highlight(language, code).value;
                 }
                 else {
                     return code;
@@ -196,6 +196,10 @@ export class Render {
             // Search for 'DOMPurify.sanitize' to see how we do it currently.
             // sanitize: true
         });
+
+        // DO NOT DELETE: this works.
+        // const langs = highlightjs.listLanguages();
+        // console.log("highlightJs Languages: " + langs);
     }
 
     renderLinkLabel = (id: string) => {
