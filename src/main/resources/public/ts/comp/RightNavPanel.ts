@@ -204,7 +204,7 @@ export class RightNavPanel extends Div {
                     !ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
                 ]),
 
-                ast.nodeHistory?.length > 0 ? new HistoryPanel() : null
+                ast.nodeHistory?.length > 0 && !ast.isAnonUser? new HistoryPanel() : null
             ])
         ]);
     }
