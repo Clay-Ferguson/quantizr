@@ -68,6 +68,23 @@ export class TextareaTag extends Comp {
         if (this.calcRows) {
             this.attribs.rows = "" + this.calcRowsFunc(this.attribs.value);
         }
+
+        this.attribs.onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+                e.stopPropagation();
+                const textarea: any = this.getRef();
+                if (textarea) {
+                    textarea.setRangeText(
+                        "    ",
+                        textarea.selectionStart,
+                        textarea.selectionStart,
+                        "end"
+                    );
+                }
+            }
+        };
+
         return this.tag("textarea");
     }
 }
