@@ -150,7 +150,7 @@ export class TTSView extends AppTab {
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
                 this.makeRateChooser()
             ]),
-            new TextArea("Add Text to Speak", {
+            new TextArea("Enter Text to Speak", {
                 rows: 3
             }, this.textAreaState),
             paraComps?.length > 0
