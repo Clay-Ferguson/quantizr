@@ -70,7 +70,7 @@ export class RssType extends TypeBase {
                     S.domUtil.focusId(C.TAB_RSS);
                     S.tabUtil.tabScroll(C.TAB_RSS, 0);
                 });
-            }, null, "btn-primary marginAll")
+            }, null, "btn-primary marginLeft marginBottom")
         ]);
     }
 }

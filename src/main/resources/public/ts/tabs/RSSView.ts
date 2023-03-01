@@ -60,7 +60,7 @@ export class RSSView extends AppTab {
             // if it's currently loading show the spinner
             else if (ast.rssFeedCache[feedSrcHash] === "loading") {
                 feedContent = new Div(null, { className: "bigMargin" }, [
-                    new Heading(4, "Loading RSS Feed..."),
+                    new Heading(4, "Loading..."),
                     new Spinner()
                 ]);
             }
@@ -70,7 +70,7 @@ export class RSSView extends AppTab {
                         s.rssFeedCache[feedSrcHash] = "loading";
                         RSSView.loadFeed(s, feedSrcHash, feedSrc);
                     });
-                }, null, "btn-primary marginAll");
+                }, null, "btn-primary marginLeft marginBottom");
             }
             /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
             else if (ast.rssFeedCache[feedSrcHash]) {
@@ -86,7 +86,16 @@ export class RSSView extends AppTab {
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
-                new Div("RSS Feed", { className: "tabTitle" })
+                new Div("RSS Feed", { className: "tabTitle" }),
+                new Checkbox("Headlines Only", {
+                    className: "float-end"
+                }, {
+                    setValue: (checked: boolean) => {
+                        dispatch("SetHeadlinesFlag", s => S.edit.setRssHeadlinesOnly(s, checked));
+                    },
+                    getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
+                }),
+                new Clearfix()
             ]),
             comp,
             feedContent
@@ -147,15 +156,6 @@ export class RSSView extends AppTab {
         if (!page) {
             page = 1;
         }
-
-        feedList.addChild(new Checkbox("Headlines Only", {
-            className: "float-end"
-        }, {
-            setValue: (checked: boolean) => {
-                dispatch("SetHeadlinesFlag", s => S.edit.setRssHeadlinesOnly(s, checked));
-            },
-            getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
-        }));
 
         feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash));
 
