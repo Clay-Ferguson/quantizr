@@ -1,6 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.ok;
 import java.util.List;
 import java.util.Map;
 import quanta.actpub.APConst;
@@ -34,10 +33,10 @@ public class APOLike extends APOActivity {
         put(APObj.actor, actor);
         put(APObj.object, objectId);
 
-        if (ok(to)) {
+        if (to != null) {
             put(APObj.to, to);
         }
-        if (ok(cc)) {
+        if (cc != null) {
             put(APObj.cc, cc);
         }
     }

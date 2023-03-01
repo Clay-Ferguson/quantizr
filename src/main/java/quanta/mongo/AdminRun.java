@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.ok;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the
@@ -20,7 +19,7 @@ public class AdminRun extends ServiceBase {
 
 	// Runs 'runner' using 'ms' if not null, or falls back to using 'admin' if ms is null
 	public <T> T run(MongoSession ms, MongoRunnableEx<T> runner) {
-		return ok(ms) ? runner.run(ms) : run(runner);
+		return ms != null ? runner.run(ms) : run(runner);
 	}
 
 	// Runs 'runner' as admin.
@@ -29,7 +28,7 @@ public class AdminRun extends ServiceBase {
 		MongoSession savedMs = ThreadLocals.getMongoSession();
 
 		// if this thread is already using 'admin' we can just run the function immediately
-		if (ok(savedMs) && savedMs.isAdmin()) {
+		if (savedMs != null && savedMs.isAdmin()) {
 			return runner.run(savedMs);
 		}
 

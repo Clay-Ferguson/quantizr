@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -115,7 +113,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			throw ExUtil.logAndWrapEx(log, "Failed Generating PDF", ex);
 		} finally {
 			try {
-				if (ok(stream)) {
+				if (stream != null) {
 					stream.close();
 				}
 
@@ -131,7 +129,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void newPage() {
 		try {
-			if (ok(stream)) {
+			if (stream != null) {
 				stream.close();
 			}
 
@@ -153,7 +151,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (no(node))
+		if (node == null)
 			return;
 
 		processNode(node);
@@ -178,12 +176,12 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	private void writeImage(SubNode node) {
 		try {
 			List<Attachment> atts = node.getOrderedAttachments();
-			if (no(atts))
+			if (atts == null)
 				return;
 
 			// process all attachments specifically to embed the image ones
 			for (Attachment att : atts) {
-				if (no(att.getBin()))
+				if (att.getBin() == null)
 					continue;
 
 				String mime = att.getMime();
@@ -191,14 +189,14 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 				String imgSize = att.getCssSize();
 				float sizeFactor = 1f;
 
-				if (ok(imgSize) && imgSize.endsWith("%")) {
+				if (imgSize != null && imgSize.endsWith("%")) {
 					imgSize = XString.stripIfEndsWith(imgSize, "%");
 					int size = Integer.parseInt(imgSize);
 					sizeFactor = Float.valueOf(size).floatValue() / 100;
 				}
 
 				InputStream is = attach.getStream(session, att.getKey(), node, false);
-				if (no(is))
+				if (is == null)
 					continue;
 
 				PDImageXObject pdImage = null;
@@ -213,7 +211,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 					IOUtils.closeQuietly(is);
 				}
 
-				if (no(pdImage))
+				if (pdImage == null)
 					continue;
 
 				float imgWidth = width * sizeFactor;

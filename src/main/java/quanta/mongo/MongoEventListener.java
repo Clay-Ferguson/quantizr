@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
@@ -102,7 +100,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
 		 * there, along with setting that on the owner property so we can do one save and have both updated
 		 */
-		if (no(id)) {
+		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);
 			isNew = true;
@@ -122,7 +120,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.PROPS, node.getProps());
 		}
 
-		if (no(node.getOrdinal())) {
+		if (node.getOrdinal() == null) {
 			node.setOrdinal(0L);
 			dbObj.put(SubNode.ORDINAL, 0L);
 		}
@@ -139,7 +137,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// }
 
 		/* if no owner is assigned... */
-		if (no(node.getOwner())) {
+		if (node.getOwner() == null) {
 			/*
 			 * if we are saving the root node, we make it be the owner of itself. This is also the admin owner,
 			 * and we only allow this to run during initialiation when the server may be creating the database,
@@ -150,7 +148,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				dbObj.put(SubNode.OWNER, id);
 				node.setOwner(id);
 			} else {
-				if (ok(auth.getAdminSession())) {
+				if (auth.getAdminSession() != null) {
 					ObjectId ownerId = auth.getAdminSession().getUserNodeId();
 					dbObj.put(SubNode.OWNER, ownerId);
 					node.setOwner(ownerId);
@@ -162,16 +160,16 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		Date now = null;
 
 		/* If no create/mod time has been set, then set it */
-		if (no(node.getCreateTime())) {
-			if (no(now)) {
+		if (node.getCreateTime() == null) {
+			if (now == null) {
 				now = Calendar.getInstance().getTime();
 			}
 			dbObj.put(SubNode.CREATE_TIME, now);
 			node.setCreateTime(now);
 		}
 
-		if (no(node.getModifyTime())) {
-			if (no(now)) {
+		if (node.getModifyTime() == null) {
+			if (now == null) {
 				now = Calendar.getInstance().getTime();
 			}
 			dbObj.put(SubNode.MODIFY_TIME, now);
@@ -193,7 +191,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		// make sure root node can never have any sharing.
-		if (node.getPath().equals(NodePath.ROOT_PATH) && ok(node.getAc())) {
+		if (node.getPath().equals(NodePath.ROOT_PATH) && node.getAc() != null) {
 			dbObj.put(SubNode.AC, null);
 			node.setAc(null);
 		}
@@ -207,14 +205,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
-		if (ok(nodeName)) {
+		if (nodeName != null) {
 			nodeName = nodeName.replace(":", "-");
 			nodeName = nodeName.replace("~", "-");
 			nodeName = nodeName.replace("/", "-");
 
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.
-			if (ok(nodeName)) {
+			if (nodeName != null) {
 				dbObj.put(SubNode.NAME, nodeName);
 				node.setName(nodeName);
 			}
@@ -224,7 +222,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.PROPS, node.getProps());
 		}
 
-		if (ok(node.getAc())) {
+		if (node.getAc() != null) {
 			/*
 			 * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
 			 * code assume that if the AC is non-null then there ARE some shares on the node.
@@ -238,8 +236,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 			// Remove any share to self because that never makes sense
 			else {
-				if (ok(node.getOwner())) {
-					if (ok(node.getAc().remove(node.getOwner().toHexString()))) {
+				if (node.getOwner() != null) {
+					if (node.getAc().remove(node.getOwner().toHexString()) != null) {
 						dbObj.put(SubNode.AC, node.getAc());
 					}
 				}
@@ -260,7 +258,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		SubNode node = event.getSource();
 
 		// update cache during save
-		if (ok(node)) {
+		if (node != null) {
 			apCache.saveNotify(node);
 		}
 
@@ -284,8 +282,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		SubNode node = event.getSource();
 		// log.debug("MongoEventListener.onAfterConvert: " + node.getContent());
-		if (no(node.getOwner())) {
-			if (ok(auth.getAdminSession())) {
+		if (node.getOwner() == null) {
+			if (auth.getAdminSession() != null) {
 				node.setOwner(auth.getAdminSession().getUserNodeId());
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
@@ -320,11 +318,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			return;
 		Document doc = event.getDocument();
 
-		if (ok(doc)) {
+		if (doc != null) {
 			Object id = doc.get("_id");
 			if (id instanceof ObjectId) {
 				SubNode node = ops.findById(id, SubNode.class);
-				if (ok(node)) {
+				if (node != null) {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuth(node);
 					ThreadLocals.clean(node);
@@ -348,7 +346,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			log.trace("saveAuth in MongoListener");
 
 		MongoSession ms = ThreadLocals.getMongoSession();
-		if (ok(ms)) {
+		if (ms != null) {
 			if (ms.isAdmin())
 				return;
 
@@ -358,7 +356,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// only if this is creating a new node do we need to check that the parent will allow it
 			if (isNew) {
 				SubNode parent = read.getParent(ms, node);
-				if (no(parent))
+				if (parent == null)
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
 				auth.authForChildNodeCreate(ms, parent);

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashSet;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -179,10 +177,10 @@ public class SyncFromMFSService extends ServiceBase {
 		log.debug("processDir: " + path);
 
 		IPFSDir dir = ipfsFiles.getDir(path);
-		if (ok(dir)) {
+		if (dir != null) {
 			log.debug("Dir: " + XString.prettyPrint(dir));
 
-			if (no(dir.getEntries())) {
+			if (dir.getEntries() == null) {
 				return success;
 			}
 
@@ -205,7 +203,7 @@ public class SyncFromMFSService extends ServiceBase {
 						// read the node json from ipfs file
 						String json = ipfsFiles.readFile(entryPath);
 						log.debug("JSON: " + json);
-						if (no(json)) {
+						if (json == null) {
 							log.debug("fileReadFailed: " + entryPath);
 							failedFiles++;
 						} else {
@@ -228,7 +226,7 @@ public class SyncFromMFSService extends ServiceBase {
 
 								// we assume the node.id values can be the same across Federated instances.
 								SubNode findNode = read.getNode(session, node.getId());
-								if (ok(findNode)) {
+								if (findNode != null) {
 									log.debug("Node existed: " + node.getId());
 									matchingFiles++;
 									// todo-2: check if node is same content here.

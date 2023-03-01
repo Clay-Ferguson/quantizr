@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -44,7 +42,7 @@ public class ImportTarService extends ImportArchiveBase {
 		used = true;
 
 		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, ThreadLocals.getSC().getUserName()));
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeEx("UserNode not found: " + ThreadLocals.getSC().getUserName());
 		}
 
@@ -54,7 +52,7 @@ public class ImportTarService extends ImportArchiveBase {
 
 			zis = new TarArchiveInputStream(is);
 			TarArchiveEntry entry;
-			while (ok(entry = zis.getNextTarEntry())) {
+			while ((entry = zis.getNextTarEntry()) != null) {
 				if (!entry.isDirectory()) {
 					processFile(entry, zis, userNode.getOwner());
 				}

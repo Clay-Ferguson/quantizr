@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -199,7 +197,7 @@ public class IPFSPubSub extends ServiceBase {
     public void processInboundEvent(Map<String, Object> msg) {
         checkIpfs();
         String from = (String) msg.get("from");
-        if (no(from))
+        if (from == null)
             return;
         if (throttle(from))
             return;
@@ -216,7 +214,7 @@ public class IPFSPubSub extends ServiceBase {
         synchronized (fromCounter) {
             Integer hitCount = fromCounter.get(from);
 
-            if (no(hitCount)) {
+            if (hitCount == null) {
                 fromCounter.put(from, 1);
                 return false;
             } else {
@@ -231,14 +229,14 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private void processInboundPayload(String payload) {
-        if (no(payload))
+        if (payload == null)
             return;
 
         ServerPushInfo pushInfo = null;
         payload = payload.trim();
         if (payload.startsWith("{") && payload.endsWith("}")) {
             IPSMMessage msg = parseIpsmPayload(payload);
-            if (no(msg))
+            if (msg == null)
                 return;
 
             String message = getMessageText(msg);
@@ -260,7 +258,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private String getMessageText(IPSMMessage msg) {
-        if (no(msg) || no(msg.getContent()))
+        if (msg == null || msg.getContent() == null)
             return null;
         StringBuilder sb = new StringBuilder();
         for (IPSMData data : msg.getContent()) {
@@ -277,7 +275,7 @@ public class IPFSPubSub extends ServiceBase {
                 log.debug("Signature Failed.");
                 return null;
             }
-            if (ok(msg)) {
+            if (msg != null) {
                 log.debug("JSON: " + XString.prettyPrint(msg));
             }
             return msg;

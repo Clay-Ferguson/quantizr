@@ -1,7 +1,6 @@
 package quanta.actpub.model;
 
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,14 +66,14 @@ public class APObj extends HashMap<String, Object> {
     public APObj() {}
 
     public APObj(Map<?, ?> obj) {
-        if (ok(obj)) {
+        if (obj != null) {
             this.putAll((Map<String, Object>) obj);
         }
     }
 
     public String getType() {
         String type = apStr(this, APObj.type);
-        return ok(type) ? type.trim() : null;
+        return type != null ? type.trim() : null;
     }
 
     // todo-1: potentially this should ONLY be in APOActivity

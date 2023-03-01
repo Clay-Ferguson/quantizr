@@ -1,7 +1,5 @@
 package quanta.filter;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.annotation.PostConstruct;
@@ -59,11 +57,11 @@ public class ThrottleFilter extends GenericFilterBean {
 		if (request instanceof HttpServletRequest) {
 			sreq = (HttpServletRequest) request;
 			HttpSession session = sreq.getSession(false);
-			if (ok(session)) {
+			if (session != null) {
 				String ip = session.getId();
 				synchronized (ipInfo) {
 					info = ipInfo.get(ip);
-					if (no(info)) {
+					if (info == null) {
 						ipInfo.put(ip, info = new IPInfo());
 					}
 				}
@@ -75,7 +73,7 @@ public class ThrottleFilter extends GenericFilterBean {
 		 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
 		 * threaded, but other servers can call in parallel
 		 */
-		if (singleThreadDebugging && ok(info)) {
+		if (singleThreadDebugging && info != null) {
 			synchronized (info.getLock()) {
 				chain.doFilter(request, response);
 			}
@@ -85,7 +83,7 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
-		if (no(httpReq))
+		if (httpReq == null)
 			return;
 
 		long curTime = System.currentTimeMillis();

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.List;
 import org.slf4j.Logger;
@@ -34,7 +32,7 @@ public class PushService extends ServiceBase {
 			List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
 
 			// if node has no sharing we're done here
-			if (no(usersSharedTo)) {
+			if (usersSharedTo == null) {
 				return;
 			}
 
@@ -45,13 +43,13 @@ public class PushService extends ServiceBase {
 			/* Scan all sessions and push message to the ones that need to see it */
 			for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 				// if we know we already just pushed to this session, we can skip it in here.
-				if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
+				if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
 					// log.debug("Skipping push: " + sc.hashCode() + " to " + sc.getUserName());
 					continue;
 				}
 
 				/* Anonymous sessions won't have userName and can be ignored */
-				if (no(sc.getUserName()))
+				if (sc.getUserName() == null)
 					continue;
 
 				/*
@@ -70,7 +68,7 @@ public class PushService extends ServiceBase {
 					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false,
 							true, true, null, false);
 
-					if (ok(info)) {
+					if (info != null) {
 						FeedPushInfo pushInfo = new FeedPushInfo(info);
 
 						// push notification message to browser
@@ -92,7 +90,7 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 			/* Anonymous sessions won't have userName and can be ignored */
-			if (no(sc.getUserName()))
+			if (sc.getUserName() == null)
 				continue;
 
 			// log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" +
@@ -101,18 +99,18 @@ public class PushService extends ServiceBase {
 
 			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
 			// the watching path
-			if (ok(node.getPath()) && ok(sc.getWatchingPath()) && node.getPath().startsWith(sc.getWatchingPath())) {
+			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
 				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false, true,
 						true, null, false);
-				if (ok(info)) {
+				if (info != null) {
 					FeedPushInfo pushInfo = new FeedPushInfo(info);
 
 					// push notification message to browser
 					sendServerPushInfo(sc, pushInfo);
 
-					if (ok(sessionsPushed)) {
+					if (sessionsPushed != null) {
 						sessionsPushed.add(sc.hashCode());
 					}
 				}
@@ -125,14 +123,14 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
 			/* Anonymous sessions can be ignored */
-			if (no(sc.getUserName()))
+			if (sc.getUserName() == null)
 				continue;
 
 			/*
 			 * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
 			 * node and therefore will be sent to their respecitve browsers
 			 */
-			if (no(sc.getTimelinePath()) || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
+			if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
 				continue;
 			}
 
@@ -144,7 +142,7 @@ public class PushService extends ServiceBase {
 	@PerfMon(category = "push")
 	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
-		if (no(sc))
+		if (sc == null)
 			return;
 
 		exec.run(() -> {

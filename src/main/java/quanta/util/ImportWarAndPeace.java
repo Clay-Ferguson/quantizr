@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,7 +63,7 @@ public class ImportWarAndPeace extends ServiceBase {
 				String line;
 				int lineCount = 0;
 
-				while (!halt && ok(line = in.readLine())) {
+				while (!halt && (line = in.readLine()) != null) {
 					line = line.trim();
 
 					/*
@@ -119,7 +117,7 @@ public class ImportWarAndPeace extends ServiceBase {
 	private boolean processChapter(String line) {
 		if (line.startsWith("CHAPTER ")) {
 			log.debug("Processing Chapter: " + line);
-			if (no(curBook))
+			if (curBook == null)
 				throw ExUtil.wrapEx("book is null.");
 
 			addParagraph();
@@ -145,7 +143,7 @@ public class ImportWarAndPeace extends ServiceBase {
 
 		if (line.length() == 0)
 			return false;
-		if (no(curChapter) || no(curBook))
+		if (curChapter == null || curBook == null)
 			return false;
 
 		// line = XString.injectForQuotations(line);

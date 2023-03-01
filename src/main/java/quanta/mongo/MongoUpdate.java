@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,7 +39,7 @@ public class MongoUpdate extends ServiceBase {
 	}
 
 	public void saveIfDirty(MongoSession ms, SubNode node) {
-		if (no(node) || !ThreadLocals.hasDirtyNode(node.getId())) return;
+		if (node == null || !ThreadLocals.hasDirtyNode(node.getId())) return;
 		save(ms, node, true);
 	}
 
@@ -50,10 +48,10 @@ public class MongoUpdate extends ServiceBase {
 	}
 
 	public void setParentHasChildren(SubNode node) {
-		if (no(node)) return;
+		if (node == null) return;
 		arun.run(as -> {
 			SubNode parent = read.findNodeByPath(node.getParentPath());
-			if (ok(parent)) {
+			if (parent != null) {
 				parent.setHasChildren(true);
 			}
 			return null;
@@ -88,12 +86,12 @@ public class MongoUpdate extends ServiceBase {
 	}
 
 	private boolean isSaving() {
-		return ok(saving.get()) && saving.get().booleanValue();
+		return saving.get() != null && saving.get().booleanValue();
 	}
 
 	@PerfMon(category = "update")
 	public void saveSession(MongoSession ms, boolean asAdmin) {
-		if (no(ms) || isSaving() || !ThreadLocals.hasDirtyNodes())
+		if (ms == null || isSaving() || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
@@ -161,7 +159,7 @@ public class MongoUpdate extends ServiceBase {
 		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfsPin.getPins());
-			if (ok(pins)) {
+			if (pins != null) {
 				/*
 				 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
 				 * if not we remove the pin
@@ -174,7 +172,7 @@ public class MongoUpdate extends ServiceBase {
 					Attachment att = ipfsNode.getFirstAttachment();
 
 					// if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
-					if (no(ipfsNode)) {
+					if (ipfsNode == null) {
 						// turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
 						// to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that
 						// are
@@ -184,13 +182,13 @@ public class MongoUpdate extends ServiceBase {
 						attachment = true;
 					}
 
-					if (ok(ipfsNode)) {
+					if (ipfsNode != null) {
 						pinCount++;
 						log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
 
-						if (attachment && ok(statsMap)) {
-							Long binSize = ok(att) ? att.getSize() : null;
-							if (no(binSize)) {
+						if (attachment && statsMap != null) {
+							Long binSize = att != null ? att.getSize() : null;
+							if (binSize == null) {
 								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above
 								// an call objectStat to put correct amount in.
 								binSize = 0L;
@@ -203,7 +201,7 @@ public class MongoUpdate extends ServiceBase {
 							 * becasue it should be correct.
 							 */
 							UserStats stats = statsMap.get(ipfsNode.getOwner());
-							if (no(stats)) {
+							if (stats == null) {
 								stats = new UserStats();
 								stats.binUsage = binSize;
 								statsMap.put(ipfsNode.getOwner(), stats);
@@ -234,7 +232,7 @@ public class MongoUpdate extends ServiceBase {
 
 	// returns a new BulkOps if one not yet existing
 	public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val) {
-		if (no(bops)) {
+		if (bops == null) {
 			bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 		}
 		Query query = new Query().addCriteria(new Criteria("id").is(id));

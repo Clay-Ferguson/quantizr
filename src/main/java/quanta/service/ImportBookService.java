@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -45,6 +44,6 @@ public class ImportBookService extends ServiceBase {
 	}
 
 	public static boolean safeBooleanVal(Boolean val) {
-		return ok(val) && val.booleanValue();
+		return val != null && val.booleanValue();
 	}
 }

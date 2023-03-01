@@ -1,6 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.ok;
 import java.util.Map;
 import quanta.actpub.APConst;
 
@@ -24,7 +23,7 @@ public class APOFollow extends APOActivity {
     /* 'actor' is person doing the following, and 'target' is the person being followed */
     public APOFollow(String id, String actor, String target) {
         this();
-        if (ok(id)) {
+        if (id != null) {
             put(APObj.id, id);
         }
         put(APObj.actor, actor); 

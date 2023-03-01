@@ -1,6 +1,5 @@
 package quanta.actpub;
 
-import static quanta.util.Util.ok;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class ActPubReplies extends ServiceBase {
             LinkedList<SubNode> nodes = new LinkedList<>();
 
             SubNode node = read.getNode(as, nodeId);
-            if (ok(node) && AclService.isPublic(as, node)) {
+            if (node != null && AclService.isPublic(as, node)) {
                 // We only get COMMENT nodes, because those are considered 'replies' and other things are considered core content,
                 // at least as far as ActPub is concerned.
                 Sort sort = Sort.by(Sort.Direction.ASC, SubNode.CREATE_TIME);

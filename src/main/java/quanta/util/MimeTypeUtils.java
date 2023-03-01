@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
@@ -49,10 +48,10 @@ public class MimeTypeUtils {
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public static String probeContentType(Path file) throws IOException {
         String mimeType = Files.probeContentType(file);
-        if (no(mimeType)) {
+        if (mimeType == null) {
             mimeType = tika.detect(file.toFile());
 
-            if (no(mimeType)) {
+            if (mimeType == null) {
                 mimeType = getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
             }
         }

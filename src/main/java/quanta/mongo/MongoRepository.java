@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,7 @@ public class MongoRepository extends ServiceBase {
 			@Override
 			public void run() {
 				synchronized (lock) {
-					if (ok(ServiceBase.mongoRepo)) {
+					if (ServiceBase.mongoRepo != null) {
 						log.debug("********** runtime shutdownHook executing. **********");
 						ServiceBase.mongoRepo.close();
 					}
@@ -121,7 +119,7 @@ public class MongoRepository extends ServiceBase {
 
 	public void close() {
 		AppServer.setShuttingDown(true);
-		if (no(ServiceBase.mongoRepo))
+		if (ServiceBase.mongoRepo == null)
 			return;
 
 		synchronized (lock) {

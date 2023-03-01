@@ -4,8 +4,6 @@ import static quanta.actpub.model.AP.apHasProps;
 import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -152,13 +150,13 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public String getActorUrlFromWebFingerObj(Object webFinger) {
-        if (no(webFinger))
+        if (webFinger == null)
             return null;
         Object self = getLinkByRel(webFinger, "self");
         // log.debug("Self Link: " + XString.prettyPrint(self));
 
         String actorUrl = null;
-        if (ok(self)) {
+        if (self != null) {
             actorUrl = apStr(self, APObj.href);
         }
         return actorUrl;
@@ -171,7 +169,7 @@ public class ActPubUtil extends ServiceBase {
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = apList(webFinger, APObj.links, false);
 
-        if (no(linksList))
+        if (linksList == null)
             return null;
 
         for (Object link : linksList) {
@@ -197,23 +195,23 @@ public class ActPubUtil extends ServiceBase {
         }
         String _userDoingGet = userDoingGet;
 
-        if (ok(_userDoingGet)) {
+        if (_userDoingGet != null) {
             return (APObj) arun.run(as -> {
                 String actor = apUtil.makeActorUrlForUserName(_userDoingGet);
 
                 /* if private key not sent then get it using the session */
                 String privateKey = apCrypto.getPrivateKey(as, _userDoingGet);
-                if (no(privateKey)) {
+                if (privateKey == null) {
                     throw new RuntimeException("Unable to get private key for user.");
                 }
                 return secureGet(url, clazz, privateKey, actor, mediaType);
             });
-        } else if (ok(ms)) {
+        } else if (ms != null) {
             String actor = apUtil.makeActorUrlForUserName(ms.getUserName());
 
             /* if private key not sent then get it using the session */
             String privateKey = apCrypto.getPrivateKey(ms, ms.getUserName());
-            if (no(privateKey)) {
+            if (privateKey == null) {
                 throw new RuntimeException("Unable to get private key for user.");
             }
             return secureGet(url, clazz, privateKey, actor, mediaType);
@@ -223,7 +221,7 @@ public class ActPubUtil extends ServiceBase {
 
                 /* if private key not sent then get it using the session */
                 String privateKey = apCrypto.getPrivateKey(as, as.getUserName());
-                if (no(privateKey)) {
+                if (privateKey == null) {
                     throw new RuntimeException("Unable to get private key for user.");
                 }
                 return secureGet(url, clazz, privateKey, actor, mediaType);
@@ -241,11 +239,11 @@ public class ActPubUtil extends ServiceBase {
         APObj ret = null;
         int responseCode = 0;
         try {
-            if (no(headers)) {
+            if (headers == null) {
                 headers = new HttpHeaders();
             }
 
-            if (ok(mediaType)) {
+            if (mediaType != null) {
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
                 acceptableMediaTypes.add(mediaType);
                 headers.setAccept(acceptableMediaTypes);
@@ -254,7 +252,7 @@ public class ActPubUtil extends ServiceBase {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            if (ok(response)) {
+            if (response != null) {
                 responseCode = response.getStatusCodeValue();
                 // DO NOT DELETE: Example of how to query with completely unknown class.
                 // mapper.readValue(response.getBody(), new TypeReference<>() {});
@@ -284,7 +282,7 @@ public class ActPubUtil extends ServiceBase {
     /* Posts to all inboxes */
     public void securePostEx(HashSet<String> inboxes, String fromActor, String privateKey, String actor, APObj message,
             MediaType postType) {
-        if (no(inboxes))
+        if (inboxes == null)
             return;
         for (String inbox : inboxes) {
             try {
@@ -324,14 +322,14 @@ public class ActPubUtil extends ServiceBase {
      */
     @PerfMon(category = "apUtil")
     public APOActor getActorByUrl(MongoSession ms, String userDoingAction, String url) {
-        if (no(url))
+        if (url == null)
             return null;
 
         apub.saveFediverseName(url);
 
         // first try to return from cache.
         APOActor actor = apCache.actorsByUrl.get(url);
-        if (ok(actor)) {
+        if (actor != null) {
             return actor;
         }
 
@@ -341,7 +339,7 @@ public class ActPubUtil extends ServiceBase {
             log.error("Unable to get actor from url: " + url);
         }
 
-        if (ok(actor)) {
+        if (actor != null) {
             String userName = getLongUserNameFromActor(actor);
             apCache.actorsByUrl.put(url, actor);
             apCache.actorsByUserName.put(userName, actor);
@@ -354,7 +352,7 @@ public class ActPubUtil extends ServiceBase {
         String actorUrl = null;
 
         SubNode userNode = arun.run(as -> apub.getAcctNodeByForeignUserName(as, userDoingAction, userName, false, true));
-        if (ok(userNode)) {
+        if (userNode != null) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
         }
 
@@ -415,14 +413,14 @@ public class ActPubUtil extends ServiceBase {
 
         // return from cache if we have this cached
         APObj finger = apCache.webFingerCacheByUserName.get(userName);
-        if (ok(finger)) {
+        if (finger != null) {
             return finger;
         }
 
         String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
         finger = getJson(ms, APObj.class, userDoingAction, url, APConst.MTYPE_JRD_JSON);
 
-        if (ok(finger)) {
+        if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(userName, finger);
         } else {
@@ -436,13 +434,13 @@ public class ActPubUtil extends ServiceBase {
         try {
             // log.debug("postJson to: " + url);
 
-            if (no(headers)) {
+            if (headers == null) {
                 headers = new HttpHeaders();
             }
             headers.setAccept(List.of(APConst.MTYPE_ACT_JSON, APConst.MTYPE_JSON));
 
             String appName = prop.getConfigText("brandingAppName");
-            if (no(appName))
+            if (appName == null)
                 appName = "Quanta";
 
             // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
@@ -481,7 +479,7 @@ public class ActPubUtil extends ServiceBase {
                         String username = parts[0];
 
                         SubNode userNode = read.getUserNodeByUserName(null, username);
-                        if (ok(userNode)) {
+                        if (userNode != null) {
                             return new APOWebFinger(username + "@" + fullHost, makeActorUrlForUserName(username));
                         }
                     }
@@ -497,7 +495,7 @@ public class ActPubUtil extends ServiceBase {
     // #todo-optimization: we can call apub.getUserProperty() to get the value right? or is there a
     // direct cache entry for this?
     public String getLongUserNameFromActorUrl(MongoSession ms, String userDoingAction, String actorUrl) {
-        if (no(actorUrl)) {
+        if (actorUrl == null) {
             return null;
         }
 
@@ -511,7 +509,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         APOActor actor = getActorByUrl(ms, userDoingAction, actorUrl);
-        if (no(actor)) {
+        if (actor == null) {
             return null;
         }
         // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
@@ -596,12 +594,12 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public boolean isLocalUrl(String url) {
-        return ok(url) && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
+        return url != null && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
     public void iterateCollection(MongoSession ms, String userDoingAction, Object collectionObj, int maxCount,
             ActPubObserver observer) {
-        if (no(collectionObj))
+        if (collectionObj == null)
             return;
         /*
          * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
@@ -627,11 +625,11 @@ public class ActPubUtil extends ServiceBase {
         List<?> items = apList(collectionObj, APObj.orderedItems, false);
 
         // try as unordered next (we handle both)
-        if (no(items)) {
+        if (items == null) {
             items = apList(collectionObj, APObj.items, false);
         }
 
-        if (ok(items)) {
+        if (items != null) {
             // log.debug("orderedItems(a): " + XString.prettyPrint(orderedItems));
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
@@ -653,7 +651,7 @@ public class ActPubUtil extends ServiceBase {
          */
         Object firstPage = apObj(collectionObj, APObj.first);
 
-        if (ok(firstPage)) {
+        if (firstPage != null) {
             // log.debug("First Page Url: " + XString.prettyPrint(firstPage));
             if (++pageQueries > maxPageQueries)
                 return;
@@ -670,14 +668,14 @@ public class ActPubUtil extends ServiceBase {
                 ocPage = firstPage;
             }
 
-            while (ok(ocPage)) {
+            while (ocPage != null) {
                 items = apList(ocPage, APObj.orderedItems, false);
 
-                if (no(items)) {
+                if (items == null) {
                     items = apList(ocPage, APObj.items, false);
                 }
 
-                if (ok(items)) {
+                if (items != null) {
                     // log.debug("orderedItems(b): " + XString.prettyPrint(orderedItems));
 
                     for (Object item : items) {
@@ -685,7 +683,7 @@ public class ActPubUtil extends ServiceBase {
                         if (apHasProps(item)) {
                             String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
-                            if (no(apId)) {
+                            if (apId == null) {
                                 if (!observer.item(item))
                                     return;
                             }
@@ -710,7 +708,7 @@ public class ActPubUtil extends ServiceBase {
 
                 Object nextPage = apObj(ocPage, APObj.next);
 
-                if (ok(nextPage)) {
+                if (nextPage != null) {
                     // log.debug("nextPage: " + XString.prettyPrint(nextPage));
                     if (++pageQueries > maxPageQueries)
                         return;
@@ -729,7 +727,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         Object lastPage = apObj(collectionObj, APObj.last);
-        if (ok(lastPage)) {
+        if (lastPage != null) {
             // log.debug("Last Page Url: " + lastPage);
             if (++pageQueries > maxPageQueries)
                 return;
@@ -745,21 +743,21 @@ public class ActPubUtil extends ServiceBase {
             else {
                 ocPage = lastPage;
             }
-            if (ok(ocPage)) {
+            if (ocPage != null) {
                 items = apList(ocPage, APObj.orderedItems, false);
 
-                if (no(items)) {
+                if (items == null) {
                     items = apList(ocPage, APObj.items, false);
                 }
 
-                if (ok(items)) {
+                if (items != null) {
                     // log.debug("orderedItems(c): " + XString.prettyPrint(orderedItems));
                     for (Object item : items) {
                         // if item is an object (map)
                         if (apHasProps(item)) {
                             String apId = apStr(item, APObj.id);
                             // if no apId that's fine, just process item.
-                            if (no(apId)) {
+                            if (apId == null) {
                                 if (!observer.item(item))
                                     return;
                             }
@@ -787,7 +785,7 @@ public class ActPubUtil extends ServiceBase {
 
     /* Try to generate the best 'inReplyTo' that TARGETS this node */
     public String buildUrlForReplyTo(MongoSession ms, SubNode node) {
-        if (no(node))
+        if (node == null)
             return null;
 
         // note: I had these two reversed until 1/19/23, which was BAD but somehow it worked most of the
@@ -798,12 +796,12 @@ public class ActPubUtil extends ServiceBase {
         String replyTo = node.getStr(NodeProp.ACT_PUB_ID);
 
         // fall back to this...
-        if (no(replyTo)) {
+        if (replyTo == null) {
             replyTo = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
         }
 
         // or finally reference pointing to our own server node, if it's not private
-        if (no(replyTo)) {
+        if (replyTo == null) {
             replyTo = snUtil.getIdBasedUrl(node);
         }
 
@@ -821,11 +819,11 @@ public class ActPubUtil extends ServiceBase {
 
         arun.run(as -> {
             SubNode node = read.getNode(as, nodeId);
-            if (ok(node) && node.isType(NodeType.FRIEND)) {
+            if (node != null && node.isType(NodeType.FRIEND)) {
                 String friendUserName = node.getStr(NodeProp.USER);
-                if (ok(friendUserName)) {
+                if (friendUserName != null) {
                     // if a foreign user, update thru ActivityPub
-                    if (friendUserName.contains("@") && ok(ThreadLocals.getSC()) && !ThreadLocals.getSC().isAdmin()) {
+                    if (friendUserName.contains("@") && ThreadLocals.getSC() != null && !ThreadLocals.getSC().isAdmin()) {
                         String followerUser = ThreadLocals.getSC().getUserName();
                         apFollowing.setFollowing(followerUser, friendUserName, false);
                     }
@@ -843,13 +841,13 @@ public class ActPubUtil extends ServiceBase {
     // todo-1: method is part of a work in progress and is not complete
     public void readForeignReplies(MongoSession ms, SubNode node, LinkedList<NodeInfo> replyNodes) {
         String apId = node.getStr(NodeProp.ACT_PUB_ID);
-        if (no(apId)) {
+        if (apId == null) {
             // if no apId exists this isn't a foreign node, nothing to do here.
             return;
         }
 
         Map<String, Object> repliesObj = node.getObj(NodeProp.ACT_PUB_REPLIES.s(), Map.class);
-        if (no(repliesObj))
+        if (repliesObj == null)
             return;
 
         String type = apStr(repliesObj, APObj.type);
@@ -865,7 +863,7 @@ public class ActPubUtil extends ServiceBase {
             // If a reply is the string assume that's the URL to the object
             if (obj instanceof String) {
                 NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
-                if (ok(replyNodeInfo)) {
+                if (replyNodeInfo != null) {
                     // log.debug("reply (BY URL): " + XString.prettyPrint(replyNodeInfo));
                     replyNodes.add(replyNodeInfo);
                 }
@@ -874,7 +872,7 @@ public class ActPubUtil extends ServiceBase {
             else if (obj instanceof Map) {
                 APObj apObj = new APObj((Map) obj);
                 NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
-                if (ok(replyNodeInfo)) {
+                if (replyNodeInfo != null) {
                     // log.debug("reply (BY OBJ): " + XString.prettyPrint(replyNodeInfo));
                     replyNodes.add(replyNodeInfo);
                 }
@@ -891,7 +889,7 @@ public class ActPubUtil extends ServiceBase {
 
         // get node that's going to have it's ancestors gathered
         SubNode node = read.getNode(ms, nodeId);
-        if (no(node))
+        if (node == null)
             return res;
 
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, false, false,
@@ -899,7 +897,7 @@ public class ActPubUtil extends ServiceBase {
         nodes.add(info);
 
         String apReplies = node.getStr(NodeProp.ACT_PUB_REPLIES);
-        if (ok(apReplies)) {
+        if (apReplies != null) {
             readForeignReplies(ms, node, nodes);
         }
 
@@ -931,7 +929,7 @@ public class ActPubUtil extends ServiceBase {
         // }
 
         // iterate up the parent chain or chain of inReplyTo for ActivityPub
-        while (ok(node) && nodes.size() < MAX_THREAD_NODES) {
+        while (node != null && nodes.size() < MAX_THREAD_NODES) {
             try {
                 NodeInfo info = null;
 
@@ -963,7 +961,7 @@ public class ActPubUtil extends ServiceBase {
                          * NodeProp.ACT_PUB_OBJ_INREPLYTO pointing to it, because they are also replies
                          */
                         String actPubId = node.getStr(NodeProp.ACT_PUB_ID);
-                        if (ok(actPubId)) {
+                        if (actPubId != null) {
 
                             // todo-1: we have to do both LOCAL and REMOTE users separately here until I create the
                             // REGEX expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
@@ -995,7 +993,7 @@ public class ActPubUtil extends ServiceBase {
                     }
                 }
 
-                if (ok(info)) {
+                if (info != null) {
                     nodes.addFirst(info);
                     lastNodeId = node.getId();
                 }
@@ -1003,21 +1001,21 @@ public class ActPubUtil extends ServiceBase {
                 // if we node id known to be topNode, set parent to null, to trigger the only path up to have to
                 // go thru an inReplyTo, rather than be based on tree structure.
                 SubNode parent = topNode ? null : read.getParent(ms, node);
-                boolean top = ok(parent) && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
+                boolean top = parent != null && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
 
                 // if we didn't get a usable (non root) parent from the tree structure, try using the 'inReplyTo'
                 // value
-                if (no(parent) || top) {
+                if (parent == null || top) {
                     String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
                     // if node has an inReplyTo...
-                    if (ok(inReplyTo)) {
+                    if (inReplyTo != null) {
                         // then loadObject will get it from DB or else resort to getting it from internet
                         parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
                     }
                 }
 
                 node = parent;
-                if (no(node)) {
+                if (node == null) {
                     topReached = true;
                 }
             } catch (Exception e) {
@@ -1030,7 +1028,7 @@ public class ActPubUtil extends ServiceBase {
                  */
             }
         }
-        if (no(node)) {
+        if (node == null) {
             topReached = true;
         }
 
@@ -1042,7 +1040,7 @@ public class ActPubUtil extends ServiceBase {
 
             // sort all children also
             for (NodeInfo n : nodes) {
-                if (ok(n.getChildren())) {
+                if (n.getChildren() != null) {
                     n.getChildren().sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
                 }
             }
@@ -1075,7 +1073,7 @@ public class ActPubUtil extends ServiceBase {
      */
     public SubNode loadObject(MongoSession ms, String userDoingAction, String url) {
         // log.debug("loadObject: url=" + url + " userDoingAction: " + userDoingAction);
-        if (no(url))
+        if (url == null)
             return null;
 
         if (apUtil.isLocalUrl(url)) {
@@ -1088,14 +1086,14 @@ public class ActPubUtil extends ServiceBase {
 
         // Try to look up the node first from the DB.
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), url);
-        if (ok(nodeFound)) {
+        if (nodeFound != null) {
             log.debug("loadObject(): Node found by ID: " + url);
             return nodeFound;
         }
 
         // node not found in DB yet, so we have to get it from off the web from scratch
         APObj obj = apUtil.getRemoteAP(ms, userDoingAction, url);
-        if (no(obj)) {
+        if (obj == null) {
             log.debug("unable to get json: " + url);
             return null;
         }
@@ -1107,7 +1105,7 @@ public class ActPubUtil extends ServiceBase {
         String id = apStr(obj, APObj.id);
 
         SubNode nodeFound = read.findNodeByProp(ms, NodeProp.ACT_PUB_ID.s(), id);
-        if (ok(nodeFound)) {
+        if (nodeFound != null) {
             log.debug("loadObjectFromObj(): Node found by ID: " + id);
             return nodeFound;
         }
@@ -1120,16 +1118,16 @@ public class ActPubUtil extends ServiceBase {
             // Quanta and so the history cannot be displayed.
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);
-                if (ok(ownerActorUrl)) {
+                if (ownerActorUrl != null) {
                     return (SubNode) arun.run(as -> {
                         SubNode node = null;
                         SubNode accountNode = apub.getAcctNodeByActorUrl(as, userDoingAction, ownerActorUrl);
-                        if (ok(accountNode)) {
+                        if (accountNode != null) {
                             String apUserName = accountNode.getStr(NodeProp.USER);
                             SubNode outboxNode =
                                     read.getUserNodeByType(as, apUserName, accountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
                                             Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
-                            if (no(outboxNode)) {
+                            if (outboxNode == null) {
                                 log.debug("no outbox for user: " + apUserName);
                                 return null;
                             }
@@ -1162,9 +1160,9 @@ public class ActPubUtil extends ServiceBase {
         // "https://kenzoishii.example.com/image/165987aklre4"
         // ]
 
-        if (ok(icon)) {
+        if (icon != null) {
             String iconUrl = apStr(icon, APObj.url);
-            if (ok(iconUrl)) {
+            if (iconUrl != null) {
                 String curIconUrl = node.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
                 if (!iconUrl.equals(curIconUrl)) {
                     if (node.set(NodeProp.ACT_PUB_USER_ICON_URL, iconUrl)) {
@@ -1175,9 +1173,9 @@ public class ActPubUtil extends ServiceBase {
         }
 
         Object endpoints = apObj(actor, APObj.endpoints);
-        if (ok(endpoints)) {
+        if (endpoints != null) {
             String sharedInbox = apStr(endpoints, APObj.sharedInbox);
-            if (ok(sharedInbox)) {
+            if (sharedInbox != null) {
                 String curSharedInbox = node.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                 if (!sharedInbox.equals(curSharedInbox)) {
                     if (node.set(NodeProp.ACT_PUB_SHARED_INBOX, sharedInbox)) {
@@ -1188,9 +1186,9 @@ public class ActPubUtil extends ServiceBase {
         }
 
         Object image = apObj(actor, APObj.image);
-        if (ok(image)) {
+        if (image != null) {
             String imageUrl = apStr(image, APObj.url);
-            if (ok(imageUrl)) {
+            if (imageUrl != null) {
                 String curImageUrl = node.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
                 if (!imageUrl.equals(curImageUrl)) {
                     if (node.set(NodeProp.ACT_PUB_USER_IMAGE_URL, imageUrl)) {
@@ -1207,7 +1205,7 @@ public class ActPubUtil extends ServiceBase {
             changed = true;
 
         String actorId = apStr(actor, APObj.id);
-        if (no(actorId)) {
+        if (actorId == null) {
             log.debug("no actorId on object: " + XString.prettyPrint(actor));
         }
 

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.InputStream;
 import java.util.HashMap;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -54,10 +52,10 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (lastSlashIdx != -1) {
 				// log.debug(" isBIN: " + entry.getName());
 				String nodeId = pathToIdMap.get(path);
-				if (ok(nodeId)) {
+				if (nodeId != null) {
 					arun.run(as -> {
 						SubNode node = read.getNode(as, nodeId);
-						if (ok(node)) {
+						if (node != null) {
 							if (importBinary(entry, node, zis, fileName)) {
 								done.setVal(true);
 							}
@@ -116,7 +114,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 					}
 				});
 
-				if (no(node)) {
+				if (node == null) {
 					throw new RuntimeException("import unmarshalling failed.");
 				}
 
@@ -125,7 +123,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 				 * be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
 				 * the obsolete values cannot be reused.
 				 */
-				if (ok(node.getAttachments())) {
+				if (node.getAttachments() != null) {
 					node.getAttachments().forEach((String key, Attachment att) -> {
 						att.setBin(null);
 					});
@@ -153,7 +151,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
 		String attName = fileUtil.stripExtension(fileName);
 		HashMap<String, Attachment> atts = node.getAttachments();
-		if (no(atts))
+		if (atts == null)
 			return false;
 
 		/*
@@ -162,7 +160,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 		 * on the node we have now.
 		 */
 		Attachment att = atts.get(attName);
-		if (no(att))
+		if (att == null)
 			return false;
 
 		Long length = att.getSize();

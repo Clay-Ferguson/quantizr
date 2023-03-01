@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
 import java.io.BufferedInputStream;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -22,13 +21,13 @@ public class ImportService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportService.class);
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
-		if (no(nodeId)) {
+		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 		ms = ThreadLocals.ensure(ms);
 
 		SubNode node = read.getNode(ms, nodeId);
-		if (no(node)) {
+		if (node == null) {
 			throw ExUtil.wrapEx("Node not found.");
 		}
 		auth.ownerAuth(ms, node);

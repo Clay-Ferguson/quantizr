@@ -1,7 +1,5 @@
 package quanta.types;
 
-
-import static quanta.util.Util.no;
 import java.util.HashSet;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -24,11 +22,11 @@ public class RssFeedType extends TypeBase {
         String feedSrc = node.getStr(NodeProp.RSS_FEED_SRC);
 
         // if no content or it's encrypted return
-        if (no(feedSrc) || feedSrc.startsWith(Constant.ENC_TAG.s()))
+        if (feedSrc == null || feedSrc.startsWith(Constant.ENC_TAG.s()))
             return;
 
         List<String> lines = XString.tokenizeWithDelims(feedSrc, "\n\r");
-        if (no(lines)) {
+        if (lines == null) {
             return;
         }
 

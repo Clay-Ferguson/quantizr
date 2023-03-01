@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
@@ -100,7 +98,7 @@ public class IPFSService extends ServiceBase {
         if (!prop.ipfsEnabled())
             return null;
         synchronized (instanceIdLock) {
-            if (no(instanceId)) {
+            if (instanceId == null) {
                 instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
             }
             return instanceId;
@@ -113,14 +111,14 @@ public class IPFSService extends ServiceBase {
         // todo-2: this is not yet handling multiple images. It's ok IPFS is on the back burner right now.
         Attachment att = node.getFirstAttachment();
         String cid = null;
-        String mime = ok(att) ? att.getMime() : null;
-        String fileName = ok(att) ? att.getFileName() : null;
+        String mime = att != null ? att.getMime() : null;
+        String fileName = att != null ? att.getFileName() : null;
 
         InputStream is = attach.getStreamByNode(node, "");
-        if (ok(is)) {
+        if (is != null) {
             try {
                 MerkleLink ret = addFromStream(ms, is, fileName, mime, null, false);
-                if (ok(ret)) {
+                if (ret != null) {
                     cid = ret.getHash();
                 }
             } catch (Exception e) {
@@ -223,7 +221,7 @@ public class IPFSService extends ServiceBase {
                 // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
             }
 
-            if (ok(streamSize)) {
+            if (streamSize != null) {
                 streamSize.setVal((int) lis.getCount());
             }
         } catch (Exception e) {
@@ -263,7 +261,7 @@ public class IPFSService extends ServiceBase {
         SubNode exportParent =
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
-        if (ok(exportParent)) {
+        if (exportParent != null) {
             SubNode node =
                     create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true, true);
 
@@ -281,7 +279,7 @@ public class IPFSService extends ServiceBase {
 
             update.save(ms, node);
 
-            if (ok(childrenFiles)) {
+            if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true, true);
@@ -333,7 +331,7 @@ public class IPFSService extends ServiceBase {
 
     public InputStream getStream(MongoSession ms, String hash) {
         checkIpfs();
-        if (ok(failedCIDs.get(hash))) {
+        if (failedCIDs.get(hash) != null) {
             // log.debug("Abort CID already failed: " + hash);
             throw new RuntimeException("failed CIDs: " + hash);
         }
@@ -393,10 +391,10 @@ public class IPFSService extends ServiceBase {
             if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
                 String body = response.getBody();
                 if (clazz == String.class) {
-                    return no(response.getBody()) ? "success" : body;
+                    return response.getBody() == null ? "success" : body;
                 } else {
                     // log.debug("postForJsonReply: " + body);
-                    if (no(body)) {
+                    if (body == null) {
                         ret = "success";
                     } else {
                         try {

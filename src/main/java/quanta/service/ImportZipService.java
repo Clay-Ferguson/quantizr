@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -68,7 +66,7 @@ public class ImportZipService extends ImportArchiveBase {
 		used = true;
 
 		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
 		}
 
@@ -83,7 +81,7 @@ public class ImportZipService extends ImportArchiveBase {
 			zis = new ZipArchiveInputStream(is);
 
 			ZipArchiveEntry entry;
-			while (ok(entry = zis.getNextZipEntry())) {
+			while ((entry = zis.getNextZipEntry()) != null) {
 				if (!entry.isDirectory()) {
 					processFile(entry, zis, userNode.getOwner());
 				}

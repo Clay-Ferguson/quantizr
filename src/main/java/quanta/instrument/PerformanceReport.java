@@ -1,7 +1,5 @@
 package quanta.instrument;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +53,7 @@ public class PerformanceReport {
 		// calculate totals per person
 		HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
 		for (PerfMonEvent se : orderedData) {
-			String user = ok(se.user) ? se.user : PrincipalName.ANON.s();
+			String user = se.user != null ? se.user : PrincipalName.ANON.s();
 			UserPerf up = userPerfInfo.get(user);
 			if (up == null) {
 				userPerfInfo.put(user, up = new UserPerf());
@@ -126,7 +124,7 @@ public class PerformanceReport {
 
 		for (PerfMonEvent event : Instrument.data) {
 			MethodStat stat = stats.get(event.event);
-			if (no(stat)) {
+			if (stat == null) {
 				stats.put(event.event, stat = new MethodStat());
 				stat.category = event.event;
 			}
@@ -162,14 +160,14 @@ public class PerformanceReport {
 		boolean embedSubEvents = false;
 
 		if (!isSubItem) {
-			tr += htmlTd(ok(se.user) ? se.user : PrincipalName.ANON.s());
+			tr += htmlTd(se.user != null ? se.user : PrincipalName.ANON.s());
 		}
 
 		// If this event happens to be the head/root of a series of events
 		String set = "";
 		if (embedSubEvents) {
 			String rows = "";
-			if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
+			if (showSubEvents && se.root != null && se.root.subEvents != null) {
 				// sb.append("\n Set:\n");
 				for (PerfMonEvent subEvent : se.root.subEvents) {
 					// if we run across same 'se' we're processing, skip it
@@ -192,7 +190,7 @@ public class PerformanceReport {
 		tr += htmlTd(se.event + set);
 		tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
 
-		if (!isSubItem && ok(se.root)) {
+		if (!isSubItem && se.root != null) {
 			tr += htmlTdRt(String.valueOf(se.root.hashCode()));
 		}
 

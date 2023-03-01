@@ -1,6 +1,5 @@
 package quanta.model.client;
 
-import static quanta.util.Util.ok;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MFSDirEntry {
@@ -49,10 +48,10 @@ public class MFSDirEntry {
     }
 
     public boolean isDir() {
-        return ok(type) && type.intValue() == 1;
+        return type != null && type.intValue() == 1;
     }
 
     public boolean isFile() {
-        return ok(type) && type.intValue() == 0;
+        return type != null && type.intValue() == 0;
     }
 }

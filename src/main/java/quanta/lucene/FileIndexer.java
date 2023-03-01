@@ -1,6 +1,5 @@
 package quanta.lucene;
 
-import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -283,7 +282,7 @@ public class FileIndexer extends ServiceBase {
 
 	private void indexZipStream(ZipInputStream zis, String zipParent) throws Exception {
 		ZipEntry entry;
-		while (ok(entry = zis.getNextEntry())) {
+		while ((entry = zis.getNextEntry()) != null) {
 			if (entry.isDirectory()) {
 				/*
 				 * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
@@ -309,7 +308,7 @@ public class FileIndexer extends ServiceBase {
 	private void indexTarStream(TarArchiveInputStream tis, String zipParent) throws Exception {
 		try {
 			ArchiveEntry entry = null;
-			while (ok(entry = tis.getNextEntry())) {
+			while ((entry = tis.getNextEntry()) != null) {
 
 				if (!tis.canReadEntryData(entry)) {
 					log.warn("Can't read entry." + entry.getName());
@@ -689,7 +688,7 @@ public class FileIndexer extends ServiceBase {
 	}
 
 	private void closeIndexWriter() {
-		if (ok(writer)) {
+		if (writer != null) {
 			log.info("Shutting down index writer");
 			try {
 				writer.close();
@@ -701,7 +700,7 @@ public class FileIndexer extends ServiceBase {
 	}
 
 	private void closeFSDirectory() {
-		if (ok(fsDir)) {
+		if (fsDir != null) {
 			log.info("closing FSDirectory");
 			try {
 				fsDir.close();

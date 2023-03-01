@@ -1,7 +1,5 @@
 package quanta.mail;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.Properties;
 import javax.mail.BodyPart;
@@ -58,13 +56,13 @@ public class EmailSender extends ServiceBase implements TransportListener {
 		String mailPassword = appProp.getMailPassword();
 		// log.debug("mailPassword=" + mailPassword);
 
-		if (no(mailSession)) {
+		if (mailSession == null) {
 			props = new Properties();
 			props.put("mail.smtps.host", mailHost);
 			props.put("mail.smtps.auth", "true");
 
 			mailSession = Session.getInstance(props, null);
-			if (ok(mailSession)) {
+			if (mailSession != null) {
 				log.trace("Created mailSession");
 			}
 			mailSession.setDebug(debug);
@@ -72,7 +70,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
 
 		try {
 			transport = (SMTPTransport) mailSession.getTransport("smtps");
-			if (ok(transport)) {
+			if (transport != null) {
 				log.trace("Created mail transport.");
 			}
 
@@ -102,7 +100,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	public void close() {
 		if (!mailEnabled())
 			return;
-		if (ok(transport)) {
+		if (transport != null) {
 			try {
 				log.trace("closing transport");
 				transport.close();
@@ -118,11 +116,11 @@ public class EmailSender extends ServiceBase implements TransportListener {
 		if (!mailEnabled())
 			return;
 
-		if (no(fromAddress)) {
+		if (fromAddress == null) {
 			fromAddress = appProp.getMailFrom();
 		}
 
-		if (no(transport)) {
+		if (transport == null) {
 			throw ExUtil.wrapEx("Tried to use MailSender after close() call or without initializing.");
 		}
 

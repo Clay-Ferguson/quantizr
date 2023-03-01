@@ -1,6 +1,5 @@
 package quanta.model;
 
-import static quanta.util.Util.no;
 import java.util.LinkedList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,7 +52,7 @@ public class AccessControlInfo {
 	}
 
 	public void addPrivilege(PrivilegeInfo priv) {
-		if (no(privileges)) {
+		if (privileges == null) {
 			privileges = new LinkedList<>();
 		}
 		privileges.add(priv);

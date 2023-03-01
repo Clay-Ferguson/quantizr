@@ -1,10 +1,8 @@
 package quanta.test;
 
-import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
@@ -35,7 +33,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
         String webFingerUrl = targetUser + "@" + targetHostAndPort;
 
         APObj webFinger = apUtil.getWebFingerSec(null, null, webFingerUrl, false);
-        if (no(webFinger)) {
+        if (webFinger == null) {
             throw new Exception("Unable to get webFinger of " + webFingerUrl);
         }
 
@@ -44,7 +42,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
         /* ----- GET ACTOR ----- */
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         APObj actorObj = apUtil.getRemoteAP(null, null, actorUrl);
-        if (no(actorObj)) {
+        if (actorObj == null) {
             throw new Exception("Unable to get actor: " + actorUrl);
         }
 

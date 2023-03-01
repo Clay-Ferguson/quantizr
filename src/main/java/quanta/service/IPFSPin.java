@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.annotation.PostConstruct;
@@ -45,15 +43,15 @@ public class IPFSPin extends ServiceBase {
         checkIpfs();
         // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
-        return ok(ipfs.postForJsonReply(url, Object.class));
+        return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public boolean add(String cid) {
-        if (no(cid)) return false;
+        if (cid == null) return false;
         checkIpfs();
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
-        return ok(ipfs.postForJsonReply(url, Object.class));
+        return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public LinkedHashMap<String, Object> getPins() {
@@ -65,7 +63,7 @@ public class IPFSPin extends ServiceBase {
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
             // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
 
-            if (ok(res)) {
+            if (res != null) {
                 pins = Cast.toLinkedHashMap(res.get("Keys"));
             }
         } catch (Exception e) {
@@ -85,7 +83,7 @@ public class IPFSPin extends ServiceBase {
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
 
-            if (no(node))
+            if (node == null)
                 return;
 
             // todo-2: make this handle multiple attachments, and all calls to it
@@ -102,7 +100,7 @@ public class IPFSPin extends ServiceBase {
 
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
-            if (ok(accountNode)) {
+            if (accountNode != null) {
                 user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode);
             }
         });

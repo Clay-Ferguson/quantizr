@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
@@ -172,15 +171,15 @@ public class SystemService extends ServiceBase {
 
 	public String getJson(MongoSession ms, String nodeId) {
 		SubNode node = read.getNode(ms, nodeId, true, null);
-		if (ok(node)) {
+		if (node != null) {
 			String ret = XString.prettyPrint(node);
 
 			List<Attachment> atts = node.getOrderedAttachments();
-			if (ok(atts)) {
+			if (atts != null) {
 				for (Attachment att : atts) {
-					if (ok(att.getIpfsLink())) {
+					if (att.getIpfsLink() != null) {
 						IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
-						if (ok(fullStat)) {
+						if (fullStat != null) {
 							ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
 						}
 					}
@@ -294,7 +293,7 @@ public class SystemService extends ServiceBase {
 			String s;
 
 			BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while (ok(s = stdout.readLine())) {
+			while ((s = stdout.readLine()) != null) {
 				output.append(s);
 				output.append("\n");
 			}
@@ -329,9 +328,9 @@ public class SystemService extends ServiceBase {
 
 		sb.append("Live Sessions:\n");
 		for (SessionContext sc : SessionContext.getAllSessions(false, true)) {
-			if (sc.isLive() && ok(sc.getUserName())) {
+			if (sc.isLive() && sc.getUserName() != null) {
 				Integer hits = map.get(sc.getSession().getId());
-				sb.append("    " + sc.getUserName() + " hits=" + (ok(hits) ? String.valueOf(hits) : "?"));
+				sb.append("    " + sc.getUserName() + " hits=" + (hits != null ? String.valueOf(hits) : "?"));
 				sb.append("\n");
 			}
 		}

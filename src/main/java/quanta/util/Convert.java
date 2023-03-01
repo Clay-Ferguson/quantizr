@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -64,14 +62,14 @@ public class Convert extends ServiceBase {
 
 		// if we have a signature, check it.
 		boolean sigFail = false;
-		if (ok(sig) && !crypto.nodeSigVerify(node, sig)) {
+		if (sig != null && !crypto.nodeSigVerify(node, sig)) {
 			sigFail = true;
 		}
 
 		// #sig: need a config setting that specifies which path(s) are required to be signed so
 		// this can be enabled/disabled easily by admin
 		if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
-			if ((no(sig) || sigFail) && !sc.isAdmin()) {
+			if ((sig == null || sigFail) && !sc.isAdmin()) {
 				// todo-2: we need a special global counter for when this happens, so the server info can show it.
 				/*
 				 * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
@@ -91,7 +89,7 @@ public class Convert extends ServiceBase {
 		}
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
-		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
+		if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
 			if (!ms.isAdmin()) {
 				node.clearSecretProperties();
 			}
@@ -104,7 +102,7 @@ public class Convert extends ServiceBase {
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
-		if (no(node.getOwner())) {
+		if (node.getOwner() == null) {
 			throw new RuntimeException("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
 		}
 
@@ -117,18 +115,18 @@ public class Convert extends ServiceBase {
 		String owner = PrincipalName.ADMIN.s();
 
 		SubNode userNode = ThreadLocals.getCachedNode(node.getOwner());
-		if (no(userNode)) {
+		if (userNode == null) {
 			userNode = read.getOwner(ms, node, false);
-			if (ok(userNode)) {
+			if (userNode != null) {
 				ThreadLocals.cacheNode(userNode);
 			}
 		}
 
-		if (ok(userNode)) {
+		if (userNode != null) {
 			nameProp = userNode.getStr(NodeProp.USER);
 
 			Attachment userAtt = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-			if (ok(userAtt)) {
+			if (userAtt != null) {
 				avatarVer = userAtt.getBin();
 			}
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
@@ -156,18 +154,18 @@ public class Convert extends ServiceBase {
 		 * put in cipherKey, so send back so the user can decrypt the node.
 		 */
 		String cipherKey = null;
-		if (!ownerId.equals(sc.getRootId()) && ok(node.getAc())) {
+		if (!ownerId.equals(sc.getRootId()) && node.getAc() != null) {
 			AccessControl ac = node.getAc().get(sc.getRootId());
-			if (ok(ac)) {
+			if (ac != null) {
 				cipherKey = ac.getKey();
-				if (ok(cipherKey)) {
+				if (cipherKey != null) {
 					log.debug("Rendering Sent Back CipherKey: " + cipherKey);
 				}
 			}
 		}
 
 		ArrayList<String> likes = null;
-		if (ok(node.getLikes())) {
+		if (node.getLikes() != null) {
 			likes = new ArrayList<String>(node.getLikes());
 		}
 
@@ -177,14 +175,14 @@ public class Convert extends ServiceBase {
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
 				owner, ownerId, //
-				ok(node.getTransferFrom()) ? node.getTransferFrom().toHexString() : null, //
+				node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, //
 				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
-		if (ok(plugin)) {
+		if (plugin != null) {
 			plugin.convert(ms, nodeInfo, node, getFollowers);
 		}
 
@@ -216,7 +214,7 @@ public class Convert extends ServiceBase {
 
 					NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel, lastChild,
 							childrenCheck, false, loadLikes, false, null, false);
-					if (ok(info)) {
+					if (info != null) {
 						nodeInfo.safeGetChildren().add(info);
 					}
 				}
@@ -250,21 +248,21 @@ public class Convert extends ServiceBase {
 		if (attachBoosted) {
 			SubNode boostedNode = null;
 
-			if (ok(boostedNodeVal)) {
+			if (boostedNodeVal != null) {
 				// if boosted node was passed in use it
 				boostedNode = boostedNodeVal.getVal();
 			} else {
 				// otherwise check to see if we have a boosted node from scratch.
 				String boostTargetId = node.getStr(NodeProp.BOOST);
-				if (ok(boostTargetId)) {
+				if (boostTargetId != null) {
 					boostedNode = read.getNode(ms, boostTargetId);
 				}
 			}
 
-			if (ok(boostedNode)) {
+			if (boostedNode != null) {
 				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, 0, false, false, false, false, false, false,
 						null, false);
-				if (ok(info)) {
+				if (info != null) {
 					nodeInfo.setBoostedNode(info);
 				}
 			}
@@ -285,7 +283,7 @@ public class Convert extends ServiceBase {
 	public static String replaceTagsWithHtml(SubNode node, boolean includeHashtags) {
 
 		// don't process foreign-created nodes!
-		if (ok(node.getStr(NodeProp.ACT_PUB_ID))) {
+		if (node.getStr(NodeProp.ACT_PUB_ID) != null) {
 			return null;
 		}
 
@@ -293,13 +291,13 @@ public class Convert extends ServiceBase {
 		// parse both.
 		HashMap<String, APObj> tags = auth.parseTags(node.getContent(), true, false);
 		HashMap<String, APObj> nodePropTags = auth.parseTags(node);
-		if (ok(nodePropTags)) {
+		if (nodePropTags != null) {
 			tags.putAll(nodePropTags);
 		}
 
 		// sending back null for renderContent if no tags were inserted (no special HTML to send back, but
 		// just markdown)
-		if (no(tags) || tags.size() == 0)
+		if (tags == null || tags.size() == 0)
 			return null;
 
 		StringBuilder sb = new StringBuilder();
@@ -317,7 +315,7 @@ public class Convert extends ServiceBase {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOHashtag) {
 					String href = (String) tag.get(APObj.href);
-					if (ok(href)) {
+					if (href != null) {
 						String shortTok = XString.stripIfStartsWith(tok, "#");
 						// having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
 						formatted = true;
@@ -334,7 +332,7 @@ public class Convert extends ServiceBase {
 				APObj tag = tags.get(tok);
 				if (tag instanceof APOMention) {
 					String href = (String) tag.get(APObj.href);
-					if (ok(href)) {
+					if (href != null) {
 						// if tok is a 'long fedi name' make it the shortened version (no domain)
 						if (atCount == 2) {
 							tok = XString.truncAfterLast(tok, "@");
@@ -361,15 +359,15 @@ public class Convert extends ServiceBase {
 
 	public static ImageSize getImageSize(Attachment att) {
 		ImageSize imageSize = new ImageSize();
-		if (ok(att)) {
+		if (att != null) {
 			try {
 				Integer width = att.getWidth();
-				if (ok(width)) {
+				if (width != null) {
 					imageSize.setWidth(width.intValue());
 				}
 
 				Integer height = att.getHeight();
-				if (ok(height)) {
+				if (height != null) {
 					imageSize.setHeight(height.intValue());
 				}
 			} catch (Exception e) {
@@ -387,7 +385,7 @@ public class Convert extends ServiceBase {
 
 		List<PropertyInfo> props = null;
 		HashMap<String, Object> propMap = node.getProps();
-		if (ok(propMap) && ok(propMap.keySet())) {
+		if (propMap != null && propMap.keySet() != null) {
 			for (String propName : propMap.keySet()) {
 				// inticate to the client the signature is no good by not even sending the bad signature to client.
 				if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName)) {
@@ -395,7 +393,7 @@ public class Convert extends ServiceBase {
 				}
 
 				/* lazy create props */
-				if (no(props)) {
+				if (props == null) {
 					props = new LinkedList<>();
 				}
 
@@ -406,7 +404,7 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		if (ok(props)) {
+		if (props != null) {
 			props.sort((a, b) -> a.getName().compareTo(b.getName()));
 		}
 		return props;
@@ -415,7 +413,7 @@ public class Convert extends ServiceBase {
 	public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
 		List<AccessControlInfo> ret = null;
 		HashMap<String, AccessControl> ac = node.getAc();
-		if (no(ac))
+		if (ac == null)
 			return null;
 
 		for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
@@ -423,7 +421,7 @@ public class Convert extends ServiceBase {
 			AccessControl acval = entry.getValue();
 
 			/* lazy create list */
-			if (no(ret)) {
+			if (ret == null) {
 				ret = new LinkedList<>();
 			}
 
@@ -438,15 +436,15 @@ public class Convert extends ServiceBase {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
 
-		if (ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.READ.s())) {
+		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
 			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
 		}
 
-		if (ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
 			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
 		}
 
-		if (ok(principalId)) {
+		if (principalId != null) {
 			arun.run(s -> {
 				// todo-2: if the actual user account has been delete we can get here and end up with null user name
 				// I think. Look into it.

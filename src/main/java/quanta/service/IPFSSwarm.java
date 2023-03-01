@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -74,7 +73,7 @@ public class IPFSSwarm extends ServiceBase {
         if (!prop.ipfsEnabled()) return;
         arun.run(as -> {
             List<String> adrsList = getConnectAddresses(as);
-            if (ok(adrsList)) {
+            if (adrsList != null) {
                 for (String adrs : adrsList) {
                     if (adrs.startsWith("/")) {
                         connect(adrs);
@@ -89,7 +88,7 @@ public class IPFSSwarm extends ServiceBase {
         checkIpfs();
         List<String> ret = null;
         SubNode node = read.getNode(ms, ":ipfsSwarmAddresses");
-        if (ok(node)) {
+        if (node != null) {
             log.debug("swarmAddresses: " + node.getContent());
             ret = XString.tokenize(node.getContent(), "\n", true);
         }

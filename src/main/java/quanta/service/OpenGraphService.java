@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import org.apache.commons.collections4.map.LRUMap;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -68,22 +66,22 @@ public class OpenGraphService extends ServiceBase {
 		// todo-2: add site_name, type, url, twitter:url, twitter:card (like og:type)
 
 		openGraph.setTitle(getOg(doc, "og:title"));
-		if (no(openGraph.getTitle())) {
+		if (openGraph.getTitle() == null) {
 			openGraph.setTitle(getOg(doc, "twitter:title"));
 		}
 
 		openGraph.setUrl(getOg(doc, "og:url"));
-		if (no(openGraph.getUrl())) {
+		if (openGraph.getUrl() == null) {
 			openGraph.setUrl(getOg(doc, "twitter:url"));
 		}
 
 		openGraph.setDescription(getOg(doc, "og:description"));
-		if (no(openGraph.getDescription())) {
+		if (openGraph.getDescription() == null) {
 			openGraph.setDescription(getOg(doc, "twitter:description"));
 		}
 
 		openGraph.setImage(getOg(doc, "og:image"));
-		if (no(openGraph.getImage())) {
+		if (openGraph.getImage() == null) {
 			openGraph.setImage(getOg(doc, "twitter:image"));
 		}
 		return openGraph;
@@ -91,6 +89,6 @@ public class OpenGraphService extends ServiceBase {
 
 	private String getOg(Document doc, String prop) {
 		Elements elm = doc.select("meta[property=" + prop + "]");
-		return ok(elm) ? elm.attr("content") : null;
+		return elm != null ? elm.attr("content") : null;
 	}
 }

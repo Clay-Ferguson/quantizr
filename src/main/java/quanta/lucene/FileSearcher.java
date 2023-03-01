@@ -1,6 +1,5 @@
 package quanta.lucene;
 
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.apache.lucene.analysis.Analyzer;
@@ -86,10 +85,10 @@ public class FileSearcher {
 		for (int i = 0; i < hits.length; i++) {
 			Document doc = searcher.doc(hits[i].doc);
 			String path = doc.get("path");
-			if (ok(path)) {
+			if (path != null) {
 				write(String.valueOf(i + 1) + ". " + path);
 				String title = doc.get("title");
-				if (ok(title)) {
+				if (title != null) {
 					write("   Title: " + doc.get("title"));
 				}
 			} else {

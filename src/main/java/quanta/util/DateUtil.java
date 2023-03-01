@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
@@ -296,13 +294,13 @@ public class DateUtil {
 	}
 
 	public static String formatTimeForUserTimezone(Date date, String timezone, String timeZoneAbbrev) {
-		if (no(date))
+		if (date == null)
 			return null;
 
 		/* If we have a short timezone abbreviation display timezone with it */
-		if (ok(timeZoneAbbrev)) {
+		if (timeZoneAbbrev != null) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (ok(timezone)) {
+			if (timezone != null) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
 			}
 			return dateFormat.format(date) + " " + timeZoneAbbrev;
@@ -310,7 +308,7 @@ public class DateUtil {
 		/* else display timezone in standard GMT format */
 		else {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (ok(timezone)) {
+			if (timezone != null) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
 			}
 			return dateFormat.format(date);

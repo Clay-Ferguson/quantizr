@@ -1,8 +1,6 @@
 package quanta.actpub;
 
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -83,7 +81,7 @@ public class ActPubFactory extends ServiceBase {
 	public APObj newNote(String userDoingAction, HashSet<String> toUserNames, String attributedTo /* fromActor */,
 			String inReplyTo, String replyToType, String content, String noteUrl, String repliesUrl, ZonedDateTime now,
 			boolean privateMessage, APList attachments) {
-		if (ok(content)) {
+		if (content != null) {
 			// convert all double and single spaced lines to <br> for formatting, for servers that don't
 			// understand Markdown
 			content = content.replace("\n", "<br>");
@@ -92,7 +90,7 @@ public class ActPubFactory extends ServiceBase {
 		APObj ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, repliesUrl,
 				false, content, null);
 
-		if (ok(inReplyTo)) {
+		if (inReplyTo != null) {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);
 		}
 
@@ -138,7 +136,7 @@ public class ActPubFactory extends ServiceBase {
 				// build an actorUrl for either foreign or local users. Both are included.
 				if (userName.contains("@")) {
 					actorUrl = apUtil.getActorUrlFromForeignUserName(userDoingAction, userName);
-					if (no(actorUrl))
+					if (actorUrl == null)
 						continue;
 				} else {
 					actorUrl = apUtil.makeActorUrlForUserName(userName);
@@ -152,7 +150,7 @@ public class ActPubFactory extends ServiceBase {
 					toActors.add(actorUrl);
 				}
 
-				if (ok(tagList)) {
+				if (tagList != null) {
 					// prepend character to make it like '@user@server.com'
 					tagList.val(new APOMention(actorUrl, "@" + userName));
 				}
@@ -163,7 +161,7 @@ public class ActPubFactory extends ServiceBase {
 			}
 		}
 
-		if (ok(tagList)) {
+		if (tagList != null) {
 			object.put(APObj.tag, tagList);
 		}
 
@@ -186,7 +184,7 @@ public class ActPubFactory extends ServiceBase {
 					return apUtil.getActorByUrl(as, userDoingAction, fromActor);
 				});
 
-				if (ok(fromActorObj)) {
+				if (fromActorObj != null) {
 					ccActors.add(fromActorObj.getFollowers());
 				}
 			}
@@ -212,7 +210,7 @@ public class ActPubFactory extends ServiceBase {
 	// Wraps an array of SubNodes into APONote Objects */
 	public List<APObj> makeAPONotes(MongoSession as, List<SubNode> nodes, SubNode parent) {
 		LinkedList<APObj> items = new LinkedList<>();
-		if (no(nodes) || nodes.isEmpty())
+		if (nodes == null || nodes.isEmpty())
 			return items;
 
 		for (SubNode node : nodes) {
@@ -226,7 +224,7 @@ public class ActPubFactory extends ServiceBase {
 		String userName = read.getNodeOwner(as, child);
 		String host = prop.getProtocolHostAndPort();
 		String nodeIdBase = host + "?id=";
-		if (no(parent)) {
+		if (parent == null) {
 			parent = read.getParent(as, child, false);
 		}
 
@@ -235,7 +233,7 @@ public class ActPubFactory extends ServiceBase {
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
 		String content = Convert.replaceTagsWithHtml(child, true);
-		if (no(content)) {
+		if (content == null) {
 			content = child.getContent();
 		}
 
@@ -247,16 +245,16 @@ public class ActPubFactory extends ServiceBase {
 
 		// build the 'tags' array for this object from the sharing ACLs.
 		List<String> userNames = apub.getUserNamesFromNodeAcl(as, child);
-		if (ok(userNames)) {
+		if (userNames != null) {
 			APList tags = apub.getTagListFromUserNames(null, userNames);
-			if (ok(tags)) {
+			if (tags != null) {
 				ret.put(APObj.tag, tags);
 			}
 		}
 
-		if (ok(parent)) {
+		if (parent != null) {
 			String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-			if (ok(replyTo)) {
+			if (replyTo != null) {
 				ret = ret.put(APObj.inReplyTo, replyTo);
 			}
 		}
@@ -272,7 +270,7 @@ public class ActPubFactory extends ServiceBase {
 		String actor = apUtil.makeActorUrlForUserName(userName);
 
 		String content = Convert.replaceTagsWithHtml(child, true);
-		if (no(content)) {
+		if (content == null) {
 			content = child.getContent();
 		}
 
@@ -281,9 +279,9 @@ public class ActPubFactory extends ServiceBase {
 		APObj ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, repliesUrl, false, content,
 				new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
-		if (ok(parent)) {
+		if (parent != null) {
 			String replyTo = apUtil.buildUrlForReplyTo(as, parent);
-			if (ok(replyTo)) {
+			if (replyTo != null) {
 				ret = ret.put(APObj.inReplyTo, replyTo);
 			}
 		}
@@ -310,7 +308,7 @@ public class ActPubFactory extends ServiceBase {
 			String avatarMime = null;
 			String avatarVer = null;
 			Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-			if (ok(att)) {
+			if (att != null) {
 				avatarMime = att.getMime();
 				avatarVer = att.getBin();
 			}
@@ -334,11 +332,11 @@ public class ActPubFactory extends ServiceBase {
 							.put(APObj.url, avatarUrl));
 
 			Attachment headerAtt = userNode.getAttachment(Constant.ATTACHMENT_HEADER.s(), false, false);
-			if (ok(headerAtt)) {
+			if (headerAtt != null) {
 				String headerImageMime = headerAtt.getMime();
-				if (ok(headerImageMime)) {
+				if (headerImageMime != null) {
 					String headerImageVer = headerAtt.getBin();
-					if (ok(headerImageVer)) {
+					if (headerImageVer != null) {
 						String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
 								+ "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
 

@@ -1,9 +1,6 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.List;
-import com.mongodb.bulk.BulkWriteResult;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +43,7 @@ public class MongoCreate extends ServiceBase {
 	}
 
 	public SubNode createNode(MongoSession ms, String path, String type) {
-		if (no(type)) {
+		if (type == null) {
 			type = NodeType.NONE.s();
 		}
 		SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
@@ -65,29 +62,29 @@ public class MongoCreate extends ServiceBase {
 	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
 			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
 			boolean updateParent) {
-		if (no(relPath)) {
+		if (relPath == null) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
 			 */
 			relPath = "?";
 		}
 
-		if (no(type)) {
+		if (type == null) {
 			type = NodeType.NONE.s();
 		}
 
-		String path = (no(parent) ? "" : parent.getPath()) + "/" + relPath;
+		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
 
-		if (no(ownerId)) {
+		if (ownerId == null) {
 			ownerId = ms.getUserNodeId();
 		}
 
 		// for now not worried about ordinals for root nodes.
-		if (no(parent)) {
+		if (parent == null) {
 			ordinal = 0L;
 		} else {
 			if (updateOrdinals) {
-				if (no(ordinal)) {
+				if (ordinal == null) {
 					ordinal = 0L;
 				}
 
@@ -104,7 +101,7 @@ public class MongoCreate extends ServiceBase {
 			parent.setHasChildren(true);
 		}
 
-		if (ok(properties)) {
+		if (properties != null) {
 			for (PropertyInfo propInfo : properties) {
 				node.set(propInfo.getName(), propInfo.getValue());
 			}
@@ -194,7 +191,7 @@ public class MongoCreate extends ServiceBase {
 		for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit)) {
 
 			// lazy create bulkOps
-			if (no(bops)) {
+			if (bops == null) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
 
@@ -209,7 +206,7 @@ public class MongoCreate extends ServiceBase {
 			}
 		}
 
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +50,7 @@ public class NodeMoveService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
-		if (no(node)) {
+		if (node == null) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
 
@@ -74,7 +72,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeUp(MongoSession ms, SubNode node) {
 		SubNode nodeAbove = read.getSiblingAbove(ms, node, null);
-		if (ok(nodeAbove)) {
+		if (nodeAbove != null) {
 			Long saveOrdinal = nodeAbove.getOrdinal();
 			nodeAbove.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
@@ -84,7 +82,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeDown(MongoSession ms, SubNode node) {
 		SubNode nodeBelow = read.getSiblingBelow(ms, node, null);
-		if (ok(nodeBelow)) {
+		if (nodeBelow != null) {
 			Long saveOrdinal = nodeBelow.getOrdinal();
 			nodeBelow.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
@@ -94,7 +92,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeToTop(MongoSession ms, SubNode node) {
 		SubNode parentNode = read.getParent(ms, node);
-		if (no(parentNode)) {
+		if (parentNode == null) {
 			return;
 		}
 		create.insertOrdinal(ms, parentNode, 0L, 1L);
@@ -111,7 +109,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeToBottom(MongoSession ms, SubNode node) {
 		SubNode parentNode = read.getParent(ms, node);
-		if (no(parentNode)) {
+		if (parentNode == null) {
 			return;
 		}
 		long ordinal = read.getMaxChildOrdinal(ms, parentNode) + 1L;
@@ -135,7 +133,7 @@ public class NodeMoveService extends ServiceBase {
 		for (String nodeId : req.getNodeIds()) {
 			SubNode node = read.getNode(ms, nodeId);
 
-			if (no(parentPath)) {
+			if (parentPath == null) {
 				parentPath = node.getParentPath();
 			} else if (!parentPath.equals(node.getParentPath())) {
 				res.setMessage("Failed: All nodes must be under the same parent node.");
@@ -161,7 +159,7 @@ public class NodeMoveService extends ServiceBase {
 		int counter = 0;
 
 		for (SubNode n : nodes) {
-			if (no(firstNode)) {
+			if (firstNode == null) {
 				firstNode = n;
 			}
 			if (counter > 0) {
@@ -248,13 +246,13 @@ public class NodeMoveService extends ServiceBase {
 			/*
 			 * Verify all nodes being pasted are siblings
 			 */
-			if (ok(sourceParentPath) && !sourceParentPath.equals(node.getParentPath())) {
+			if (sourceParentPath != null && !sourceParentPath.equals(node.getParentPath())) {
 				throw new RuntimeException("Nodes to move must be all from the same parent.");
 			}
 			sourceParentPath = node.getParentPath();
 
 			// get the nodeParent if we don't have it already.
-			if (no(nodeParent)) {
+			if (nodeParent == null) {
 				nodeParent = read.getParent(ms, node);
 			}
 		}
@@ -290,9 +288,9 @@ public class NodeMoveService extends ServiceBase {
 					node.setPath(newPath);
 
 					// crypto sig uses path as part of it, so we just invalidated the signature.
-					if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+					if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
 						node.delete(NodeProp.CRYPTO_SIG);
-						if (ok(res)) {
+						if (res != null) {
 							res.setSignaturesRemoved(true);
 						}
 					}
@@ -363,14 +361,14 @@ public class NodeMoveService extends ServiceBase {
 				newPath = mongoUtil.findAvailablePath(newPath);
 			}
 
-			if (no(bops)) {
+			if (bops == null) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
 
 			Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
 			Update update = new Update().set(SubNode.PATH, newPath);
 
-			if (ok(node.getStr(NodeProp.CRYPTO_SIG))) {
+			if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
 				// crypto sig uses path as part of it, so we just invalidated the signature.
 				node.getProps().remove(NodeProp.CRYPTO_SIG.s());
 				update.set(SubNode.PROPS, node.getProps());
@@ -385,7 +383,7 @@ public class NodeMoveService extends ServiceBase {
 			}
 		}
 
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 	}
@@ -397,7 +395,7 @@ public class NodeMoveService extends ServiceBase {
 		String nodeId = req.getParentNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		List<String> nodeIds = read.getChildrenIds(ms, node, false, null);
-		if (ok(nodeIds)) {
+		if (nodeIds != null) {
 			res.setNodeIds(nodeIds);
 		}
 		res.setSuccess(true);

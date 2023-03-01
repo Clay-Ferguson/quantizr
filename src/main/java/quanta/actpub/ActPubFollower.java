@@ -2,8 +2,6 @@ package quanta.actpub;
 
 import static quanta.actpub.model.AP.apInt;
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -57,7 +55,7 @@ public class ActPubFollower extends ServiceBase {
     public int loadRemoteFollowers(MongoSession ms, String userMakingRequest, APOActor actor) {
 
         APObj followers = getRemoteFollowers(ms, userMakingRequest, actor.getFollowers());
-        if (no(followers)) {
+        if (followers == null) {
             log.debug("Unable to get followers for AP user: " + actor.getFollowers());
             return 0;
         }
@@ -92,7 +90,7 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public APObj getRemoteFollowers(MongoSession ms, String userMakingRequest, String url) {
-        if (no(url))
+        if (url == null)
             return null;
 
         APObj outbox = apUtil.getRemoteAP(ms, userMakingRequest, url);
@@ -123,13 +121,13 @@ public class ActPubFollower extends ServiceBase {
                 // the owner of the friend node is the "Follower".
                 SubNode ownerOfFriendNode = read.getNode(as, n.getOwner());
 
-                if (ok(ownerOfFriendNode)) {
+                if (ownerOfFriendNode != null) {
                     // log.debug(" owner (follower): " + ownerOfFriendNode.getIdStr());
                     // fyi: we had ACT_PUB_ACTOR_URL here before, which was a bug.
                     String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
                     // this will be non-null if it's a remote account.
-                    if (ok(remoteActorUrl)) {
+                    if (remoteActorUrl != null) {
                         followers.add(remoteActorUrl);
                     }
                     // otherwise, it's a local user, and we know how to build the Actor URL of our own users.
@@ -163,7 +161,7 @@ public class ActPubFollower extends ServiceBase {
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
-        if (ok(minId)) {
+        if (minId != null) {
             url += "&min_id=" + minId;
         }
 
@@ -174,7 +172,7 @@ public class ActPubFollower extends ServiceBase {
 
     public Iterable<SubNode> getPeopleByUserName(MongoSession ms, String userName) {
         Query q = getPeopleByUserName_query(ms, null, userName);
-        if (no(q))
+        if (q == null)
             return null;
         return mongoUtil.find(q);
     }
@@ -184,7 +182,7 @@ public class ActPubFollower extends ServiceBase {
 
         return arun.run(as -> {
             Query q = getPeopleByUserName_query(as, null, req.getTargetUserName());
-            if (no(q))
+            if (q == null)
                 return null;
 
             q.limit(ConstantInt.ROWS_PER_PAGE.val());
@@ -197,7 +195,7 @@ public class ActPubFollower extends ServiceBase {
             for (SubNode node : iterable) {
                 NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
                         false, false, true, false, false, null, false);
-                if (ok(info)) {
+                if (info != null) {
                     searchResults.add(info);
                 }
             }
@@ -217,13 +215,13 @@ public class ActPubFollower extends ServiceBase {
         else {
             /* Starting with just actorUrl, lookup the follower count */
             int ret = 0;
-            if (ok(actorUrl)) {
+            if (actorUrl != null) {
                 // #todo-optimization: we can call apub.getUserProperty() to get followersUrl right?
                 APOActor actor = apUtil.getActorByUrl(ms, userMakingRequest, actorUrl);
-                if (ok(actor)) {
+                if (actor != null) {
                     String followersUrl = apStr(actor, APObj.followers);
                     APObj followers = getRemoteFollowers(ms, userMakingRequest, followersUrl);
-                    if (no(followers)) {
+                    if (followers == null) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }
                     ret = apInt(followers, APObj.totalItems);
@@ -235,7 +233,7 @@ public class ActPubFollower extends ServiceBase {
 
     public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
         Query q = getPeopleByUserName_query(ms, userNode, userName);
-        if (no(q))
+        if (q == null)
             return 0L;
         return ops.count(q, SubNode.class);
     }
@@ -244,9 +242,9 @@ public class ActPubFollower extends ServiceBase {
     public Query getPeopleByUserName_query(MongoSession ms, SubNode userNode, String userName) {
         Query q = new Query();
 
-        if (no(userNode)) {
+        if (userNode == null) {
             userNode = read.getUserNodeByUserName(ms, userName, false);
-            if (no(userNode)) {
+            if (userNode == null) {
                 return null;
             }
         }

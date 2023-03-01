@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ public class LuceneService extends ServiceBase  {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
 		SubNode node = read.getNode(ms, nodeId, true, null);
-		if (ok(node)) {
+		if (node != null) {
 			/*
 			 * Remember 'searchFolder' will have to be visible to the VM and therefore this might require adding
 			 * a new mapping parameter to the startup shell script for docker. Docker can't see the entire

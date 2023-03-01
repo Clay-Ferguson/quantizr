@@ -1,7 +1,5 @@
 package quanta.mongo.model;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -231,7 +229,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getIdStr() {
-		return ok(getId()) ? getId().toHexString() : null;
+		return getId() != null ? getId().toHexString() : null;
 	}
 
 	/* Auth: Anyone can write the id as there's no pre-existing id */
@@ -239,7 +237,7 @@ public class SubNode {
 	public void setId(ObjectId id) {
 		// IDs are allowed to be set to null and ImportArchiveBase does this to force nodes to get saved
 		// as a new document when they're being imported.
-		if (ok(id) && ok(this.id) && !this.id.equals(id)) {
+		if (id != null && this.id != null && !this.id.equals(id)) {
 			throw new RuntimeException("Node IDs are immutable.");
 		}
 		this.id = id;
@@ -247,7 +245,7 @@ public class SubNode {
 
 	@JsonGetter(ID)
 	public String jsonId() {
-		return ok(id) ? id.toHexString() : null;
+		return id != null ? id.toHexString() : null;
 	}
 
 	@JsonProperty(PATH)
@@ -258,7 +256,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getParentPath() {
-		if (no(getPath()))
+		if (getPath() == null)
 			return null;
 		return XString.truncAfterLast(getPath(), "/");
 	}
@@ -266,7 +264,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getLastPathPart() {
-		if (no(getPath()))
+		if (getPath() == null)
 			return null;
 		return XString.parseAfterLast(getPath(), "/");
 	}
@@ -345,7 +343,7 @@ public class SubNode {
 
 	@JsonGetter(OWNER)
 	public String jsonOwner() {
-		return ok(owner) ? owner.toHexString() : null;
+		return owner != null ? owner.toHexString() : null;
 	}
 
 	public ObjectId getTransferFrom() {
@@ -362,7 +360,7 @@ public class SubNode {
 
 	@JsonGetter(XFR)
 	public String jsonTransferFrom() {
-		return ok(transferFrom) ? transferFrom.toHexString() : null;
+		return transferFrom != null ? transferFrom.toHexString() : null;
 	}
 
 	@JsonProperty(CREATE_TIME)
@@ -402,7 +400,7 @@ public class SubNode {
 	@JsonIgnore
 	public HashMap<String, AccessControl> safeGetAc() {
 		synchronized (acLock) {
-			if (no(ac)) {
+			if (ac == null) {
 				ac = new HashMap<>();
 				ThreadLocals.dirty(this);
 			}
@@ -420,7 +418,7 @@ public class SubNode {
 
 		// only put the new ac key in the map if the existing was not found or if it's not the same value we
 		// already have
-		if (no(thisAc) || !thisAc.eq(ac)) {
+		if (thisAc == null || !thisAc.eq(ac)) {
 			safeGetAc().put(key, ac);
 			ThreadLocals.dirty(this);
 		}
@@ -428,7 +426,7 @@ public class SubNode {
 
 	@JsonProperty(AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
-		if (no(ac) && no(this.ac))
+		if (ac == null && this.ac == null)
 			return;
 		ThreadLocals.dirty(this);
 		synchronized (acLock) {
@@ -438,7 +436,7 @@ public class SubNode {
 
 	public void clearSecretProperties() {
 		synchronized (propLock) {
-			if (ok(props)) {
+			if (props != null) {
 				props.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
 				props.remove(NodeProp.EMAIL.s());
 				props.remove(NodeProp.CODE.s());
@@ -458,7 +456,7 @@ public class SubNode {
 
 	@JsonProperty(PROPS)
 	public void setProps(HashMap<String, Object> props) {
-		if (no(props) && no(this.props))
+		if (props == null && this.props == null)
 			return;
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
@@ -475,7 +473,7 @@ public class SubNode {
 
 	@JsonProperty(ATTACHMENTS)
 	public void setAttachments(HashMap<String, Attachment> attachments) {
-		if (no(attachments) && no(this.attachments))
+		if (attachments == null && this.attachments == null)
 			return;
 		ThreadLocals.dirty(this);
 		synchronized (attLock) {
@@ -492,7 +490,7 @@ public class SubNode {
 
 	@JsonProperty(LINKS)
 	public void setLinks(HashMap<String, NodeLink> links) {
-		if (no(links) && no(this.links))
+		if (links == null && this.links == null)
 			return;
 		ThreadLocals.dirty(this);
 		synchronized (linksLock) {
@@ -504,10 +502,10 @@ public class SubNode {
 	@JsonIgnore
 	public void addLink(String key, NodeLink link) {
 		synchronized (linksLock) {
-			if (no(links)) {
+			if (links == null) {
 				links = new HashMap<>();
 			}
-			if (no(key)) {
+			if (key == null) {
 				key = "k" + links.size();
 			}
 			links.put(key, link);
@@ -520,9 +518,9 @@ public class SubNode {
 	public Attachment getFirstAttachment() {
 		Attachment att = null;
 		synchronized (attLock) {
-			if (ok(attachments)) {
+			if (attachments != null) {
 				List<Attachment> atts = getOrderedAttachments();
-				if (ok(atts) && atts.size() > 0) {
+				if (atts != null && atts.size() > 0) {
 					att = atts.get(0);
 				}
 			}
@@ -534,7 +532,7 @@ public class SubNode {
 	@JsonIgnore
 	public void addAttachment(Attachment att) {
 		synchronized (attLock) {
-			if (no(attachments)) {
+			if (attachments == null) {
 				attachments = new HashMap<>();
 			}
 			attachments.put(att.getKey(), att);
@@ -547,7 +545,7 @@ public class SubNode {
 	public List<Attachment> getOrderedAttachments() {
 		List<Attachment> list = new LinkedList<>();
 		synchronized (attLock) {
-			if (ok(attachments)) {
+			if (attachments != null) {
 				attachments.forEach((String key, Attachment att) -> {
 					att.setKey(key);
 					list.add(att);
@@ -555,8 +553,8 @@ public class SubNode {
 			}
 		}
 		list.sort((a1, a2) -> {
-			int a1Idx = ok(a1.getOrdinal()) ? a1.getOrdinal().intValue() : 0;
-			int a2Idx = ok(a2.getOrdinal()) ? a2.getOrdinal().intValue() : 0;
+			int a1Idx = a1.getOrdinal() != null ? a1.getOrdinal().intValue() : 0;
+			int a2Idx = a2.getOrdinal() != null ? a2.getOrdinal().intValue() : 0;
 			return a1Idx - a2Idx;
 		});
 		return list.size() > 0 ? list : null;
@@ -573,14 +571,14 @@ public class SubNode {
 			}
 
 			Attachment ret = null;
-			if (ok(attachments)) {
+			if (attachments != null) {
 				if (forceNew) {
 					ret = new Attachment(this);
 					attachments.put(name, ret);
 					ThreadLocals.dirty(this);
 				} else {
 					ret = attachments.get(name);
-					if (ok(ret)) {
+					if (ret != null) {
 						return ret;
 					}
 					if (create) {
@@ -600,7 +598,7 @@ public class SubNode {
 	}
 
 	public void fixAttachments() {
-		if (ok(getAttachments())) {
+		if (getAttachments() != null) {
 			if (getAttachments().size() == 0) {
 				setAttachments(null);
 			} else {
@@ -623,7 +621,7 @@ public class SubNode {
 
 	@JsonProperty(LIKES)
 	public void setLikes(HashSet<String> likes) {
-		if (no(likes) && no(this.likes))
+		if (likes == null && this.likes == null)
 			return;
 		ThreadLocals.dirty(this);
 		synchronized (likesLock) {
@@ -634,7 +632,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void addLike(String actor) {
-		if (no(getLikes())) {
+		if (getLikes() == null) {
 			setLikes(new HashSet<>());
 		}
 
@@ -647,7 +645,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void removeLike(String actor) {
-		if (no(getLikes()))
+		if (getLikes() == null)
 			return;
 
 		if (getLikes().remove(actor)) {
@@ -671,20 +669,20 @@ public class SubNode {
 	@JsonIgnore
 	public boolean set(String key, Object val) {
 		synchronized (propLock) {
-			if (no(props)) {
+			if (props == null) {
 				// if there are no props currently, and the val is null we do nothing, because
 				// the way we set a null prop anyway is by REMOVING it from the props.
-				if (no(val))
+				if (val == null)
 					return false;
 				props = props();
 			}
 
 			boolean changed = false;
-			if (no(val)) {
-				changed = ok(props.remove(key));
+			if (val == null) {
+				changed = props.remove(key) != null;
 			} else {
 				Object curVal = props.get(key);
-				changed = no(curVal) || !val.equals(curVal);
+				changed = curVal == null || !val.equals(curVal);
 				props.put(key, val);
 			}
 
@@ -704,11 +702,11 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void delete(String key) {
-		if (no(props))
+		if (props == null)
 			return;
 
 		synchronized (propLock) {
-			if (ok(props().remove(key))) {
+			if (props().remove(key) != null) {
 				ThreadLocals.dirty(this);
 			}
 		}
@@ -723,12 +721,12 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getStr(String key) {
-		if (no(props))
+		if (props == null)
 			return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
-				if (no(v))
+				if (v == null)
 					return null;
 
 				return v.toString();
@@ -748,12 +746,12 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Long getInt(String key) {
-		if (no(props))
+		if (props == null)
 			return 0L;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
-				if (no(v))
+				if (v == null)
 					return 0L;
 
 				if (v instanceof Integer) {
@@ -785,12 +783,12 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Date getDate(String key) {
-		if (no(props))
+		if (props == null)
 			return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
-				if (no(v))
+				if (v == null)
 					return null;
 				return (Date) v;
 			}
@@ -802,7 +800,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public <T> T getObj(String key, Class<T> classType) {
-		if (no(props))
+		if (props == null)
 			return null;
 
 		synchronized (propLock) {
@@ -825,12 +823,12 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Double getFloat(String key) {
-		if (no(props))
+		if (props == null)
 			return 0.0;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
-				if (no(v))
+				if (v == null)
 					return 0.0;
 				return (Double) v;
 			}
@@ -849,12 +847,12 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Boolean getBool(String key) {
-		if (no(props))
+		if (props == null)
 			return false;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
-				if (no(v))
+				if (v == null)
 					return false;
 
 				/*
@@ -878,7 +876,7 @@ public class SubNode {
 	@JsonIgnore
 	private HashMap<String, Object> props() {
 		synchronized (propLock) {
-			if (no(props)) {
+			if (props == null) {
 				props = new HashMap<String, Object>();
 			}
 			return props;

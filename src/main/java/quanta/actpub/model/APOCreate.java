@@ -1,6 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.ok;
 import java.util.Map;
 import quanta.actpub.APConst;
 
@@ -26,7 +25,7 @@ public class APOCreate extends APOActivity {
         put(APObj.actor, actor);
         put(APObj.published, published);
         put(APObj.object, object);
-        if (ok(to)) {
+        if (to != null) {
             put(APObj.to, to);
         }
     }

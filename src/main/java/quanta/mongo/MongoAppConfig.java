@@ -2,8 +2,6 @@ package quanta.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
@@ -74,11 +72,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (no(factory)) {
+		if (factory == null) {
 			log.debug("create mongoDbFactory");
 			try {
 				MongoClient mc = mongoClient();
-				if (ok(mc)) {
+				if (mc != null) {
 					factory = new SimpleMongoClientDatabaseFactory(mc, databaseName);
 				} else {
 					return null;
@@ -98,10 +96,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (no(gridFsBucket)) {
+		if (gridFsBucket == null) {
 			log.debug("create gridFdBucket");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
-			if (ok(mdbf)) {
+			if (mdbf != null) {
 				MongoDatabase db = mdbf.getMongoDatabase();
 				gridFsBucket = GridFSBuckets.create(db);
 			}
@@ -120,7 +118,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (no(mongoClient)) {
+		if (mongoClient == null) {
 			log.debug("create mongoClient");
 			MongoCredential credential = null;
 
@@ -136,11 +134,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				String mongoHost = appProp.getMongoDbHost();
 				Integer mongoPort = appProp.getMongoDbPort();
 
-				if (no(mongoHost)) {
+				if (mongoHost == null) {
 					throw new RuntimeEx("mongodb.host property is missing");
 				}
 
-				if (no(mongoPort)) {
+				if (mongoPort == null) {
 					throw new RuntimeEx("mongodb.port property is missing");
 				}
 
@@ -155,7 +153,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
 				MongoClientSettings.Builder builder = MongoClientSettings.builder();
-				if (ok(credential)) {
+				if (credential != null) {
 					builder = builder.credential(credential);
 				}
 				builder = builder.applyConnectionString(new ConnectionString(uri)); //
@@ -163,8 +161,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				MongoClientSettings settings = builder.build();
 				mongoClient = MongoClients.create(settings);
 
-				if (ok(mongoClient)) {
-					if (ok(credential)) {
+				if (mongoClient != null) {
+					if (credential != null) {
 						for (String db : mongoClient.listDatabaseNames()) {
 							log.debug("MONGO DB NAME: " + db);
 						}
@@ -191,7 +189,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Override
 	@Bean
 	public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
-		if (no(ops)) {
+		if (ops == null) {
 			log.debug("create mongoTemplate");
 			ops = super.mongoTemplate(databaseFactory, converter);
 			ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
@@ -205,10 +203,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (no(grid)) {
+		if (grid == null) {
 			log.debug("create gridFsTemplate");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
-			if (ok(mdbf)) {
+			if (mdbf != null) {
 				grid = new GridFsTemplate(mdbf, converter);
 			} else {
 				return null;

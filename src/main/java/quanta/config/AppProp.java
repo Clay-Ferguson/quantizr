@@ -1,7 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -51,7 +49,7 @@ public class AppProp {
 
 	public HashMap<String, Object> getConfig() {
 		synchronized (configLock) {
-			if (ok(configMap)) {
+			if (configMap != null) {
 				return configMap;
 			}
 
@@ -60,7 +58,7 @@ public class AppProp {
 					configMap = readYamlExternal("config-text.yaml");
 
 					// if we found the external config file in [deploy]/config/ folder then use it's contents
-					if (no(configMap)) {
+					if (configMap == null) {
 						// otherwise use the internal version (internal to JAR)
 						configMap = readYamlInternal("config-text.yaml");
 					}
@@ -68,7 +66,7 @@ public class AppProp {
 					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
 
-				if (no(configMap)) {
+				if (configMap == null) {
 					configMap = new HashMap<>();
 				}
 				configMap.put("ipfsEnabled", ipfsEnabled());
@@ -96,7 +94,7 @@ public class AppProp {
 				is = resource.getInputStream();
 
 				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
-				if (no(map)) {
+				if (map == null) {
 					map = new HashMap<>();
 				}
 
@@ -148,7 +146,7 @@ public class AppProp {
 	}
 
 	public String getProtocolHostAndPort() {
-		if (ok(protocolHostAndPort))
+		if (protocolHostAndPort != null)
 			return protocolHostAndPort;
 
 		protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
@@ -291,7 +289,7 @@ public class AppProp {
 	/* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
 	public boolean getBooleanProp(String propName) {
 		String val = env.getProperty(propName);
-		if (no(val))
+		if (val == null)
 			return false;
 		val = val.toLowerCase();
 		return val.startsWith("t") || val.startsWith("y") || val.startsWith("1");
@@ -306,7 +304,7 @@ public class AppProp {
 	}
 
 	public String translateDirs(String folder) {
-		if (no(folder))
+		if (folder == null)
 			return folder;
 		String userDir = System.getProperty("user.dir");
 		return folder.replace("{user.dir}", userDir);

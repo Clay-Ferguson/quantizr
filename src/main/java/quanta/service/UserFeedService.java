@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -120,10 +118,10 @@ public class UserFeedService extends ServiceBase {
 		 * if we're doing a 'feed' under a specific root node this is like the 'chat feature' and is
 		 * normally only called for a chat-room type node.
 		 */
-		if (ok(req.getNodeId())) {
+		if (req.getNodeId() != null) {
 			// Get the chat room node (root of the chat room query)
 			SubNode rootNode = read.getNode(ms, req.getNodeId());
-			if (no(rootNode)) {
+			if (rootNode == null) {
 				throw new RuntimeException("Node not found: " + req.getNodeId());
 			}
 			pathToSearch = rootNode.getPath();
@@ -177,7 +175,7 @@ public class UserFeedService extends ServiceBase {
 		else if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 
-			if (ok(myAcntNode)) {
+			if (myAcntNode != null) {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
 				SubNode _myAcntNode = myAcntNode;
@@ -271,11 +269,11 @@ public class UserFeedService extends ServiceBase {
 		if (bidirectional) {
 			SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
 
-			if (no(myAcntNode)) {
+			if (myAcntNode == null) {
 				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 
-			if (ok(myAcntNode)) {
+			if (myAcntNode != null) {
 				// sharing from us to the other user.
 				orCriteria.add(
 						// where node is owned by us.
@@ -295,11 +293,11 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (!testQuery && doAuth && req.getFromMe()) {
-			if (no(myAcntNode)) {
+			if (myAcntNode == null) {
 				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 
-			if (ok(myAcntNode)) {
+			if (myAcntNode != null) {
 				orCriteria.add(
 						// where node is owned by us.
 						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()) //
@@ -321,10 +319,10 @@ public class UserFeedService extends ServiceBase {
 
 				HashSet<String> friendsHashTagsSet = new HashSet<>();
 				List<SubNode> allFriendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
-				if (ok(allFriendNodes)) {
+				if (allFriendNodes != null) {
 					for (SubNode friendNode : allFriendNodes) {
 						List<String> hashTags = XString.tokenize(friendNode.getTags(), " ,", false);
-						if (ok(hashTags)) {
+						if (hashTags != null) {
 							for (String hashTag : hashTags) {
 								// ignore anything that happens not to be a tag
 								if (hashTag.startsWith("#")) {
@@ -341,7 +339,7 @@ public class UserFeedService extends ServiceBase {
 							String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 							// if we have a userNodeId and they aren't in the blocked list.
-							if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
+							if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
 								friendIds.add(new ObjectId(userNodeId));
 							}
 						}
@@ -361,13 +359,13 @@ public class UserFeedService extends ServiceBase {
 				}
 
 				List<SubNode> friendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, tagCriteria);
-				if (ok(friendNodes)) {
+				if (friendNodes != null) {
 					for (SubNode friendNode : friendNodes) {
 						// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 						String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 						// if we have a userNodeId and they aren't in the blocked list.
-						if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
+						if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
 							friendIds.add(new ObjectId(userNodeId));
 						}
 					}
@@ -393,7 +391,7 @@ public class UserFeedService extends ServiceBase {
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 
 			// Just being consistent here, this check is not needed.
-			if (no(textCriteria)) {
+			if (textCriteria == null) {
 				textCriteria = TextCriteria.forDefaultLanguage();
 			}
 			String text = req.getSearchText();
@@ -408,14 +406,14 @@ public class UserFeedService extends ServiceBase {
 			textCriteria.matching(text);
 		}
 
-		if (ok(searchForUserName)) {
-			if (no(textCriteria)) {
+		if (searchForUserName != null) {
+			if (textCriteria == null) {
 				textCriteria = TextCriteria.forDefaultLanguage();
 			}
 			textCriteria.matching("\"@" + searchForUserName + "\"");
 		}
 
-		if (ok(textCriteria)) {
+		if (textCriteria != null) {
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
 		}
@@ -423,7 +421,7 @@ public class UserFeedService extends ServiceBase {
 		q.addCriteria(crit);
 
 		// if we have a node id this is like a chat room type, and so we sort by create time.
-		if (ok(req.getNodeId())) {
+		if (req.getNodeId() != null) {
 			q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
 		} else {
 			q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
@@ -468,7 +466,7 @@ public class UserFeedService extends ServiceBase {
 			// it's a boost! Be careful boosts also have no content, but we DO want to show boosts.
 			if (Constant.FEED_PUB.s().equals(req.getName())) {
 				if ((StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) //
-						&& no(node.getAttachments()) && no(node.getStr(NodeProp.BOOST))) {
+						&& node.getAttachments() == null && node.getStr(NodeProp.BOOST) == null) {
 					skipped++;
 					continue;
 				}
@@ -477,14 +475,14 @@ public class UserFeedService extends ServiceBase {
 			Val<SubNode> boostedNodeVal = null;
 			if (!allowNonEnglish || !allowBadWords) {
 				String boostTargetId = node.getStr(NodeProp.BOOST);
-				if (ok(boostTargetId)) {
+				if (boostTargetId != null) {
 					SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
 
 					// once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
 					// even if boostedNode is null here, indicating it's not found.
 					boostedNodeVal = new Val<>(boostedNode);
 
-					if (ok(boostedNode)) {
+					if (boostedNode != null) {
 						// if the owner of the boosted node is a blocked user and we're querying public nodes and with
 						// applyAdminBlocks in effect then skip this post.
 						if (req.getToPublic() && req.isApplyAdminBlocks() && blockedUserIds.contains(boostedNode.getOwner())) {
@@ -510,7 +508,7 @@ public class UserFeedService extends ServiceBase {
 			try {
 				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, false,
 						true, true, boostedNodeVal, false);
-				if (ok(info)) {
+				if (info != null) {
 					searchResults.add(info);
 
 					if (searchResults.size() >= MAX_FEED_ITEMS) {
@@ -534,10 +532,10 @@ public class UserFeedService extends ServiceBase {
 	public LinkedList<String> getFriendsHashTags(MongoSession ms) {
 		HashSet<String> friendsHashTagsSet = new HashSet<>();
 		List<SubNode> allFriendNodes = user.getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), null, true, null);
-		if (ok(allFriendNodes)) {
+		if (allFriendNodes != null) {
 			for (SubNode friendNode : allFriendNodes) {
 				List<String> hashTags = XString.tokenize(friendNode.getTags(), " ,", false);
-				if (ok(hashTags)) {
+				if (hashTags != null) {
 					for (String hashTag : hashTags) {
 						// ignore anything that happens not to be a tag
 						if (hashTag.startsWith("#")) {
@@ -559,7 +557,7 @@ public class UserFeedService extends ServiceBase {
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		arun.run(as -> {
 			List<SubNode> nodeList = user.getSpecialNodesList(as, null, NodeType.BLOCKED_USERS.s(), userName, false, null);
-			if (no(nodeList))
+			if (nodeList == null)
 				return null;
 
 			for (SubNode node : nodeList) {

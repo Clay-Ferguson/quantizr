@@ -1,7 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -125,7 +123,7 @@ public class SessionContext extends ServiceBase {
 		SessionContext scBean = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
-		if (no(scBean) || !scBean.isLive()) {
+		if (scBean == null || !scBean.isLive()) {
 
 			// if we had a bean for this HTTP session, we need to remove it because we're replacing
 			// it with a new one now. 
@@ -198,7 +196,7 @@ public class SessionContext extends ServiceBase {
 
 	public void addAction(String actionName) {
 		Integer count = actionCounters.get(actionName);
-		if (no(count)) {
+		if (count == null) {
 			actionCounters.put(actionName, 1);
 		} else {
 			actionCounters.put(actionName, count.intValue() + 1);
@@ -226,7 +224,7 @@ public class SessionContext extends ServiceBase {
 			throw new RuntimeException("invalid call to setAuthenticated for anon.");
 		}
 
-		if (no(userToken)) {
+		if (userToken == null) {
 			userToken = Util.genStrongToken();
 		}
 
@@ -234,10 +232,10 @@ public class SessionContext extends ServiceBase {
 				+ userToken);
 		setUserName(userName);
 
-		if (no(userNodeId)) {
+		if (userNodeId == null) {
 			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
 			// we found user's node.
-			if (ok(userNode)) {
+			if (userNode != null) {
 				setUserNodeId(userNode.getId());
 			} else {
 				throw new RuntimeException("No userNode found for user: " + userName);
@@ -248,7 +246,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public boolean isAuthenticated() {
-		return ok(userToken);
+		return userToken != null;
 	}
 
 	/*
@@ -256,13 +254,13 @@ public class SessionContext extends ServiceBase {
 	 * and perhaps use Spring Security
 	 */
 	public static boolean validToken(String token, String userName) {
-		if (no(token))
+		if (token == null)
 			return false;
 
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
-					if (ok(userName)) {
+					if (userName != null) {
 						return userName.equals(sc.getUserName());
 					} else {
 						return true;
@@ -280,7 +278,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static SessionContext getSCByToken(String token) {
-		if (no(token))
+		if (token == null)
 			return null;
 
 		synchronized (allSessions) {
@@ -296,20 +294,20 @@ public class SessionContext extends ServiceBase {
 
 	public static void authBearer() {
 		SessionContext sc = ThreadLocals.getSC();
-		if (no(sc)) {
+		if (sc == null) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}
 		String bearer = ThreadLocals.getReqBearerToken();
 
 		// otherwise require secure header
-		if (no(bearer) || !validToken(bearer, sc.getUserName())) {
+		if (bearer == null || !validToken(bearer, sc.getUserName())) {
 			throw new RuntimeException("Auth failed. Bad bearer token.");
 		}
 	}
 
 	public static void authSig() {
 		SessionContext sc = ThreadLocals.getSC();
-		if (no(sc)) {
+		if (sc == null) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}
 
@@ -318,23 +316,23 @@ public class SessionContext extends ServiceBase {
 		}
 
 		String sig = ThreadLocals.getReqSig();
-		if (no(sig)) {
+		if (sig == null) {
 			throw new RuntimeException("Request failed. No signature.");
 		}
 
 		// if pubSigKey not yet saved in SessionContext then generate it
-		if (no(sc.pubSigKey)) {
+		if (sc.pubSigKey == null) {
 			SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
-			if (no(userNode)) {
+			if (userNode == null) {
 				throw new RuntimeException("Unknown user: " + sc.getUserName());
 			}
 			String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-			if (no(pubKeyJson)) {
+			if (pubKeyJson == null) {
 				throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
 			}
 
 			sc.pubSigKey = crypto.parseJWK(pubKeyJson, userNode);
-			if (no(sc.pubSigKey)) {
+			if (sc.pubSigKey == null) {
 				throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
 			}
 			// log.debug("Saved User SigKey in SessionContext: " + sc.pubSigKey);
@@ -352,7 +350,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static void removeSession(SessionContext sc) {
-		if (no(sc)) return;
+		if (sc == null) return;
 		synchronized (allSessions) {
 			allSessions.remove(sc);
 		}
@@ -373,14 +371,14 @@ public class SessionContext extends ServiceBase {
 			for (SessionContext sc : allSessions) {
 				if (sc.isLive()) {
 					if (requireAppGuid) {
-						if (ok(sc.getAppGuid())) {
+						if (sc.getAppGuid() != null) {
 							if (!guids.contains(sc.getAppGuid())) {
 								ret.add(sc);
 								guids.add(sc.getAppGuid());
 							}
 						}
 					} else if (requireToken) {
-						if (ok(sc.getUserToken())) {
+						if (sc.getUserToken() != null) {
 							if (!tokens.contains(sc.getUserToken())) {
 								ret.add(sc);
 								tokens.add(sc.getUserToken());
@@ -402,14 +400,14 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public static List<SessionContext> getSessionsByUserName(String userName) {
-		if (no(userName))
+		if (userName == null)
 			return null;
 
 		List<SessionContext> list = null;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (userName.equals(sc.getUserName())) {
-					if (no(list)) {
+					if (list == null) {
 						list = new LinkedList<>();
 					}
 					list.add(sc);
@@ -451,7 +449,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public void setUserName(String userName) {
-		if (ok(userName)) {
+		if (userName != null) {
 			pastUserName = userName;
 		}
 		this.userName = userName;
@@ -582,7 +580,7 @@ public class SessionContext extends ServiceBase {
 	}
 
 	public void setAllowedFeatures(String allowedFeatures) {
-		if (no(allowedFeatures)) {
+		if (allowedFeatures == null) {
 			allowedFeatures = "";
 		}
 		this.allowedFeatures = allowedFeatures;

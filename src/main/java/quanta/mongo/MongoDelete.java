@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -45,7 +43,7 @@ public class MongoDelete extends ServiceBase {
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
 		auth.ownerAuth(ms, node);
 		if (!childrenOnly && deleteAttachments) {
-			if (ok(node.getAttachments())) {
+			if (node.getAttachments() != null) {
 				node.getAttachments().forEach((String key, Attachment att) -> {
 					attach.deleteBinary(ms, key, node, null, true);
 				});
@@ -87,7 +85,7 @@ public class MongoDelete extends ServiceBase {
 
 		Iterable<SubNode> nodes = mongoUtil.find(q);
 		for (SubNode node : nodes) {
-			if (no(node.getOwner()))
+			if (node.getOwner() == null)
 				continue;
 
 			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID);
@@ -164,12 +162,12 @@ public class MongoDelete extends ServiceBase {
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
 		Criteria crit = auth.addSecurityCriteria(ms, null);
-		if (ok(crit)) {
+		if (crit != null) {
 			q.addCriteria(crit);
 		}
 
 		SubNode parent = read.getNode(ms, path);
-		if (ok(parent)) {
+		if (parent != null) {
 			parent.setHasChildren(false);
 		}
 
@@ -239,7 +237,7 @@ public class MongoDelete extends ServiceBase {
 	 */
 	public DeleteResult delete(MongoSession ms, SubNode node) {
 		SubNode parent = read.getParent(ms, node, false);
-		if (ok(parent)) {
+		if (parent != null) {
 			parent.setHasChildren(null);
 		}
 		return ops.remove(node);
@@ -287,7 +285,7 @@ public class MongoDelete extends ServiceBase {
 			}
 
 			SubNode parent = read.getParent(ms, node, false);
-			if (ok(parent) && parentIds.add(parent.getId())) {
+			if (parent != null && parentIds.add(parent.getId())) {
 				// we have a known 'bops' in this one and don't lazy create so we don't care about the
 				// return value of this call
 				update.bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
@@ -319,7 +317,7 @@ public class MongoDelete extends ServiceBase {
 			}
 		}
 
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 	}
@@ -337,7 +335,7 @@ public class MongoDelete extends ServiceBase {
 			}
 		}
 
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 	}
@@ -379,11 +377,11 @@ public class MongoDelete extends ServiceBase {
 				SubNode parent = mongoUtil.findOne(q);
 
 				// if parent node doesn't exist, this is an orphan we can delete.
-				if (no(parent)) {
+				if (parent == null) {
 					// log.debug("orphan[" + node.getPath() + "]: " + node.getContent());
 
 					// lazy create our bulk ops here.
-					if (no(bops.getVal())) {
+					if (bops.getVal() == null) {
 						bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 					}
 
@@ -511,7 +509,7 @@ public class MongoDelete extends ServiceBase {
 			// delete all orphans identified in this pass
 			orphans.entrySet().stream().forEach(entry -> {
 				// lazy create bops
-				if (no(bops.getVal())) {
+				if (bops.getVal() == null) {
 					bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
 				}
 
@@ -553,7 +551,7 @@ public class MongoDelete extends ServiceBase {
 		DeleteNodesResponse res = new DeleteNodesResponse();
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeEx("User not found.");
 		}
 
@@ -565,13 +563,13 @@ public class MongoDelete extends ServiceBase {
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
 			SubNode node = read.getNode(ms, nodeId);
-			if (no(node))
+			if (node == null)
 				continue;
 			auth.ownerAuth(ms, node);
 
 			// get the parent of the node and add it's id to parentIds
 			SubNode parent = read.getParent(ms, node, false);
-			if (no(parent)) {
+			if (parent == null) {
 				/*
 				 * if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's
 				 * essentially already deleted. todo-1: Could we have a background queue mow thru "Known Orphans"
@@ -596,7 +594,7 @@ public class MongoDelete extends ServiceBase {
 			}
 
 			// really need a 'hasForeignShares' here to ignore if there aren't any (todo-2)
-			if (ok(node.getAc())) {
+			if (node.getAc() != null) {
 				nodes.add(node);
 			}
 
@@ -627,7 +625,7 @@ public class MongoDelete extends ServiceBase {
 			});
 		});
 
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 
@@ -648,7 +646,7 @@ public class MongoDelete extends ServiceBase {
 			// if deleting children AND root then the parent of this root is the one we need to update the
 			// hasChildren for
 			SubNode parent = read.getParent(ms, node, false);
-			if (ok(parent)) {
+			if (parent != null) {
 				bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
 			}
 			bops = bulkOpRemoveNode(bops, node.getId());
@@ -682,14 +680,14 @@ public class MongoDelete extends ServiceBase {
 		}
 
 		// deletes all nodes in this subgraph branch
-		if (ok(bops)) {
+		if (bops != null) {
 			bops.execute();
 		}
 	}
 
 	// returns a new BulkOps if one not yet existing
 	public BulkOperations bulkOpRemoveNode(BulkOperations bops, ObjectId id) {
-		if (no(bops)) {
+		if (bops == null) {
 			bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 		}
 		Query query = new Query().addCriteria(new Criteria("id").is(id));
@@ -704,7 +702,7 @@ public class MongoDelete extends ServiceBase {
 		DeleteNodesResponse res = new DeleteNodesResponse();
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeEx("User not found.");
 		}
 

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -32,7 +29,6 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetBookmarksRequest;
@@ -88,7 +84,7 @@ public class NodeSearchService extends ServiceBase {
 		res.setSearchResults(results);
 
 		SubNode node = read.getNode(ms, new ObjectId(req.getRootId()));
-		if (!ok(node)) {
+		if (!(node != null)) {
 			return res;
 		}
 
@@ -106,7 +102,7 @@ public class NodeSearchService extends ServiceBase {
 			NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
 					false, false, false, true, null, false);
 
-			if (ok(info)) {
+			if (info != null) {
 				if (truncates.contains(n.getIdStr())) {
 					info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
 				}
@@ -136,10 +132,10 @@ public class NodeSearchService extends ServiceBase {
 
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true, null);
-			if (ok(node)) {
+			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
 						false, false, false, true, null, false);
-				if (ok(info)) {
+				if (info != null) {
 					searchResults.add(info);
 				}
 			}
@@ -153,10 +149,10 @@ public class NodeSearchService extends ServiceBase {
 				}
 			}
 			SubNode node = read.getNode(ms, searchText, true, null);
-			if (ok(node)) {
+			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
 						false, false, false, true, null, false);
-				if (ok(info)) {
+				if (info != null) {
 					searchResults.add(info);
 				}
 			}
@@ -192,7 +188,7 @@ public class NodeSearchService extends ServiceBase {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, counter + 1,
 								false, false, false, false, false, true, null, false);
-						if (ok(info)) {
+						if (info != null) {
 							searchResults.add(info);
 						}
 					} catch (Exception e) {
@@ -223,7 +219,7 @@ public class NodeSearchService extends ServiceBase {
 			return null;
 		});
 
-		if (ok(accountNodes.getVal())) {
+		if (accountNodes.getVal() != null) {
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
 			 * amount).
@@ -232,7 +228,7 @@ public class NodeSearchService extends ServiceBase {
 				try {
 					NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
 							false, false, false, false, false, null, false);
-					if (ok(info)) {
+					if (info != null) {
 						searchResults.add(info);
 					}
 				} catch (Exception e) {
@@ -252,11 +248,11 @@ public class NodeSearchService extends ServiceBase {
 			final String _findUserName = findUserName;
 			arun.run(as -> {
 				SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
-				if (ok(userNode)) {
+				if (userNode != null) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false, counter + 1,
 								false, false, false, false, false, false, null, false);
-						if (ok(info)) {
+						if (info != null) {
 							searchResults.add(info);
 						}
 					} catch (Exception e) {
@@ -295,20 +291,20 @@ public class NodeSearchService extends ServiceBase {
 		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(), searchRoot.getPath(),
 				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), ConstantInt.ROWS_PER_PAGE.val())) {
 
-			if (no(node.getAc()) || node.getAc().size() == 0)
+			if (node.getAc() == null || node.getAc().size() == 0)
 				continue;
 
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check here
 			 */
-			if (ok(req.getShareTarget())) {
+			if (req.getShareTarget() != null) {
 
 				if (!node.getAc().containsKey(req.getShareTarget())) {
 					continue;
 				}
 
 				// if specifically searching for rd or wr
-				if (ok(req.getAccessOption())) {
+				if (req.getAccessOption() != null) {
 					AccessControl ac = node.getAc().get(req.getShareTarget());
 
 					// log.debug("NodeId: " + node.getIdStr() + " req=" + req.getAccessOption() + " privs="
@@ -327,7 +323,7 @@ public class NodeSearchService extends ServiceBase {
 
 			NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
 					false, false, false, true, null, false);
-			if (ok(info)) {
+			if (info != null) {
 				searchResults.add(info);
 			}
 		}
@@ -341,7 +337,7 @@ public class NodeSearchService extends ServiceBase {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
 		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, null, NodeType.BOOKMARK_LIST.s(), null, true, null);
-		if (ok(bookmarksNode)) {
+		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStr(NodeProp.TARGET_ID);
 				Bookmark bm = new Bookmark();
@@ -365,7 +361,7 @@ public class NodeSearchService extends ServiceBase {
 		 * trendingFeedInfo (the cache), or else cache it
 		 */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
-			if (req.isFeed() && ok(NodeSearchService.trendingFeedInfo)) {
+			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
 				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
 				res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
 				res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
@@ -447,7 +443,7 @@ public class NodeSearchService extends ServiceBase {
 			// We pass true if this is a basic subgraph (not a Trending analysis), so that running Node Stats
 			// has the side effect of cleaning out orphans.
 			// Note doAuth is saying here if there's any potential secrets in the results then use doAuth=true
-			boolean doAuth = ok(wordMap) || ok(tagMap) || ok(mentionMap);
+			boolean doAuth = wordMap != null || tagMap != null || mentionMap != null;
 			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false, false, doAuth);
 		}
 
@@ -466,7 +462,7 @@ public class NodeSearchService extends ServiceBase {
 			nodeCount++;
 			if (req.isSignatureVerify()) {
 				String sig = node.getStr(NodeProp.CRYPTO_SIG);
-				if (ok(sig)) {
+				if (sig != null) {
 					signedNodeCount++;
 					if (!crypto.nodeSigVerify(node, sig)) {
 						failedSigCount++;
@@ -479,12 +475,12 @@ public class NodeSearchService extends ServiceBase {
 
 			// PART 1: Process sharing info
 			HashMap<String, AccessControl> aclEntry = node.getAc();
-			if (ok(aclEntry)) {
+			if (aclEntry != null) {
 				for (String key : aclEntry.keySet()) {
 					AccessControl ac = aclEntry.get(key);
 					if (PrincipalName.PUBLIC.s().equals(key)) {
 						publicCount++;
-						if (ok(ac) && ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+						if (ac != null && ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
 							publicWriteCount++;
 						}
 					} else {
@@ -499,11 +495,11 @@ public class NodeSearchService extends ServiceBase {
 			}
 
 			// PART 2: process 'content' text.
-			if (no(node.getContent()))
+			if (node.getContent() == null)
 				continue;
 
 			String content = node.getContent();
-			if (ok(node.getTags())) {
+			if (node.getTags() != null) {
 				content += " " + node.getTags();
 			}
 
@@ -526,14 +522,14 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 
 						// lazy create and update knownTokens
-						if (no(knownTokens)) {
+						if (knownTokens == null) {
 							knownTokens = new HashSet<>();
 						}
 						knownTokens.add(lcToken);
 
-						if (ok(mentionMap)) {
+						if (mentionMap != null) {
 							WordStats ws = mentionMap.get(lcToken);
-							if (no(ws)) {
+							if (ws == null) {
 								ws = new WordStats(token);
 								mentionMap.put(lcToken, ws);
 							}
@@ -552,14 +548,14 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 
 						// lazy create and update knownTokens
-						if (no(knownTokens)) {
+						if (knownTokens == null) {
 							knownTokens = new HashSet<>();
 						}
 						knownTokens.add(lcToken);
 
-						if (ok(tagMap)) {
+						if (tagMap != null) {
 							WordStats ws = tagMap.get(lcToken);
-							if (no(ws)) {
+							if (ws == null) {
 								ws = new WordStats(token);
 								tagMap.put(lcToken, ws);
 							}
@@ -572,9 +568,9 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 						}
 
-						if (ok(wordMap)) {
+						if (wordMap != null) {
 							WordStats ws = wordMap.get(lcToken);
-							if (no(ws)) {
+							if (ws == null) {
 								ws = new WordStats(token);
 								wordMap.put(lcToken, ws);
 							}
@@ -588,11 +584,11 @@ public class NodeSearchService extends ServiceBase {
 
 			if (countVotes) {
 				String vote = node.getStr(NodeProp.VOTE.s());
-				if (ok(vote)) {
+				if (vote != null) {
 					// 'add' returns true if we are encountering this ID for the first time, so we can tally it's vote
 					if (uniqueVoters.add(node.getId())) {
 						WordStats ws = voteMap.get(vote);
-						if (no(ws)) {
+						if (ws == null) {
 							ws = new WordStats(vote);
 							voteMap.put(vote, ws);
 						}
@@ -607,26 +603,26 @@ public class NodeSearchService extends ServiceBase {
 		List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
 		List<WordStats> voteList = countVotes ? new ArrayList<>(voteMap.values()) : null;
 
-		if (ok(wordList))
+		if (wordList != null)
 			wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
-		if (ok(tagList))
+		if (tagList != null)
 			tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
-		if (ok(mentionList))
+		if (mentionList != null)
 			mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
-		if (ok(voteList))
+		if (voteList != null)
 			voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
 
-		if (ok(wordList)) {
+		if (wordList != null) {
 			sb.append("Unique Words: " + wordList.size() + "\n");
 		}
 
-		if (ok(voteList)) {
+		if (voteList != null) {
 			sb.append("Unique Votes: " + voteList.size() + "\n");
 		}
 
@@ -642,7 +638,7 @@ public class NodeSearchService extends ServiceBase {
 
 		res.setStats(sb.toString());
 
-		if (ok(wordList)) {
+		if (wordList != null) {
 			ArrayList<String> topWords = new ArrayList<>();
 			res.setTopWords(topWords);
 			for (WordStats ws : wordList) {
@@ -652,7 +648,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 		}
 
-		if (ok(voteList)) {
+		if (voteList != null) {
 			ArrayList<String> topVotes = new ArrayList<>();
 			res.setTopVotes(topVotes);
 			for (WordStats ws : voteList) {
@@ -662,7 +658,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 		}
 
-		if (ok(tagList)) {
+		if (tagList != null) {
 			ArrayList<String> topTags = new ArrayList<>();
 			res.setTopTags(topTags);
 			for (WordStats ws : tagList) {
@@ -672,7 +668,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 		}
 
-		if (ok(mentionList)) {
+		if (mentionList != null) {
 			ArrayList<String> topMentions = new ArrayList<>();
 			res.setTopMentions(topMentions);
 			for (WordStats ws : mentionList) {
@@ -698,7 +694,7 @@ public class NodeSearchService extends ServiceBase {
 	private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
 			HashMap<String, WordStats> mentionMap) {
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
-		if (no(tags))
+		if (tags == null)
 			return;
 
 		for (Object tag : tags) {
@@ -715,7 +711,7 @@ public class NodeSearchService extends ServiceBase {
 					String _name = ((String) name).toLowerCase();
 
 					// we use the knownTags to avoid double counting stuff we already counted from the content text
-					if (ok(knownTokens) && knownTokens.contains(_name))
+					if (knownTokens != null && knownTokens.contains(_name))
 						continue;
 
 					// Mentions
@@ -727,7 +723,7 @@ public class NodeSearchService extends ServiceBase {
 						 * what we do in parseMentionsFromNode()
 						 */
 						WordStats ws = mentionMap.get(_name);
-						if (no(ws)) {
+						if (ws == null) {
 							ws = new WordStats(_name);
 							mentionMap.put(_name, ws);
 						}
@@ -738,7 +734,7 @@ public class NodeSearchService extends ServiceBase {
 						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
 						if (!_name.toLowerCase().contains("tallship")) {
 							WordStats ws = tagMap.get(_name);
-							if (no(ws)) {
+							if (ws == null) {
 								ws = new WordStats(_name);
 								tagMap.put(_name, ws);
 							}

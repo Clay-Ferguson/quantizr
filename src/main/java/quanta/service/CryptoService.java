@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -23,7 +21,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -64,29 +61,29 @@ public class CryptoService extends ServiceBase {
 	}
 
 	public boolean nodeSigVerify(SubNode node, String sig) {
-		if (no(sig) || no(node))
+		if (sig == null || node == null)
 			return false;
 		PublicKey pubKey = null;
 
 		try {
 			// if we didn't get this as admin key we'll be generating the key
-			if (no(pubKey)) {
+			if (pubKey == null) {
 				// log.debug("Checking Signature: " + sig + " nodeId: " + node.getIdStr());
 				SubNode ownerAccntNode = arun.run(as -> read.getNode(as, node.getOwner()));
-				if (no(ownerAccntNode)) {
+				if (ownerAccntNode == null) {
 					log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
 					return false;
 				}
 
 				String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-				if (no(pubKeyJson)) {
+				if (pubKeyJson == null) {
 					log.debug("User Account didn't have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr() + " They own nodeId="
 							+ node.getIdStr());
 					return false;
 				}
 
 				pubKey = parseJWK(pubKeyJson, ownerAccntNode);
-				if (no(pubKey)) {
+				if (pubKey == null) {
 					log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
 					return false;
 				}
@@ -118,12 +115,12 @@ public class CryptoService extends ServiceBase {
 		}
 
 		List<Attachment> atts = node.getOrderedAttachments();
-		if (ok(atts) && atts.size() > 0) {
+		if (atts != null && atts.size() > 0) {
 			for (Attachment att : atts) {
-				if (ok(att.getBin())) {
+				if (att.getBin() != null) {
 					strToSign += "-" + att.getBin();
 				}
-				if (ok(att.getBinData())) {
+				if (att.getBinData() != null) {
 					strToSign += "-" + att.getBinData();
 				}
 			}
@@ -141,7 +138,7 @@ public class CryptoService extends ServiceBase {
 		try {
 			// log.debug("parsing: " + pubKeyJson);
 			Jwk keyObj = mapper.readValue(jwkJson.getBytes(StandardCharsets.UTF_8), Jwk.class);
-			if (no(keyObj)) {
+			if (keyObj == null) {
 				log.error("Unable to parse USER_PREF_PUBLIC_SIG_KEY from accnt " + accntNode.getIdStr());
 				return null;
 			}
@@ -150,7 +147,7 @@ public class CryptoService extends ServiceBase {
 			BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(keyObj.getE()));
 
 			pubKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent));
-			if (no(keyObj)) {
+			if (keyObj == null) {
 				log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + accntNode.getIdStr());
 				return null;
 			}
@@ -191,7 +188,7 @@ public class CryptoService extends ServiceBase {
 				SubNode node = read.getNode(ms, id);
 
 				// if we found the node and this setter DID change it's value, then we save.
-				if (ok(node) && node.set(NodeProp.CRYPTO_SIG, data.getData())) {
+				if (node != null && node.set(NodeProp.CRYPTO_SIG, data.getData())) {
 					// clean so we won't let this node get persisted, because we're doing the persist in this bulk op
 					ThreadLocals.clean(node);
 
@@ -204,7 +201,7 @@ public class CryptoService extends ServiceBase {
 				}
 			}
 
-			if (ok(bops)) {
+			if (bops != null) {
 				bops.execute();
 			}
 			sigPendingQueue.remove(req.getWorkloadId());
@@ -215,7 +212,7 @@ public class CryptoService extends ServiceBase {
 
 	public void signSubGraph(MongoSession ms, SessionContext sc, SignSubGraphRequest req) {
 		SubNode parent = read.getNode(ms, req.getNodeId());
-		if (no(parent)) {
+		if (parent == null) {
 			return;
 		}
 
@@ -241,7 +238,7 @@ public class CryptoService extends ServiceBase {
 			if (failed.getVal() || !sc.isLive()) return;
 
 			// create new push object lazily
-			if (no(pushInfo.getVal())) {
+			if (pushInfo.getVal() == null) {
 				pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
 				pushInfo.getVal().setListToSign(new LinkedList<>());
 			}
@@ -265,7 +262,7 @@ public class CryptoService extends ServiceBase {
 		if (failed.getVal() || !sc.isLive()) return;
 
 		// send the accumulated remainder
-		if (ok(pushInfo.getVal()) && pushInfo.getVal().getListToSign().size() > 0) {
+		if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
 			// log.debug("REMAIN: " + XString.prettyPrint(pushInfo));
 			if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
 				failed.setVal(true);

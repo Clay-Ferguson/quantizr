@@ -1,6 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class MongoSession {
 	}
 
 	public boolean isAnon() {
-		return no(userName) || PrincipalName.ANON.s().equals(userName);
+		return userName == null || PrincipalName.ANON.s().equals(userName);
 	}
 
 	public String getUserName() {

@@ -1,7 +1,5 @@
 package quanta.model;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -112,7 +110,7 @@ public class NodeInfo {
 		this.renderContent = renderContent;
 		this.tags = tags;
 		this.lastModified = lastModified;
-		if (ok(lastModified)) {
+		if (lastModified != null) {
 			this.timeAgo = DateUtil.formatDurationMillis(System.currentTimeMillis() - lastModified.getTime(), false);
 		}
 		this.displayName = displayName;
@@ -139,7 +137,7 @@ public class NodeInfo {
 	@Transient
 	@JsonIgnore
 	public Object getPropVal(String propName) {
-		if (no(properties))
+		if (properties == null)
 			return null;
 
 		for (PropertyInfo prop : properties) {
@@ -153,7 +151,7 @@ public class NodeInfo {
 	@Transient
 	@JsonIgnore
 	public void setPropVal(String propName, Object val) {
-		if (no(properties)) {
+		if (properties == null) {
 			safeGetProperties().add(new PropertyInfo(propName, val));
 			return;
 		}
@@ -218,7 +216,7 @@ public class NodeInfo {
 	}
 
 	public List<NodeInfo> safeGetChildren() {
-		if (ok(children))
+		if (children != null)
 			return children;
 		return children = new LinkedList<>();
 	}
@@ -248,7 +246,7 @@ public class NodeInfo {
 	}
 
 	public List<PropertyInfo> safeGetProperties() {
-		if (ok(properties))
+		if (properties != null)
 			return properties;
 		return properties = new LinkedList<>();
 	}
@@ -398,7 +396,7 @@ public class NodeInfo {
 	}
 
 	public List<PropertyInfo> safeGetClientProps() {
-		if (ok(clientProps))
+		if (clientProps != null)
 			return clientProps;
 		return clientProps = new LinkedList<>();
 	}

@@ -1,8 +1,5 @@
 package quanta.filter;
 
-
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -72,16 +69,16 @@ public class AppFilter extends GenericFilterBean {
 				// Get SessionContext from the 'token' parameter if we can.
 				SessionContext sc = null;
 				String token = httpReq.getParameter("token");
-				if (ok(token)) {
+				if (token != null) {
 					sc = SessionContext.getSCByToken(token);
-					if (ok(sc)) {
+					if (sc != null) {
 						ThreadLocals.setSC(sc);
 					}
 				} else {
 					sc = ThreadLocals.getSC();
 				}
 
-				if (no(sc) || !SessionContext.sessionExists(sc)) {
+				if (sc == null || !SessionContext.sessionExists(sc)) {
 					if (Util.allowInsecureUrl(httpReq.getRequestURI())) {
 						HttpSession session = httpReq.getSession(true);
 						sc = SessionContext.init(context, session);
@@ -106,7 +103,7 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				// if no bearer is given, and no userName is set, then set to ANON
-				if (no(bearer) && no(sc.getUserName())) {
+				if (bearer == null && sc.getUserName() == null) {
 					sc.setUserName(PrincipalName.ANON.s());
 				}
 

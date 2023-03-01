@@ -1,7 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -41,12 +39,12 @@ public class AP {
      * </pre>
      */
     public static Object apParseList(List list, String prop) {
-        if (no(list))
+        if (list == null)
             return null;
         for (Object element : list) {
             // see if we can get it, no matter what type element is
             Val<Object> val = getFromMap(element, prop);
-            if (ok(val)) {
+            if (val != null) {
                 return val.getVal();
             }
         }
@@ -60,8 +58,8 @@ public class AP {
     public static String apStr(Object obj, String prop, boolean warnIfMissing) {
         Val<Object> val = null;
 
-        if (ok(val = getFromMap(obj, prop))) {
-            if (no(val.getVal())) {
+        if ((val = getFromMap(obj, prop)) != null) {
+            if (val.getVal() == null) {
                 return null;
             } else if (val.getVal() instanceof String) {
                 return (String) val.getVal();
@@ -73,7 +71,7 @@ public class AP {
             } else {
                 if (warnIfMissing) {
                     ExUtil.warn("unhandled type on apStr() return val: "
-                            + (ok(val.getVal()) ? val.getVal().getClass().getName() : "null on object")
+                            + (val.getVal() != null ? val.getVal().getClass().getName() : "null on object")
                             + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
                 }
                 return null;
@@ -81,7 +79,7 @@ public class AP {
         }
 
         if (warnIfMissing) {
-            ExUtil.warn("unhandled type on apStr(): " + (ok(obj) ? obj.getClass().getName() : "null")
+            ExUtil.warn("unhandled type on apStr(): " + (obj != null ? obj.getClass().getName() : "null")
                     + "\nUnable to get property " + prop + " from obj " + XString.prettyPrint(obj));
         }
         return null;
@@ -90,8 +88,8 @@ public class AP {
     public static Boolean apBool(Object obj, String prop) {
         Val<Object> val = null;
 
-        if (ok(val = getFromMap(obj, prop))) {
-            if (no(val.getVal())) {
+        if ((val = getFromMap(obj, prop)) != null) {
+            if (val.getVal() == null) {
                 return false;
             } else if (val.getVal() instanceof String) {
                 return ((String) val.getVal()).equalsIgnoreCase(APConst.TRUE);
@@ -100,7 +98,7 @@ public class AP {
             }
         }
 
-        ExUtil.warn("unhandled type on apBool(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+        ExUtil.warn("unhandled type on apBool(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
                 + prop + " from obj " + XString.prettyPrint(obj));
         return false;
     }
@@ -108,8 +106,8 @@ public class AP {
     public static Integer apInt(Object obj, String prop) {
         Val<Object> val = null;
 
-        if (ok(val = getFromMap(obj, prop))) {
-            if (no(val.getVal())) {
+        if ((val = getFromMap(obj, prop)) != null) {
+            if (val.getVal() == null) {
                 return 0;
             } else if (val.getVal() instanceof Integer) {
                 return ((Integer) val.getVal()).intValue();
@@ -120,7 +118,7 @@ public class AP {
             }
         }
 
-        ExUtil.warn("unhandled type on apInt(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+        ExUtil.warn("unhandled type on apInt(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
                 + prop + " from obj " + XString.prettyPrint(obj));
         return 0;
     }
@@ -128,15 +126,15 @@ public class AP {
     public static Date apDate(Object obj, String prop) {
         Val<Object> val = null;
 
-        if (ok(val = getFromMap(obj, prop))) {
-            if (no(val.getVal())) {
+        if ((val = getFromMap(obj, prop)) != null) {
+            if (val.getVal() == null) {
                 return null;
             } else if (val.getVal() instanceof String) {
                 return DateUtil.parseISOTime((String) val.getVal());
             }
         }
 
-        ExUtil.warn("unhandled type on apDate(): " + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property "
+        ExUtil.warn("unhandled type on apDate(): " + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property "
                 + prop + " from obj " + XString.prettyPrint(obj));
         return null;
     }
@@ -144,8 +142,8 @@ public class AP {
     public static List<?> apList(Object obj, String prop, boolean allowConvertString) {
         Val<Object> val = null;
 
-        if (ok(val = getFromMap(obj, prop))) {
-            if (no(val.getVal())) {
+        if ((val = getFromMap(obj, prop)) != null) {
+            if (val.getVal() == null) {
                 return null;
             }
             // if we got an instance of a list return it
@@ -173,7 +171,7 @@ public class AP {
             return ((Map<?, ?>) obj).get(prop);
         } else {
             ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: "
-                    + (ok(obj) ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
+                    + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop + " from obj "
                     + XString.prettyPrint(obj));
         }
         return null;
@@ -207,7 +205,7 @@ public class AP {
      * in.
      */
     public static APObj typeFromFactory(Object obj) {
-        if (no(obj))
+        if (obj == null)
             return null;
 
         APObj ret = null;

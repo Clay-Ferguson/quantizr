@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +79,7 @@ public class IPFSDag extends ServiceBase {
         DagNode dagNode = getNode(req.getFolder());
         log.debug("DagNode: " + XString.prettyPrint(dagNode));
 
-        if (ok(dagNode) && ok(dagNode.getLinks())) {
+        if (dagNode != null && dagNode.getLinks() != null) {
             for (DagLink entry : dagNode.getLinks()) {
                 MFSDirEntry me = new MFSDirEntry();
                 me.setName(entry.getName());

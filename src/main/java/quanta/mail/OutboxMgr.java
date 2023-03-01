@@ -1,7 +1,5 @@
 package quanta.mail;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,7 @@ public class OutboxMgr extends ServiceBase {
 			SubNode userInbox =
 					read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
-			if (ok(userInbox)) {
+			if (userInbox != null) {
 				// log.debug("userInbox id=" + userInbox.getIdStr());
 
 				/*
@@ -60,7 +58,7 @@ public class OutboxMgr extends ServiceBase {
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one
 				 */
-				if (no(notifyNode)) {
+				if (notifyNode == null) {
 					notifyNode = create.createNode(as, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
 							CreateNodeLocation.FIRST, null, null, true, true);
 
@@ -80,7 +78,7 @@ public class OutboxMgr extends ServiceBase {
 				 * even.
 				 */
 				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
-				if (ok(scList)) {
+				if (scList != null) {
 					for (SessionContext sc : scList) {
 						push.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
@@ -143,13 +141,13 @@ public class OutboxMgr extends ServiceBase {
 	}
 
 	public SubNode getSystemOutbox(MongoSession ms) {
-		if (ok(OutboxMgr.outboxNode)) {
+		if (OutboxMgr.outboxNode != null) {
 			return OutboxMgr.outboxNode;
 		}
 
 		synchronized (outboxLock) {
 			// yep it's correct threading to check the node value again once inside the lock
-			if (ok(OutboxMgr.outboxNode)) {
+			if (OutboxMgr.outboxNode != null) {
 				return OutboxMgr.outboxNode;
 			}
 

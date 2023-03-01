@@ -1,7 +1,5 @@
 package quanta.test;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -169,7 +167,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		MongoSession as = asUser(PrincipalName.ADMIN.s());
 
 		SubNode adminNode = read.getUserNodeByUserName(as, PrincipalName.ADMIN.s());
-		if (no(adminNode)) {
+		if (adminNode == null) {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
@@ -230,7 +228,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		// adam successfully inserts node in his root
 		SubNode adamsNode = null;
 		SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam");
-		if (ok(adamsRootNode)) {
+		if (adamsRootNode != null) {
 			adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
 			adamsNode.setContent("adam's test node " + System.currentTimeMillis());
 			update.save(adamSession, adamsNode);
@@ -319,7 +317,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
 	private MongoSession asUser(String userName) {
 		SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeException("UserNode not found for userName " + userName);
 		}
 		MongoSession ms = new MongoSession(userName, userNode.getId());

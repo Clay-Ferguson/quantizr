@@ -1,6 +1,5 @@
 package quanta.mail;
 
-import static quanta.util.Util.ok;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,7 @@ public class EmailSenderDaemon extends ServiceBase {
 
 				arun.run((MongoSession ms) -> {
 					Iterable<SubNode> mailNodes = outbox.getMailNodes(ms);
-					if (ok(mailNodes)) {
+					if (mailNodes != null) {
 						sendAllMail(ms, mailNodes);
 					}
 					return null;

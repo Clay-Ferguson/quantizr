@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
@@ -92,7 +90,7 @@ public class FileUtils extends ServiceBase {
 	 * output: file.txt
 	 */
 	public String getShortFileName(String fileName) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String shortName = null;
@@ -112,7 +110,7 @@ public class FileUtils extends ServiceBase {
 	 * If no extension exists empty string is returned
 	 */
 	public String getFileNameExtension(String fileName) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String ext = null;
@@ -126,7 +124,7 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public String stripExtension(String fileName) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String ret = null;
@@ -177,13 +175,13 @@ public class FileUtils extends ServiceBase {
 		File[] folders = directory.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				if (ok(exclusions) && exclusions.contains(file.getAbsolutePath())) {
+				if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
 					return false;
 				}
 				return file.isDirectory() && !file.getName().startsWith(".");
 			}
 		});
-		if (ok(folders)) {
+		if (folders != null) {
 			Arrays.sort(folders, NameFileComparator.NAME_COMPARATOR);
 		}
 
@@ -200,13 +198,13 @@ public class FileUtils extends ServiceBase {
 		File[] files = directory.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				if (ok(exclusions) && exclusions.contains(file.getAbsolutePath())) {
+				if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
 					return false;
 				}
 				return file.isFile() && (file.getName().equals(".meta-fs") || !file.getName().startsWith("."));
 			}
 		});
-		if (ok(files)) {
+		if (files != null) {
 			Arrays.sort(files, NameFileComparator.NAME_COMPARATOR);
 		}
 		// log.debug("fileCount=" + (ok(files) ? files.length : 0));
@@ -214,20 +212,20 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public boolean fileOrFolderExists(String fileName) {
-		if (no(fileName) || fileName.trim().length() == 0)
+		if (fileName == null || fileName.trim().length() == 0)
 			return false;
 		return new File(fileName).exists();
 	}
 
 	public static boolean fileExists(String fileName) {
-		if (no(fileName) || fileName.equals(""))
+		if (fileName == null || fileName.equals(""))
 			return false;
 
 		return new File(fileName).isFile();
 	}
 
 	public static boolean dirExists(String fileName) {
-		if (no(fileName) || fileName.equals(""))
+		if (fileName == null || fileName.equals(""))
 			return false;
 
 		return new File(fileName).isDirectory();
@@ -279,7 +277,7 @@ public class FileUtils extends ServiceBase {
 	}
 
 	public static String ensureValidFileNameChars(String text) {
-		if (no(text))
+		if (text == null)
 			return null;
 
 		int length = text.length();

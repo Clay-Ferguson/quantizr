@@ -1,6 +1,5 @@
 package quanta.model.ipfs.file;
 
-import static quanta.util.Util.ok;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class IPFSDirEntry {
@@ -49,10 +48,10 @@ public class IPFSDirEntry {
     }
 
     public boolean isDir() {
-        return ok(type) && type.intValue() == 1;
+        return type != null && type.intValue() == 1;
     }
 
     public boolean isFile() {
-        return ok(type) && type.intValue() == 0;
+        return type != null && type.intValue() == 0;
     }
 }

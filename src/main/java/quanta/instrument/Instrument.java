@@ -1,17 +1,13 @@
 package quanta.instrument;
-
-import static quanta.util.Util.ok;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
 import quanta.model.client.PrincipalName;
 import quanta.util.ThreadLocals;
@@ -60,7 +56,7 @@ public class Instrument {
 		String userName = null;
 		try {
 			SessionContext sc = ThreadLocals.getSC();
-			if (ok(sc) && !PrincipalName.ANON.s().equals(sc.getUserName())) {
+			if (sc != null && !PrincipalName.ANON.s().equals(sc.getUserName())) {
 				userName = sc.getUserName();
 			}
 

@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -60,26 +58,26 @@ public class MongoAuth extends ServiceBase {
 	private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
 
 	public MongoSession getAdminSession() {
-		if (ok(adminSession)) {
+		if (adminSession != null) {
 			return adminSession;
 		}
 
 		synchronized (adminSessionLck) {
-			if (no(adminSession)) {
+			if (adminSession == null) {
 				SubNode root = read.getDbRoot();
-				adminSession = new MongoSession(PrincipalName.ADMIN.s(), no(root) ? null : root.getId());
+				adminSession = new MongoSession(PrincipalName.ADMIN.s(), root == null ? null : root.getId());
 			}
 			return adminSession;
 		}
 	}
 
 	public MongoSession getAnonSession() {
-		if (ok(anonSession)) {
+		if (anonSession != null) {
 			return anonSession;
 		}
 
 		synchronized (anonSessionLck) {
-			if (no(anonSession)) {
+			if (anonSession == null) {
 				anonSession = new MongoSession(PrincipalName.ANON.s(), null);
 			}
 			return anonSession;
@@ -100,13 +98,13 @@ public class MongoAuth extends ServiceBase {
 		accntNode = userNodesById.get(accountId);
 
 		// if we found the node get property from it to return.
-		if (ok(accntNode)) {
+		if (accntNode != null) {
 			propVal = accntNode.getStr(prop);
 		}
 		// else we have to lookup the node from the DB, and then cache it if found
 		else {
 			accntNode = read.getNode(ms, accountId);
-			if (ok(accntNode)) {
+			if (accntNode != null) {
 				propVal = accntNode.getStr(prop);
 				userNodesById.put(accountId, accntNode);
 			}
@@ -124,7 +122,7 @@ public class MongoAuth extends ServiceBase {
 		List<String> userNames = null;
 
 		List<AccessControlInfo> acList = getAclEntries(ms, node);
-		if (ok(acList)) {
+		if (acList != null) {
 			for (AccessControlInfo info : acList) {
 				String userNodeId = info.getPrincipalNodeId();
 				String name = null;
@@ -132,16 +130,16 @@ public class MongoAuth extends ServiceBase {
 				if (PrincipalName.PUBLIC.s().equals(userNodeId)) {
 					name = PrincipalName.PUBLIC.s();
 				} //
-				else if (ok(userNodeId)) {
+				else if (userNodeId != null) {
 					SubNode accountNode = read.getNode(ms, userNodeId);
-					if (ok(accountNode)) {
+					if (accountNode != null) {
 						name = accountNode.getStr(NodeProp.USER);
 					}
 				}
 
-				if (ok(name)) {
+				if (name != null) {
 					// lazy create the list
-					if (no(userNames)) {
+					if (userNames == null) {
 						userNames = new LinkedList<>();
 					}
 					userNames.add(name);
@@ -160,7 +158,7 @@ public class MongoAuth extends ServiceBase {
 	public void setDefaultReplyAcl(SubNode parent, SubNode child) {
 
 		// if parent or child is null or parent is an ACCOUNT node do nothing here.
-		if (no(parent) || parent.isType(NodeType.ACCOUNT) || no(child))
+		if (parent == null || parent.isType(NodeType.ACCOUNT) || child == null)
 			return;
 
 		// log.debug("childNode: " + child.getIdStr() + " being created under " + parent.getIdStr());
@@ -170,7 +168,7 @@ public class MongoAuth extends ServiceBase {
 		 * at all we create a new empty ACL.
 		 */
 		HashMap<String, AccessControl> ac = parent.getAc();
-		if (no(ac)) {
+		if (ac == null) {
 			ac = new HashMap<>();
 		} else {
 			ac = (HashMap<String, AccessControl>) ac.clone();
@@ -186,9 +184,9 @@ public class MongoAuth extends ServiceBase {
 			String userName = parent.getStr(NodeProp.USER);
 
 			// if we have a userProp, find the account node for the user
-			if (ok(userName)) {
+			if (userName != null) {
 				SubNode accountNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
-				if (ok(accountNode)) {
+				if (accountNode != null) {
 					ac.put(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
 				}
 			}
@@ -211,10 +209,10 @@ public class MongoAuth extends ServiceBase {
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
 				SubNode parentUserNode = arun.run(as -> read.getNode(as, parent.getOwner()));
 
-				if (ok(parentUserNode)) {
+				if (parentUserNode != null) {
 					String user = parentUserNode.getStr(NodeProp.USER);
 					String url = parentUserNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-					if (no(url)) {
+					if (url == null) {
 						url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
 					}
 
@@ -265,7 +263,7 @@ public class MongoAuth extends ServiceBase {
 		SubNode myAcntNode = null;
 
 		// note, anonymous users end up keeping myAcntNode null here. anon will nave null rootID here.
-		if (ok(sc.getRootId())) {
+		if (sc.getRootId() != null) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 		}
 
@@ -273,7 +271,7 @@ public class MongoAuth extends ServiceBase {
 		orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 
 		// if we have a user add their privileges in addition to public.
-		if (ok(myAcntNode)) {
+		if (myAcntNode != null) {
 			// or node is shared to us
 			orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
@@ -285,7 +283,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		if (orCriteria.size() > 0) {
-			if (no(crit)) {
+			if (crit == null) {
 				crit = new Criteria();
 			}
 			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
@@ -299,17 +297,17 @@ public class MongoAuth extends ServiceBase {
 
 	@PerfMon(category = "auth")
 	public void ownerAuth(MongoSession ms, SubNode node) {
-		if (no(node)) {
+		if (node == null) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
 		if (node.adminUpdate)
 			return;
 
-		if (no(ms)) {
+		if (ms == null) {
 			ms = ThreadLocals.getMongoSession();
 		}
 
-		if (no(ms)) {
+		if (ms == null) {
 			// when we get here it normally means we should've called "arun.exec" to manage
 			// the thread instead of justs passing in an 'ms' or null
 			throw new RuntimeException("ThreadLocals doesn't have session.");
@@ -319,7 +317,7 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 
-		if (no(ms.getUserNodeId())) {
+		if (ms.getUserNodeId() == null) {
 			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(ms));
 		}
 
@@ -348,7 +346,7 @@ public class MongoAuth extends ServiceBase {
 	@PerfMon(category = "auth")
 	public void auth(MongoSession ms, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
-		if (no(node) || !MongoRepository.fullInit) {
+		if (node == null || !MongoRepository.fullInit) {
 			return;
 		}
 
@@ -369,7 +367,7 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	public boolean ownedByThreadUser(SubNode node) {
-		return ok(node) && ok(node.getOwner()) && node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId());
+		return node != null && node.getOwner() != null && node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId());
 	}
 
 	/*
@@ -384,7 +382,7 @@ public class MongoAuth extends ServiceBase {
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession ms, SubNode node, List<PrivilegeType> priv) {
 		// during server init no auth is required.
-		if (no(node) || !MongoRepository.fullInit) {
+		if (node == null || !MongoRepository.fullInit) {
 			return;
 		}
 
@@ -398,15 +396,15 @@ public class MongoAuth extends ServiceBase {
 		if (verbose)
 			log.trace("auth path " + node.getPath() + " for " + ms.getUserName());
 
-		if (no(priv) || priv.size() == 0) {
+		if (priv == null || priv.size() == 0) {
 			throw new RuntimeEx("privileges not specified.");
 		}
 
-		if (no(node.getOwner())) {
+		if (node.getOwner() == null) {
 			throw new RuntimeEx("node had no owner: " + node.getIdStr());
 		}
 
-		if (ok(ms.getUserNodeId())) {
+		if (ms.getUserNodeId() != null) {
 			// if this session user is the owner of this node, then they have full power
 			if (ms.getUserNodeId().equals(node.getOwner())) {
 				if (verbose)
@@ -422,7 +420,7 @@ public class MongoAuth extends ServiceBase {
 			}
 		}
 
-		String sessionUserNodeId = ok(ms.getUserNodeId()) ? ms.getUserNodeId().toHexString() : null;
+		String sessionUserNodeId = ms.getUserNodeId() != null ? ms.getUserNodeId().toHexString() : null;
 		// log.debug("nodeAuth userAcctId=" + sessionUserNodeId);
 		if (nodeAuth(node, sessionUserNodeId, priv)) {
 			if (verbose)
@@ -446,15 +444,15 @@ public class MongoAuth extends ServiceBase {
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
 		// log.debug("nodeAuth on node: " + XString.prettyPrint(node));
 		HashMap<String, AccessControl> acl = node.getAc();
-		if (no(acl)) {
+		if (acl == null) {
 			// log.debug("no acls.");
 			return false;
 		}
 		String allPrivs = "";
 
-		AccessControl ac = (no(sessionUserNodeId) ? null : acl.get(sessionUserNodeId));
-		String privsForUserId = ok(ac) ? ac.getPrvs() : null;
-		if (ok(privsForUserId)) {
+		AccessControl ac = (sessionUserNodeId == null ? null : acl.get(sessionUserNodeId));
+		String privsForUserId = ac != null ? ac.getPrvs() : null;
+		if (privsForUserId != null) {
 			allPrivs += privsForUserId;
 			// log.debug("Privs for this user: " + privsForUserId);
 		}
@@ -464,8 +462,8 @@ public class MongoAuth extends ServiceBase {
 		 * the auth equivalent is really the union of this set.
 		 */
 		AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
-		String privsForPublic = ok(acPublic) ? acPublic.getPrvs() : null;
-		if (ok(privsForPublic)) {
+		String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
+		if (privsForPublic != null) {
 			if (allPrivs.length() > 0) {
 				allPrivs += ",";
 			}
@@ -490,7 +488,7 @@ public class MongoAuth extends ServiceBase {
 
 	public List<AccessControlInfo> getAclEntries(MongoSession ms, SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
-		if (no(aclMap)) {
+		if (aclMap == null) {
 			return null;
 		}
 
@@ -502,7 +500,7 @@ public class MongoAuth extends ServiceBase {
 
 		aclMap.forEach((k, v) -> {
 			AccessControlInfo acei = createAccessControlInfo(ms, k, v.getPrvs());
-			if (ok(acei)) {
+			if (acei != null) {
 				ret.add(acei);
 			}
 		});
@@ -523,7 +521,7 @@ public class MongoAuth extends ServiceBase {
 		/* else we need the user name */
 		else {
 			SubNode principalNode = read.getNode(ms, principalId, false, null);
-			if (no(principalNode)) {
+			if (principalNode == null) {
 				return null;
 			}
 			principalName = principalNode.getStr(NodeProp.USER);
@@ -533,9 +531,9 @@ public class MongoAuth extends ServiceBase {
 			// This will be null if it's a local node, and this is fine
 			foreignAvatarUrl = principalNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
 
-			if (no(foreignAvatarUrl)) {
+			if (foreignAvatarUrl == null) {
 				Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-				avatarVer = ok(att) ? att.getBin() : null;
+				avatarVer = att != null ? att.getBin() : null;
 			}
 		}
 
@@ -558,10 +556,10 @@ public class MongoAuth extends ServiceBase {
 			int limit, ObjectId ownerIdMatch) {
 
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (no(q))
+		if (q == null)
 			return null;
 
-		if (ok(sort)) {
+		if (sort != null) {
 			q.with(sort);
 		}
 
@@ -576,7 +574,7 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public long countSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
 		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (no(q))
+		if (q == null)
 			return 0L;
 		Long ret = ops.count(q, SubNode.class);
 		return ret;
@@ -585,14 +583,14 @@ public class MongoAuth extends ServiceBase {
 	private Query subGraphByAclUser_query(MongoSession ms, String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
-		if (no(pathToSearch)) {
+		if (pathToSearch == null) {
 			pathToSearch = NodePath.USERS_PATH;
 		}
 
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
 
-		if (ok(sharedToAny) && sharedToAny.size() > 0) {
+		if (sharedToAny != null && sharedToAny.size() > 0) {
 			List<Criteria> orCriteria = new LinkedList<>();
 			for (String share : sharedToAny) {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
@@ -601,7 +599,7 @@ public class MongoAuth extends ServiceBase {
 			crit = crit.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 		}
 
-		if (ok(ownerIdMatch)) {
+		if (ownerIdMatch != null) {
 			crit = crit.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
@@ -622,7 +620,7 @@ public class MongoAuth extends ServiceBase {
 			int limit) {
 		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 
-		if (ok(sort)) {
+		if (sort != null) {
 			q.with(sort);
 		}
 
@@ -643,7 +641,7 @@ public class MongoAuth extends ServiceBase {
 	public Query subGraphByAcl_query(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
 		Query q = new Query();
 
-		if (no(pathToSearch)) {
+		if (pathToSearch == null) {
 			pathToSearch = NodePath.USERS_PATH;
 		}
 
@@ -655,7 +653,7 @@ public class MongoAuth extends ServiceBase {
 		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)) //
 				.and(SubNode.AC).ne(null);
 
-		if (ok(ownerIdMatch)) {
+		if (ownerIdMatch != null) {
 			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
@@ -669,7 +667,7 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public HashMap<String, APObj> parseTags(String content, boolean parseMentions, boolean parseHashtags) {
 		HashMap<String, APObj> tags = new HashMap<>();
-		if (no(content))
+		if (content == null)
 			return tags;
 
 		StringTokenizer t = new StringTokenizer(content, APConst.TAGS_TOKENIZER, false);
@@ -713,11 +711,11 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public HashMap<String, APObj> parseTags(SubNode node) {
 		HashMap<String, APObj> tagSet = new HashMap<>();
-		if (no(node))
+		if (node == null)
 			return tagSet;
 
 		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
-		if (ok(tags)) {
+		if (tags != null) {
 			for (Object tag : tags) {
 				try {
 					if (tag instanceof Map) {
@@ -727,7 +725,7 @@ public class MongoAuth extends ServiceBase {
 						Object name = m.get("name");
 
 						// ActPub spec originally didn't have Hashtag here, so default to that if no type
-						if (no(type)) {
+						if (type == null) {
 							type = "Hashtag";
 						}
 
@@ -795,7 +793,7 @@ public class MongoAuth extends ServiceBase {
 	 * mentioned has visibility of this node and that it will also appear in their FEED.
 	 */
 	public void saveMentionsToACL(HashMap<String, APObj> tags, MongoSession ms, SubNode node) {
-		if (no(tags)) {
+		if (tags == null) {
 			return;
 		}
 		boolean acChanged = false;
@@ -828,14 +826,14 @@ public class MongoAuth extends ServiceBase {
 				apub.userEncountered(userName, false);
 			}
 
-			if (ok(acctNode)) {
+			if (acctNode != null) {
 				String acctNodeId = acctNode.getIdStr();
-				if (no(ac) || !ac.containsKey(acctNodeId)) {
+				if (ac == null || !ac.containsKey(acctNodeId)) {
 					/*
 					 * Lazy create 'ac' so that the net result of this method is never to assign non null when it could
 					 * be left null
 					 */
-					if (no(ac)) {
+					if (ac == null) {
 						ac = new HashMap<String, AccessControl>();
 					}
 					acChanged = true;

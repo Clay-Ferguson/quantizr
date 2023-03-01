@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.ok;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class AsyncExec extends ServiceBase {
                     if (execCounter > maxExecCounter) {
                         maxExecCounter = execCounter;
                     }
-                    if (ok(tlc)) {
+                    if (tlc != null) {
                         ThreadLocals.setContext(tlc);
                     }
                     runnable.run();

@@ -1,6 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.ok;
 import java.util.Map;
 import quanta.actpub.APConst;
 
@@ -19,7 +18,7 @@ public class APOUndo extends APOActivity {
 
     public APOUndo(String id, String actor, Object object) {
         this();
-        if (ok(id)) {
+        if (id != null) {
             put(APObj.id, id);
         }
         put(APObj.actor, actor);

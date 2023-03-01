@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.ok;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
@@ -17,7 +16,7 @@ public class ImageUtil {
 	}
 
 	public static boolean isImageMime(String mimeType) {
-		return ok(mimeType) && mimeType.toLowerCase().startsWith("image/");
+		return mimeType != null && mimeType.toLowerCase().startsWith("image/");
 	}
 
 	public static String mimeToFomatName(String mimeType) {

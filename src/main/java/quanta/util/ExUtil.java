@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.exception.base.RuntimeEx;
@@ -46,7 +44,7 @@ public class ExUtil {
 	// Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
 	// argument here
 	public static final String getStackTrace(Thread thread) {
-		if (no(thread)) {
+		if (thread == null) {
 			thread = Thread.currentThread();
 		}
 		StringBuilder sb = new StringBuilder();
@@ -72,7 +70,7 @@ public class ExUtil {
 		logger.debug(msg, e);
 
 		/* Not showing all sub-causes in the chain, but just the immediate one */
-		if (ok(e.getCause())) {
+		if (e.getCause() != null) {
 			logger.debug("cause:", e);
 		}
 	}
@@ -81,7 +79,7 @@ public class ExUtil {
 		logger.error(msg, e);
 
 		/* Not showing all sub-causes in the chain, but just the immediate one */
-		if (ok(e.getCause())) {
+		if (e.getCause() != null) {
 			logger.error("cause:", e);
 		}
 	}
@@ -90,7 +88,7 @@ public class ExUtil {
 		logger.warn(msg, e);
 
 		/* Not showing all sub-causes in the chain, but just the immediate one */
-		if (ok(e.getCause())) {
+		if (e.getCause() != null) {
 			logger.warn("cause:", e);
 		}
 	}

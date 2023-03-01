@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +76,7 @@ public class GraphNodesService extends ServiceBase {
 
 	private String getNodeName(SubNode node) {
 		String content = node.getContent();
-		if (no(content))
+		if (content == null)
 			return "";
 		String name = null;
 
@@ -128,7 +126,7 @@ public class GraphNodesService extends ServiceBase {
 			String parentPath = XString.truncAfterLast(n.getPath(), "/");
 			// log.debug("Looking for Parent (b): " + parentPath);
 			GraphNode parent = mapByPath.get(parentPath);
-			if (ok(parent)) {
+			if (parent != null) {
 				parent.addChild(n);
 				// log.debug("Parent Name "+parent.getName()+" now has
 				// childCount="+parent.getChildren().size());
@@ -139,7 +137,7 @@ public class GraphNodesService extends ServiceBase {
 	}
 
 	public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
-		if (no(path) || path.length() < 3)
+		if (path == null || path.length() < 3)
 			return;
 
 		String parentPath = XString.truncAfterLast(path, "/");
@@ -148,7 +146,7 @@ public class GraphNodesService extends ServiceBase {
 
 		GraphNode parent = mapByPath.get(parentPath);
 
-		if (no(parent)) {
+		if (parent == null) {
 			// We only need guid on this name, to ensure D3 works, but the actual name on these
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.

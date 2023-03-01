@@ -1,6 +1,5 @@
 package quanta.test;
 
-import static quanta.util.Util.ok;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
             // Now read back the file
             String content = ipfsFiles.readFile(fileName);
-            if (ok(content)) {
+            if (content != null) {
                 log.debug("Read Confirmed: " + content);
             }
 

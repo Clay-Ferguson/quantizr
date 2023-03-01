@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -53,7 +51,7 @@ public class EnglishDictionary extends ServiceBase {
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
 				String line;
-				while (ok(line = in.readLine())) {
+				while ((line = in.readLine()) != null) {
 					line = line.trim();
 					if (line.length() > 0) {
 						words.add(line.toLowerCase());
@@ -86,7 +84,7 @@ public class EnglishDictionary extends ServiceBase {
 	}
 
 	public boolean isStopWord(String word) {
-		if (no(word))
+		if (word == null)
 			return true;
 		return stopWords.contains(word.toLowerCase());
 	}
@@ -102,7 +100,7 @@ public class EnglishDictionary extends ServiceBase {
 	 * example threshold=0.60f -> 60% english)
 	 */
 	public boolean isEnglish(String text) {
-		if (no(text))
+		if (text == null)
 			return true;
 		if (dictWords.size() == 0)
 			throw new RuntimeException("called isEnglish before dictionary was loaded.");
@@ -163,7 +161,7 @@ public class EnglishDictionary extends ServiceBase {
 	public boolean hasBadWords(String text) {
 		if (badWords.size() == 0)
 			throw new RuntimeException("called isBadWord before dictionary was loaded.");
-		if (no(text))
+		if (text == null)
 			return false;
 
 		StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);

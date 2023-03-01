@@ -1,6 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.ok;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -43,7 +42,7 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
-		if (ok(sc)) {
+		if (sc != null) {
 			sc.sessionTimeout();
 			session.removeAttribute(SessionContext.QSC);
 

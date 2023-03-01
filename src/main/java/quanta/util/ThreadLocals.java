@@ -1,7 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -86,7 +84,7 @@ public class ThreadLocals {
 
 	public static void requireAdminThread() {
 		MongoSession as = ThreadLocals.getMongoSession();
-		if (no(as) || !as.isAdmin()) {
+		if (as == null || !as.isAdmin()) {
 			throw new NodeAuthFailedException();
 		}
 	}
@@ -180,7 +178,7 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getParentCheckEnabled() {
-		if (no(parentCheckEnabled.get()))
+		if (parentCheckEnabled.get() == null)
 			return false;
 		return parentCheckEnabled.get();
 	}
@@ -190,7 +188,7 @@ public class ThreadLocals {
 	}
 
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
-		if (no(dirtyNodes.get())) {
+		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return dirtyNodes.get();
@@ -201,7 +199,7 @@ public class ThreadLocals {
 	}
 
 	public static void cacheNode(SubNode node) {
-		if (no(node) || no(node.getId())) {
+		if (node == null || node.getId() == null) {
 			return;
 		}
 
@@ -213,7 +211,7 @@ public class ThreadLocals {
 	}
 
 	public static HashMap<ObjectId, SubNode> getCachedNodes() {
-		if (no(cachedNodes.get())) {
+		if (cachedNodes.get() == null) {
 			cachedNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return cachedNodes.get();
@@ -256,7 +254,7 @@ public class ThreadLocals {
 	 * request, are guaranteed to be saved to the DB.
 	 */
 	public static void dirty(SubNode node) {
-		if (no(node) || no(node.getId())) {
+		if (node == null || node.getId() == null) {
 			return;
 		}
 
@@ -270,7 +268,7 @@ public class ThreadLocals {
 		 * Normally NodeIterator.java, and all places we ready from the DB should be wrapped in a way as to
 		 * let the dirty nodes be correctly referenced, so this message should never get printed.
 		 */
-		if (ok(nodeFound)) {
+		if (nodeFound != null) {
 			// Not checking this, becasue it can happen in normal code flow
 			// if (nodeFound.hashCode() != node.hashCode()) {
 			// 	ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
@@ -294,10 +292,10 @@ public class ThreadLocals {
 	}
 
 	public static MongoSession ensure(MongoSession ms) {
-		MongoSession ret = ok(ms) ? ms : session.get();
+		MongoSession ret = ms != null ? ms : session.get();
 
 		// this should never happen, but if we didn't have a mongoSession here make one to return
-		if (no(ret) && ok(getSC())) {
+		if (ret == null && getSC() != null) {
 			ret = new MongoSession(getSC().getUserName(), getSC().getUserNodeId());
 		}
 		return ret;

@@ -1,6 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.ok;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +63,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 Thread.currentThread().interrupt();
             }
         } else {
-            if (ok(executor)) {
+            if (executor != null) {
                 log.debug("Unexpected executor: " + executor.getClass().getName());
             }
         }

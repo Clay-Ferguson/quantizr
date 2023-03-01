@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -158,7 +156,7 @@ public class RSSFeedService extends ServiceBase {
 				for (String url : failedFeedsList) {
 					log.debug("Retrying previously failed feed: " + url);
 					SyndFeed feed = getFeed(url, false);
-					if (ok(feed)) {
+					if (feed != null) {
 						count++;
 					} else {
 						fails++;
@@ -169,7 +167,7 @@ public class RSSFeedService extends ServiceBase {
 			for (String url : feedCache.keySet()) {
 				log.debug("Refreshing feed: " + url);
 				SyndFeed feed = getFeed(url, false);
-				if (ok(feed)) {
+				if (feed != null) {
 					count++;
 				} else {
 					fails++;
@@ -187,9 +185,9 @@ public class RSSFeedService extends ServiceBase {
 				// log.debug("Processing Feed: " + url);
 
 				SyndFeed inFeed = getFeed(url, true);
-				if (ok(inFeed)) {
+				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
-						if (ok(entry.getPublishedDate())) {
+						if (entry.getPublishedDate() != null) {
 							entries.add(entry);
 						} else {
 							// log.debug("ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
@@ -242,7 +240,7 @@ public class RSSFeedService extends ServiceBase {
 
 			if (fromCache) {
 				inFeed = feedCache.get(url);
-				if (ok(inFeed)) {
+				if (inFeed != null) {
 					// log.debug("CACHE FEED HIT: " + url); // XString.prettyPrint(inFeed));
 					return inFeed;
 				}
@@ -326,7 +324,7 @@ public class RSSFeedService extends ServiceBase {
 			feedCache.put(url, inFeed);
 
 			// store knowledge of which feed Title goes with each entry instance.
-			if (ok(inFeed.getEntries())) {
+			if (inFeed.getEntries() != null) {
 				for (SyndEntry se : inFeed.getEntries()) {
 					feedNameOfItem.put(se.hashCode(), inFeed.getTitle());
 				}
@@ -351,7 +349,7 @@ public class RSSFeedService extends ServiceBase {
 			// if the feed has failed at least attempt to get from the cache whatever the latest is that we have
 			return feedCache.get(url);
 		} finally {
-			if (ok(reader)) {
+			if (reader != null) {
 				StreamUtil.close(reader);
 			}
 		}
@@ -378,7 +376,7 @@ public class RSSFeedService extends ServiceBase {
 		// this sanitizer seems to choke on these special quotes so replace them first.
 		html = quoteFix(html);
 
-		if (no(policy)) {
+		if (policy == null) {
 			synchronized (policyLock) {
 				/*
 				 * I have removed IMAGES only because it looks silly when we display an image that's also displayed
@@ -421,13 +419,13 @@ public class RSSFeedService extends ServiceBase {
 		else {
 			String url = urlList.get(0);
 			SyndFeed cachedFeed = getFeed(url, true);
-			if (ok(cachedFeed)) {
+			if (cachedFeed != null) {
 				feed = new SyndFeedImpl();
 				cloneFeedForPage(feed, cachedFeed, req.getPage());
 			}
 		}
 
-		if (ok(feed)) {
+		if (feed != null) {
 			fixFeed(feed);
 			boolean addFeedTitles = urlList.size() > 1;
 			RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
@@ -446,7 +444,7 @@ public class RSSFeedService extends ServiceBase {
 		rf.setAuthor(feed.getAuthor());
 		rf.setEncoding(feed.getEncoding());
 
-		if (ok(feed.getImage())) {
+		if (feed.getImage() != null) {
 			rf.setImage(feed.getImage().getUrl());
 		}
 
@@ -460,7 +458,7 @@ public class RSSFeedService extends ServiceBase {
 		List<RssFeedEntry> rssEntries = new LinkedList<>();
 		rf.setEntries(rssEntries);
 
-		if (ok(feed.getEntries())) {
+		if (feed.getEntries() != null) {
 			for (SyndEntry entry : feed.getEntries()) {
 				// log.debug("Entry: " + XString.prettyPrint(entry));
 				RssFeedEntry e = new RssFeedEntry();
@@ -483,21 +481,21 @@ public class RSSFeedService extends ServiceBase {
 	private boolean processEntry(SyndEntry entry, RssFeedEntry e) {
 		// log.debug("entry: " + entry.getTitle());
 
-		if (ok(entry.getDescription())) {
+		if (entry.getDescription() != null) {
 			e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
 		}
 
 		e.setTitle(entry.getTitle());
 		e.setLink(entry.getLink());
 
-		if (ok(entry.getPublishedDate())) {
+		if (entry.getPublishedDate() != null) {
 			e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		} else {
 			// log.debug("RSS ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
 		}
 		e.setAuthor(entry.getAuthor());
 
-		if (ok(entry.getContents())) {
+		if (entry.getContents() != null) {
 			for (SyndContent content : entry.getContents()) {
 				e.setDescription(sanitizeHtml(content.getValue()));
 			}
@@ -510,7 +508,7 @@ public class RSSFeedService extends ServiceBase {
 		// String imgURL = foreignMarkup.getAttribute("url").getValue();
 		// }
 
-		if (ok(entry.getEnclosures())) {
+		if (entry.getEnclosures() != null) {
 			List<RssFeedEnclosure> enclosures = new LinkedList<>();
 			e.setEnclosures(enclosures);
 
@@ -527,13 +525,13 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private void processModules(SyndFeed entry, RssFeed e) {
-		if (ok(entry.getModules())) {
+		if (entry.getModules() != null) {
 			for (Module m : entry.getModules()) {
 
 				// log.debug("Module: " + m.getClass().getName());
 				if (m instanceof MediaEntryModuleImpl) {
 					MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
-					if (ok(mm.getMediaContents())) {
+					if (mm.getMediaContents() != null) {
 
 						// put new list on return object
 						List<RssFeedMediaContent> mediaContent = new LinkedList<>();
@@ -551,19 +549,19 @@ public class RSSFeedService extends ServiceBase {
 						}
 					}
 
-					if (ok(mm.getMediaGroups())) {
+					if (mm.getMediaGroups() != null) {
 						for (MediaGroup mg : mm.getMediaGroups()) {
 							Metadata md = mg.getMetadata();
-							if (ok(md)) {
+							if (md != null) {
 
-								if (ok(md.getDescription())) {
+								if (md.getDescription() != null) {
 									e.setDescription(sanitizeHtml(md.getDescription()));
 								}
-								if (ok(md.getEmbed())) {
+								if (md.getEmbed() != null) {
 									log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
 								}
 
-								if (ok(md.getThumbnail())) {
+								if (md.getThumbnail() != null) {
 									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
 										e.setImage(tn.getUrl().toASCIIString());
 									}
@@ -593,7 +591,7 @@ public class RSSFeedService extends ServiceBase {
 				} else if (m instanceof EntryInformationImpl) {
 					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
 
-					if (ok(itunesMod.getImage())) {
+					if (itunesMod.getImage() != null) {
 						try {
 							e.setImage(itunesMod.getImage().toURI().toString());
 						} catch (Exception e1) {
@@ -628,13 +626,13 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private void processModules(SyndEntry entry, RssFeedEntry e) {
-		if (ok(entry.getModules())) {
+		if (entry.getModules() != null) {
 			for (Module m : entry.getModules()) {
 
 				// log.debug("Module: " + m.getClass().getName());
 				if (m instanceof MediaEntryModuleImpl) {
 					MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
-					if (ok(mm.getMediaContents())) {
+					if (mm.getMediaContents() != null) {
 
 						// put new list on return object
 						List<RssFeedMediaContent> mediaContent = new LinkedList<>();
@@ -650,19 +648,19 @@ public class RSSFeedService extends ServiceBase {
 						}
 					}
 
-					if (ok(mm.getMediaGroups())) {
+					if (mm.getMediaGroups() != null) {
 						for (MediaGroup mg : mm.getMediaGroups()) {
 							Metadata md = mg.getMetadata();
-							if (ok(md)) {
+							if (md != null) {
 
-								if (ok(md.getDescription())) {
+								if (md.getDescription() != null) {
 									e.setDescription(sanitizeHtml(md.getDescription()));
 								}
-								if (ok(md.getEmbed())) {
+								if (md.getEmbed() != null) {
 									log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
 								}
 
-								if (ok(md.getThumbnail())) {
+								if (md.getThumbnail() != null) {
 									for (Thumbnail tn : md.getThumbnail()) {
 										e.setThumbnail(tn.getUrl().toASCIIString());
 									}
@@ -676,12 +674,12 @@ public class RSSFeedService extends ServiceBase {
 					}
 
 					Metadata md = mm.getMetadata();
-					if (ok(md)) {
-						if (ok(md.getDescription())) {
+					if (md != null) {
+						if (md.getDescription() != null) {
 							e.setDescription(sanitizeHtml(md.getDescription()));
 						}
 
-						if (ok(md.getThumbnail())) {
+						if (md.getThumbnail() != null) {
 							for (Thumbnail tn : md.getThumbnail()) {
 								e.setThumbnail(tn.getUrl().toASCIIString());
 							}
@@ -705,7 +703,7 @@ public class RSSFeedService extends ServiceBase {
 				} else if (m instanceof EntryInformationImpl) {
 					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
 
-					if (ok(itunesMod.getImage())) {
+					if (itunesMod.getImage() != null) {
 						try {
 							e.setImage(itunesMod.getImage().toURI().toString());
 						} catch (Exception e1) {
@@ -778,9 +776,9 @@ public class RSSFeedService extends ServiceBase {
 		feed.setFeedType("rss_2.0");
 
 		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
-		feed.setTitle(ok(metaInfo.getTitle()) ? metaInfo.getTitle() : "");
+		feed.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "");
 		feed.setLink("");
-		feed.setDescription(sanitizeHtml(ok(metaInfo.getDescription()) ? metaInfo.getDescription() : ""));
+		feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
 
 		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
@@ -789,7 +787,7 @@ public class RSSFeedService extends ServiceBase {
 			Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
 			Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
 
-			if (ok(iter)) {
+			if (iter != null) {
 				for (SubNode n : iter) {
 					if (!AclService.isPublic(ms, n))
 						continue;
@@ -798,13 +796,13 @@ public class RSSFeedService extends ServiceBase {
 
 					// Currently the link will be an attachment URL, but need to research how ROME
 					// handles attachments.
-					if (no(metaInfo.getAttachmentUrl())) {
+					if (metaInfo.getAttachmentUrl() == null) {
 						metaInfo.setAttachmentUrl(metaInfo.getUrl());
 					}
 					SyndEntry entry = new SyndEntryImpl();
 
-					entry.setTitle(ok(metaInfo.getTitle()) ? metaInfo.getTitle() : "ID: " + n.getIdStr());
-					entry.setLink(ok(metaInfo.getAttachmentUrl()) ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
+					entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
+					entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
 
 					/*
 					 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
@@ -828,7 +826,7 @@ public class RSSFeedService extends ServiceBase {
 					 */
 					description.setType("text/plain");
 					description.setType("text/html");
-					description.setValue(sanitizeHtml(ok(metaInfo.getDescription()) ? metaInfo.getDescription() : ""));
+					description.setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
 					entry.setDescription(description);
 
 					entries.add(entry);
@@ -840,7 +838,7 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private void fixFeed(SyndFeed feed) {
-		if (no(feed))
+		if (feed == null)
 			return;
 		if (StringUtils.isEmpty(feed.getEncoding()))
 			feed.setEncoding("UTF-8");
@@ -857,7 +855,7 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	private void writeFeed(SyndFeed feed, Writer writer) {
-		if (ok(writer) && ok(feed)) {
+		if (writer != null && feed != null) {
 			try {
 				fixFeed(feed);
 				SyndFeedOutput output = new SyndFeedOutput();

@@ -1,7 +1,5 @@
 package quanta;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -45,7 +43,7 @@ public class CallProcessor extends ServiceBase {
 		}
 
 		SessionContext sc = ThreadLocals.getSC();
-		if (no(sc) || !SessionContext.sessionExists(sc)) {
+		if (sc == null || !SessionContext.sessionExists(sc)) {
 			throw new RuntimeException("Unable to get SessionContext to check token.");
 		}
 
@@ -88,7 +86,7 @@ public class CallProcessor extends ServiceBase {
 
 		Object ret = null;
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
-		if (no(mutex)) {
+		if (mutex == null) {
 			log.error("Session mutex lock is null.");
 		}
 
@@ -96,7 +94,7 @@ public class CallProcessor extends ServiceBase {
 		String userName = null;
 
 		try {
-			if (useLock && ok(mutex)) {
+			if (useLock && mutex != null) {
 				mutex.lockEx();
 			}
 
@@ -116,7 +114,7 @@ public class CallProcessor extends ServiceBase {
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
 			try {
-				if (ok(res)) {
+				if (res != null) {
 					ExUtil.warn("Unauthorized. Not logged in.");
 					res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 				}
@@ -137,7 +135,7 @@ public class CallProcessor extends ServiceBase {
 					/*
 					 * for now, we can just send back the actual exception message
 					 */
-					if (ok(e.getMessage())) {
+					if (e.getMessage() != null) {
 						orb.setMessage("Failed: " + e.getMessage());
 					} else {
 						orb.setMessage("Failed.");
@@ -152,7 +150,7 @@ public class CallProcessor extends ServiceBase {
 				new PerfMonEvent(duration, "callProc." + command, userName);
 			}
 
-			if (useLock && ok(mutex)) {
+			if (useLock && mutex != null) {
 				mutex.unlockEx();
 			}
 			// mutexCounter--;
@@ -170,10 +168,10 @@ public class CallProcessor extends ServiceBase {
 	}
 
 	private static void logRequest(String url, Object req, HttpSession httpSession) {
-		log.trace("REQ=" + url + " " + (no(req) ? "none" : XString.prettyPrint(req)));
+		log.trace("REQ=" + url + " " + (req == null ? "none" : XString.prettyPrint(req)));
 	}
 
 	private static void logResponse(Object res) {
-		log.trace("RES=" + (no(res) ? "none" : XString.prettyPrint(res)));
+		log.trace("RES=" + (res == null ? "none" : XString.prettyPrint(res)));
 	}
 }

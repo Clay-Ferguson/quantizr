@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,7 +150,7 @@ public class MongoUtil extends ServiceBase {
 	 */
 	@PerfMon
 	public SubNode findById(ObjectId objId) {
-		if (no(objId))
+		if (objId == null)
 			return null;
 
 		// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
@@ -233,7 +231,7 @@ public class MongoUtil extends ServiceBase {
 		 * colon-delimited list like username:password:email.
 		 */
 		final List<String> testUserAccountsList = XString.tokenize(prop.getTestUserAccounts(), ",", true);
-		if (no(testUserAccountsList)) {
+		if (testUserAccountsList == null) {
 			return;
 		}
 
@@ -242,7 +240,7 @@ public class MongoUtil extends ServiceBase {
 				log.debug("Verifying test Account: " + accountInfo);
 
 				final List<String> accountInfoList = XString.tokenize(accountInfo, ":", true);
-				if (no(accountInfoList) || accountInfoList.size() != 3) {
+				if (accountInfoList == null || accountInfoList.size() != 3) {
 					log.debug("Invalid User Info substring: " + accountInfo);
 					continue;
 				}
@@ -250,7 +248,7 @@ public class MongoUtil extends ServiceBase {
 				String userName = accountInfoList.get(0);
 
 				SubNode ownerNode = read.getUserNodeByUserName(as, userName);
-				if (no(ownerNode)) {
+				if (ownerNode == null) {
 					log.debug("userName not found: " + userName + ". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();
 					signupReq.setUserName(userName);
@@ -306,7 +304,7 @@ public class MongoUtil extends ServiceBase {
 
 
 	public String getHashOfPassword(String password) {
-		if (no(password))
+		if (password == null)
 			return null;
 		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
@@ -343,13 +341,13 @@ public class MongoUtil extends ServiceBase {
 	/* Returns true if there were actually some encryption keys removed */
 	public boolean removeAllEncryptionKeys(SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
-		if (no(aclMap)) {
+		if (aclMap == null) {
 			return false;
 		}
 
 		Val<Boolean> keysRemoved = new Val<>(false);
 		aclMap.forEach((String key, AccessControl ac) -> {
-			if (ok(ac.getKey())) {
+			if (ac.getKey() != null) {
 				ac.setKey(null);
 				keysRemoved.setVal(true);
 			}
@@ -359,7 +357,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public boolean isImageAttachment(Attachment att) {
-		return ok(att) && ImageUtil.isImageMime(att.getMime());
+		return att != null && ImageUtil.isImageMime(att.getMime());
 	}
 
 	public int dump(String message, Iterable<SubNode> iter) {
@@ -420,7 +418,7 @@ public class MongoUtil extends ServiceBase {
 
 		for (SubNode acctNode : accntNodes) {
 			String userName = acctNode.getStr(NodeProp.USER.s());
-			if (no(userName))
+			if (userName == null)
 				continue;
 
 			String path = acctNode.getPath();
@@ -444,7 +442,7 @@ public class MongoUtil extends ServiceBase {
 		// ---------------------------------
 
 		SubNode localCheck = read.getNode(ms, "/r/usr/L");
-		if (no(localCheck)) {
+		if (localCheck == null) {
 			log.debug("localCheck failed");
 			return;
 		} else {
@@ -453,7 +451,7 @@ public class MongoUtil extends ServiceBase {
 
 		// -----------------------------------
 		SubNode remoteCheck = read.getNode(ms, "/r/usr/R");
-		if (no(remoteCheck)) {
+		if (remoteCheck == null) {
 			log.debug("remoteCheck failed");
 			return;
 		} else {
@@ -1009,7 +1007,7 @@ public class MongoUtil extends ServiceBase {
 	@PerfMon(category = "mongoUtil")
 	public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated) {
 		SubNode userNode = read.getUserNodeByUserName(ms, newUserName);
-		if (ok(userNode)) {
+		if (userNode != null) {
 			throw new RuntimeException("User already existed: " + newUserName);
 		}
 
@@ -1066,7 +1064,7 @@ public class MongoUtil extends ServiceBase {
 		String adminUser = prop.getMongoAdminUserName();
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
-		if (no(adminNode)) {
+		if (adminNode == null) {
 			adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());

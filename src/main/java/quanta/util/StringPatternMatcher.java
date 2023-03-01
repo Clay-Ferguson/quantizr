@@ -3,7 +3,6 @@
  */
 package quanta.util;
 
-import static quanta.util.Util.no;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -48,7 +47,7 @@ public class StringPatternMatcher {
 	}
 
 	public void addListOfPatterns(String input) {
-		if (no(input) || input.length() == 0) return;
+		if (input == null || input.length() == 0) return;
 
 		StringTokenizer t = new StringTokenizer(input, ",", true);
 		String token;

@@ -1,6 +1,5 @@
 package quanta.filter;
 
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -67,7 +66,7 @@ public class GlobalFilter extends GenericFilterBean {
 
 				// NOTE: this is new logic! We used to create session always here.
 				HttpSession session = sreq.getSession(createSession);
-				if (ok(session)) {
+				if (session != null) {
 					SessionContext.init(context, session);
 				}
 			}

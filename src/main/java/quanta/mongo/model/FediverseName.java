@@ -1,6 +1,5 @@
 package quanta.mongo.model;
 
-import static quanta.util.Util.ok;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -59,7 +58,7 @@ public class FediverseName {
 
 	@JsonGetter(ID)
 	public String jsonId() {
-		return ok(id) ? id.toHexString() : null;
+		return id != null ? id.toHexString() : null;
 	}
 
 	@JsonProperty(CREATE_TIME)

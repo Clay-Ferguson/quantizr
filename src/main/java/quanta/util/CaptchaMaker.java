@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.ok;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -60,7 +59,7 @@ public class CaptchaMaker {
          * due to wierdness on various comptuers the rendering size of any given font is not known and we
          * must iterate to find the appropriate font to match our image size
          */
-        if (ok(fontKnown)) {
+        if (fontKnown != null) {
             g.setFont(fontKnown);
         } else {
             int fontPoints = 12;

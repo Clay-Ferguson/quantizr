@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,7 +31,7 @@ public class IPFSName extends ServiceBase {
         checkIpfs();
         Map<String, Object> ret = null;
         try {
-            if (no(key))
+            if (key == null)
                 throw new RuntimeException("Key is required for publishing.");
             String url = API_NAME + "/publish?arg=" + cid + "&key=" + key;
 

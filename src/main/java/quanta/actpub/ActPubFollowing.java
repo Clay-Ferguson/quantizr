@@ -3,8 +3,6 @@ package quanta.actpub;
 import static quanta.actpub.model.AP.apInt;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -69,12 +67,12 @@ public class ActPubFollowing extends ServiceBase {
                 String actorUrlOfUserBeingFollowed = apCache.actorUrlsByUserName.get(apUserName);
 
                 // if not found in cache, get it the harder way.
-                if (no(actorUrlOfUserBeingFollowed)) {
+                if (actorUrlOfUserBeingFollowed == null) {
                     actorUrlOfUserBeingFollowed =
                             apub.getUserProperty(as, followerUserName, apUserName, null, NodeProp.ACT_PUB_ACTOR_URL.s());
 
                     // if we got the actor url put it in the cache now.
-                    if (ok(actorUrlOfUserBeingFollowed)) {
+                    if (actorUrlOfUserBeingFollowed != null) {
                         // are there othere places we can take advantage and load this cache, by chance? #todo-optimization
                         // (yes I looked, there's about 20ish other places we can take advantage of having both these and
                         // just cram into cache)
@@ -103,7 +101,7 @@ public class ActPubFollowing extends ServiceBase {
 
                 // #todo-optimization: we can call apub.getUserProperty() to get toInbox right?
                 APOActor toActor = apUtil.getActorByUrl(as, followerUserName, actorUrlOfUserBeingFollowed);
-                if (ok(toActor)) {
+                if (toActor != null) {
                     String privateKey = apCrypto.getPrivateKey(as, followerUserName);
                     apUtil.securePostEx(toActor.getInbox(), privateKey, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
@@ -135,7 +133,7 @@ public class ActPubFollowing extends ServiceBase {
                 try {
                     // #todo-optimization: we can call apub.getUserProperty() to get followerUserName right?
                     APOActor followerActor = apUtil.getActorByUrl(as, null, activity.getActor());
-                    if (no(followerActor)) {
+                    if (followerActor == null) {
                         apLog.trace("no followerActor object gettable from actor: " + activity.getActor());
                         return null;
                     }
@@ -146,7 +144,7 @@ public class ActPubFollowing extends ServiceBase {
 
                     // this will lookup the user AND import if it's a non-existant user
                     SubNode followerAccountNode = apub.getAcctNodeByForeignUserName(as, null, followerUserName, false, true);
-                    if (no(followerAccountNode)) {
+                    if (followerAccountNode == null) {
                         apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
@@ -159,7 +157,7 @@ public class ActPubFollowing extends ServiceBase {
                     // Note: followObj CAN be a String here.
                     Object followObj = apObj(activity, APObj.object);
 
-                    if (no(followObj)) {
+                    if (followObj == null) {
                         log.debug("Can't get followObj from: " + XString.prettyPrint(activity));
                         throw new RuntimeException("no followObj");
                     }
@@ -175,13 +173,13 @@ public class ActPubFollowing extends ServiceBase {
 
                     log.debug("actorBeingFollowedUrl: " + actorBeingFollowedUrl);
 
-                    if (no(actorBeingFollowedUrl)) {
+                    if (actorBeingFollowedUrl == null) {
                         log.debug("failed to get actorBeingFollowed from this object: " + XString.prettyPrint(activity));
                         return null;
                     }
 
                     String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
-                    if (no(userToFollow)) {
+                    if (userToFollow == null) {
                         log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
                         return null;
                     }
@@ -196,12 +194,12 @@ public class ActPubFollowing extends ServiceBase {
                     SubNode friendNode = read.findFriendNode(as, followerFriendList.getOwner(), null, userToFollow);
 
                     // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
-                    if (ok(friendNode) && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
+                    if (friendNode != null && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
                         delete.delete(as, friendNode);
                         friendNode = null;
                     }
 
-                    if (no(friendNode)) {
+                    if (friendNode == null) {
                         if (!unFollow) {
                             apLog.trace("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(as, followerFriendList, userToFollow);
@@ -282,7 +280,7 @@ public class ActPubFollowing extends ServiceBase {
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
-        if (ok(minId)) {
+        if (minId != null) {
             url += "&min_id=" + minId;
         }
 
@@ -294,7 +292,7 @@ public class ActPubFollowing extends ServiceBase {
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowing(MongoSession ms, String userDoingAction, APOActor actor) {
         APObj followings = getFollowing(ms, userDoingAction, actor.getFollowing());
-        if (no(followings)) {
+        if (followings == null) {
             log.debug("Unable to get followings for AP user: " + actor.getFollowing());
             return 0;
         }
@@ -324,7 +322,7 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     public APObj getFollowing(MongoSession ms, String userDoingAction, String url) {
-        if (no(url))
+        if (url == null)
             return null;
 
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
@@ -351,7 +349,7 @@ public class ActPubFollowing extends ServiceBase {
             Iterable<SubNode> iter = findFollowingOfUser(as, userName);
 
             for (SubNode n : iter) {
-                if (queueForRefresh && ok(blockedUserIds) && !blockedUserIds.contains(n.getId())) {
+                if (queueForRefresh && blockedUserIds != null && !blockedUserIds.contains(n.getId())) {
                     apub.queueUserForRefresh(n.getStr(NodeProp.USER), true);
                 }
 
@@ -360,7 +358,7 @@ public class ActPubFollowing extends ServiceBase {
                 String remoteActorId = n.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
                 // this will be non-null if it's a remote account.
-                if (ok(remoteActorId)) {
+                if (remoteActorId != null) {
                     if (foreignUsers) {
                         following.add(remoteActorId);
                     }
@@ -395,7 +393,7 @@ public class ActPubFollowing extends ServiceBase {
 
         return arun.run(as -> {
             Query q = findFollowingOfUser_query(as, req.getTargetUserName());
-            if (no(q))
+            if (q == null)
                 return null;
 
             q.limit(ConstantInt.ROWS_PER_PAGE.val());
@@ -408,7 +406,7 @@ public class ActPubFollowing extends ServiceBase {
             for (SubNode node : iterable) {
                 NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false, false,
                         false, false, false, false, null, false);
-                if (ok(info)) {
+                if (info != null) {
                     searchResults.add(info);
                 }
             }
@@ -421,7 +419,7 @@ public class ActPubFollowing extends ServiceBase {
     /* Returns FRIEND nodes for every user 'userName' is following */
     public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
         Query q = findFollowingOfUser_query(ms, userName);
-        if (no(q))
+        if (q == null)
             return null;
 
         return mongoUtil.find(q);
@@ -436,12 +434,12 @@ public class ActPubFollowing extends ServiceBase {
         else {
             /* Starting with just actorUrl, lookup the following count */
             int ret = 0;
-            if (ok(actorUrl)) {
+            if (actorUrl != null) {
                 // #todo-optimization: we can call apub.getUserProperty() to get 'following' prop right?
                 APOActor actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
-                if (ok(actor)) {
+                if (actor != null) {
                     APObj following = getFollowing(ms, userDoingAction, actor.getFollowing());
-                    if (no(following)) {
+                    if (following == null) {
                         log.debug("Unable to get followers for AP user: " + actor.getFollowing());
                     }
                     ret = apInt(following, APObj.totalItems);
@@ -453,7 +451,7 @@ public class ActPubFollowing extends ServiceBase {
 
     public long countFollowingOfLocalUser(MongoSession ms, String userName) {
         Query q = findFollowingOfUser_query(ms, userName);
-        if (no(q))
+        if (q == null)
             return 0;
 
         return ops.count(q, SubNode.class);
@@ -465,7 +463,7 @@ public class ActPubFollowing extends ServiceBase {
         // get friends list node
         SubNode friendsListNode =
                 read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-        if (no(friendsListNode))
+        if (friendsListNode == null)
             return null;
 
         /*

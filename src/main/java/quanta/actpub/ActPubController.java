@@ -1,6 +1,5 @@
 package quanta.actpub;
 
-import static quanta.util.Util.ok;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +52,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest req) {
 		apLog.trace("getWebFinger: " + resource);
 		APObj ret = apUtil.generateWebFinger(resource);
-		if (ok(ret)) {
+		if (ret != null) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_JRD_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -112,7 +111,7 @@ public class ActPubController extends ServiceBase {
 		Util.failIfAdmin(userName);
 		apLog.trace("getActor: " + userName);
 		APOPerson ret = apub.generatePersonObj(userName);
-		if (ok(ret)) {
+		if (ret != null) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -176,7 +175,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "id", required = false) String id) {
 		try {
 			APObj ret = apOutbox.getResource(req, id);
-			if (ok(ret)) {
+			if (ret != null) {
 				HttpHeaders hdr = new HttpHeaders();
 				setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 				return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -218,7 +217,7 @@ public class ActPubController extends ServiceBase {
 			ret = apOutbox.generateOutbox(userName);
 		}
 
-		if (ok(ret)) {
+		if (ret != null) {
 			apLog.trace("Reply with Outbox: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
@@ -247,7 +246,7 @@ public class ActPubController extends ServiceBase {
 			ret = apFollower.generateFollowers(null, userName);
 		}
 
-		if (ok(ret)) {
+		if (ret != null) {
 			apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
@@ -276,7 +275,7 @@ public class ActPubController extends ServiceBase {
 			ret = apFollowing.generateFollowing(null, userName);
 		}
 
-		if (ok(ret)) {
+		if (ret != null) {
 			apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
@@ -296,7 +295,7 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
 
 		APObj ret = apReplies.generateReplies(nodeId);
-		if (ok(ret)) {
+		if (ret != null) {
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -310,7 +309,7 @@ public class ActPubController extends ServiceBase {
 	 * default type
 	 */
 	private void setContentType(HttpHeaders hdr, HttpServletRequest req, MediaType defaultType) {
-		if (ok(req) && !StringUtils.isEmpty(req.getContentType())) {
+		if (req != null && !StringUtils.isEmpty(req.getContentType())) {
 			hdr.setContentType(MediaType.valueOf(req.getContentType()));
 		} else {
 			hdr.setContentType(defaultType);

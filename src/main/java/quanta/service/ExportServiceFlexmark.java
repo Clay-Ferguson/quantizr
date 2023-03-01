@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -244,14 +242,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 		String fullCid = rootDir.getHash() + "/index.html";
 		ipfs.writeIpfsExportNode(session, fullCid, mime, "index.html", files);
 
-		if (ok(rootDir)) {
+		if (rootDir != null) {
 			res.setIpfsCid(fullCid);
 			res.setIpfsMime(mime);
 		}
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (no(node))
+		if (node == null)
 			return;
 
 		processNode(node);
@@ -261,7 +259,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 			// If a node has a property "noexport" (added by power users) then this node will not be exported.
 			String noExport = n.getStr(NodeProp.NO_EXPORT);
-			if (ok(noExport)) {
+			if (noExport != null) {
 				continue;
 			}
 			recurseNode(n, level + 1);
@@ -277,7 +275,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 	private void writeImage(SubNode node) {
 		List<Attachment> atts = node.getOrderedAttachments();
-		if (no(atts))
+		if (atts == null)
 			return;
 
 		// process all attachments specifically to embed the image ones
@@ -290,13 +288,13 @@ public class ExportServiceFlexmark extends ServiceBase {
 			String url = att.getUrl();
 			String ipfsLink = att.getIpfsLink();
 
-			if (no(bin) && no(ipfsLink) && no(url)) {
+			if (bin == null && ipfsLink == null && url == null) {
 				continue;
 			}
 
 			String style = "";
 			String imgSize = att.getCssSize();
-			if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
+			if (imgSize != null && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
 				style = " style='width:" + imgSize + "'";
 			} else {
 				// For large enough images if they're left to actual size that can clip in the final PDF output
@@ -312,7 +310,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			if (req.isToIpfs() && "html".equals(format)) {
 				String fileName = att.getFileName();
 
-				if (ok(bin)) {
+				if (bin != null) {
 					String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
 					// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
 					files.add(new ExportIpfsFile(cid, fileName, mime));
@@ -322,7 +320,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 				 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
 				 * so reference it in src
 				 */
-				else if (ok(ipfsLink) && ok(fileName)) {
+				else if (ipfsLink != null && fileName != null) {
 					// log.debug("Found IPFS file: " + fileName);
 					files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
 
@@ -345,15 +343,15 @@ public class ExportServiceFlexmark extends ServiceBase {
 			 * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
 			 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 			 */
-			else if (ok(bin)) {
+			else if (bin != null) {
 				String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
 						+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 				src = prop.getHostAndPort() + path;
-			} else if (ok(url)) {
+			} else if (url != null) {
 				src = url;
 			}
 
-			if (no(src))
+			if (src == null)
 				continue;
 
 			/*

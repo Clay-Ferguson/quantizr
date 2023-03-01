@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -143,7 +141,7 @@ public class AttachmentService extends ServiceBase {
 		if (toIpfs) {
 			checkIpfs();
 		}
-		if (no(nodeId)) {
+		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 
@@ -160,7 +158,7 @@ public class AttachmentService extends ServiceBase {
 			if (nodeId.equals("[auto]")) {
 				allowEmailParse = true;
 				SubNode parent = read.getNode(ms, "~" + NodeType.NOTES, false, null);
-				if (no(parent)) {
+				if (parent == null) {
 					throw ExUtil.wrapEx("Node not found.");
 				}
 
@@ -171,7 +169,7 @@ public class AttachmentService extends ServiceBase {
 				node = read.getNode(ms, nodeId, false, null);
 			}
 
-			if (no(node)) {
+			if (node == null) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 
@@ -191,7 +189,7 @@ public class AttachmentService extends ServiceBase {
 
 				// get how many bytes of storage the user currently holds
 				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
-				if (no(binTotal)) {
+				if (binTotal == null) {
 					binTotal = 0L;
 				}
 
@@ -258,13 +256,13 @@ public class AttachmentService extends ServiceBase {
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
 		 */
-		if (no(node) && ok(nodeId)) {
+		if (node == null && nodeId != null) {
 			node = read.getNode(ms, nodeId);
 		}
 		auth.ownerAuth(ms, node);
 
 		/* mimeType can be passed as null if it's not yet determined */
-		if (no(mimeType)) {
+		if (mimeType == null) {
 			mimeType = getMimeFromFileType(fileName);
 		}
 
@@ -287,7 +285,7 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public void pinLocalIpfsAttachments(SubNode node) {
-		if (no(node) || no(node.getAttachments()))
+		if (node == null || node.getAttachments() == null)
 			return;
 
 		node.getAttachments().forEach((String key, Attachment att) -> {
@@ -295,10 +293,10 @@ public class AttachmentService extends ServiceBase {
 			 * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
 			 * (IPFS_REF means 'referenced' and external to our server).
 			 */
-			if (ok(att.getIpfsLink())) {
+			if (att.getIpfsLink() != null) {
 				// if there's no 'ref' property this is not a foreign reference, which means we
 				// DO pin this.
-				if (no(att.getIpfsRef())) {
+				if (att.getIpfsRef() == null) {
 					arun.run(sess -> {
 						// don't pass the actual node into here, because it runs in a separate thread and would be
 						// a concurrency problem.
@@ -322,7 +320,7 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public void fixAllAttachmentMimes(SubNode node) {
-		if (no(node) || no(node.getAttachments()))
+		if (node == null || node.getAttachments() == null)
 			return;
 
 		node.getAttachments().forEach((String key, Attachment att) -> {
@@ -369,17 +367,17 @@ public class AttachmentService extends ServiceBase {
 		String mimeType = null;
 
 		/* mimeType can be passed as null if it's not yet determined */
-		if (no(mimeType)) {
+		if (mimeType == null) {
 			mimeType = URLConnection.guessContentTypeFromName(fileName);
 		}
 
-		if (no(mimeType)) {
+		if (mimeType == null) {
 			String ext = FilenameUtils.getExtension(fileName);
 			mimeType = MimeTypeUtils.getMimeType(ext);
 		}
 
 		/* fallback to at lest some acceptable mime type */
-		if (no(mimeType)) {
+		if (mimeType == null) {
 			mimeType = "application/octet-stream";
 		}
 
@@ -404,7 +402,7 @@ public class AttachmentService extends ServiceBase {
 			fileName = att.getFileName();
 		} else {
 			// if no attName given we try to use "primary", but if primary exists, we find a different name
-			if (StringUtils.isEmpty(attName) && ok(node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false))) {
+			if (StringUtils.isEmpty(attName) && node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false) != null) {
 				attName = getNextAttachmentKey(node);
 			}
 
@@ -450,7 +448,7 @@ public class AttachmentService extends ServiceBase {
 		att.setMime(mimeType);
 		SubNode userNode = read.getNode(ms, node.getOwner());
 
-		if (no(imageBytes)) {
+		if (imageBytes == null) {
 			try {
 				att.setSize(size);
 
@@ -458,7 +456,7 @@ public class AttachmentService extends ServiceBase {
 					writeStreamToIpfs(ms, attName, node, inputStream, mimeType, userNode);
 				} else {
 					if (storeLocally) {
-						if (ok(fileName)) {
+						if (fileName != null) {
 							att.setFileName(fileName);
 						}
 						writeStream(ms, importMode, attName, node, inputStream, fileName, mimeType, userNode);
@@ -477,7 +475,7 @@ public class AttachmentService extends ServiceBase {
 				att.setSize((long) imageBytes.length);
 
 				if (storeLocally) {
-					if (ok(fileName)) {
+					if (fileName != null) {
 						att.setFileName(fileName);
 					}
 					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
@@ -501,7 +499,7 @@ public class AttachmentService extends ServiceBase {
 
 	public String getNextAttachmentKey(SubNode node) {
 		int imgIdx = 1;
-		while (ok(node.getAttachment("img" + String.valueOf(imgIdx), false, false))) {
+		while (node.getAttachment("img" + String.valueOf(imgIdx), false, false) != null) {
 			imgIdx++;
 		}
 		return "img" + String.valueOf(imgIdx);
@@ -509,11 +507,11 @@ public class AttachmentService extends ServiceBase {
 
 	/* appends all the attachments from sourceNode onto targetNode, leaving targetNode as is */
 	public void mergeAttachments(SubNode sourceNode, SubNode targetNode) {
-		if (no(sourceNode) || no(targetNode))
+		if (sourceNode == null || targetNode == null)
 			return;
 
 		List<Attachment> atts = sourceNode.getOrderedAttachments();
-		if (ok(atts)) {
+		if (atts != null) {
 			for (Attachment att : atts) {
 				String newKey = getNextAttachmentKey(targetNode);
 				att.setKey(newKey);
@@ -524,7 +522,7 @@ public class AttachmentService extends ServiceBase {
 
 	public int getMaxAttachmentOrdinal(SubNode node) {
 		int max = -1;
-		if (ok(node.getAttachments())) {
+		if (node.getAttachments() != null) {
 			for (String key : node.getAttachments().keySet()) {
 				Attachment att = node.getAttachments().get(key);
 				if (att.getOrdinal() > max) {
@@ -545,7 +543,7 @@ public class AttachmentService extends ServiceBase {
 		auth.ownerAuth(node);
 
 		final List<String> attKeys = XString.tokenize(req.getAttName(), ",", true);
-		if (ok(attKeys)) {
+		if (attKeys != null) {
 			for (String attKey : attKeys) {
 				deleteBinary(ms, attKey, node, null, false);
 			}
@@ -582,22 +580,22 @@ public class AttachmentService extends ServiceBase {
 		try {
 			ms = ThreadLocals.ensure(ms);
 
-			if (no(node)) {
+			if (node == null) {
 				node = read.getNode(ms, nodeId, false, null);
 			} else {
 				nodeId = node.getIdStr();
 			}
 
-			if (no(node)) {
+			if (node == null) {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
 			Attachment att = null;
 			// todo-2: put this in a method (finding attachment by binId)
-			if (ok(node.getAttachments())) {
+			if (node.getAttachments() != null) {
 				for (String key : node.getAttachments().keySet()) {
 					Attachment curAtt = node.getAttachments().get(key);
-					if (ok(curAtt.getBin()) && curAtt.getBin().equals(binId)) {
+					if (curAtt.getBin() != null && curAtt.getBin().equals(binId)) {
 						att = curAtt;
 						attName = key;
 						break;
@@ -605,9 +603,9 @@ public class AttachmentService extends ServiceBase {
 				}
 			}
 
-			if (no(att)) {
+			if (att == null) {
 				att = node.getAttachment(attName, false, false);
-				if (no(att)) {
+				if (att == null) {
 					throw ExUtil.wrapEx("attachment info not found.");
 				}
 			}
@@ -626,17 +624,17 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			String mimeTypeProp = att.getMime();
-			if (no(mimeTypeProp)) {
+			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = att.getFileName();
-			if (no(fileName)) {
+			if (fileName == null) {
 				fileName = "filename";
 			}
 
 			InputStream is = getStream(ms, attName, node, allowAuth);
-			if (no(is)) {
+			if (is == null) {
 				throw new RuntimeException("Image not found.");
 			}
 			long size = att.getSize();
@@ -713,7 +711,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("file not found.");
 
 			String mimeType = MimeTypeUtils.getMimeType(file);
-			if (no(disposition)) {
+			if (disposition == null) {
 				disposition = "inline";
 			}
 
@@ -744,7 +742,7 @@ public class AttachmentService extends ServiceBase {
 
 		try {
 			SubNode node = read.getNode(ms, nodeId, false, null);
-			if (no(node)) {
+			if (node == null) {
 				throw new RuntimeEx("node not found: " + nodeId);
 			}
 			String fullFileName = node.getStr(NodeProp.FS_LINK);
@@ -755,7 +753,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			String mimeType = MimeTypeUtils.getMimeType(file);
-			if (no(disposition)) {
+			if (disposition == null) {
 				disposition = "inline";
 			}
 
@@ -791,18 +789,18 @@ public class AttachmentService extends ServiceBase {
 		try {
 			SubNode node = read.getNode(ms, nodeId, false, null);
 			Attachment att = node.getFirstAttachment();
-			if (no(att))
+			if (att == null)
 				throw ExUtil.wrapEx("no attachment info found");
 
 			auth.auth(ms, node, PrivilegeType.READ);
 
 			String mimeTypeProp = att.getMime();
-			if (no(mimeTypeProp)) {
+			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = att.getFileName();
-			if (no(fileName)) {
+			if (fileName == null) {
 				fileName = "filename";
 			}
 
@@ -842,7 +840,7 @@ public class AttachmentService extends ServiceBase {
 		long contentLength = resource.contentLength();
 
 		HttpRange httpRange = headers.getRange().stream().findFirst().get();
-		if (ok(httpRange)) {
+		if (httpRange != null) {
 			long start = httpRange.getRangeStart(contentLength);
 			long end = httpRange.getRangeEnd(contentLength);
 			long rangeLength = Long.min(chunkSize, end - start + 1);
@@ -866,12 +864,12 @@ public class AttachmentService extends ServiceBase {
 
 	public UploadFromIPFSResponse attachFromIPFS(MongoSession ms, UploadFromIPFSRequest req) {
 		UploadFromIPFSResponse res = new UploadFromIPFSResponse();
-		if (no(req.getNodeId())) {
+		if (req.getNodeId() == null) {
 			throw new RuntimeException("null nodeId");
 		}
 
 		SubNode node = read.getNode(ms, req.getNodeId());
-		if (no(node)) {
+		if (node == null) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
@@ -910,15 +908,15 @@ public class AttachmentService extends ServiceBase {
 	public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint, String mimeType,
 			int maxFileSize, boolean storeLocally) {
 
-		if (no(mimeType)) {
+		if (mimeType == null) {
 			mimeType = getMimeTypeFromUrl(sourceUrl);
-			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
+			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
 			// log.debug("ended up with mimeType: " + mimeType);
 		}
 
-		if (no(node)) {
+		if (node == null) {
 			node = read.getNode(ms, nodeId);
 			// only need to auth if we looked up the node.
 		}
@@ -928,7 +926,7 @@ public class AttachmentService extends ServiceBase {
 		if (!storeLocally) {
 			int maxAttOrdinal = getMaxAttachmentOrdinal(node);
 			Attachment att = node.getAttachment(attKey, true, true);
-			if (ok(mimeType)) {
+			if (mimeType != null) {
 				att.setMime(mimeType);
 			}
 			att.setUrl(sourceUrl);
@@ -1032,7 +1030,7 @@ public class AttachmentService extends ServiceBase {
 				reader = readers.next();
 				String formatName = reader.getFormatName();
 
-				if (ok(formatName)) {
+				if (formatName != null) {
 					formatName = formatName.toLowerCase();
 					// log.debug("determined format name of image url: " + formatName);
 					reader.setInput(is, true, false);
@@ -1070,7 +1068,7 @@ public class AttachmentService extends ServiceBase {
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId", node.getId());
 
-		if (no(userNode)) {
+		if (userNode == null) {
 			userNode = read.getUserNodeByUserName(null, null);
 		}
 
@@ -1092,7 +1090,7 @@ public class AttachmentService extends ServiceBase {
 			user.addBytesToUserNodeBytes(ms, streamCount, userNode);
 		}
 
-		if (no(userNode)) {
+		if (userNode == null) {
 			throw new RuntimeEx("User not found.");
 		}
 
@@ -1114,7 +1112,7 @@ public class AttachmentService extends ServiceBase {
 		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
-		if (ok(ret)) {
+		if (ret != null) {
 			att.setIpfsLink(ret.getHash());
 			att.setSize((long) streamSize.getVal());
 
@@ -1129,14 +1127,14 @@ public class AttachmentService extends ServiceBase {
 	 * itself
 	 */
 	public void deleteBinary(MongoSession ms, String attName, SubNode node, SubNode userNode, boolean gridOnly) {
-		if (no(node))
+		if (node == null)
 			return;
 
 		HashMap<String, Attachment> attachments = node.getAttachments();
-		if (no(attachments))
+		if (attachments == null)
 			return;
 		Attachment att = attachments.get(attName);
-		if (no(att))
+		if (att == null)
 			return;
 
 		if (!gridOnly) {
@@ -1169,12 +1167,12 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		Attachment att = node.getAttachment(attName, false, false);
-		if (no(att))
+		if (att == null)
 			return null;
 
 		InputStream is = null;
 		String ipfsHash = att.getIpfsLink();
-		if (ok(ipfsHash)) {
+		if (ipfsHash != null) {
 			/*
 			 * todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
 			 * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
@@ -1188,19 +1186,19 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public InputStream getStreamByNode(SubNode node, String attName) {
-		if (no(node))
+		if (node == null)
 			return null;
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
 		Attachment att = node.getAttachment(attName, false, false);
-		if (no(att) || no(att.getBin()))
+		if (att == null || att.getBin() == null)
 			return null;
 
 		/* why not an import here? */
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (no(gridFile)) {
+		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
@@ -1217,7 +1215,7 @@ public class AttachmentService extends ServiceBase {
 
 		try {
 			InputStream is = gridFsResource.getInputStream();
-			if (no(is)) {
+			if (is == null) {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
 
@@ -1232,7 +1230,7 @@ public class AttachmentService extends ServiceBase {
 
 	public String getStringByNode(MongoSession ms, SubNode node) {
 		String ret = null;
-		if (ok(node)) {
+		if (node != null) {
 			auth.auth(ms, node, PrivilegeType.READ);
 			ret = getStringByNodeEx(node);
 		}
@@ -1241,17 +1239,17 @@ public class AttachmentService extends ServiceBase {
 
 	/* Gets the content of the grid resource by reading it into a string */
 	public String getStringByNodeEx(SubNode node) {
-		if (no(node))
+		if (node == null)
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
 		Attachment att = node.getFirstAttachment();
-		if (no(att) || no(att.getBin()))
+		if (att == null || att.getBin() == null)
 			return null;
 
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (no(gridFile)) {
+		if (gridFile == null) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
@@ -1259,7 +1257,7 @@ public class AttachmentService extends ServiceBase {
 		GridFsResource gridFsResource = new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
 			InputStream is = gridFsResource.getInputStream();
-			if (no(is)) {
+			if (is == null) {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
 			String result = IOUtils.toString(is, StandardCharsets.UTF_8.name());
@@ -1275,7 +1273,7 @@ public class AttachmentService extends ServiceBase {
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
-			if (ok(files)) {
+			if (files != null) {
 				/*
 				 * I am needing this quick and didn't find another way to do this other than brute force scan. Maybe
 				 * they are using a linked list so that there genuinely is no faster way ?
@@ -1306,31 +1304,31 @@ public class AttachmentService extends ServiceBase {
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
-			if (ok(files)) {
+			if (files != null) {
 				for (GridFSFile file : files) {
 					Document meta = file.getMetadata();
-					if (ok(meta)) {
+					if (meta != null) {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
 						// checking for the obsolete key (we can remove this some day, or clean the db of these)
-						if (no(id)) {
+						if (id == null) {
 							id = (ObjectId) meta.get("nodeIdh");
 						}
 
 						// checking for the obsolete key (we can remove this some day, or clean the db of these)
-						if (no(id)) {
+						if (id == null) {
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 
-						if (ok(id)) {
+						if (id != null) {
 							/* Find the node */
 							SubNode subNode = read.getNode(as, id);
 
 							/*
 							 * If the node doesn't exist then this grid file is an orphan and should go away
 							 */
-							if (no(subNode)) {
+							if (subNode == null) {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
@@ -1347,7 +1345,7 @@ public class AttachmentService extends ServiceBase {
 							 */
 							else {
 								UserStats stats = statsMap.get(subNode.getOwner());
-								if (no(stats)) {
+								if (stats == null) {
 									stats = new UserStats();
 									stats.binUsage = file.getLength();
 									statsMap.put(subNode.getOwner(), stats);
@@ -1369,7 +1367,7 @@ public class AttachmentService extends ServiceBase {
 			for (SubNode accountNode : accountNodes) {
 				log.debug("Processing Account Node: id=" + accountNode.getIdStr());
 				UserStats stats = statsMap.get(accountNode.getOwner());
-				if (no(stats)) {
+				if (stats == null) {
 					stats = new UserStats();
 					stats.binUsage = 0L;
 					statsMap.put(accountNode.getOwner(), stats);

@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -118,12 +116,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private void recurseNode(String rootPath, String parentFolder, SubNode node, ArrayList<SubNode> nodeStack, int level,
 			String parentHtmlFile, String parentId) {
-		if (no(node))
+		if (node == null)
 			return;
 
 		// If a node has a property "noexport" (added by power users) then this node will not be exported.
 		String noExport = node.getStr(NodeProp.NO_EXPORT);
-		if (ok(noExport)) {
+		if (noExport != null) {
 			return;
 		}
 
@@ -146,7 +144,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 					sb.append(" / ");
 				}
 				String friendlyName = generateFriendlyName(bcNode);
-				if (ok(friendlyName)) {
+				if (friendlyName != null) {
 					sb.append(friendlyName);
 				}
 				count++;
@@ -157,8 +155,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			html.append("<div class='breadcrumbs'>" + sb.toString() + "</div>");
 		}
 
-		if (ok(parentHtmlFile)) {
-			html.append("<a href='" + parentHtmlFile + (ok(parentId) ? "#" + parentId : "")
+		if (parentHtmlFile != null) {
+			html.append("<a href='" + parentHtmlFile + (parentId != null ? "#" + parentId : "")
 					+ "'><button class='uplevel-button'>Up Level</button></a>");
 		}
 
@@ -174,13 +172,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		html.append("</div>\n");
 		String folder = node.getIdStr();
 
-		if (ok(iter)) {
+		if (iter != null) {
 			/*
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (SubNode n : iter) {
 				String noExp = n.getStr(NodeProp.NO_EXPORT);
-				if (ok(noExp)) {
+				if (noExp != null) {
 					continue;
 				}
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
@@ -206,7 +204,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		String relParent = "../" + fileUtil.getShortFileName(htmlFile);
 
-		if (ok(iter)) {
+		if (iter != null) {
 			/* Second pass over children is the actual recursion down into the tree */
 			for (SubNode n : iter) {
 				nodeStack.add(n);
@@ -218,7 +216,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
 		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		if (ok(iter)) {
+		if (iter != null) {
 			/*
 			 * First pass over children is to embed their content onto the child display on the current page
 			 */
@@ -278,7 +276,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				}
 			}
 
-			String content = ok(node.getContent()) ? node.getContent() : "";
+			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
 
 			String escapedContent = StringEscapeUtils.escapeHtml4(content);
@@ -289,29 +287,29 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 
 			List<Attachment> atts = node.getOrderedAttachments();
-			if (ok(atts)) {
+			if (atts != null) {
 				for (Attachment att : atts) {
 					String ext = null;
 					String binFileNameProp = att.getFileName();
-					if (ok(binFileNameProp)) {
+					if (binFileNameProp != null) {
 						ext = FilenameUtils.getExtension(binFileNameProp);
 						if (!StringUtils.isEmpty(ext)) {
 							ext = "." + ext;
 						}
 					}
-					String binFileNameStr = ok(binFileNameProp) ? binFileNameProp : "binary";
+					String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 					String mimeType = att.getMime();
 					String imgUrl = null;
 					String attachmentUrl = null;
 
-					if (ok(mimeType)) {
+					if (mimeType != null) {
 						html.append("<div style='margin-top: 12px'>");
 						// Otherwise if this is an ordinary binary image, encode the link to it.
-						if (no(imgUrl) && mimeType.startsWith("image/")) {
+						if (imgUrl == null && mimeType.startsWith("image/")) {
 
 							// If this is an external URL (just a URL to an image on the web)
 							String extUrl = att.getUrl();
-							if (ok(extUrl)) {
+							if (extUrl != null) {
 								binFileNameStr = "External image";
 								imgUrl = extUrl;
 							}
@@ -367,11 +365,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 							content.getBytes(StandardCharsets.UTF_8));
 				}
 
-				if (ok(atts)) {
+				if (atts != null) {
 					for (Attachment att : atts) {
 						String ext = null;
 						String binFileNameProp = att.getFileName();
-						if (ok(binFileNameProp)) {
+						if (binFileNameProp != null) {
 							ext = FilenameUtils.getExtension(binFileNameProp);
 							if (!StringUtils.isEmpty(ext)) {
 								ext = "." + ext;
@@ -381,13 +379,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 						 * If we had a binary property on this node we write the binary file into a separate file, but for
 						 * ipfs links we do NOT do this
 						 */
-						if (ok(att.getMime())) {
+						if (att.getMime() != null) {
 							InputStream is = null;
 							try {
 								is = attach.getStream(ms, att.getKey(), node, false);
-								if (ok(is)) {
+								if (is != null) {
 									BufferedInputStream bis = new BufferedInputStream(is);
-									long length = ok(att) ? att.getSize() : null;
+									long length = att != null ? att.getSize() : null;
 									String binFileName = parentFolder + "/" + fileName + "/" + att.getKey() + ext;
 
 									if (length > 0) {
@@ -469,7 +467,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 		if (StringUtils.isEmpty(fileName)) {
 			fileName = node.getContent();
-			if (ok(fileName)) {
+			if (fileName != null) {
 				fileName = fileName.trim();
 				fileName = XString.truncAfterFirst(fileName, "\n");
 				fileName = XString.truncAfterFirst(fileName, "\r");

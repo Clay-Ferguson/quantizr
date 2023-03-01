@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -47,13 +45,13 @@ public class IPFSFiles extends ServiceBase {
     public boolean deletePath(String path) {
         checkIpfs();
         String url = API_FILES + "/rm?arg=" + path + "&force=true";
-        return ok(ipfs.postForJsonReply(url, Object.class));
+        return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public boolean flushFiles(String path) {
         checkIpfs();
         String url = API_FILES + "/flush?arg=" + path;
-        return ok(ipfs.postForJsonReply(url, Object.class));
+        return ipfs.postForJsonReply(url, Object.class) != null;
     }
 
     public void addFile(MongoSession ms, String fileName, String mimeType, String content) {
@@ -96,10 +94,10 @@ public class IPFSFiles extends ServiceBase {
         checkIpfs();
         log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
-        if (ok(dir)) {
+        if (dir != null) {
             log.debug("Dir: " + XString.prettyPrint(dir));
 
-            if (deleteEmptyDirs && no(dir.getEntries())) {
+            if (deleteEmptyDirs && dir.getEntries() == null) {
                 log.debug("DEL EMPTY FOLDER: " + path);
                 deletePath(path);
                 return;
@@ -121,7 +119,7 @@ public class IPFSFiles extends ServiceBase {
                         log.debug("dump: " + entryPath);
                         // String readTest = readFile(entryPath);
                         // log.debug("readTest: " + readTest);
-                        if (ok(allFilePaths)) {
+                        if (allFilePaths != null) {
                             allFilePaths.add(entryPath);
                         }
                     }
@@ -167,7 +165,7 @@ public class IPFSFiles extends ServiceBase {
         // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
         String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
 
-        String mfsPath = no(req.getFolder()) ? ("/" + userNodeId) : req.getFolder();
+        String mfsPath = req.getFolder() == null ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
 
         // opps, not a path
@@ -175,14 +173,14 @@ public class IPFSFiles extends ServiceBase {
             return null;
 
         IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
-        if (ok(pathStat)) {
+        if (pathStat != null) {
             cid.setVal(pathStat.getHash());
         }
 
         IPFSDir dir = getDir(mfsPath);
-        if (ok(dir)) {
+        if (dir != null) {
             log.debug("Dir: " + XString.prettyPrint(dir));
-            if (ok(dir.getEntries())) {
+            if (dir.getEntries() != null) {
                 for (IPFSDirEntry entry : dir.getEntries()) {
                     MFSDirEntry me = new MFSDirEntry();
                     me.setName(entry.getName());

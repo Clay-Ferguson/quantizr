@@ -1,6 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +23,7 @@ public class AppUserDetailsService extends ServiceBase implements UserDetailsSer
             return new AppUserDetails(userName, prop.getAdminPassword());
         } else {
             SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
-            if (ok(userNode)) {
+            if (userNode != null) {
                 String pwdHash = userNode.getStr(NodeProp.PWD_HASH);
                 return new AppUserDetails(userName, pwdHash);
             } else {

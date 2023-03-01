@@ -1,6 +1,5 @@
 package quanta.config;
 
-import static quanta.util.Util.ok;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -81,7 +80,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	 */
 	@Bean(name = "threadPoolTaskExecutor")
 	public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-		if (ok(executor)) {
+		if (executor != null) {
 			return executor;
 		}
 
@@ -101,7 +100,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	}
 
 	public static void shutdown() {
-		if (ok(executor)) {
+		if (executor != null) {
 			log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class="
 					+ executor.getClass().getName());
 			executor.shutdown();

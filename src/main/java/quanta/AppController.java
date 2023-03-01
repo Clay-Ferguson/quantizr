@@ -1,7 +1,5 @@
 package quanta;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.Date;
@@ -214,7 +212,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		ServiceBase.init(event.getApplicationContext());
 		log.debug("ContextRefreshedEvent");
-		if (no(context)) {
+		if (context == null) {
 			throw new RuntimeException("Failed to autowire ApplicationContext");
 		}
 	}
@@ -285,7 +283,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			// for this request.
 
 			// If no id given defalt to ":home" only so we can get the social card props.
-			if (no(id)) {
+			if (id == null) {
 				id = ":home";
 			} else {
 				urlId = true;
@@ -302,7 +300,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					Val<SubNode> accntNode = new Val<>();
 					node = read.getNode(as, _id, true, accntNode);
 
-					if (no(node) && _isHomeNodeRequest && accntNode.hasVal()) {
+					if (node == null && _isHomeNodeRequest && accntNode.hasVal()) {
 						sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
 					}
 				} catch (Exception e) {
@@ -310,7 +308,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					ExUtil.warn(log, "Unable to access node: " + _id, e);
 				}
 
-				if (ok(node)) {
+				if (node != null) {
 					if (_urlId) {
 						sc.setInitialNodeId(_id);
 					}
@@ -322,7 +320,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				return null;
 			});
 
-			if (ok(signupCode)) {
+			if (signupCode != null) {
 				sc.setUserMsg(user.processSignupCode(signupCode));
 			}
 
@@ -413,7 +411,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					cacheBytes = RSSFeedService.proxyCache.get(url);
 				}
 
-				if (ok(cacheBytes)) {
+				if (cacheBytes != null) {
 					// limiting the stream just becasue for now this is only used in feed
 					// processing, and 5MB is plenty
 					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
@@ -495,7 +493,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			session.invalidate();
 
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (ok(auth)) {
+			if (auth != null) {
 				new SecurityContextLogoutHandler().logout(sreq, sres, auth);
 			}
 			SecurityContextHolder.getContext().setAuthentication(null);
@@ -573,7 +571,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			List<MFSDirEntry> files = null;
 
 			// Get files using MFS
-			if (no(req.getFolder()) || req.getFolder().startsWith("/")) {
+			if (req.getFolder() == null || req.getFolder().startsWith("/")) {
 				files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
 			}
 			// Get files using DAG
@@ -654,7 +652,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		return callProc.run("getPeople", true, true, req, session, ms -> {
 			GetPeopleResponse ret = null;
-			if (ok(req.getNodeId())) {
+			if (req.getNodeId() != null) {
 				ret = user.getPeopleOnNode(ms, req.getNodeId());
 			} else {
 				ret = user.getPeople(ms, req.getType());
@@ -728,7 +726,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			 */
 			arun.run(as -> {
 				SubNode node = read.getNode(as, req.getNodeId());
-				if (no(node))
+				if (node == null)
 					throw new RuntimeException("Node not found: " + req.getNodeId());
 
 				if (!auth.ownedByThreadUser(node)) {
@@ -1008,7 +1006,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + nameOnAdminNode;
 			}
 
-			if (ok(id)) {
+			if (id != null) {
 				String _id = id;
 				String _attName = attName;
 				arun.run(as -> {
@@ -1016,14 +1014,14 @@ public class AppController extends ServiceBase implements ErrorController {
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(as, _id);
 
-					if (no(node)) {
+					if (node == null) {
 						throw new RuntimeException("Node not found.");
 					}
 
 					// if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
 					// This is for
 					// good fediverse interoperability but still with a level of privacy for completely unshared nodes.
-					if (no(node.getAc()) || node.getAc().size() == 0) {
+					if (node.getAc() == null || node.getAc().size() == 0) {
 						SessionContext.authBearer();
 						SessionContext.authSig();
 					}
@@ -1032,14 +1030,14 @@ public class AppController extends ServiceBase implements ErrorController {
 
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
-					if (no(_gid)) {
+					if (_gid == null) {
 						Attachment att = node.getAttachment(_attName, false, false);
-						_gid = ok(att) ? att.getIpfsLink() : null;
-						if (no(_gid)) {
-							_gid = ok(att) ? att.getBin() : null;
+						_gid = att != null ? att.getIpfsLink() : null;
+						if (_gid == null) {
+							_gid = att != null ? att.getBin() : null;
 						}
 
-						if (ok(_gid)) {
+						if (_gid != null) {
 							try {
 								response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
 							} catch (Exception e) {
@@ -1048,15 +1046,15 @@ public class AppController extends ServiceBase implements ErrorController {
 						}
 					}
 
-					if (no(_gid)) {
+					if (_gid == null) {
 						throw new RuntimeException("No attachment data for node.");
 					}
 
-					if (no(node)) {
+					if (node == null) {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attach.getBinary(as, _attName, node, null, null, ok(download), response);
+						attach.getBinary(as, _attName, node, null, null, download != null, response);
 					}
 					return null;
 				});
@@ -1095,28 +1093,28 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpSession session, HttpServletResponse response) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 
-		if (no(token)) {
+		if (token == null) {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
 				arun.run(as -> {
-					attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, ok(download), response);
+					attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null, response);
 					return null;
 				});
 			}
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
 				arun.run(as -> {
-					attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, ok(download), response);
+					attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null, response);
 					return null;
 				});
 			}
 			/* Else if not an avatar request then do a secure acccess */
 			else {
 				callProc.run("bin", false, false, null, session, ms -> {
-					if (ok(ipfsCid)) {
+					if (ipfsCid != null) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
-						attach.getBinary(null, null, null, nodeId, binId, ok(download), response);
+						attach.getBinary(null, null, null, nodeId, binId, download != null, response);
 					}
 					return null;
 				});
@@ -1124,7 +1122,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(as -> {
-					attach.getBinary(as, null, null, nodeId, binId, ok(download), response);
+					attach.getBinary(as, null, null, nodeId, binId, download != null, response);
 					return null;
 				});
 			}
@@ -1145,7 +1143,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(name = "token", required = true) String token, //
 			HttpSession session, //
 			HttpServletResponse response) {
-		if (no(SessionContext.getSCByToken(token))) {
+		if (SessionContext.getSCByToken(token) == null) {
 			throw new RuntimeException("Invalid token.");
 		}
 		callProc.run("file", false, false, null, session, ms -> {
@@ -1247,7 +1245,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
 
-		final String _attName = no(attName) ? "" : attName;
+		final String _attName = attName == null ? "" : attName;
 
 		return callProc.run("upload", true, true, null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
@@ -1426,7 +1424,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		// Identifier generated once on Browser, can uniquely identify one single session to associate with
 		// the given webpage/tab
 		SessionContext sc = ThreadLocals.getSC();
-		if (ok(sc)) {
+		if (sc != null) {
 			ThreadLocals.getSC().setAppGuid(req.getAppGuid());
 			log.debug("BrowserGuid: " + req.getAppGuid());
 			res.setUrlIdFailMsg(sc.getUrlIdFailMsg());

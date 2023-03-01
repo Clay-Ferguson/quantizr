@@ -1,7 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,7 +79,7 @@ public class AclService extends ServiceBase {
 				false, true)) {
 			if (batchMode) {
 				// lazy instantiate
-				if (no(bops)) {
+				if (bops == null) {
 					bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 				}
 
@@ -110,7 +108,7 @@ public class AclService extends ServiceBase {
 			}
 		}
 
-		if (batchMode && ok(bops)) {
+		if (batchMode && bops != null) {
 			bops.execute();
 		} else {
 			update.saveSession(ms);
@@ -164,7 +162,7 @@ public class AclService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 
 		String cipherKey = node.getStr(NodeProp.ENC_KEY);
-		if (no(cipherKey)) {
+		if (cipherKey == null) {
 			throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
 		}
 
@@ -179,7 +177,7 @@ public class AclService extends ServiceBase {
 
 		HashMap<String, AccessControl> acl = node.getAc();
 		AccessControl ac = acl.get(principalNodeId);
-		if (ok(ac)) {
+		if (ac != null) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
 			update.save(ms, node);
@@ -197,10 +195,10 @@ public class AclService extends ServiceBase {
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, SubNode principalNode,
 			List<String> privileges, AddPrivilegeResponse res) {
 
-		if ((no(principal) && no(principalNode)) || no(node))
+		if ((principal == null && principalNode == null) || node == null)
 			return false;
 
-		if (ok(principal)) {
+		if (principal != null) {
 			principal = principal.trim();
 		}
 
@@ -209,7 +207,7 @@ public class AclService extends ServiceBase {
 
 		/* If we are sharing to public, then that's the map key */
 		if (PrincipalName.PUBLIC.s().equalsIgnoreCase(principal)) {
-			if (ok(cipherKey)) {
+			if (cipherKey != null) {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
@@ -219,11 +217,11 @@ public class AclService extends ServiceBase {
 		 */
 		else {
 			// if no principal node passed in, then look it up
-			if (no(principalNode)) {
+			if (principalNode == null) {
 				String _principal = principal;
 				principalNode = arun.run(as -> read.getUserNodeByUserName(as, _principal));
-				if (no(principalNode)) {
-					if (ok(res)) {
+				if (principalNode == null) {
+					if (res != null) {
 						res.setMessage("Unknown user name: " + principal);
 						res.setSuccess(false);
 					}
@@ -239,17 +237,17 @@ public class AclService extends ServiceBase {
 			 * client, which will then use it to encrypt the symmetric key to the data, and then send back up to
 			 * the server to store in this sharing entry
 			 */
-			if (ok(cipherKey)) {
+			if (cipherKey != null) {
 				String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
-				if (no(principalPubKey)) {
-					if (ok(res)) {
+				if (principalPubKey == null) {
+					if (res != null) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
 						res.setSuccess(false);
 						return false;
 					}
 				}
 
-				if (ok(res)) {
+				if (res != null) {
 					res.setPrincipalPublicKey(principalPubKey);
 					res.setPrincipalNodeId(mapKey);
 				}
@@ -259,7 +257,7 @@ public class AclService extends ServiceBase {
 		HashMap<String, AccessControl> acl = node.getAc();
 
 		/* initialize acl to a map if it's null, or if we're sharing to public */
-		if (no(acl)) {
+		if (acl == null) {
 			acl = new HashMap<>();
 		}
 
@@ -267,7 +265,7 @@ public class AclService extends ServiceBase {
 		 * Get access control entry from map, but if one is not found, we can just create one.
 		 */
 		AccessControl ac = acl.get(mapKey);
-		if (no(ac)) {
+		if (ac == null) {
 			ac = new AccessControl();
 		}
 
@@ -344,7 +342,7 @@ public class AclService extends ServiceBase {
 		}
 
 		HashMap<String, AccessControl> acl = node.getAc();
-		if (no(acl))
+		if (acl == null)
 			return;
 
 		String newPrivs = "";
@@ -358,13 +356,13 @@ public class AclService extends ServiceBase {
 		// else removing just some specific privileges
 		else {
 			ac = acl.get(principalNodeId);
-			if (no(ac)) {
+			if (ac == null) {
 				log.debug("ac not found for " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
 				return;
 			}
 
 			String privs = ac.getPrvs();
-			if (no(privs)) {
+			if (privs == null) {
 				log.debug("privs not found for " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
 				return;
 			}
@@ -427,7 +425,7 @@ public class AclService extends ServiceBase {
 		removeAclEntry(ms, node, req.getPrincipalNodeId(), req.getPrivilege());
 
 		// if there are no privileges left remove the "unpublished" flag, because there's no need for it.
-		if (no(node.getAc()) || node.getAc().size() == 0) {
+		if (node.getAc() == null || node.getAc().size() == 0) {
 			node.set(NodeProp.UNPUBLISHED, null);
 		}
 
@@ -458,7 +456,7 @@ public class AclService extends ServiceBase {
 
 			if (principals.size() == 0) {
 				node = read.getParent(ms, node);
-				if (no(node))
+				if (node == null)
 					break;
 			} else {
 				break;
@@ -480,7 +478,7 @@ public class AclService extends ServiceBase {
 	}
 
 	public static boolean isPublic(MongoSession ms, SubNode node) {
-		return ok(node) && ok(node.getAc()) && node.getAc().containsKey(PrincipalName.PUBLIC.s());
+		return node != null && node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s());
 	}
 
 	public void makePublicAppendable(MongoSession ms, SubNode node) {
@@ -490,13 +488,13 @@ public class AclService extends ServiceBase {
 	// The effeciency of using this function is it won't set the node to dirty of nothing changed.
 	public void setKeylessPriv(MongoSession ms, SubNode node, String key, String prvs) {
 		// if no privileges exist at all just add the one we need to add
-		if (no(node.getAc())) {
+		if (node.getAc() == null) {
 			node.putAc(key, new AccessControl(null, prvs));
 		}
 		// otherwise first check to see if it's already added
 		else {
 			AccessControl ac = node.getAc().get(key);
-			if (ok(ac) && ac.getPrvs().equals(prvs)) {
+			if (ac != null && ac.getPrvs().equals(prvs)) {
 				// already had the correct ac, nothing to do here
 			}
 			// else need to add it.
@@ -513,7 +511,7 @@ public class AclService extends ServiceBase {
 	}
 
 	public boolean isAdminOwned(SubNode node) {
-		if (no(node))
+		if (node == null)
 			return false;
 		return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
 	}

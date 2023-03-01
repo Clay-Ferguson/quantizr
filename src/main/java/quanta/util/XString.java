@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.no;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -37,7 +36,7 @@ public class XString {
 	private static ObjectWriter jsonCompactWriter = jsonMapper.writer();
 
 	public static String prettyPrint(Object obj) {
-		if (no(obj))
+		if (obj == null)
 			return "null";
 		if (obj instanceof String) {
 			return (String) obj;
@@ -51,7 +50,7 @@ public class XString {
 	}
 
 	public static String compactPrint(Object obj) {
-		if (no(obj))
+		if (obj == null)
 			return "null";
 		if (obj instanceof String) {
 			return (String) obj;
@@ -84,7 +83,7 @@ public class XString {
 	}
 
 	public static String repeatingTrimFromFront(String val, String prefix) {
-		if (no(val))
+		if (val == null)
 			return null;
 		int loopSafe = 0;
 		while (++loopSafe < 1000) {
@@ -100,12 +99,12 @@ public class XString {
 	}
 
 	public static List<String> tokenizeWithDelims(String val, String delimiter) {
-		if (no(val))
+		if (val == null)
 			return null;
 		List<String> list = null;
 		StringTokenizer t = new StringTokenizer(val, delimiter, true);
 		while (t.hasMoreTokens()) {
-			if (no(list)) {
+			if (list == null) {
 				list = new LinkedList<>();
 			}
 			list.add(t.nextToken());
@@ -114,12 +113,12 @@ public class XString {
 	}
 
 	public static List<String> tokenize(String val, String delimiter, boolean trim) {
-		if (no(val))
+		if (val == null)
 			return null;
 		List<String> list = null;
 		StringTokenizer t = new StringTokenizer(val, delimiter, false);
 		while (t.hasMoreTokens()) {
-			if (no(list)) {
+			if (list == null) {
 				list = new LinkedList<>();
 			}
 			list.add(trim ? t.nextToken().trim() : t.nextToken());
@@ -131,7 +130,7 @@ public class XString {
 		HashSet<String> list = null;
 		StringTokenizer t = new StringTokenizer(val, delimiter, false);
 		while (t.hasMoreTokens()) {
-			if (no(list)) {
+			if (list == null) {
 				list = new HashSet<>();
 			}
 			list.add(trim ? t.nextToken().trim() : t.nextToken());
@@ -158,7 +157,7 @@ public class XString {
 	}
 
 	public static String trimToMaxLen(String val, int maxLen) {
-		if (no(val))
+		if (val == null)
 			return null;
 		if (val.length() <= maxLen)
 			return val;
@@ -183,7 +182,7 @@ public class XString {
 
 	/* Truncates after delimiter including truncating the delimiter */
 	public static String truncAfterFirst(String text, String delim) {
-		if (no(text))
+		if (text == null)
 			return null;
 
 		int idx = text.indexOf(delim);
@@ -201,7 +200,7 @@ public class XString {
 	}
 
 	public static String stripIfStartsWith(String val, String prefix) {
-		if (no(val))
+		if (val == null)
 			return val;
 		if (val.startsWith(prefix)) {
 			val = val.substring(prefix.length());
@@ -214,7 +213,7 @@ public class XString {
 	}
 
 	public static String truncAfterLast(String text, String delim) {
-		if (no(text))
+		if (text == null)
 			return null;
 
 		int idx = text.lastIndexOf(delim);
@@ -225,7 +224,7 @@ public class XString {
 	}
 
 	public static String parseAfterLast(String text, String delim) {
-		if (no(text))
+		if (text == null)
 			return null;
 
 		int idx = text.lastIndexOf(delim);
@@ -251,7 +250,7 @@ public class XString {
 	 * input: abc--file.txt, -- output: file.txt
 	 */
 	public String truncBefore(String fileName, String delims) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String ret = null;
@@ -269,7 +268,7 @@ public class XString {
 	 * input: abc--file.txt, . output: abc--file
 	 */
 	public String truncAfter(String fileName, String delims) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String ret = null;
@@ -287,7 +286,7 @@ public class XString {
 	 * input: /home/clay/path/file.txt output: /home/clay/path
 	 */
 	public String getPathPart(String fileName) {
-		if (no(fileName))
+		if (fileName == null)
 			return null;
 
 		String pathPart = null;

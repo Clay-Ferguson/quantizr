@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -76,8 +75,8 @@ public class ExportJsonService extends ServiceBase {
 				iter.forEach((node) -> {
 					// todo-2: this is not yet handling multiple images, but this method isn't currently used.
 					Attachment att = node.getFirstAttachment();
-					String binFileName = ok(att) ? att.getFileName() : null;
-					if (ok(binFileName)) {
+					String binFileName = att != null ? att.getFileName() : null;
+					if (binFileName != null) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
 						}
@@ -141,12 +140,12 @@ public class ExportJsonService extends ServiceBase {
 
 	private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
 		boolean ret = false;
-		if (ok(binFileName)) {
+		if (binFileName != null) {
 			log.debug("FileName: " + binFileName);
 		}
 
 		InputStream is = attach.getStreamByNode(node, "");
-		if (ok(is)) {
+		if (is != null) {
 			try {
 				String targetFileName = targetFolder + File.separator + node.getIdStr() + "-" + binFileName;
 				File targetFile = new File(targetFileName);

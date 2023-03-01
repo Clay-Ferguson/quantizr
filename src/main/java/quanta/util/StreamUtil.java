@@ -1,6 +1,5 @@
 package quanta.util;
 
-import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
@@ -26,7 +25,7 @@ public class StreamUtil {
 					e.printStackTrace();
 				}
 			} else {
-				if (ok(obj)) {
+				if (obj != null) {
 					log.warn("Object to close was of unsupported type: " + obj.getClass().getName());
 				}
 			}

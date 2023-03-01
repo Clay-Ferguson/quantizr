@@ -1,7 +1,5 @@
 package quanta.model;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,14 +30,14 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (ok(childIds) && childIds.contains(child.getId()))
+        if (childIds != null && childIds.contains(child.getId()))
             return;
 
-        if (no(children)) {
+        if (children == null) {
             children = new LinkedList<>();
         }
         children.add(child);
-        if (no(childIds)) {
+        if (childIds == null) {
             childIds = new HashSet<>();
         }
         childIds.add(child.getId());

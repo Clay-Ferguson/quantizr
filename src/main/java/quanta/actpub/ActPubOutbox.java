@@ -2,8 +2,6 @@ package quanta.actpub;
 
 import static quanta.actpub.model.AP.apAPObj;
 import static quanta.actpub.model.AP.apStr;
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,18 +63,18 @@ public class ActPubOutbox extends ServiceBase {
         try {
             // try to read outboxUrl first and if we can't we just return false
             APObj outbox = getOutbox(ms, userDoingAction, actor.getOutbox());
-            if (no(outbox)) {
+            if (outbox == null) {
                 log.debug("outbox read fail: " + apUserName);
                 return false;
             }
 
-            if (no(userNode)) {
+            if (userNode == null) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
             }
 
             SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
-            if (no(outboxNode)) {
+            if (outboxNode == null) {
                 log.debug("no posts node for user: " + apUserName);
                 return false;
             }
@@ -94,7 +92,7 @@ public class ActPubOutbox extends ServiceBase {
             HashSet<String> apIdSet = new HashSet<>();
             for (SubNode n : outboxItems) {
                 String apId = n.getStr(NodeProp.ACT_PUB_ID);
-                if (ok(apId)) {
+                if (apId != null) {
                     apIdSet.add(apId);
                 }
             }
@@ -113,7 +111,7 @@ public class ActPubOutbox extends ServiceBase {
                     // If this is a new post our server hasn't yet injested.
                     if (!apIdSet.contains(apId)) {
                         APObj object = apAPObj(obj, APObj.object);
-                        if (ok(object)) {
+                        if (object != null) {
                             String type = apStr(object, APObj.type);
                             // if (object instanceof String) {
                             // // todo-1: handle boosts.
@@ -166,7 +164,7 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getOutbox(MongoSession ms, String userDoingAction, String url) {
-        if (no(url))
+        if (url == null)
             return null;
 
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
@@ -194,7 +192,7 @@ public class ActPubOutbox extends ServiceBase {
         Long totalItems = arun.run(as -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (ok(userNode)) {
+            if (userNode != null) {
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
                 count = auth.countSubGraphByAclUser(as, null, sharedToList, userNode.getOwner());
@@ -245,7 +243,7 @@ public class ActPubOutbox extends ServiceBase {
 
             apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
 
-            if (ok(keyId.getVal())) {
+            if (keyId.getVal() != null) {
                 log.debug("keyId=" + keyId.getVal());
 
                 // keyId should be like this:
@@ -253,7 +251,7 @@ public class ActPubOutbox extends ServiceBase {
                 String actorId = keyId.getVal().replace("#main-key", "");
 
                 SubNode actorAccnt = arun.run(as -> read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId));
-                if (ok(actorAccnt)) {
+                if (actorAccnt != null) {
                     log.debug("got Actor: " + actorAccnt.getIdStr());
 
                     // create a MongoSession representing the user account we just looked up
@@ -273,7 +271,7 @@ public class ActPubOutbox extends ServiceBase {
                          * if the publickey has changed for whatever reason we need to update it in our own db.
                          */
                         PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
-                        if (ok(pubKey)) {
+                        if (pubKey != null) {
                             try {
                                 log.debug("Checking with pubKey.");
                                 apCrypto.verifySignature(httpReq, pubKey, null);
@@ -298,7 +296,7 @@ public class ActPubOutbox extends ServiceBase {
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (no(userNode)) {
+            if (userNode == null) {
                 return null;
             }
 
@@ -309,7 +307,7 @@ public class ActPubOutbox extends ServiceBase {
                 boolean collecting = false;
 
                 // todo-1: is this just unfinished code or a bug? Either way this paging is broken.
-                if (no(minId)) {
+                if (minId == null) {
                     collecting = true;
                 }
 
@@ -352,10 +350,10 @@ public class ActPubOutbox extends ServiceBase {
                             // To create an Announce that other instances can consume we go to the boosted Node ID,
                             // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
                             SubNode boostTargetNode = read.getNode(as, boostTarget);
-                            if (ok(boostTargetNode)) {
+                            if (boostTargetNode != null) {
                                 String boostedId = boostTargetNode.getStr(NodeProp.ACT_PUB_ID);
 
-                                if (no(boostedId)) {
+                                if (boostedId == null) {
                                     boostedId = host + "?id=" + boostTarget;
                                 }
 
@@ -367,7 +365,7 @@ public class ActPubOutbox extends ServiceBase {
                             ret = apFactory.makeAPOCreateNote(as, userName, nodeIdBase, child);
                         }
 
-                        if (ok(ret)) {
+                        if (ret != null) {
                             items.add(ret);
                         }
                     }
@@ -385,7 +383,7 @@ public class ActPubOutbox extends ServiceBase {
 
     /* Gets the object identified by nodeId as an ActPub object */
     public APObj getResource(HttpServletRequest httpReq, String nodeId) {
-        if (no(nodeId))
+        if (nodeId == null)
             return null;
 
         // this is breaking whenever a CURL command is used other scenarios
@@ -395,7 +393,7 @@ public class ActPubOutbox extends ServiceBase {
 
         return (APObj) arun.run(as -> {
             SubNode node = read.getNode(as, nodeId);
-            if (!ok(node)) {
+            if (!(node != null)) {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
@@ -420,13 +418,13 @@ public class ActPubOutbox extends ServiceBase {
 
                 apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
 
-                if (ok(keyId.getVal())) {
+                if (keyId.getVal() != null) {
                     // keyId should be like this:
                     // actorId + "#main-key"
                     String actorId = keyId.getVal().replace("#main-key", "");
 
                     SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId);
-                    if (ok(actorAccnt)) {
+                    if (actorAccnt != null) {
                         log.debug("got Actor: " + actorAccnt.getIdStr());
 
                         // create a MongoSession representing the user account we just looked up
@@ -440,7 +438,7 @@ public class ActPubOutbox extends ServiceBase {
 
                             // final step is just validate the signature.
                             PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
-                            if (ok(pubKey)) {
+                            if (pubKey != null) {
                                 try {
                                     log.debug("Checking with pubKey.");
                                     apCrypto.verifySignature(httpReq, pubKey, null);
@@ -469,7 +467,7 @@ public class ActPubOutbox extends ServiceBase {
              * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
              */
             APObj ret = apFactory.makeAPONote(as, node, null);
-            if (ok(ret)) {
+            if (ret != null) {
                 apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
             }
             return ret;

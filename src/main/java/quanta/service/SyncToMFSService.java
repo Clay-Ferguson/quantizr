@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.ok;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -89,7 +88,7 @@ public class SyncToMFSService extends ServiceBase {
 
 			// Now we can get the IPFS CID of the root and save it on a property on the root of the node we just saved to MFS.
 			IPFSDirStat pathStat = ipfsFiles.pathStat(node.getPath());
-			if (ok(pathStat)) {
+			if (pathStat != null) {
 				node.set(NodeProp.IPFS_CID, pathStat.getHash());
 			}
 

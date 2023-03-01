@@ -1,6 +1,5 @@
 package quanta.actpub.model;
 
-import static quanta.util.Util.ok;
 import org.apache.commons.lang3.StringUtils;
 import quanta.actpub.APConst;
 
@@ -35,7 +34,7 @@ public class APONote extends APObj {
         put(APObj.replies, repliesUrl);
         put(APObj.sensitive, sensitive);
         put(APObj.content, content);
-        if (ok(to)) {
+        if (to != null) {
             put(APObj.to, to);
         }
     }

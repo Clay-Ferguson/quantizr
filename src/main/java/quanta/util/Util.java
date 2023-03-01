@@ -31,14 +31,6 @@ public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
 	private static final Random rand = new Random();
 
-	public static boolean no(Object o) {
-		return o == null;
-	}
-
-	public static boolean ok(Object o) {
-		return o != null;
-	}
-
 	public static boolean allowInsecureUrl(String url) {
 		return url.contains("/bin/profileHeader") || //
 				url.contains("/bin/avatar") || //
@@ -79,7 +71,7 @@ public class Util {
 	}
 
 	public static boolean isSpringAuthenticated() {
-		return ok(SecurityContextHolder.getContext().getAuthentication())
+		return SecurityContextHolder.getContext().getAuthentication() != null
 				&& SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
 
 		// DO NOT DELETE (yet)
@@ -99,11 +91,11 @@ public class Util {
 	}
 
 	public static boolean equalObjs(Object o1, Object o2) {
-		if (no(o1) && no(o2))
+		if (o1 == null && o2 == null)
 			return true;
-		if (ok(o1) && no(o2))
+		if (o1 != null && o2 == null)
 			return false;
-		if (ok(o2) && no(o1))
+		if (o2 != null && o1 == null)
 			return false;
 		return o1.equals(o2);
 	}
@@ -125,7 +117,7 @@ public class Util {
 			}
 		}
 
-		if (no(query)) {
+		if (query == null) {
 			return url;
 		} else {
 			return url + "?" + query;

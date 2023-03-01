@@ -1,7 +1,5 @@
 package quanta.filter;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -64,7 +62,7 @@ public class AuditFilter extends GenericFilterBean {
 	private String getConfigParamInfo() {
 		StringBuilder sb = new StringBuilder();
 		Enumeration<?> en = getFilterConfig().getInitParameterNames();
-		if (ok(en)) {
+		if (en != null) {
 			while (en.hasMoreElements()) {
 				String param = (String) en.nextElement();
 				sb.append(INDENT);
@@ -93,7 +91,7 @@ public class AuditFilter extends GenericFilterBean {
 		sb.append(sreq.getServletPath());
 		sb.append("\n");
 
-		if (ok(sreq.getPathInfo()) || ok(sreq.getPathTranslated())) {
+		if (sreq.getPathInfo() != null || sreq.getPathTranslated() != null) {
 			sb.append(INDENT);
 			sb.append("pinfo -> ptrans: ");
 			sb.append(sreq.getPathInfo());
@@ -102,7 +100,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append("\n");
 		}
 
-		if (ok(sreq.getQueryString())) {
+		if (sreq.getQueryString() != null) {
 			sb.append(INDENT);
 			sb.append("q: ");
 			sb.append(sreq.getQueryString());
@@ -178,7 +176,7 @@ public class AuditFilter extends GenericFilterBean {
 			while (e.hasMoreElements()) {
 				String name = (String) e.nextElement();
 				String vals[] = (String[]) sreq.getParameterValues(name);
-				if (ok(vals)) {
+				if (vals != null) {
 					sb.append(INDENT);
 					sb.append("[");
 					sb.append(name);
@@ -201,12 +199,12 @@ public class AuditFilter extends GenericFilterBean {
 	private String getAttributeInfo(HttpServletRequest sreq) {
 		StringBuilder sb = new StringBuilder();
 		Object reqAttrs = sreq.getAttributeNames();
-		if (ok(reqAttrs) && reqAttrs instanceof Enumeration<?>) {
+		if (reqAttrs != null && reqAttrs instanceof Enumeration<?>) {
 			Enumeration<?> attrs = (Enumeration<?>) reqAttrs;
 			sb.append("Req Attrs:\n");
 			while (attrs.hasMoreElements()) {
 				String attr = attrs.nextElement().toString();
-				if (ok(sreq.getAttribute(attr))) {
+				if (sreq.getAttribute(attr) != null) {
 					sb.append(INDENT);
 					sb.append(attr);
 					sb.append("=");
@@ -224,18 +222,18 @@ public class AuditFilter extends GenericFilterBean {
 
 	private String getSessionAttributeInfo(HttpServletRequest sreq) {
 		HttpSession session = ((HttpServletRequest) sreq).getSession(false);
-		if (no(session)) {
+		if (session == null) {
 			return "[no session]\n";
 		}
 
 		StringBuilder sb = new StringBuilder();
 		Object sessionAattrs = session.getAttributeNames();
-		if (ok(sessionAattrs) && sessionAattrs instanceof Enumeration<?>) {
+		if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?>) {
 			Enumeration<?> attrs = (Enumeration<?>) sessionAattrs;
 			sb.append("Sess Attrs:\n");
 			while (attrs.hasMoreElements()) {
 				String attr = attrs.nextElement().toString();
-				if (ok(session.getAttribute(attr))) {
+				if (session.getAttribute(attr) != null) {
 					sb.append(INDENT);
 					sb.append(attr);
 					sb.append(" = ");
@@ -268,7 +266,7 @@ public class AuditFilter extends GenericFilterBean {
 	}
 
 	private void preProcess(HttpServletRequest sreq) {
-		if (no(sreq))
+		if (sreq == null)
 			return;
 
 		// NON-VERBOSE Logging
@@ -278,7 +276,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(sreq.getMethod());
 			sb.append(" ");
 			sb.append(sreq.getRequestURI());
-			if (ok(sreq.getQueryString())) {
+			if (sreq.getQueryString() != null) {
 				sb.append(" -> ");
 				sb.append(sreq.getQueryString());
 			}
@@ -310,7 +308,7 @@ public class AuditFilter extends GenericFilterBean {
 
 	private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
 		try {
-			if (no(sreq) || no(sres))
+			if (sreq == null || sres == null)
 				return;
 
 			StringBuilder sb = new StringBuilder();

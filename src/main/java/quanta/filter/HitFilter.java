@@ -1,7 +1,5 @@
 package quanta.filter;
 
-import static quanta.util.Util.no;
-import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.servlet.FilterChain;
@@ -42,7 +40,7 @@ public class HitFilter extends GenericFilterBean {
 
 	private void updateHitCounter(HttpServletRequest httpReq) {
 		HttpSession session = ((HttpServletRequest) httpReq).getSession(false);
-		if (ok(session)) {
+		if (session != null) {
 			addHit(session.getId());
 		}
 	}
@@ -50,9 +48,9 @@ public class HitFilter extends GenericFilterBean {
 	// Identifier can be a username OR a sessionId, depending on which map is being updated
 	public static void addHit(String id) {
 		synchronized (uniqueHits) {
-			Integer hitCount = ok(id) ? uniqueHits.get(id) : null;
+			Integer hitCount = id != null ? uniqueHits.get(id) : null;
 
-			if (no(hitCount)) {
+			if (hitCount == null) {
 				uniqueHits.put(id, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;

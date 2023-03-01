@@ -1,6 +1,5 @@
 package quanta.service;
 
-import static quanta.util.Util.no;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,7 +102,7 @@ public class ExportTextService extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (no(node))
+		if (node == null)
 			return;
 
 		/* process the current node */
