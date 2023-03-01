@@ -2103,7 +2103,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .rowHeaderSharingNames {
-    margin-left: 6px;
+    margin-right: $smallGap;
 }
 
 .editDlgSharingNames {
@@ -2378,7 +2378,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .lastModifiedTime {
-    margin-right: $microGap;
+    margin-right: $smallGap;
 }
 
 .boost-header {

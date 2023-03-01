@@ -268,7 +268,7 @@ export class NodeCompRowHeader extends Div {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
-                    className: iconClass + " marginLeft marginRight",
+                    className: iconClass + " marginRight",
                     title: "Node Type: " + type.getName()
                 }));
             }
@@ -288,7 +288,7 @@ export class NodeCompRowHeader extends Div {
 
         const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, this.node);
         const unpublishedIcon = unpublished ? new Icon({
-            className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
+            className: "fa fa-eye-slash fa-lg sharingIcon marginRight",
             title: "Node is Unpublished\n\nWill not appear in feed"
         }) : null;
 
@@ -298,7 +298,7 @@ export class NodeCompRowHeader extends Div {
                 const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
                 floatUpperRightDiv.addChildren([
                     new Icon({
-                        className: "fa fa-globe fa-lg sharingIcon marginLeft microMarginRight",
+                        className: "fa fa-globe fa-lg sharingIcon marginRight",
                         title: "Node is Public\n(" + appendNode + ")"
                     }),
                     unpublishedIcon
@@ -312,7 +312,7 @@ export class NodeCompRowHeader extends Div {
                         className: "rowHeaderSharingNames"
                     }, [
                         new Icon({
-                            className: "fa fa-envelope fa-lg"
+                            className: "fa fa-envelope fa-lg sharingIcon"
                         }),
                         ...shareComps
                     ]),
@@ -405,7 +405,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (editButton || jumpButton) {
-            floatUpperRightDiv.addChild(new ButtonBar([pasteButton, editButton, jumpButton], null, "marginLeft"));
+            floatUpperRightDiv.addChild(new ButtonBar([pasteButton, editButton, jumpButton], null, "marginRight"));
         }
 
         if (floatUpperRightDiv.hasChildren()) {
