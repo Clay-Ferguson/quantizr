@@ -78,6 +78,7 @@
     border: 1px solid $nodeBorderBottomColor;
     margin-top: 12px;
     margin-bottom: 12px;
+    margin-right: 12px;
     max-width: 50%;
 }
 
@@ -96,7 +97,5 @@
 }
 
 .rss-feed-listing {
-    margin-top: $smallGap;
     margin-left: $smallGap;
-    // max-width: 800px;
 }

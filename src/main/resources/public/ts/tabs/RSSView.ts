@@ -30,6 +30,7 @@ export class RSSView extends AppTab {
 
     static lastGoodFeed: J.RssFeed;
     static lastGoodPage: number;
+    static loading: boolean = false;
 
     constructor(data: TabIntf) {
         super(data);
@@ -44,8 +45,11 @@ export class RSSView extends AppTab {
         let feedContent: Comp = null;
 
         const feedSrc: string = ast.rssNode ? S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, ast.rssNode) : null;
+        let feedSrcHash: string = null;
+        let feedReady = false;
+        let page: number = 0;
         if (feedSrc) {
-            const feedSrcHash = S.util.hashOfString(feedSrc);
+            feedSrcHash = S.util.hashOfString(feedSrc);
 
             /*
             If we find the RSS feed in the cache, use it.
@@ -65,16 +69,27 @@ export class RSSView extends AppTab {
                 ]);
             }
             else if (!ast.rssFeedCache[feedSrcHash]) {
-                feedContent = new Button("View Feed", () => {
-                    dispatch("LoadingFeed", s => {
+                feedContent = new Div(null, { className: "bigMargin" }, [
+                    new Heading(4, "Refreshing..."),
+                    new Spinner()
+                ]);
+                setTimeout(() => {
+                    dispatch("RefreshingFeed", s => {
                         s.rssFeedCache[feedSrcHash] = "loading";
                         RSSView.loadFeed(s, feedSrcHash, feedSrc);
                     });
-                }, null, "btn-primary marginLeft marginBottom");
+                }, 250);
             }
             /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
             else if (ast.rssFeedCache[feedSrcHash]) {
-                feedContent = this.renderItem(ast.rssFeedCache[feedSrcHash], feedSrc);
+                feedContent = this.renderFeed(ast.rssFeedCache[feedSrcHash], feedSrc);
+                feedReady = true;
+
+                page = ast.rssFeedPage[feedSrcHash];
+                if (!page) {
+                    page = 1;
+                    ast.rssFeedPage[feedSrcHash] = page;
+                }
             }
             else {
                 console.error("unknown state in feed runner");
@@ -87,6 +102,10 @@ export class RSSView extends AppTab {
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
                 new Div("RSS Feed", { className: "tabTitle" }),
+                new IconButton("fa-arrow-left", "", {
+                    onClick: () => S.view.jumpToId(ast.rssNode.id),
+                    title: "Back to Folders View"
+                }, "bigMarginLeft"),
                 new Checkbox("Headlines Only", {
                     className: "float-end"
                 }, {
@@ -97,12 +116,16 @@ export class RSSView extends AppTab {
                 }),
                 new Clearfix()
             ]),
+            feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "float-end") : null,
             comp,
             feedContent
         ]);
     }
 
     static loadFeed = async (ust: AppState, feedSrcHash: string, feedSrc: string) => {
+        if (RSSView.loading) return;
+        RSSView.loading = true;
+
         /* warning: paging here is not zero offset. First page is number 1 */
         let page: number = ust.rssFeedPage[feedSrcHash];
         if (!page) {
@@ -114,6 +137,8 @@ export class RSSView extends AppTab {
             urls: feedSrc,
             page
         }, true);
+
+        RSSView.loading = false;
 
         if (!res?.feed) {
             // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
@@ -146,7 +171,7 @@ export class RSSView extends AppTab {
         }
     }
 
-    renderItem(feed: J.RssFeed, feedSrc: string): Comp {
+    renderFeed(feed: J.RssFeed, feedSrc: string): Comp {
         const ast = getAs();
         const feedList = new Div("", { className: "rss-feed-listing" });
         const feedOut: Comp[] = [];
@@ -156,8 +181,6 @@ export class RSSView extends AppTab {
         if (!page) {
             page = 1;
         }
-
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -183,8 +206,6 @@ export class RSSView extends AppTab {
             }
         }
 
-        feedOut.push(new Div(null, { className: "clearBoth" }));
-
         if (feed.description) {
             feedOut.push(new Html(feed.description));
         }
@@ -199,18 +220,20 @@ export class RSSView extends AppTab {
             feedOut.push(new Div(feed.author));
         }
 
-        const feedOutDiv = new Div(null, { className: "marginBottom marginLeft" }, feedOut);
-        feedList.addChild(feedOutDiv);
+        if (feedOut.length > 0) {
+            const feedOutDiv = new Div(null, { className: "marginBottom marginLeft" }, feedOut);
+            feedList.addChild(feedOutDiv);
+        }
 
         for (const item of feed.entries) {
             feedList.addChild(this.buildFeedItem(feed, item));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "text-center marginTop marginBottom"));
         return feedList;
     }
 
-    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string): ButtonBar => {
+    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, clazz: string): ButtonBar => {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event: Event) => {
@@ -236,7 +259,7 @@ export class RSSView extends AppTab {
                 },
                 title: "Next Page"
             })
-        ], "text-center marginTop marginBottom");
+        ], clazz);
     }
 
     /* cleverly does both prev or next paging */
