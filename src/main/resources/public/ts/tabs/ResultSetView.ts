@@ -77,7 +77,8 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
         results.forEach(node => {
             if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
             if (ast.editNode && ast.editNode.id === node.id && ast.editNodeOnTab === this.data.id) {
-                children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                children.push(EditNodeDlg.embedInstance || //
+                    new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
             }
             else {
                 const c = this.renderItem(node, i, rowCount, jumpButton);

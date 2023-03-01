@@ -43,11 +43,13 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                    comps.push(EditNodeDlg.embedInstance || //
+                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                 }
 
                 if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && n.id === ast.editNode.id) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                    comps.push(EditNodeDlg.embedInstance || //
+                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                 }
                 else {
                     const type = S.plugin.getType(n.type);
@@ -80,7 +82,8 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
 
                 if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
-                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                    comps.push(EditNodeDlg.embedInstance || //
+                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                 }
             }
             rowIdx++;

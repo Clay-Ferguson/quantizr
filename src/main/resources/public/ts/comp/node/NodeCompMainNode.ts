@@ -43,7 +43,8 @@ export class NodeCompMainNode extends Div {
         }
 
         if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && node.id === ast.editNode.id) {
-            this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED)]);
+            this.setChildren([EditNodeDlg.embedInstance || //
+                new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED)]);
         }
         else {
             const focusNode = S.nodeUtil.getHighlightedNode();

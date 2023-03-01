@@ -162,7 +162,8 @@ export class FeedView extends AppTab<FeedViewProps> {
 
         // if editing a new post (not a reply)
         if (!editingExistingItem && ast.editNode && ast.editNodeOnTab === C.TAB_FEED && !ast.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+            children.push(EditNodeDlg.embedInstance || //
+                new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
         }
 
         if (this.data.props.feedLoading && childCount === 0) {
@@ -208,7 +209,8 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                 // If we're editing this item right on the feed page, render the editor instead of the row
                 if (editingExistingItem && node.id === ast.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                    children.push(EditNodeDlg.embedInstance || //
+                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                 }
                 // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
                 else {
@@ -220,7 +222,8 @@ export class FeedView extends AppTab<FeedViewProps> {
 
                     // editing a reply inline.
                     if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED && ast.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                        children.push(EditNodeDlg.embedInstance || //
+                            new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
                     }
                 }
             });
