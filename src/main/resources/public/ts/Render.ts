@@ -26,10 +26,10 @@ import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
-import { RssType } from "./plugins/RssType";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
+import { RSSView } from "./tabs/RSSView";
 
 export class Render {
     private debug: boolean = false;
@@ -507,7 +507,7 @@ export class Render {
                                     dispatch("AutoRSSUpdate", s => {
                                         s.rssFeedCache[feedSrcHash] = "loading";
                                         s.rssFeedPage[feedSrcHash] = 1;
-                                        RssType.loadFeed(s, feedSrcHash, feedSrc);
+                                        RSSView.loadFeed(s, feedSrcHash, feedSrc);
                                     });
                                 }, 250);
                             }

@@ -124,6 +124,9 @@ export class AppState {
     // being able to click 'more...' button to page thru a feed.
     rssFeedPage = {};
 
+    // non-null if user is viewing an RSS feed and this will be the actual feed node
+    rssNode: J.NodeInfo = null;
+
     bookmarks: J.Bookmark[];
     editNode: J.NodeInfo;
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'

@@ -44,6 +44,7 @@ export class Constants {
     static TAB_IPFSVIEW: string = "ipfsFilesTab";
     static TAB_LOG: string = "logTab";
     static TAB_TTS: string = "ttsTab";
+    static TAB_RSS: string = "rssTab";
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
 
