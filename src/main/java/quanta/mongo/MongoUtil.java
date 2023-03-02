@@ -182,12 +182,8 @@ public class MongoUtil extends ServiceBase {
 		 * don't have a path ending with slash because that means we KNOW we need to always find a new child
 		 * regardless of any existing ones
 		 */
-		if (!path.endsWith("/")) {
-			Query q = new Query();
-			q.addCriteria(Criteria.where(SubNode.PATH).is(path));
-			if (!ops.exists(q, SubNode.class)) {
-				return path;
-			}
+		if (!path.endsWith("/") && pathIsAvailable(path)) {
+			return path;
 		}
 
 		int tries = 0;
@@ -211,14 +207,31 @@ public class MongoUtil extends ServiceBase {
 				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
 			}
 
-			Query q = new Query();
-			q.addCriteria(Criteria.where(SubNode.PATH).is(path));
+			// after 4 fails get even more aggressive with 4 new chars per loop here.
+			if (tries >= 4) {
+				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
+			}
 
-			if (!ops.exists(q, SubNode.class)) {
+			if (pathIsAvailable(path)) {
 				return path;
 			}
 			tries++;
 		}
+	}
+
+	public boolean pathIsAvailable(String path) {
+		Criteria orCriteria = new Criteria();
+
+		/*
+		 * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
+		 * as an orphan (which can definitely happen) then this path it not available. So even orphaned
+		 * nodes can keep us from being able to consider a path 'available for use'
+		 */
+		orCriteria.orOperator(Criteria.where(SubNode.PATH).is(path), //
+				Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+
+		Query q = new Query(orCriteria);
+		return !ops.exists(q, SubNode.class);
 	}
 
 	/*
@@ -935,7 +948,7 @@ public class MongoUtil extends ServiceBase {
 					// not searched for like "and, of, the, about, over" etc, however if you index without stop words
 					// that also means searching for these basic words in the content fails. But if you do index them
 					// (by using "none" here) then the index will be larger.
-					//.withDefaultLanguage("none")
+					// .withDefaultLanguage("none")
 
 					// .onField(SubNode.CONTENT) //
 					// .onField(SubNode.TAGS) //
