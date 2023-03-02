@@ -64,12 +64,6 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        /* putting this logic separate from setters above, but this is because we don't allow the actual page root
-        to be deleted WHILE you're looking at it */
-        if (isPageRootNode) {
-            deleteAllowed = false;
-        }
-
         /* DO NOT DELETE
             todo-2: need to make this if condition:
              if ((state.isAdminUser || S.props.isMine(node, state)) && S.props.isShared(node)) {

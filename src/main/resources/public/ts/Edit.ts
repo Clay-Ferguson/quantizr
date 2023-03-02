@@ -921,9 +921,9 @@ export class Edit {
             return;
         }
 
+        let deletedPageNode: boolean = false;
         if (selNodesArray.find(id => id === ast.node?.id)) {
-            S.util.showMessage("You can't delete your page node! Go up a level to do that.", "Warning");
-            return;
+            deletedPageNode = true;
         }
 
         const confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
@@ -949,28 +949,33 @@ export class Edit {
                     ast.node.children = ast.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
                 }
 
-                if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
-                    dispatch("NodeDeleteComplete", s => {
-                        // remove this node from all data from all the tabs, so they all refresh without
-                        // the deleted node without being queries from the server again.
-                        selNodesArray.forEach(id => {
-                            S.srch.removeNodeById(id, s);
-                        });
-                        s.selectedNodes.clear();
-                    });
+                this.afterDeleteCleanup(selNodesArray);
+                if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
+                    // todo-1: Improvement here would be to try to go to the parent of the node, so we could pass
+                    // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
+                    // to pass back to us the ID of the parent node or null if we don't have access to it, but for
+                    // now if user deletes their page root node we take them to their account node.
+                    S.nav.navToMyAccntRoot();
+                }
+                else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
                     S.view.jumpToId(ast.node.id);
                 }
                 else {
-                    dispatch("UpdateChildren", s => {
-                        selNodesArray.forEach(id => {
-                            S.srch.removeNodeById(id, s);
-                        });
-                        s.selectedNodes.clear();
-                        s.node.children = ast.node.children;
-                    });
+                    getAs().node.children = ast.node.children;
                 }
             }
         }
+    }
+
+    afterDeleteCleanup = (selNodesArray: string[]) => {
+        dispatch("AfterDeleteCleanup", s => {
+            // remove this node from all data from all the tabs, so they all refresh without
+            // the deleted node without being queries from the server again.
+            selNodesArray.forEach(id => {
+                S.srch.removeNodeById(id, s);
+            });
+            s.selectedNodes.clear();
+        });
     }
 
     /* Updates 'nodeHistory' when nodes are deleted */
