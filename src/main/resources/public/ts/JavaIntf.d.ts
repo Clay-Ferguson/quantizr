@@ -418,6 +418,7 @@ export interface NodeSearchRequest extends RequestBase {
     recursive: boolean;
     requirePriority: boolean;
     requireAttachment: boolean;
+    deleteMatches: boolean;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {

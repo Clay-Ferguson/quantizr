@@ -91,6 +91,6 @@ export class SearchUsersDlg extends DialogBase {
             desc,
             null,
             false,
-            false, 0, true, "mtm", "DESC", false, false, this.close);
+            false, 0, true, "mtm", "DESC", false, false, false, this.close);
     }
 }

@@ -43,6 +43,6 @@ export class SearchByNameDlg extends DialogBase {
 
         const desc = "Node Name: " + SearchByNameDlg.defaultSearchText;
         S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, null, desc, null, false,
-            false, 0, true, "mtm", "DESC", false, false, this.close);
+            false, 0, true, "mtm", "DESC", false, false, false, this.close);
     }
 }

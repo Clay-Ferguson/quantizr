@@ -8,13 +8,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
@@ -30,8 +33,10 @@ import quanta.response.DeleteNodesResponse;
 import quanta.util.Const;
 import quanta.util.IntVal;
 import quanta.util.LongVal;
+import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
+
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
@@ -671,7 +676,7 @@ public class MongoDelete extends ServiceBase {
 			 */
 			// apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
 			bops = bulkOpRemoveNode(bops, child.getId());
-			
+
 			if (++opCount > Const.MAX_BULK_OPS) {
 				bops.execute();
 				bops = null;
@@ -729,5 +734,81 @@ public class MongoDelete extends ServiceBase {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	// Deletes all matches to this search criteria. Very dangerous! Only admin can run.
+	public void deleteMatches(MongoSession ms, SubNode node, String prop, String text, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
+			boolean requirePriority) {
+		ThreadLocals.requireAdmin();
+		List<CriteriaDefinition> criterias = new LinkedList<>();
+
+		/*
+		 * This regex finds all that START WITH path, have some characters after path, before the end of the
+		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+		 * children.
+		 */
+		Criteria crit = null;
+		if (recursive) {
+			crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())); //
+		} else {
+			crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+		}
+
+		crit = auth.addSecurityCriteria(ms, crit);
+		criterias.add(crit);
+
+		if (!StringUtils.isEmpty(text)) {
+			if (fuzzy) {
+				if (StringUtils.isEmpty(prop)) {
+					prop = SubNode.CONTENT;
+				}
+
+				if (caseSensitive) {
+					criterias.add(Criteria.where(prop).regex(text));
+				} else {
+					// i==insensitive (case)
+					criterias.add(Criteria.where(prop).regex(text, "i"));
+				}
+			} else {
+				// todo-1: take another look at these to see if any can be useful for more powerful searching.
+				// .matchingAny("search term1", "search term2")
+				// .matching("search term") // matches any that contain "search" OR "term"
+				// .matchingPhrase("search term")
+
+				TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+
+				/*
+				 * If searching for a pure tag name or a username (no spaces in search string), be smart enough to
+				 * enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up finding
+				 * also just instances of mytag (not a tag) which is incorrect.
+				 */
+				if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
+					text = "\"" + text + "\"";
+				}
+
+				// This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
+				// bug.
+				// (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR
+				// search
+				// on strings containing special characters, without the special characters basically being ignored.
+				// textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
+
+				textCriteria.matching(text);
+				textCriteria.caseSensitive(caseSensitive);
+				criterias.add(textCriteria);
+			}
+		}
+
+		if (requirePriority) {
+			criterias.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
+		}
+
+		Query q = new Query();
+
+		for (CriteriaDefinition c : criterias) {
+			q.addCriteria(c);
+		}
+
+		ops.remove(q, SubNode.class);
 	}
 }

@@ -182,14 +182,15 @@ export class Search {
             return;
         }
         this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
-            J.NodeProp.PRIORITY_FULL, "asc", true, false, null);
+            J.NodeProp.PRIORITY_FULL, "asc", true, false, false, null);
     }
 
     // todo-1: We should make this method return a Promise<boolean> for success and get rid of the successCallback arg.
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
-        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean,
+        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
         successCallback: Function) => {
+
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
             page,
@@ -205,8 +206,14 @@ export class Search {
             timeRangeType: null,
             recursive,
             requirePriority,
-            requireAttachment
+            requireAttachment,
+            deleteMatches
         });
+
+        if (res.success && deleteMatches) {
+            S.util.showMessage("Matches were deleted.", "Warning");
+            return;
+        }
 
         if (res.searchResults && res.searchResults.length > 0) {
             if (successCallback) {
@@ -333,7 +340,8 @@ export class Search {
             timeRangeType,
             recursive,
             requirePriority: false,
-            requireAttachment: false
+            requireAttachment: false,
+            deleteMatches: false
         });
 
         if (page === 0 && (!res.searchResults || res.searchResults.length === 0)) {

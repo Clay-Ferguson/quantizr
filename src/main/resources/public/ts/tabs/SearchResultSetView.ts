@@ -31,6 +31,7 @@ export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<
             this.data.props.sortDir,
             this.data.props.requirePriority,
             this.data.props.requireAttachment,
+            false,
             null);
     }
 

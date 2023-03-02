@@ -190,7 +190,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (deleteAllowed) {
-                // not user's account node!
+                // not this user's own account node!
                 if (this.node.id !== ast.userProfile?.userNodeId) {
                     deleteNodeIcon = new Icon({
                         className: "fa fa-trash fa-lg buttonBarIcon",

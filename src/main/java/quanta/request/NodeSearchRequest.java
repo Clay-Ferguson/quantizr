@@ -42,6 +42,9 @@ public class NodeSearchRequest extends RequestBase {
 
 	private boolean requireAttachment;
 
+	// Admin can set this, and it will delete all matches to the search results
+	private boolean deleteMatches;
+
 	public String getSearchRoot() {
 		return searchRoot;
 	}
@@ -160,5 +163,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setRequireAttachment(boolean requireAttachment) {
 		this.requireAttachment = requireAttachment;
+	}
+
+	public boolean isDeleteMatches() {
+		return deleteMatches;
+	}
+
+	public void setDeleteMatches(boolean deleteMatches) {
+		this.deleteMatches = deleteMatches;
 	}
 }

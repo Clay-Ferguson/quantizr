@@ -15,6 +15,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { ConfirmDlg } from "./ConfirmDlg";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
@@ -51,6 +52,7 @@ export class SearchContentDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+        const ast = getAs();
         let requirePriorityCheckbox = null;
         if (this.getState<LS>().sortField === J.NodeProp.PRIORITY_FULL) {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
@@ -65,13 +67,13 @@ export class SearchContentDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new Div(null, null, [
-                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState })
+                    this.searchTextField = new TextField({ enter: () => this.search(false), val: this.searchTextState })
                 ]),
                 this.createSearchFieldIconButtons(),
                 new Clearfix(),
 
                 new HorizontalLayout([
-                    new Checkbox("Regex", null, {
+                    new Checkbox("Substring", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
@@ -145,8 +147,9 @@ export class SearchContentDlg extends DialogBase {
                 ], "horizontalLayoutComp bigMarginBottom"),
 
                 new ButtonBar([
-                    new Button("Search", this.search, null, "btn-primary"),
+                    new Button("Search", () => this.search(false), null, "btn-primary"),
                     new Button("Graph", this.graph),
+                    ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
                     new HelpButton(() => getAs().config.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
@@ -212,7 +215,16 @@ export class SearchContentDlg extends DialogBase {
         S.render.showGraph(null, SearchContentDlg.defaultSearchText);
     }
 
-    search = () => {
+    deleteMatches = async () => {
+        const dlg = new ConfirmDlg("Permanently delete ALL MATCHING Nodes", "WARNING",
+            "btn-danger", "alert alert-danger");
+        await dlg.open();
+        if (dlg.yes) {
+            this.search(true);
+        }
+    }
+
+    search = (deleteMatches: boolean) => {
         // until we have better validation
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
@@ -238,6 +250,7 @@ export class SearchContentDlg extends DialogBase {
             state.sortDir,
             requirePriority,
             state.requireAttachment,
+            deleteMatches,
             this.close);
     }
 }
