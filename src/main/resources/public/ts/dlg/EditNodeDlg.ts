@@ -261,11 +261,13 @@ export class EditNodeDlg extends DialogBase {
         const type = S.plugin.getType(ast.editNode.type);
         let customProps: string[] = null;
         let editorOpts: EditorOptions = {};
+        let autoExpandProps = false;
         if (type) {
             editorOpts = type.getEditorOptions();
             customProps = type.getCustomProperties();
             type.ensureDefaultProperties(ast.editNode);
             this.editorHelp = type.getEditorHelp();
+            autoExpandProps = type.getAutoExpandProps();
         }
 
         const allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
@@ -369,10 +371,11 @@ export class EditNodeDlg extends DialogBase {
                 propsTable
             ], false,
                 (expanded: boolean) => {
+                    if (autoExpandProps) return;
                     dispatch("setPropsPanelExpanded", s => {
                         s.propsPanelExpanded = expanded;
                     });
-                }, getAs().propsPanelExpanded, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+                }, getAs().propsPanelExpanded || autoExpandProps, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
         }
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection" }, [

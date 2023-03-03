@@ -21,6 +21,10 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
+    getAutoExpandProps(): boolean {
+        return false;
+    }
+
     getAllowUserSelect(): boolean {
         return this.allowUserSelect;
     }

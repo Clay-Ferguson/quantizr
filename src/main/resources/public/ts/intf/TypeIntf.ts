@@ -12,6 +12,7 @@ export interface TypeIntf {
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo): boolean;
     getAllowRowHeader(): boolean;
+    getAutoExpandProps(): boolean;
     allowPropertyEdit(typeName: string): boolean;
     domPreUpdateFunction(parent: CompIntf): void;
 
