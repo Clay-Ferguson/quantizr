@@ -63,7 +63,8 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0,
+                jumpToRss: false
             });
             this.upLevelResponse(res, null, true);
         }
@@ -100,7 +101,8 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0,
+                jumpToRss: false
             });
 
             if (processingDelete) {
@@ -147,7 +149,7 @@ export class Nav {
         });
     }
 
-    openContentNode = async (nodePathOrId: string) => {
+    openContentNode = async (nodePathOrId: string, jumpToRss: boolean) => {
         const ast = getAs();
 
         try {
@@ -161,8 +163,21 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0,
+                jumpToRss
             });
+
+            // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
+            // the actual RSS feed that this node defines.
+            if (jumpToRss && res?.rssNode) {
+                dispatch("LoadingFeed", s => {
+                    s.rssNode = res.node;
+                    s.activeTab = C.TAB_RSS;
+                    S.domUtil.focusId(C.TAB_RSS);
+                    S.tabUtil.tabScroll(C.TAB_RSS, 0);
+                });
+                return;
+            }
 
             this.navPageNodeResponse(res);
         }
@@ -261,7 +276,8 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: ast.userPrefs.showParents ? 1 : 0
+                    parentCount: ast.userPrefs.showParents ? 1 : 0,
+                    jumpToRss: false
                 });
 
                 this.navPageNodeResponse(res);
@@ -302,7 +318,8 @@ export class Nav {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: true,
-                    parentCount: 0
+                    parentCount: 0,
+                    jumpToRss: false
                 });
                 if (!res.node) {
                     // todo-1: in this code path we should show an error message ON the Document Tab.
@@ -363,7 +380,8 @@ export class Nav {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: true,
-                parentCount: 0
+                parentCount: 0,
+                jumpToRss: false
             });
 
             if (!res.node) return;

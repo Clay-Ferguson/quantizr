@@ -421,7 +421,8 @@ export class Edit {
     //             goToLastPage: false,
     //             forceIPFSRefresh: false,
     //             singleNode: true,
-    //             parentCount: ast.userPrefs.showParents ? 1 : 0
+    //             parentCount: ast.userPrefs.showParents ? 1 : 0,
+    //             jumpToRss: false
     //         });
 
     //         if (!res || !res.node) {
@@ -829,7 +830,7 @@ export class Edit {
                 childrenOnly: true,
                 bulkDelete: false
             });
-            S.nav.openContentNode(ast.userProfile.userNodeId);
+            S.nav.openContentNode(ast.userProfile.userNodeId, false);
         }
     }
 

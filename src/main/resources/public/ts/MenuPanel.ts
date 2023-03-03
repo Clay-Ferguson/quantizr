@@ -46,7 +46,7 @@ export class MenuPanel extends Div {
     }
 
     // leaving for reference how to open this.
-    static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
+    static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES, false);
 
     static editFriends = () => {
         // DO NOT DELETE (This is good know as the way to access raw friends nodes)
@@ -57,7 +57,7 @@ export class MenuPanel extends Div {
 
     static openBookmarksNode = () => {
         S.util.setUserPreferences(true);
-        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
+        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST, false);
     };
 
     static continueEditing = () => {
@@ -109,13 +109,17 @@ export class MenuPanel extends Div {
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
     // which can be slow in JS.
 
+    // todo-0: Need an Admin guide that can mention ALL these "expected" node names and/or make these
+    // configurable in the YAML, so they're not even existing by default.
+    // (basically this means testing the White-Label use of the platform too)
+    //
     // todo-1: Need to include in instance setup docs, the fact that these nodes need to be defined.
     //         and don't forget also ":quanta-news" which is referenced in the config-text.json
-    static aboutQuanta = () => S.nav.openContentNode(":home");
-    static openUserGuide = () => S.nav.openContentNode(":user-guide");
-    static openFeatures = () => S.nav.openContentNode(":features");
-    static openScreencasts = () => S.nav.openContentNode(":screencast");
-    static openDemoContent = () => S.nav.openContentNode(":demo-data");
+    static aboutQuanta = () => S.nav.openContentNode(":home", false);
+    static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
+    static openFeatures = () => S.nav.openContentNode(":features", false);
+    static openScreencasts = () => S.nav.openContentNode(":screencast", false);
+    static openDemoContent = () => S.nav.openContentNode(":demo-data", false);
 
     static showBlockedUsers = () => {
         // S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
@@ -123,11 +127,13 @@ export class MenuPanel extends Div {
         dlg.open();
     }
 
-    static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
-    static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
-    static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home");
-    static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
-    static openUsersNode = () => S.nav.openContentNode("/r/usr");
+    // todo-0: ditto above, this all needs to be mentioned in an Admin Guide
+    static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
+    static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
+    static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home", false);
+    static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, false);
+    static openUsersNode = () => S.nav.openContentNode("/r/usr", false);
+
     static transferNode = () => { new TransferNodeDlg("transfer").open(); };
     static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
     static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
@@ -283,8 +289,11 @@ export class MenuPanel extends Div {
                 new MenuItem("Notes", MenuPanel.openNotesNode),
                 new MenuItem("Exports", MenuPanel.openExportsNode),
                 new MenuItemSeparator(),
-                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide")),
-                new MenuItem("Portal Home", () => S.nav.openContentNode(":home"))
+
+                // todo-0: need to mention in Admin Guide how to handle this and make it
+                // configuralbe externally to the app code
+                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", false)),
+                new MenuItem("Portal Home", () => S.nav.openContentNode(":home", false))
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
@@ -702,7 +711,7 @@ export class MenuPanel extends Div {
                         }
                         // named nodes like ":myName"
                         else {
-                            func = () => S.nav.openContentNode(link);
+                            func = () => S.nav.openContentNode(link, true);
                         }
                     }
 

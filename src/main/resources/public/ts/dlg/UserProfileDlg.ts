@@ -238,7 +238,7 @@ export class UserProfileDlg extends DialogBase {
         // let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
         // window.open(url, "_blank");
         this.close();
-        setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName), 250);
+        setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName, false), 250);
     }
 
     reload = async (userNodeId: string) => {

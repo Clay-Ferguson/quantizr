@@ -95,6 +95,19 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
+		// If this request is indicates the server would rather display RSS than jump to an RSS node itself,
+		// then here we indicate to the caller this happened and return immediately.
+		if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
+			res.setSuccess(true);
+			res.setRssNode(true);
+
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false, false,
+					true, false, true, true, null, false);
+			res.setNode(nodeInfo);
+
+			return res;
+		}
+
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
 			node = read.getNode(ms, prop.getUserLandingPageNode());

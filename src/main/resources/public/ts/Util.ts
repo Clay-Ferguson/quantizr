@@ -870,7 +870,8 @@ export class Util {
                     goToLastPage: false,
                     forceIPFSRefresh: false,
                     singleNode: false,
-                    parentCount: 0
+                    parentCount: 0,
+                    jumpToRss: false
                 });
 
                 // if we have trouble accessing even the anon page just drop out to landing page.

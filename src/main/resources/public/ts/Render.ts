@@ -894,7 +894,7 @@ export class Render {
                         }
                         // named nodes like ":myName"
                         else {
-                            func = () => S.nav.openContentNode(link);
+                            func = () => S.nav.openContentNode(link, true);
                         }
                     }
 

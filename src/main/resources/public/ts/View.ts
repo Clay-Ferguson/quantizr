@@ -69,7 +69,8 @@ export class View {
                 goToLastPage: false,
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0,
+                jumpToRss: false
             });
 
             if (!res || !res.success) {
@@ -140,7 +141,8 @@ export class View {
                 goToLastPage,
                 forceIPFSRefresh: false,
                 singleNode: false,
-                parentCount: ast.userPrefs.showParents ? 1 : 0
+                parentCount: ast.userPrefs.showParents ? 1 : 0,
+                jumpToRss: false
             });
 
             if (!res.node) return;

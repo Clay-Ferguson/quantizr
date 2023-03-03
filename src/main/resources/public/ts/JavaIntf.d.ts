@@ -456,6 +456,7 @@ export interface RenderNodeRequest extends RequestBase {
     renderParentIfLeaf: boolean;
     forceRenderParent: boolean;
     parentCount: number;
+    jumpToRss: boolean;
     goToLastPage: boolean;
     singleNode: boolean;
     forceIPFSRefresh: boolean;
@@ -883,6 +884,7 @@ export interface RenderNodeResponse extends ResponseBase {
     endReached: boolean;
     noDataResponse: string;
     breadcrumbs: BreadcrumbInfo[];
+    rssNode: boolean;
 }
 
 export interface ResetPasswordResponse extends ResponseBase {

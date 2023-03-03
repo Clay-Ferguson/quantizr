@@ -267,7 +267,8 @@ export class FullScreenGraphViewer extends Main {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: true,
-            parentCount: 0
+            parentCount: 0,
+            jumpToRss: false
         });
 
         if (res?.node) {

@@ -12,14 +12,15 @@ public class RenderNodeResponse extends ResponseBase {
 
 	/*
 	 * This holds the actual number of children on the node, independent of how many at a time the
-	 * browser is requesting to see per page, and unrelated to size of 'children' list, on this
-	 * object.
+	 * browser is requesting to see per page, and unrelated to size of 'children' list, on this object.
 	 */
 	private boolean endReached;
-	
+
 	private String noDataResponse;
 
 	private LinkedList<BreadcrumbInfo> breadcrumbs;
+
+	private boolean rssNode;
 
 	public NodeInfo getNode() {
 		return node;
@@ -46,10 +47,18 @@ public class RenderNodeResponse extends ResponseBase {
 	}
 
 	public LinkedList<BreadcrumbInfo> getBreadcrumbs() {
-        return breadcrumbs;
-    }
+		return breadcrumbs;
+	}
 
-    public void setBreadcrumbs(LinkedList<BreadcrumbInfo> breadcrumbs) {
-        this.breadcrumbs = breadcrumbs;
-    }
+	public void setBreadcrumbs(LinkedList<BreadcrumbInfo> breadcrumbs) {
+		this.breadcrumbs = breadcrumbs;
+	}
+
+	public boolean isRssNode() {
+		return rssNode;
+	}
+
+	public void setRssNode(boolean rssNode) {
+		this.rssNode = rssNode;
+	}
 }

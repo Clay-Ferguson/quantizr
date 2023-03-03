@@ -30,7 +30,7 @@ export class InboxNotifyDlg extends DialogBase {
                 new ButtonBar([
                     this.nodeId ? new Button("Go to Node", () => {
                         this.close();
-                        S.nav.openContentNode(this.nodeId);
+                        S.nav.openContentNode(this.nodeId, false);
                     }) : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop"),
