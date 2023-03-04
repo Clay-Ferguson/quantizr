@@ -109,25 +109,12 @@ export class MenuPanel extends Div {
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
     // which can be slow in JS.
 
-    // todo-0: Need an Admin guide that can mention ALL these "expected" node names and/or make these
-    // configurable in the YAML, so they're not even existing by default.
-    // (basically this means testing the White-Label use of the platform too)
-    //
-    // todo-1: Need to include in instance setup docs, the fact that these nodes need to be defined.
-    //         and don't forget also ":quanta-news" which is referenced in the config-text.json
-    static aboutQuanta = () => S.nav.openContentNode(":home", false);
-    static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
-    static openFeatures = () => S.nav.openContentNode(":features", false);
-    static openScreencasts = () => S.nav.openContentNode(":screencast", false);
-    static openDemoContent = () => S.nav.openContentNode(":demo-data", false);
-
     static showBlockedUsers = () => {
         // S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
         const dlg = new BlockedUsersDlg("Blocked Users");
         dlg.open();
     }
 
-    // todo-0: ditto above, this all needs to be mentioned in an Admin Guide
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
     static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home", false);
