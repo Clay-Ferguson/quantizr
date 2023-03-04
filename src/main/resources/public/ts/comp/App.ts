@@ -10,9 +10,9 @@ import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { Button } from "./core/Button";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
+import { Span } from "./core/Span";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -104,19 +104,43 @@ export class App extends Main {
     getTopMobileBar = (): CompIntf => {
         const ast = getAs();
         if (ast.mobileMode) {
-            const menuButton = new IconButton("fa-bars", "Menu", {
+            // DO NOT DELETE:
+            // Currently we have no need to show the menu to anonymous users, but I want to keep
+            // this here for future purposes in case we eventually do need this menu.
+            const menuButton = ast.isAnonUser ? null : new IconButton("fa-bars", null, {
                 onClick: S.nav.showMainMenu,
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 
-            const navButton = new IconButton("fa-sitemap", "Nav", {
+            const navButton = new IconButton("fa-sitemap", null, {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
             }, "btn-primary menuButton", "off");
 
-            const loginButton = ast.isAnonUser ? new Button("Login", S.user.userLogin, {
-                className: "menuButton"
-            }, "btn-primary") : null;
+            const feedButton = new IconButton("fa-globe", null, {
+                onClick: S.nav.messagesFediverse,
+                id: "feedMenu"
+            }, "btn-primary menuButton", "off");
+
+            const loginButton = ast.isAnonUser ? new Span("Login", {
+                className: "marginLeft clickable",
+                id: "loginButton",
+                onClick: S.user.userLogin
+            }) : null;
+
+            const signupButton = ast.isAnonUser ? new Span("Signup", {
+                className: "marginLeft clickable",
+                id: "loginButton",
+                onClick: S.user.userSignup
+            }) : null;
+
+            const floatRightDiv = new Div(null, { className: "float-end" }, [
+                loginButton, signupButton,
+                !ast.isAnonUser ? new Span(ast.userName, {
+                    className: "clickable",
+                    onClick: S.nav.navToMyAccntRoot
+                }) : null
+            ]);
 
             const logo = new Img({
                 className: "marginRight smallLogoButton",
@@ -125,8 +149,7 @@ export class App extends Main {
                 title: "Main application Landing Page"
             });
 
-            // let title = !state.isAnonUser ? new Button("@" + state.userName, () => S.nav.navHome(state), null, "btn-secondary") : null;
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, loginButton]);
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
         }
         return null;
     }

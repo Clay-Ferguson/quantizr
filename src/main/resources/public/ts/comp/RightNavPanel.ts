@@ -138,10 +138,11 @@ export class RightNavPanel extends Div {
             });
         }
 
+        const rightNavPanelClass = ast.mobileMode ? "rightNavPanelInnerMobile" : "rightNavPanelInner";
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 // for anon user float this more to the right so the main view looks less jammed up
-                new Div(null, { className: "rightNavPanelInner" + (ast.isAnonUser ? " float-end" : "") }, [
+                new Div(null, { className: rightNavPanelClass }, [
                     !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
                     new Div(null, { className: "float-end" }, [
@@ -201,10 +202,10 @@ export class RightNavPanel extends Div {
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    !ast.isAnonUser ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
+                    new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu")
                 ]),
 
-                ast.nodeHistory?.length > 0 && !ast.isAnonUser? new HistoryPanel() : null
+                ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
             ])
         ]);
     }

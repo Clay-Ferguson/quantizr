@@ -32,6 +32,7 @@ export class NodeCompRowHeader extends Div {
         const ast = getAs();
 
         let displayName = null;
+        const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
 
         // if user has set their displayName
         if (this.node.displayName) {
@@ -185,7 +186,7 @@ export class NodeCompRowHeader extends Div {
                 }));
             }
 
-            if (showInfo) {
+            if (showInfo && allowWideViewIcons) {
                 children.push(new Icon({
                     className: "fa fa-link fa-lg row-header-icon",
                     title: "Show URLs for this node",
@@ -228,7 +229,7 @@ export class NodeCompRowHeader extends Div {
             // Don't try to read Foreign server content (by checking actPubId to detect remote)
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
-            if (!actPubId) {
+            if (!actPubId && allowWideViewIcons) {
                 children.push(new Icon({
                     className: "fa fa-lg fa-volume-up row-header-icon",
                     onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
@@ -408,7 +409,8 @@ export class NodeCompRowHeader extends Div {
             floatUpperRightDiv.addChild(new ButtonBar([pasteButton, editButton, jumpButton], null, "marginRight"));
         }
 
-        if (floatUpperRightDiv.hasChildren()) {
+        // for mobile, we don't show this float right component unless in wide-screen orientation.
+        if ((!ast.mobileMode || S.quanta.isLandscapeOrientation()) && floatUpperRightDiv.hasChildren()) {
             children.push(floatUpperRightDiv);
             children.push(new Clearfix());
         }

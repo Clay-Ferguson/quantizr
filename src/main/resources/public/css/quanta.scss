@@ -548,6 +548,7 @@ a {
 
 .rhsMenuMobile {
     width: 85%;
+    padding-left: 0;
 }
 
 .userName {
@@ -868,9 +869,8 @@ Will come back later and study this more. todo-3 */
 .app-modal-main-menu {
     border: 2px solid $modal-content-border-color;
     background-color: $modal-content-bg;
-    padding: $smallGap;
-    width: 85%;
-    max-width: 50rem;
+    width: 80%;
+    max-width: 80%;
 }
 
 /* Modal Content/ Dialog Box */
@@ -958,6 +958,10 @@ Will come back later and study this more. todo-3 */
 .rightNavPanelInner {
     min-width: 15rem;
     margin-left: 10px;
+}
+
+.rightNavPanelInnerMobile {
+    min-width: 15rem;
 }
 
 .scrollY {
