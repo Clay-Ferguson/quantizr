@@ -61,14 +61,15 @@ export class NodeCompContent extends Div {
 
         if (S.props.hasBinary(this.node) && !isAccountNode) {
             const attComps: CompIntf[] = [];
-            S.props.getOrderedAttachments(this.node).forEach(att => {
+            const attachments = S.props.getOrderedAttachments(this.node);
+            attachments.forEach(att => {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
                 // so we break a bit of type safety here.
 
                 // show it here only if there's no "position(p)" for it, becasue the positioned ones are layed out
                 // via html in 'render.injectSubstitutions'
                 if (!att.p || att.p === "auto") {
-                    attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false));
+                    attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0));
                 }
             });
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));

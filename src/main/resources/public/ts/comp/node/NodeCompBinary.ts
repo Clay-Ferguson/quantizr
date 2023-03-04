@@ -21,7 +21,8 @@ interface LS {
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, public attName: string, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean) {
+    constructor(public node: J.NodeInfo, public attName: string, private isEditorEmbed: boolean,
+        private isFullScreenEmbed: boolean, private allowRightMargin: boolean) {
         super();
         this.mergeState<LS>({ node });
     }
@@ -36,6 +37,7 @@ export class NodeCompBinary extends Div {
 
         const style: any = {};
         let size = "";
+        let rtMargin = true;
         if (this.isFullScreenEmbed) {
             size = ast.fullScreenImageSize;
         }
@@ -45,6 +47,9 @@ export class NodeCompBinary extends Div {
         }
         else {
             size = att.c;
+            if (size==="0" || size==="100%") {
+                rtMargin = false;
+            }
         }
 
         if (!this.isEditorEmbed) {
@@ -83,7 +88,7 @@ export class NodeCompBinary extends Div {
         else {
             this.attribs.style = style;
             if (!this.isEditorEmbed) {
-                this.attribs.className = "nodeCompBinary";
+                this.attribs.className = rtMargin && this.allowRightMargin ? "nodeCompBinary" : "nodeCompBinaryNoRtMargin";
             }
         }
 

@@ -365,7 +365,7 @@ export class Render {
                 attachmentComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
-                    attachmentComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false)]));
+                    attachmentComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true)]));
                     attachmentComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
