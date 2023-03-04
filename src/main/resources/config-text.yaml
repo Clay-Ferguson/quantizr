@@ -19,6 +19,12 @@ rhsAnonLinks:
 #   - name: "News"
 #     link: ":quanta-news"
 
+systemFolderLinks:
+  - name: "User Guide"
+    link: ":user-guide"
+  - name: "Portal Home"
+    link: ":home"
+
 rhsFeedLinks:
   - name: "separator"
     link: ""

@@ -265,6 +265,8 @@ export class MenuPanel extends Div {
         // }
 
         if (!ast.isAnonUser) {
+            const systemFolderLinks = this.getSystemFolderLinks();
+
             children.push(new Menu(state, "Folders", [
                 new MenuItem("My Account", S.nav.navToMyAccntRoot),
                 new MenuItem("My Home", MenuPanel.openHomeNode),
@@ -275,12 +277,8 @@ export class MenuPanel extends Div {
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
                 new MenuItem("Notes", MenuPanel.openNotesNode),
                 new MenuItem("Exports", MenuPanel.openExportsNode),
-                new MenuItemSeparator(),
-
-                // todo-0: need to mention in Admin Guide how to handle this and make it
-                // configuralbe externally to the app code
-                new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", false)),
-                new MenuItem("Portal Home", () => S.nav.openContentNode(":home", false))
+                systemFolderLinks.length > 0 ? new MenuItemSeparator() : null,
+                ...systemFolderLinks
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
@@ -667,46 +665,61 @@ export class MenuPanel extends Div {
     }
 
     // These are defined externally in config-text.yaml
-    helpMenuItems = (): Div[] => {
+    // helpMenuItems = (): Div[] => {
+    //     const ast = getAs();
+    //     const items: Div[] = [];
+    //     if (ast.config.menu?.help) {
+    //         for (const menuItem of ast.config.menu.help) {
+    //             this.appendMenuItemFromConfig(menuItem, items);
+    //         }
+    //     }
+    // }
+    //     return items;
+    // }
+
+    getSystemFolderLinks = (): MenuItem[] => {
+        const ret: MenuItem[] = [];
         const ast = getAs();
-        const items: Div[] = [];
-        if (ast.config.menu?.help) {
-            for (const menuItem of ast.config.menu.help) {
-                if (menuItem.name === "separator") {
-                    items.push(new MenuItemSeparator());
-                }
-                else {
-                    const link: string = menuItem.link;
-                    let func: Function = null;
+        if (!ast.config.systemFolderLinks) return ret;
+        for (const menuItem of ast.config.systemFolderLinks) {
+            this.appendMenuItemFromConfig(menuItem, ret);
+        }
+        return ret;
+    }
 
-                    if (link) {
-                        // allows ability to select a tab
-                        if (link.startsWith("tab:")) {
-                            const tab = link.substring(4);
+    appendMenuItemFromConfig = (cfgItem: any, items: CompIntf[]): void => {
+        if (cfgItem.name === "separator") {
+            items.push(new MenuItemSeparator());
+        }
+        else {
+            const link: string = cfgItem.link;
+            let func: Function = null;
 
-                            /* special case for feed tab */
-                            if (tab === C.TAB_FEED) {
-                                func = S.nav.messagesFediverse;
-                            }
-                            else {
-                                func = () => S.tabUtil.selectTab(tab);
-                            }
-                        }
-                        // covers http and https
-                        else if (link.startsWith("http")) {
-                            func = () => window.open(link);
-                        }
-                        // named nodes like ":myName"
-                        else {
-                            func = () => S.nav.openContentNode(link, true);
-                        }
+            if (link) {
+                // allows ability to select a tab
+                if (link.startsWith("tab:")) {
+                    const tab = link.substring(4);
+
+                    /* special case for feed tab */
+                    if (tab === C.TAB_FEED) {
+                        func = S.nav.messagesFediverse;
                     }
-
-                    items.push(new MenuItem(menuItem.name, func));
+                    else {
+                        func = () => S.tabUtil.selectTab(tab);
+                    }
+                }
+                // covers http and https
+                else if (link.startsWith("http")) {
+                    func = () => window.open(link);
+                }
+                // named nodes like ":myName"
+                else {
+                    func = () => S.nav.openContentNode(link, true);
                 }
             }
+
+            items.push(new MenuItem(cfgItem.name, func));
         }
-        return items;
     }
 }
 
