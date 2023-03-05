@@ -202,7 +202,7 @@ export class RightNavPanel extends Div {
                     }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
-                    new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu")
+                    !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null
                 ]),
 
                 ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
