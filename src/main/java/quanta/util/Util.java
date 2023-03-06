@@ -33,7 +33,7 @@ public class Util {
 
 	public static boolean allowInsecureUrl(String url) {
 		// return url.contains("/bin/profileHeader") || url.contains("/bin/avatar") || //
-		// todo-0: this is a known and 'by design' security hole where we don't protect binaries from access [yet]
+		// todo-1: this is a known and 'by design' security hole where we don't protect binaries from access [yet]
 		return url.contains("/bin/") || //
 				!url.contains(AppController.API_PATH);
 	}
