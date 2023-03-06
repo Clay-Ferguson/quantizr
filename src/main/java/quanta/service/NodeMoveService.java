@@ -208,12 +208,14 @@ public class NodeMoveService extends ServiceBase {
 	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
 			MoveNodesResponse res) {
 		// log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
+
+		// get targetNode which is node we're pasting at or into.
 		SubNode targetNode = read.getNode(ms, targetId);
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
 
 		auth.ownerAuth(ms, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
-		// log.debug("targetPath: " + parentPath);
+		// log.debug("targetPath (pasting into this): " + parentPath);
 		Long curTargetOrdinal = null;
 
 		// location==inside
@@ -240,7 +242,7 @@ public class NodeMoveService extends ServiceBase {
 			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuth(ms, node);
 
-			// log.debug("Will be Moving ID: " + nodeId + " path: " + node.getPath());
+			// log.debug("Will be Moving ID (and children of): " + nodeId + " path: " + node.getPath());
 			nodesToMove.add(node);
 
 			/*
@@ -262,8 +264,7 @@ public class NodeMoveService extends ServiceBase {
 
 		// process all nodes being moved.
 		for (SubNode node : nodesToMove) {
-			// log.debug("MovingID: " + node.getIdStr() + "[" + node.getContent() + "] path: " +
-			// node.getPath());
+			// log.debug("MovingID (and it's children): " + node.getIdStr() + "[" + node.getContent() + "] path: " + node.getPath());
 			Long _targetOrdinal = curTargetOrdinal;
 			SubNode _nodeParent = nodeParent;
 			arun.run(as -> {
@@ -272,8 +273,8 @@ public class NodeMoveService extends ServiceBase {
 				 * all children and also update its own path, otherwise it's staying under same parent and only it's
 				 * ordinal will change.
 				 */
-				if (_nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
-					// log.debug("going into new parent: " + parentToPasteInto.getPath());
+				if (!_nodeParent.getPath().equals(parentToPasteInto.getPath())) {
+					// log.debug("pasting going into DIFFERENT parent");
 					/*
 					 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
 					 * so we reject the attempt.
@@ -282,9 +283,11 @@ public class NodeMoveService extends ServiceBase {
 						throw new RuntimeException("Impossible node move requested.");
 					}
 
-					changePathOfSubGraph(as, node, parentPath, res, false);
+					// find any new Path available under the paste target location 'parentPath'
+					String newPath = mongoUtil.findAvailablePath(parentPath + "/"); // + node.getLastPathPart());
+					// log.debug("New Available Path Found: " + newPath);
+					changePathOfSubGraph(as, node, node.getPath(), newPath, res, false);
 
-					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
 					node.setPath(newPath);
 
 					// crypto sig uses path as part of it, so we just invalidated the signature.
@@ -321,15 +324,15 @@ public class NodeMoveService extends ServiceBase {
 	}
 
 	/*
-	 * WARNING: This does NOT affect teh path of 'graphRoot' itself, but only changes the location of
+	 * WARNING: This does NOT affect the path of 'graphRoot' itself, but only changes the location of
 	 * all the children under it
 	 */
-	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix, MoveNodesResponse res,
-			boolean fast) {
+	public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix, //
+			MoveNodesResponse res, boolean fast) {
 		String originalPath = graphRoot.getPath();
 
-		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath);
-		int originalParentPathLen = graphRoot.getParentPath().length();
+		// log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" + oldPathPrefix
+		// 		+ " newPathPrefix" + newPathPrefix);
 		boolean removeOrphans = !fast;
 		BulkOperations bops = null;
 		int batchSize = 0;
@@ -340,26 +343,8 @@ public class NodeMoveService extends ServiceBase {
 			}
 			// log.debug(" PROCESSING oldPath: " + node.getPath());
 
-			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
-			String newPath = newPathPrefix + "/" + pathSuffix;
-			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
-
-			int idx = pathSuffix.indexOf("/");
-			if (idx != -1) {
-				/*
-				 * we get here if we're pasting in a subgraph and we need to be sure the top root of this particular
-				 * subgraph is not duplicating an already existing node path, so we have to do the findAvailablePath
-				 * logic on just the path plus that root piece only, to get the target root of the pasted subgraph.
-				 */
-				String newPathPart = pathSuffix.substring(0, idx);
-				String restOfNewPath = pathSuffix.substring(idx + 1);
-				String newPathParent = newPathPrefix + "/" + newPathPart;
-				newPathParent = mongoUtil.findAvailablePath(newPathParent);
-				newPath = newPathParent + "/" + restOfNewPath;
-			} else {
-				// else we're moving a leaf and can just find the newPath this simpler way.
-				newPath = mongoUtil.findAvailablePath(newPath);
-			}
+			String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);
+			// log.debug("      SETTING new path:" + newPath);
 
 			if (bops == null) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
