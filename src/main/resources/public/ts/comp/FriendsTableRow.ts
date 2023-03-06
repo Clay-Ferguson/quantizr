@@ -10,7 +10,6 @@ import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
 import { Icon } from "./core/Icon";
-import { Span } from "./core/Span";
 import { ListBoxRow } from "./ListBoxRow";
 
 export class FriendsTableRow extends ListBoxRow {
@@ -65,8 +64,8 @@ export class FriendsTableRow extends ListBoxRow {
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                 }, [
                     new Div(null, null, [
-                        this.friend.displayName ? new Span(this.friend.displayName, { className: "friendName" }) : null,
-                        this.friend.userName ? new Span("(" + this.friend.userName + ")") : null
+                        this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,
+                        this.friend.userName ? new Div("@" + this.friend.userName) : null
                     ]),
 
                     // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,

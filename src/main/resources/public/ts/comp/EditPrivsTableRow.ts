@@ -47,14 +47,13 @@ export class EditPrivsTableRow extends ListBoxRow {
             src = this.aclEntry.foreignAvatarUrl;
         }
 
-        const displayName = this.aclEntry.displayName
-            ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
-            : ("@" + this.aclEntry.principalName);
-
+        const displayName = this.aclEntry.displayName;
+        const userNameDisp = "@" + this.aclEntry.principalName;
         const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
             new Div(null, null, [
+                this.renderAclPrivileges(this.aclEntry),
                 new Div(null, { className: "friendListImgDivCont" }, [
                     !isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
                         src ? new Img({
@@ -72,16 +71,22 @@ export class EditPrivsTableRow extends ListBoxRow {
                         })
                     ]) : null
                 ]),
-                // todo-1: I tried for 30min to get spacing to show up at bottom of of 'sharingDisplayName'
-                // and failed. welp, I guess I'm done on that for a minute. I must be missing something.
-                isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
-                    : new Div(displayName, {
-                        className: "sharingDisplayName",
+                new Div(null, { className: "sharingDisplayName" }, [
+                    // todo-1: I tried for 30min to get spacing to show up at bottom of of 'sharingDisplayName'
+                    // and failed. welp, I guess I'm done on that for a minute. I must be missing something.
+                    isPublic ? new Div("Public (Everyone)", { className: "largeFont sharingDisplayName" })
+                        : new Div(displayName, {
+                            className: "friendName",
+                            onClick: () => {
+                                new UserProfileDlg(this.aclEntry.principalNodeId).open();
+                            }
+                        }),
+                    isPublic ? null : new Div(userNameDisp, {
                         onClick: () => {
                             new UserProfileDlg(this.aclEntry.principalNodeId).open();
                         }
-                    }),
-                this.renderAclPrivileges(this.aclEntry)
+                    })
+                ])
             ])
         ]);
     }
