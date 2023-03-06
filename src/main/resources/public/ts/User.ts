@@ -267,7 +267,8 @@ export class User {
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false
+                forceRenderParent: false,
+                jumpToRss: true
             });
         } else {
             console.log("LocalDb login failed.");

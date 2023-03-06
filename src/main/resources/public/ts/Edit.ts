@@ -57,7 +57,8 @@ export class Edit {
             scrollToTop: true,
             allowScroll: true,
             setTab: true,
-            forceRenderParent: false
+            forceRenderParent: false,
+            jumpToRss: false
         });
         S.view.scrollToNode();
     }
@@ -75,7 +76,8 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false
+                forceRenderParent: false,
+                jumpToRss: false
             });
         }
     }
@@ -164,7 +166,8 @@ export class Edit {
                     scrollToTop: false,
                     allowScroll: true,
                     setTab: true,
-                    forceRenderParent: false
+                    forceRenderParent: false,
+                    jumpToRss: false
                 });
             }
             else {
@@ -1116,7 +1119,8 @@ export class Edit {
                     scrollToTop: false,
                     allowScroll: true,
                     setTab: true,
-                    forceRenderParent: false
+                    forceRenderParent: false,
+                    jumpToRss: false
                 });
             }, 500);
         }
@@ -1149,7 +1153,8 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
-                forceRenderParent: false
+                forceRenderParent: false,
+                jumpToRss: false
             });
             S.view.scrollToNode();
         }
@@ -1300,7 +1305,8 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: false,
                 setTab: false,
-                forceRenderParent: false
+                forceRenderParent: false,
+                jumpToRss: false
             });
         }
     }
@@ -1331,7 +1337,8 @@ export class Edit {
                 scrollToTop: false,
                 allowScroll: false,
                 setTab: false,
-                forceRenderParent: false
+                forceRenderParent: false,
+                jumpToRss: false
             });
         }
     }

@@ -27,7 +27,8 @@ export class View {
             scrollToTop: false,
             allowScroll: true,
             setTab: true,
-            forceRenderParent
+            forceRenderParent,
+            jumpToRss: false
         });
     }
 
@@ -70,8 +71,20 @@ export class View {
                 forceIPFSRefresh: a.forceIPFSRefresh,
                 singleNode: false,
                 parentCount: ast.userPrefs.showParents ? 1 : 0,
-                jumpToRss: false
+                jumpToRss: a.jumpToRss
             });
+
+            // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
+            // the actual RSS feed that this node defines.
+            if (a.jumpToRss && res?.rssNode) {
+                dispatch("LoadingFeed", s => {
+                    s.rssNode = res.node;
+                    s.activeTab = C.TAB_RSS;
+                    S.domUtil.focusId(C.TAB_RSS);
+                    S.tabUtil.tabScroll(C.TAB_RSS, 0);
+                });
+                return;
+            }
 
             if (!res || !res.success) {
                 console.log("Unable to access node: " + a.nodeId);
@@ -375,4 +388,5 @@ interface RefreshTreeArgs {
     allowScroll: boolean;
     setTab: boolean;
     forceRenderParent: boolean;
+    jumpToRss: boolean;
 }

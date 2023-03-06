@@ -749,7 +749,8 @@ export class Search {
             scrollToTop: false,
             allowScroll: true,
             setTab: true,
-            forceRenderParent: false
+            forceRenderParent: false,
+            jumpToRss: false
         });
         S.util.showMessage(res.message, "Success");
     }
