@@ -62,7 +62,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {
-                        onClick: () => this.uploadFromUrl,
+                        onClick: this.uploadFromUrl,
                         title: "Upload from Web/URL"
                     }),
 
