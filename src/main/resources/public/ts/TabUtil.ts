@@ -35,7 +35,7 @@ export class TabUtil {
             }
             else {
                 this.tabChanging(s.activeTab, tabName);
-                s.activeTab = S.quanta.activeTab = tabName;
+                s.activeTab = tabName;
             }
         });
     }
@@ -57,7 +57,7 @@ export class TabUtil {
         }
         else {
             this.tabChanging(ast.activeTab, tabName);
-            dispatch("SetActiveTab", s => s.activeTab = S.quanta.activeTab = tabName);
+            dispatch("SetActiveTab", s => s.activeTab = tabName);
         }
     }
 

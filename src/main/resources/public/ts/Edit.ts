@@ -98,18 +98,18 @@ export class Edit {
                     (!S.nodeUtil.displayingOnTree(res.nodeInfo.id) &&
                         !S.nodeUtil.displayingOnTree(S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
-                    S.quanta.activeTab !== C.TAB_MAIN ||
+                    ast.activeTab !== C.TAB_MAIN ||
                     S.util.fullscreenViewerActive();
 
-                if (S.quanta.activeTab === C.TAB_DOCUMENT || //
-                    S.quanta.activeTab === C.TAB_SEARCH || //
-                    S.quanta.activeTab === C.TAB_TIMELINE) {
+                if (ast.activeTab === C.TAB_DOCUMENT || //
+                    ast.activeTab === C.TAB_SEARCH || //
+                    ast.activeTab === C.TAB_TIMELINE) {
                     editInPopup = true;
                 }
 
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */
-                if (!editInPopup && S.quanta.activeTab === C.TAB_FEED) {
+                if (!editInPopup && ast.activeTab === C.TAB_FEED) {
                     dispatch("StartEditingInFeed", s => {
                         s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
@@ -129,7 +129,7 @@ export class Edit {
                 } else {
                     dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
-                        s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
+                        s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                     });
@@ -1345,7 +1345,7 @@ export class Edit {
                     jumpToRss: false
                 });
             }
-            else if (S.quanta.activeTab === C.TAB_DOCUMENT) {
+            else if (ast.activeTab === C.TAB_DOCUMENT) {
                 const data: TabIntf<any, DocumentResultSetView<any>> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
                     data.inst.pageChange(null);

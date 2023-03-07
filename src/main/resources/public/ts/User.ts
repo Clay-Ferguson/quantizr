@@ -228,7 +228,7 @@ export class User {
             default to main tab (tree) and set it up to display an error */
             if (S.quanta.configRes.urlIdFailMsg) {
                 await promiseDispatch("setAccessFailed", s => {
-                    s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
+                    s.activeTab = C.TAB_MAIN;
                 });
                 return;
             }

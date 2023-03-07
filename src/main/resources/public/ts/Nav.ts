@@ -466,7 +466,7 @@ export class Nav {
 
         await promiseDispatch("SelectTab", s => {
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED);
-            s.activeTab = S.quanta.activeTab = C.TAB_FEED;
+            s.activeTab = C.TAB_FEED;
 
             // merge props parameter into the feed data props.
             FeedTab.inst.props = { ...FeedTab.inst.props, ...props };
@@ -528,7 +528,7 @@ export class Nav {
 
         dispatch("SelectTab", s => {
             S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
-            s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
+            s.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
             TrendingTab.inst.props = { ...TrendingTab.inst.props };

@@ -477,7 +477,7 @@ export class Render {
             await promiseDispatch("RenderPage", s => {
                 if (!s.activeTab || clickTab) {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN);
-                    s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
+                    s.activeTab = C.TAB_MAIN;
                 }
 
                 s.pageMessage = null;
