@@ -102,9 +102,8 @@ public class NodeRenderService extends ServiceBase {
 			res.setSuccess(true);
 			res.setRssNode(true);
 
-			// todo-0: look for cases where we don't need to generate the logicalOrdinal
 			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-					Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, //
+					Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, //
 					false, true, true, null, false);
 			res.setNode(nodeInfo);
 
@@ -132,7 +131,6 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			// todo-0: do we ALWAYS need to generate the ordinal?
 			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
 					Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, false, true, true, null, false);
 			res.setNode(nodeInfo);

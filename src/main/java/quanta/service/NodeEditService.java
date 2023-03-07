@@ -224,10 +224,9 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, newNode, parentNode);
 		}
 
-		// todo-0: verify if there are cases where we can cram in 0 for logicalOrdinal if we know it's an
-		// 'insert First Child' happening
 		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-				Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, false, null, false));
+				req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, false, null,
+				false));
 		res.setSuccess(true);
 		return res;
 	}

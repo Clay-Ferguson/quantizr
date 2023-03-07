@@ -59,8 +59,6 @@ public class Convert extends ServiceBase {
 	 * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
 	 * if there ARE an children REGARDLESS of whether the given user can access those children.
 	 */
-	// todo-0: after node inserts, or at other times, unless this is a QUERY generated Node, based on
-	// a 'getChildren' kind of thing, the 'ordinal' here can be wrong
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
 			long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,

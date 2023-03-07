@@ -1057,7 +1057,6 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
-        // todo-0: do we need logicalOrdinal here ever?
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
                 false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
                 true, false, true, true, null, false);
@@ -1066,7 +1065,6 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
-        // todo-0: do we need logicalOrdinal here ever?
         NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
                 false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
                 true, false, true, true, null, false);
