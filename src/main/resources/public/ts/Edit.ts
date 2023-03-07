@@ -112,7 +112,7 @@ export class Edit {
                 if (!editInPopup && ast.activeTab === C.TAB_FEED) {
                     dispatch("StartEditingInFeed", s => {
                         s.editNodeReplyToId = replyToId;
-                        s.editNodeOnTab = s.mobileMode ? null : S.quanta.activeTab;
+                        s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editNode = res.nodeInfo;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
