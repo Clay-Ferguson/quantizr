@@ -19,7 +19,10 @@ export class Quanta {
     configRes: J.GetConfigResponse = null;
     mainMenu: MainMenuDlg;
     noScrollToId: string = null;
+
+    // todo-0: do we need this since we also have AppState.activeTab? why both?
     activeTab: string;
+
     pendingLocationHash: string;
 
     newNodeTargetId: string;

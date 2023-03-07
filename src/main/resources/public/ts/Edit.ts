@@ -1328,18 +1328,30 @@ export class Edit {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
             });
-            S.view.refreshTree({
-                nodeId: null,
-                zeroOffset: false,
-                renderParentIfLeaf: false,
-                highlightId: null,
-                forceIPFSRefresh: false,
-                scrollToTop: false,
-                allowScroll: false,
-                setTab: false,
-                forceRenderParent: false,
-                jumpToRss: false
-            });
+
+            const ast = getAs();
+            if (ast.activeTab === C.TAB_MAIN) {
+                S.view.refreshTree({
+                    nodeId: null,
+                    zeroOffset: false,
+                    renderParentIfLeaf: false,
+                    highlightId: null,
+                    forceIPFSRefresh: false,
+                    scrollToTop: false,
+                    allowScroll: false,
+                    setTab: false,
+                    forceRenderParent: false,
+                    jumpToRss: false
+                });
+            }
+            else if (S.quanta.activeTab === C.TAB_DOCUMENT) {
+                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                if (data) {
+                    // todo-0: do better parameterized type so that 'any' is not needed here
+                    // and so we have type safety here
+                    (data.inst as any).pageChange(null);
+                }
+            }
         }
     }
 

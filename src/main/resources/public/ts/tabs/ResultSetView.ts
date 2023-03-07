@@ -155,7 +155,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
             new ButtonBar([
                 isTopBar ? new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
-                    title: "Refresh Search"
+                    title: "Refresh View"
                 }) : null,
                 this.data.props.page > 1 ? new IconButton("fa-angle-double-left", null, {
                     onClick: () => this.pageChange(0),
