@@ -346,9 +346,9 @@ export class DomUtil {
     }
 
     /* #mouseEffects (do not delete tag) */
-    toggleMouseEffect = () => {
+    setMouseEffect = (mouseEffect: boolean) => {
         dispatch("ToggleMouseEffect", s => {
-            this.mouseEffect = !this.mouseEffect;
+            this.mouseEffect = mouseEffect;
             S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0", "allUsers");
         });
     }

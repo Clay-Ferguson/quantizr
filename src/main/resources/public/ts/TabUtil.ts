@@ -14,6 +14,7 @@ import { RepliesTab } from "./tabs/data/RepliesTab";
 import { RSSTab } from "./tabs/data/RSSTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
+import { SettingsTab } from "./tabs/data/SettingsTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
@@ -97,7 +98,8 @@ export class TabUtil {
                 new ServerInfoTab(),
                 new TTSTab(),
                 new RSSTab(),
-                new IPFSTab()
+                new IPFSTab(),
+                new SettingsTab()
 
                 // this is throwing a react error, but we don't need this now anyaay
                 // {

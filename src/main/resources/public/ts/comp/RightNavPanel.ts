@@ -8,6 +8,7 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
+import { SettingsTab } from "../tabs/data/SettingsTab";
 import { CompIntf } from "./base/CompIntf";
 import { Clearfix } from "./core/Clearfix";
 import { Icon } from "./core/Icon";
@@ -193,13 +194,23 @@ export class RightNavPanel extends Div {
                     //         }) : null
                     //     ])
                     // ]),
-                    displayName && !ast.isAnonUser ? new Div(displayName, {
-                        className: "clickable float-end marginRight",
-                        onClick: () => {
-                            PubSub.pub(C.PUBSUB_closeNavPanel);
-                            new UserProfileDlg(null).open();
-                        }
-                    }) : null,
+                    displayName && !ast.isAnonUser ? new Div(null, { className: "float-end" }, [
+                        new Span(displayName, {
+                            className: "clickable marginRight",
+                            onClick: () => {
+                                PubSub.pub(C.PUBSUB_closeNavPanel);
+                                new UserProfileDlg(null).open();
+                            }
+                        }),
+                        new Icon({
+                            className: "fa fa-gear fa-lg marginRight clickable",
+                            onClick: () => {
+                                SettingsTab.tabSelected = true;
+                                S.tabUtil.selectTab(C.TAB_SETTINGS);
+                            },
+                            title: "Edit Account Settings"
+                        })
+                    ]) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
                     !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null

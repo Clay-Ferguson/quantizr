@@ -2390,3 +2390,24 @@ audio::-webkit-media-controls-play-button {
     cursor: pointer;
     margin-left: $smallGap;
 }
+
+.settingsLink {
+    cursor: pointer;
+    font-size: 120%;
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsSectionTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--bs-green);
+    margin-top: 24px;
+    margin-bottom: 8px;
+    text-decoration: underline;
+}
+
+.contentWidthSelection {
+    margin-bottom: 12px;
+    max-width: 20rem;
+}

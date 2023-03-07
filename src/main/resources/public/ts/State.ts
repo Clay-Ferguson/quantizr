@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export class State {
     state: any = {};
+    onStateChange: (val: any) => void;
 
     // this is 'overridable/assignable' so that we have a way to monitor values as they get assigned
     // or even translate a value to some other value during assignment
@@ -28,14 +29,23 @@ export class State {
     */
     private setStateEx(state: Function) {
         this.state = state(this.state);
+        if (this.onStateChange) {
+            this.onStateChange(this.state);
+        }
     }
 
     useState = () => {
         const [state, setStateEx] = useState(this.state);
         this.state = state;
 
-        // Yes, this is a bit odd but correct. We override our default setStateEx method here with the one
-        // react provides us for state management, now that react state management is going into effect.
-        this.setStateEx = setStateEx.bind(this);
+        if (this.onStateChange) {
+            this.setStateEx = (state: Function) => {
+                setStateEx(state);
+                this.onStateChange(state());
+            }
+        }
+        else {
+            this.setStateEx = setStateEx.bind(this);
+        }
     }
 }

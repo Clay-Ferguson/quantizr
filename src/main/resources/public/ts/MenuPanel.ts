@@ -8,10 +8,7 @@ import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
-import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
-import { ManageCryptoKeysDlg } from "./dlg/ManageCryptoKeysDlg";
-import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
@@ -23,7 +20,6 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
-import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { MenuPanelState } from "./Interfaces";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
@@ -163,7 +159,6 @@ export class MenuPanel extends Div {
     };
 
     static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
-    static mouseEffects = () => { S.domUtil.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
@@ -192,30 +187,6 @@ export class MenuPanel extends Div {
 
         S.util.saveUserPrefs(s => s.userPrefs.enableIPSM = true);
     };
-
-    static showKeys = () => { new ManageCryptoKeysDlg().open(); };
-    static changePassword = () => { new ChangePasswordDlg(null).open(); };
-    static bulkDelete = () => { S.edit.bulkDelete(); };
-    static closeAccount = () => { S.user.closeAccount(); };
-    static profile = () => { new UserProfileDlg(null).open(); };
-    static storageSpace = () => { new ManageStorageDlg().open(); };
-    static toggleEditMode = () => S.edit.toggleEditMode();
-    static toggleMetaData = () => S.edit.toggleShowMetaData();
-    static toggleNsfw = () => S.edit.toggleNsfw();
-    static toggleShowProps = () => S.edit.toggleShowProps();
-    static toggleParents = () => S.edit.toggleShowParents();
-    static toggleReplies = () => S.edit.toggleShowReplies();
-    static browserInfo = () => S.util.showBrowserInfo();
-    static mobileToggle = () => S.util.switchBrowsingMode();
-
-    static narrowerView = () => dispatch("widthAdjust", s => {
-        S.edit.setMainPanelCols(--s.userPrefs.mainPanelCols);
-        return s;
-    });
-
-    static widerView = () => dispatch("widthAdjust", s => {
-        S.edit.setMainPanelCols(++s.userPrefs.mainPanelCols);
-    });
 
     preRender(): void {
         const ast = getAs();
@@ -323,10 +294,7 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "Edit", [
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
-                new MenuItem("Set Link Source", MenuPanel.setLinkSource, ast.userPrefs.editMode && selNodeIsMine), //
-                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, ast.userPrefs.editMode), //
-                new MenuItem("Link Nodes", MenuPanel.linkNodes, ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget), //
-                new MenuItemSeparator(), //
+                ast.editNode ? new MenuItemSeparator() : null, //
 
                 new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, ast.selectedNodes.size > 0), //
 
@@ -454,7 +422,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Node Info", [
+            children.push(new Menu(state, "Info", [
                 // I decided with this on the toolbar we don't need it repliated here.
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
@@ -473,6 +441,12 @@ export class MenuPanel extends Div {
                 // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
                 //     !state.isAnonUser /* state.isAdminUser */) //
             ], null, this.makeHelpIcon(":menu-node-info")));
+
+            children.push(new Menu(state, "Shortcuts", [
+                new MenuItem("Set Link Source", MenuPanel.setLinkSource, ast.userPrefs.editMode && selNodeIsMine), //
+                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, ast.userPrefs.editMode), //
+                new MenuItem("Link Nodes", MenuPanel.linkNodes, ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget)
+            ]));
         }
 
         if (!ast.isAnonUser) {
@@ -484,62 +458,6 @@ export class MenuPanel extends Div {
 
                 // todo-1: need "Show Incomming" transfers menu option
             ], null, this.makeHelpIcon(":transfers")));
-        }
-
-        if (!ast.isAnonUser) {
-            const panelCols = ast.userPrefs.mainPanelCols || 6;
-
-            children.push(new Menu(state, "Settings", [
-                new MenuItem("Edit Hashtags", S.edit.editHashtags), //
-                new MenuItemSeparator(), //
-
-                // DO NOT DELETE (for now we don't need these since the NAV/RHS panel has them already)
-                // new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPrefs.editMode), //
-                // new MenuItem("Info/Metadata", MenuPanel.toggleMetaData, true, () => state.userPrefs.showMetaData), //
-
-                new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => ast.userPrefs.nsfw), //
-                new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => ast.userPrefs.showParents), //
-                new MenuItem("Show Comments", MenuPanel.toggleReplies, true, () => ast.userPrefs.showReplies), //
-
-                // for now, we don't need the 'show properties' and it may never be needed again
-                new MenuItem("Show Properties", MenuPanel.toggleShowProps, true, () => ast.userPrefs.showProps), //
-                // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
-
-                // until we have at least one more preference the preferences dialog is not needed.
-                // new MenuItem("Preferences", () => {new PrefsDlg().open();}, !state.isAnonUser), // "fa-gear"
-
-                new MenuItemSeparator(), //
-
-                /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
-                 that I have to impose an intentional performance lag to let the animation show up, so in order to have the
-                 absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
-                 the code in place for future reference. */
-                new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !ast.mobileMode, () => S.domUtil.mouseEffect),
-
-                new MenuItem("Browser Info", MenuPanel.browserInfo), //
-                new MenuItem(ast.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
-
-                !ast.mobileMode ? new MenuItemSeparator() : null, //
-                !ast.mobileMode ? new MenuItem("Narrower View", MenuPanel.narrowerView, panelCols > 4) : null,
-                !ast.mobileMode ? new MenuItem("Wider View", MenuPanel.widerView, panelCols < 8) : null
-
-                // menuItem("Full Repository Export", "fullRepositoryExport", "
-                // S.edit.fullRepositoryExport();") + //
-            ]));
-        }
-
-        if (!ast.isAnonUser) {
-            children.push(new Menu(state, "Account", [
-                new MenuItem("Logout", S.user.userLogout), //
-                new MenuItemSeparator(), //
-                new MenuItem("Profile", MenuPanel.profile), //
-                new MenuItem("Storage Space", MenuPanel.storageSpace), //
-                new MenuItem("Security Keys", MenuPanel.showKeys, S.crypto.avail), //
-                new MenuItem("Change Password", MenuPanel.changePassword), //
-                new MenuItemSeparator(), //
-                new MenuItem("Bulk Delete", MenuPanel.bulkDelete), //
-                new MenuItem("Close Account", MenuPanel.closeAccount) //
-            ], null, this.makeHelpIcon(":account")));
         }
 
         // //need to make export safe for end users to use (recarding file sizes)

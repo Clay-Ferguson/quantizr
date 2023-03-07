@@ -6,7 +6,6 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { FriendsTable } from "../comp/FriendsTable";
@@ -29,13 +28,32 @@ export class FriendsDlg extends DialogBase {
     friendsTagSearch: string;
     searchTextField: TextField;
 
+    static inst: FriendsDlg = null;
+    static searchDirty = false;
+    static dirtyCounter = 0;
+    static interval = setInterval(() => {
+        if (!FriendsDlg.inst) return;
+        if (FriendsDlg.searchDirty) {
+            FriendsDlg.dirtyCounter++;
+            if (FriendsDlg.dirtyCounter >= 2) {
+                FriendsDlg.searchDirty = false;
+                setTimeout(FriendsDlg.inst.userSearch, 10);
+            }
+        }
+    }, 500);
+
     constructor(title: string, private nodeId: string, private displayOnly: boolean) {
         super(title);
-
+        FriendsDlg.inst = this;
         this.mergeState<LS>({
             selections: new Set<string>(),
             loading: true
         });
+
+        this.searchTextState.v.onStateChange = (val: any) => {
+            FriendsDlg.searchDirty = true;
+            FriendsDlg.dirtyCounter = 0;
+        };
     }
 
     preLoad = async () => {
@@ -81,7 +99,7 @@ export class FriendsDlg extends DialogBase {
 
         if (ast.friendHashTags && ast.friendHashTags.length > 0) {
             const items: any[] = [
-                { key: "", val: "All Friends" }
+                { key: "", val: "Show All" }
             ];
 
             for (const tag of ast.friendHashTags) {
@@ -117,7 +135,7 @@ export class FriendsDlg extends DialogBase {
             }
         });
 
-        return [
+        const ret = [
             new Div(null, null, [
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
@@ -128,14 +146,6 @@ export class FriendsDlg extends DialogBase {
                         enter: this.userSearch,
                         outterClass: "friendSearchField"
                     })),
-
-                    // This div wrapper is to keep the button from stretching wrong
-                    new Div(null, { className: "friendSearchButtonDiv" }, [
-                        new IconButton("fa-search", null, {
-                            onClick: this.userSearch,
-                            title: "Search"
-                        }, "btn-secondary")
-                    ]),
 
                     friendsTagDropDown
                 ], "flexRowAlignBottom marginBottom") : null,
@@ -159,6 +169,7 @@ export class FriendsDlg extends DialogBase {
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
+        return ret;
     }
 
     setSelectAllPersons = (state: LS, selectAll: boolean) => {

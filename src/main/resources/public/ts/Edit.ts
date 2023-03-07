@@ -598,8 +598,8 @@ export class Edit {
         return S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
     }
 
-    toggleShowReplies = async () => {
-        await S.util.saveUserPrefs(s => s.userPrefs.showReplies = !s.userPrefs.showReplies);
+    setShowReplies = async (showReplies: boolean) => {
+        await S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
 
         const ast = getAs();
         // todo-1: we need a PubSub broadcast event for "SHOW_REPLIES_CHANGED" that we can send out to all tabs.

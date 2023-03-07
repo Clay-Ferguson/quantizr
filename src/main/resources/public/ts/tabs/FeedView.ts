@@ -65,7 +65,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         let friendsTagDropDown: Selection = null;
         if (ast.friendHashTags && ast.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
             const items: any[] = [
-                { key: "", val: "All Tags" }
+                { key: "", val: "Show All" }
             ];
             for (const tag of ast.friendHashTags) {
                 items.push({ key: tag, val: tag });
