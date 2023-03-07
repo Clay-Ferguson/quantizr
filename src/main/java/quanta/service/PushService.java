@@ -16,6 +16,7 @@ import quanta.mongo.model.SubNode;
 import quanta.response.FeedPushInfo;
 import quanta.response.NodeEditedPushInfo;
 import quanta.response.ServerPushInfo;
+import quanta.util.Convert;
 
 @Component
 public class PushService extends ServiceBase {
@@ -65,8 +66,10 @@ public class PushService extends ServiceBase {
 				// usersSharedToSet.contains("public") ||
 						usersSharedToSet.contains(sc.getUserName())) {
 					/* build our push message payload */
-					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false,
-							true, true, null, false);
+					// todo-0: make sure we never need to send back logicalOrdinal
+					NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, //
+							Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, //
+							false, true, true, null, false);
 
 					if (info != null) {
 						FeedPushInfo pushInfo = new FeedPushInfo(info);
@@ -102,8 +105,9 @@ public class PushService extends ServiceBase {
 			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
-				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, 1, false, false, true, false, true,
-						true, null, false);
+				// todo-0: logical ordinal ignore ALWAYS ok here?
+				NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, true, false, true, true,
+						null, false);
 				if (info != null) {
 					FeedPushInfo pushInfo = new FeedPushInfo(info);
 

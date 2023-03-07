@@ -522,7 +522,8 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
+        Criteria crit =
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
         crit = auth.addSecurityCriteria(ms, crit);
 
         if (ordered) {
@@ -1356,7 +1357,8 @@ public class MongoRead extends ServiceBase {
         // return ret;
     }
 
-    public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit, int skip, boolean remote, boolean local) {
+    public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit, int skip,
+            boolean remote, boolean local) {
         if (!remote && !local) {
             throw new RuntimeException("Accont query needs local and/or remote specified.");
         }
@@ -1578,5 +1580,15 @@ public class MongoRead extends ServiceBase {
             }
         }
         return true;
+    }
+
+    // Generates the logicalOrdinal of node by counting all the nodes that have a 'lower ordinal' than
+    // it does. If no nodes are lower in ordinal that makes it the top one, and thus 0th ordinal, etc.
+    public long generateLogicalOrdinal(MongoSession ms, SubNode node) {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath())) //
+                .and(SubNode.ORDINAL).lt(node.getOrdinal());
+        q.addCriteria(crit);
+        return ops.count(q, SubNode.class);
     }
 }

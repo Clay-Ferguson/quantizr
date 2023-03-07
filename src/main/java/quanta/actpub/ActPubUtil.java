@@ -52,6 +52,7 @@ import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.GetThreadViewResponse;
+import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -892,8 +893,9 @@ public class ActPubUtil extends ServiceBase {
         if (node == null)
             return res;
 
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, false, false,
-                true, true, null, false);
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, //
+                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, //
+                false, true, true, null, false);
         nodes.add(info);
 
         String apReplies = node.getStr(NodeProp.ACT_PUB_REPLIES);
@@ -938,8 +940,10 @@ public class ActPubUtil extends ServiceBase {
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS);
 
                 if (!topNode) {
-                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, false, false,
-                            true, true, null, true);
+                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
+                            false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, //
+                             false, true, true, null, //
+                             true);
 
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
@@ -951,7 +955,8 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1, false,
+                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, //
+                                child, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
                                         false, false, false, true, true, null, false));
                             }
                         }
@@ -971,7 +976,7 @@ public class ActPubUtil extends ServiceBase {
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
+                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, Convert.LOGICAL_ORDINAL_IGNORE,
                                             false, false, false, false, true, true, null, false));
                                 }
                             }
@@ -981,7 +986,7 @@ public class ActPubUtil extends ServiceBase {
                             for (SubNode child : iter) {
                                 // if we didn't already add above, add now
                                 if (!childIds.contains(child.getIdStr())) {
-                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, -1,
+                                    children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false, Convert.LOGICAL_ORDINAL_IGNORE,
                                             false, false, false, false, true, true, null, false));
                                 }
                             }
@@ -1052,15 +1057,19 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
-                true, true, null, false);
+        // todo-0: do we need logicalOrdinal here ever?
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
+                false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
+                true, false, true, true, null, false);
         return info;
     }
 
     public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, 1, false, false, true, false,
-                true, true, null, false);
+        // todo-0: do we need logicalOrdinal here ever?
+        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, //
+                false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
+                true, false, true, true, null, false);
         return info;
     }
 

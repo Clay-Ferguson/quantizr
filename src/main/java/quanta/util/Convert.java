@@ -44,6 +44,12 @@ import quanta.types.TypeBase;
 public class Convert extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
+	// indicates we don't need to worry about sending back a good logicalOrdinal
+	public static int LOGICAL_ORDINAL_IGNORE = -1;
+
+	// indicates we need generate the correct logicalOrdinal
+	public static int LOGICAL_ORDINAL_GENERATE = -2;
+
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
@@ -53,9 +59,11 @@ public class Convert extends ServiceBase {
 	 * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
 	 * if there ARE an children REGARDLESS of whether the given user can access those children.
 	 */
+	// todo-0: after node inserts, or at other times, unless this is a QUERY generated Node, based on
+	// a 'getChildren' kind of thing, the 'ordinal' here can be wrong
 	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
-			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
+			long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers,
 			boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal, boolean attachLinkedNodes) {
 
 		String sig = node.getStr(NodeProp.CRYPTO_SIG);
@@ -172,13 +180,17 @@ public class Convert extends ServiceBase {
 		String content = node.getContent();
 		String renderContent = replaceTagsWithHtml(node, true);
 
+		if (logicalOrdinal==LOGICAL_ORDINAL_GENERATE) {
+			logicalOrdinal = read.generateLogicalOrdinal(ms, node);
+		}
+
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
 				node.getTags(), displayName, //
 				owner, ownerId, //
 				node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
 				node.getOrdinal(), //
 				node.getModifyTime(), propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, //
-				node.getType(), ordinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
+				node.getType(), logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
@@ -260,7 +272,7 @@ public class Convert extends ServiceBase {
 			}
 
 			if (boostedNode != null) {
-				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, 0, false, false, false, false, false, false,
+				NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, false,
 						null, false);
 				if (info != null) {
 					nodeInfo.setBoostedNode(info);

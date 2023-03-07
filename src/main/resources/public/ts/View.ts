@@ -107,7 +107,7 @@ export class View {
 
     prevPage = () => {
         const firstChild = S.edit.getFirstChildNode();
-        if (firstChild && firstChild.logicalOrdinal > 0) {
+        if (firstChild?.logicalOrdinal > 0) {
             let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
                 targetOffset = 0;

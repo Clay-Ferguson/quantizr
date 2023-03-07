@@ -38,6 +38,7 @@ import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
 import quanta.util.Const;
+import quanta.util.Convert;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -101,8 +102,10 @@ public class NodeRenderService extends ServiceBase {
 			res.setSuccess(true);
 			res.setRssNode(true);
 
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false, false,
-					true, false, true, true, null, false);
+			// todo-0: look for cases where we don't need to generate the logicalOrdinal
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+					Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, //
+					false, true, true, null, false);
 			res.setNode(nodeInfo);
 
 			return res;
@@ -129,8 +132,9 @@ public class NodeRenderService extends ServiceBase {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, -1, false, false,
-					true, false, true, true, null, false);
+			// todo-0: do we ALWAYS need to generate the ordinal?
+			NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+					Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, false, true, true, null, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -206,8 +210,8 @@ public class NodeRenderService extends ServiceBase {
 			try {
 				highestUpParent = read.getParent(ms, highestUpParent);
 				if (highestUpParent != null) {
-					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false, 0,
-							false, false, false, false, true, true, null, false);
+					NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, highestUpParent, false,
+							Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, true, true, null, false);
 
 					if (nodeInfo != null) {
 						// each parent up goes on top of list for correct rendering order on client.
@@ -554,8 +558,9 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, -1, false, false, true, false,
-				false, false, null, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true, //
+				Convert.LOGICAL_ORDINAL_IGNORE, false, false, //
+				true, false, false, false, null, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

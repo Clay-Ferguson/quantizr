@@ -65,6 +65,7 @@ import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateFriendNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
+import quanta.util.Convert;
 import quanta.util.IntVal;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
@@ -223,8 +224,10 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, newNode, parentNode);
 		}
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
-				false, false, null, false));
+		// todo-0: verify if there are cases where we can cram in 0 for logicalOrdinal if we know it's an
+		// 'insert First Child' happening
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+				Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, false, null, false));
 		res.setSuccess(true);
 		return res;
 	}
@@ -308,8 +311,9 @@ public class NodeEditService extends ServiceBase {
 		// where it's expecting the node to exist.
 		update.save(ms, newNode);
 
-		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, -1, false, false, false, false,
-				false, false, null, false));
+		res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+				Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, //
+				false, false, false, null, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -634,7 +638,8 @@ public class NodeEditService extends ServiceBase {
 			processAfterSave(ms, node, parent);
 		}
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, -1, false, false, true,
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, //
+				Convert.LOGICAL_ORDINAL_GENERATE, false, false, true, //
 				false, true, true, null, false);
 		if (newNodeInfo != null) {
 			res.setNode(newNodeInfo);
