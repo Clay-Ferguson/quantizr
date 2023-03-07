@@ -15,9 +15,9 @@ import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
-export class MainTabComp extends AppTab {
+export class MainTabComp extends AppTab<any, MainTabComp> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<any, MainTabComp>) {
         super(data, null);
         this.attribs.key = "mainTabCompKey";
         data.inst = this;

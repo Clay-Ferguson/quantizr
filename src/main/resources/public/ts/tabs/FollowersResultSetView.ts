@@ -9,9 +9,9 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class FollowersResultSetView<T extends FollowersRSInfo> extends ResultSetView<T> {
+export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSetView<PT, FollowersResultSetView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, FollowersResultSetView<PT>>) {
         super(data);
         data.inst = this;
         this.showContentHeading = false;

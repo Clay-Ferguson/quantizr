@@ -25,11 +25,11 @@ PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
     }
 });
 
-export class TrendingView extends AppTab<TrendingRSInfo> {
+export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     static loaded: boolean = false;
     static inst: TrendingView = null;
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<TrendingRSInfo, TrendingView>) {
         super(data);
         data.inst = TrendingView.inst = this;
     }

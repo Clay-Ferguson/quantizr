@@ -7,9 +7,9 @@ import { Pre } from "../comp/core/Pre";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
-export class ServerInfoView extends AppTab {
+export class ServerInfoView extends AppTab<any, ServerInfoView> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<any, ServerInfoView>) {
         super(data);
         data.inst = this;
     }

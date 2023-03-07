@@ -15,11 +15,11 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
-export class TTSView extends AppTab {
+export class TTSView extends AppTab<any, TTSView> {
 
     textAreaState: Validator = new Validator();
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<any, TTSView>) {
         super(data);
         data.inst = this;
     }

@@ -4,9 +4,9 @@ import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class SearchResultSetView<T extends ResultSetInfo> extends ResultSetView<T> {
+export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView<PT, SearchResultSetView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, SearchResultSetView<PT>>) {
         super(data);
         data.inst = this;
     }

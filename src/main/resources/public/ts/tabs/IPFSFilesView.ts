@@ -21,12 +21,12 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { IPFSFilesViewProps } from "./IPFSFilesViewProps";
 
-export class IPFSFilesView extends AppTab<IPFSFilesViewProps> {
+export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
 
     loaded: boolean = false;
     static history: string[] = [];
 
-    constructor(data: TabIntf<IPFSFilesViewProps>) {
+    constructor(data: TabIntf<IPFSFilesViewProps, IPFSFilesView>) {
         super(data);
         data.inst = this;
 

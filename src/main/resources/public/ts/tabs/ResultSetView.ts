@@ -17,7 +17,7 @@ import * as J from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 
-export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
+export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab> extends AppTab<PT, TT> {
 
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
@@ -25,7 +25,7 @@ export abstract class ResultSetView<T extends ResultSetInfo> extends AppTab<T> {
     showContentHeading: boolean = true;
     pagingContainerClass: string = "marginBottom marginTop"; // used to have 'text-center' to center buttons
 
-    constructor(data: TabIntf, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
+    constructor(data: TabIntf<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
         if (infiniteScrolling && showPageNumber) {
             throw new Error("page numbering incompatable with infinite scrolling")

@@ -4,9 +4,9 @@ import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
 import { ResultSetView } from "./ResultSetView";
 
-export class TimelineResultSetView<T extends TimelineRSInfo> extends ResultSetView<T> {
+export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetView<PT, TimelineResultSetView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, TimelineResultSetView<PT>>) {
         super(data);
         data.inst = this;
     }

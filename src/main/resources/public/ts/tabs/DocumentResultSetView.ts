@@ -12,9 +12,9 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class DocumentResultSetView<T extends DocumentRSInfo> extends ResultSetView<T> {
+export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetView<TT, DocumentResultSetView<TT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<TT, DocumentResultSetView<TT>>) {
         super(data, false, false, true);
         data.inst = this;
 

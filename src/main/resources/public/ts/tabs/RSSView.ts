@@ -26,13 +26,13 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { MainTab } from "../tabs/data/MainTab";
 
-export class RSSView extends AppTab {
+export class RSSView extends AppTab<any, RSSView> {
 
     static lastGoodFeed: J.RssFeed;
     static lastGoodPage: number;
     static loading: boolean = false;
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<any, RSSView>) {
         super(data);
         data.inst = this;
     }

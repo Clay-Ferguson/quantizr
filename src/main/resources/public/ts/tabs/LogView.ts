@@ -5,10 +5,10 @@ import { LogViewIntf } from "../intf/LogViewIntf";
 import { TabIntf } from "../intf/TabIntf";
 import { Log } from "../Log";
 
-export class LogView extends AppTab implements LogViewIntf {
+export class LogView extends AppTab<any, LogView> implements LogViewIntf {
     static logs: string = "";
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<any, LogView>) {
         super(data);
         data.inst = this;
 

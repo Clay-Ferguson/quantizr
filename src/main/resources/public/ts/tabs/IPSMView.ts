@@ -5,8 +5,8 @@ import { Div } from "../comp/core/Div";
 import { HelpButton } from "../comp/core/HelpButton";
 import { TabIntf } from "../intf/TabIntf";
 
-export class IPSMView extends AppTab {
-    constructor(data: TabIntf) {
+export class IPSMView extends AppTab<any, IPSMView> {
+    constructor(data: TabIntf<any, IPSMView>) {
         super(data);
         data.inst = this;
     }

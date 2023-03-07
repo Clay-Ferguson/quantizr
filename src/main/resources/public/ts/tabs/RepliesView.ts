@@ -10,9 +10,9 @@ import * as J from "../JavaIntf";
 import { RepliesRSInfo } from "../RepliesRSInfo";
 import { S } from "../Singletons";
 
-export class RepliesView<T extends RepliesRSInfo> extends AppTab<T> {
+export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, RepliesView<PT>>) {
         super(data);
         data.inst = this;
     }

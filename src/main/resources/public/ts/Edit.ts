@@ -16,6 +16,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
+import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
 
 export class Edit {
     showReadOnlyProperties: boolean = false;
@@ -1345,11 +1346,9 @@ export class Edit {
                 });
             }
             else if (S.quanta.activeTab === C.TAB_DOCUMENT) {
-                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                const data: TabIntf<any, DocumentResultSetView<any>> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
-                    // todo-0: do better parameterized type so that 'any' is not needed here
-                    // and so we have type safety here
-                    (data.inst as any).pageChange(null);
+                    data.inst.pageChange(null);
                 }
             }
         }

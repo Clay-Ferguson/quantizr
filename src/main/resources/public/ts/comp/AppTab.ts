@@ -7,10 +7,12 @@ import { Comp } from "./base/Comp";
 /* NOTE: All classes derived from AppTab should have each top-level (in the vertical dimension) item having
 a class 'data.id' tacked on to it. This class is expected to be there for managing scrolling, and also the
 IDs on each of those elements needs to be repeatable across all renders. */
-export class AppTab<T = any> extends Div {
+
+// PT=Properties Type, TT=Tab Type
+export class AppTab<PT = any, TT = any> extends Div {
     headingBar: Comp = null;
 
-    constructor(public data: TabIntf<T>, private extraEditModeClass: string = null) {
+    constructor(public data: TabIntf<PT, TT>, private extraEditModeClass: string = null) {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.

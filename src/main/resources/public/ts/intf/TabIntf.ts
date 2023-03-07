@@ -4,7 +4,8 @@ import { Div } from "../comp/core/Div";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import * as J from "../JavaIntf";
 
-export interface TabIntf<T = any> {
+// PT=PropsType, TT=TabType
+export interface TabIntf<PT = any, TT = any> {
     // display name shown on the tab
     name: string;
 
@@ -19,7 +20,7 @@ export interface TabIntf<T = any> {
     */
     id: string;
     scrollPos: number;
-    inst?: AppTab;
+    inst?: TT; // AppTab;
 
     // used for re-scrolling screen back to same place after the page layout may have changed due to 'edit mode' or 'info mode'
     // turning on/off or other places.
@@ -36,7 +37,7 @@ export interface TabIntf<T = any> {
     nodeDeleted(ust: AppState, nodeId: string): void;
     replaceNode(ust: AppState, newNode: J.NodeInfo): void;
 
-    props: T;
+    props: PT;
 
     openGraphComps: OpenGraphPanel[];
 }

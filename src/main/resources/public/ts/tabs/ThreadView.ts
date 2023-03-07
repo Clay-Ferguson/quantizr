@@ -12,9 +12,9 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
 
-export class ThreadView<T extends ThreadRSInfo> extends AppTab<T> {
+export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, ThreadView<PT>>) {
         super(data);
         data.inst = this;
     }

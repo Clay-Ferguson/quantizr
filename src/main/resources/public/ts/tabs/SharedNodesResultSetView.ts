@@ -4,9 +4,9 @@ import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class SharedNodesResultSetView<T extends SharesRSInfo> extends ResultSetView<T> {
+export class SharedNodesResultSetView<PT extends SharesRSInfo> extends ResultSetView<PT, SharedNodesResultSetView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, SharedNodesResultSetView<PT>>) {
         super(data);
         data.inst = this;
         this.showContentHeading = false;

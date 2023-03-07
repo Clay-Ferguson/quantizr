@@ -6,9 +6,9 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
-export class FollowingResultSetView<T extends FollowingRSInfo> extends ResultSetView<T> {
+export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSetView<PT, FollowingResultSetView<PT>> {
 
-    constructor(data: TabIntf) {
+    constructor(data: TabIntf<PT, FollowingResultSetView<PT>>) {
         super(data);
         this.allowHeader = false;
         this.allowFooter = false;
