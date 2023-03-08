@@ -12,7 +12,6 @@ export class IPSMView extends AppTab<any, IPSMView> {
     }
 
     preRender(): void {
-        this.attribs.className = this.getClass();
         const children: Comp[] = [];
 
         children.push(new Div(null, null, [

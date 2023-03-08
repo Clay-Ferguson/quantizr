@@ -16,7 +16,6 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
 
     preRender(): void {
         const ast = getAs();
-        this.attribs.className = this.getClass();
 
         this.setChildren([
             new Div(null, { className: "marginTop" }, [

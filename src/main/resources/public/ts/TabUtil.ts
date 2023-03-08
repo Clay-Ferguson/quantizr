@@ -4,6 +4,7 @@ import { Constants as C } from "./Constants";
 import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { AdminTab } from "./tabs/data/AdminTab";
 import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
@@ -65,6 +66,7 @@ export class TabUtil {
     createAppTabs = async () => {
         await promiseDispatch("initTabs", s => {
             s.tabData = [
+                new AdminTab(),
                 new MainTab(),
                 new DocumentTab(),
                 new SearchTab(),

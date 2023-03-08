@@ -49,7 +49,7 @@ export class TabPanel extends Div {
     buildTabs = (): AppTab[] => {
         const ast = getAs();
         const tabs = ast.tabData.map(tab => {
-            if (tab.isVisible()) {
+            if (tab.isVisible() && tab.id === ast.activeTab) {
                 return tab.constructView(tab);
             }
             return null;

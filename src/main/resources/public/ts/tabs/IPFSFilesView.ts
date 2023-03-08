@@ -40,7 +40,6 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
     }
 
     preRender(): void {
-        this.attribs.className = this.getClass();
         const children = [];
 
         if (this.data.props.loading) {

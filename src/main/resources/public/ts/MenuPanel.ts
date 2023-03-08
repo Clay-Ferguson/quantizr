@@ -1,4 +1,4 @@
-import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Tag } from "./comp/core/Tag";
@@ -17,7 +17,6 @@ import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
-import { SignupDlg } from "./dlg/SignupDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { MenuPanelState } from "./Interfaces";
@@ -134,7 +133,6 @@ export class MenuPanel extends Div {
     static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static multiFollow = () => { new MultiFollowDlg().open(); };
-    static createUser = () => { new SignupDlg(true).open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time", 0, true);
@@ -165,28 +163,6 @@ export class MenuPanel extends Div {
     static nodeStats = () => S.view.getNodeStats(false, false);
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
-
-    static readJSONfromURL = () => {
-        // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
-        const url = window.prompt("ActivityPub Object URL: ");
-        if (url) {
-            S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "");
-        }
-    }
-
-    // DO NOT DELETE
-    // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
-    static setIpsmActive = async () => {
-
-        await promiseDispatch("enableIpsm", s => {
-            s.ipsmActive = true;
-            setTimeout(() => {
-                // S.tabUtil.selectTab(C.TAB_IPSM);
-            }, 250);
-        });
-
-        S.util.saveUserPrefs(s => s.userPrefs.enableIPSM = true);
-    };
 
     preRender(): void {
         const ast = getAs();
@@ -492,74 +468,6 @@ export class MenuPanel extends Div {
             //     new MenuItem("Sync: From IPFS", () => S.nodeUtil.loadNodeFromIpfs(hltNode), //
             //         state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)) //
             // ]));
-        }
-
-        if (ast.isAdminUser) {
-            children.push(new Menu(state, "Admin - Analytic", [
-
-                // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
-                new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
-                new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null)), //
-                new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")) //
-            ]));
-            children.push(new Menu(state, "Admin - Utils", [
-
-                // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
-                new MenuItem("Create User", MenuPanel.createUser), //
-                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
-                new MenuItem("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
-                new MenuItem("Send Restart Warning", () => S.view.runServerCommand("sendAdminNote", null, "Admin Note", null)), //
-                new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
-                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace())
-            ]));
-
-            children.push(new Menu(state, "Admin - DB", [
-                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
-                new MenuItem("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
-                new MenuItem("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null)), //
-                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //
-                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null)), //
-                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null)),
-                new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)) //
-            ]));
-
-            children.push(new Menu(state, "Admin - ActivityPub", [
-                new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
-                new MenuItem("Get JSON from URL", MenuPanel.readJSONfromURL), //
-                new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null)), //
-                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null)), //
-                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
-                new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null))
-            ]));
-
-            children.push(new Menu(state, "Admin - Test", [
-                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
-                new MenuItem("Send Email", () => S.util.sendTestEmail()),
-                new MenuItem("Server Log Text", () => S.util.sendLogText()),
-                new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
-                new MenuItem("WebCrypto Encryption", async () => {
-                    await S.crypto.encryptionTest();
-                    S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
-                }),
-                new MenuItem("WebCrypto Signatures", async () => {
-                    await S.crypto.signatureTest();
-                    S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
-                }),
-                new MenuItem("Text to Speech", async () => {
-                    const tts = window.speechSynthesis;
-                    // let voices = tts.getVoices();
-                    // for (let i = 0; i < voices.length; i++) {
-                    //     let voice = voices[i];
-                    //     // Google UK English Female (en-GB)
-                    //     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
-                    // }
-
-                    /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
-                    on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
-                    const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
-                    tts.speak(sayThis);
-                })
-            ]));
         }
 
         this.setChildren(children);

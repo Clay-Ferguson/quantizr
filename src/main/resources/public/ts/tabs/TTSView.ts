@@ -37,8 +37,6 @@ export class TTSView extends AppTab<any, TTSView> {
 
     preRender(): void {
         const ast = getAs();
-        this.attribs.className = this.getClass();
-
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable",
             // This mouseover stuff is compensating for the fact that when the onClick gets called

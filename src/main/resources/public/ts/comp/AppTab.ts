@@ -18,6 +18,8 @@ export class AppTab<PT = any, TT = any> extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "2"
         });
+
+        this.attribs.className = this.getClass();
     }
 
     getClass = (): string => {

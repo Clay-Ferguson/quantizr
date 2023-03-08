@@ -39,8 +39,6 @@ export class RSSView extends AppTab<any, RSSView> {
 
     preRender(): void {
         const ast = getAs();
-        this.attribs.className = this.getClass();
-
         let comp: NodeCompMarkdown = null;
         let feedContent: Comp = null;
 

@@ -21,7 +21,6 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) return;
-        this.attribs.className = this.getClass();
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the

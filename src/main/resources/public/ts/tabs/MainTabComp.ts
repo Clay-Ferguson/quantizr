@@ -25,7 +25,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
 
     preRender(): void {
         const ast = getAs();
-        this.attribs.className = this.getClass();
 
         let contentDiv: CompIntf = null;
         if (S.quanta.configRes.urlIdFailMsg) {

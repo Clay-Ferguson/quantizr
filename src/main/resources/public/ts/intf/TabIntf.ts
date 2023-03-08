@@ -16,7 +16,7 @@ export interface TabIntf<PT = any, TT = any> {
      multiple different instances of the same AppTab-derived class each one will need to have a unique id. This means
     we can in the future support multiple SearchView tabs opened simultaneously, each with a different ID of course.
 
-    This 'id' is ALSO used as an 'identification-only' class name on each of the rows/nodes displayed on any tab
+    This 'id' is used as an 'identification-only' class name on each of the rows/nodes displayed on any tab
     */
     id: string;
     scrollPos: number;
