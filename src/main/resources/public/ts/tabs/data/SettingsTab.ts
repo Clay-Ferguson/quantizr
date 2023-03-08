@@ -7,8 +7,8 @@ import * as J from "../../JavaIntf";
 import { SettingsView } from "../SettingsView";
 
 export class SettingsTab implements TabIntf<any> {
-    name = "Account Settings";
-    tooltip = "Account Settings";
+    name = "Settings";
+    tooltip = "Edit your Account Settings";
     id = C.TAB_SETTINGS;
     scrollPos = 0;
     props = {};

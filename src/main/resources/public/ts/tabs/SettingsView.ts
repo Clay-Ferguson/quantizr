@@ -34,6 +34,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
             this.settingsLink("Show Storage Space", () => { new ManageStorageDlg().open(); }), //
             this.settingsLink("Manage Hashtags", S.edit.editHashtags),
             S.crypto.avail ? this.settingsLink("Manage Keys", () => { new ManageCryptoKeysDlg().open(); }) : null, //
+            this.settingsLink("About your Browser", S.util.showBrowserInfo), //
             this.settingsLink("Change Password", () => { new ChangePasswordDlg(null).open(); }), //
 
             new Div("View Options", { className: "settingsSectionTitle" }),
@@ -70,16 +71,13 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 getValue: (): boolean => S.domUtil.mouseEffect
             }),
 
-            // todo-0: just display this browser info inline here....
-            // new MenuItem("Browser Info", MenuPanel.browserInfo), //
-
             new Selection(null, "Content Width", [
                 { key: "4", val: "Narrowest" },
                 { key: "5", val: "Narrow" },
                 { key: "6", val: "Normal" },
                 { key: "7", val: "Wider" },
                 { key: "8", val: "Widest" }
-            ], "contentWidthSelection", "bigMarginLeft", {
+            ], "contentWidthSelection", "bigMarginLeft marginTop", {
                 setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                 getValue: (): string => "" + getAs().userPrefs.mainPanelCols
             }),
