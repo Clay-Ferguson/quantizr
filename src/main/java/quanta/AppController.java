@@ -1537,6 +1537,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
 					break;
 
+				case "refreshTrendingCache":
+					res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
+					break;
+
 				case "refreshFediverseUsers":
 					// apub.refreshForeignUsers();
 					apub.refreshFollowedUsers();

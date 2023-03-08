@@ -1920,11 +1920,6 @@ public class ActPubService extends ServiceBase {
                 }
 
                 log.debug("usersToFollow: " + usersToFollow.toString());
-
-                /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
-                synchronized (NodeSearchService.trendingFeedInfoLock) {
-                    NodeSearchService.trendingFeedInfo = null;
-                }
             } finally {
                 refreshingForeignUsers = false;
             }

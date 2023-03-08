@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -74,6 +75,26 @@ public class NodeSearchService extends ServiceBase {
 	static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
 	static final int TRENDING_LIMIT = 10000;
+	private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
+
+	/*
+	 * Runs immediately at startup, and then every few minutes, to refresh the feedCache.
+	 */
+	@Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
+	public void run() {
+		/* Setting the trending data to null causes it to refresh itself the next time it needs to. */
+		synchronized (NodeSearchService.trendingFeedInfoLock) {
+			NodeSearchService.trendingFeedInfo = null;
+		}
+	}
+
+	public String refreshTrendingCache() {
+		/* Setting the trending data to null causes it to refresh itself the next time it needs to. */
+		synchronized (NodeSearchService.trendingFeedInfoLock) {
+			NodeSearchService.trendingFeedInfo = null;
+		}
+		return "Trending Data will be refreshed immediately at next request to display it.";
+	}
 
 	@PerfMon(category = "search")
 	public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
