@@ -317,6 +317,9 @@ public class AppController extends ServiceBase implements ErrorController {
 						render.populateSocialCardProps(node, model);
 					}
 				}
+				else {
+					sc.setUrlIdFailMsg("Unable to access node: " + _id);
+				}
 				return null;
 			});
 
