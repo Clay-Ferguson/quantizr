@@ -96,6 +96,14 @@ public class SessionContext extends ServiceBase {
 	// this gets set to true, to trigger a refresh when needed again.
 	private boolean friendsTagsDirty;
 
+	// whenever we know the user is refreshing browser this are the things to reset.
+	public void urlAccessReset() {
+		urlIdFailMsg = null;
+		userMsg = null;
+		displayUserProfileId = null;
+		initialNodeId = null;			
+	}
+
 	public boolean isEnableIPSM() {
 		return enableIPSM;
 	}

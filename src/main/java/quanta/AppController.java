@@ -263,6 +263,8 @@ public class AppController extends ServiceBase implements ErrorController {
 		try {
 			// we force create a new session bean here, but the http session itself of course may stay unchanged
 			SessionContext sc = SessionContext.init(context, session);
+			sc.urlAccessReset();
+
 			boolean isHomeNodeRequest = false;
 
 			// Node Names are identified using a colon in front of it, to make it detectable
@@ -1431,6 +1433,10 @@ public class AppController extends ServiceBase implements ErrorController {
 			ThreadLocals.getSC().setAppGuid(req.getAppGuid());
 			log.debug("BrowserGuid: " + req.getAppGuid());
 			res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
+		
+			// we only need to display this once so remove it.
+			sc.setUrlIdFailMsg(null);
+
 			res.setUserMsg(sc.getUserMsg());
 			res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
 			res.setInitialNodeId(sc.getInitialNodeId());
