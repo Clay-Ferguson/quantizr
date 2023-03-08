@@ -99,7 +99,7 @@ export class FriendsDlg extends DialogBase {
 
         if (ast.friendHashTags && ast.friendHashTags.length > 0) {
             const items: any[] = [
-                { key: "", val: "Show All" }
+                { key: "", val: "All Tags" }
             ];
 
             for (const tag of ast.friendHashTags) {

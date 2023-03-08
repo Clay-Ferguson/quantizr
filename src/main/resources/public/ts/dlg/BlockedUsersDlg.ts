@@ -67,7 +67,7 @@ export class BlockedUsersDlg extends DialogBase {
 
         if (ast.friendHashTags && ast.friendHashTags.length > 0) {
             const items: any[] = [
-                { key: "", val: "All Blocked Users" }
+                { key: "", val: "All Tags" }
             ];
 
             for (const tag of ast.friendHashTags) {

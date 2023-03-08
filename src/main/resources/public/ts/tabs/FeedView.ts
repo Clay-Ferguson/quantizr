@@ -64,13 +64,13 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         let friendsTagDropDown: Selection = null;
         if (ast.friendHashTags && ast.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
             const items: any[] = [
-                { key: "", val: "Show All" }
+                { key: "", val: "All Tags" }
             ];
             for (const tag of ast.friendHashTags) {
                 items.push({ key: tag, val: tag });
             }
 
-            friendsTagDropDown = new Selection(null, "Filter By Tag",
+            friendsTagDropDown = new Selection(null, null, // "Filter By Tag",
                 items,
                 null, "friendsTagPickerOnView", {
                 setValue: (val: string) => {
@@ -120,8 +120,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
                         setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
                         getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
-                    }),
-                    friendsTagDropDown
+                    })
                     // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
                     // new HelpButton(() => state.config.help?.fediverse?.feed),
                 ], "flexRowAlignBottom")
@@ -276,9 +275,12 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Folders View"
                 }, "bigMarginLeft ") : null,
-                ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
-                    title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                }, "attentionButton float-end")
+                ast.isAnonUser ? null : new Div(null, { className: "float-end" }, [
+                    friendsTagDropDown,
+                    new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true), {
+                        title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
+                    }, "attentionButton")
+                ])
             ]),
             new Div(null, { className: "feedView" }, children)
         ]);

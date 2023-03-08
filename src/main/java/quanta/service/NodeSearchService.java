@@ -182,8 +182,8 @@ public class NodeSearchService extends ServiceBase {
 				}
 
 				if (req.isDeleteMatches()) {
-					delete.deleteMatches(ms, searchRoot, req.getSearchProp(), searchText, req.getFuzzy(),
-							req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority());
+					delete.deleteMatches(ms, searchRoot, req.getSearchProp(), searchText, req.getFuzzy(), req.getCaseSensitive(),
+							req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority());
 				} else {
 					for (SubNode node : read.searchSubGraph(ms, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 							req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
@@ -544,7 +544,8 @@ public class NodeSearchService extends ServiceBase {
 					// if word is a hashtag.
 					else if (token.startsWith("#")) {
 						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
-						if (token.endsWith("#") || token.length() == 1 || token.toLowerCase().contains("tallship"))
+						if (token.endsWith("#") || token.length() == 1 || //
+								token.toLowerCase().contains("tallship"))
 							continue;
 
 						// ignore stuff like #1 #23
