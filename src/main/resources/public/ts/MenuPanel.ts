@@ -229,29 +229,6 @@ export class MenuPanel extends Div {
             ], null, this.makeHelpIcon(":menu-tree")));
         }
 
-        // const messagesSuffix = state.newMessageCount > 0
-        //     ? " (" + state.newMessageCount + " new)" : "";
-        // These options will appear on the RHS for desktop mode
-        // No longer needed now that we have RHS as popup (NavDlg)
-        // if (state.mobileMode) {
-        //     children.push(new Menu(localState, "Feed" + messagesSuffix, [
-        //         new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
-        //         new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
-        //         new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
-        //         new MenuItemSeparator(),
-        //         new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
-        //         // We need to make this a configurable option.
-        //         // new MenuItem("From Local Users", S.nav.messagesLocal),
-        //         new MenuItem("Federated", S.nav.messagesFediverse)
-        //     ], null, this.makeHelpIcon(":menu-feed")));
-
-        //     children.push(new Menu(localState, "Trending", [
-        //         new MenuItem("Hashtags", S.nav.showTrendingHashtags),
-        //         new MenuItem("Mentions", S.nav.showTrendingMentions),
-        //         new MenuItem("Words", S.nav.showTrendingWords)
-        //     ]));
-        // }
-
         if (!ast.isAnonUser) {
             children.push(new Menu(state, "People", [
                 new MenuItem("Friends", MenuPanel.editFriends),
@@ -406,16 +383,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Show Raw Data", MenuPanel.showRawData, selNodeIsMine), //
                 ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson) : null, //
                 new MenuItemSeparator(), //
-
                 new MenuItem("Node Stats", MenuPanel.nodeStats) //
-
-                // This menu item works, but will have little value to users, because the only difference between this and 'Node Stats', is that
-                // the 'trending' stats is defined as the 'Node Stats' for the most recent 500 results in the query. I had a need for this early on
-                // because this is how the Feed View (Fediverse) stats is done, using arbitrarily chosen number 500 most recent posts as the universe
-                // of data to pick the statistics from, but this arbitrary number 500 just won't be helpful on any sub-graph for any ordinary users (yet)
-                // because you'd need a document with many thousands of nodes before the "top 500" will have any real significance as a 'trending' definition.
-                // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
-                //     !state.isAnonUser /* state.isAdminUser */) //
             ], null, this.makeHelpIcon(":menu-node-info")));
 
             children.push(new Menu(state, "Shortcuts", [
