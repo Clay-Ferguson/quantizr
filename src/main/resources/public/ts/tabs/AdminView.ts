@@ -1,6 +1,7 @@
 import { promiseDispatch } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { TabHeading } from "../comp/core/TabHeading";
 import { SignupDlg } from "../dlg/SignupDlg";
 import { TabIntf } from "../intf/TabIntf";
@@ -35,9 +36,11 @@ export class AdminView extends AppTab<any, AdminView> {
         S.util.saveUserPrefs(s => s.userPrefs.enableIPSM = true);
     };
 
-    preRender(): void {
-        // const ast = getAs();
+    sectionTitle(title: string): Heading {
+        return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
+    }
 
+    preRender(): void {
         this.setChildren([
             // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
@@ -45,14 +48,14 @@ export class AdminView extends AppTab<any, AdminView> {
             ]),
 
             new Div(null, { className: "marginLeft" }, [
-                new Div("Analytics", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Analytics"),
 
                 // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
                 this.settingsLink("View Session Activity", () => S.view.runServerCommand("getSessionActivity", null, "Session Activity", null)), //
                 this.settingsLink("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
 
-                new Div("Utils", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Utils"),
 
                 // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
@@ -62,7 +65,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
                 this.settingsLink("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace()),
 
-                new Div("Database", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Database"),
 
                 this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                 this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
@@ -72,7 +75,8 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null)),
                 this.settingsLink("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)), //
 
-                new Div("ActivityPub", { className: "settingsSectionTitle" }),
+                this.sectionTitle("ActivityPub"),
+
                 this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                 this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL), //
                 this.settingsLink("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null)), //
@@ -80,7 +84,8 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.settingsLink("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
                 this.settingsLink("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null)),
 
-                new Div("Testing", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Testing"),
+
                 this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
                 this.settingsLink("Send Email", () => S.util.sendTestEmail()),
                 this.settingsLink("Server Log Text", () => S.util.sendLogText()),

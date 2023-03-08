@@ -2,6 +2,7 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
@@ -18,6 +19,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
         data.inst = this;
     }
 
+    sectionTitle(title: string): Heading {
+        return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
+    }
+
     preRender(): void {
         const ast = getAs();
 
@@ -28,7 +33,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
             ]),
 
             new Div(null, { className: "marginLeft" }, [
-                new Div("Account", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Account"),
 
                 this.settingsLink("Logout", S.user.userLogout), //
                 this.settingsLink("Edit Profile", () => { new UserProfileDlg(null).open(); }), //
@@ -38,7 +43,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.settingsLink("About Browser", S.util.showBrowserInfo), //
                 this.settingsLink("Change Password", () => { new ChangePasswordDlg(null).open(); }), //
 
-                new Div("View Options", { className: "settingsSectionTitle" }),
+                this.sectionTitle("View Options"),
 
                 new Checkbox("Show Sensitive Content", { className: "bigMarginLeft" }, {
                     setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
@@ -87,7 +92,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
 
-                new Div("Danger Zone", { className: "settingsSectionTitle" }),
+                this.sectionTitle("Danger Zone"),
+
                 this.settingsLink("Bulk Delete", () => { S.edit.bulkDelete(); }), //
                 this.settingsLink("Close Account", () => { S.user.closeAccount(); }) //
             ])
