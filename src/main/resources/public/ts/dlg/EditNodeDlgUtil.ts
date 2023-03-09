@@ -8,11 +8,10 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
-import { LS as EditNodeDlgState, EditNodeDlg } from "./EditNodeDlg";
+import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
-import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 export class EditNodeDlgUtil {
@@ -71,9 +70,6 @@ export class EditNodeDlgUtil {
         editNode.name = dlg.nameState.getValue();
         editNode.tags = dlg.tagsState.getValue();
 
-        const askToSplit = editNode.content && (editNode.content.indexOf("{split}") !== -1 ||
-            editNode.content.indexOf("\n\n\n") !== -1);
-
         this.savePropsToNode(editNode, dlg);
         this.saveAttFileNamesToNode(editNode, dlg);
 
@@ -104,12 +100,6 @@ export class EditNodeDlgUtil {
 
         S.render.fadeInId = editNode.id;
         S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset);
-
-        // Only ask to split for ordinary nodes (non special)
-        const type = S.plugin.getType(editNode.type);
-        if (askToSplit && !(type && type.isSpecialAccountNode())) {
-            new SplitNodeDlg(editNode).open();
-        }
 
         S.util.notifyNodeUpdated(editNode.id, editNode.type);
         return true;

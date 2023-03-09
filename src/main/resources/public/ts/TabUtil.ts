@@ -66,7 +66,6 @@ export class TabUtil {
     createAppTabs = async () => {
         await promiseDispatch("initTabs", s => {
             s.tabData = [
-                new AdminTab(),
                 new MainTab(),
                 new DocumentTab(),
                 new SearchTab(),
@@ -101,7 +100,8 @@ export class TabUtil {
                 new TTSTab(),
                 new RSSTab(),
                 new IPFSTab(),
-                new SettingsTab()
+                new SettingsTab(),
+                new AdminTab()
 
                 // this is throwing a react error, but we don't need this now anyaay
                 // {

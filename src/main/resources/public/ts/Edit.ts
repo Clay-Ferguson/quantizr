@@ -869,8 +869,7 @@ export class Edit {
         }
 
         const confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        const dlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
-            "btn-danger", "alert alert-info");
+        const dlg = new ConfirmDlg(confirmMsg, "Confirm Join");
         await dlg.open();
         if (dlg.yes) {
             const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
