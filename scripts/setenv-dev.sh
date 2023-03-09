@@ -11,7 +11,7 @@ source ./define-functions.sh
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
-export QUANTA_VER=2.11.10
+export QUANTA_VER=2.13
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
 export DOCKER_TAG=quanta-dev-${QUANTA_VER}
 
