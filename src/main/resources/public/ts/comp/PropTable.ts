@@ -30,6 +30,8 @@ export class PropTable extends Comp {
                 ]));
             });
         }
-        return this.tag("div", { className: "scrollingPropsTable customScrollBar" }, [this.tag("table")]);
+        return this.tag("div", { className: "scrollingPropsTable" }, [
+            this.tag("table", { className: "customScrollBar smallMarginRight" })
+        ]);
     }
 }

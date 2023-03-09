@@ -836,7 +836,9 @@ strong {
 
 .scrollingPropsTable {
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 /* I was getting a crazy render flicker where the browser was apparently toggling scrollbar off and on 10 times per second
@@ -1172,6 +1174,10 @@ Will come back later and study this more. todo-3 */
 
 .smallMarginBottom {
     margin-bottom: $tinyGap;
+}
+
+.smallMarginRight {
+    margin-right: $smallGap;
 }
 
 .bigMarginBottom {
@@ -1687,8 +1693,6 @@ Will come back later and study this more. todo-3 */
 }
 
 .property-table {
-    margin-left: .5rem;
-    margin-bottom: .5rem;
 }
 
 .prop-table-row {

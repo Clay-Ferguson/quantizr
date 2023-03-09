@@ -585,10 +585,6 @@ export class Edit {
         return S.util.saveUserPrefs(s => s.userPrefs.autoRefreshFeed = autoRefreshFeed);
     }
 
-    toggleShowProps = async () => {
-        return S.util.saveUserPrefs(s => s.userPrefs.showProps = !s.userPrefs.showProps);
-    }
-
     toggleShowParents = async () => {
         await S.util.saveUserPrefs(s => s.userPrefs.showParents = !s.userPrefs.showParents);
         S.quanta.refresh();

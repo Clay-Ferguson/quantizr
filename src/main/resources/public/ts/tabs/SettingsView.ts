@@ -59,11 +59,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     getValue: (): boolean => ast.userPrefs.showReplies
                 }),
 
-                // NOTE: not yet needed.
-                // new Checkbox("Show Properties", { className: "bigMarginLeft" }, {
-                //     setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
-                //     getValue: (): boolean => ast.userPrefs.showProps
-                // })
+                new Checkbox("Show Properties", { className: "bigMarginLeft" }, {
+                    setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
+                    getValue: (): boolean => ast.userPrefs.showProps
+                }),
 
                 /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
                  that I have to impose an intentional performance lag to let the animation show up, so in order to have the
