@@ -758,15 +758,12 @@ public class NodeSearchService extends ServiceBase {
 					}
 					// Hashtags
 					else if (type.equals("Hashtag")) {
-						// todo-1: testing "blocked hashtags" feature, by hardcoding a word
-						if (!_name.toLowerCase().contains("tallship")) {
-							WordStats ws = tagMap.get(_name);
-							if (ws == null) {
-								ws = new WordStats(_name);
-								tagMap.put(_name, ws);
-							}
-							ws.count++;
+						WordStats ws = tagMap.get(_name);
+						if (ws == null) {
+							ws = new WordStats(_name);
+							tagMap.put(_name, ws);
 						}
+						ws.count++;
 					}
 				}
 			} catch (Exception e) {
