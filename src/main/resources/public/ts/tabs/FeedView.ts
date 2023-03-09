@@ -9,6 +9,7 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
+import { HelpButton } from "../comp/core/HelpButton";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -106,13 +107,13 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         },
                         title: "Search Feed"
                     }),
+                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     new IconButton("fa-refresh", null, {
                         onClick: () => S.srch.refreshFeed(),
                         title: "Refresh Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
-
                     showBookmarkIcon ? new IconButton("fa-bookmark", null, {
                         title: "Bookmark this Chat Room",
                         onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode)
