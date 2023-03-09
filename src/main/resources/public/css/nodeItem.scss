@@ -123,7 +123,7 @@
 
 .boosted-by-onfeed {
     display: inline-block;
-    padding: 3px 6px 3px 6px;
+    padding: 3px 10px 3px 10px;
     border: 1px solid gray;
     border-radius: 6px 6px 0 0;
     margin: 0 $tinyGap 0 $smallGap;
@@ -301,7 +301,7 @@ i'm backing out for now
 
 .boost-row-onfeed {
     border: 1px solid gray;
-
+    border-radius: 0px 6px 6px 6px;
     margin: -1px 12px 4px 12px;
     padding-bottom: $tinyGap;
     padding-top: $smallGap;

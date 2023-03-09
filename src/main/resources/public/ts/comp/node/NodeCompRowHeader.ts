@@ -265,7 +265,8 @@ export class NodeCompRowHeader extends Div {
         }
 
         const type = S.plugin.getType(this.node.type);
-        if (type) {
+        // for node type of NONE, don't show the type icon
+        if (type && type.getTypeName() !== NodeType.NONE) {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
@@ -344,7 +345,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         let editButton: IconButton = null;
-        let jumpButton: IconButton = null;
+        let jumpButton: Icon = null;
         let pasteButton: Button = null;
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
@@ -388,18 +389,18 @@ export class NodeCompRowHeader extends Div {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
                 jumpButtonAdded = true;
-                jumpButton = new IconButton("fa-arrow-right", null, {
-                    className: "marginLeft",
+                jumpButton = new Icon({
+                    className: "fa fa-arrow-right fa-lg",
                     onClick: () => S.view.jumpToId(targetId),
-                    title: "Jump to the Node"
+                    title: "Jump to Tree"
                 });
             }
         }
 
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
         if (this.jumpButton && !jumpButtonAdded) {
-            jumpButton = new IconButton("fa-arrow-right", null, {
-                className: "marginLeft",
+            jumpButton = new Icon({
+                className: "fa fa-arrow-right fa-lg",
                 onClick: () => S.srch.clickSearchNode(this.node.id),
                 title: "Jump to Tree"
             });

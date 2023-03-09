@@ -144,7 +144,9 @@ export class RightNavPanel extends Div {
             new Div(null, { className: "float-left" }, [
                 // for anon user float this more to the right so the main view looks less jammed up
                 new Div(null, { className: rightNavPanelClass }, [
-                    !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
+
+                    // I don't think I want this for now (leaving commented)
+                    // !ast.userPrefs.showReplies ? new Span("Show Replies setting is disabled", { title: "This means replies to posts are not displayed." }) : null,
 
                     new Div(null, { className: "float-end" }, [
                         // Not showing login on this panel in mobileMode, because it's shown at top of page instead
