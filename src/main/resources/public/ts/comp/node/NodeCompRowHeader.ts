@@ -1,11 +1,10 @@
 import { getAs } from "../../AppContext";
-import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
-import { IconButton } from "../../comp/core/IconButton";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
+import { Constants as C } from "../../Constants";
 import { UserProfileDlg } from "../../dlg/UserProfileDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
@@ -13,7 +12,6 @@ import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Button } from "../core/Button";
-import { Constants as C } from "../../Constants";
 
 export class NodeCompRowHeader extends Div {
 
@@ -344,7 +342,7 @@ export class NodeCompRowHeader extends Div {
             deleteAllowed = false;
         }
 
-        let editButton: IconButton = null;
+        let editButton: Icon = null;
         let jumpButton: Icon = null;
         let pasteButton: Button = null;
 
@@ -352,8 +350,8 @@ export class NodeCompRowHeader extends Div {
         showing up in a different place. We show here only for timeline, or search results views */
         if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
             if (editingAllowed && editableNode) {
-                editButton = new IconButton("fa-edit", null, {
-                    className: "marginLeft",
+                editButton = new Icon({
+                    className: "fa fa-edit fa-lg marginRight",
                     onClick: S.edit.runEditNodeByClick,
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
@@ -390,7 +388,7 @@ export class NodeCompRowHeader extends Div {
             if (targetId) {
                 jumpButtonAdded = true;
                 jumpButton = new Icon({
-                    className: "fa fa-arrow-right fa-lg",
+                    className: "fa fa-arrow-right fa-lg marginRight",
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to Tree"
                 });
@@ -400,14 +398,14 @@ export class NodeCompRowHeader extends Div {
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
         if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new Icon({
-                className: "fa fa-arrow-right fa-lg",
+                className: "fa fa-arrow-right fa-lg marginRight",
                 onClick: () => S.srch.clickSearchNode(this.node.id),
                 title: "Jump to Tree"
             });
         }
 
         if (editButton || jumpButton) {
-            floatUpperRightDiv.addChild(new ButtonBar([pasteButton, editButton, jumpButton], null, "marginRight"));
+            floatUpperRightDiv.addChildren([pasteButton, editButton, jumpButton]);
         }
 
         // for mobile, we don't show this float right component unless in wide-screen orientation.
