@@ -140,7 +140,6 @@ export class FriendsDlg extends DialogBase {
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",
-                        label: "Search",
                         val: this.searchTextState,
                         placeholder: "Search for...",
                         enter: this.userSearch,
