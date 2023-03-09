@@ -43,7 +43,6 @@ export class AdminView extends AppTab<any, AdminView> {
 
     preRender(): void {
         this.setChildren([
-            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
                 new Div("Admin Console", { className: "tabTitle" })
             ]),

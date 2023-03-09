@@ -9,7 +9,6 @@ import { Constants as C } from "./Constants";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
-import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
@@ -147,7 +146,6 @@ export class MenuPanel extends Div {
     static import = () => S.edit.openImportDlg();
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
     static export = () => S.edit.openExportDlg();
-    static testMicrophone = () => { new MediaRecorderDlg(false, false).open(); };
 
     static openTtsTab = () => {
         // this ttsTabSelected var is a quick hack to make tab show up, but we really need common
@@ -156,7 +154,6 @@ export class MenuPanel extends Div {
         S.tabUtil.selectTab(C.TAB_TTS);
     };
 
-    static testWebCam = () => { new MediaRecorderDlg(true, false).open(); };
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
@@ -355,11 +352,6 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Import", MenuPanel.import, importFeatureEnabled),
                 new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
-                new MenuItemSeparator(), //
-
-                new MenuItem("Test Microphone", MenuPanel.testMicrophone), //
-                new MenuItem("Test Web Cam", MenuPanel.testWebCam), //
-                new MenuItem("My GEO Location", S.nav.geoLocation), //
                 new MenuItemSeparator(), //
 
                 !state.unknownPubSigKey && S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //

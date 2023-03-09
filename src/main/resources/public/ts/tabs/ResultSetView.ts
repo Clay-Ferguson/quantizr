@@ -50,7 +50,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
             content = this.data.props.node ? S.nodeUtil.getShortContent(this.data.props.node) : null;
         }
 
-        // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
                 // include back button if we have a central node this panel is about.

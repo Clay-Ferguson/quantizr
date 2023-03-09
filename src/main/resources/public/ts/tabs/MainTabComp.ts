@@ -65,7 +65,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
 
         let header: Div = null;
         this.setChildren([
-            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
             ast.isAnonUser || !ast.node ? null : (this.headingBar = new TabHeading([

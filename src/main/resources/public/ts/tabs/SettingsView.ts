@@ -8,6 +8,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
 import { ManageCryptoKeysDlg } from "../dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "../dlg/ManageStorageDlg";
+import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
@@ -27,24 +28,20 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const ast = getAs();
 
         this.setChildren([
-            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
             ]),
 
             new Div(null, { className: "marginLeft" }, [
                 this.sectionTitle("Account"),
-
                 this.settingsLink("Logout", S.user.userLogout), //
                 this.settingsLink("Edit Profile", () => { new UserProfileDlg(null).open(); }), //
                 this.settingsLink("Storage Space", () => { new ManageStorageDlg().open(); }), //
                 this.settingsLink("Manage Hashtags", S.edit.editHashtags),
                 S.crypto.avail ? this.settingsLink("Manage Keys", () => { new ManageCryptoKeysDlg().open(); }) : null, //
-                this.settingsLink("About Browser", S.util.showBrowserInfo), //
                 this.settingsLink("Change Password", () => { new ChangePasswordDlg(null).open(); }), //
 
                 this.sectionTitle("View Options"),
-
                 new Checkbox("Show Sensitive Content", { className: "bigMarginLeft" }, {
                     setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
                     getValue: (): boolean => ast.userPrefs.nsfw
@@ -78,11 +75,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 }),
 
                 new Selection(null, "Content Width", [
-                    { key: "4", val: "Narrowest" },
+                    { key: "4", val: "Very Narrow" },
                     { key: "5", val: "Narrow" },
-                    { key: "6", val: "Normal" },
-                    { key: "7", val: "Wider" },
-                    { key: "8", val: "Widest" }
+                    { key: "6", val: "Medium" },
+                    { key: "7", val: "Wide" },
+                    { key: "8", val: "Very Wide" }
                 ], "contentWidthSelection", "bigMarginLeft marginTop", {
                     setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
@@ -92,8 +89,13 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
 
-                this.sectionTitle("Danger Zone"),
+                this.sectionTitle("Tools"),
+                this.settingsLink("Test Microphone", () => { new MediaRecorderDlg(false, false).open(); }), //
+                this.settingsLink("Test Web Cam", () => { new MediaRecorderDlg(true, false).open(); }), //
+                this.settingsLink("My GEO Location", S.nav.geoLocation), //
+                this.settingsLink("About Browser", S.util.showBrowserInfo), //
 
+                this.sectionTitle("Danger Zone"),
                 this.settingsLink("Bulk Delete", () => { S.edit.bulkDelete(); }), //
                 this.settingsLink("Close Account", () => { S.user.closeAccount(); }) //
             ])

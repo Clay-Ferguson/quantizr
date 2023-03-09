@@ -29,7 +29,6 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         let rowCount = 0;
         let i = 0;
         const children: CompIntf[] = [
-            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
                 new Div(this.data.name, { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {

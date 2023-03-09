@@ -97,7 +97,6 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         this.setChildren([
-            // WARNING: headingBar has to be a child of the actual scrollable panel for stickyness to work.
             this.headingBar = new TabHeading([
                 new Div("RSS Feed", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", "", {
