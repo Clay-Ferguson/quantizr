@@ -333,6 +333,8 @@ export abstract class Comp implements CompIntf {
         return true;
     }
 
+    // todo-0: consider making these states ALL perfectly typesafe and not allowing defalt to 'any' type in the
+    // template parameter
     mergeState<T = any>(moreState: T): void {
         if (!this.checkState()) return;
         this.stateMgr.mergeState<T>(moreState);

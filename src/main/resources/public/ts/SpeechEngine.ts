@@ -133,10 +133,9 @@ export class SpeechEngine {
         }, 1000);
     }
 
-    speakSelOrClipboard = (ttsView: TTSView) => {
-        if (ttsView?.textAreaState.getValue()) {
-            this.speakText(ttsView.textAreaState.getValue(), false);
-            ttsView.textAreaState.setValue("");
+    speakSelOrClipboard = (allowUseEditField: boolean) => {
+        if (allowUseEditField && TTSView.textAreaState.getValue()) {
+            this.speakText(TTSView.textAreaState.getValue(), false);
         }
         else if (S.quanta.selectedForTts) {
             this.speakText(S.quanta.selectedForTts, false);
@@ -147,12 +146,12 @@ export class SpeechEngine {
     }
 
     // Append more text to buffer of what's being read.
-    appendSelOrClipboard = async (ttsView: TTSView) => {
+    appendSelOrClipboard = async () => {
         let textToAdd: string = null;
 
-        if (ttsView?.textAreaState.getValue()) {
-            textToAdd = ttsView.textAreaState.getValue();
-            ttsView.textAreaState.setValue("");
+        if (TTSView.textAreaState.getValue()) {
+            textToAdd = TTSView.textAreaState.getValue();
+            TTSView.textAreaState.setValue("");
         }
         else if (S.quanta.selectedForTts) {
             textToAdd = S.quanta.selectedForTts;

@@ -83,6 +83,7 @@ export class AppState {
     speechVoice2: number = -1; // index into speech.voices array (-1 means not set)
     speechRate: string = "normal"; // slow, normal, fast
     ttsRan: boolean = false;
+    showTtsInputText: boolean = false;
 
     anonShowLHSMenu = false;
 

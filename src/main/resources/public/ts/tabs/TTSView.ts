@@ -1,6 +1,7 @@
 import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -17,7 +18,7 @@ import { Validator } from "../Validator";
 
 export class TTSView extends AppTab<any, TTSView> {
 
-    textAreaState: Validator = new Validator();
+    static textAreaState: Validator = new Validator();
 
     constructor(data: TabIntf<any, TTSView>) {
         super(data);
@@ -43,8 +44,8 @@ export class TTSView extends AppTab<any, TTSView> {
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: () => S.speech.speakSelOrClipboard(this),
-            title: "Text-to-Speech: Speak from Text Area below, Selected Text, or Clipboard"
+            onClick: () => S.speech.speakSelOrClipboard(true),
+            title: "Text-to-Speech: Speak from input below, Selected Text, or Clipboard"
         }) : null;
 
         // make the entire tab area a drop target for speaking text.
@@ -64,7 +65,7 @@ export class TTSView extends AppTab<any, TTSView> {
             // it's a problem that by then the text selection "might" have gotten lost. This can happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: () => S.speech.appendSelOrClipboard(this),
+            onClick: () => S.speech.appendSelOrClipboard(),
             title: "Text-to-Speech: Append more text from...\n\nText Area below, Selected Text, or Clipboard"
         }) : null;
 
@@ -145,11 +146,20 @@ export class TTSView extends AppTab<any, TTSView> {
             new FlexRowLayout([
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
-                this.makeRateChooser()
+                this.makeRateChooser(),
+                new Checkbox("Text Input", { className: "bigMarginLeft" }, {
+                    setValue: (checked: boolean) => dispatch("setTtsInput", s => {
+                        if (!checked) {
+                            TTSView.textAreaState.setValue("");
+                        }
+                        s.showTtsInputText = checked;
+                    }),
+                    getValue: (): boolean => getAs().showTtsInputText
+                })
             ]),
-            new TextArea("Enter Text to Speak", {
+            getAs().showTtsInputText ? new TextArea("Enter Text to Speak", {
                 rows: 3
-            }, this.textAreaState),
+            }, TTSView.textAreaState) : null,
             paraComps?.length > 0
                 ? new Div(null, { className: "speech-text-area" }, [
                     new Heading(4, heading, { className: "speech-area-title alert alert-primary" }),
