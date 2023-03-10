@@ -61,7 +61,7 @@ export class SelectTagsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let buttons: Button[] = [];
-        const state = this.getState();
+        const state = this.getState<LS>();
 
         if (state.tags?.length > 0) {
             switch (this.modeOption) {
@@ -97,11 +97,11 @@ export class SelectTagsDlg extends DialogBase {
                 this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "float-end" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
-                        if (checked && this.getState().suggestedTags.length === 0) {
+                        if (checked && this.getState<LS>().suggestedTags.length === 0) {
                             setTimeout(this.updateSuggestTags, 250);
                         }
                     },
-                    getValue: (): boolean => this.getState().suggestTags
+                    getValue: (): boolean => this.getState<LS>().suggestTags
                 }, "form-switch form-check-inline") : null,
                 this.createTagsPickerList(),
                 new ButtonBar([
@@ -240,7 +240,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     select = () => {
-        const state = this.getState();
+        const state = this.getState<LS>();
         const editVal = this.editFieldState.getValue();
         if (editVal) {
             state.selectedTags.add(editVal);

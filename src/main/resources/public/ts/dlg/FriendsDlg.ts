@@ -216,7 +216,7 @@ export class FriendsDlg extends DialogBase {
         const usersText = this.userNameState.getValue();
         if (usersText) {
             const users: string[] = usersText.split(",");
-            const state = this.getState();
+            const state = this.getState<LS>();
             for (const user of users) {
                 state.selections.add(user);
             }

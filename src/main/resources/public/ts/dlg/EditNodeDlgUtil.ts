@@ -10,7 +10,7 @@ import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
-import { EmojiPickerDlg } from "./EmojiPickerDlg";
+import { EmojiPickerDlg, LS as EmojiPickerDlgState } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -77,7 +77,7 @@ export class EditNodeDlgUtil {
         been encrypted just above.
         todo-1: Note: We only sign if admin for now, by design */
 
-        if (dlg.getState().signCheckboxVal) {
+        if (dlg.getState<EditNodeDlgState>().signCheckboxVal) {
             if (S.crypto.avail) {
                 // Note: this needs to come AFTER the 'savePropsToNode' call above because we're overriding what was
                 // possibly in there.
@@ -394,7 +394,7 @@ export class EditNodeDlgUtil {
             }
         });
 
-        const speechActive = !dlg.getState().speechActive;
+        const speechActive = !dlg.getState<EditNodeDlgState>().speechActive;
         if (speechActive) {
             S.speech.startListening();
         }
@@ -459,10 +459,10 @@ an upload has been added or removed.
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
         // loose the cursor position.
         const selStart = dlg.contentEditor.getSelStart();
-        const emojiDlg: EmojiPickerDlg = new EmojiPickerDlg();
-        await emojiDlg.open();
-        if (emojiDlg.getState().selectedEmoji) {
-            dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji, selStart);
+        const eDlg: EmojiPickerDlg = new EmojiPickerDlg();
+        await eDlg.open();
+        if (eDlg.getState<EmojiPickerDlgState>().selectedEmoji) {
+            dlg.contentEditor.insertTextAtCursor(eDlg.getState<EmojiPickerDlgState>().selectedEmoji, selStart);
         }
     }
 

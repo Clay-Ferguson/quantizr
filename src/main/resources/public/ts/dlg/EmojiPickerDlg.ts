@@ -6,7 +6,7 @@ import { EmojiPicker } from "../comp/core/EmojiPicker";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 
-interface LS { // Local State
+export interface LS { // Local State
     selectedEmoji: string;
 }
 

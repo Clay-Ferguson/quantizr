@@ -340,12 +340,12 @@ export abstract class Comp implements CompIntf {
         this.stateMgr.mergeState<T>(moreState);
     }
 
-    setState = <T = any>(newState: T) => {
+    setState = <T>(newState: T) => {
         if (!this.checkState()) return;
         this.stateMgr.setState<T>(newState);
     }
 
-    getState<T = any>(): T {
+    getState<T>(): T {
         if (!this.checkState()) return null;
         return this.stateMgr.state;
     }

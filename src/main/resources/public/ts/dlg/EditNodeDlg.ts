@@ -229,7 +229,7 @@ export class EditNodeDlg extends DialogBase {
     getExtraTitleBarComps(): CompIntf[] {
         let comps: CompIntf[] = null;
 
-        if (this.getState().signCheckboxVal) {
+        if (this.getState<LS>().signCheckboxVal) {
             comps = comps || [];
             comps.push(new Icon({
                 title: "Crypto Signature Verified",
@@ -240,7 +240,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        if (this.getState().encryptCheckboxVal) {
+        if (this.getState<LS>().encryptCheckboxVal) {
             comps = comps || [];
             comps.push(new Icon({
                 title: "Node is Encrypted",
@@ -454,7 +454,7 @@ export class EditNodeDlg extends DialogBase {
 
     makePublic = async (allowAppends: boolean) => {
         const ast = getAs();
-        if (this.getState().encryptCheckboxVal) {
+        if (this.getState<LS>().encryptCheckboxVal) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
             return;
         }
@@ -583,7 +583,7 @@ export class EditNodeDlg extends DialogBase {
                     this.utl.setEncryption(this, checked);
                 }
             },
-            getValue: (): boolean => this.getState().encryptCheckboxVal
+            getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
         }) : null;
 
         const signCheckBox = advancedOpts.sign && S.crypto.avail ? new Checkbox("Sign", null, {
@@ -592,7 +592,7 @@ export class EditNodeDlg extends DialogBase {
                     this.mergeState({ signCheckboxVal: checked });
                 }
             },
-            getValue: (): boolean => this.getState().signCheckboxVal
+            getValue: (): boolean => this.getState<LS>().signCheckboxVal
         }) : null;
 
         const wordWrapCheckbox = advancedOpts.wordWrap ? new Checkbox("Word Wrap", null, {

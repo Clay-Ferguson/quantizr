@@ -6,9 +6,11 @@ export interface CompIntf {
 
     getId(prefix?: string): string;
     onMount(func: Function): void;
-    setState(newState: any): void;
-    getState(): any;
-    mergeState(moreState: any): void;
+
+    mergeState<T = any>(moreState: T): void;
+    setState<T = any>(newState: T): void;
+    getState<T = any>(): T;
+
     setClass(clazz: string): void;
     getAttribs() : Object;
     compRender(): ReactNode;

@@ -163,7 +163,7 @@ export class MenuPanel extends Div {
 
     preRender(): void {
         const ast = getAs();
-        const state = this.getState();
+        const state = this.getState<MenuPanelState>();
 
         const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
@@ -354,7 +354,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
                 new MenuItemSeparator(), //
 
-                !state.unknownPubSigKey && S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
+                !ast.unknownPubSigKey && S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, selNodeIsMine), //
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, selNodeIsMine) //
 
@@ -512,7 +512,7 @@ export class MenuPanel extends Div {
 // Object will have 'op' and 'name' props
 PubSub.sub(C.PUBSUB_menuExpandChanged, (payload: any) => {
     MenuPanel.inst?.onMount(() => {
-        const state = MenuPanel.inst.getState();
+        const state = MenuPanel.inst.getState<MenuPanelState>();
         if (payload.op === "toggle") {
             if (state.expanded.has(payload.name)) {
                 state.expanded.delete(payload.name);
