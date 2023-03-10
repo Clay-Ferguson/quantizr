@@ -9,7 +9,6 @@ import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
 import { EditAttachmentsPanel } from "../comp/core/EditAttachmentsPanel";
-import { HelpButton } from "../comp/core/HelpButton";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Label } from "../comp/core/Label";
@@ -49,7 +48,6 @@ export class EditNodeDlg extends DialogBase {
     static pendingUploadFile: File = null;
     public utl: EditNodeDlgUtil = new EditNodeDlgUtil();
     static embedInstance: EditNodeDlg;
-    editorHelp: string = null;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: Validator = new Validator();
     decryptFailed: boolean = false;
@@ -257,7 +255,6 @@ export class EditNodeDlg extends DialogBase {
         const ast = getAs();
         const hasAttachment: boolean = S.props.hasBinary(ast.editNode);
 
-        this.editorHelp = null;
         const type = S.plugin.getType(ast.editNode.type);
         let customProps: string[] = null;
         let editorOpts: EditorOptions = {};
@@ -266,7 +263,6 @@ export class EditNodeDlg extends DialogBase {
             editorOpts = type.getEditorOptions();
             customProps = type.getCustomProperties();
             type.ensureDefaultProperties(ast.editNode);
-            this.editorHelp = type.getEditorHelp();
             autoExpandProps = type.getAutoExpandProps();
         }
 
@@ -700,9 +696,7 @@ export class EditNodeDlg extends DialogBase {
             advancedButtons && !datePropExists ? new IconButton("fa-calendar", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry)",
                 onClick: () => this.utl.addDateProperty(this)
-            }) : null,
-
-            this.editorHelp ? new HelpButton(() => this.editorHelp) : null
+            }) : null
         ]);
     }
 

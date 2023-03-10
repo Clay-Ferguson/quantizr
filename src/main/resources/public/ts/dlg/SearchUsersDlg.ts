@@ -3,7 +3,6 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { HelpButton } from "../comp/core/HelpButton";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
@@ -66,7 +65,6 @@ export class SearchUsersDlg extends DialogBase {
                 adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
                     // todo: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
                     // possible and not even all that difficult based on the existing code already written.

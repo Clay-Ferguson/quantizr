@@ -5,7 +5,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { HelpButton } from "../comp/core/HelpButton";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -75,8 +74,7 @@ export class SharingDlg extends DialogBase {
                         }
                     }, null, "btn-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(J.PrincipalName.PUBLIC, false), null, "btn-secondary"),
-                    new Button("Done", () => this.close(), null, "btn-secondary float-end"),
-                    new HelpButton(() => getAs().config.help?.sharing?.dialog)
+                    new Button("Done", () => this.close(), null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

@@ -29,7 +29,6 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", false);
         }
 
-        // children.push(new HelpButton(state.config.help?.gettingStarted));
         this.setChildren(children);
     }
 

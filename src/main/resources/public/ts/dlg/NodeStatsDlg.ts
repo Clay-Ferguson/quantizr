@@ -4,15 +4,14 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { HelpButton } from "../comp/core/HelpButton";
 import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { SearchContentDlg } from "./SearchContentDlg";
-import { Constants as C } from "../Constants";
 
 export class NodeStatsDlg extends DialogBase {
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean) {
@@ -77,8 +76,7 @@ export class NodeStatsDlg extends DialogBase {
             new ButtonBar([
                 new Button("Ok", () => {
                     this.close();
-                }, null, "btn-primary"),
-                new HelpButton(() => getAs().config.help?.nodeStats?.dialog)
+                }, null, "btn-primary")
             ], "marginTop")
         ];
     }

@@ -9,7 +9,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { HelpButton } from "../comp/core/HelpButton";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -107,7 +106,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         },
                         title: "Search Feed"
                     }),
-                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     new IconButton("fa-refresh", null, {
                         onClick: () => S.srch.refreshFeed(),
                         title: "Refresh Feed"
@@ -122,8 +120,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
                         getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     })
-                    // This view is reused for "Chat View" so for now let's not confuse things with a fediverse-specific help button.
-                    // new HelpButton(() => state.config.help?.fediverse?.feed),
                 ], "flexRowAlignBottom")
             ]),
             new Clearfix(),

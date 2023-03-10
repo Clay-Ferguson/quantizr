@@ -2,7 +2,6 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
-import { HelpButton } from "../comp/core/HelpButton";
 import { TabIntf } from "../intf/TabIntf";
 
 export class IPSMView extends AppTab<any, IPSMView> {
@@ -18,12 +17,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading()
             ]),
-            new Div("Realtime IPFS PubSub events from ipsm-heartbeat topic..."),
-            new HelpButton(() => {
-                return "IPSM Console\nThis is a diagnostic view which shows unfiltered IPFS PubSub messages " + //
-                    " being posted to 'ipsm-heartbeat'. Peers can send up to only 10 events per minute, and messages " + //
-                    " sent at a faster rate than that, from any specific peer, get ignored.";
-            })
+            new Div("Realtime IPFS PubSub events from ipsm-heartbeat topic...")
         ]));
 
         if (this.data.props?.events) {

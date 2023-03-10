@@ -20,7 +20,6 @@ export class EditNodeDlgUtil {
         const type = S.plugin.getType(ast.editNode.type);
         if (type) {
             type.ensureDefaultProperties(ast.editNode);
-            dlg.editorHelp = type.getEditorHelp();
         }
 
         let numPropsShowing: number = 0;

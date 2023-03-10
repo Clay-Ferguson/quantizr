@@ -6,7 +6,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -150,7 +149,6 @@ export class SearchContentDlg extends DialogBase {
                     new Button("Search", () => this.search(false), null, "btn-primary"),
                     new Button("Graph", this.graph),
                     ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
-                    new HelpButton(() => getAs().config.help?.search?.dialog),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
