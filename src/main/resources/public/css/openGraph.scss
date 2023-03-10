@@ -64,12 +64,12 @@
     // Leave LHS 20% and RHS 75%, because that adds up to enough less than 100% so that the padding
     // doesn't cause unwanted wrap (in narrow content layouts)
     width: 75%;
-    padding: 8px 18px 8px 18px;
+    padding-left: 12px;
 }
 
 .openGraphDesc {
     max-width: 45rem;
-    margin-right: 1rem;
+    margin-right: $smallGap;
 }
 
 .openGraphTitle {
