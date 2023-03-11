@@ -239,6 +239,11 @@ export class SearchContentDlg extends DialogBase {
             requirePriority = false;
         }
 
+        // If we're deleting matches
+        if (SearchContentDlg.defaultSearchText?.trim().length < 5 && deleteMatches) {
+            return;
+        }
+
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, null, desc,
             state.searchRoot,
             state.fuzzy,

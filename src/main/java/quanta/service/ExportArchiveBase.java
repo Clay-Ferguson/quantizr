@@ -45,6 +45,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private String shortFileName;
 	private String fullFileName;
 	private String rootPathParent;
+	ExportRequest req;
 
 	/*
 	 * It's possible that nodes recursively contained under a given node can have same name, so we have
@@ -53,9 +54,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	private final HashSet<String> fileNameSet = new HashSet<>();
 
 	private MongoSession session;
+	private StringBuilder fullHtml = new StringBuilder();
 
 	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
 		ms = ThreadLocals.ensure(ms);
+		this.req = req;
 		this.session = ms;
 
 		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
@@ -76,7 +79,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			auth.ownerAuth(ms, node);
 			ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
+
+			if (req.isLargeHtmlFile()) {
+				appendHtmlBegin("", fullHtml);
+			}
+
 			recurseNode("../", "", node, nodeStack, 0, null, null);
+
+			if (req.isLargeHtmlFile()) {
+				appendHtmlEnd("", fullHtml);
+				addFileEntry("all-content.html", fullHtml.toString().getBytes(StandardCharsets.UTF_8));
+			}
 			res.setFileName(shortFileName);
 			success = true;
 		} catch (Exception ex) {
@@ -126,33 +139,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 
 		// log.debug("recurseNode: " + node.getContent() + " parentHtmlFile=" + parentHtmlFile);
-
 		StringBuilder html = new StringBuilder();
-		html.append("<html>");
-		html.append("<head>\n");
-		html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
-		html.append("</head>\n");
-		html.append("<body>\n");
+		appendHtmlBegin(rootPath, html);
 
 		// breadcrumbs at the top of each page.
 		if (nodeStack.size() > 1) {
-			StringBuilder sb = new StringBuilder();
-			int max = nodeStack.size() - 1;
-			int count = 0;
-			for (SubNode bcNode : nodeStack) {
-				if (sb.length() > 0) {
-					sb.append(" / ");
-				}
-				String friendlyName = generateFriendlyName(bcNode);
-				if (friendlyName != null) {
-					sb.append(friendlyName);
-				}
-				count++;
-				if (count >= max) {
-					break;
-				}
-			}
-			html.append("<div class='breadcrumbs'>" + sb.toString() + "</div>");
+			appendBreadcrumbs(nodeStack, html);
 		}
 
 		if (parentHtmlFile != null) {
@@ -168,7 +160,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
 		html.append("<div class='top-row'/>\n");
-		processNodeExport(session, parentFolder, "", node, html, true, fileName, true, 0, true);
+		processNodeExport(session, req.isLargeHtmlFile(), parentFolder, "", node, html, true, fileName, true, 0, true);
 		html.append("</div>\n");
 		String folder = node.getIdStr();
 
@@ -184,7 +176,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				String inlineChildren = n.getStr(NodeProp.INLINE_CHILDREN);
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 
-				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
+				processNodeExport(session, false, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
 
 				if ("1".equals(inlineChildren)) {
 					String subFolder = n.getIdStr();
@@ -194,13 +186,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			}
 		}
 
-		// todo-1: be sure these files are in place and up to date.
-		html.append("<script src='" + rootPath + "marked.min.js'></script>");
-		html.append("<script src='" + rootPath + "exported.js'></script>");
+		appendHtmlEnd(rootPath, html);
 
-		html.append("</body></html>");
 		String htmlFile = fileName.getVal() + ".html";
-		addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
+		if (req.isIncludeHTML()) {
+			addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
+		}
 
 		String relParent = "../" + fileUtil.getShortFileName(htmlFile);
 
@@ -214,6 +205,44 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
+	private void appendBreadcrumbs(ArrayList<SubNode> nodeStack, StringBuilder html) {
+		StringBuilder sb = new StringBuilder();
+		int max = nodeStack.size() - 1;
+		int count = 0;
+		for (SubNode bcNode : nodeStack) {
+			if (sb.length() > 0) {
+				sb.append(" / ");
+			}
+			String friendlyName = generateFriendlyName(bcNode);
+			if (friendlyName != null) {
+				sb.append(friendlyName);
+			}
+			count++;
+			if (count >= max) {
+				break;
+			}
+		}
+		html.append("<div class='breadcrumbs'>" + sb.toString() + "</div>");
+	}
+
+	private void appendHtmlBegin(String rootPath, StringBuilder html) {
+		html.append("<html>");
+		html.append("<head>\n");
+		html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
+		html.append("</head>\n");
+		html.append("<body>\n");
+	}
+
+	private void appendHtmlEnd(String rootPath, StringBuilder html) {
+		html.append("<script src='" + rootPath + "marked.min.js'></script>");
+
+		// this did work fine!
+		// html.append("<script src='https://cdn.jsdelivr.net/npm/marked/marked.min.js'></script>");
+
+		html.append("<script src='" + rootPath + "exported.js'></script>");
+		html.append("</body></html>");
+	}
+
 	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
 		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 		if (iter != null) {
@@ -225,7 +254,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				boolean allowOpenButton = !"1".equals(inlineChildren);
 				String folder = n.getIdStr();
 
-				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level, false);
+				processNodeExport(session, false, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level, false);
 
 				if ("1".equals(inlineChildren)) {
 					inlineChildren(html, n, parentFolder, deeperPath + folder + "/", level + 1);
@@ -237,13 +266,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	/*
 	 * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, becasue we let
 	 * exceptions bubble all the way up to abort and even cause the zip file itself (to be deleted)
-	 * since it was unable to be written to.
+	 * since it was unable to be written to completely successfully.
 	 * 
 	 * fileNameCont is an output parameter that has the complete filename minus the period and
 	 * extension.
 	 */
-	private void processNodeExport(MongoSession ms, String parentFolder, String deeperPath, SubNode node, StringBuilder html,
-			boolean writeFile, Val<String> fileNameCont, boolean allowOpenButton, int level, boolean isTopRow) {
+	private void processNodeExport(MongoSession ms, boolean appendFullHtml, String parentFolder, String deeperPath, SubNode node,
+			StringBuilder html, boolean writeFile, Val<String> fileNameCont, boolean allowOpenButton, int level,
+			boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
@@ -256,8 +286,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			if (level > 0) {
 				indenter = " style='margin-left:" + String.valueOf(level * 30) + "px'";
 			}
-			html.append("<div href='#" + nodeId + "' " + rowClass + " id='" + nodeId + "' " + indenter + ">\n");
-			html.append("<div class='meta-info'>" + nodeId + "</div>\n");
+			appendContent(html, appendFullHtml,
+					"<div href='#" + nodeId + "' " + rowClass + " id='" + nodeId + "' " + indenter + ">\n");
+
+			if (req.isIncludeIDs()) {
+				appendContent(html, appendFullHtml, "<div class='meta-info'>" + nodeId + "</div>\n");
+			}
 
 			/*
 			 * If we aren't writing the file we know we need the text appended to include a link to open the
@@ -278,140 +312,183 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 			String content = node.getContent() != null ? node.getContent() : "";
 			content = content.trim();
+			appendNodeHtmlContent(node, html, content);
 
-			String escapedContent = StringEscapeUtils.escapeHtml4(content);
-			if (node.isType(NodeType.PLAIN_TEXT)) {
-				html.append("\n<pre>" + escapedContent + "\n</pre>");
-			} else {
-				html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>");
+			if (appendFullHtml) {
+				appendNodeHtmlContent(node, fullHtml, content);
 			}
 
 			List<Attachment> atts = node.getOrderedAttachments();
 			if (atts != null) {
 				for (Attachment att : atts) {
-					String ext = null;
-					String binFileNameProp = att.getFileName();
-					if (binFileNameProp != null) {
-						ext = FilenameUtils.getExtension(binFileNameProp);
-						if (!StringUtils.isEmpty(ext)) {
-							ext = "." + ext;
-						}
-					}
-					String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
-					String mimeType = att.getMime();
-					String imgUrl = null;
-					String attachmentUrl = null;
-
-					if (mimeType != null) {
-						html.append("<div style='margin-top: 12px'>");
-						// Otherwise if this is an ordinary binary image, encode the link to it.
-						if (imgUrl == null && mimeType.startsWith("image/")) {
-
-							// If this is an external URL (just a URL to an image on the web)
-							String extUrl = att.getUrl();
-							if (extUrl != null) {
-								binFileNameStr = "External image";
-								imgUrl = extUrl;
-							}
-							// otherwise it's an internal image so get imgUrl that way
-							else {
-								String relImgPath = writeFile ? "" : (fileName + "/");
-								/*
-								 * embeds an image that's 400px wide until you click it which makes it go fullsize
-								 */
-								imgUrl = "./" + deeperPath + relImgPath + att.getKey() + ext;
-							}
-
-							html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
-									+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
-									+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
-						} else {
-							String relPath = writeFile ? "" : (fileName + "/");
-							/*
-							 * embeds an image that's 400px wide until you click it which makes it go fullsize
-							 */
-							attachmentUrl = "./" + deeperPath + relPath + att.getKey() + ext;
-
-							html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
-									+ binFileNameStr + "</a>");
-						}
-						html.append("</div>");
-					}
+					appendAttachmentHtml(deeperPath, req.isAttOneFolder() ? "attachments" : ("." + parentFolder), html,
+							appendFullHtml, writeFile, nodeId, fileName, att);
 				}
 			}
 
-			html.append("</div>\n");
+			appendContent(html, appendFullHtml, "</div>\n");
+			if (appendFullHtml && req.isDividerLine()) {
+				fullHtml.append("<hr>\n");
+			}
 
 			if (writeFile) {
-				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
-				/*
-				 * Pretty print the node having the relative path, and then restore the node to the full path
-				 */
-				String fullPath = node.getPath();
-				String relPath = fullPath.substring(rootPathParent.length());
-				String json = null;
-				try {
-					node.directSetPath(relPath);
-					json = XString.prettyPrint(node);
-				} finally {
-					node.directSetPath(fullPath);
-				}
-
-				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json", json.getBytes(StandardCharsets.UTF_8));
-
-				/* If content property was found write it into separate file */
-				if (StringUtils.isNotEmpty(content)) {
-					addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".md",
-							content.getBytes(StandardCharsets.UTF_8));
-				}
-
-				if (atts != null) {
-					for (Attachment att : atts) {
-						String ext = null;
-						String binFileNameProp = att.getFileName();
-						if (binFileNameProp != null) {
-							ext = FilenameUtils.getExtension(binFileNameProp);
-							if (!StringUtils.isEmpty(ext)) {
-								ext = "." + ext;
-							}
-						}
-						/*
-						 * If we had a binary property on this node we write the binary file into a separate file, but for
-						 * ipfs links we do NOT do this
-						 */
-						if (att.getMime() != null) {
-							InputStream is = null;
-							try {
-								is = attach.getStream(ms, att.getKey(), node, false);
-								if (is != null) {
-									BufferedInputStream bis = new BufferedInputStream(is);
-									long length = att != null ? att.getSize() : null;
-									String binFileName = parentFolder + "/" + fileName + "/" + att.getKey() + ext;
-
-									if (length > 0) {
-										/* NOTE: the archive WILL fail if no length exists in this codepath */
-										addFileEntry(binFileName, bis, length);
-									} else {
-										/*
-										 * This *should* never happen that we fall back to writing as an array from the input
-										 * stream because normally we will always have the length saved on the node. But re are
-										 * trying to be as resilient as possible here falling back to this rather than failing the
-										 * entire export
-										 */
-										addFileEntry(binFileName, IOUtils.toByteArray(bis));
-									}
-								}
-							} catch (Exception e) {
-								throw ExUtil.wrapEx(e);
-							} finally {
-								StreamUtil.close(is);
-							}
-						}
-					}
-				}
+				writeFilesForNode(ms, parentFolder, node, fileNameCont, fileName, content, atts);
 			}
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
+		}
+	}
+
+	private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont, String fileName,
+			String content, List<Attachment> atts) {
+		String fileNameBase = parentFolder + "/" + fileName + "/" + fileName;
+		fileNameCont.setVal(fileNameBase);
+		String json = getNodeJson(node);
+
+		if (req.isIncludeJSON()) {
+			addFileEntry(fileNameBase + ".json", json.getBytes(StandardCharsets.UTF_8));
+		}
+
+		/* If content property was found write it into separate file */
+		if (StringUtils.isNotEmpty(content) && req.isIncludeMD()) {
+			addFileEntry(fileNameBase + ".md", content.getBytes(StandardCharsets.UTF_8));
+		}
+
+		if (atts != null) {
+			for (Attachment att : atts) {
+				writeAttachmentFileForNode(ms, parentFolder, node, fileName, att);
+			}
+		}
+	}
+
+	private String getNodeJson(SubNode node) {
+		String json;
+		/*
+		 * Pretty print the node having the relative path, and then restore the node to the full path
+		 */
+		String fullPath = node.getPath();
+		String relPath = fullPath.substring(rootPathParent.length());
+		try {
+			node.directSetPath(relPath);
+			json = XString.prettyPrint(node);
+		} finally {
+			node.directSetPath(fullPath);
+		}
+		return json;
+	}
+
+	private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String fileName, Attachment att) {
+		String ext = null;
+		String binFileNameProp = att.getFileName();
+		if (binFileNameProp != null) {
+			ext = FilenameUtils.getExtension(binFileNameProp);
+			if (!StringUtils.isEmpty(ext)) {
+				ext = "." + ext;
+			}
+		}
+		/*
+		 * If we had a binary property on this node we write the binary file into a separate file, but for
+		 * ipfs links we do NOT do this
+		 */
+		if (att.getMime() != null) {
+			InputStream is = null;
+			try {
+				is = attach.getStream(ms, att.getKey(), node, false);
+				if (is == null)
+					return;
+				BufferedInputStream bis = new BufferedInputStream(is);
+				long length = att != null ? att.getSize() : null;
+				String binFileName = req.isAttOneFolder() ? ("/attachments/" + fileName + "-" + att.getKey() + ext) : //
+						(parentFolder + "/" + fileName + "/" + att.getKey() + ext);
+
+				if (length > 0) {
+					/* NOTE: the archive WILL fail if no length exists in this codepath */
+					addFileEntry(binFileName, bis, length);
+				} else {
+					/*
+					 * This *should* never happen that we fall back to writing as an array from the input stream because
+					 * normally we will always have the length saved on the node. But re are trying to be as resilient
+					 * as possible here falling back to this rather than failing the entire export
+					 */
+					addFileEntry(binFileName, IOUtils.toByteArray(bis));
+				}
+
+			} catch (Exception e) {
+				throw ExUtil.wrapEx(e);
+			} finally {
+				StreamUtil.close(is);
+			}
+		}
+	}
+
+	// todo-0: do we need writeFile in here?
+	private void appendAttachmentHtml(String deeperPath, String parentFolder, StringBuilder html, boolean appendFullHtml,
+			boolean writeFile, String nodeId, String fileName, Attachment att) {
+		String ext = null;
+		String binFileNameProp = att.getFileName();
+		if (binFileNameProp != null) {
+			ext = FilenameUtils.getExtension(binFileNameProp);
+			if (!StringUtils.isEmpty(ext)) {
+				ext = "." + ext;
+			}
+		}
+		String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
+		String mimeType = att.getMime();
+		String fullUrl = parentFolder + "/" + fileName + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
+		String relPath = writeFile ? "" : (fileName + "/");
+		String url = att.getUrl();
+
+		// if no exernal link, this is a local file so build path to it.
+		if (url == null) {
+			url = "./" + deeperPath + relPath + att.getKey() + ext;
+		} else {
+			binFileNameStr = "External image";
+		}
+
+		if (mimeType == null)
+			return;
+
+		appendContent(html, appendFullHtml, "<div class='attachment'>");
+
+		if (mimeType.startsWith("image/")) {
+			appendImgLink(html, nodeId, binFileNameStr, url);
+
+			if (appendFullHtml) {
+				appendImgLink(fullHtml, nodeId, binFileNameStr, fullUrl);
+			}
+		} else {
+			appendNonImgLink(html, binFileNameStr, url);
+
+			if (appendFullHtml) {
+				appendNonImgLink(fullHtml, binFileNameStr, fullUrl);
+			}
+		}
+		appendContent(html, appendFullHtml, "</div>");
+	}
+
+	private void appendImgLink(StringBuilder html, String nodeId, String binFileNameStr, String url) {
+		html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
+				+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId + "\").style.width=\"\"' src='" + url
+				+ "'/>");
+	}
+
+	private void appendNonImgLink(StringBuilder html, String binFileNameStr, String url) {
+		html.append("<a class='link' target='_blank' href='" + url + "'>Attachment: " + binFileNameStr + "</a>");
+	}
+
+	private void appendContent(StringBuilder html, boolean appendFullHtml, String content) {
+		html.append(content);
+		if (appendFullHtml) {
+			fullHtml.append(content);
+		}
+	}
+
+	private void appendNodeHtmlContent(SubNode node, StringBuilder html, String content) {
+		String escapedContent = StringEscapeUtils.escapeHtml4(content);
+		if (node.isType(NodeType.PLAIN_TEXT)) {
+			html.append("\n<pre>" + escapedContent + "\n</pre>\n");
+		} else {
+			html.append("\n<div class='markdown container'>" + escapedContent + "\n</div>\n");
 		}
 	}
 
@@ -424,7 +501,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	}
 
 	private void addFileEntry(String fileName, byte[] bytes) {
-		log.debug("addFileEntry: " + fileName);
+		// log.debug("addFileEntry: " + fileName);
 		/*
 		 * If we have duplicated a filename, number it sequentially to create a unique file
 		 */
@@ -438,7 +515,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 
 		fileNameSet.add(fileName);
-
 		addEntry(fileName, bytes);
 	}
 
@@ -479,7 +555,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 
 		fileName = cleanupFileName(fileName);
-		log.debug(" nodePath=[" + node.getPath() + "] fileName=[" + fileName + "]");
+		// log.debug(" nodePath=[" + node.getPath() + "] fileName=[" + fileName + "]");
 
 		fileName = XString.trimToMaxLen(fileName, 40);
 		return fileName;

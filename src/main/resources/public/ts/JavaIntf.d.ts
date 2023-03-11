@@ -208,6 +208,13 @@ export interface ExportRequest extends RequestBase {
     fileName: string;
     toIpfs: boolean;
     includeToc: boolean;
+    largeHtmlFile: boolean;
+    attOneFolder: boolean;
+    includeJSON: boolean;
+    includeMD: boolean;
+    includeHTML: boolean;
+    includeIDs: boolean;
+    dividerLine: boolean;
 }
 
 export interface FileSearchRequest extends RequestBase {

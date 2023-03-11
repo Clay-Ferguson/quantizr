@@ -18,8 +18,11 @@ if [ "$CLEAN" == "true" ]; then
 fi
 
 # copy the marked js file into location where export engine finds it
-cp ${PRJROOT}/src/main/resources/public/node_modules/marked/marked.min.js \
-   ${PRJROOT}/src/main/resources/public/export-includes/marked.min.js
+# The latest marked version that I need for support in static html files is missing
+# the typescript type file, so I'm leving my NPM at an older version and putting
+# the latest version manually into 'export-includes'
+# cp ${PRJROOT}/src/main/resources/public/node_modules/marked/marked.min.js \
+#    ${PRJROOT}/src/main/resources/public/export-includes/marked.min.js
 
 # Run ignore-scripts for some security from NodeJS
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.

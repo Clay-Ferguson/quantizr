@@ -3,6 +3,14 @@ body {
     color: white;
 }
 
+.markdown {
+    margin: 20px;
+}
+
+.attachment {
+    margin-left: 20px;
+}
+
 .markdown kbd,
 .markdown pre,
 .markdown samp {    
@@ -11,6 +19,7 @@ body {
     padding: 8px;
     background-color: black;
     color: green;
+    font-size: 115%;
 }
 
 a:link, a:visited {

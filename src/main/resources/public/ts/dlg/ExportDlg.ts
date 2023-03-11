@@ -23,6 +23,13 @@ interface LS { // Local State
     exportType: string;
     toIpfs?: boolean;
     includeToc?: boolean;
+    largeHtmlFile?: boolean;
+    attOneFolder?: boolean;
+    includeJSON?: boolean;
+    includeMD?: boolean;
+    includeHTML?: boolean;
+    includeIDs?: boolean;
+    dividerLine?: boolean;
 }
 
 export class ExportDlg extends DialogBase {
@@ -34,7 +41,14 @@ export class ExportDlg extends DialogBase {
         super("Export Node");
         this.mergeState<LS>({
             exportType: "zip",
-            includeToc: true
+            includeToc: true,
+            largeHtmlFile: true,
+            attOneFolder: false,
+            includeJSON: true,
+            includeMD: true,
+            includeHTML: true,
+            includeIDs: true,
+            dividerLine: true
             // toIpfs: false <--- set by 'saveToIpfsState'
         });
         this.fileNameState.setValue(node.name);
@@ -42,6 +56,7 @@ export class ExportDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const ast = getAs();
+        const exportType = this.getState<LS>().exportType
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
@@ -53,7 +68,8 @@ export class ExportDlg extends DialogBase {
                 this.radioButton("PDF", "pdf"),
                 this.radioButton("HTML", "html")
             ], "radioButtonsBar marginTop"),
-            this.getState<LS>().exportType === "pdf" ? this.makePdfOptions() : null,
+            exportType === "pdf" ? this.makePdfOptions() : null,
+            exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
             ast.config.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
@@ -74,6 +90,43 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
+    makeArchiveOptions = (): Div => {
+        return new Div(null, { className: "bigMarginLeft bigMarginBottom" }, [
+
+            new Heading(5, "Files to Include", { className: "bigMarginTop" }),
+            new Checkbox("Full HTML File", null, {
+                setValue: (checked: boolean) => this.getState<LS>().largeHtmlFile = checked,
+                getValue: (): boolean => this.getState<LS>().largeHtmlFile
+            }),
+            new Checkbox("HTML", null, {
+                setValue: (checked: boolean) => this.getState<LS>().includeHTML = checked,
+                getValue: (): boolean => this.getState<LS>().includeHTML
+            }),
+            new Checkbox("JSON", null, {
+                setValue: (checked: boolean) => this.getState<LS>().includeJSON = checked,
+                getValue: (): boolean => this.getState<LS>().includeJSON
+            }),
+            new Checkbox("Markdown", null, {
+                setValue: (checked: boolean) => this.getState<LS>().includeMD = checked,
+                getValue: (): boolean => this.getState<LS>().includeMD
+            }),
+
+            new Heading(5, "Other Options", { className: "bigMarginTop" }),
+            new Checkbox("Attachments Folder", null, {
+                setValue: (checked: boolean) => this.getState<LS>().attOneFolder = checked,
+                getValue: (): boolean => this.getState<LS>().attOneFolder
+            }),
+            new Checkbox("IDs", null, {
+                setValue: (checked: boolean) => this.getState<LS>().includeIDs = checked,
+                getValue: (): boolean => this.getState<LS>().includeIDs
+            }),
+            new Checkbox("Divider Line", null, {
+                setValue: (checked: boolean) => this.getState<LS>().dividerLine = checked,
+                getValue: (): boolean => this.getState<LS>().dividerLine
+            })
+        ]);
+    }
+
     radioButton = (name: string, exportType: string) => {
         return new Span(null, null, [
             new RadioButton(name, false, "exportTypeGroup", null, {
@@ -88,13 +141,21 @@ export class ExportDlg extends DialogBase {
     }
 
     exportNodes = async () => {
+        debugger;
         const state = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,
             fileName: this.fileNameState.getValue(),
             toIpfs: state.toIpfs,
-            includeToc: state.includeToc
+            includeToc: state.includeToc,
+            largeHtmlFile: state.largeHtmlFile,
+            attOneFolder: state.attOneFolder,
+            includeJSON: state.includeJSON,
+            includeMD: state.includeMD,
+            includeHTML: state.includeHTML,
+            includeIDs: state.includeIDs,
+            dividerLine: state.dividerLine
         });
         this.exportResponse(res);
         this.close();

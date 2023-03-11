@@ -1,8 +1,13 @@
 console.log("loaded process page.");
 
-var elements = document.getElementsByClassName("markdown");
-for (var i = 0; i < elements.length; i++) {
-    elements[i].innerHTML = marked(elements[i].innerHTML);
+if (marked && marked.parse) {
+    var elements = document.getElementsByClassName("markdown");
+    for (var i = 0; i < elements.length; i++) {
+        elements[i].innerHTML = marked.parse(elements[i].innerHTML);
+    }
+}
+else {
+    console.error("marked failed to load.");
 }
 
 window.onload = function () {
