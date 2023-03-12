@@ -421,7 +421,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 	}
 
-	// todo-0: do we need writeFile in here?
 	private void appendAttachmentHtml(String deeperPath, String parentFolder, StringBuilder html, boolean appendFullHtml,
 			boolean writeFile, String nodeId, String fileName, Attachment att) {
 		String ext = null;

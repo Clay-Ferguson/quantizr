@@ -3,6 +3,7 @@ import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
@@ -21,57 +22,72 @@ export class SettingsView extends AppTab<any, SettingsView> {
     }
 
     sectionTitle(title: string): Heading {
-        return new Heading(4, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(5, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
     preRender(): void {
         const ast = getAs();
+        const horzClass = "horizontalLayoutComp accountSettingsSection";
 
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
             ]),
 
-            new Div(null, { className: "marginLeft" }, [
+            new Div(null, { className: "accountSettingsPanel" }, [
+                // -----------------------
                 this.sectionTitle("Account"),
-                this.settingsLink("Logout", S.user.userLogout), //
-                this.settingsLink("Edit Profile", () => { new UserProfileDlg(null).open(); }), //
-                this.settingsLink("Storage Space", () => { new ManageStorageDlg().open(); }), //
-                this.settingsLink("Manage Hashtags", S.edit.editHashtags),
-                S.crypto.avail ? this.settingsLink("Manage Keys", () => { new ManageCryptoKeysDlg().open(); }) : null, //
-                this.settingsLink("Change Password", () => { new ChangePasswordDlg(null).open(); }), //
+                new HorizontalLayout([
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("Logout", S.user.userLogout), //
+                        this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
+                        this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()) //
+                    ]),
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("Storage Space", () => new ManageStorageDlg().open()), //
+                        this.settingsLink("Manage Hashtags", S.edit.editHashtags),
+                        S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null //
+                    ])
+                ], horzClass),
 
+                // -----------------------
                 this.sectionTitle("View Options"),
-                new Checkbox("Show Sensitive Content", { className: "bigMarginLeft" }, {
-                    setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
-                    getValue: (): boolean => ast.userPrefs.nsfw
-                }),
+                new HorizontalLayout([
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        new Checkbox("Show Sensitive Content", { className: "bigMarginLeft" }, {
+                            setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
+                            getValue: (): boolean => ast.userPrefs.nsfw
+                        }),
 
-                new Checkbox("Show Parent", { className: "bigMarginLeft" }, {
-                    setValue: async (checked: boolean) => {
-                        await S.util.saveUserPrefs(s => s.userPrefs.showParents = checked);
-                    },
-                    getValue: (): boolean => ast.userPrefs.showParents
-                }),
+                        new Checkbox("Show Parent", { className: "bigMarginLeft" }, {
+                            setValue: async (checked: boolean) => {
+                                await S.util.saveUserPrefs(s => s.userPrefs.showParents = checked);
+                            },
+                            getValue: (): boolean => ast.userPrefs.showParents
+                        }),
 
-                new Checkbox("Show Comments", { className: "bigMarginLeft" }, {
-                    setValue: async (checked: boolean) => S.edit.setShowReplies(checked),
-                    getValue: (): boolean => ast.userPrefs.showReplies
-                }),
+                        new Checkbox("Show Comments", { className: "bigMarginLeft" }, {
+                            setValue: async (checked: boolean) => S.edit.setShowReplies(checked),
+                            getValue: (): boolean => ast.userPrefs.showReplies
+                        })
+                    ]),
 
-                new Checkbox("Show Properties", { className: "bigMarginLeft" }, {
-                    setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
-                    getValue: (): boolean => ast.userPrefs.showProps
-                }),
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        new Checkbox("Show Properties", { className: "bigMarginLeft" }, {
+                            setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
+                            getValue: (): boolean => ast.userPrefs.showProps
+                        }),
 
-                /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
-                 that I have to impose an intentional performance lag to let the animation show up, so in order to have the
-                 absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
-                 the code in place for future reference. */
-                new Checkbox("Mouse Effects", { className: "bigMarginLeft" }, {
-                    setValue: async (checked: boolean) => S.domUtil.setMouseEffect(checked),
-                    getValue: (): boolean => S.domUtil.mouseEffect
-                }),
+                        /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
+                         that I have to impose an intentional performance lag to let the animation show up, so in order to have the
+                         absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
+                         the code in place for future reference. */
+                        new Checkbox("Mouse Effects", { className: "bigMarginLeft" }, {
+                            setValue: async (checked: boolean) => S.domUtil.setMouseEffect(checked),
+                            getValue: (): boolean => S.domUtil.mouseEffect
+                        })
+                    ])
+                ], horzClass),
 
                 new Selection(null, "Content Width", [
                     { key: "4", val: "Very Narrow" },
@@ -83,20 +99,35 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),
+
                 this.settingsLink(ast.mobileMode ? "Switch to Desktop Browser" : "Switch to Moble Browser", S.util.switchBrowsingMode, "marginTop"),
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
 
+                // -----------------------
                 this.sectionTitle("Tools"),
-                this.settingsLink("Test Microphone", () => { new MediaRecorderDlg(false, false).open(); }), //
-                this.settingsLink("Test Web Cam", () => { new MediaRecorderDlg(true, false).open(); }), //
-                this.settingsLink("My GEO Location", S.nav.geoLocation), //
-                this.settingsLink("About Browser", S.util.showBrowserInfo), //
+                new HorizontalLayout([
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("Test Microphone", () => new MediaRecorderDlg(false, false).open()), //
+                        this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
+                    ]),
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("My GEO Location", S.nav.geoLocation), //
+                        this.settingsLink("About Browser", S.util.showBrowserInfo)
+                    ])
+                ], horzClass),
 
+                // -----------------------
                 this.sectionTitle("Danger Zone"),
-                this.settingsLink("Bulk Delete", () => { S.edit.bulkDelete(); }), //
-                this.settingsLink("Close Account", () => { S.user.closeAccount(); }) //
+                new HorizontalLayout([
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("Bulk Delete", S.edit.bulkDelete)
+                    ]),
+                    new Div(null, { className: "accountSettingsCol" }, [
+                        this.settingsLink("Close Account", S.user.closeAccount)
+                    ])
+                ], horzClass)
             ])
         ]);
     }

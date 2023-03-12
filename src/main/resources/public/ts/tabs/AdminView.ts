@@ -57,7 +57,6 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("Utils"),
 
-                // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                 this.settingsLink("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
                 this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //

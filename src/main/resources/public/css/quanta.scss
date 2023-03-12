@@ -2401,6 +2401,24 @@ audio::-webkit-media-controls-play-button {
     margin-left: $smallGap;
 }
 
+.contentWidthSelection {
+    margin-bottom: 12px;
+    max-width: 20rem;
+}
+
+.accountSettingsCol {
+    width: 50%;
+}
+
+.accountSettingsPanel {
+    margin-left: $smallGap;
+    width: 100%;
+}
+
+.accountSettingsSection {
+    width: 100%;
+}
+
 .settingsLink {
     cursor: pointer;
     font-size: 120%;
@@ -2414,9 +2432,5 @@ audio::-webkit-media-controls-play-button {
     padding: 6px 6px 6px 12px;
     border: 1px solid $nodeBorderBottomColor;
     text-align: center;
-}
-
-.contentWidthSelection {
-    margin-bottom: 12px;
-    max-width: 20rem;
+    margin-right: $bigGap;
 }
