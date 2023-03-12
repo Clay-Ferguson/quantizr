@@ -7,6 +7,19 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 
+export interface ExportSettings {
+    exportType: string;
+    toIpfs?: boolean;
+    includeToc?: boolean;
+    largeHtmlFile?: boolean;
+    attOneFolder?: boolean;
+    includeJSON?: boolean;
+    includeMD?: boolean;
+    includeHTML?: boolean;
+    includeIDs?: boolean;
+    dividerLine?: boolean;
+}
+
 export class AppState {
     constructor() {
         console.log("Constructing AppState");
@@ -99,6 +112,18 @@ export class AppState {
         maxUploadFileSize: 0,
         enableIPSM: false,
         mainPanelCols: 6
+    };
+
+    exportSettings: ExportSettings = {
+        exportType: "zip",
+        includeToc: true,
+        largeHtmlFile: true,
+        attOneFolder: false,
+        includeJSON: true,
+        includeMD: true,
+        includeHTML: true,
+        includeIDs: true,
+        dividerLine: true
     };
 
     userProfile: J.UserProfile = null;

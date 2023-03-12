@@ -1,4 +1,4 @@
-import { getAs } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
@@ -19,19 +19,6 @@ import { Validator } from "../Validator";
 import { Value } from "../Value";
 import { MessageDlg } from "./MessageDlg";
 
-interface LS { // Local State
-    exportType: string;
-    toIpfs?: boolean;
-    includeToc?: boolean;
-    largeHtmlFile?: boolean;
-    attOneFolder?: boolean;
-    includeJSON?: boolean;
-    includeMD?: boolean;
-    includeHTML?: boolean;
-    includeIDs?: boolean;
-    dividerLine?: boolean;
-}
-
 export class ExportDlg extends DialogBase {
 
     fileNameState: Validator = new Validator();
@@ -39,24 +26,12 @@ export class ExportDlg extends DialogBase {
 
     constructor(private node: NodeInfo) {
         super("Export Node");
-        this.mergeState<LS>({
-            exportType: "zip",
-            includeToc: true,
-            largeHtmlFile: true,
-            attOneFolder: false,
-            includeJSON: true,
-            includeMD: true,
-            includeHTML: true,
-            includeIDs: true,
-            dividerLine: true
-            // toIpfs: false <--- set by 'saveToIpfsState'
-        });
         this.fileNameState.setValue(node.name);
     }
 
     renderDlg(): CompIntf[] {
         const ast = getAs();
-        const exportType = this.getState<LS>().exportType
+        const exportType = ast.exportSettings.exportType
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
@@ -84,8 +59,8 @@ export class ExportDlg extends DialogBase {
         return new Div(null, { className: "bigMarginBottom" }, [
             new Heading(5, "PDF Options"),
             new Checkbox("Include Table of Contents (using Markdown Headings)", null, {
-                setValue: (checked: boolean) => this.getState<LS>().includeToc = checked,
-                getValue: (): boolean => this.getState<LS>().includeToc
+                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
+                getValue: (): boolean => getAs().exportSettings.includeToc
             })
         ]);
     }
@@ -95,34 +70,34 @@ export class ExportDlg extends DialogBase {
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
             new Checkbox("Full HTML File", null, {
-                setValue: (checked: boolean) => this.getState<LS>().largeHtmlFile = checked,
-                getValue: (): boolean => this.getState<LS>().largeHtmlFile
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.largeHtmlFile = checked; }),
+                getValue: (): boolean => getAs().exportSettings.largeHtmlFile
             }),
             new Checkbox("HTML", null, {
-                setValue: (checked: boolean) => this.getState<LS>().includeHTML = checked,
-                getValue: (): boolean => this.getState<LS>().includeHTML
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeHTML = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeHTML
             }),
             new Checkbox("JSON", null, {
-                setValue: (checked: boolean) => this.getState<LS>().includeJSON = checked,
-                getValue: (): boolean => this.getState<LS>().includeJSON
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJSON = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeJSON
             }),
             new Checkbox("Markdown", null, {
-                setValue: (checked: boolean) => this.getState<LS>().includeMD = checked,
-                getValue: (): boolean => this.getState<LS>().includeMD
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeMD = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeMD
             }),
 
             new Heading(5, "Other Options", { className: "bigMarginTop" }),
             new Checkbox("Attachments Folder", null, {
-                setValue: (checked: boolean) => this.getState<LS>().attOneFolder = checked,
-                getValue: (): boolean => this.getState<LS>().attOneFolder
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
+                getValue: (): boolean => getAs().exportSettings.attOneFolder
             }),
             new Checkbox("IDs", null, {
-                setValue: (checked: boolean) => this.getState<LS>().includeIDs = checked,
-                getValue: (): boolean => this.getState<LS>().includeIDs
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
+                getValue: (): boolean => getAs().exportSettings.includeIDs
             }),
             new Checkbox("Divider Line", null, {
-                setValue: (checked: boolean) => this.getState<LS>().dividerLine = checked,
-                getValue: (): boolean => this.getState<LS>().dividerLine
+                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
+                getValue: (): boolean => getAs().exportSettings.dividerLine
             })
         ]);
     }
@@ -132,30 +107,29 @@ export class ExportDlg extends DialogBase {
             new RadioButton(name, false, "exportTypeGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {
-                        this.mergeState<LS>({ exportType });
+                        dispatch("exportSetting", s => s.exportSettings.exportType = exportType);
                     }
                 },
-                getValue: (): boolean => this.getState<LS>().exportType === exportType
+                getValue: (): boolean => getAs().exportSettings.exportType === exportType
             }, "form-check-inline marginRight")
         ]);
     }
 
     exportNodes = async () => {
-        debugger;
-        const state = this.getState<LS>();
+        const ast = getAs();
         const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
-            exportExt: state.exportType,
+            exportExt: ast.exportSettings.exportType,
             fileName: this.fileNameState.getValue(),
-            toIpfs: state.toIpfs,
-            includeToc: state.includeToc,
-            largeHtmlFile: state.largeHtmlFile,
-            attOneFolder: state.attOneFolder,
-            includeJSON: state.includeJSON,
-            includeMD: state.includeMD,
-            includeHTML: state.includeHTML,
-            includeIDs: state.includeIDs,
-            dividerLine: state.dividerLine
+            toIpfs: ast.exportSettings.toIpfs,
+            includeToc: ast.exportSettings.includeToc,
+            largeHtmlFile: ast.exportSettings.largeHtmlFile,
+            attOneFolder: ast.exportSettings.attOneFolder,
+            includeJSON: ast.exportSettings.includeJSON,
+            includeMD: ast.exportSettings.includeMD,
+            includeHTML: ast.exportSettings.includeHTML,
+            includeIDs: ast.exportSettings.includeIDs,
+            dividerLine: ast.exportSettings.dividerLine
         });
         this.exportResponse(res);
         this.close();
