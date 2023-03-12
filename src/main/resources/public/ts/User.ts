@@ -184,6 +184,8 @@ export class User {
             if (usr !== J.PrincipalName.ANON) {
 
                 await promiseDispatch("unknownPubKeys", s => {
+                    // we capture these 'unknowns' here, but we only issue a warning to user only later on
+                    // if/when the crypto is actually attempted to be used.
                     s.unknownPubEncKey = res.unknownPubEncKey;
                     s.unknownPubSigKey = res.unknownPubSigKey;
                 });

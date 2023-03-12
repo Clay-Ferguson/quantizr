@@ -579,7 +579,7 @@ export class EditNodeDlg extends DialogBase {
         const ast = getAs();
         const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
-                if (S.crypto.warnIfEncKeyUnknown()) {
+                if (S.crypto.encKeyOk()) {
                     this.utl.setEncryption(this, checked);
                 }
             },
@@ -588,7 +588,7 @@ export class EditNodeDlg extends DialogBase {
 
         const signCheckBox = advancedOpts.sign && S.crypto.avail ? new Checkbox("Sign", null, {
             setValue: (checked: boolean) => {
-                if (S.crypto.warnIfSigKeyUnknown()) {
+                if (checked && S.crypto.sigKeyOk()) {
                     this.mergeState({ signCheckboxVal: checked });
                 }
             },

@@ -351,7 +351,7 @@ export class NodeCompRowHeader extends Div {
         if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
             if (editingAllowed && editableNode) {
                 editButton = new Icon({
-                    className: "fa fa-edit fa-lg marginRight",
+                    className: "fa fa-edit fa-lg buttonBarIcon",
                     onClick: S.edit.runEditNodeByClick,
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
@@ -388,7 +388,7 @@ export class NodeCompRowHeader extends Div {
             if (targetId) {
                 jumpButtonAdded = true;
                 jumpButton = new Icon({
-                    className: "fa fa-arrow-right fa-lg marginRight",
+                    className: "fa fa-arrow-right fa-lg buttonBarIcon",
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to Tree"
                 });
@@ -398,7 +398,7 @@ export class NodeCompRowHeader extends Div {
         /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
         if (this.jumpButton && !jumpButtonAdded) {
             jumpButton = new Icon({
-                className: "fa fa-arrow-right fa-lg marginRight",
+                className: "fa fa-arrow-right fa-lg buttonBarIcon",
                 onClick: () => S.srch.clickSearchNode(this.node.id),
                 title: "Jump to Tree"
             });

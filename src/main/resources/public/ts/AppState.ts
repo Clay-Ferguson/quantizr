@@ -179,8 +179,8 @@ export class AppState {
 
     graphData: J.GraphNode;
 
-    unknownPubEncKey: boolean;
-    unknownPubSigKey: boolean;
+    unknownPubEncKey: boolean = false;
+    unknownPubSigKey: boolean = false;
 
     morePanelExpanded: boolean;
     propsPanelExpanded: boolean;

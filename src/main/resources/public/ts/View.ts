@@ -318,7 +318,7 @@ export class View {
     }
 
     signSubGraph = async (): Promise<any> => {
-        if (!S.crypto.warnIfEncKeyUnknown()) {
+        if (!S.crypto.sigKeyOk()) {
             return null;
         }
         const node = S.nodeUtil.getHighlightedNode();

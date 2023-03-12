@@ -349,7 +349,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Export", MenuPanel.export, exportFeatureEnabled),
                 new MenuItemSeparator(), //
 
-                !ast.unknownPubSigKey && S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
+                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine) : null, //
                 new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, selNodeIsMine), //
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, selNodeIsMine) //
 

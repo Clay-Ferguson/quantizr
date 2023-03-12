@@ -22,6 +22,10 @@ Original way I had for creating a hash-based key from a password:
 
 export class Crypto {
     readonly avail: boolean = !!(crypto?.subtle);
+    warningShown: boolean = false;
+
+    static userWarnedAboutPubEncKey: boolean = false;
+    static userWarnedAboutPubSigKey: boolean = false;
 
     // cache the keys here for faster access.
     privateEncKey: CryptoKey = null;
@@ -782,8 +786,7 @@ export class Crypto {
     /* This method will simply sign all the strings in 'dataToSign' and then send it up to the server when done */
     generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
 
-        if (getAs().unknownPubSigKey) {
-            console.warn("Unrecognized key");
+        if (!this.sigKeyOk()) {
             return null;
         }
 
@@ -799,9 +802,8 @@ export class Crypto {
     }
 
     signNode = async (node: J.NodeInfo): Promise<void> => {
-        if (getAs().unknownPubSigKey) {
-            console.warn("Unrecognized key");
-            return;
+        if (!this.sigKeyOk()) {
+            return null;
         }
 
         if (!this.avail) {
@@ -844,36 +846,59 @@ export class Crypto {
         return null;
     }
 
-    // returns true if key is ok to use
-    warnIfEncKeyUnknown = () => {
+    cryptoWarning = () => {
+        if (!this.warningShown) {
+            this.warningShown = true;
+            S.util.showMessage("Crypto not available in browser.", "Crypto");
+        }
+    }
+
+    // returns true of key is ok to use
+    sigKeyOk = () => {
+        if (!this.avail) {
+            this.cryptoWarning();
+            return false;
+        }
         let ret = true;
-        const ast = getAs();
-        if (ast.unknownPubEncKey) {
+        if (getAs().unknownPubSigKey) {
             ret = false;
-            this.showEncryptionKeyProblem("Encryption Key (Asymmetric Key)", "Encryption");
+            // warn user only once
+            if (!Crypto.userWarnedAboutPubSigKey) {
+                Crypto.userWarnedAboutPubSigKey = true;
+                this.showEncryptionKeyProblem("Signature Key", "Signature");
+            }
         }
         return ret;
     }
 
-    // returns true of key is ok to use
-    warnIfSigKeyUnknown = () => {
+    encKeyOk = () => {
+        if (!this.avail) {
+            this.cryptoWarning();
+            return false;
+        }
         let ret = true;
-        const ast = getAs();
-        if (ast.unknownPubSigKey) {
+        if (getAs().unknownPubEncKey) {
             ret = false;
-            this.showEncryptionKeyProblem("Signature Key", "Signature")
+            // warn user only once
+            if (!Crypto.userWarnedAboutPubEncKey) {
+                Crypto.userWarnedAboutPubEncKey = true;
+                this.showEncryptionKeyProblem("Encryption Key", "Encryption");
+            }
         }
         return ret;
     }
 
     showEncryptionKeyProblem = (keyName: string, featureName: string) => {
-        S.util.showMessage("Your " + keyName + " doesn't match the public key that the server has for you: \n" +
-            "\nYou need to fix this before you can use " + featureName + " features.\n\n" +
-            "Three ways to fix: \n" +
-            "* Use the original browser where your keys got initialized from.\n" +
-            "* or, Go to `Menu->Account->Security Keys` and publish the key(s) from this browser.\n" +
-            "* or, Import the key(s) from your original browser into this browser."
-            , "Unknown PublicKeys/Browser", true);
+        // run in async timout to be sure not to interfere with any react state flow (recursive dispatching)
+        setTimeout(() => {
+            S.util.showMessage("Your " + keyName + " doesn't match the public key that the server has for you: \n" +
+                "\nYou need to fix this before you can use " + featureName + " features.\n\n" +
+                "Three ways to fix: \n" +
+                "* Use the original browser where your keys got initialized from.\n" +
+                "* or, Go to `Account -> Manage Keys` and publish the key(s) from this browser.\n" +
+                "* or, Import the key(s) from your original browser into this browser."
+                , "Unknown Security Key", true);
+        }, 100);
     }
 
     // ab2str = (buf: ArrayBuffer) => {
