@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.toc.internal.TocOptions;
@@ -120,7 +122,11 @@ public class ExportServiceFlexmark extends ServiceBase {
 			// options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
 			MutableDataSet options = new MutableDataSet();
-			options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), TocExtension.create()));
+			options.set(Parser.EXTENSIONS, Arrays.asList(//
+					TablesExtension.create(), //
+					TocExtension.create(), //
+					AnchorLinkExtension.create(), //
+					AutolinkExtension.create()));
 			options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
 
 			// This numbering works in the TOC but I haven't figured out how to number the
@@ -270,10 +276,10 @@ public class ExportServiceFlexmark extends ServiceBase {
 		markdown.append("\n");
 		markdown.append(node.getContent());
 		markdown.append("\n");
-		writeImage(node);
+		writeImages(node);
 	}
 
-	private void writeImage(SubNode node) {
+	private void writeImages(SubNode node) {
 		List<Attachment> atts = node.getOrderedAttachments();
 		if (atts == null)
 			return;

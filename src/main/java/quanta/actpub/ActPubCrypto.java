@@ -111,7 +111,6 @@ public class ActPubCrypto extends ServiceBase {
             throw new RuntimeException("Header signature missing 'headers'");
         if (signature == null)
             throw new RuntimeException("Header signature missing 'signature'");
-
         if (!headers.getVal().contains("(request-target)"))
             throw new RuntimeException("(request-target) is not in signed headers");
         if (!headers.getVal().contains("date"))

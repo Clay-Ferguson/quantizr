@@ -63,7 +63,6 @@ public class AclService extends ServiceBase {
 
 	public CopySharingResponse copySharing(MongoSession ms, CopySharingRequest req) {
 		CopySharingResponse res = new CopySharingResponse();
-
 		SubNode node = read.getNode(ms, req.getNodeId());
 		BulkOperations bops = null;
 

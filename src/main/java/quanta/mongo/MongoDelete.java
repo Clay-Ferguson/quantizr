@@ -37,7 +37,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
-
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
