@@ -85,7 +85,7 @@ services:
             XMX: "${XMX}"
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
-            # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest"
+            # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest,SchemaOrgTest"
             # **** Tip ****: remember to put this line in setenv-dev.sh if running IPFS tests: `export ipfsEnabled="true"`
             runTests:
             

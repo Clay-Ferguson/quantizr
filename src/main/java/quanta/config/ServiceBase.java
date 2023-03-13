@@ -56,6 +56,7 @@ import quanta.service.NodeSearchService;
 import quanta.service.OpenGraphService;
 import quanta.service.PushService;
 import quanta.service.RSSFeedService;
+import quanta.service.SchemaOrgService;
 import quanta.service.SystemService;
 import quanta.service.UserFeedService;
 import quanta.service.UserManagerService;
@@ -157,6 +158,7 @@ public class ServiceBase {
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
 	public static CryptoService crypto;
+	public static SchemaOrgService schema;
 
 	public static IPFSService ipfs;
 	public static IPFSCat ipfsCat;
@@ -242,6 +244,7 @@ public class ServiceBase {
 			rssType = getBean(ctx, RssFeedType.class);
 			mongoRepo = getBean(ctx, MongoRepository.class);
 			crypto = getBean(ctx, CryptoService.class);
+			schema = getBean(ctx, SchemaOrgService.class);
 
 			ipfs = getBean(ctx, IPFSService.class);
 			ipfsCat = getBean(ctx, IPFSCat.class);
