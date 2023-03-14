@@ -98,7 +98,8 @@ export class AppState {
     ttsRan: boolean = false;
     showTtsInputText: boolean = false;
 
-    anonShowLHSMenu = false;
+    anonShowLHSMenu: boolean = false;
+    schemaOrgProps: boolean = false;
 
     userPrefs: J.UserPreferences = {
         editMode: false,

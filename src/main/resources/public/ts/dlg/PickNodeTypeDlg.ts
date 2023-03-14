@@ -1,6 +1,8 @@
+import { dispatch, getAs } from "../AppContext";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { NodeTypeListBox } from "../comp/NodeTypeListBox";
@@ -13,8 +15,7 @@ interface LS { // Local State
     selType?: string;
 }
 
-// todo-0: rename to PickNodeType
-export class ChangeNodeTypeDlg extends DialogBase {
+export class PickNodeTypeDlg extends DialogBase {
 
     searchTextState: Validator = new Validator();
     searchTextField: TextField;
@@ -23,16 +24,16 @@ export class ChangeNodeTypeDlg extends DialogBase {
     selCallback: Function = null;
     inlineButton: Button;
 
-    static inst: ChangeNodeTypeDlg = null;
+    static inst: PickNodeTypeDlg = null;
     static searchDirty = false;
     static dirtyCounter = 0;
     static interval = setInterval(() => {
-        if (!ChangeNodeTypeDlg.inst) return;
-        if (ChangeNodeTypeDlg.searchDirty) {
-            ChangeNodeTypeDlg.dirtyCounter++;
-            if (ChangeNodeTypeDlg.dirtyCounter >= 2) {
-                ChangeNodeTypeDlg.searchDirty = false;
-                setTimeout(ChangeNodeTypeDlg.inst.typeSearch, 10);
+        if (!PickNodeTypeDlg.inst) return;
+        if (PickNodeTypeDlg.searchDirty) {
+            PickNodeTypeDlg.dirtyCounter++;
+            if (PickNodeTypeDlg.dirtyCounter >= 2) {
+                PickNodeTypeDlg.searchDirty = false;
+                setTimeout(PickNodeTypeDlg.inst.typeSearch, 10);
             }
         }
     }, 500);
@@ -40,7 +41,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
     constructor(curType: string, selCallback: Function) {
         super("Set Node Type", "app-modal-content-narrow-width");
         this.selCallback = selCallback;
-        ChangeNodeTypeDlg.inst = this;
+        PickNodeTypeDlg.inst = this;
 
         this.valIntf = {
             setValue: (val: string) => this.mergeState<LS>({ selType: val }),
@@ -50,8 +51,8 @@ export class ChangeNodeTypeDlg extends DialogBase {
         this.mergeState<LS>({ selType: curType || J.NodeType.NONE });
 
         this.searchTextState.v.onStateChange = (val: any) => {
-            ChangeNodeTypeDlg.searchDirty = true;
-            ChangeNodeTypeDlg.dirtyCounter = 0;
+            PickNodeTypeDlg.searchDirty = true;
+            PickNodeTypeDlg.dirtyCounter = 0;
         };
     }
 
@@ -65,6 +66,10 @@ export class ChangeNodeTypeDlg extends DialogBase {
                     enter: this.typeSearch,
                     outterClass: "typeSearchField"
                 })),
+                new Checkbox("Schema.org Props", { className: "marginRight" }, {
+                    setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.schemaOrgProps = checked; }),
+                    getValue: (): boolean => getAs().schemaOrgProps
+                }),
                 new NodeTypeListBox(this.valIntf, this.searchTextState.getValue()),
                 new ButtonBar([
                     new Button("Set Type", this.setNodeType, null, "btn-primary"),

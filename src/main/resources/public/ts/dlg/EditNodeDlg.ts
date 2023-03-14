@@ -26,7 +26,7 @@ import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
+import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
 
@@ -209,7 +209,10 @@ export class EditNodeDlg extends DialogBase {
                     className: "fa fa-calendar fa-lg dlgIcon"
                 }));
             }
-            span.addChild(new Span(type.getName(), { className: "marginRight" }));
+            span.addChild(new Span(type.getName(), {
+                className: "marginRight clickable",
+                onClick: this.openChangeNodeTypeDlg
+            }));
         }
         else {
             span = span || new Span();
@@ -741,7 +744,7 @@ export class EditNodeDlg extends DialogBase {
 
     openChangeNodeTypeDlg = () => {
         const ast = getAs();
-        new ChangeNodeTypeDlg(ast.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
+        new PickNodeTypeDlg(ast.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
     }
 
     makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {

@@ -21,7 +21,12 @@ export class NodeTypeListBox extends ListBox {
         const types = S.plugin.getAllTypes();
 
         const lcSearchText = this.searchText.toLowerCase();
+        const showSchemaOrg = getAs().schemaOrgProps;
+
         types.forEach((type, k) => {
+            if (type.schemaOrg && !showSchemaOrg) {
+                return;
+            }
             if (!this.searchText || type.getName().toLowerCase().indexOf(lcSearchText) !== -1) {
                 if (getAs().isAdminUser || type.getAllowUserSelect()) {
                     children.push(new NodeTypeListBoxRow(type, () => {
