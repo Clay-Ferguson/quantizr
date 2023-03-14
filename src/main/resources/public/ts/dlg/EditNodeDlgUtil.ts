@@ -205,12 +205,6 @@ export class EditNodeDlgUtil {
         await uploadDlg.open();
     }
 
-    setNodeType = (newType: string) => {
-        const ast = getAs();
-        ast.editNode.type = newType;
-        S.edit.updateNode(ast.editNode);
-    }
-
     deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {

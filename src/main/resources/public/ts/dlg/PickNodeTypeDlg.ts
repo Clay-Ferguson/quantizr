@@ -21,7 +21,7 @@ export class PickNodeTypeDlg extends DialogBase {
     searchTextField: TextField;
 
     valIntf: ValueIntf;
-    selCallback: Function = null;
+    chosenType: string = null;
     inlineButton: Button;
 
     static inst: PickNodeTypeDlg = null;
@@ -38,9 +38,8 @@ export class PickNodeTypeDlg extends DialogBase {
         }
     }, 500);
 
-    constructor(curType: string, selCallback: Function) {
+    constructor(curType: string) {
         super("Set Node Type", "app-modal-content-narrow-width");
-        this.selCallback = selCallback;
         PickNodeTypeDlg.inst = this;
 
         this.valIntf = {
@@ -86,7 +85,7 @@ export class PickNodeTypeDlg extends DialogBase {
     }
 
     setNodeType = () => {
-        this.selCallback(this.getState<LS>().selType);
+        this.chosenType = this.getState<LS>().selType;
         this.close();
     }
 }

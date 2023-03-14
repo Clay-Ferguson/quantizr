@@ -742,9 +742,14 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    openChangeNodeTypeDlg = () => {
+    openChangeNodeTypeDlg = async () => {
         const ast = getAs();
-        new PickNodeTypeDlg(ast.editNode.type, (type: string) => this.utl.setNodeType(type)).open();
+        const dlg = new PickNodeTypeDlg(ast.editNode.type);
+        await dlg.open();
+        if (dlg.chosenType) {
+            ast.editNode.type = dlg.chosenType;
+            S.edit.updateNode(ast.editNode);
+        }
     }
 
     makePropEditor = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
