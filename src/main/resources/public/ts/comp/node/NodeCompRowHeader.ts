@@ -154,7 +154,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
-            if (!this.node.boostedNode) {
+            if (!this.node.boostedNode && !ast.isAdminUser) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
                     className: "fa fa-star fa-lg row-header-icon " + (youLiked ? "likedByMeIcon" : ""),
