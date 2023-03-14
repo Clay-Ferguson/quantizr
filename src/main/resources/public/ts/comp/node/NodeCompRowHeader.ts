@@ -125,7 +125,7 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo) {
             // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
-            if (!ast.isAdminUser && !this.node.boostedNode) {
+            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
                 children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg row-header-icon",
@@ -154,7 +154,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
-            if (!this.node.boostedNode && !ast.isAdminUser) {
+            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
                     className: "fa fa-star fa-lg row-header-icon " + (youLiked ? "likedByMeIcon" : ""),
@@ -227,7 +227,7 @@ export class NodeCompRowHeader extends Div {
             // Don't try to read Foreign server content (by checking actPubId to detect remote)
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
-            if (!actPubId && allowWideViewIcons) {
+            if (!actPubId && !ast.isAnonUser && allowWideViewIcons) {
                 children.push(new Icon({
                     className: "fa fa-lg fa-volume-up row-header-icon",
                     onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },

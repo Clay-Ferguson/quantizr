@@ -64,7 +64,7 @@
     // Leave LHS 20% and RHS 75%, because that adds up to enough less than 100% so that the padding
     // doesn't cause unwanted wrap (in narrow content layouts)
     width: 75%;
-    padding-left: 12px;
+    padding-left: $bigGap;
 }
 
 .openGraphDesc {
