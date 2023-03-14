@@ -28,7 +28,7 @@ export class EditPropertyDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         const type = S.plugin.getType(this.editNode.type);
-        const showSchemaOrg = getAs().schemaOrgProps;
+        const showSchemaOrg = getAs().showSchemaOrgProps;
 
         return [
             new Div(null, { className: "marginBottom" }, [
@@ -36,8 +36,8 @@ export class EditPropertyDlg extends DialogBase {
             ]),
 
             type?.schemaOrg?.props ? new Checkbox("Schema.org Props", { className: "marginRight" }, {
-                setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.schemaOrgProps = checked; }),
-                getValue: (): boolean => getAs().schemaOrgProps
+                setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
+                getValue: (): boolean => getAs().showSchemaOrgProps
             }) : null,
 
             showSchemaOrg && type?.schemaOrg?.props ? new SchemaOrgPropsTable(type.schemaOrg.props) : null,

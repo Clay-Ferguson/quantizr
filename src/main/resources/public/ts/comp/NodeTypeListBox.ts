@@ -21,7 +21,7 @@ export class NodeTypeListBox extends ListBox {
         const types = S.plugin.getAllTypes();
 
         const lcSearchText = this.searchText.toLowerCase();
-        const showSchemaOrg = getAs().schemaOrgProps;
+        const showSchemaOrg = getAs().showSchemaOrgProps;
 
         types.forEach((type, k) => {
             if (type.schemaOrg && !showSchemaOrg) {

@@ -39,7 +39,7 @@ export class PickNodeTypeDlg extends DialogBase {
     }, 500);
 
     constructor(curType: string) {
-        super("Set Node Type", "app-modal-content-narrow-width");
+        super("Choose Type", "app-modal-content-narrow-width");
         PickNodeTypeDlg.inst = this;
 
         this.valIntf = {
@@ -66,12 +66,12 @@ export class PickNodeTypeDlg extends DialogBase {
                     outterClass: "typeSearchField"
                 })),
                 new Checkbox("Schema.org Props", { className: "marginRight" }, {
-                    setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.schemaOrgProps = checked; }),
-                    getValue: (): boolean => getAs().schemaOrgProps
+                    setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
+                    getValue: (): boolean => getAs().showSchemaOrgProps
                 }),
                 new NodeTypeListBox(this.valIntf, this.searchTextState.getValue()),
                 new ButtonBar([
-                    new Button("Set Type", this.setNodeType, null, "btn-primary"),
+                    new Button("Ok", this.setNodeType, null, "btn-primary"),
                     new Button("Cancel", this.close)
                 ], "marginTop")
             ])
