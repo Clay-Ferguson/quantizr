@@ -3,15 +3,11 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
+import { SchemaOrgPropsTable } from "../comp/SchemaOrgPropsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
-
-/*
- * Property Editor Dialog (Edits Node Properties)
- * todo-1: Rename this to EditProperyNameDlg
- */
 export class EditPropertyDlg extends DialogBase {
 
     nameState: Validator = new Validator("", [
@@ -19,15 +15,19 @@ export class EditPropertyDlg extends DialogBase {
     ]);
 
     constructor(private editNode: J.NodeInfo) {
-        super("New Property", "app-modal-content-narrow-width");
+        super("Add Property", "app-modal-content-narrow-width");
         this.validatedStates = [this.nameState];
     }
 
     renderDlg(): CompIntf[] {
+        const type = S.plugin.getType(this.editNode.type);
+
         return [
-            new Div(null, null, [
+            new Div(null, { className: "marginBottom" }, [
                 new TextField({ label: "Name", val: this.nameState })
             ]),
+            type?.schemaOrg?.props ? new Div("Schema.org Props for Type: " + type?.schemaOrg.label) : null,
+            type?.schemaOrg?.props ? new SchemaOrgPropsTable(type.schemaOrg.props) : null,
             new ButtonBar([
                 new Button("Save", this.save, null, "btn-primary"),
                 new Button("Cancel", this.close)

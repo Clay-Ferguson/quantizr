@@ -1360,7 +1360,6 @@ Will come back later and study this more. todo-3 */
     font-family: "monospace";
 }
 
-
 /* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
 .passwordTextField {
     margin-bottom: $tinyGap;
@@ -1371,6 +1370,10 @@ Will come back later and study this more. todo-3 */
     margin-right: 6px;
     vertical-align: middle;
     cursor: pointer;
+}
+
+.typeSearchField {
+    margin-bottom: $smallGap;
 }
 
 .rowTypeIcon {
@@ -1696,6 +1699,14 @@ Will come back later and study this more. todo-3 */
     background: #f9e79f;
 }
 
+.propsList {
+}
+
+.propsListItemCheckBox {
+    vertical-align: middle;
+    margin-left: $smallGap;
+}
+
 .property-table {
 }
 
@@ -2003,6 +2014,11 @@ Will come back later and study this more. todo-3 */
 
 .friendListImgDivCont {
     display: inline-block;
+}
+
+.propNameInList {
+    display: inline-block;
+    margin: $tinyGap;
 }
 
 .friendListImgDiv {

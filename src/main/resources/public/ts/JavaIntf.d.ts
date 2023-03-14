@@ -104,6 +104,17 @@ export interface RssFeedMediaContent {
     medium: string;
 }
 
+export interface SchemaOrgClass {
+    id: string;
+    comment: string;
+    label: string;
+    props: SchemaOrgProp[];
+}
+
+export interface SchemaOrgProp {
+    label: string;
+}
+
 export interface UserProfile {
     displayName: string;
     userName: string;
@@ -286,6 +297,9 @@ export interface GetPeopleRequest extends RequestBase {
 
 export interface GetRepliesViewRequest extends RequestBase {
     nodeId: string;
+}
+
+export interface GetSchemaOrgTypesRequest extends RequestBase {
 }
 
 export interface GetServerInfoRequest extends RequestBase {
@@ -741,6 +755,10 @@ export interface GetPublicServerInfoResponse extends ResponseBase {
 
 export interface GetRepliesViewResponse extends ResponseBase {
     nodes: NodeInfo[];
+}
+
+export interface GetSchemaOrgTypesResponse extends ResponseBase {
+    classes: SchemaOrgClass[];
 }
 
 export interface GetServerInfoResponse extends ResponseBase {

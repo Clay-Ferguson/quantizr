@@ -6,6 +6,7 @@ import { TabIntf } from "./TabIntf";
 
 /* This interface is how Type Plugins are handled */
 export interface TypeIntf {
+    schemaOrg: J.SchemaOrgClass;
     getTypeName(): string;
     getName(): string;
     render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;

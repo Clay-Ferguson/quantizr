@@ -3,9 +3,8 @@ package quanta.service;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,20 +15,14 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
+import quanta.model.client.SchemaOrgClass;
+import quanta.model.client.SchemaOrgProp;
+import quanta.response.GetSchemaOrgTypesResponse;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
 
 @Component
 public class SchemaOrgService extends ServiceBase {
-	/*
-	 * For the PoC experimental code, we'll just hold the schema info in the actual maps we got from a
-	 * generic map parse via faster jackson.
-	 */
-	class SchemaClass {
-		LinkedHashMap<String, Object> clazz;
-		List<LinkedHashMap<String, Object>> properties = new LinkedList<>();
-	}
-
 	private static final Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
 
 	public static final ObjectMapper mapper = new ObjectMapper();
@@ -40,7 +33,8 @@ public class SchemaOrgService extends ServiceBase {
 	 * always afford to do a brute force thru all properties whenever we need to find the properties in
 	 * a given class.
 	 */
-	public static final LinkedHashMap<String, SchemaClass> classes = new LinkedHashMap<>();
+	public static final HashMap<String, SchemaOrgClass> classMap = new HashMap<>();
+	public static final ArrayList<SchemaOrgClass> classList = new ArrayList<>();
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -61,12 +55,6 @@ public class SchemaOrgService extends ServiceBase {
 				} else {
 					// log.debug("SCHEMA.ORG: " + XString.prettyPrint(schema));
 					parseSchema();
-
-					// prove the parsing works by printing Person object properties.
-					// SchemaClass person = classes.get("schema:Person");
-					// if (person != null) {
-					// 	log.debug("PERSON PROPS=" + XString.prettyPrint(person.properties));
-					// }
 				}
 			} finally {
 				StreamUtil.close(in);
@@ -86,18 +74,28 @@ public class SchemaOrgService extends ServiceBase {
 		// first scan graph to build classes
 		log.debug("Scanning Schema.org Classes.");
 		for (Object item : graph) {
-			Object id = null;
-			if (item instanceof LinkedHashMap) {
-				Object type = ((LinkedHashMap) item).get("@type");
+			if (item instanceof HashMap) {
+				HashMap mitem = (HashMap) item;
+				Object type = mitem.get("@type");
 				if (type instanceof String) {
 					switch ((String) type) {
 						case "rdfs:Class":
-							id = ((LinkedHashMap) item).get("@id");
+							Object id = mitem.get("@id");
 							if (id instanceof String) {
-								// log.debug("TypeID: " + (String) id);
-								SchemaClass clazz = new SchemaClass();
-								clazz.clazz = (LinkedHashMap) item;
-								classes.put((String) id, clazz);
+								String sid = (String) id;
+								// log.debug("TypeID: " + sid);
+								SchemaOrgClass soc = new SchemaOrgClass();
+								Object label = mitem.get("rdfs:label");
+								String slabel = getStringValue(label);
+
+								if (slabel == null) {
+									throw new RuntimeException("label not available: " + XString.prettyPrint(mitem));
+								}
+
+								soc.setLabel(slabel);
+								soc.setId(sid);
+								classMap.put(sid, soc);
+								classList.add(soc);
 							}
 							break;
 						default:
@@ -112,12 +110,15 @@ public class SchemaOrgService extends ServiceBase {
 		log.debug("Scanning Schema.org Properties.");
 		// next we scan again to distribute the properties into all the classes
 		for (Object item : graph) {
-			if (item instanceof LinkedHashMap) {
-				Object type = ((LinkedHashMap) item).get("@type");
+			if (item instanceof HashMap) {
+				HashMap mitem = (HashMap) item;
+				Object type = mitem.get("@type");
 				if (type instanceof String) {
-					switch ((String) type) {
+					String stype = (String) type;
+					switch (stype) {
 						case "rdf:Property":
-							setupProperty((LinkedHashMap) item);
+							// log.debug("Property: " + stype);
+							setupProperty(mitem);
 						default:
 							break;
 					}
@@ -126,28 +127,53 @@ public class SchemaOrgService extends ServiceBase {
 				}
 			}
 		}
+
+		classList.sort((n1, n2) -> (int) n1.getLabel().compareTo(n2.getLabel()));
+
+		for (SchemaOrgClass soc : classList) {
+			// to simplify and save space we can remove "schema:" prefix from all IDs
+			soc.setId(soc.getId().replace("schema:", ""));
+
+			// sort properties
+			soc.getProps().sort((n1, n2) -> (int) n1.getLabel().compareTo(n2.getLabel()));
+		}
 	}
 
-	private void setupProperty(LinkedHashMap item) {
-		// Object id = ((LinkedHashMap) item).get("@id");
-		// if (id instanceof String) {
-		// 	log.debug("Property: " + (String) id);
-		// }
+	private String getStringValue(Object label) {
+		String slabel = null;
+		// handle if string
+		if (label instanceof String) {
+			slabel = (String) label;
+		}
+		// else try to get @value out of object
+		else if (label instanceof HashMap) {
+			HashMap mlabel = (HashMap) label;
+			Object val = mlabel.get("@value");
+			if (val instanceof String) {
+				slabel = (String) val;
+			}
+		}
+		return slabel;
+	}
 
+	private void setupProperty(HashMap item) {
 		Object domains = item.get("schema:domainIncludes");
-		if (domains instanceof List) {
-			for (Object domain : (List) domains) {
-				if (domain instanceof LinkedHashMap) {
-					Object domainId = ((LinkedHashMap) domain).get("@id");
-					if (domainId instanceof String) {
-						// log.debug("    DOMAIN: " + domainId);
-						SchemaClass clazz = classes.get((String) domainId);
-						if (clazz != null) {
-							clazz.properties.add(item);
-						}
-					}
+		// handle if object
+		if (domains instanceof HashMap) {
+			setupDomainObj(item, domains);
+		}
+		// handle of list
+		else if (domains instanceof List) {
+			List ldomains = (List) domains;
+			for (Object domain : ldomains) {
+				if (domain instanceof HashMap) {
+					setupDomainObj(item, domain);
 				}
 			}
+		}
+		// else warning
+		else {
+			log.debug("unable to get domainIncludes from " + XString.prettyPrint(item));
 		}
 
 		// Now that classes are updated we don't need domains to even residen in memory, so blow it away.
@@ -156,5 +182,33 @@ public class SchemaOrgService extends ServiceBase {
 		// and these now have no value either, so remove from memory
 		item.remove("@type");
 		item.remove("schema:source");
+	}
+
+	private void setupDomainObj(HashMap item, Object domain) {
+		HashMap mdomain = (HashMap) domain;
+		Object domainId = mdomain.get("@id");
+		if (domainId instanceof String) {
+			String sdomainId = (String) domainId;
+			// log.debug(" DOMAIN: " + domainId);
+			SchemaOrgClass soc = classMap.get(sdomainId);
+			if (soc != null) {
+				SchemaOrgProp prop = new SchemaOrgProp();
+				Object propLabel = item.get("rdfs:label");
+				String slabel = getStringValue(propLabel);
+
+				if (slabel != null) {
+					prop.setLabel(slabel);
+					soc.getProps().add(prop);
+				} else {
+					throw new RuntimeException("Unable to parse 'rdfs:label' from " + XString.prettyPrint(item));
+				}
+			}
+		}
+	}
+
+	public GetSchemaOrgTypesResponse getSchemaOrgTypes() {
+		GetSchemaOrgTypesResponse res = new GetSchemaOrgTypesResponse();
+		res.setClasses(classList);
+		return res;
 	}
 }

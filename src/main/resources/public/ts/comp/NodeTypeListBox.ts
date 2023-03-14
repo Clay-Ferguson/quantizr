@@ -6,8 +6,9 @@ import { ListBox } from "./ListBox";
 import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
 
 export class NodeTypeListBox extends ListBox {
+    private static scrollPos: number = 0;
 
-    constructor(valueIntf: ValueIntf) {
+    constructor(valueIntf: ValueIntf, private searchText: string) {
         super(valueIntf);
 
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.7) : 300;
@@ -19,14 +20,25 @@ export class NodeTypeListBox extends ListBox {
         const children: Comp[] = [];
         const types = S.plugin.getAllTypes();
 
+        const lcSearchText = this.searchText.toLowerCase();
         types.forEach((type, k) => {
-            if (getAs().isAdminUser || type.getAllowUserSelect()) {
-                children.push(new NodeTypeListBoxRow(type, () => {
-                    this.updateVal(type.getTypeName());
-                }, this.valueIntf.getValue() === type.getTypeName()));
+            if (!this.searchText || type.getName().toLowerCase().indexOf(lcSearchText) !== -1) {
+                if (getAs().isAdminUser || type.getAllowUserSelect()) {
+                    children.push(new NodeTypeListBoxRow(type, () => {
+                        this.updateVal(type.getTypeName());
+                    }, this.valueIntf.getValue() === type.getTypeName()));
+                }
             }
         });
 
         this.setChildren(children);
+    }
+
+    getScrollPos = (): number => {
+        return NodeTypeListBox.scrollPos;
+    }
+
+    setScrollPos = (pos: number): void => {
+        NodeTypeListBox.scrollPos = pos;
     }
 }

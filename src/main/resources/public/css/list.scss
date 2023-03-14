@@ -23,7 +23,7 @@
 .unselectedListItem {
     cursor: pointer;
     width: 100%;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     padding: 8px;
 }
 
@@ -45,6 +45,14 @@
 }
 
 .personsListItem {
+    cursor: pointer;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
+}
+
+.propListItem {
     cursor: pointer;
 
     &:not(:last-child) {

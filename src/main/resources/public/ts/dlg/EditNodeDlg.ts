@@ -196,11 +196,12 @@ export class EditNodeDlg extends DialogBase {
             if (iconClass) {
                 span = span || new Span();
                 span.addChild(new Icon({
-                    title: `Node is a '${type.getName()}' type.`,
+                    title: `Node Type: ${type.getName()}`,
                     className: iconClass + " dlgIcon clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
             }
+
             if (S.props.getPropStr(J.NodeProp.DATE, ast.editNode)) {
                 span = span || new Span();
                 span.addChild(new Icon({
@@ -209,6 +210,15 @@ export class EditNodeDlg extends DialogBase {
                 }));
             }
             span.addChild(new Span(type.getName(), { className: "marginRight" }));
+        }
+        else {
+            span = span || new Span();
+            span.addChild(new Icon({
+                title: "Node Type: Unknown",
+                className: "fa fa-question-circle fa-lg dlgIcon clickable",
+                onClick: this.openChangeNodeTypeDlg
+            }));
+            span.addChild(new Span("Unknown Type", { className: "marginRight" }));
         }
 
         if (this.showJumpButton) {

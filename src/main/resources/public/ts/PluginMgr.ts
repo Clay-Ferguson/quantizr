@@ -21,6 +21,9 @@ import { RoomType } from "./plugins/RoomType";
 import { RssFeedsType } from "./plugins/RssFeedsType";
 import { RssType } from "./plugins/RssType";
 import { TextType } from "./plugins/TextType";
+import * as J from "./JavaIntf";
+import { S } from "./Singletons";
+import { SchemaOrgType } from "./plugins/SchemaOrgType";
 
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
@@ -72,5 +75,18 @@ export class PluginMgr {
         this.addType(new FriendsListType());
         this.addType(new BlockedUsersType());
         this.addType(new FriendType());
+
+        // It's intentional that we don't do an await here, but let it complete async
+        this.addSchemaOrgTypes();
+    }
+
+    addSchemaOrgTypes = async () => {
+        const res = await S.rpcUtil.rpc<J.GetSchemaOrgTypesRequest, J.GetSchemaOrgTypesResponse>("getSchemaOrgTypes", {
+        });
+        res.classes.forEach(soc => {
+            const type = new SchemaOrgType(soc.id, soc.label);
+            type.schemaOrg = soc;
+            this.addType(type);
+        })
     }
 }

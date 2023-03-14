@@ -80,6 +80,7 @@ import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
 import quanta.request.GetPeopleRequest;
+import quanta.request.GetSchemaOrgTypesRequest;
 import quanta.request.GetServerInfoRequest;
 import quanta.request.GetSharedNodesRequest;
 import quanta.request.GetThreadViewRequest;
@@ -137,6 +138,7 @@ import quanta.response.GetIPFSContentResponse;
 import quanta.response.GetIPFSFilesResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetPeopleResponse;
+import quanta.response.GetSchemaOrgTypesResponse;
 import quanta.response.GetServerInfoResponse;
 import quanta.response.GetThreadViewResponse;
 import quanta.response.GetUserProfileResponse;
@@ -642,6 +644,14 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return openGraph.getOpenGraph(req);
+	}
+
+	@RequestMapping(value = API_PATH + "/getSchemaOrgTypes", method = RequestMethod.POST)
+	public @ResponseBody Object getSchemaOrgTypes(@RequestBody GetSchemaOrgTypesRequest req, HttpSession session) {
+		return callProc.run("getSchemaOrgTypes", false, false, req, session, ms -> {
+			GetSchemaOrgTypesResponse res = schema.getSchemaOrgTypes();
+			return res;
+		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)

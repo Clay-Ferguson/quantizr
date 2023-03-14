@@ -13,6 +13,7 @@ import { S } from "../../Singletons";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
+    public schemaOrg: J.SchemaOrgClass;
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }
