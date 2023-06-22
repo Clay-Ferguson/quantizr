@@ -99,7 +99,7 @@ export class View {
                 return;
             }
 
-            if (!res || res.code != 200) {
+            if (!res || res.code != C.RESPONSE_CODE_OK) {
                 console.log("Unable to access node(4): " + a.nodeId + " RES: " + S.util.prettyPrint(res));
                 return;
             }

@@ -78,7 +78,7 @@ export class User {
             }, false, true);
             S.quanta.authToken = res.authToken;
 
-            if (res && res.code == 200) {
+            if (res && res.code == C.RESPONSE_CODE_OK) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 if (!S.quanta.config.initialNodeId) {
                     S.quanta.config.initialNodeId = ":home";
@@ -90,7 +90,7 @@ export class User {
                 // but this res.userName however will have the correct name (case-sensitive) here now.
                 await this.loginResponse(res, res.userProfile.userName, callPwd, false);
             } else {
-                if (res.code == 200) {
+                if (res.code == C.RESPONSE_CODE_OK) {
                     S.util.setInitialStateVars(res);
                 }
             }

@@ -2,6 +2,7 @@ import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
+import { Constants as C } from "./Constants";
 
 export class RpcUtil {
     rpcPath: string = null;
@@ -80,17 +81,17 @@ export class RpcUtil {
                 })
                     .then(async (res: any) => {
                         // Unauthorized refers to the session, and our session has likely timed out.
-                        if (res.status === 401) {
+                        if (res.status === C.RESPONSE_CODE_UNAUTHORIZED) {
                             console.error("UNAUTHORIZED(401a) error for: " + postName + " RES: " + res);
                             reject({ response: res });
                             this.authFail();
                         }
-                        else if (res.status === 403) {
+                        else if (res.status === C.RESPONSE_CODE_FORBIDDEN) {
                             console.error("FORBIDDEN(403a) error for: " + postName + " RES: " + res);
                             reject({ response: res });
                             S.util.showMessage("Content not visible to you.", "Message");
                         }
-                        else if (res.status !== 200) {
+                        else if (res.status !== C.RESPONSE_CODE_OK) {
                             console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                             reject({ response: res });
                         }
@@ -137,24 +138,24 @@ export class RpcUtil {
                 this.progressInterval();
             }
 
-            if (this.logRpc && data?.code == 200) {
+            if (this.logRpc && data?.code == C.RESPONSE_CODE_OK) {
                 console.log("    RESULT: " + postName + "\n    JSON: " +
                     S.util.prettyPrint(data));
             }
 
-            if (data.code === 401) {
+            if (data.code === C.RESPONSE_CODE_UNAUTHORIZED) {
                 console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + data);
                 this.authFail();
                 return;
             }
 
-            if (data.code === 403) {
+            if (data.code === C.RESPONSE_CODE_FORBIDDEN) {
                 console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + data);
                 S.util.showMessage("Content not visible to you.", "Message");
                 return;
             }
 
-            if (data.code != 200) {
+            if (data.code != C.RESPONSE_CODE_OK) {
                 if (!this.logRpc) {
                     let trace = data.stackTrace;
                     if (trace) {
@@ -207,13 +208,13 @@ export class RpcUtil {
             console.log("FAIL [" + postName + "]\n    ERROR: " + S.util.prettyPrint(error) + //
                 "\n    POST DATA: " + S.util.prettyPrint(postData));
 
-            if (error?.response?.status === 401) {
+            if (error?.response?.status === C.RESPONSE_CODE_UNAUTHORIZED) {
                 console.error("UNAUTHORIZED(401c) error");
                 this.authFail();
                 return;
             }
 
-            if (error?.response?.status === 403) {
+            if (error?.response?.status === C.RESPONSE_CODE_FORBIDDEN) {
                 console.error("FORBIDDEN(403c) error");
                 S.util.showMessage("Content not visible to you.", "Message");
                 return;

@@ -22,6 +22,7 @@ import { NodeType } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
+import { Constants as C } from "../Constants";
 
 interface LS { // Local State
     userProfile?: J.UserProfile;
@@ -373,7 +374,7 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName
         });
 
-        if (res.code == 200) {
+        if (res.code == C.RESPONSE_CODE_OK) {
             state.userProfile.following = true;
             state.userProfile.blocked = false;
             this.mergeState<LS>({
@@ -438,7 +439,7 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName
         });
 
-        if (res.code == 200) {
+        if (res.code == C.RESPONSE_CODE_OK) {
             state.userProfile.blocked = true;
             state.userProfile.following = false;
             this.mergeState<LS>({
@@ -456,7 +457,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     saveResponse = (res: J.SaveUserPreferencesResponse) => {
-        if (res?.code == 200) {
+        if (res?.code == C.RESPONSE_CODE_OK) {
             this.close();
             dispatch("SaveUserPerferences", s => {
                 s.displayName = this.displayNameState.getValue();

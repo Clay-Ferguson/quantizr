@@ -8,6 +8,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
+import { Constants as C } from "../Constants";
 
 export class EditNostrKeyAndRelaysDlg extends DialogBase {
     userTextState: Validator = new Validator();
@@ -37,7 +38,7 @@ export class EditNostrKeyAndRelaysDlg extends DialogBase {
             key: null,
             relays: this.nostrRelayState.getValue()
         });
-        if (res.code == 200) {
+        if (res.code == C.RESPONSE_CODE_OK) {
             dispatch("setUserProfileRelays", s => {
                 s.userProfile.relays = this.nostrRelayState.getValue();
             });

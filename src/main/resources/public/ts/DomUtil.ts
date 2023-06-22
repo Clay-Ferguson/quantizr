@@ -228,7 +228,7 @@ export class DomUtil {
                 }
             })
                 .then((res: any) => {
-                    if (res.status !== 200) {
+                    if (res.status !== C.RESPONSE_CODE_OK) {
                         return null;
                     }
                     else {
@@ -279,10 +279,10 @@ export class DomUtil {
             return ret.text();
         }).then((json: string) => {
             const obj = JSON.parse(json);
-            if (obj.code == 507) {
+            if (obj.code == C.RESPONSE_CODE_OUTOFSPACE) {
                 S.util.showMessage("Out of Storage Space", "Failed");
             }
-            else if (obj.code == 200) {
+            else if (obj.code == C.RESPONSE_CODE_OK) {
                 if (showConfirm) {
                     S.util.showMessage("Upload complete", "Success");
                 }

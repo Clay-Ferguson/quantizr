@@ -397,10 +397,10 @@ export class Util {
      * requires: res.success res.message
      */
     checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
-        if (!res || res.code != 200) {
+        if (!res || res.code != C.RESPONSE_CODE_OK) {
             this.showMessage(opFriendlyName + " failed: " + (res?.message ? res.message : ""), "Warning");
         }
-        return res.code == 200;
+        return res.code == C.RESPONSE_CODE_OK;
     }
 
     flashMessage = (message: string, title: string, preformatted: boolean = false) => {
@@ -900,7 +900,7 @@ export class Util {
                 });
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
-                if (res?.code == 200) {
+                if (res?.code == C.RESPONSE_CODE_OK) {
                     await S.render.renderPage(res, false, null, true, true);
                 }
             }

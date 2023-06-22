@@ -1543,7 +1543,7 @@ export class Nostr {
                 nostrPubKey: null
             });
 
-            if (res.code != 200) {
+            if (res.code != C.RESPONSE_CODE_OK) {
                 console.log("Unable to query user profile for userId: " + node.ownerId);
             }
             console.log("loadReplyChain userProfile (getting relays from this obj): " + S.util.prettyPrint(res.userProfile));

@@ -15,6 +15,8 @@ import { EmojiPickerDlg, LS as EmojiPickerDlgState } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { Event } from "nostr-tools";
+import { Constants as C } from "../Constants";
+
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
         const ast = getAs();
@@ -120,7 +122,7 @@ export class EditNodeDlgUtil {
         });
         S.nodeUtil.processInboundNode(res.node);
 
-        if (res?.code != 200) {
+        if (res?.code != C.RESPONSE_CODE_OK) {
             return false;
         }
 

@@ -9,6 +9,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
+import { Constants as C } from "../Constants";
 
 export class SignupDlg extends DialogBase {
 
@@ -87,7 +88,7 @@ export class SignupDlg extends DialogBase {
     }
 
     signupResponse = async (res: J.SignupResponse): Promise<void> => {
-        if (res.code == 200) {
+        if (res.code == C.RESPONSE_CODE_OK) {
             this.close();
 
             if (this.adminCreatingUser) {

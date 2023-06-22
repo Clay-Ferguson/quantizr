@@ -14,6 +14,7 @@ import { Divc } from "../comp/core/Divc";
 import { IconButton } from "../comp/core/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
+import { Constants as C } from "../Constants";
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
@@ -291,13 +292,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
                     // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
-                    if (resp.code != 200) {
+                    if (resp.code != C.RESPONSE_CODE_OK) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
 
                             let msg = "Uplaod Failed."
-                            if (resp.code == 507) {
+                            if (resp.code == C.RESPONSE_CODE_OUTOFSPACE) {
                                 msg += " You're out of storage space.";
                             }
 
