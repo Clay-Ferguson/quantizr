@@ -21,8 +21,7 @@ import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NodeAuthFailedException;
-import quanta.instrument.PerfMon;
+import quanta.exception.ForbiddenException;
 import quanta.model.AccessControlInfo;
 import quanta.model.NodeInfo;
 import quanta.model.PrivilegeInfo;
@@ -103,7 +102,7 @@ public class Convert extends ServiceBase {
         // if we know we shold only be including admin node then throw an error if this is not an admin
         // node, but only if we ourselves are not admin.
         if (adminOnly && !acl.isAdminOwned(node) && !sc.isAdmin()) {
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
         /* If session user shouldn't be able to see secrets on this node remove them */
         if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {

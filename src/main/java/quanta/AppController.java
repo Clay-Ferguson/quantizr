@@ -249,92 +249,90 @@ public class AppController extends ServiceBase implements ErrorController {
         @RequestParam(value = "n", required = false) String name, //
         @RequestParam(value = "passCode", required = false) String passCode, //
         @RequestParam(value = "signupCode", required = false) String signupCode, //
+        @RequestParam(value = "login", required = false) String login, //
         HttpSession session, //
         Model model
     ) {
         HashMap<String, String> attrs = getThymeleafAttribs();
-        try {
-            SessionContext sc = ThreadLocals.getSC();
 
-            boolean isHomeNodeRequest = false;
-            if (nostrId != null) {
-                id = "." + nostrId;
-            } //
-            else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified using a colon in front of it, to make it detectable
-                if ("home".equalsIgnoreCase(nameOnUserNode)) {
-                    isHomeNodeRequest = true;
-                }
-                id = ":" + userName + ":" + nameOnUserNode;
-            } //
-            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
-                id = ":" + nameOnAdminNode;
-            } //
-            else if (!StringUtils.isEmpty(name)) {
-                id = ":" + name;
+        SessionContext sc = ThreadLocals.getSC();
+
+        boolean isHomeNodeRequest = false;
+        if (nostrId != null) {
+            id = "." + nostrId;
+        } //
+        else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified using a colon in front of it, to make it detectable
+            if ("home".equalsIgnoreCase(nameOnUserNode)) {
+                isHomeNodeRequest = true;
             }
-            boolean hasUrlId = false;
-            // if we have an ID, try to look it up, to put it in the session and load the Social Card properties
-            // for this request.
-            // If no id given defalt to ":home" only so we can get the social card props.
-            if (id != null) {
-                hasUrlId = true;
-            } else {
-                id = ":home";
-            }
-            String _id = id;
-            boolean _hasUrlId = hasUrlId;
-            boolean _isHomeNodeRequest = isHomeNodeRequest;
-            arun.run(as -> {
-                SubNode node = null;
-                try {
-                    Val<SubNode> accntNode = new Val<>();
-                    node = read.getNode(as, _id, true, accntNode);
-                    if (node == null) {
-                        // if we just tried to look in local DB for nostrId and didn't find it
-                        // we set the loadNostrId
-                        if (_id.startsWith(".")) {
-                            // set this var to signal to client it needs to load the nostrId from client.
-                            sc.setLoadNostrId(nostrId);
-                            // refNodeId is optional and tells us which nodeId is the account from which we should
-                            // try to get relays for looking up nostrId
-                            if (refNodeId != null) {
-                                SubNode nostrUserAccnt = read.getNode(as, refNodeId);
-                                if (nostrUserAccnt != null) {
-                                    sc.setLoadNostrIdRelays(nostrUserAccnt.getStr(NodeProp.NOSTR_RELAYS));
-                                }
+            id = ":" + userName + ":" + nameOnUserNode;
+        } //
+        else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+            id = ":" + nameOnAdminNode;
+        } //
+        else if (!StringUtils.isEmpty(name)) {
+            id = ":" + name;
+        }
+        boolean hasUrlId = false;
+        // if we have an ID, try to look it up, to put it in the session and load the Social Card properties
+        // for this request.
+        // If no id given defalt to ":home" only so we can get the social card props.
+        if (id != null) {
+            hasUrlId = true;
+        } else {
+            id = ":home";
+        }
+        String _id = id;
+        boolean _hasUrlId = hasUrlId;
+        boolean _isHomeNodeRequest = isHomeNodeRequest;
+        arun.run(as -> {
+            SubNode node = null;
+            try {
+                Val<SubNode> accntNode = new Val<>();
+                node = read.getNode(as, _id, true, accntNode);
+                if (node == null) {
+                    // if we just tried to look in local DB for nostrId and didn't find it
+                    // we set the loadNostrId
+                    if (_id.startsWith(".")) {
+                        // set this var to signal to client it needs to load the nostrId from client.
+                        sc.setLoadNostrId(nostrId);
+                        // refNodeId is optional and tells us which nodeId is the account from which we should
+                        // try to get relays for looking up nostrId
+                        if (refNodeId != null) {
+                            SubNode nostrUserAccnt = read.getNode(as, refNodeId);
+                            if (nostrUserAccnt != null) {
+                                sc.setLoadNostrIdRelays(nostrUserAccnt.getStr(NodeProp.NOSTR_RELAYS));
                             }
                         }
-                        if (_isHomeNodeRequest && accntNode.hasVal()) {
-                            sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
-                        }
                     }
-                } catch (Exception e) {
-                    sc.setUrlIdFailMsg("Unable to access node: " + _id);
-                    ExUtil.warn(log, "Unable to access node: " + _id, e);
+                    if (_isHomeNodeRequest && accntNode.hasVal()) {
+                        sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
+                    }
                 }
-                if (node != null) {
-                    if (_hasUrlId) {
-                        // todo-1: should this always be set even when we used ":home" above?
-                        sc.setInitialNodeId(_id);
-                    }
-                    if (AclService.isPublic(as, node)) {
-                        render.populateSocialCardProps(node, model);
-                    }
-                } else {
-                    sc.setUrlIdFailMsg("Unable to access node: " + _id);
-                }
-                return null;
-            });
-            if (signupCode != null) {
-                sc.setUserMsg(user.processSignupCode(signupCode));
+            } catch (Exception e) {
+                sc.setUrlIdFailMsg("Unable to access node: " + _id);
+                ExUtil.warn(log, "Unable to access node: " + _id, e);
             }
-        } catch (Exception e) {
-            // need to add some kind of message to exception to indicate to user something
-            // with the arguments went wrong.
-            ExUtil.error(log, "exception in call processor", e);
+            if (node != null) {
+                if (_hasUrlId) {
+                    // todo-1: should this always be set even when we used ":home" above?
+                    sc.setInitialNodeId(_id);
+                }
+                if (AclService.isPublic(as, node)) {
+                    render.populateSocialCardProps(node, model);
+                }
+            } else {
+                sc.setUrlIdFailMsg("Unable to open node: " + _id);
+            }
+            return null;
+        });
+        if (signupCode != null) {
+            sc.setUserMsg(user.processSignupCode(signupCode));
         }
+
         ClientConfig config = new ClientConfig();
         config.setTagSearch(tag);
+        config.setLogin(login);
         loadConfig(config);
         attrs.put("g_config", XString.compactPrint(config));
         model.addAllAttributes(attrs);
@@ -529,7 +527,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 ThreadLocals.getSC().forceAnonymous();
                 session.invalidate();
                 LogoutResponse res = new LogoutResponse();
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -582,7 +579,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
                 GetActPubObjectResponse res = new GetActPubObjectResponse();
                 res.setNode(node);
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -916,24 +912,21 @@ public class AppController extends ServiceBase implements ErrorController {
                     svc.export(ms, "pdf", req, res);
                 } else if ("zip".equalsIgnoreCase(req.getExportExt())) { // ================================================ // } // // } // res.setSuccess(false); // res.setMessage("Export of Markdown to IPFS not yet available."); // if (req.isToIpfs()) { // else if ("md".equalsIgnoreCase(req.getExportExt())) { // } // // svc.export(ms, "html", req, res); // ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class); // else if ("html".equalsIgnoreCase(req.getExportExt())) { // and we don't need these options, but I'm leaving the code in place for now. // I think the HTML and MARKDOWN export as ZIP/TAR formats can suffice for this // DO NOT DELETE (YET) // ================================================ //
                     if (req.isToIpfs()) {
-                        res.setMessage("Export of ZIP to IPFS not yet available.");
-                        res.setSuccess(false);
+                        res.error("Export of ZIP to IPFS not yet available.");
                     }
                     ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
                     svc.export(ms, req, res);
                 } //
                 else if ("tar".equalsIgnoreCase(req.getExportExt())) {
                     if (req.isToIpfs()) {
-                        res.setMessage("Export of TAR to IPFS not yet available.");
-                        res.setSuccess(false);
+                        res.error("Export of TAR to IPFS not yet available.");
                     }
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
                     svc.export(ms, req, res);
                 } //
                 else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
                     if (req.isToIpfs()) {
-                        res.setMessage("Export of TAR.GZ to IPFS not yet available.");
-                        res.setSuccess(false);
+                        res.error("Export of TAR.GZ to IPFS not yet available.");
                     }
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
                     svc.setUseGZip(true);
@@ -1168,7 +1161,6 @@ public class AppController extends ServiceBase implements ErrorController {
             ms -> {
                 edit.updateHeadings(ms, req.getNodeId());
                 UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -1832,7 +1824,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 UserProfile userProfile = user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false);
                 if (userProfile != null) {
                     res.setUserProfile(userProfile);
-                    res.setSuccess(true);
                 }
                 return res;
             }
@@ -1981,7 +1972,6 @@ public class AppController extends ServiceBase implements ErrorController {
             ms -> {
                 SignNodesResponse res = new SignNodesResponse();
                 crypto.signNodes(ms, req, res);
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2003,7 +1993,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 exec.run(() -> {
                     crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
                 });
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2041,6 +2030,7 @@ public class AppController extends ServiceBase implements ErrorController {
                 if (req.getCommand().equalsIgnoreCase("getJson")) {} else { // allow this one if user owns node.
                     ThreadLocals.requireAdmin();
                 }
+
                 log.debug("Command: " + req.getCommand());
                 switch (req.getCommand()) {
                     case "performanceReport":
@@ -2123,7 +2113,6 @@ public class AppController extends ServiceBase implements ErrorController {
                     default:
                         throw new RuntimeEx("Invalid command: " + req.getCommand());
                 }
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2140,7 +2129,6 @@ public class AppController extends ServiceBase implements ErrorController {
             session,
             ms -> {
                 GraphResponse res = graphNodes.graphNodes(ms, req);
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2213,7 +2201,6 @@ public class AppController extends ServiceBase implements ErrorController {
             ms -> {
                 PingResponse res = new PingResponse();
                 res.setServerInfo("Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2250,7 +2237,6 @@ public class AppController extends ServiceBase implements ErrorController {
                         mail.close();
                     }
                 }
-                res.setSuccess(true);
                 return res;
             }
         );
@@ -2273,7 +2259,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 log.trace("TRACE: " + req.getText());
                 // log this one to get test ActPubLog log level
                 apLog.trace("apLog TRACE: " + req.getText());
-                res.setSuccess(true);
                 return res;
             }
         );

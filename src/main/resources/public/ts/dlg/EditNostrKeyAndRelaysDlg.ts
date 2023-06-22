@@ -37,7 +37,7 @@ export class EditNostrKeyAndRelaysDlg extends DialogBase {
             key: null,
             relays: this.nostrRelayState.getValue()
         });
-        if (res.success) {
+        if (res.code == 200) {
             dispatch("setUserProfileRelays", s => {
                 s.userProfile.relays = this.nostrRelayState.getValue();
             });

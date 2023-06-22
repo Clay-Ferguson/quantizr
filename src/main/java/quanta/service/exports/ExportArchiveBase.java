@@ -130,7 +130,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 FileUtils.deleteFile(fullFileName);
             }
         }
-        res.setSuccess(true);
     }
 
     private JupyterNB makeJupyterNotebook() {

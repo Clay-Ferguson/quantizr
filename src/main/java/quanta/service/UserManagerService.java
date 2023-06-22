@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -36,8 +37,8 @@ import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
+import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMonEvent;
 import quanta.model.UserPreferences;
@@ -135,7 +136,7 @@ public class UserManagerService extends ServiceBase {
         String bearer = ThreadLocals.getReqBearerToken();
         // otherwise require secure header
         if (bearer == null || !validToken(bearer, sc.getUserName())) {
-            throw new NotLoggedInException();
+            throw new UnauthorizedException();
         }
     }
 
@@ -302,9 +303,6 @@ public class UserManagerService extends ServiceBase {
         } else {
             res.setUserPreferences(getDefaultUserPreferences());
         }
-        // note, this is a valid path even for 'anon' user.
-        res.setMessage("login ok.");
-        res.setSuccess(true);
         return res;
     }
 
@@ -579,31 +577,30 @@ public class UserManagerService extends ServiceBase {
             String password = req.getPassword().trim();
             String email = req.getEmail();
             log.debug("Signup: userName=" + userName + " email=" + email);
-            res.setSuccess(true);
             String userError = validator.checkUserName(userName);
             if (userError != null) {
                 res.setUserError(userError);
-                res.setSuccess(false);
+                res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
             }
             String passwordError = validator.checkPassword(password);
             if (passwordError != null) {
                 res.setPasswordError(passwordError);
-                res.setSuccess(false);
+                res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
             }
             String emailError = validator.checkEmail(email);
             if (emailError != null) {
                 res.setEmailError(emailError);
-                res.setSuccess(false);
+                res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
             }
             if (!automated) {
                 String captcha = (String) ThreadLocals.getHttpSession().getAttribute("captcha");
                 if (!captcha.equals(req.getCaptcha())) {
                     Util.sleep(3000);
                     res.setCaptchaError("Wrong captcha. Try again.");
-                    res.setSuccess(false);
+                    res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
                 }
             }
-            if (!res.isSuccess()) {
+            if (res.getCode() == null || res.getCode() != 200) {
                 return res;
             }
             if (!automated) {
@@ -674,7 +671,6 @@ public class UserManagerService extends ServiceBase {
                     userNode.set(NodeProp.NOSTR_USER_NPUB, req.getNostrNpub());
                     userNode.set(NodeProp.NOSTR_USER_PUBKEY, req.getNostrPubKey());
                 }
-                res.setSuccess(true);
             } else {
                 log.debug("savePublicKey failed to find userName: " + userName);
             }
@@ -689,8 +685,7 @@ public class UserManagerService extends ServiceBase {
         arun.run(as -> {
             SubNode userNode = read.getUserNodeByUserName(as, userName);
             if (userNode == null) {
-                res.setMessage("unknown user: " + userName);
-                res.setSuccess(false);
+                res.error("unknown user: " + userName);
             }
             try {
                 // foreign users won't have these.
@@ -700,7 +695,6 @@ public class UserManagerService extends ServiceBase {
                 res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
                 res.setBinTotal(binTotal == null ? -1 : binTotal.intValue());
             } catch (Exception e) {}
-            res.setSuccess(true);
             return null;
         });
         return res;
@@ -743,7 +737,6 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
             userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
             userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
-            res.setSuccess(true);
             return null;
         });
         return res;
@@ -775,7 +768,6 @@ public class UserManagerService extends ServiceBase {
                 userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
                 // sessionContext.setUserName(req.getUserName());
                 update.save(as, userNode);
-                res.setSuccess(true);
                 if (req.isPublish()) {
                     writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
                 }
@@ -886,7 +878,6 @@ public class UserManagerService extends ServiceBase {
             } else {
                 res.setMessage("Unable to block user: " + req.getUserName());
             }
-            res.setSuccess(true);
         } else {
             /*
              * todo-2: for this AND the friend request (similar places), we need to make it where the user can
@@ -895,7 +886,6 @@ public class UserManagerService extends ServiceBase {
              * what's needed for this.
              */
             res.setMessage("You already blocked " + req.getUserName());
-            res.setSuccess(true);
         }
         return res;
     }
@@ -912,7 +902,6 @@ public class UserManagerService extends ServiceBase {
                 delete.delete(ms, friendNode, false);
             }
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -948,7 +937,6 @@ public class UserManagerService extends ServiceBase {
                 log.debug("BATCH FOLLOW complete.");
             });
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -1258,7 +1246,6 @@ public class UserManagerService extends ServiceBase {
             update.save(ms, userNode.getVal());
         }
         res.setUser(userName.getVal());
-        res.setSuccess(true);
         return res;
     }
 
@@ -1274,14 +1261,12 @@ public class UserManagerService extends ServiceBase {
             String email = req.getEmail();
             /* make sure username itself is acceptalbe */
             if (!isNormalUserName(user)) {
-                res.setMessage("User name is illegal.");
-                res.setSuccess(false);
+                res.error("User name is illegal.");
                 return null;
             }
             SubNode ownerNode = read.getUserNodeByUserName(as, user);
             if (ownerNode == null) {
-                res.setMessage("User does not exist.");
-                res.setSuccess(false);
+                res.error("User does not exist.");
                 return null;
             }
             /*
@@ -1291,8 +1276,7 @@ public class UserManagerService extends ServiceBase {
              */
             String nodeEmail = ownerNode.getStr(NodeProp.EMAIL);
             if (nodeEmail == null || !nodeEmail.equals(email)) {
-                res.setMessage("Wrong user name and/or email.");
-                res.setSuccess(false);
+                res.error("Wrong user name and/or email.");
                 return null;
             }
             /*
@@ -1320,7 +1304,6 @@ public class UserManagerService extends ServiceBase {
                 link;
             outbox.queueEmail(email, brandingAppName + " Password Reset", content);
             res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
-            res.setSuccess(true);
             return null;
         });
         return res;
@@ -1331,7 +1314,7 @@ public class UserManagerService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         if (node == null) {
             res.setMessage("Unable to find node.");
-            res.setSuccess(false);
+            res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
         }
         String ownerIdStr = node.getOwner().toHexString();
         HashSet<String> idSet = new HashSet<>();
@@ -1418,7 +1401,6 @@ public class UserManagerService extends ServiceBase {
             });
         }
         friends.sort((f1, f2) -> f1.getUserName().compareTo(f2.getUserName()));
-        res.setSuccess(true);
         return res;
     }
 
@@ -1471,7 +1453,6 @@ public class UserManagerService extends ServiceBase {
             }
             res.setPeople(friends);
         }
-        res.setSuccess(true);
         return res;
     }
 

@@ -1,3 +1,4 @@
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -80,9 +81,14 @@ export class RpcUtil {
                     .then(async (res: any) => {
                         // Unauthorized refers to the session, and our session has likely timed out.
                         if (res.status === 401) {
-                            console.warn("401 error for: " + postName);
+                            console.error("UNAUTHORIZED(401a) error for: " + postName + " RES: " + res);
                             reject({ response: res });
                             this.authFail();
+                        }
+                        else if (res.status === 403) {
+                            console.error("FORBIDDEN(403a) error for: " + postName + " RES: " + res);
+                            reject({ response: res });
+                            S.util.showMessage("Content not visible to you.", "Message");
                         }
                         else if (res.status !== 200) {
                             console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
@@ -96,8 +102,8 @@ export class RpcUtil {
                         /* if we did a reject above in the first 'then' we will get here with json undefined
                         so we ignore that */
                         if (json) {
-                            // console.log("rpc: " + postName + " " + (new Date().getTime() - startTime) + "ms");
-                            resolve(JSON.parse(json));
+                            const obj = JSON.parse(json);
+                            resolve(obj);
                         }
                         else {
                             reject(null);
@@ -116,12 +122,12 @@ export class RpcUtil {
             throw ex;
         }
 
-        reqPromise.then((data: any) => this.rpcSuccess(data, background, postName))
+        reqPromise.then((data: J.ResponseBase) => this.rpcSuccess(data, background, postName))
             .catch((error: any) => this.rpcFail(error, background, allowErrorDlg, postName, postData));
         return reqPromise;
     }
 
-    rpcSuccess = (data: any, background: boolean, postName: string) => {
+    rpcSuccess = (data: J.ResponseBase, background: boolean, postName: string) => {
         try {
             if (!background) {
                 this.rpcCounter--;
@@ -131,21 +137,46 @@ export class RpcUtil {
                 this.progressInterval();
             }
 
-            if (this.logRpc) {
-                console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+            if (this.logRpc && data?.code == 200) {
+                console.log("    RESULT: " + postName + "\n    JSON: " +
                     S.util.prettyPrint(data));
             }
 
-            if (!data.success && data.message) {
-                // if we didn't just console log it then console log it now.
-                if (!this.logRpc) {
-                    console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                        S.util.prettyPrint(data));
-                }
-                S.util.showMessage(data.message, "Message");
+            if (data.code === 401) {
+                console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + data);
+                this.authFail();
+                return;
+            }
 
-                // get rid of message so it can't be shown again
-                data.message = null;
+            if (data.code === 403) {
+                console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + data);
+                S.util.showMessage("Content not visible to you.", "Message");
+                return;
+            }
+
+            if (data.code != 200) {
+                if (!this.logRpc) {
+                    let trace = data.stackTrace;
+                    if (trace) {
+                        trace = trace.replace("\\n", "\n");
+                        trace = trace.replace("\\t", "\t");
+
+                        // remove this so the prettyPrint doesn't contain it.
+                        delete data.stackTrace;
+                    }
+                    console.error("FAILED RESULT: " + postName + "\n    JSON: " +
+                        S.util.prettyPrint(data));
+                    if (trace) {
+                        console.error("TRACE: " + trace);
+                    }
+                }
+
+                if (data.message) {
+                    S.util.showMessage(data.message, "Message");
+
+                    // get rid of message so it can't be shown again
+                    data.message = null;
+                }
                 return;
             }
         } catch (ex) {
@@ -172,28 +203,21 @@ export class RpcUtil {
                 }
                 this.progressInterval();
             }
-            let status = error.response ? error.response.status : "";
-            const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
-            console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
-            // 401==Unauthorized
-            if (error.response?.status === 401) {
+            console.log("FAIL [" + postName + "]\n    ERROR: " + S.util.prettyPrint(error) + //
+                "\n    POST DATA: " + S.util.prettyPrint(postData));
+
+            if (error?.response?.status === 401) {
+                console.error("UNAUTHORIZED(401c) error");
                 this.authFail();
                 return;
             }
 
-            let msg: string = `Failed: \nPostName: ${postName}\n`;
-            msg += "PostData: " + S.util.prettyPrint(postData) + "\n";
-
-            if (error.response) {
-                msg += "Error Response: " + S.util.prettyPrint(error.response) + "\n";
+            if (error?.response?.status === 403) {
+                console.error("FORBIDDEN(403c) error");
+                S.util.showMessage("Content not visible to you.", "Message");
+                return;
             }
-
-            msg += info;
-            console.error("Request failed: msg=" + msg);
-
-            status = error.response ? error.response.status : "";
-            console.error("Failed: " + status + " " + (error.message || ""));
 
             if (!background && allowErrorDlg) {
                 S.util.showMessage("Something went wrong. Try refreshing your browser.", "Warning", true);
@@ -212,7 +236,14 @@ export class RpcUtil {
     authFail = async () => {
         if (this.unauthMessageShowing) return;
         this.unauthMessageShowing = true;
-        await S.util.showMessage("Unauthorized or Logged Out", "Warning");
+
+        const dlg = new ConfirmDlg("<p class='alertText'>Unauthorized (or Logged Out)<br><br>Login now?</p>", "Session Message",
+            "btn-info", "alert alert-info");
+        await dlg.open();
+        if (dlg.yes) {
+            window.location.href = window.location.origin + "?login=y";
+        }
+
         this.unauthMessageShowing = false;
     }
 

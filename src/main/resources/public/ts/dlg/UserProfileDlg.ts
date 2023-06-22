@@ -373,7 +373,7 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName
         });
 
-        if (res.success) {
+        if (res.code == 200) {
             state.userProfile.following = true;
             state.userProfile.blocked = false;
             this.mergeState<LS>({
@@ -438,7 +438,7 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName
         });
 
-        if (res.success) {
+        if (res.code == 200) {
             state.userProfile.blocked = true;
             state.userProfile.following = false;
             this.mergeState<LS>({
@@ -456,7 +456,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     saveResponse = (res: J.SaveUserPreferencesResponse) => {
-        if (res?.success) {
+        if (res?.code == 200) {
             this.close();
             dispatch("SaveUserPerferences", s => {
                 s.displayName = this.displayNameState.getValue();

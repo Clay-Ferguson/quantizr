@@ -41,7 +41,6 @@ public class ImportBookService extends ServiceBase {
             safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE
         );
         update.saveSession(ms);
-        res.setSuccess(true);
         return res;
     }
 

@@ -21,8 +21,10 @@ import org.springframework.web.util.WebUtils;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NotLoggedInException;
+import quanta.exception.UnauthorizedException;
+import quanta.exception.base.RuntimeEx;
 import quanta.util.Const;
+import quanta.util.ExUtil;
 import quanta.util.LockEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -38,7 +40,7 @@ public class AppFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
     public static boolean audit = false;
-    public static boolean debug = true;
+    public static boolean debug = false;
     public static String BEARER_TOKEN = "token";
 
     private static final Object filterLock = new Object();
@@ -118,7 +120,7 @@ public class AppFilter extends GenericFilterBean {
             if (!StringUtils.isEmpty(token)) {
                 sc = ServiceBase.user.redisGet(token);
                 if (sc == null) {
-                    throw new NotLoggedInException();
+                    throw new UnauthorizedException();
                 } else {
                     // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
                     ThreadLocals.setReqBearerToken(token);
@@ -154,15 +156,15 @@ public class AppFilter extends GenericFilterBean {
                     log.debug("First Save of RedisKey: " + sc.getUserToken());
                 }
             }
-        } catch (NotLoggedInException e) {
-            httpRes.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        } catch (RuntimeEx e) {
+            // NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
+            // error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able to
+            // still respond to this error even in the case where no ResponseBase is being returned which is rare but
+            // is still possible
+            sendError(httpRes, httpReq.getRequestURI(), e.getCode(), e);
         } catch (Exception e) {
-            /*
-             * we send back the error here, for AJAX calls so we don't bubble up to the default handling and
-             * cause it to send back the html error page.
-             */
-            log.error("Failed", e);
-            httpRes.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            // ditto comment above
+            sendError(httpRes, httpReq.getRequestURI(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         } finally {
             try {
                 if (audit) {
@@ -179,6 +181,13 @@ public class AppFilter extends GenericFilterBean {
                 }
             }
         }
+    }
+
+    private void sendError(HttpServletResponse res, String msg, int code, Exception e) {
+        ExUtil.error(log, "Failed in " + msg, e);
+        try {
+            res.sendError(code);
+        } catch (Exception ex) {}
     }
 
     private String getConfigParamInfo() {

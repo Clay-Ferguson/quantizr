@@ -579,7 +579,6 @@ public class MongoDelete extends ServiceBase {
             bops.execute();
         }
         update.saveSession(ms);
-        res.setSuccess(true);
         return res;
     }
 
@@ -669,7 +668,6 @@ public class MongoDelete extends ServiceBase {
         String msg = "Nodes deleted: " + delRes.getDeletedCount();
         log.debug("Bulk Delete: " + msg);
         res.setMessage(msg);
-        res.setSuccess(true);
         return res;
     }
 

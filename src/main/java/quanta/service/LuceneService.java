@@ -34,7 +34,6 @@ public class LuceneService extends ServiceBase {
             ret = fileIndexer.getSummaryReport();
             fileIndexer.close();
         }
-        res.setSuccess(true);
         res.setMessage(ret);
         return res;
     }
@@ -47,7 +46,6 @@ public class LuceneService extends ServiceBase {
         // if (ok(node )) {
         // ret = searcher.search(nodeId, searchText);
         // }
-        res.setSuccess(true);
         res.setMessage(ret);
         return res;
     }

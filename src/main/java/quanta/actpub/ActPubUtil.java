@@ -803,7 +803,6 @@ public class ActPubUtil extends ServiceBase {
             readForeignReplies(ms, node, nodes);
         }
         if (nodes.size() > 1) {
-            res.setSuccess(true);
             res.setNodes(nodes);
         }
         return res;
@@ -1012,7 +1011,6 @@ public class ActPubUtil extends ServiceBase {
                     n.getChildren().sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
                 }
             }
-            res.setSuccess(true);
         }
         if (debug) {
             log.debug("getNodeThreadView() RESP: " + XString.prettyPrint(res));

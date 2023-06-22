@@ -1,46 +1,49 @@
 package quanta.response.base;
 
+import javax.servlet.http.HttpServletResponse;
 import quanta.util.ThreadLocals;
 
 public class ResponseBase {
-	private boolean success;
-	private String message;
-	private String stackTrace;
-	private String errorType;
 
-	public ResponseBase() {
-		ThreadLocals.setResponse(this);
-	}
+    private String message;
+    private String stackTrace;
+    private Integer code;
 
-	public boolean isSuccess() {
-		return success;
-	}
+    public Integer getCode() {
+        return code;
+    }
 
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
+    public void setCode(Integer code) {
+        this.code = code;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public ResponseBase() {
+        ThreadLocals.setResponse(this);
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void error(String msg, int code) {
+        setMessage(msg);
+        setCode(code);
+    }
 
-	public String getStackTrace() {
-		return this.stackTrace;
-	}
+    public void error(String msg) {
+        setMessage(msg);
+        setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
+    }
 
-	public void setStackTrace(String stackTrace) {
-		this.stackTrace = stackTrace;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public String getErrorType() {
-		return errorType;
-	}
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-	public void setErrorType(String errorType) {
-		this.errorType = errorType;
-	}
+    public String getStackTrace() {
+        return this.stackTrace;
+    }
+
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
+    }
 }

@@ -320,7 +320,7 @@ export class Crypto {
                 nostrPubKey: S.nostr.pk
             });
 
-            if (res.success) {
+            if (res.code == 200) {
                 // note, even though we only update these if successful on the server the client side will still definitely
                 // have the new keys in the LocalDB already
                 if (newAsymEncKey) {

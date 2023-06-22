@@ -274,13 +274,25 @@ export class DomUtil {
             }
         });
 
-        promise.then(() => {
+        promise.then((ret: any) => {
             this.exitFetch();
-            if (showConfirm) {
-                S.util.showMessage("Upload complete", "Success");
+            return ret.text();
+        }).then((json: string) => {
+            const obj = JSON.parse(json);
+            if (obj.code == 507) {
+                S.util.showMessage("Out of Storage Space", "Failed");
+            }
+            else if (obj.code == 200) {
+                if (showConfirm) {
+                    S.util.showMessage("Upload complete", "Success");
+                }
+            }
+            else {
+                S.util.showMessage("Upload Failed", "Failed");
             }
         })
-            .catch(() => {
+            .catch((err: any) => {
+                console.log("ERR: " + S.util.prettyPrint(err));
                 this.exitFetch();
                 S.util.showMessage("Upload failed", "Warning");
             });

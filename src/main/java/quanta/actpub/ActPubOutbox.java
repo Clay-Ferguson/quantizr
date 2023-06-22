@@ -25,7 +25,7 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -447,7 +447,7 @@ public class ActPubOutbox extends ServiceBase {
             // if not authorized and not a public node fail now.
             if (!authSuccess && !AclService.isPublic(as, node)) {
                 log.debug("getResource failed on non-public node: " + node.getIdStr());
-                throw new NodeAuthFailedException();
+                throw new ForbiddenException();
             }
             /*
              * todo-1: We should be able to get an object as whatever actual type it is based on the type (not

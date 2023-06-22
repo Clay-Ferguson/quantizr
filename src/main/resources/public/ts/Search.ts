@@ -203,7 +203,7 @@ export class Search {
             });
             S.nodeUtil.processInboundNodes(res.searchResults);
 
-            if (res.success && deleteMatches) {
+            if (res.code == 200 && deleteMatches) {
                 S.util.showMessage("Matches were deleted.", "Warning");
                 resolve(true);
             }
@@ -387,7 +387,7 @@ export class Search {
             url
         });
 
-        if (res.success) {
+        if (res.code == 200) {
             dispatch("RenderFeedResults", s => {
                 FeedTab.inst.openGraphComps = [];
 

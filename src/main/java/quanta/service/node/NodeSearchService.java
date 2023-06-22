@@ -284,7 +284,6 @@ public class NodeSearchService extends ServiceBase {
                 }
             }
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -454,7 +453,6 @@ public class NodeSearchService extends ServiceBase {
                 searchResults.add(info);
             }
         }
-        res.setSuccess(true);
         // log.debug("search results count: " + counter);
         return res;
     }
@@ -473,7 +471,6 @@ public class NodeSearchService extends ServiceBase {
                 bookmarks.add(bm);
             }
         }
-        res.setSuccess(true);
         res.setBookmarks(bookmarks);
     }
 
@@ -492,7 +489,6 @@ public class NodeSearchService extends ServiceBase {
                         res.setTopMentions(NodeSearchService.nostrTrendingFeedInfo.getTopMentions());
                         res.setTopTags(NodeSearchService.nostrTrendingFeedInfo.getTopTags());
                         res.setTopWords(NodeSearchService.nostrTrendingFeedInfo.getTopWords());
-                        res.setSuccess(true);
                         return;
                     }
                 }
@@ -503,7 +499,6 @@ public class NodeSearchService extends ServiceBase {
                         res.setTopMentions(NodeSearchService.apTrendingFeedInfo.getTopMentions());
                         res.setTopTags(NodeSearchService.apTrendingFeedInfo.getTopTags());
                         res.setTopWords(NodeSearchService.apTrendingFeedInfo.getTopWords());
-                        res.setSuccess(true);
                         return;
                     }
                 }
@@ -810,7 +805,6 @@ public class NodeSearchService extends ServiceBase {
                 if (topMentions.size() >= 100) break;
             }
         }
-        res.setSuccess(true);
         /*
          * If this is a feed query cache it. Only will refresh every 30mins based on a @Schedule event
          */

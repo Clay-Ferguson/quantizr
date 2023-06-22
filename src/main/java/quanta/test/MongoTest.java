@@ -3,7 +3,6 @@ package quanta.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -148,14 +147,14 @@ public class MongoTest extends ServiceBase implements TestIntf {
             adminsNode.setPath(adminsNode.getPath() + "abc");
             update.save(adamSession, adminsNode);
             throw new RuntimeException("failed to block path alter.");
-        } catch (NodeAuthFailedException e) {
+        } catch (ForbiddenException e) {
             log.debug("Successful path alter blocked.");
         }
         // let adam try and fail to access insertedId
         try {
             SubNode updateNode = read.getNode(adamSession, insertedId);
             throw new RuntimeException("failed to block.");
-        } catch (NodeAuthFailedException e) {
+        } catch (ForbiddenException e) {
             log.debug("Successful auth block.");
         }
         // adam attempts and fails to create a node in a protected area
@@ -165,7 +164,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
             adamsNode.setContent("adam's test node " + System.currentTimeMillis());
             update.save(as, adamsNode);
             throw new RuntimeException("allowed node in secure area");
-        } catch (NodeAuthFailedException e) {
+        } catch (ForbiddenException e) {
             log.debug("successfully blocked invalid create (in root)");
         }
         // adam attempts and fails to create a node under adminsNode
@@ -175,7 +174,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
             adamsNode.setContent("adam's test node " + System.currentTimeMillis());
             update.save(as, adamsNode);
             throw new RuntimeException("allowed node in secure area");
-        } catch (NodeAuthFailedException e) {
+        } catch (ForbiddenException e) {
             log.debug("successfully blocked invalid create (in an admin node)");
         }
         // adam successfully inserts node in his root
@@ -205,7 +204,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
             ThreadLocals.setMongoSession(adamSession);
             update.save(adamSession, adminsNode);
             throw new RuntimeException("failed to block.");
-        } catch (NodeAuthFailedException e) {
+        } catch (ForbiddenException e) {
             log.debug("Successfully blocked save by wrong user.");
         }
     }

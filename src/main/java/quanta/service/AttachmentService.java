@@ -57,7 +57,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -121,7 +120,6 @@ public class AttachmentService extends ServiceBase {
             try {
                 LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
                 String mkdown = mail.convertEmailToMarkdown(limitedIs);
-                resp.setSuccess(true);
                 payloads.add(mkdown);
             } catch ( //
                 Exception e
@@ -580,7 +578,6 @@ public class AttachmentService extends ServiceBase {
                 deleteBinary(ms, attKey, node, null, false);
             }
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -849,7 +846,6 @@ public class AttachmentService extends ServiceBase {
     public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
         UploadFromUrlResponse res = new UploadFromUrlResponse();
         readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally());
-        res.setSuccess(true);
         return res;
     }
 
@@ -875,7 +871,6 @@ public class AttachmentService extends ServiceBase {
         }
         att.setMime(mime);
         update.save(ms, node);
-        res.setSuccess(true);
         return res;
     }
 

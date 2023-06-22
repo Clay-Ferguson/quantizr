@@ -54,6 +54,7 @@ export interface ClientConfig {
     nostrRelays: string;
     urlView: string;
     tagSearch: string;
+    login: string;
 }
 
 export interface IPSMData {
@@ -1090,10 +1091,9 @@ export interface UploadResponse extends ResponseBase {
 }
 
 export interface ResponseBase {
-    success: boolean;
     message: string;
     stackTrace: string;
-    errorType: string;
+    code: number;
 }
 
 export interface PropertyInfo {
@@ -1214,12 +1214,6 @@ export const enum Constant {
 
 export const enum ConstantInt {
     ROWS_PER_PAGE = 25,
-}
-
-export const enum ErrorType {
-    OUT_OF_SPACE = "oos",
-    TIMEOUT = "timeout",
-    AUTH = "auth",
 }
 
 export const enum NodeProp {

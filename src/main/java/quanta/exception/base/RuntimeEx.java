@@ -1,6 +1,12 @@
 package quanta.exception.base;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class RuntimeEx extends RuntimeException {
+
+    public int getCode() {
+        return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+    }
 
     public RuntimeEx() {
         super();

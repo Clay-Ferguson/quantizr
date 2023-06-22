@@ -80,7 +80,6 @@ public class GraphNodesService extends ServiceBase {
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
-        res.setSuccess(true);
         return res;
     }
 

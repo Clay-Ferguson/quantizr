@@ -3,9 +3,14 @@
     margin-left: 3px;
 }
 
+.alertText {
+    margin-bottom: 0;
+    font-size: 120%;
+}
+
 .alert {
     // these sizes are half the default for bootstrap
-    padding: .5rem;
+    padding: .6rem;
     margin-bottom: .5rem;
 }
 

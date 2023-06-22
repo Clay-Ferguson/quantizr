@@ -1407,7 +1407,7 @@ public class MongoRead extends ServiceBase {
     // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
     public TreeNode getSubGraphTree(MongoSession ms, String rootId, Criteria criteria, HashMap<String, TreeNode> idMap) {
         SubNode rootNode = getNode(ms, new ObjectId(rootId));
-        if (rootNode == null) throw new RuntimeException("unable to access node: " + rootId);
+        if (rootNode == null) throw new RuntimeException("unable to access node(3): " + rootId);
 
         TreeNode rootTreeNode = new TreeNode(rootNode);
         if (idMap != null) {

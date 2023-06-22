@@ -7,23 +7,23 @@ import {
     generatePrivateKey,
     getEventHash,
     getPublicKey,
+    getSignature,
     nip04,
     nip05,
     nip19,
     parseReferences,
     relayInit,
-    getSignature,
     validateEvent, verifySignature
 } from "nostr-tools";
 import { dispatch, getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
+import { NostrMetadataDispInfo } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Val } from "./Val";
 import { Comp } from "./comp/base/Comp";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SetNostrPrivateKeyDlg } from "./dlg/SetNostrPrivateKeyDlg";
-import { NostrMetadataDispInfo } from "./Interfaces";
 
 /* This class holds our initial experimentation with Nostr, and the only GUI for this is a single
 link on the Admin Console that can run the "test()" method
@@ -1543,7 +1543,7 @@ export class Nostr {
                 nostrPubKey: null
             });
 
-            if (!res.success) {
+            if (res.code != 200) {
                 console.log("Unable to query user profile for userId: " + node.ownerId);
             }
             console.log("loadReplyChain userProfile (getting relays from this obj): " + S.util.prettyPrint(res.userProfile));

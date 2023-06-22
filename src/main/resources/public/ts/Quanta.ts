@@ -252,6 +252,9 @@ export class Quanta {
 
             Log.log("initApp complete.");
             S.domUtil.enableMouseEffect();
+            if (S.quanta.config.login) {
+                S.user.userLogin();
+            }
         }
         catch (e) {
             S.util.logErr(e);

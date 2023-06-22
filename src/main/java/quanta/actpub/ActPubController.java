@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.model.client.PrincipalName;
 import quanta.util.XString;
 
@@ -186,7 +186,7 @@ public class ActPubController extends ServiceBase {
             } else {
                 return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
             }
-        } catch (NodeAuthFailedException nafe) {
+        } catch (ForbiddenException fe) {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

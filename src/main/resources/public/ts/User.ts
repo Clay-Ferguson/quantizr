@@ -3,6 +3,7 @@ import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { LoginDlg } from "./dlg/LoginDlg";
+import { ProgressDlg } from "./dlg/ProgressDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
@@ -77,7 +78,7 @@ export class User {
             }, false, true);
             S.quanta.authToken = res.authToken;
 
-            if (res && !res.success) {
+            if (res && res.code == 200) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 if (!S.quanta.config.initialNodeId) {
                     S.quanta.config.initialNodeId = ":home";
@@ -89,7 +90,7 @@ export class User {
                 // but this res.userName however will have the correct name (case-sensitive) here now.
                 await this.loginResponse(res, res.userProfile.userName, callPwd, false);
             } else {
-                if (res.success) {
+                if (res.code == 200) {
                     S.util.setInitialStateVars(res);
                 }
             }
@@ -104,6 +105,8 @@ export class User {
     }
 
     logout = async () => {
+        new ProgressDlg();
+
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -119,18 +122,9 @@ export class User {
         }
 
         S.quanta.loggingOut = true;
-        try {
-            await S.rpcUtil.rpc<J.LogoutRequest, J.LogoutResponse>("logout");
-        }
-        finally {
-            this.logoutResponse();
-        }
-    }
-
-    logoutResponse = () => {
         S.push.close();
-        S.quanta.authToken = null;
-        S.quanta.userName = null;
+
+        await S.rpcUtil.rpc<J.LogoutRequest, J.LogoutResponse>("logout");
         window.location.href = window.location.origin;
     }
 

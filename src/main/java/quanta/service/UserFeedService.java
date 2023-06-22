@@ -524,7 +524,6 @@ public class UserFeedService extends ServiceBase {
         if (searchResults.size() < MAX_FEED_ITEMS - skipped) {
             res.setEndReached(true);
         }
-        res.setSuccess(true);
         return res;
     }
 

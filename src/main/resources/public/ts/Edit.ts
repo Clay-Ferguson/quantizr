@@ -843,7 +843,7 @@ export class Edit {
             nodeId: node.id,
             recursive: true
         }).then((res: J.SubGraphHashResponse) => {
-            if (res.success) {
+            if (res.code == 200) {
                 S.util.showMessage(res.message);
             }
             else {

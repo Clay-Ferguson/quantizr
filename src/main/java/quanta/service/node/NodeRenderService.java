@@ -3,6 +3,7 @@ package quanta.service.node;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +18,14 @@ import org.springframework.ui.Model;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.PerfMon;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.CalendarItem;
 import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
-import quanta.model.client.ErrorType;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -71,25 +70,16 @@ public class NodeRenderService extends ServiceBase {
         // XString.prettyPrint(sc.getUserPreferences()));
         String targetId = req.getNodeId();
         boolean isActualUplevelRequest = req.isUpLevel();
-        SubNode node = null;
-        try {
-            node = read.getNode(ms, targetId);
+        SubNode node = read.getNode(ms, targetId);
 
-            if (node == null && !sc.isAnonUser()) {
-                node = read.getNode(ms, sc.getRootId());
-            }
-            adminOnly = acl.isAdminOwned(node);
-        } catch (NodeAuthFailedException e) {
-            res.setSuccess(false);
-            res.setMessage("Unauthorized.");
-            res.setErrorType(ErrorType.AUTH.s());
-            log.error("error", e);
-            return res;
+        if (node == null && !sc.isAnonUser()) {
+            node = read.getNode(ms, sc.getRootId());
         }
+        adminOnly = acl.isAdminOwned(node);
+
         // If this request is indicates the server would rather display RSS than jump to an RSS node itself,
         // then here we indicate to the caller this happened and return immediately.
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
-            res.setSuccess(true);
             res.setRssNode(true);
             NodeInfo nodeInfo = convert.convertToNodeInfo(
                 adminOnly,
@@ -145,7 +135,6 @@ public class NodeRenderService extends ServiceBase {
                 false
             );
             res.setNode(nodeInfo);
-            res.setSuccess(true);
             return res;
         }
         /*
@@ -198,9 +187,7 @@ public class NodeRenderService extends ServiceBase {
                      * children showing.
                      */
                     if (isActualUplevelRequest) {
-                        res.setErrorType(ErrorType.AUTH.s());
-                        res.setSuccess(true);
-                        return res;
+                        throw new ForbiddenException();
                     }
                 }
             }
@@ -213,9 +200,8 @@ public class NodeRenderService extends ServiceBase {
         NodeInfo nodeInfo = render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
         if (nodeInfo != null) {
             res.setNode(nodeInfo);
-            res.setSuccess(true);
         } else {
-            res.setSuccess(false);
+            res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
         }
         return res;
     }
@@ -533,8 +519,7 @@ public class NodeRenderService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         if (node == null) {
-            res.setMessage("Node not found.");
-            res.setSuccess(false);
+            res.error("Node not found.");
             return res;
         }
         NodeInfo nodeInfo = convert.convertToNodeInfo(
@@ -554,7 +539,6 @@ public class NodeRenderService extends ServiceBase {
             false
         );
         res.setNodeInfo(nodeInfo);
-        res.setSuccess(true);
         return res;
     }
 

@@ -101,7 +101,6 @@ public class NostrService extends ServiceBase {
             if (userNode != null) {
                 userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(req.getRelays()));
                 update.save(as, userNode);
-                res.setSuccess(true);
             }
             return null;
         });

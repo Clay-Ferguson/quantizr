@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -17,7 +18,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -57,7 +58,6 @@ public class AclService extends ServiceBase {
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         res.setAclEntries(auth.getAclEntries(ms, node));
-        res.setSuccess(true);
         return res;
     }
 
@@ -103,7 +103,6 @@ public class AclService extends ServiceBase {
         } else {
             update.saveSession(ms);
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -123,7 +122,7 @@ public class AclService extends ServiceBase {
                 success = false;
             }
         }
-        res.setSuccess(success);
+        res.setCode(success ? 200 : HttpServletResponse.SC_EXPECTATION_FAILED);
         return res;
     }
 
@@ -136,7 +135,6 @@ public class AclService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
-        res.setSuccess(true);
         return res;
     }
 
@@ -153,7 +151,7 @@ public class AclService extends ServiceBase {
             throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
         }
         boolean success = setCipherKey(ms, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
-        res.setSuccess(success);
+        res.setCode(success ? 200 : HttpServletResponse.SC_EXPECTATION_FAILED);
         return res;
     }
 
@@ -213,8 +211,7 @@ public class AclService extends ServiceBase {
                 principalNode = arun.run(as -> read.getUserNodeByUserName(as, _principal));
                 if (principalNode == null) {
                     if (res != null) {
-                        res.setMessage("Unknown user name: " + principal);
-                        res.setSuccess(false);
+                        res.error("Unknown user name: " + principal);
                     }
                     return false;
                 }
@@ -231,8 +228,7 @@ public class AclService extends ServiceBase {
                 String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
                 if (principalPubKey == null) {
                     if (res != null) {
-                        res.setMessage("User doesn't have a PublicKey available: " + principal);
-                        res.setSuccess(false);
+                        res.error("User doesn't have a PublicKey available: " + principal);
                         return false;
                     }
                 }
@@ -394,7 +390,6 @@ public class AclService extends ServiceBase {
         if (node.getAc() == null || node.getAc().size() == 0) {
             node.set(NodeProp.UNPUBLISHED, null);
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -462,7 +457,7 @@ public class AclService extends ServiceBase {
 
     public void failIfAdminOwned(SubNode node) {
         if (isAdminOwned(node)) {
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
     }
 

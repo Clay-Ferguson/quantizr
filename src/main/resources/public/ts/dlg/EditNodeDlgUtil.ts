@@ -120,7 +120,7 @@ export class EditNodeDlgUtil {
         });
         S.nodeUtil.processInboundNode(res.node);
 
-        if (!res?.success) {
+        if (res?.code != 200) {
             return false;
         }
 

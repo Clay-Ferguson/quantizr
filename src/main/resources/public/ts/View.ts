@@ -99,8 +99,8 @@ export class View {
                 return;
             }
 
-            if (!res || !res.success) {
-                console.log("Unable to access node: " + a.nodeId);
+            if (!res || res.code != 200) {
+                console.log("Unable to access node(4): " + a.nodeId + " RES: " + S.util.prettyPrint(res));
                 return;
             }
 

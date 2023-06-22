@@ -48,7 +48,7 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.model.client.APTag;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
@@ -851,7 +851,7 @@ public class ActPubService extends ServiceBase {
 
     public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
         apLog.trace("processUpdatePerson");
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin()) throw new ForbiddenException();
         SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
         if (actorAccnt == null) {
             log.debug("user not found: " + actor.getId());
@@ -876,7 +876,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void createOrUpdateObj(MongoSession as, APOActivity activity, String encodedKey) {
-        if (!as.isAdmin()) throw new NodeAuthFailedException();
+        if (!as.isAdmin()) throw new ForbiddenException();
         apLog.trace("createOrUpdateObj");
         // obj is the 'Note' or 'Video' object, or other payload type.
         APObj obj = activity.getAPObj();

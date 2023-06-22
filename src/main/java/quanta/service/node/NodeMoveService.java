@@ -67,7 +67,6 @@ public class NodeMoveService extends ServiceBase {
         } else {
             throw new RuntimeEx("Invalid target type: " + req.getTargetName());
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -134,14 +133,12 @@ public class NodeMoveService extends ServiceBase {
                 parentPath = node.getParentPath();
             } //
             else if (!parentPath.equals(node.getParentPath())) {
-                res.setMessage("Failed: All nodes must be under the same parent node.");
-                res.setSuccess(false);
+                res.error("Failed: All nodes must be under the same parent node.");
                 return res;
             }
             auth.ownerAuth(ms, node);
             if (read.hasChildren(ms, node, false, false)) {
-                res.setMessage("Failed. Nodes to be joined cannot have any children/subnodes");
-                res.setSuccess(false);
+                res.error("Failed. Nodes to be joined cannot have any children/subnodes");
                 return res;
             }
             nodes.add(node);
@@ -173,7 +170,6 @@ public class NodeMoveService extends ServiceBase {
         firstNode.setContent(sb.toString());
         firstNode.touch();
         update.saveSession(ms);
-        res.setSuccess(true);
         return res;
     }
 
@@ -184,7 +180,6 @@ public class NodeMoveService extends ServiceBase {
         MoveNodesResponse res = new MoveNodesResponse();
         ms = ThreadLocals.ensure(ms);
         moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), res);
-        res.setSuccess(true);
         return res;
     }
 
@@ -355,7 +350,6 @@ public class NodeMoveService extends ServiceBase {
         if (nodeIds != null) {
             res.setNodeIds(nodeIds);
         }
-        res.setSuccess(true);
         return res;
     }
 }

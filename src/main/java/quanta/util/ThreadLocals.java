@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.config.SessionContext;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.instrument.PerfMonEvent;
 import quanta.model.client.NostrUserInfo;
 import quanta.mongo.MongoSession;
@@ -89,7 +89,7 @@ public class ThreadLocals {
     public static void requireAdminThread() {
         MongoSession as = ThreadLocals.getMongoSession();
         if (as == null || !as.isAdmin()) {
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
     }
 

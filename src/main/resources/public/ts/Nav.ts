@@ -31,8 +31,8 @@ export class Nav {
     }
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean) => {
-        if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
-            S.util.showPageMessage("The node above is not shared.");
+        if (!res || !res.node) {
+            S.util.showPageMessage("The node above is not accessible.");
         } else {
             S.render.renderPage(res, scrollToTop, id, true, true);
         }

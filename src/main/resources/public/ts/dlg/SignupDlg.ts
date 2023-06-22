@@ -87,7 +87,7 @@ export class SignupDlg extends DialogBase {
     }
 
     signupResponse = async (res: J.SignupResponse): Promise<void> => {
-        if (res.success) {
+        if (res.code == 200) {
             this.close();
 
             if (this.adminCreatingUser) {

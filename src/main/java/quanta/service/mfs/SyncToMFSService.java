@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -89,7 +90,7 @@ public class SyncToMFSService extends ServiceBase {
             throw ExUtil.wrapEx(ex);
         }
         res.setMessage(buildReport());
-        res.setSuccess(success);
+        res.setCode(success ? 200 : HttpServletResponse.SC_EXPECTATION_FAILED);
     }
 
     private String buildReport() {

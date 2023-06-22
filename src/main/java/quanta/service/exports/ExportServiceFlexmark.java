@@ -82,7 +82,6 @@ public class ExportServiceFlexmark extends ServiceBase {
             exportNodeToFile(ms, nodeId);
             res.setFileName(shortFileName);
         }
-        res.setSuccess(true);
     }
 
     private void exportNodeToFile(MongoSession ms, String nodeId) {

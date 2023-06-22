@@ -94,7 +94,7 @@ export class LoginDlg extends DialogBase {
                 nostrPubKey: S.nostr.pk
             }, false, true);
 
-            if (res.success) {
+            if (res.code == 200) {
                 S.quanta.authToken = res.authToken;
                 S.user.loginResponse(res, usr, pwd, true);
                 this.close();

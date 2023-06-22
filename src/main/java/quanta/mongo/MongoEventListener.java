@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import quanta.EventPublisher;
 import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
@@ -310,7 +310,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                 if (parent == null) throw new RuntimeException("unable to get node parent: " + node.getParentPath());
                 auth.authForChildNodeCreate(ms, parent);
                 if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
-                    throw new NodeAuthFailedException();
+                    throw new ForbiddenException();
                 }
             }
         }

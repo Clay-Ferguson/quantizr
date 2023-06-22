@@ -9,11 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NotLoggedInException;
-import quanta.exception.OutOfSpaceException;
+import quanta.exception.base.RuntimeEx;
 import quanta.instrument.Instrument;
 import quanta.instrument.PerfMonEvent;
-import quanta.model.client.ErrorType;
 import quanta.mongo.MongoSession;
 import quanta.request.LogoutRequest;
 import quanta.request.base.RequestBase;
@@ -27,6 +25,7 @@ import quanta.util.XString;
 public class CallProcessor extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
+    private static boolean logResponses = false;
 
     /*
      * Wraps the processing of any command by using whatever info is on the session and/or the request
@@ -65,12 +64,11 @@ public class CallProcessor extends ServiceBase {
          * on it, but most (not all) implementations of methods end up instantiating their own which
          * overwrites this
          */
-        new ResponseBase();
-
+        ResponseBase orb = new ResponseBase();
         Object ret = null;
-
         long startTime = System.currentTimeMillis();
         String userName = null;
+
         try {
             if (req instanceof LogoutRequest) {
                 // Note: all this run will be doing in this case is a session invalidate.
@@ -81,36 +79,22 @@ public class CallProcessor extends ServiceBase {
                 ret = runner.run(ms);
                 update.saveSession(ms);
             }
-        } catch (NotLoggedInException e1) {
-            HttpServletResponse res = ThreadLocals.getServletResponse();
-            try {
-                if (res != null) {
-                    ExUtil.warn("Unauthorized. Not logged in.");
-                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                }
-            } catch (Exception e) {
-                ExUtil.error(log, "exception in call processor", e);
-            }
-        } catch (Exception e) {
-            ExUtil.error(log, "exception in call processor", e);
-            ret = ThreadLocals.getResponse();
+
             if (ret instanceof ResponseBase) {
-                ResponseBase orb = (ResponseBase) ret;
-                orb.setSuccess(false);
-                setErrorType(orb, e);
-                /* only set a message if one is not already set */
-                if (StringUtils.isEmpty(orb.getMessage())) {
-                    /*
-                     * for now, we can just send back the actual exception message
-                     */
-                    if (e.getMessage() != null) {
-                        orb.setMessage("Failed: " + e.getMessage());
-                    } else {
-                        orb.setMessage("Oops, something went wrong.");
-                    }
+                orb = (ResponseBase) ret;
+
+                if (orb.getCode() == null) {
+                    orb.setCode(HttpServletResponse.SC_OK);
                 }
-                orb.setStackTrace(ExceptionUtils.getStackTrace(e));
             }
+
+            setResponse(orb, orb.getCode(), null);
+        } catch (RuntimeEx e) {
+            // NOTE: Do not rethrow (return via http, code 200) in this case
+            setResponse(orb, e.getCode(), e);
+        } catch (Exception e) {
+            // NOTE: Do not rethrow (return via http, code 200) in this case
+            setResponse(orb, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         } finally {
             int duration = (int) (System.currentTimeMillis() - startTime);
             if (duration > Instrument.CAPTURE_THRESHOLD) {
@@ -118,13 +102,36 @@ public class CallProcessor extends ServiceBase {
             }
             nostr.pushNostrInfoToClient();
         }
-        logResponse(ret);
-        return ret;
+        logResponse(orb);
+        return orb;
     }
 
-    private void setErrorType(ResponseBase res, Exception ex) {
-        if (ex instanceof OutOfSpaceException) {
-            res.setErrorType(ErrorType.OUT_OF_SPACE.s());
+    private void setResponse(ResponseBase orb, int code, Exception e) {
+        orb.setCode(code);
+
+        // If this is an error condition and there's no message set then set one.
+        if (code != HttpServletResponse.SC_OK || e != null) {
+            /* only set a message if one is not already set */
+            if (StringUtils.isEmpty(orb.getMessage())) {
+                // if it's an exception and the exception has ap message, show that message
+                if (e != null && e.getMessage() != null) {
+                    orb.setMessage("Failed: " + e.getMessage());
+                }
+                // otherwise show a generic message
+                else {
+                    orb.setMessage("Oops, something went wrong.");
+                }
+            }
+        }
+
+        if (e != null) {
+            String stack = ExceptionUtils.getStackTrace(e);
+            log.debug("ERROR: " + stack);
+            orb.setStackTrace(stack);
+        }
+
+        if (logResponses) {
+            log.debug("ORB: " + XString.prettyPrint(orb));
         }
     }
 

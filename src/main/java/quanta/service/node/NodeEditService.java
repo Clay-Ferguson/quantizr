@@ -24,7 +24,7 @@ import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
@@ -150,7 +150,7 @@ public class NodeEditService extends ServiceBase {
         parentNode.adminUpdate = true;
         // note: redundant security
         if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
         SubNode newNode = create.createNode(
@@ -294,7 +294,6 @@ public class NodeEditService extends ServiceBase {
                 false
             )
         );
-        res.setSuccess(true);
         return res;
     }
 
@@ -315,7 +314,7 @@ public class NodeEditService extends ServiceBase {
         parentNode.adminUpdate = true;
         // note: redundant security
         if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
         SubNode newNode = create.createNode(
             ms,
@@ -405,7 +404,6 @@ public class NodeEditService extends ServiceBase {
         // && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
         // outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
         // }
-        res.setSuccess(true);
         return res;
     }
 
@@ -534,7 +532,6 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeException("Not a Friend node.");
         }
         node.setTags(req.getTags());
-        res.setSuccess(true);
         return res;
     }
 
@@ -695,7 +692,6 @@ public class NodeEditService extends ServiceBase {
             res.setNode(newNodeInfo);
         }
 
-        res.setSuccess(true);
         return res;
     }
 
@@ -927,7 +923,6 @@ public class NodeEditService extends ServiceBase {
             node.delete(propName);
         }
         update.save(ms, node);
-        res.setSuccess(true);
         return res;
     }
 
@@ -950,7 +945,6 @@ public class NodeEditService extends ServiceBase {
          * If split will have no effect, just return as if successful.
          */
         if (!containsDelim) {
-            res.setSuccess(true);
             return res;
         }
         String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
@@ -1004,7 +998,6 @@ public class NodeEditService extends ServiceBase {
         if (req.getSplitType().equalsIgnoreCase("children")) {
             parentForNewNodes.setHasChildren(true);
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -1063,13 +1056,11 @@ public class NodeEditService extends ServiceBase {
             prevHash = node.getStr(NodeProp.SUBGRAPH_HASH);
             node.set(NodeProp.SUBGRAPH_HASH, newHash);
         } catch (Exception e) {
-            res.setMessage("Failed generating hash");
-            res.setSuccess(false);
+            res.error("Failed generating hash");
             return res;
         }
         boolean hashChanged = prevHash != null && !prevHash.equals(newHash);
         res.setMessage((hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
-        res.setSuccess(true);
         return res;
     }
 
@@ -1134,7 +1125,6 @@ public class NodeEditService extends ServiceBase {
             });
         }
         res.setMessage(String.valueOf(ops.getVal()) + " nodes were affected.");
-        res.setSuccess(true);
         return res;
     }
 
@@ -1262,7 +1252,6 @@ public class NodeEditService extends ServiceBase {
             link.setName(req.getName());
             sourceNode.addLink(null, link);
         }
-        res.setSuccess(true);
         return res;
     }
 
@@ -1397,7 +1386,6 @@ public class NodeEditService extends ServiceBase {
             }
         }
         res.setMessage(String.valueOf(replacements) + " nodes were updated.");
-        res.setSuccess(true);
         return res;
     }
 

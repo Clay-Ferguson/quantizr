@@ -66,18 +66,14 @@ public class SyncFromMFSService extends ServiceBase {
             if (!req.getPath().startsWith("/")) {
                 if (traverseDag(null, req.getPath(), 0, 3)) {
                     res.setMessage(buildReport());
-                    res.setSuccess(true);
                 } else {
-                    res.setMessage("Unable to process: " + req.getPath());
-                    res.setSuccess(false);
+                    res.error("Unable to process: " + req.getPath());
                 }
             } else { // access data from the local MFS // Loading from an actual MFS path was completed, but is not very usable because we can only
                 if (processPath(req.getPath())) {
                     res.setMessage(buildReport());
-                    res.setSuccess(true);
                 } else {
-                    res.setMessage("Unable to process: " + req.getPath());
-                    res.setSuccess(false);
+                    res.error("Unable to process: " + req.getPath());
                 }
             }
         } catch (Exception ex) {

@@ -20,7 +20,7 @@ import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.NodeAuthFailedException;
+import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AccessControlInfo;
 import quanta.model.PrivilegeInfo;
@@ -301,7 +301,7 @@ public class MongoAuth extends ServiceBase {
             log.error(
                 "Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): " + XString.prettyPrint(node)
             );
-            throw new NodeAuthFailedException();
+            throw new ForbiddenException();
         }
     }
 
@@ -393,7 +393,7 @@ public class MongoAuth extends ServiceBase {
         // log.error("Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user:
         // " + ms.getUserName()
         // + "\n" + ExUtil.getStackTrace(null));
-        throw new NodeAuthFailedException();
+        throw new ForbiddenException();
     }
 
     /*
