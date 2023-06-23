@@ -50,7 +50,7 @@ public class ActPubReplies extends ServiceBase {
         return arun.<LinkedList<SubNode>>run(as -> {
             LinkedList<SubNode> nodes = new LinkedList<>();
             SubNode node = read.getNode(as, nodeId);
-            if (node != null && AclService.isPublic(as, node)) {
+            if (node != null && AclService.isPublic(node)) {
                 // We only get COMMENT nodes, because those are considered 'replies' and other things are considered
                 // core content,
                 // at least as far as ActPub is concerned.
@@ -58,7 +58,7 @@ public class ActPubReplies extends ServiceBase {
                 Iterable<SubNode> children = read.findSubNodesByType(as, node, NodeType.COMMENT.s(), false, sort, null);
 
                 for (SubNode child : children) {
-                    if (AclService.isPublic(as, child)) {
+                    if (AclService.isPublic(child)) {
                         nodes.add(child);
                     }
                 }
@@ -70,7 +70,7 @@ public class ActPubReplies extends ServiceBase {
                 );
 
                 for (SubNode child : iter) {
-                    if (AclService.isPublic(as, child)) {
+                    if (AclService.isPublic(child)) {
                         nodes.add(child);
                     }
                 }

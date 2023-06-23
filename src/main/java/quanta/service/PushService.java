@@ -31,7 +31,7 @@ public class PushService extends ServiceBase {
         if (node.getBool(NodeProp.UNPUBLISHED) || !node.getType().equals(NodeType.COMMENT.s())) return;
 
         exec.run(() -> {
-            boolean isPublic = AclService.isPublic(ms, node);
+            boolean isPublic = AclService.isPublic(node);
             // put user names in a hash set for faster performance
             HashSet<String> usersSharedToSet = new HashSet<>();
 

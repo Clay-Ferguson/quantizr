@@ -434,7 +434,7 @@ public class AclService extends ServiceBase {
         return principals;
     }
 
-    public static boolean isPublic(MongoSession ms, SubNode node) {
+    public static boolean isPublic(SubNode node) {
         return node != null && node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s());
     }
 

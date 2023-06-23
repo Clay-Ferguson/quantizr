@@ -112,7 +112,7 @@ public class NodeEditService extends ServiceBase {
          * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
          * user's POSTS node.
          */
-        if (req.isReply() || (nodeId == null && !linkBookmark)) {
+        if (nodeId == null && !linkBookmark) {
             parentNode =
                 read.getUserNodeByType(
                     ms,
@@ -123,6 +123,7 @@ public class NodeEditService extends ServiceBase {
                     Arrays.asList(PrivilegeType.READ.s()),
                     NodeName.POSTS
                 );
+
             if (parentNode != null) {
                 nodeId = parentNode.getIdStr();
                 makePublicWritable = true;
@@ -175,46 +176,30 @@ public class NodeEditService extends ServiceBase {
         if (req.isReply() && req.getNodeId() != null) {
             newNode.set(NodeProp.INREPLYTO, req.getNodeId());
         }
+
         if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
             newNode.set(NodeProp.TARGET_ID, req.getNodeId());
             // adding bookmark should disallow sharing.
             allowSharing = false;
         }
+
         if (req.isTypeLock()) {
             newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
         }
-        if (req.isReply()) {
-            // force to get sharing from node being replied to
-            makePublicWritable = false;
-        } else /*
-         * If we're inserting a node under the POSTS it should be public, rather than inherit sharing,
-         * unless it's a reply in which case we leave makePublicWitable alone and it picks up shares from
-         * parent maybe
-         */if (parentNode.isType(NodeType.POSTS)) {
-            makePublicWritable = true;
-        }
+
         // if we never set 'nodeBeingRepliedTo' by now that means it's the parent that we're replying to.
         if (nodeBeingRepliedTo == null) {
             nodeBeingRepliedTo = parentNode;
         }
+
         if (allowSharing) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
                 ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
                 newNode.setAc(ac);
-            } //
-            else if (makePublicWritable) { // else maybe public.
-                acl.addPrivilege(
-                    ms,
-                    null,
-                    newNode,
-                    PrincipalName.PUBLIC.s(),
-                    null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                    null
-                );
-            } else { // else add default sharing
+            } else if (req.isReply()) {
+                // else add default sharing
                 // we always determine the access controls from the parent for any new nodes
                 auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
                 if (req.getBoosterUserId() != null) {
@@ -230,6 +215,24 @@ public class NodeEditService extends ServiceBase {
                 if (cipherKey != null) {
                     res.setEncrypt(true);
                 }
+            }
+
+            /* Always make public if we're replying to public node or posting under our POSTs node */
+            if (
+                makePublicWritable ||
+                (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
+                parentNode.isType(NodeType.POSTS)
+            ) {
+                // todo-0: this call can be put in a 'ac.makePublic()' method.
+                acl.addPrivilege(
+                    ms,
+                    null,
+                    newNode,
+                    PrincipalName.PUBLIC.s(),
+                    null,
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                    null
+                );
             }
         }
         if (nostr.isNostrNode(nodeBeingRepliedTo)) {
@@ -761,7 +764,7 @@ public class NodeEditService extends ServiceBase {
                     apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
                 }
             }
-            if (AclService.isPublic(ms, node) && !StringUtils.isEmpty(node.getName())) {
+            if (AclService.isPublic(node) && !StringUtils.isEmpty(node.getName())) {
                 saveNodeToMFS(ms, node);
             }
             return null;

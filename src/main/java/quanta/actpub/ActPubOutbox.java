@@ -445,7 +445,7 @@ public class ActPubOutbox extends ServiceBase {
                 }
             }
             // if not authorized and not a public node fail now.
-            if (!authSuccess && !AclService.isPublic(as, node)) {
+            if (!authSuccess && !AclService.isPublic(node)) {
                 log.debug("getResource failed on non-public node: " + node.getIdStr());
                 throw new ForbiddenException();
             }

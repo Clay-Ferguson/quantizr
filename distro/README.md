@@ -112,9 +112,11 @@ Should tell you image is already up to date
     docker network ls
     docker network prune
 
-### Prune entire system of unused things
+### To Cleanup Disk Space
 
     docker system prune -a
+    docker image prune -a
+
 
 ### IPFS Not Working ?
 

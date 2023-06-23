@@ -318,7 +318,7 @@ public class AppController extends ServiceBase implements ErrorController {
                     // todo-1: should this always be set even when we used ":home" above?
                     sc.setInitialNodeId(_id);
                 }
-                if (AclService.isPublic(as, node)) {
+                if (AclService.isPublic(node)) {
                     render.populateSocialCardProps(node, model);
                 }
             } else {

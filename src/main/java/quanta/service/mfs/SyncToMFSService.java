@@ -53,7 +53,7 @@ public class SyncToMFSService extends ServiceBase {
         this.session = ms;
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
-        if (!AclService.isPublic(ms, node)) {
+        if (!AclService.isPublic(node)) {
             throw new RuntimeException("This experimental IPFS feature only works for public nodes.");
         }
         boolean success = false;

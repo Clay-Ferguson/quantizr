@@ -116,7 +116,7 @@ public class UserFeedService extends ServiceBase {
             }
             pathToSearch = rootNode.getPath();
             /* if the chat root is public disable all auth logic in this method */
-            if (AclService.isPublic(ms, rootNode)) {} else /* // do nothing, for now.
+            if (AclService.isPublic(rootNode)) {} else /* // do nothing, for now.
              * If chat node is NOT public we try to check our read auth on it and if not this will throw an
              * exception which is the correct flow here
              */{

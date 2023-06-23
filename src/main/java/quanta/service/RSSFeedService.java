@@ -685,12 +685,12 @@ public class RSSFeedService extends ServiceBase {
         feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
         List<SyndEntry> entries = new LinkedList<>();
         feed.setEntries(entries);
-        if (AclService.isPublic(ms, node)) {
+        if (AclService.isPublic(node)) {
             Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
             Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
             if (iter != null) {
                 for (SubNode n : iter) {
-                    if (!AclService.isPublic(ms, n)) continue;
+                    if (!AclService.isPublic(n)) continue;
                     metaInfo = snUtil.getNodeMetaInfo(n);
                     // Currently the link will be an attachment URL, but need to research how ROME
                     // handles attachments.
