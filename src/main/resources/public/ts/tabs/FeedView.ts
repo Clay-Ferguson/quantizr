@@ -292,6 +292,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
     }
 
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
+        const ast = getAs();
         let subHeading = null;
 
         if (data.props.feedFilterToDisplayName) {
@@ -328,6 +329,13 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
                 case J.Constant.FEED_PUB:
                     subHeading = "Fediverse";
+                    if (ast.protocolFilter == J.Constant.NETWORK_ACTPUB) {
+                        subHeading = "ActivityPub " + subHeading;
+                    }
+                    else if (ast.protocolFilter == J.Constant.NETWORK_NOSTR) {
+                        subHeading = "Nostr " + subHeading;
+                    }
+
                     break;
 
                 default: break;
