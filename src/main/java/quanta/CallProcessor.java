@@ -86,15 +86,22 @@ public class CallProcessor extends ServiceBase {
                 if (orb.getCode() == null) {
                     orb.setCode(HttpServletResponse.SC_OK);
                 }
+                setResponse(orb, orb.getCode(), null);
             }
-
-            setResponse(orb, orb.getCode(), null);
         } catch (RuntimeEx e) {
-            // NOTE: Do not rethrow (return via http, code 200) in this case
-            setResponse(orb, e.getCode(), e);
+            if (ret == null) ret = orb;
+            if (ret instanceof ResponseBase) {
+                // NOTE: Do not rethrow (return via http, code 200) in this case
+                setResponse(orb, e.getCode(), e);
+            }
         } catch (Exception e) {
-            // NOTE: Do not rethrow (return via http, code 200) in this case
-            setResponse(orb, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            if (ret == null) ret = orb;
+            if (ret instanceof ResponseBase) {
+                // NOTE: Do not rethrow (return via http, code 200) in this case
+                setResponse(orb, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            } else {
+                log.debug("ERROR: " + ExceptionUtils.getStackTrace(e));
+            }
         } finally {
             int duration = (int) (System.currentTimeMillis() - startTime);
             if (duration > Instrument.CAPTURE_THRESHOLD) {
@@ -102,8 +109,11 @@ public class CallProcessor extends ServiceBase {
             }
             nostr.pushNostrInfoToClient();
         }
-        logResponse(orb);
-        return orb;
+
+        if (ret instanceof ResponseBase) {
+            log.trace("RES=" + XString.prettyPrint(ret));
+        }
+        return ret;
     }
 
     private void setResponse(ResponseBase orb, int code, Exception e) {
@@ -124,7 +134,7 @@ public class CallProcessor extends ServiceBase {
             }
         }
 
-        if (e != null) {
+        if (e != null && orb.getStackTrace() == null) {
             String stack = ExceptionUtils.getStackTrace(e);
             log.debug("ERROR: " + stack);
             orb.setStackTrace(stack);
@@ -137,9 +147,5 @@ public class CallProcessor extends ServiceBase {
 
     private static void logRequest(String url, Object req, HttpSession httpSession) {
         log.trace("REQ=" + url + " " + (req == null ? "none" : XString.prettyPrint(req)));
-    }
-
-    private static void logResponse(Object res) {
-        log.trace("RES=" + (res == null ? "none" : XString.prettyPrint(res)));
     }
 }

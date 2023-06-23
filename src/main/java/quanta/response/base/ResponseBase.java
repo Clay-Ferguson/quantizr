@@ -1,9 +1,14 @@
 package quanta.response.base;
 
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 
 public class ResponseBase {
+
+    private static Logger log = LoggerFactory.getLogger(ResponseBase.class);
 
     private String message;
     private String stackTrace;
@@ -29,6 +34,9 @@ public class ResponseBase {
     public void error(String msg) {
         setMessage(msg);
         setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
+        String stack = ExUtil.getStackTrace(null);
+        setStackTrace(stack);
+        log.error("error: " + msg + "\n Stack: " + stack);
     }
 
     public String getMessage() {

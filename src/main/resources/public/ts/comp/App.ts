@@ -5,6 +5,7 @@ import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { DialogMode } from "../DialogBase";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
@@ -108,7 +109,7 @@ export class App extends Main {
             // DO NOT DELETE:
             // Currently we have no need to show the menu to anonymous users, but I want to keep
             // this here for future purposes in case we eventually do need this menu.
-            const menuButton = ast.isAnonUser ? null : new IconButton("fa-bars", null, {
+            const menuButton = new IconButton("fa-bars", null, {
                 onClick: S.nav.showMainMenu,
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
@@ -139,7 +140,7 @@ export class App extends Main {
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Span(ast.userName, {
                     className: "clickable",
-                    onClick: S.nav.navToMyAccntRoot
+                    onClick: () => new UserProfileDlg(null).open()
                 }) : null
             ]);
 

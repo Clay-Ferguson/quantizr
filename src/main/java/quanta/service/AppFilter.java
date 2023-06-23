@@ -39,8 +39,12 @@ public class AppFilter extends GenericFilterBean {
 
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
+
+    // turns on FULL and verbose logging
     public static boolean audit = false;
-    public static boolean debug = false;
+
+    // turns on some logging (not too verbose)
+    public static boolean debug = true;
     public static String BEARER_TOKEN = "token";
 
     private static final Object filterLock = new Object();

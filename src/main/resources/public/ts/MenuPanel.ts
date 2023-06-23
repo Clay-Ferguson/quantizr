@@ -24,7 +24,6 @@ import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-import { SettingsTab } from "./tabs/data/SettingsTab";
 import { TTSTab } from "./tabs/data/TTSTab";
 
 PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
@@ -138,11 +137,6 @@ export class MenuPanel extends Div {
     }
     static toggleInfoMode = () => {
         S.edit.setShowMetaData(!getAs().userPrefs.showMetaData);
-    }
-
-    static userSettings = () => {
-        SettingsTab.tabSelected = true;
-        S.tabUtil.selectTab(C.TAB_SETTINGS);
     }
 
     static userProfile = () => { new UserProfileDlg(null).open(); }
@@ -475,7 +469,7 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("Account", [
                 new MenuItem("Profile", MenuPanel.userProfile),
-                new MenuItem("Settings", MenuPanel.userSettings)
+                new MenuItem("Settings", S.nav.showUserSettings)
             ]));
         }
 

@@ -13,6 +13,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
+import { SettingsTab } from "./tabs/data/SettingsTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class Nav {
@@ -252,6 +253,11 @@ export class Nav {
         else {
             new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, null).open();
         }
+    }
+
+    showUserSettings = () => {
+        SettingsTab.tabSelected = true;
+        S.tabUtil.selectTab(C.TAB_SETTINGS);
     }
 
     showMainMenu = () => {

@@ -1,7 +1,6 @@
 console.log("entering Constants.ts");
 export class Constants {
 
-    // todo-0: need to start using these codes.
     static RESPONSE_CODE_OK = 200;
     static RESPONSE_CODE_OUTOFSPACE = 507;
     static RESPONSE_CODE_INTERNAL_SERVER_ERROR = 500;

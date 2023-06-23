@@ -191,7 +191,7 @@ export class UserProfileDlg extends DialogBase {
                 web3Div,
 
                 new ButtonBar([
-                    getAs().isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
                     (getAs().isAnonUser || this.readOnly || !S.quanta.cfg.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
                         title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
                     }),
@@ -230,7 +230,11 @@ export class UserProfileDlg extends DialogBase {
                         window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                     }) : null,
                     !this.readOnly ? new Button("Logout", S.user.logout) : null,
-                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary")
+                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Settings", () => {
+                        this.close();
+                        S.nav.showUserSettings();
+                    }),
+                    new Button(this.readOnly ? "Close" : "Cancel", this.close)
                 ], "marginTop")
             ])
         ];
@@ -582,7 +586,9 @@ export class UserProfileDlg extends DialogBase {
     }
 
     override async preLoad(): Promise<void> {
-        await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        if (!this.readOnly) {
+            await S.rpcUtil.rpc<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        }
         await this.reload();
     }
 }
