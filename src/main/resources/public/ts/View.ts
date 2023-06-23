@@ -72,47 +72,41 @@ export class View {
             a.renderParentIfLeaf = false;
         }
 
-        try {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: a.nodeId,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: a.renderParentIfLeaf,
-                forceRenderParent: a.forceRenderParent,
-                offset,
-                goToLastPage: false,
-                forceIPFSRefresh: a.forceIPFSRefresh,
-                singleNode: false,
-                jumpToRss: a.jumpToRss
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: a.nodeId,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: a.renderParentIfLeaf,
+            forceRenderParent: a.forceRenderParent,
+            offset,
+            goToLastPage: false,
+            forceIPFSRefresh: a.forceIPFSRefresh,
+            singleNode: false,
+            jumpToRss: a.jumpToRss
+        });
+        S.nodeUtil.processInboundNode(res.node);
+
+        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
+        // the actual RSS feed that this node defines.
+        if (a.jumpToRss && res?.rssNode) {
+            dispatch("LoadingFeed", s => {
+                s.rssNode = res.node;
+                s.activeTab = C.TAB_RSS;
+                S.domUtil.focusId(C.TAB_RSS);
+                S.tabUtil.tabScroll(C.TAB_RSS, 0);
             });
-            S.nodeUtil.processInboundNode(res.node);
-
-            // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
-            // the actual RSS feed that this node defines.
-            if (a.jumpToRss && res?.rssNode) {
-                dispatch("LoadingFeed", s => {
-                    s.rssNode = res.node;
-                    s.activeTab = C.TAB_RSS;
-                    S.domUtil.focusId(C.TAB_RSS);
-                    S.tabUtil.tabScroll(C.TAB_RSS, 0);
-                });
-                return;
-            }
-
-            if (!res || res.code != C.RESPONSE_CODE_OK) {
-                console.log("Unable to access node(4): " + a.nodeId + " RES: " + S.util.prettyPrint(res));
-                return;
-            }
-
-            if (C.DEBUG_SCROLLING) {
-                console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
-            }
-            await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
+            return;
         }
-        catch (e) {
-            S.util.logErr(e);
-            S.nodeUtil.clearLastNodeIds();
+
+        if (!res || res.code != C.RESPONSE_CODE_OK) {
+            console.log("Unable to access node(4): " + a.nodeId + " RES: " + S.util.prettyPrint(res));
+            return;
         }
+
+        if (C.DEBUG_SCROLLING) {
+            console.log("refreshTree -> renderPage (scrollTop=" + a.scrollToTop + ")");
+        }
+        await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
     }
 
     firstPage = () => {
@@ -157,52 +151,47 @@ export class View {
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
     private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean) => {
         const ast = getAs();
-        try {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: ast.node.id,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: true,
-                forceRenderParent: false,
-                offset,
-                goToLastPage,
-                forceIPFSRefresh: false,
-                singleNode: false,
-                jumpToRss: false
-            },
-                // query as background mode if growing page
-                growingPage);
-            S.nodeUtil.processInboundNode(res.node);
 
-            if (!res.node) return;
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: ast.node.id,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: true,
+            forceRenderParent: false,
+            offset,
+            goToLastPage,
+            forceIPFSRefresh: false,
+            singleNode: false,
+            jumpToRss: false
+        },
+            // query as background mode if growing page
+            growingPage);
+        S.nodeUtil.processInboundNode(res.node);
 
-            // if this is an "infinite scroll" call to load in additional nodes
-            if (growingPage) {
-                /* if the response has some children, and we already have local children we can add to, and we haven't reached
-                max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
-                if (res?.node?.children && ast?.node?.children) {
-                    // create a set for duplicate detection
-                    const idSet: Set<string> = new Set<string>();
+        if (!res.node) return;
 
-                    // load set for known children.
-                    ast.node.children.forEach(child => idSet.add(child.id));
+        // if this is an "infinite scroll" call to load in additional nodes
+        if (growingPage) {
+            /* if the response has some children, and we already have local children we can add to, and we haven't reached
+            max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
+            if (res?.node?.children && ast?.node?.children) {
+                // create a set for duplicate detection
+                const idSet: Set<string> = new Set<string>();
 
-                    // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
-                    res.node.children = ast.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
-                }
-                S.render.renderPage(res, false, null, false, false);
+                // load set for known children.
+                ast.node.children.forEach(child => idSet.add(child.id));
+
+                // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
+                res.node.children = ast.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
             }
-            // else, loading in a page which overrides and discards all existing nodes in browser view
-            else {
-                if (C.DEBUG_SCROLLING) {
-                    console.log("loadPage -> renderPage (scrollTop=true)");
-                }
-                S.render.renderPage(res, true, null, true, true);
-            }
+            S.render.renderPage(res, false, null, false, false);
         }
-        catch (e) {
-            S.util.logErr(e);
-            S.nodeUtil.clearLastNodeIds();
+        // else, loading in a page which overrides and discards all existing nodes in browser view
+        else {
+            if (C.DEBUG_SCROLLING) {
+                console.log("loadPage -> renderPage (scrollTop=true)");
+            }
+            S.render.renderPage(res, true, null, true, true);
         }
     }
 

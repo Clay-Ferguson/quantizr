@@ -129,11 +129,6 @@ export class NodeUtil {
         return null;
     }
 
-    clearLastNodeIds = () => {
-        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, null);
-        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, null);
-    }
-
     /* Returns the node if it's currently displaying on the page. For now we don't have ability */
     displayingOnTree = (nodeId: string): J.NodeInfo => {
         const ast = getAs();

@@ -51,27 +51,21 @@ export class Nav {
         const ast = getAs();
         if (!ast.node) return null;
 
-        try {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: ast.node.id,
-                upLevel: false,
-                siblingOffset,
-                renderParentIfLeaf: true,
-                forceRenderParent: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: false,
-                jumpToRss: false
-            });
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: ast.node.id,
+            upLevel: false,
+            siblingOffset,
+            renderParentIfLeaf: true,
+            forceRenderParent: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: false,
+            jumpToRss: false
+        });
 
-            S.nodeUtil.processInboundNode(res.node);
-            this.upLevelResponse(res, null, true);
-        }
-        catch (e) {
-            S.util.logErr(e);
-            S.nodeUtil.clearLastNodeIds();
-        }
+        S.nodeUtil.processInboundNode(res.node);
+        this.upLevelResponse(res, null, true);
     }
 
     navUpLevelClick = async (evt: Event = null, id: string = null) => {
@@ -91,31 +85,25 @@ export class Nav {
             return;
         }
 
-        try {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: ast.node.id,
-                upLevel: true,
-                siblingOffset: 0,
-                renderParentIfLeaf: false,
-                forceRenderParent: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: false,
-                jumpToRss: false
-            });
-            S.nodeUtil.processInboundNode(res.node);
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: ast.node.id,
+            upLevel: true,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            forceRenderParent: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: false,
+            jumpToRss: false
+        });
+        S.nodeUtil.processInboundNode(res.node);
 
-            if (processingDelete) {
-                S.quanta.refresh();
-            }
-            else {
-                this.upLevelResponse(res, ast.node.id, false);
-            }
+        if (processingDelete) {
+            S.quanta.refresh();
         }
-        catch (e) {
-            S.util.logErr(e);
-            S.nodeUtil.clearLastNodeIds();
+        else {
+            this.upLevelResponse(res, ast.node.id, false);
         }
     }
 
@@ -152,39 +140,33 @@ export class Nav {
     }
 
     openContentNode = async (nodePathOrId: string, jumpToRss: boolean) => {
-        try {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: nodePathOrId,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: null,
-                forceRenderParent: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: false,
-                jumpToRss
+        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: nodePathOrId,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: null,
+            forceRenderParent: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: false,
+            jumpToRss
+        });
+        S.nodeUtil.processInboundNode(res.node);
+
+        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
+        // the actual RSS feed that this node defines.
+        if (jumpToRss && res?.rssNode) {
+            dispatch("LoadingFeed", s => {
+                s.rssNode = res.node;
+                s.activeTab = C.TAB_RSS;
+                S.domUtil.focusId(C.TAB_RSS);
+                S.tabUtil.tabScroll(C.TAB_RSS, 0);
             });
-            S.nodeUtil.processInboundNode(res.node);
-
-            // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
-            // the actual RSS feed that this node defines.
-            if (jumpToRss && res?.rssNode) {
-                dispatch("LoadingFeed", s => {
-                    s.rssNode = res.node;
-                    s.activeTab = C.TAB_RSS;
-                    S.domUtil.focusId(C.TAB_RSS);
-                    S.tabUtil.tabScroll(C.TAB_RSS, 0);
-                });
-                return;
-            }
-
-            this.navPageNodeResponse(res);
+            return;
         }
-        catch (e) {
-            S.util.logErr(e);
-            S.nodeUtil.clearLastNodeIds();
-        }
+
+        this.navPageNodeResponse(res);
     }
 
     openNodeById = (evt: Event) => {
@@ -272,27 +254,22 @@ export class Nav {
         if (ast.isAnonUser) {
             S.util.loadAnonPageHome();
         } else {
-            try {
-                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                    nodeId: ast.userProfile?.userNodeId,
-                    upLevel: false,
-                    siblingOffset: 0,
-                    renderParentIfLeaf: false,
-                    forceRenderParent: false,
-                    offset: 0,
-                    goToLastPage: false,
-                    forceIPFSRefresh: false,
-                    singleNode: false,
-                    jumpToRss: false
-                });
-                S.nodeUtil.processInboundNode(res.node);
 
-                this.navPageNodeResponse(res);
-            }
-            catch (e) {
-                S.util.logErr(e);
-                S.nodeUtil.clearLastNodeIds();
-            }
+            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: ast.userProfile?.userNodeId,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                forceRenderParent: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: false,
+                jumpToRss: false
+            });
+            S.nodeUtil.processInboundNode(res.node);
+
+            this.navPageNodeResponse(res);
         }
     }
 

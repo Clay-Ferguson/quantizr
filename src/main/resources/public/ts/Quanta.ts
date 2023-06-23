@@ -280,18 +280,15 @@ export class Quanta {
                 break;
         }
 
-        if (initialTab) {
-            if (initialTab === C.TAB_FEED && S.quanta.config.tagSearch) {
-                TrendingView.searchWord(null, "#" + S.quanta.config.tagSearch);
-                return;
-            }
-            else {
-                if (initialTab === C.TAB_DOCUMENT && S.quanta.config.initialNodeId) {
-                    S.nav.openDocumentView(null, S.quanta.config.initialNodeId);
-                    S.quanta.config.initialNodeId = null;
-                    return;
-                }
-            }
+        if (initialTab === C.TAB_FEED && S.quanta.config.tagSearch) {
+            TrendingView.searchWord(null, "#" + S.quanta.config.tagSearch);
+            return;
+        }
+
+        if (initialTab === C.TAB_DOCUMENT && S.quanta.config.initialNodeId) {
+            S.nav.openDocumentView(null, S.quanta.config.initialNodeId);
+            S.quanta.config.initialNodeId = null;
+            return;
         }
 
         /* set ID to be the page we want to show user right after login */
@@ -340,6 +337,15 @@ export class Quanta {
         else if (S.quanta.config.initialNodeId) {
             id = S.quanta.config.initialNodeId;
             S.quanta.config.initialNodeId = null;
+
+            const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
+
+            // if server is instructing the initial page load to just go to ":home" we know we
+            // should override that with the actua last node the usere was browsing if we can
+            if (id == ":home" && lastNode != null) {
+                id = lastNode;
+            }
+
             if (id && id.startsWith("~")) {
                 renderParentIfLeaf = false;
             }
