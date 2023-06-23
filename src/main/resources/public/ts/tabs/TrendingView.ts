@@ -96,9 +96,17 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
+        let heading = "Trending";
+        if (ast.protocolFilter == J.Constant.NETWORK_ACTPUB) {
+            heading += " on ActivityPub ";
+        }
+        else if (ast.protocolFilter == J.Constant.NETWORK_NOSTR) {
+            heading += " on Nostr ";
+        }
+
         this.setChildren([
             this.headingBar = new TabHeading([
-                new Div("Trending", { className: "tabTitle" })
+                new Div(heading, { className: "tabTitle" })
             ]),
 
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),

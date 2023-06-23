@@ -335,7 +335,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     else if (ast.protocolFilter == J.Constant.NETWORK_NOSTR) {
                         subHeading = "Nostr " + subHeading;
                     }
-
                     break;
 
                 default: break;
