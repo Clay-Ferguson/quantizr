@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMonEvent;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.RssFeed;
@@ -68,6 +69,7 @@ import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
@@ -97,6 +99,8 @@ public class RSSFeedService extends ServiceBase {
      */
     private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
     private static int MAX_CACHE_SIZE = 500;
+    private static final boolean debug = true;
+
     public static final LinkedHashMap<String, byte[]> proxyCache = new LinkedHashMap<String, byte[]>(
         MAX_CACHE_SIZE + 1,
         0.75F,
@@ -170,6 +174,7 @@ public class RSSFeedService extends ServiceBase {
 
     public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
         try {
+            // Reads all the feeds from the web and creates 'entries' for all content.
             for (String url : urls) {
                 SyndFeed inFeed = getFeed(url, true);
                 if (inFeed != null) {
@@ -180,6 +185,7 @@ public class RSSFeedService extends ServiceBase {
                     }
                 }
             }
+
             entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
             /*
              * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
@@ -213,17 +219,27 @@ public class RSSFeedService extends ServiceBase {
          * feed has failed
          */
         if (fromCache && failedFeeds.contains(url)) {
+            if (debug) {
+                log.debug("Feed previously faild (skipping): " + url);
+            }
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);
         }
+
         Reader reader = null;
         try {
             SyndFeed inFeed = null;
             if (fromCache) {
                 inFeed = feedCache.get(url);
                 if (inFeed != null) {
+                    if (debug) {
+                        log.debug("Got Feed from Cache: " + url);
+                    }
                     return inFeed;
                 }
+            }
+            if (debug) {
+                log.debug("Reading Feed from Web: " + url);
             }
             int timeout = 60; // seconds
             if (USE_URL_READER) {
@@ -256,6 +272,7 @@ public class RSSFeedService extends ServiceBase {
                     .setConnectionRequestTimeout(timeout * 1000)
                     .setSocketTimeout(timeout * 1000)
                     .build();
+
                 HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                 HttpGet request = new HttpGet(url);
                 request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
@@ -267,8 +284,8 @@ public class RSSFeedService extends ServiceBase {
                 SyndFeedInput input = new SyndFeedInput();
                 inFeed = input.build(reader);
             }
+
             if (USE_SPRING_READER) {
-                log.debug("rss network read: " + url);
                 inFeed =
                     restTemplate.execute(
                         url,
@@ -276,12 +293,23 @@ public class RSSFeedService extends ServiceBase {
                         null,
                         response -> {
                             SyndFeedInput input = new SyndFeedInput();
+                            long start = System.currentTimeMillis();
                             try {
                                 return input.build(
                                     new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB))
                                 );
                             } catch (FeedException e) {
-                                throw new IOException("Could not parse response", e);
+                                throw new IOException("Could not parse response for feed: " + url, e);
+                            } finally {
+                                long time = System.currentTimeMillis() - start;
+                                if (time > 2000) {
+                                    log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
+                                }
+                                new PerfMonEvent(
+                                    System.currentTimeMillis() - start,
+                                    "readFeed",
+                                    ThreadLocals.getSC().getUserName()
+                                );
                             }
                         }
                     );
@@ -514,14 +542,9 @@ public class RSSFeedService extends ServiceBase {
                         log.debug("media has no groups.");
                     }
                 } //
-                else if (m instanceof ContentModuleImpl) {} else // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // log.debug("CI.encoding: " + ci.getContentEncoding());
-                // log.debug("CI.format: " + ci.getContentFormat());
-                // log.debug("CI.value: " + ci.getContentValue());
-                // log.debug("CI.url: " + ci.getContentResource());
-                // }
-                // }
-                if (m instanceof EntryInformationImpl) {
+                else if (m instanceof ContentModuleImpl) {
+                    //
+                } else if (m instanceof EntryInformationImpl) {
                     EntryInformationImpl itunesMod = (EntryInformationImpl) m;
                     if (itunesMod.getImage() != null) {
                         try {
@@ -598,14 +621,7 @@ public class RSSFeedService extends ServiceBase {
                         }
                     }
                 } //
-                else if (m instanceof ContentModuleImpl) {} else // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                // log.debug("CI.encoding: " + ci.getContentEncoding());
-                // log.debug("CI.format: " + ci.getContentFormat());
-                // log.debug("CI.value: " + ci.getContentValue());
-                // log.debug("CI.url: " + ci.getContentResource());
-                // }
-                // }
-                if (m instanceof EntryInformationImpl) {
+                else if (m instanceof ContentModuleImpl) {} else if (m instanceof EntryInformationImpl) { // } // } // log.debug("CI.url: " + ci.getContentResource()); // log.debug("CI.value: " + ci.getContentValue()); // log.debug("CI.format: " + ci.getContentFormat()); // log.debug("CI.encoding: " + ci.getContentEncoding()); // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                     EntryInformationImpl itunesMod = (EntryInformationImpl) m;
                     if (itunesMod.getImage() != null) {
                         try {
