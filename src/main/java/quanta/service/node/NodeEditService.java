@@ -174,7 +174,7 @@ public class NodeEditService extends ServiceBase {
 
         // NOTE: Be sure to get nodeId off 'req' here, instead of the var
         if (req.isReply() && req.getNodeId() != null) {
-            newNode.set(NodeProp.INREPLYTO, req.getNodeId());
+            newNode.set(NodeProp.INREPLYTO, prop.getProtocolHostAndPort() + "?id=" + req.getNodeId());
         }
 
         if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
