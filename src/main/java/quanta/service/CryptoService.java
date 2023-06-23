@@ -154,7 +154,8 @@ public class CryptoService extends ServiceBase {
             return verifier.verify(sigBytes);
         } catch (Exception e) {
             ExUtil.error(log, "exception in signature", e);
-            throw new RuntimeException(e);
+            // todo-1: we need a special exception for this.
+            throw new RuntimeException("Signature Failed", e);
         }
     }
 

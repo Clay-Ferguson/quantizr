@@ -225,7 +225,7 @@ export class LocalDB {
         this.userName = userName;
 
         // we need a pubsub mechanism here so this nostr logic is decoupled
-        S.quanta.invalidateKeys()
+        S.quanta.invalidateKeys();
         await this.openDB();
         await S.quanta.initKeys(userName);
     }

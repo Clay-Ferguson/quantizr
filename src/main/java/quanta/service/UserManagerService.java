@@ -331,7 +331,7 @@ public class UserManagerService extends ServiceBase {
             return;
         }
         String sig = ThreadLocals.getReqSig();
-        if (sig == null) {
+        if (StringUtils.isEmpty(sig)) {
             throw new RuntimeException("Request failed. No signature.");
         }
         // if pubSigKey not yet saved in SessionContext then generate it
@@ -354,6 +354,7 @@ public class UserManagerService extends ServiceBase {
             Util.hexStringToBytes(sig),
             sc.getUserName().getBytes(StandardCharsets.UTF_8)
         );
+
         if (!verified) {
             throw new RuntimeException(
                 "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName()

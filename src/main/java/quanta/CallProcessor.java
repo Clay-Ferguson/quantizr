@@ -58,6 +58,7 @@ public class CallProcessor extends ServiceBase {
         if (authSig && sc.isAdmin()) {
             user.authSig();
         }
+
         logRequest(command, req, httpSession);
         /*
          * Instantiating this, runs its constructor and ensures our threadlocal at least has response object

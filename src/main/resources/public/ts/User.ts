@@ -110,13 +110,6 @@ export class User {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
-        // set user to know they're logged out
-        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-
-        // set anon user to know they're logged out
-        await S.localDB.setUser(J.PrincipalName.ANON);
-        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-
         if (getAs().isAnonUser) {
             return;
         }
@@ -124,7 +117,18 @@ export class User {
         S.quanta.loggingOut = true;
         S.push.close();
 
+        // Call this before calling "setUser(anon)" below becasue we want to make sure the "Sig" is 
+        // in the header and if anon we won't have a Sig
         await S.rpcUtil.rpc<J.LogoutRequest, J.LogoutResponse>("logout");
+
+        // set user to know they're logged out
+        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+
+        // set anon user to know they're logged out
+        await S.localDB.setUser(J.PrincipalName.ANON);
+        await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+
+
         window.location.href = window.location.origin;
     }
 

@@ -103,6 +103,7 @@ export class Crypto {
     }
 
     invalidateKeys = () => {
+        console.log("Setting crypto keys to all null");
         this.sigKey = null;
         this.userSignature = null;
 

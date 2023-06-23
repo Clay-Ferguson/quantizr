@@ -223,7 +223,6 @@ public class NodeEditService extends ServiceBase {
                 (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
                 parentNode.isType(NodeType.POSTS)
             ) {
-                // todo-0: this call can be put in a 'ac.makePublic()' method.
                 acl.addPrivilege(
                     ms,
                     null,
