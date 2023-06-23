@@ -225,8 +225,9 @@ export class NodeCompRowHeader extends Div {
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             const inReplToNostr: string[] = S.nostr.getRepliedToItemOfNode(this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
+            const adminNode = this.node.owner === J.PrincipalName.ADMIN;
 
-            if (showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo || Array.isArray(inReplToNostr))) {
+            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo || Array.isArray(inReplToNostr))) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",

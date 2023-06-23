@@ -77,7 +77,8 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                         },
                         title: "Back to Folders View"
                     }, "bigMarginLeft") : null,
-                this.getFloatRightHeaderComp()
+                this.getFloatRightHeaderComp(),
+                new Clearfix()
             ]),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.props.description ? new Div(this.data.props.description) : null,
