@@ -120,9 +120,9 @@ export class LocalDB {
             this.db = await this.openDB();
         }
 
-        if (this.debug) {
-            console.log("runTrans on store: " + storeName);
-        }
+        // if (this.debug) {
+        //     console.log("runTrans on store: " + storeName);
+        // }
 
         const tx = this.db.transaction(storeName, access);
         const store = tx.objectStore(storeName);
@@ -152,7 +152,7 @@ export class LocalDB {
         const obj: IndexedDBObj = await this.readObject(k, storeName);
         const ret = obj?.v;
         if (this.debug) {
-            console.log("Queried for user: " + this.userName + " k=" + k + " and found " + S.util.prettyPrint(ret));
+            console.log("Queried for user: " + this.userName + " k=" + k + " v=" + S.util.prettyPrint(ret));
         }
         return ret;
     }
@@ -162,7 +162,7 @@ export class LocalDB {
         if (!storeName) storeName = this.STORE_DEFAULT;
         await this.writeObject({ k, v }, storeName);
         if (this.debug) {
-            console.log("Saved for user: " + this.userName + " k=" + k + " val=" + v);
+            console.log("Saved for user: " + this.userName + " k=" + k + " v=" + v);
         }
     }
 
@@ -198,14 +198,14 @@ export class LocalDB {
             this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {
                     // NOTE: name is the "keyPath" value.
-                        const req = store.get(k);
-                        req.onsuccess = () => {
-                            resolve(req.result);
-                        };
-                        req.onerror = () => {
-                            console.warn("readObject failed: k=" + k);
-                            resolve(null);
-                        };
+                    const req = store.get(k);
+                    req.onsuccess = () => {
+                        resolve(req.result);
+                    };
+                    req.onerror = () => {
+                        console.warn("readObject failed: k=" + k);
+                        resolve(null);
+                    };
                 });
         });
     }

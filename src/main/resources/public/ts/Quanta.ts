@@ -119,6 +119,7 @@ export class Quanta {
             // this.dragImg.src = "/images/favicon-32x32.png";
 
             if (S.quanta.config.requireCrypto && !S.crypto.avail) {
+                console.error("Crypto not available in browser.");
                 return;
             }
 
@@ -261,6 +262,12 @@ export class Quanta {
         finally {
             dispatch("AppInitComplete", s => s.appInitComplete = true);
         }
+    }
+
+    resetPageLoadConfigs = () => {
+        this.config.urlView = null
+        this.config.loadNostrId = null
+        this.config.initialNodeId = null
     }
 
     initialRender = async () => {

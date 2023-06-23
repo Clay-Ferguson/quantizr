@@ -78,7 +78,7 @@ export class User {
             }, false, true);
             S.quanta.authToken = res.authToken;
 
-            if (res && res.code == C.RESPONSE_CODE_OK) {
+            if (res?.code == C.RESPONSE_CODE_OK) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
                 if (!S.quanta.config.initialNodeId) {
                     S.quanta.config.initialNodeId = ":home";
@@ -114,7 +114,7 @@ export class User {
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
         // set anon user to know they're logged out
-        S.localDB.setUser(J.PrincipalName.ANON);
+        await S.localDB.setUser(J.PrincipalName.ANON);
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
         if (getAs().isAnonUser) {
@@ -140,11 +140,11 @@ export class User {
             if (usr !== J.PrincipalName.ANON) {
 
                 // Setting CREDS on 'anon' user means when user comes back to this page it automatically can log them in
-                S.localDB.setUser(J.PrincipalName.ANON);
+                await S.localDB.setUser(J.PrincipalName.ANON);
                 await this.setLoginVars(usr, pwd, "1");
 
                 // Setting CREDS after switching DB user
-                S.localDB.setUser(usr);
+                await S.localDB.setUser(usr);
                 await this.setLoginVars(usr, pwd, "1"); // <-- note this is NOT a redundant line.
 
                 S.quanta.userName = usr;

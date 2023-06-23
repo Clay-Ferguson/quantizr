@@ -59,7 +59,7 @@ export class LoginDlg extends DialogBase {
             usr = J.PrincipalName.ADMIN;
         }
 
-        S.localDB.setUser(usr);
+        await S.localDB.setUser(usr);
 
         // if the password field is empty, or CTRL key is down, and a username is provided, then get the password from the browser
         // and ignore the password field.
@@ -93,11 +93,13 @@ export class LoginDlg extends DialogBase {
                 nostrNpub: S.nostr.npub,
                 nostrPubKey: S.nostr.pk
             }, false, true);
+            S.quanta.authToken = res.authToken;
 
-            if (res.code == C.RESPONSE_CODE_OK) {
-                S.quanta.authToken = res.authToken;
-                S.user.loginResponse(res, usr, pwd, true);
+            if (res?.code == C.RESPONSE_CODE_OK) {
+                await S.user.loginResponse(res, usr, pwd, true);
                 this.close();
+                S.quanta.resetPageLoadConfigs();
+                await S.quanta.initialRender();
             }
         }
     }
