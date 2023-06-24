@@ -1,6 +1,7 @@
 package quanta.util;
 
 import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -27,6 +28,7 @@ public class ThreadLocals {
 
     private static Logger log = LoggerFactory.getLogger(ThreadLocals.class);
     private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
+    private static final ThreadLocal<HttpServletRequest> servletRequest = new ThreadLocal<>();
     private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
     private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
     private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
@@ -68,6 +70,7 @@ public class ThreadLocals {
         httpSession.remove();
         sessionContext.remove();
         servletResponse.remove();
+        servletRequest.remove();
         response.remove();
         reqBearerToken.remove();
         reqSig.remove();
@@ -128,6 +131,14 @@ public class ThreadLocals {
 
     public static HttpServletResponse getServletResponse() {
         return servletResponse.get();
+    }
+
+    public static void setServletRequest(HttpServletRequest req) {
+        servletRequest.set(req);
+    }
+
+    public static HttpServletRequest getServletRequest() {
+        return servletRequest.get();
     }
 
     public static void setRootEvent(PerfMonEvent res) {

@@ -14,6 +14,18 @@ public class ResponseBase {
     private String stackTrace;
     private Integer code;
 
+    // For diagnostic purposes we can put an info string about which replica on the docker swarm
+    // was responsible for processing the request.
+    private String replica;
+
+    public String getReplica() {
+        return replica;
+    }
+
+    public void setReplica(String replica) {
+        this.replica = replica;
+    }
+
     public Integer getCode() {
         return code;
     }

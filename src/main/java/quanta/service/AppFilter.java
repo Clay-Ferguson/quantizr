@@ -58,6 +58,10 @@ public class AppFilter extends GenericFilterBean {
         SessionContext sc = null;
         HttpServletRequest httpReq = (HttpServletRequest) req;
         HttpServletResponse httpRes = (HttpServletResponse) res;
+
+        ThreadLocals.setServletRequest(httpReq);
+        ThreadLocals.setServletResponse(httpRes);
+
         HttpSession session = null;
         boolean isNewSession = false;
         LockEx mutex = null;
@@ -119,7 +123,6 @@ public class AppFilter extends GenericFilterBean {
             }
 
             ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
-            ThreadLocals.setServletResponse(httpRes);
 
             if (!StringUtils.isEmpty(token)) {
                 sc = ServiceBase.user.redisGet(token);

@@ -1094,6 +1094,7 @@ export interface ResponseBase {
     message: string;
     stackTrace: string;
     code: number;
+    replica: string;
 }
 
 export interface PropertyInfo {

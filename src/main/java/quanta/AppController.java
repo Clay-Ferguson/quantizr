@@ -2174,7 +2174,7 @@ public class AppController extends ServiceBase implements ErrorController {
     }
 
     // todo-1: broken for now. Needs special treatment in AppFilter to allow
-    @RequestMapping(value = "/up", method = RequestMethod.GET)
+    @RequestMapping(value = "/health", method = RequestMethod.GET)
     @ResponseBody
     public String up() {
         return (

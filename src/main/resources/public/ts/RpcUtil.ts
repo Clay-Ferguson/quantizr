@@ -8,7 +8,8 @@ export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
     logRpc: boolean = false;
-    logRpcShort: boolean = false;
+    logRpcShort: boolean = true;
+    callId: number = 0;
     timer: any = null;
     unauthMessageShowing: boolean = false;
 
@@ -42,16 +43,17 @@ export class RpcUtil {
 
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
+        const callId = ++this.callId;
 
         try {
             // todo-1: We *could* now get rid of this wrapper promise and always just return the
             // final thing that gets resolved.
             reqPromise = new Promise<ResponseType>((resolve, reject) => {
                 if (this.logRpc) {
-                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + S.util.prettyPrint(postData));
+                    console.log("POST(" + callId + "): [" + this.getRpcPath() + postName + "]" + S.util.prettyPrint(postData));
                 }
                 else if (this.logRpcShort) {
-                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
+                    console.log("POST(" + callId + "): [" + this.getRpcPath() + postName + "]");
                 }
 
                 // This setOverlay is turned back off
@@ -72,7 +74,8 @@ export class RpcUtil {
                     headers: {
                         "Content-Type": "application/json",
                         Bearer: S.quanta.authToken || "",
-                        Sig: S.crypto.userSignature || ""
+                        Sig: S.crypto.userSignature || "",
+                        callId: callId.toString()
                     },
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -128,7 +131,7 @@ export class RpcUtil {
         return reqPromise;
     }
 
-    rpcSuccess = (data: J.ResponseBase, background: boolean, postName: string) => {
+    rpcSuccess = (res: J.ResponseBase, background: boolean, postName: string) => {
         try {
             if (!background) {
                 this.rpcCounter--;
@@ -138,45 +141,51 @@ export class RpcUtil {
                 this.progressInterval();
             }
 
-            if (this.logRpc && data?.code == C.RESPONSE_CODE_OK) {
-                console.log("    RESULT: " + postName + "\n    JSON: " +
-                    S.util.prettyPrint(data));
+            if (res?.code == C.RESPONSE_CODE_OK) {
+                if (this.logRpcShort) {
+                    console.log("RES: " + postName + " REPL: " + res.replica);
+                }
+                else if (this.logRpc) {
+                    console.log("RES: " + postName + " REPL: " + res.replica,
+                        "\n    JSON: " +
+                        S.util.prettyPrint(res));
+                }
             }
 
-            if (data.code === C.RESPONSE_CODE_UNAUTHORIZED) {
-                console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + data);
+            if (res.code === C.RESPONSE_CODE_UNAUTHORIZED) {
+                console.error("UNAUTHORIZED(401b) error for: " + postName + " RES: " + res);
                 this.authFail();
                 return;
             }
 
-            if (data.code === C.RESPONSE_CODE_FORBIDDEN) {
-                console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + data);
+            if (res.code === C.RESPONSE_CODE_FORBIDDEN) {
+                console.error("FORBIDDEN(403b) error for: " + postName + " RES: " + res);
                 S.util.showMessage("Content not visible to you.", "Message");
                 return;
             }
 
-            if (data.code != C.RESPONSE_CODE_OK) {
+            if (res.code != C.RESPONSE_CODE_OK) {
                 if (!this.logRpc) {
-                    let trace = data.stackTrace;
+                    let trace = res.stackTrace;
                     if (trace) {
                         trace = trace.replace("\\n", "\n");
                         trace = trace.replace("\\t", "\t");
 
                         // remove this so the prettyPrint doesn't contain it.
-                        delete data.stackTrace;
+                        delete res.stackTrace;
                     }
                     console.error("FAILED RESULT: " + postName + "\n    JSON: " +
-                        S.util.prettyPrint(data));
+                        S.util.prettyPrint(res));
                     if (trace) {
                         console.error("TRACE: " + trace);
                     }
                 }
 
-                if (data.message) {
-                    S.util.showMessage(data.message, "Message");
+                if (res.message) {
+                    S.util.showMessage(res.message, "Message");
 
                     // get rid of message so it can't be shown again
-                    data.message = null;
+                    res.message = null;
                 }
                 return;
             }
