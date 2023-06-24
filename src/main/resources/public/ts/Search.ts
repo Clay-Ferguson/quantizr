@@ -60,14 +60,16 @@ export class Search {
         }
     }
 
-    showThread = async (node: J.NodeInfo) => {
+    showThread = async (nodeId: string) => {
         // First call the server in case it has enough data already to render the Thread, in which case
         // we don't need to load any events from relays via client
         let res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId: node.id,
+            nodeId,
             loadOthers: true
         });
         S.nodeUtil.processInboundNodes(res.nodes);
+
+        const node = res.nodes?.length > 0 ? res.nodes[res.nodes.length - 1] : null;
 
         // console.log("res=" + S.util.prettyPrint(res));
 
@@ -100,7 +102,12 @@ export class Search {
                 if (s.activeTab !== C.TAB_THREAD) {
                     s.threadViewFromTab = s.activeTab;
                 }
-                s.threadViewFromNode = node;
+
+                if (!s.threadViewFromTab) {
+                    s.threadViewFromTab = C.TAB_MAIN;
+                }
+
+                s.threadViewFromNodeId = node.id;
                 data.openGraphComps = [];
 
                 data.props.results = res.nodes;

@@ -341,6 +341,7 @@ export class Render {
         const dlgHolder: any = {};
 
         const byIdUrl = window.location.origin + "?id=" + node.id;
+        const byIdUrlThreadView = byIdUrl + "&view=thread";
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
         if (S.nostr.isNostrNode(node)) {
@@ -388,6 +389,13 @@ export class Render {
                     onClick: () => this.copyLinkToClipboard(markdownByNameUrl)
                 }));
         }
+
+        children.push(new Heading(6, "Thread View"), //
+            new Div(byIdUrlThreadView, {
+                className: "linkDisplay",
+                title: "Click -> Copy to clipboard",
+                onClick: () => this.copyLinkToClipboard(byIdUrlThreadView)
+            }));
 
         // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
         // const rssFeed = window.location.origin + "/rss?id=" + node.id;

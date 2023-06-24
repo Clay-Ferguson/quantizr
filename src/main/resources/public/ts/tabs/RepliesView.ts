@@ -56,8 +56,8 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
 
         results.forEach(node => {
-            const clazzName = ast.threadViewFromNode.id === node.id ? "threadFeedItemTarget" : "threadFeedItem";
-            const highlightClazzName = ast.threadViewFromNode.id === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
+            const clazzName = ast.threadViewFromNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
+            const highlightClazzName = ast.threadViewFromNodeId === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
 
             const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, highlightClazzName);
             if (c) {

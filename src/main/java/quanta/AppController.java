@@ -250,6 +250,7 @@ public class AppController extends ServiceBase implements ErrorController {
         @RequestParam(value = "passCode", required = false) String passCode, //
         @RequestParam(value = "signupCode", required = false) String signupCode, //
         @RequestParam(value = "login", required = false) String login, //
+        @RequestParam(value = "view", required = false) String view, //
         HttpSession session, //
         Model model
     ) {
@@ -333,6 +334,7 @@ public class AppController extends ServiceBase implements ErrorController {
         ClientConfig config = new ClientConfig();
         config.setTagSearch(tag);
         config.setLogin(login);
+        config.setUrlView(view);
         loadConfig(config);
         attrs.put("g_config", XString.compactPrint(config));
         model.addAllAttributes(attrs);

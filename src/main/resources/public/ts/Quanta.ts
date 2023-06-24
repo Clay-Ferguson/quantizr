@@ -274,21 +274,29 @@ export class Quanta {
         let initialTab = null;
         switch (this.config.urlView) {
             case "doc":
-                initialTab = "docRS";
+                initialTab = C.TAB_DOCUMENT;
                 break;
             case "feed":
-                initialTab = "feedTab";
+                initialTab = C.TAB_FEED;
                 break;
             case "trending":
-                initialTab = "trendingTab";
+                initialTab = C.TAB_TRENDING;
+                break;
+            case "thread":
+                initialTab = C.TAB_THREAD;
                 break;
             default:
-                initialTab = "mainRS";
+                initialTab = C.TAB_MAIN;
                 break;
         }
 
         if (initialTab === C.TAB_FEED && S.quanta.config.tagSearch) {
             TrendingView.searchWord(null, "#" + S.quanta.config.tagSearch);
+            return;
+        }
+
+        if (initialTab === C.TAB_THREAD && S.quanta.config.initialNodeId) {
+            S.srch.showThread(S.quanta.config.initialNodeId);
             return;
         }
 

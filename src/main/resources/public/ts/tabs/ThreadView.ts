@@ -42,14 +42,14 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                         const ast = getAs();
                         if (ast.threadViewFromTab === C.TAB_MAIN) {
                             // the jumpToId is the best way to get to a node on the main tab.
-                            S.view.jumpToId(ast.threadViewFromNode.id);
+                            S.view.jumpToId(ast.threadViewFromNodeId);
                         }
                         else {
                             S.tabUtil.selectTab(ast.threadViewFromTab);
                             setTimeout(() => {
                                 const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
-                                if (ast.threadViewFromNode && data.inst) {
-                                    data.inst.scrollToNode(ast.threadViewFromNode.id);
+                                if (ast.threadViewFromNodeId && data.inst) {
+                                    data.inst.scrollToNode(ast.threadViewFromNodeId);
                                 }
                             }, 500);
                         }
@@ -97,7 +97,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     moreHistory = () => {
         // todo: this is slightly inefficient but just load the whole thread here, and the server will notice it
         // it's dead ended on a nostr node and query for more of them
-        S.srch.showThread(getAs().threadViewFromNode);
+        S.srch.showThread(getAs().threadViewFromNodeId);
     }
 
     /* overridable (don't use arrow function) */

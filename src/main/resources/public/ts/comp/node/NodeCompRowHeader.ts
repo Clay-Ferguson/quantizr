@@ -231,7 +231,7 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",
-                    onClick: () => S.srch.showThread(this.node)
+                    onClick: () => S.srch.showThread(this.node.id)
                 }));
             }
 
