@@ -74,6 +74,7 @@ import quanta.response.DeleteAttachmentResponse;
 import quanta.response.UploadFromIPFSResponse;
 import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
+import quanta.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -133,7 +134,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
-    public ResponseEntity<?> uploadMultipleFiles(
+    public ResponseBase uploadMultipleFiles(
         MongoSession ms,
         String attName,
         String nodeId,
@@ -255,7 +256,7 @@ public class AttachmentService extends ServiceBase {
         } catch (Exception e) {
             throw ExUtil.wrapEx(e);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseBase();
     }
 
     /*
