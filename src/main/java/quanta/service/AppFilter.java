@@ -41,7 +41,7 @@ public class AppFilter extends GenericFilterBean {
     private static String INDENT = "    ";
 
     // turns on FULL and verbose logging
-    public static boolean audit = true;
+    public static boolean audit = false;
 
     // turns on some logging (not too verbose)
     public static boolean debug = false;
