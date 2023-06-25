@@ -335,6 +335,10 @@ public class AppProp {
         log.debug("setDaemonsEnabled: " + String.valueOf(daemonsEnabled));
     }
 
+    public String getAppVersion() {
+        return env.getProperty("QUANTA_VER");
+    }
+
     public String getSwarmTaskId() {
         return env.getProperty("X_TASK_ID");
     }

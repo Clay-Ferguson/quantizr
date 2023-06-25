@@ -43,7 +43,10 @@ cd ${PRJROOT}
 # read -p "Config look ok?"
 
 # Take all the services offline
+read -p "Full Shutdown Before Deploy ? (y/n)" yn
+if [ "y" = "$yn" ]; then
 dockerDown
+fi
 
 # Build the application from source
 cd ${PRJROOT}

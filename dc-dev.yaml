@@ -88,12 +88,44 @@ services:
                 REDIS_PORT: "${REDIS_PORT}"
                 REDIS_PASSWORD: "${REDIS_PASSWORD}"
             dockerfile: ./dockerfile-dev
-        restart: "no"
+        # restart: "no"
+
+        # =================================================================
+        # DEPLOY REPLICAS
+        # Enable either one of the two deploy sections below
+        # =================================================================
+        # deploy for normal development with single replia
+        # NOTE: If you don't need Zero Downtime deploy you can just set multiple replias here
         deploy:
             restart_policy:
                 condition: none
                 max_attempts: 0
             replicas: 1
+        # =================================================================
+        # This config does a Zero-Downtime Redeploy!!
+        # deploy:
+        #     replicas: 2
+        #     update_config:
+        #         parallelism: 1
+        #         order: start-first
+        #         failure_action: rollback
+        #         delay: 10s
+        #     rollback_config:
+        #         parallelism: 0
+        #         order: stop-first
+        #     restart_policy:
+        #         condition: any
+        #         delay: 5s
+        #         max_attempts: 3
+        #         window: 120s
+        # healthcheck:
+        #     test: ["CMD", "curl", "-f", "http://quanta-host:${PORT}/health"]
+        #     # interval: 3m
+        #     # timeout: 10s
+        #     # retries: 3
+        #     # start_period: 20s
+        # ====================================================================
+
         hostname: quanta-host
         networks:
             bridge:
@@ -121,6 +153,7 @@ services:
             X_TASK_ID: '{{.Task.ID}}'
             X_TASK_NAME: '{{.Task.Name}}'
 
+            QUANTA_VER: "${QUANTA_VER}"
             logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"

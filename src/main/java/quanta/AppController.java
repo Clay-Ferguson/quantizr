@@ -2178,7 +2178,9 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public String up() {
         return (
-            "Server: t=" +
+            "Ver: " +
+            prop.getAppVersion() +
+            "Server: time=" +
             System.currentTimeMillis() +
             " SwarmTaskId=" +
             prop.getSwarmTaskId() +

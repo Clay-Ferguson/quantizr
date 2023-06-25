@@ -8,7 +8,7 @@ THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export QUANTA_VER=2.15
+export QUANTA_VER="2.20.3"
 export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 
@@ -18,6 +18,8 @@ export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
 
 # tserver-tag
 export TSERVER_IMAGE=subnode/repo:tserver-${QUANTA_VER}
+export TSERVER_API_KEY=yourkey
+export nostrDaemonEnabled=false
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 export SCRIPTS=${PRJROOT}/scripts

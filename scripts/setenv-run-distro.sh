@@ -2,7 +2,7 @@
 
 source ./define-functions.sh
 
-export QUANTA_VER=2.15
+export QUANTA_VER="2.20.3"
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 # Uncomment either option 1 or option 2
@@ -23,6 +23,8 @@ export DOCKER_IMAGE=quanta-${QUANTA_VER}
 
 # tserver-tag
 export TSERVER_IMAGE=tserver-${QUANTA_VER}
+export TSERVER_API_KEY=yourkey
+export nostrDaemonEnabled=false
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 # ================================================================
 

@@ -252,12 +252,13 @@ public class SystemService extends ServiceBase {
 
     public String getSystemInfo() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Swarm Replica ID: " + SystemService.replicaId + "\n");
+        sb.append("Ver: " + prop.getAppVersion() + "\n");
+        sb.append("Replica ID: " + SystemService.replicaId + "\n");
         sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 
         sb.append(getRedisReport());
-        sb.append("HttpSessions: " + AppSessionListener.sessionCounter);
+        sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
 
         Runtime runtime = Runtime.getRuntime();
         runtime.gc();

@@ -11,13 +11,15 @@ source ./define-functions.sh
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
-export QUANTA_VER=2.15
+export QUANTA_VER="2.20.3"
 export WEBPACK_SCRIPT=build-dev
 export SASS_SCRIPT=sass-dev
 export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
 
 # tserver-tag
 export TSERVER_IMAGE=tserver-dev-${QUANTA_VER}
+export TSERVER_API_KEY=yourkey
+export nostrDaemonEnabled=false
 export DOCKER_TAG=quanta-dev-${QUANTA_VER}
 
 # Must be the folder where the Quantizr project is located. The root of the source folders.

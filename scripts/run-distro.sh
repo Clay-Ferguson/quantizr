@@ -16,7 +16,10 @@ clear
 
 source ./setenv-run-distro.sh
 
+read -p "Full Shutdown Before Deploy ? (y/n)" yn
+if [ "y" = "$yn" ]; then
 ./stop-distro.sh
+fi
 
 # take ownership of this directory as current user
 sudo chown -R $USER .

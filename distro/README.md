@@ -67,6 +67,10 @@ You'll notice neither of those two volumes are defined for the distro (PROD) YAM
 
 If something doesn't work, here's some tips to troubleshoot docker and the app:
 
+### Healthcheck Results
+
+    docker inspect --format "{{json .State.Health }}" <container-name>
+
 ### Check to see what Docker has Running
 
     docker ps
