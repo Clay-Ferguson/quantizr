@@ -71,6 +71,10 @@ If something doesn't work, here's some tips to troubleshoot docker and the app:
 
     docker inspect --format "{{json .State.Health }}" <container-name>
 
+### Realtime Monitoring Console (CPU & MEM)
+
+    docker stats
+
 ### Check to see what Docker has Running
 
     docker ps
