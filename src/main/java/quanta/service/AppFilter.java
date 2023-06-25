@@ -41,10 +41,10 @@ public class AppFilter extends GenericFilterBean {
     private static String INDENT = "    ";
 
     // turns on FULL and verbose logging
-    public static boolean audit = false;
+    public static boolean audit = true;
 
     // turns on some logging (not too verbose)
-    public static boolean debug = true;
+    public static boolean debug = false;
     public static String BEARER_TOKEN = "token";
 
     private static final Object filterLock = new Object();
@@ -175,11 +175,9 @@ public class AppFilter extends GenericFilterBean {
         } finally {
             try {
                 if (audit) {
-                    if (log.isTraceEnabled()) {
-                        if (res instanceof HttpServletResponse) {
-                            HttpServletResponse sres = (HttpServletResponse) res;
-                            postProcess(httpReq, sres);
-                        }
+                    if (res instanceof HttpServletResponse) {
+                        HttpServletResponse sres = (HttpServletResponse) res;
+                        postProcess(httpReq, sres);
                     }
                 }
             } finally {
@@ -401,24 +399,24 @@ public class AppFilter extends GenericFilterBean {
 
     private void preProcess(HttpServletRequest sreq) {
         if (sreq == null) return;
-        // NON-VERBOSE Logging
-        if (log.isDebugEnabled() && !log.isTraceEnabled()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("REQ: ");
-            sb.append(sreq.getMethod());
-            sb.append(" ");
-            sb.append(sreq.getRequestURI());
-            if (sreq.getQueryString() != null) {
-                sb.append(" -> ");
-                sb.append(sreq.getQueryString());
-            }
-            sb.append(" [from ");
-            sb.append(sreq.getRemoteAddr());
-            sb.append("]");
-            // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
-            log.debug(sb.toString());
-        } //
-        else if (log.isTraceEnabled()) { // VERBOSE Logging
+        // // NON-VERBOSE Logging
+        // if (log.isDebugEnabled() && !log.isTraceEnabled()) {
+        //     StringBuilder sb = new StringBuilder();
+        //     sb.append("REQ: ");
+        //     sb.append(sreq.getMethod());
+        //     sb.append(" ");
+        //     sb.append(sreq.getRequestURI());
+        //     if (sreq.getQueryString() != null) {
+        //         sb.append(" -> ");
+        //         sb.append(sreq.getQueryString());
+        //     }
+        //     sb.append(" [from ");
+        //     sb.append(sreq.getRemoteAddr());
+        //     sb.append("]");
+        //     // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
+        //     log.debug(sb.toString());
+        // } //
+        if (audit) { // VERBOSE Logging
             try {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n>\n");
@@ -430,7 +428,7 @@ public class AppFilter extends GenericFilterBean {
                 sb.append(getAttributeInfo(sreq));
                 sb.append(getSessionAttributeInfo(sreq));
                 // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
-                log.trace(sb.toString());
+                log.debug(sb.toString());
             } catch (Exception e) {
                 log.error("error", e);
             }
@@ -441,11 +439,11 @@ public class AppFilter extends GenericFilterBean {
         try {
             if (sreq == null || sres == null) return;
             StringBuilder sb = new StringBuilder();
-            sb.append("\n<: " + String.valueOf(sres.getStatus()) + " ctyp: " + sres.getContentType() + "\n");
+            sb.append("\n<: RET_CODE=" + String.valueOf(sres.getStatus()) + " mime=" + sres.getContentType() + "\n");
             sb.append(getHeaderInfo(sres));
             sb.append(getSessionAttributeInfo(sreq));
             sb.append("++++++\n");
-            log.trace(sb.toString());
+            log.debug(sb.toString());
         } catch (Exception e) {
             log.error("error", e);
         }
