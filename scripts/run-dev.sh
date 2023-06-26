@@ -13,6 +13,9 @@ rm -rf ${QUANTA_BASE}/log/*
 mkdir -p ${QUANTA_BASE}/log
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
 
+# To see all the substitution variables in the file.
+# docker-compose -f ${dc_yaml} config > final-${dc_yaml}
+
 cd ${PRJROOT}
 dockerDown
 dockerUp
