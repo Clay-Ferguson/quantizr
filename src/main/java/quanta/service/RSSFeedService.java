@@ -110,7 +110,7 @@ public class RSSFeedService extends ServiceBase {
             return size() > MAX_CACHE_SIZE;
         }
     };
-    private static final int MAX_FEED_ITEMS = 75;
+    private static final int FEED_ITEMS_PER_PAGE = 75;
     private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
     static boolean run = false;
 
@@ -143,6 +143,8 @@ public class RSSFeedService extends ServiceBase {
             refreshingCache = true;
             int count = 0;
             int fails = 0;
+
+            // // Reload all feeds that were perviously FAILED
             if (failedFeeds.size() > 0) {
                 List<String> failedFeedsList = new LinkedList<>(failedFeeds);
                 failedFeeds.clear();
@@ -157,6 +159,8 @@ public class RSSFeedService extends ServiceBase {
                     }
                 }
             }
+
+            // Reload all feeds that were perviously Successful
             for (String url : feedCache.keySet()) {
                 log.debug("Refreshing feed: " + url);
                 SyndFeed feed = getFeed(url, false);
@@ -193,13 +197,13 @@ public class RSSFeedService extends ServiceBase {
              */
             List<SyndEntry> pageEntries = new LinkedList<>();
             int pageNo = page - 1;
-            int startIdx = pageNo * MAX_FEED_ITEMS;
+            int startIdx = pageNo * FEED_ITEMS_PER_PAGE;
             int idx = 0;
 
             for (SyndEntry entry : entries) {
                 if (idx >= startIdx) {
                     pageEntries.add(entry);
-                    if (pageEntries.size() >= MAX_FEED_ITEMS) {
+                    if (pageEntries.size() >= FEED_ITEMS_PER_PAGE) {
                         break;
                     }
                 }
@@ -346,7 +350,7 @@ public class RSSFeedService extends ServiceBase {
              * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
              * under the admin menu for checking server status info.
              */
-            log.debug("Error reading feed: " + url + " -> " + e.getMessage());
+            ExUtil.error(log, "Error reading feed: " + url, e);
             failedFeeds.add(url);
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);
@@ -396,10 +400,12 @@ public class RSSFeedService extends ServiceBase {
 
     public GetMultiRssResponse getMultiRssFeed(GetMultiRssRequest req) {
         GetMultiRssResponse res = new GetMultiRssResponse();
+
         // parse out list of URLs, and remove commented lines
         List<String> urlList = XString.tokenize(req.getUrls(), "\n", true);
         urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
         SyndFeed feed = null;
+
         /* If multiple feeds we build an aggregate */
         if (urlList.size() > 1) {
             feed = new SyndFeedImpl();
@@ -412,7 +418,8 @@ public class RSSFeedService extends ServiceBase {
             List<SyndEntry> entries = new LinkedList<>();
             feed.setEntries(entries);
             aggregateFeeds(urlList, entries, req.getPage());
-        } else /* If not an aggregate return the one external feed itself */{
+        } else {
+            /* If not an aggregate return the one external feed itself */
             String url = urlList.get(0);
             SyndFeed cachedFeed = getFeed(url, true);
             if (cachedFeed != null) {
@@ -656,17 +663,20 @@ public class RSSFeedService extends ServiceBase {
         feed.setAuthor(cachedFeed.getAuthor());
         feed.setLink(cachedFeed.getLink());
         feed.setImage(cachedFeed.getImage());
+
         List<SyndEntry> entries = new LinkedList<>();
         feed.setEntries(entries);
+
         // make page zero-offset before using.
         int pageNo = page - 1;
-        int startIdx = pageNo * MAX_FEED_ITEMS;
+        int startIdx = pageNo * FEED_ITEMS_PER_PAGE;
         int idx = 0;
+        // log.debug("Feed: " + cachedFeed.getLink() + " has " + cachedFeed.getEntries().size() + " entries.");
 
         for (SyndEntry entry : cachedFeed.getEntries()) {
             if (idx >= startIdx) {
                 entries.add(entry);
-                if (entries.size() >= MAX_FEED_ITEMS) {
+                if (entries.size() >= FEED_ITEMS_PER_PAGE) {
                     break;
                 }
             }

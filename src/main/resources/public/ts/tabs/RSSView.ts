@@ -122,7 +122,7 @@ export class RSSView extends AppTab<any, RSSView> {
         return true;
     }
 
-    static loadFeed = async (ust: AppState, feedSrcHash: string, feedSrc: string) => {
+    static loadFeed = async (ust: AppState, feedSrcHash: string, urls: string) => {
         if (RSSView.loading) return;
         RSSView.loading = true;
 
@@ -134,7 +134,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         const res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
-            urls: feedSrc,
+            urls,
             page
         }, true);
 
@@ -262,7 +262,6 @@ export class RSSView extends AppTab<any, RSSView> {
         ], clazz);
     }
 
-    /* cleverly does both prev or next paging */
     pageBump = (feedSrc: string, feedSrcHash: string, bump: number) => {
         const ast = getAs();
         let page: number = ast.rssFeedPage[feedSrcHash];
