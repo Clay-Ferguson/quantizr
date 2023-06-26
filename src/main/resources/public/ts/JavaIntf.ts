@@ -53,7 +53,7 @@ export interface ClientConfig {
     loadNostrIdRelays: string;
     nostrRelays: string;
     urlView: string;
-    tagSearch: string;
+    search: string;
     login: string;
 }
 

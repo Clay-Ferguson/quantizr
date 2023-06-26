@@ -36,8 +36,12 @@
     <script nomodule>
         alert("This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
     </script>
-    <script>
-        window.g_config = [(${ g_config })];
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.g_config = /*[[${g_config}]]*/ null;
+        // console.log("g_config: " + JSON.stringify(window.g_config, null, 4));
+        /*]]>*/
     </script>
 </head>
 

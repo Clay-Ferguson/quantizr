@@ -8,7 +8,7 @@ export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
     logRpc: boolean = false;
-    logRpcShort: boolean = true;
+    logRpcShort: boolean = false;
     callId: number = 0;
     timer: any = null;
     unauthMessageShowing: boolean = false;

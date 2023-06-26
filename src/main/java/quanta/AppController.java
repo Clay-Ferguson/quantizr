@@ -208,8 +208,8 @@ public class AppController extends ServiceBase implements ErrorController {
         }
     }
 
-    public HashMap<String, String> getThymeleafAttribs() {
-        HashMap<String, String> map = new HashMap<>();
+    public HashMap<String, Object> getThymeleafAttribs() {
+        HashMap<String, Object> map = new HashMap<>();
         map.put("instanceId", prop.getInstanceId());
         map.put("brandingAppName", prop.getConfigText("brandingAppName"));
         map.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
@@ -242,7 +242,7 @@ public class AppController extends ServiceBase implements ErrorController {
         @RequestParam(value = "id", required = false) String id, //
         @RequestParam(value = "nostrId", required = false) String nostrId, //
         @RequestParam(value = "refNodeId", required = false) String refNodeId, //
-        @RequestParam(value = "tag", required = false) String tag, //
+        @RequestParam(value = "search", required = false) String search, //
         // be careful removing this, clicking on a node updates the browser history to
         // an 'n=' style url if this node is named
         // so we will need to change that to the path format.
@@ -254,7 +254,7 @@ public class AppController extends ServiceBase implements ErrorController {
         HttpSession session, //
         Model model
     ) {
-        HashMap<String, String> attrs = getThymeleafAttribs();
+        HashMap<String, Object> attrs = getThymeleafAttribs();
 
         SessionContext sc = ThreadLocals.getSC();
 
@@ -332,11 +332,11 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         ClientConfig config = new ClientConfig();
-        config.setTagSearch(tag);
+        loadConfig(config);
+        config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);
-        loadConfig(config);
-        attrs.put("g_config", XString.compactPrint(config));
+        attrs.put("g_config", config);
         model.addAllAttributes(attrs);
         return "index";
     }

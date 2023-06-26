@@ -16,7 +16,7 @@ public class ClientConfig {
     // these are the 'system defined' relays so that anonymous users can query for info.
     private String nostrRelays;
     private String urlView;
-    private String tagSearch;
+    private String search;
     private String login;
 
     public String getLogin() {
@@ -27,12 +27,12 @@ public class ClientConfig {
         this.login = login;
     }
 
-    public String getTagSearch() {
-        return tagSearch;
+    public String getSearch() {
+        return search;
     }
 
-    public void setTagSearch(String tagSearch) {
-        this.tagSearch = tagSearch;
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public String getUrlView() {

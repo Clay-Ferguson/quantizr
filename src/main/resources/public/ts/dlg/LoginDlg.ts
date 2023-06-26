@@ -98,7 +98,6 @@ export class LoginDlg extends DialogBase {
             if (res?.code == C.RESPONSE_CODE_OK) {
                 await S.user.loginResponse(res, usr, pwd, true);
                 this.close();
-                S.quanta.resetPageLoadConfigs();
                 await S.quanta.initialRender();
             }
         }

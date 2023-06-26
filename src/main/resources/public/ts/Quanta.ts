@@ -290,8 +290,18 @@ export class Quanta {
                 break;
         }
 
-        if (initialTab === C.TAB_FEED && S.quanta.config.tagSearch) {
-            TrendingView.searchWord(null, "#" + S.quanta.config.tagSearch);
+        if (initialTab === C.TAB_TRENDING) {
+            S.tabUtil.selectTab(initialTab);
+            return;
+        }
+
+        if (initialTab === C.TAB_FEED) {
+            if (S.quanta.config.search) {
+                TrendingView.searchWord(null, S.quanta.config.search);
+            }
+            else {
+                S.tabUtil.selectTab(initialTab);
+            }
             return;
         }
 
