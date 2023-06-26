@@ -22,6 +22,7 @@ clear
 
 # Set all environment variables
 source ./setenv-dev.sh
+checkFunctions
 THIS_FILE=$(readlink -f "$0")
 THIS_FOLDER=$(dirname "$THIS_FILE")
 

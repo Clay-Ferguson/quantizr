@@ -100,6 +100,11 @@ services:
                 REDIS_PORT: "${REDIS_PORT}"
                 REDIS_PASSWORD: "${REDIS_PASSWORD}"
             dockerfile: ./dockerfile-dev
+
+        # This is important for DEV environment because we have a script
+        # we run to deploy new Java Classes, and it works by scaling down
+        # to zero replicas, doing a build, and then scaling back up, so
+        # we don't want docker swarm on it's own restarting it during all that.
         # restart: "no"
 
         # =================================================================

@@ -50,6 +50,21 @@ dockerUp() {
     sleep ${DOCKER_UP_DELAY}
 }
 
+export docker_stack=quanta-stack-dev
+DOCKER_ENV=distro
+
+# stops just our web app, leaving all containers up and running. In a swarm environment this is the best
+# way to 'restart' a service. Scale it down to zero, to shut down, and then scale it back up.
+dockerDownQuanta() {
+    echo "Stopping Container (by Scale=0): ${docker_stack}_quanta-${DOCKER_ENV}"
+    docker service scale ${docker_stack}_quanta-${DOCKER_ENV}=0
+}
+
+dockerUpQuanta() {
+    echo "Starting Container (by Scale=1): ${docker_stack}_quanta-${DOCKER_ENV}"
+    docker service scale ${docker_stack}_quanta-${DOCKER_ENV}=1
+}
+
 dockerDown() {
     # Trying to help docker not blow up (which it has been doing), by giving it as graceful a shutdown as I can
     if [[ -z ${ipfsEnabled} ]]; then
@@ -90,6 +105,12 @@ net:
 security:
     authorization: enabled
 EOM
+}
+
+# If there's any syntax errors in the above script we never make it here and so we use the existance of this
+# fuction to see if we ran this ok.
+checkFunctions() {
+    echo "Functions Defined Ok."
 }
 
 set -a

@@ -49,6 +49,8 @@ export ipfs_staging=/home/clay/.ipfs/staging
 export ipfsEnabled=
 export ipfs_container=ipfs-dev
 
+export DOCKER_ENV=dev
+
 # When we run Maven builder, this selects our profile.
 export mvn_profile=dev
 

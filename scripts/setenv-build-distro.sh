@@ -37,6 +37,7 @@ export quanta_domain=172.17.0.1
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
 
+export DOCKER_ENV=distro
 export mvn_profile=prod
 
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
