@@ -99,7 +99,7 @@ The "RepoDigests" in the output should contain the same digest shown in the "hub
 
 ### Check Docker Logs
 
-    docker logs quanta-distro
+    docker logs <container-name>
 
 ### Try to Pull again. 
 
