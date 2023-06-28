@@ -1,0 +1,244 @@
+version: '3.7'
+services:
+    redis-distro:
+        image: redis:6.0
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: redis-host-distro
+        networks:
+            bridge:
+                aliases:
+                    - redis-host-distro
+        ports:
+            - "${REDIS_PORT}:${REDIS_PORT}"
+        
+        # Saves to disk every 20 seconds (if 1 or more writes done)
+        # command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+        
+        command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD}
+        environment:
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+            
+        # todo-a: start using a cache folder
+        # volumes: 
+        #     - cache:/data
+
+    mongo-distro: 
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: mongo-host-distro
+        networks:
+            bridge:
+                aliases:
+                    - mongo-host-distro
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${MONGO_DATA}:/data/db'
+            - '${MONGOD_CONF}:/etc/mongod.conf'
+            - '${DEPLOY_TARGET}/dumps:/dumps'
+        command: mongod --config /etc/mongod.conf
+        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
+        # don't publish to outside world
+        # ports:
+        #     - '${MONGO_PORT}:${MONGO_PORT}'
+
+        # NOTE: Leave this as an example of how to read env from a file.    
+        # env_file: 
+        #     - '???/mongo.env'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
+
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    # ipfs-distro: 
+    #     # https://hub.docker.com/r/ipfs/kubo/
+    #     image: ipfs/kubo:release
+    #     hostname: ipfs-host-distro
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - ipfs-host-distro
+    #     deploy:
+    #         resources:
+    #             limits:
+    #                 # Give docker 10% of CPU and 1 GB max
+    #                 cpus: "0.1"
+    #                 memory: 1000M
+    #             # reservations:
+    #             #   cpus: 0.25
+    #             #   memory: 128M
+
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         IPFS_PROFILE: "server" 
+    #         IPFS_PATH: "/data/ipfs"
+        
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+
+    #     ports:
+    #         # Allow this thru your firewall: sudo ufw allow 4001
+    #         - "4001:4001"
+    #         - "4001:4001/udp"
+
+    quanta-distro:
+        image: ${DOCKER_IMAGE}
+        build: 
+            context: .
+            args:
+                PORT: "${PORT}"
+                PORT_DEBUG: "${PORT_DEBUG}"
+                JAR_FILE: "${JAR_FILE}"
+                XMS: "${XMS}"
+                XMX: "${XMX}"
+            dockerfile: ./dockerfile-distro
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: quanta-host
+        networks:
+            bridge:
+                aliases:
+                    - quanta-host
+        volumes:
+            - "${DEPLOY_TARGET}/tmp:/tmp"
+            - "${DEPLOY_TARGET}/log:/log"
+            - '${DEPLOY_TARGET}/config:/config'
+
+        ports:
+            - '${HOST_PORT}:${PORT}'
+            # Uncomment for debugging...
+            # - '8000:8000'
+        
+        environment:
+            # Docker warm vars
+            X_NODE_ID: "{{.Node.ID}}"
+            X_NODE_HOSTNAME: '{{.Node.Hostname}}'
+            X_SERVICE_ID: '{{.Service.ID}}'
+            X_SERVICE_NAME: '{{.Service.Name}}'
+            X_TASK_SLOT: "{{.Task.Slot}}"
+            X_TASK_ID: '{{.Task.ID}}'
+            X_TASK_NAME: '{{.Task.Name}}'
+
+            QUANTA_VER: "${QUANTA_VER}"
+            logging.config: /log/logback.xml
+            XMS: "${XMS}"
+            XMX: "${XMX}"
+
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
+            adminPassword: "${adminPassword}"
+            mongoPassword: "${mongoPassword}"
+            mongoSecurity: "true"
+
+            # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
+            # requireCrypto: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >-
+                FollowBot:${adminPassword}:${devEmail},
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail},
+                eric:${testPassword}:${devEmail}
+
+            nostrCurationAccounts: >-
+                admin,
+                clay
+    
+            # throttleTime: "0"
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "${MONGO_HOST}"
+            mongodb.port: "${MONGO_PORT}" 
+            instanceId: "prod"
+            profileName: "prod"
+            server.port: "${PORT}" 
+            httpProtocol: "http" 
+            metaHost: "${quanta_domain}" 
+            allowFileSystemSearch: "false"
+            actPubEnabled: "false"
+
+            # tserver-tag
+            nostrDaemonEnabled: "${nostrDaemonEnabled}"
+            ipfsEnabled: "${ipfsEnabled}"
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+
+            # tserver-tag
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
+
+            # mail.port: ""
+            # mail.user: "your mail user" 
+            # mail.password: "${emailPassword}" 
+            # mail.host: "your host" 
+            # mail.from: "your address"
+
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
+            #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            
+            ipfs.host: "http://ipfs-host-distro"
+            ipfs.apiPort: "5001"
+            ipfs.gatewayPort: "8080"
+
+    # tserver-tag
+    tserver-distro:
+        image: ${TSERVER_IMAGE}
+        build:
+            context: ${PRJROOT}/src/main/resources/server
+            # NOTE: dockerfile path is RELATIVE to 'context' here.
+            dockerfile: ./dockerfile
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: tserver-host
+        networks:
+            bridge:
+                aliases:
+                    - tserver-host
+        volumes:
+            - "${DEPLOY_TARGET}/log:/home/node/app/log"
+        ports:
+            - "${TSERVER_PORT}:${TSERVER_PORT}"
+        environment:
+            TSERVER_PORT: "${TSERVER_PORT}"
+            TSERVER_API_KEY: "${TSERVER_API_KEY}"
+
+networks:
+    bridge:
