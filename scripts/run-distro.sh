@@ -18,35 +18,22 @@ source ./setenv-run-distro.sh
 
 ./stop-distro.sh
 
-read -p "Rebuild ? (y/n)" yn
-if [ "y" = "$yn" ]; then
-    # take ownership of this directory as current user
-    sudo chown -R $USER .
+# take ownership of this directory as current user
+sudo chown -R $USER .
 
-    mkdir -p ./dumps
-    mkdir -p ./tmp
-    mkdir -p ./log
-    mkdir -p ./config
-    mkdir -p ./data
+mkdir -p ./dumps
+mkdir -p ./tmp
+mkdir -p ./log
+mkdir -p ./config
+mkdir -p ./data
 
-    # Use this to troubeshoot the variable substitutions in the yaml file, and will
-    # display a copy of the yaml file after all environment variables have been substituted/evaluated
-    # WARNING: This will expose your passwords in the output file!
-    # docker-compose -f ${dc_yaml} config --no-cache > final-${dc_yaml}
-    docker-compose -f ${dc_yaml} config > final-${dc_yaml}
+# Use this to troubeshoot the variable substitutions in the yaml file, and will
+# display a copy of the yaml file after all environment variables have been substituted/evaluated
+# WARNING: This will expose your passwords in the output file!
+# docker-compose -f ${dc_yaml} config --no-cache > final-${dc_yaml}
+docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
-    genMongoConfig
-
-    # If we detect that the springboot fat jar (the executable) exists in this folder then we run
-    # the dockerBuild function which does a docker-compose 'build' to update to a new docker image that contains
-    # this current latest jar file.
-    if [ -f "${JAR_FILE}" ]; then
-        echo "Building new Docker Image (${DOCKER_IMAGE}) based on JAR file: ${JAR_FILE}"
-        dockerBuild
-    else 
-        echo "Running from IMAGE: ${DOCKER_IMAGE}"
-    fi
-fi
+genMongoConfig
 
 dockerUp
 

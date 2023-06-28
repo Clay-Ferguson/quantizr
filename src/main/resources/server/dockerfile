@@ -1,11 +1,20 @@
-# NOTE: node:18 also works but is probably bigger. Docker docs recommends this:
-# https://docs.docker.com/language/nodejs/build-images/
+# # NOTE: node:18 also works but is probably bigger. Docker docs recommends this:
+# # https://docs.docker.com/language/nodejs/build-images/
 
-FROM node:18-alpine
-ENV NODE_ENV=production
+# I tried this and it had issues with the "COPY . ." command, so I'm reverting back
+# to the old version of this file below which has always worked.
+# FROM node:18-alpine
+# ENV NODE_ENV=production
+# WORKDIR /home/node/app
+# COPY ["package.json", "./"]
+# RUN npm install --production
+# COPY . .
+# EXPOSE ${TSERVER_PORT}
+# CMD ["npm", "start"]
+
+FROM node:18
 WORKDIR /home/node/app
-COPY ["package.json", "./"]
-RUN npm install --production
+COPY package.json ./
 COPY . .
 EXPOSE ${TSERVER_PORT}
 CMD ["npm", "start"]

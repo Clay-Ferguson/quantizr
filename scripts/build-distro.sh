@@ -1,10 +1,10 @@
 #!/bin/bash -i
-# (NOTE: -i arg makes .bashrc get sourced and without this NPM stuff commands won't be found)
+# (NOTE: -i arg makes .bashrc get sourced and without this NPM commands won't be found)
 
-# =================================================================================================
-# Builds a production distro zip file, which should be able to be unzipped and run on any
-# linux box to run an instance of Quanta.
-# =================================================================================================
+# --------------------------------------------------------------------
+# Builds a folder in ${DEPLOY_TARGET}, (which is normally just the ./distro folder in the project)
+# that can be used to run the app.
+# --------------------------------------------------------------------
 
 clear
 # show commands as they are run.
@@ -12,6 +12,7 @@ clear
 
 # Set all environment variables
 source ./setenv-build-distro.sh
+checkFunctions
 THIS_FILE=$(readlink -f "$0")
 THIS_FOLDER=$(dirname "$THIS_FILE")
 
@@ -35,8 +36,8 @@ cp ${PRJROOT}/entrypoint-distro.sh              ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
 # tserver-tag
-mkdir -p ${DEPLOY_TARGET}/src/main/resources/server
-cp -R ${PRJROOT}/src/main/resources/server/ ${DEPLOY_TARGET}/src/main/resources/
+# mkdir -p ${DEPLOY_TARGET}/src/main/resources/server
+# cp -R ${PRJROOT}/src/main/resources/server/ ${DEPLOY_TARGET}/src/main/resources/
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
@@ -44,7 +45,6 @@ cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv-run-distro.sh          ${DEPLOY_TARGET}
 cp ${SCRIPTS}/set-version.sh                ${DEPLOY_TARGET}
-
 
 # Note: this 'dumps' folder is mapped onto a volume in 'dc-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.

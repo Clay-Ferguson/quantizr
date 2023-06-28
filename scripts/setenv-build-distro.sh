@@ -46,7 +46,7 @@ export ipfsEnabled=
 export ipfs_container=ipfs-distro
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
-export DEPLOY_TARGET=${PRJPARENT}/quanta-distro
+export DEPLOY_TARGET=${PRJROOT}/distro
 mkdir -p ${DEPLOY_TARGET}
 
 export ipfs_data=${DEPLOY_TARGET}/ipfs

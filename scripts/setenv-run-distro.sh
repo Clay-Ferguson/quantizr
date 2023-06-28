@@ -4,21 +4,6 @@ source ./set-version.sh
 source ./define-functions.sh
 
 export DOCKER_TAG=quanta-${QUANTA_VER}
-
-# Uncomment either option 1 or option 2
-# ================================================================
-# OPTION 1) To pull from Docker Hub
-#
-# export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
-# export TSERVER_IMAGE=subnode/repo:tserver-${QUANTA_VER}
-# export JAR_FILE=
-# ----------------------------------------------------------------
-# OPTION 2) To Build Image from a local JAR
-#
-#    Having this JAR_FILE exist in the current folder will trigger a full docker-compose build
-#    and install that JAR into the DOCKER_IMAGE specified here. After this you can delete the JAR
-#    and it will be able to run from the local repo cache, or drop in an updated jar any time
-#    and run again to once again put the jar into the repo and upgrade to that latest jar.
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
 
 # tserver-tag
@@ -26,7 +11,6 @@ export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
-# ================================================================
 
 export DEPLOY_TARGET=$PWD
 

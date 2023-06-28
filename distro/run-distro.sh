@@ -35,16 +35,6 @@ docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
 genMongoConfig
 
-# If we detect that the springboot fat jar (the executable) exists in this folder then we run
-# the dockerBuild function which does a docker-compose 'build' to update to a new docker image that contains
-# this current latest jar file.
-if [ -f "${JAR_FILE}" ]; then
-    echo "Building new Docker Image (${DOCKER_IMAGE}) based on JAR file: ${JAR_FILE}"
-    dockerBuild
-else 
-    echo "Running from IMAGE: ${DOCKER_IMAGE}"
-fi
-
 dockerUp
 
 serviceCheck ${docker_stack}_quanta-distro
