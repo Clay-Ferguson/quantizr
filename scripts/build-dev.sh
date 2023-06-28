@@ -44,16 +44,18 @@ cd ${PRJROOT}
 # read -p "Config look ok?"
 
 # Take all the services offline
-read -p "Full Shutdown Before Deploy ? (y/n)" yn
-if [ "y" = "$yn" ]; then
+# read -p "Full Shutdown Before Deploy ? (y/n)" yn
+# if [ "y" = "$yn" ]; then
 dockerDown
-fi
+# fi
 
 # Build the application from source
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
 
 genMongoConfig
+
+# docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
 # run docker compose build
 cd ${PRJROOT}

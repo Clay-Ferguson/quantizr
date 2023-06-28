@@ -50,9 +50,6 @@ dockerUp() {
     sleep ${DOCKER_UP_DELAY}
 }
 
-export docker_stack=quanta-stack-dev
-DOCKER_ENV=distro
-
 # stops just our web app, leaving all containers up and running. In a swarm environment this is the best
 # way to 'restart' a service. Scale it down to zero, to shut down, and then scale it back up.
 dockerDownQuanta() {

@@ -2,7 +2,14 @@ version: '3.7'
 services:
     redis-distro:
         image: redis:6.0
-        restart: always
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: redis-host-distro
         networks:
             bridge:
@@ -26,6 +33,14 @@ services:
 
     mongo-distro: 
         hostname: mongo-host-distro
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         networks:
             bridge:
                 aliases:
@@ -95,7 +110,6 @@ services:
                 REDIS_PORT: "${REDIS_PORT}"
                 REDIS_PASSWORD: "${REDIS_PASSWORD}"
             dockerfile: ./dockerfile-distro
-        restart: "no"
         
         # =================================================================
         # DEPLOY REPLICAS
@@ -103,10 +117,13 @@ services:
         # =================================================================
         # deploy for normal development with single replia
         # NOTE: If you don't need Zero Downtime deploy you can just set multiple replias here
-        deploy:
+       deploy:
             restart_policy:
-                condition: none
-                max_attempts: 0
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
             replicas: 1
         # =================================================================
         # This config does a Zero-Downtime Redeploy!!
@@ -240,17 +257,20 @@ services:
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
 
-        depends_on:
-            - mongo-distro
-            - redis-distro
-            # - ipfs-distro
-
     # tserver-tag
     tserver-distro:
         image: ${TSERVER_IMAGE}
         build:
             context: ./src/main/resources/server
             dockerfile: ./dockerfile
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: tserver-host
         networks:
             bridge:
@@ -263,9 +283,6 @@ services:
         environment:
             TSERVER_PORT: "${TSERVER_PORT}"
             TSERVER_API_KEY: "${TSERVER_API_KEY}"
-        depends_on:
-            - mongo-distro
-            # - ipfs-distro
 
 networks:
     bridge:

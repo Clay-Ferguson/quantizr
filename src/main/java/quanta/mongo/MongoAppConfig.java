@@ -32,6 +32,7 @@ import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
+import quanta.util.Util;
 
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 // see also: ServerMonitorListener to detect heartbeats, etc.
@@ -131,6 +132,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 }
                 String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
                 log.info("Connecting to MongoDb: " + uri);
+
+                // This is just to slightly help give the MongoDB replica some time to start
+                // becasue in a docker swarm everying sort of starts simultaneously and there's
+                // no way to define a depends_on in the yaml.
+                Util.sleep(5000);
                 /*
                  * This codec registroy is what allows us to store objects that contain other POJOS, like for
                  * example the way we're storing AccessControl objects in a map inside SubNode

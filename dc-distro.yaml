@@ -2,7 +2,14 @@ version: '3.7'
 services:
     redis-distro:
         image: redis:6.0
-        restart: always
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: redis-host-distro
         networks:
             bridge:
@@ -25,6 +32,14 @@ services:
         #     - cache:/data
 
     mongo-distro: 
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: mongo-host-distro
         networks:
             bridge:
@@ -98,11 +113,13 @@ services:
                 REDIS_PORT: "${REDIS_PORT}"
                 REDIS_PASSWORD: "${REDIS_PASSWORD}"
             dockerfile: ./dockerfile-distro
-        restart: "no"
         deploy:
             restart_policy:
-                condition: none
-                max_attempts: 0
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
             replicas: 1
         hostname: quanta-host
         networks:
@@ -198,17 +215,20 @@ services:
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
 
-        depends_on:
-            - mongo-distro
-            - redis-distro
-            # - ipfs-distro
-
     # tserver-tag
     tserver-distro:
         image: ${TSERVER_IMAGE}
         build:
             context: ./src/main/resources/server
             dockerfile: ./dockerfile
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: tserver-host
         networks:
             bridge:
@@ -221,9 +241,6 @@ services:
         environment:
             TSERVER_PORT: "${TSERVER_PORT}"
             TSERVER_API_KEY: "${TSERVER_API_KEY}"
-        depends_on:
-            - mongo-distro
-            # - ipfs-distro
 
 networks:
     bridge:

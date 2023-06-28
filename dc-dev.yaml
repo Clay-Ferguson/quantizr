@@ -3,7 +3,14 @@ version: '3.7'
 services:
     redis-dev:
         image: redis:6.0
-        restart: always
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: redis-host-dev
         networks:
             bridge:
@@ -37,7 +44,20 @@ services:
         #     - ${QUANTA_BASE}/redis:/data
 
     mongo-dev: 
+        # Warning: supposedly starting at Mongo 6.0 this would be the way to do healthcheck
+        #   test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+        #      --or--
+        #   test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+
         image: mongo:4.0
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         hostname: mongo-host-dev
         networks:
             bridge:
@@ -53,6 +73,13 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
+
+        # healthcheck:
+        #     test: echo 'db.runCommand("ping").ok' | mongo mongo:27016/test --quiet
+        #     interval: 10s
+        #     timeout: 10s
+        #     retries: 5
+        #     start_period: 40s
 
     # ipfs-dev: 
     #     # https://hub.docker.com/r/ipfs/kubo/
@@ -115,8 +142,11 @@ services:
         # NOTE: If you don't need Zero Downtime deploy you can just set multiple replias here
         deploy:
             restart_policy:
-                condition: none
-                max_attempts: 0
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
             replicas: 1
         # =================================================================
         # This config does a Zero-Downtime Redeploy!!
@@ -244,14 +274,17 @@ services:
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
 
-        depends_on:
-            - mongo-dev
-            - redis-dev
-            # - ipfs-dev
-
     # tserver-tag
     tserver-dev:
         image: ${TSERVER_IMAGE}
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
         build:
             context: ./src/main/resources/server
             dockerfile: ./dockerfile
