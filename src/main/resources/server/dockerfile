@@ -1,6 +1,11 @@
-FROM node:18
+# NOTE: node:18 also works but is probably bigger. Docker docs recommends this:
+# https://docs.docker.com/language/nodejs/build-images/
+
+FROM node:18-alpine
+ENV NODE_ENV=production
 WORKDIR /home/node/app
-COPY package.json ./
+COPY ["package.json", "./"]
+RUN npm install --production
 COPY . .
 EXPOSE ${TSERVER_PORT}
 CMD ["npm", "start"]
