@@ -217,6 +217,7 @@ services:
         image: ${TSERVER_IMAGE}
         build:
             context: ./src/main/resources/server
+            # NOTE: dockerfile path is RELATIVE to 'context' here.
             dockerfile: ./dockerfile
         deploy:
             restart_policy:
