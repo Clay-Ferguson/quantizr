@@ -18,7 +18,7 @@ source ./setenv-run-distro.sh
 
 ./stop-distro.sh
 
-read -p "Rebuild before Launch? (y/n)" yn
+read -p "Rebuild ? (y/n)" yn
 if [ "y" = "$yn" ]; then
     # take ownership of this directory as current user
     sudo chown -R $USER .

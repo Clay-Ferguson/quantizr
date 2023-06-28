@@ -123,9 +123,6 @@ services:
                 JAR_FILE: "${JAR_FILE}"
                 XMS: "${XMS}"
                 XMX: "${XMX}"
-                REDIS_HOST: "${REDIS_HOST}"
-                REDIS_PORT: "${REDIS_PORT}"
-                REDIS_PASSWORD: "${REDIS_PASSWORD}"
             dockerfile: ./dockerfile-dev
 
         # This is important for DEV environment because we have a script

@@ -34,7 +34,7 @@ This section gives the recommended way for working on Quanta, as a developer, wo
 
 Once you have `setenv-dev.sh` all configured you should be able to run `build-dev.sh` which will build the code from scratch and start an instance of Quanta, that you can test against. If you then edit only TypeScript files and want to test those changes you can run just `build-webpack.sh` to make those changes go live. Or if you edit only Java files you can run `restart-dev.sh` to see those changes go live, and immediately test them. 
 
-## How the "semi" Hot-Deploy Works
+## How the "semi" Hot-Deploy Works (for Development)
 
 As just stated you can test TypeScript and Java file changes without doing a FULL build. It's worth mentioning here the tricks that allow that to work which are bascically done using the following volume definitions in the docker-compose YAML:
 

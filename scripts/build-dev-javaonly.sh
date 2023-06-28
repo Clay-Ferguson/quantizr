@@ -33,8 +33,8 @@ dockerDown
 # replica is still 'running' so we have to wait here untl even 'dockerk ps' can confirm Quanta is indeed down, and
 # for now I'm just doing a long enough wait, but depending on computer CPU load this sleep might not even be
 # long enough
-echo "Sleeping 30s for Docker Swarm stabilize" 
-sleep 30s
+echo "Sleeping 5s for Docker Swarm stabilize" 
+sleep 5s
 sudo rm -rf ${QUANTA_BASE}/log/*
 echo "Verifying Stopped"
 # docker container ls --filter name=quanta-stack-dev_quanta-dev*
@@ -44,8 +44,8 @@ dockerUp
 
 serviceCheck ${docker_stack}_quanta-dev
 
-echo "Waiting 10s for server to initialize..."
-sleep 10s
+echo "Waiting 20s for server to initialize..."
+sleep 20s
 echo "done!"
 
 

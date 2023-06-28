@@ -38,7 +38,7 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback
 cd ${PRJROOT}
 cp ${PRJROOT}/dc-distro.yaml                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile-distro                 ${DEPLOY_TARGET}
-cp ${PRJROOT}/entrypoint.sh                     ${DEPLOY_TARGET}
+cp ${PRJROOT}/entrypoint-distro.sh              ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
 # tserver-tag
