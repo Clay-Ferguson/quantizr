@@ -134,7 +134,7 @@ services:
         ports:
             - '${HOST_PORT}:${PORT}'
             # Uncomment for debugging...
-            #- '8000:8000'
+            # - '8000:8000'
         
         environment:
             # Docker warm vars

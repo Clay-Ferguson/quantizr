@@ -117,7 +117,7 @@ services:
         # =================================================================
         # deploy for normal development with single replia
         # NOTE: If you don't need Zero Downtime deploy you can just set multiple replias here
-       deploy:
+        deploy:
             restart_policy:
                 condition: on-failure
                 # delay is time between restart attempts
@@ -191,7 +191,7 @@ services:
             mongoPassword: "${mongoPassword}"
             mongoSecurity: "true"
 
-             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
+            # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
             requireCrypto: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string
