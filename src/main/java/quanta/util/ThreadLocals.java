@@ -116,13 +116,12 @@ public class ThreadLocals {
         setMongoSession(ms);
     }
 
-    /*
-     * todo-1: We need a way to detect when some code has accidentally called this from a deamon thread
-     * where there won't be any session context, rather than letting it result in a NPE that we have to
-     * trace back to this cause.
-     */
     public static SessionContext getSC() {
-        return sessionContext.get();
+        SessionContext sc = sessionContext.get();
+        if (sc == null && ThreadLocals.getServletRequest() == null) {
+            log.warn("getSC() called in Non-WEB Request Thread!\n\nStack=" + ExUtil.getStackTrace(null));
+        }
+        return sc;
     }
 
     public static void setServletResponse(HttpServletResponse res) {

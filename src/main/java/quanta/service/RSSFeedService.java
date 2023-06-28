@@ -224,7 +224,7 @@ public class RSSFeedService extends ServiceBase {
          */
         if (fromCache && failedFeeds.contains(url)) {
             if (debug) {
-                log.debug("Feed previously faild (skipping): " + url);
+                log.debug("Feed previously failed (skipping): " + url);
             }
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);
@@ -312,7 +312,7 @@ public class RSSFeedService extends ServiceBase {
                                 new PerfMonEvent(
                                     System.currentTimeMillis() - start,
                                     "readFeed",
-                                    ThreadLocals.getSC().getUserName()
+                                    ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin"
                                 );
                             }
                         }

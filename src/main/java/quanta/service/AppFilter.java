@@ -52,15 +52,11 @@ public class AppFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         if (!Util.gracefulReadyCheck(res)) return;
-        ThreadLocals.removeAll();
 
         String token = null;
         SessionContext sc = null;
         HttpServletRequest httpReq = (HttpServletRequest) req;
         HttpServletResponse httpRes = (HttpServletResponse) res;
-
-        ThreadLocals.setServletRequest(httpReq);
-        ThreadLocals.setServletResponse(httpRes);
 
         HttpSession session = null;
         boolean isNewSession = false;
@@ -68,6 +64,10 @@ public class AppFilter extends GenericFilterBean {
         boolean useLock = true;
 
         try {
+            ThreadLocals.removeAll();
+            ThreadLocals.setServletRequest(httpReq);
+            ThreadLocals.setServletResponse(httpRes);
+
             // we synchronize here to be sure no other thread can create a session or lock on it
             // while we're initializing this session and it's locking.
             synchronized (filterLock) {
@@ -181,6 +181,7 @@ public class AppFilter extends GenericFilterBean {
                     }
                 }
             } finally {
+                ThreadLocals.removeAll();
                 if (mutex != null) {
                     mutex.unlockEx();
                 }

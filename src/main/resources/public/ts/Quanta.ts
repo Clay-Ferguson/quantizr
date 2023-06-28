@@ -256,7 +256,7 @@ export class Quanta {
         }
         catch (e) {
             S.util.logErr(e);
-            alert("App failed to startup: " + e.message);
+            alert("App failed to start: " + e?.message || "");
             throw e;
         }
         finally {
