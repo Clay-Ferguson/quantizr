@@ -19,13 +19,6 @@ sudo rm -r ${DEPLOY_TARGET}
 
 echo "Preparing DEPLOY_TARGET: ${DEPLOY_TARGET}"
 mkdir -p ${DEPLOY_TARGET}
-
-# remove this to be sure we will notice if it doesn't successfully build
-sudo rm -f ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz
-
-# sanity check since we do "rm -rf" in here
-if [ -z "$DEPLOY_TARGET" ]; then exit; fi
-sudo rm -rf ${DEPLOY_TARGET}/*
 verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}/log
@@ -102,13 +95,6 @@ cp ${SCRIPTS}/tools/_restore.sh         ${DEPLOY_TARGET}/dumps
 cp ${SCRIPTS}/tools/backup.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/tools/restore.sh          ${DEPLOY_TARGET}
 
-TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
-cd ${TARGET_PARENT}
-
-tar -zcf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
-#NOTE: Extraction command will be: `tar vxf quanta1.0.3.tar.gz`
-verifySuccess "TAR create: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
-
 echo
 echo "==================== NOTE ======================================="
 echo "Run docker-publish-distro.sh to publish the distro to docker repo"
@@ -116,7 +102,7 @@ echo "You can test locally (before publishing) by running:"
 echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "================================================================="
 echo 
-echo "************ Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
+echo "************ Build Complete in ${DEPLOY_TARGET}"
 
 read -p "Press a Key"
 
