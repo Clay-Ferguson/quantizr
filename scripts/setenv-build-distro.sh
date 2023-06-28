@@ -2,13 +2,13 @@
 # This is the version of the 'setenv' file that's used to build the distro. The file named
 # 'setenv-run-distro.sh' is the environment setter for the runtime/deployment.
 
+source ./set-version.sh
 source ./define-functions.sh
 THIS_FILE=$(readlink -f "$0")
 THIS_FOLDER=$(dirname "$THIS_FILE")
 export PRJROOT=$(dirname "$THIS_FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export QUANTA_VER="2.20.3"
 export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 

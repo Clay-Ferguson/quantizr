@@ -1,8 +1,8 @@
 #!/bin/bash
 
+source ./set-version.sh
 source ./define-functions.sh
 
-export QUANTA_VER="2.20.3"
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 # Uncomment either option 1 or option 2

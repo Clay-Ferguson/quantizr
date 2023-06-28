@@ -50,6 +50,8 @@ cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv-run-distro.sh          ${DEPLOY_TARGET}
+cp ${SCRIPTS}/set-version.sh                ${DEPLOY_TARGET}
+
 
 # Note: this 'dumps' folder is mapped onto a volume in 'dc-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.

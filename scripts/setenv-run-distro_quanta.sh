@@ -2,11 +2,9 @@
 # This file is the actual version of 'setenv-run-distro.sh' that's used for the Quanta.wiki production deployment
 # and is provided here as an example of a prod config. This file should be deployed into the distro as 'setenv-run-distro.sh'
 # which means it's renamed to that name when placed in deplyment folder.
+source ./set-version.sh
 source ./define-functions.sh
 
-# we make up any prod version we want here. It won't matter. This image is built on and private to the prod instance
-# and ultimtely determined by whatever JAR is present plus all the config settings.
-export QUANTA_VER="2.20.3"
 export DOCKER_TAG=quanta-${QUANTA_VER}
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
 
