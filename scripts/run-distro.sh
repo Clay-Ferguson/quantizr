@@ -18,6 +18,14 @@ source ./setenv-run-distro.sh
 
 ./stop-distro.sh
 
+if [ -f "quanta.tar" ]; then
+    docker load -i quanta.tar
+fi
+
+if [ -f "tserver.tar" ]; then
+    docker load -i tserver.tar
+fi
+
 # take ownership of this directory as current user
 sudo chown -R $USER .
 
