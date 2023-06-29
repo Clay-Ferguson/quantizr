@@ -18,7 +18,6 @@ export DOCKER_IMAGE=quanta-${QUANTA_VER}
 export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
-export DOCKER_TAG=quanta-${QUANTA_VER}
 
 export SCRIPTS=${PRJROOT}/scripts
 export DOCKER_NETWORK=bridge

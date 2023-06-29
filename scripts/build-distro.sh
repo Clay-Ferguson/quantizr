@@ -77,7 +77,7 @@ cd ${DEPLOY_TARGET}
 dockerBuild
 echo "Docker build complete..."
 
-imageCheck ${DOCKER_TAG}
+imageCheck ${DOCKER_IMAGE}
 
 # Copy over the Backup/Restore scripts
 cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/dumps

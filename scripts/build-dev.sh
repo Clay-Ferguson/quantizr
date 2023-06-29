@@ -42,8 +42,8 @@ cd ${PRJROOT}
 dockerBuild
 echo "Docker build complete..."
 
-imageCheck ${DOCKER_TAG}
-echo "Image is in repo: ${DOCKER_TAG}"
+imageCheck ${DOCKER_IMAGE}
+echo "Image is in repo: ${DOCKER_IMAGE}"
 
 # Start the app
 dockerUp

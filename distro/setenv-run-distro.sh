@@ -3,7 +3,6 @@
 source ./set-version.sh
 source ./define-functions.sh
 
-export DOCKER_TAG=quanta-${QUANTA_VER}
 export DOCKER_IMAGE=quanta-${QUANTA_VER}
 
 # tserver-tag
