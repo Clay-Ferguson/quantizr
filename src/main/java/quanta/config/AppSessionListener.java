@@ -1,5 +1,6 @@
 package quanta.config;
 
+import java.util.concurrent.locks.ReentrantLock;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -7,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
-import quanta.util.LockEx;
+import quanta.service.AppFilter;
 
 /**
  * For keeping track of sessions.
@@ -36,7 +36,7 @@ public class AppSessionListener implements HttpSessionListener {
          * for our own API use of this lock we call lockEx() and unlockEx() on this object to use its' built
          * in ability to detect and forcably break deadlocks when they happen!
          */
-        session.setAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE, new LockEx("SESSION-LockEx:" + session.getId(), true, 180000, 1));
+        session.setAttribute(AppFilter.SESSION_LOCK_NAME, new ReentrantLock());
         sessionCounter++;
 
         if (debug) {
@@ -47,7 +47,7 @@ public class AppSessionListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         HttpSession session = se.getSession();
-        session.removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
+        session.removeAttribute(AppFilter.SESSION_LOCK_NAME);
         sessionCounter--;
 
         if (debug) {

@@ -54,7 +54,7 @@ public class PushService extends ServiceBase {
             if (scList.size() > 0) {
                 for (SessionContext sc : scList) {
                     //skip our own session because we already considered it first, above.
-                    if (sc.getUserToken().equals(ThreadLocals.getSC().getUserToken())) continue;
+                    if (ThreadLocals.getSC() != null && sc.getUserToken().equals(ThreadLocals.getSC().getUserToken())) continue;
 
                     maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, sc);
                 }
@@ -76,7 +76,7 @@ public class PushService extends ServiceBase {
         }
 
         /* Anonymous sessions won't have userName and can be ignored */
-        if (sc.getUserName() == null) return;
+        if (sc == null || sc.getUserName() == null) return;
 
         /*
          * We send a push to all users who are monitoring this node or any ancestor of it. This will be the

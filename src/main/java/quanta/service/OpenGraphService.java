@@ -71,6 +71,7 @@ public class OpenGraphService extends ServiceBase {
     public OpenGraph parseOpenGraph(String urlStr) throws Exception {
         OpenGraph openGraph = new OpenGraph();
         Connection con = Jsoup.connect(urlStr);
+        con.timeout(5000);
         /*
          * this browseragent thing is important to trick servers into sending us the LARGEST versions of the
          * images

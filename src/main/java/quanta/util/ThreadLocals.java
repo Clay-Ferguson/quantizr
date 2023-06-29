@@ -118,9 +118,14 @@ public class ThreadLocals {
 
     public static SessionContext getSC() {
         SessionContext sc = sessionContext.get();
-        if (sc == null && ThreadLocals.getServletRequest() == null) {
-            log.warn("getSC() called in Non-WEB Request Thread!\n\nStack=" + ExUtil.getStackTrace(null));
-        }
+
+        // this has WAY too many false positives. Not sure what to do about this.
+        // if (sc == null && ThreadLocals.getServletRequest() == null) {
+        //     log.warn(
+        //         "***THIS MAY NOT INDICATE A BUG*** getSC() called in Non-WEB Request Thread!\n\nStack=" +
+        //         ExUtil.getStackTrace(null)
+        //     );
+        // }
         return sc;
     }
 

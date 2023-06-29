@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -17,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.util.WebUtils;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -25,7 +26,6 @@ import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.Const;
 import quanta.util.ExUtil;
-import quanta.util.LockEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -39,15 +39,14 @@ public class AppFilter extends GenericFilterBean {
 
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
+    public static String SESSION_LOCK_NAME = "sLock";
 
     // turns on FULL and verbose logging
     public static boolean audit = false;
 
     // turns on some logging (not too verbose)
-    public static boolean debug = false;
+    public static boolean debug = true;
     public static String BEARER_TOKEN = "token";
-
-    private static final Object filterLock = new Object();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -60,7 +59,7 @@ public class AppFilter extends GenericFilterBean {
 
         HttpSession session = null;
         boolean isNewSession = false;
-        LockEx mutex = null;
+        ReentrantLock mutex = null;
         boolean useLock = true;
 
         try {
@@ -68,31 +67,31 @@ public class AppFilter extends GenericFilterBean {
             ThreadLocals.setServletRequest(httpReq);
             ThreadLocals.setServletResponse(httpRes);
 
-            // we synchronize here to be sure no other thread can create a session or lock on it
-            // while we're initializing this session and it's locking.
-            synchronized (filterLock) {
-                // test if we have a session before creating it.
-                session = httpReq.getSession(false);
-                isNewSession = session == null;
+            // test if we have a session before creating it.
+            session = httpReq.getSession(false);
+            isNewSession = (session == null);
 
-                // always create session immediately so we get concurrency mutexing
-                session = httpReq.getSession(true);
-                ThreadLocals.setHttpSession(session);
+            // always create session immediately so we get concurrency mutexing
+            session = httpReq.getSession(true);
+            ThreadLocals.setHttpSession(session);
 
-                // bypass locking for these two
-                switch (httpReq.getRequestURI()) {
-                    case AppController.API_PATH + "/serverPush":
-                    case AppController.API_PATH + "/signNodes":
-                        useLock = false;
-                        break;
-                    default:
-                        break;
-                }
+            // bypass locking for these two
+            switch (httpReq.getRequestURI()) {
+                // todo-0: need to add everything else we can that we KNOW can run concurrently to any user's session
+                case AppController.API_PATH + "/serverPush":
+                case AppController.API_PATH + "/signNodes":
+                case AppController.API_PATH + "/getOpenGraph":
+                    useLock = false;
+                    break;
+                default:
+                    break;
+            }
 
-                if (useLock) {
-                    mutex = (LockEx) WebUtils.getSessionMutex(session);
-                    mutex.lockEx();
-                    // log.debug("Mutex: " + mutex.hashCode() + " locked");
+            if (useLock) {
+                mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
+                if (mutex != null) {
+                    boolean isLockAcquired = mutex.tryLock(20, TimeUnit.SECONDS);
+                    if (!isLockAcquired) throw new RuntimeException("Server to busy.");
                 }
             }
 
@@ -173,17 +172,16 @@ public class AppFilter extends GenericFilterBean {
             // ditto comment above
             sendError(httpRes, httpReq.getRequestURI(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         } finally {
-            try {
-                if (audit) {
-                    if (res instanceof HttpServletResponse) {
-                        HttpServletResponse sres = (HttpServletResponse) res;
-                        postProcess(httpReq, sres);
-                    }
-                }
-            } finally {
-                ThreadLocals.removeAll();
-                if (mutex != null) {
-                    mutex.unlockEx();
+            if (mutex != null) {
+                mutex.unlock();
+            }
+
+            ThreadLocals.removeAll();
+
+            if (audit) {
+                if (res instanceof HttpServletResponse) {
+                    HttpServletResponse sres = (HttpServletResponse) res;
+                    postProcess(httpReq, sres);
                 }
             }
         }

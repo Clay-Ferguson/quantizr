@@ -109,7 +109,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         }
         synchronized (execInitLock) {
             ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
-            exec.setCorePoolSize(8);
+            exec.setCorePoolSize(50);
             // t.setAwaitTerminationSeconds(20);
             // t.setAllowCoreThreadTimeOut(true);
             // t.setKeepAliveSeconds(120);
@@ -212,7 +212,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Bean
     @Scope("singleton")
     public RestTemplate restTemplate() {
-        int timeout = 30000;
+        int timeout = 10000;
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectionRequestTimeout(timeout);
         httpRequestFactory.setConnectTimeout(timeout);

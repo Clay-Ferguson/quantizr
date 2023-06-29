@@ -736,7 +736,16 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
-        return openGraph.getOpenGraph(req);
+        return callProc.run(
+            "getOpenGraph",
+            false,
+            false,
+            req,
+            session,
+            ms -> {
+                return openGraph.getOpenGraph(req);
+            }
+        );
     }
 
     @RequestMapping(value = API_PATH + "/getSchemaOrgTypes", method = RequestMethod.POST)
