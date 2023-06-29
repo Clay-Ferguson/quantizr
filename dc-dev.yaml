@@ -116,11 +116,10 @@ services:
     quanta-dev:
         image: ${DOCKER_IMAGE}
         build: 
-            context: .
+            context: ${PRJROOT}
             args:
                 PORT: "${PORT}"
                 PORT_DEBUG: "${PORT_DEBUG}"
-                JAR_FILE: "${JAR_FILE}"
                 XMS: "${XMS}"
                 XMX: "${XMX}"
             dockerfile: ./dockerfile-dev
@@ -283,7 +282,7 @@ services:
                 window: 120s
             replicas: 1
         build:
-            context: ./src/main/resources/server
+            context: ${PRJROOT}/src/main/resources/server
             dockerfile: ./dockerfile
         hostname: tserver-host
         networks:

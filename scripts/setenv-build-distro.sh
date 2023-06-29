@@ -12,20 +12,15 @@ export PRJPARENT=$(dirname "$PRJROOT")
 export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 
-# always leave 'subnode/repo:' here so our publish to Docker Public Hub works, and no other
-# builds we run on our machine should ever target to the 'subnode/repo:'
-export DOCKER_IMAGE=subnode/repo:quanta-${QUANTA_VER}
+export DOCKER_IMAGE=quanta-${QUANTA_VER}
 
 # tserver-tag
-export TSERVER_IMAGE=subnode/repo:tserver-${QUANTA_VER}
+export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 export DOCKER_TAG=quanta-${QUANTA_VER}
 
 export SCRIPTS=${PRJROOT}/scripts
-# This jar file will be the one copied into the distro folder. The folder that will be zipped but without the file in it.
-export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
-
 export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.

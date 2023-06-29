@@ -13,8 +13,6 @@ export TSERVER_IMAGE=tserver-${QUANTA_VER}
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 
-export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
-
 export DEPLOY_TARGET=$PWD
 
 export DOCKER_NETWORK=bridge

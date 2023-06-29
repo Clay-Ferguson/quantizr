@@ -98,12 +98,11 @@ services:
     quanta-distro:
         image: ${DOCKER_IMAGE}
         build: 
-            context: .
+            context: ${PRJROOT}
             args:
                 PORT_SEC: "${PORT_SEC}"
                 PORT: "${PORT}"
                 PORT_DEBUG: "${PORT_DEBUG}"
-                JAR_FILE: "${JAR_FILE}"
                 XMS: "${XMS}"
                 XMX: "${XMX}"
                 REDIS_HOST: "${REDIS_HOST}"
@@ -261,7 +260,7 @@ services:
     tserver-distro:
         image: ${TSERVER_IMAGE}
         build:
-            context: ./src/main/resources/server
+            context: ${PRJROOT}/src/main/resources/server
             dockerfile: ./dockerfile
         deploy:
             restart_policy:

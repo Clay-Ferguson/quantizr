@@ -102,11 +102,10 @@ services:
     quanta-distro:
         image: ${DOCKER_IMAGE}
         build: 
-            context: .
+            context: ${PRJROOT}
             args:
                 PORT: "${PORT}"
                 PORT_DEBUG: "${PORT_DEBUG}"
-                JAR_FILE: "${JAR_FILE}"
                 XMS: "${XMS}"
                 XMX: "${XMX}"
             dockerfile: ./dockerfile-distro

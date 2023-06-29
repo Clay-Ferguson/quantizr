@@ -65,15 +65,9 @@ rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
-# Wipe previous springboot fat jar to ensure it can't be used again.
-rm -f ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar
-
 # build the project (compile all source)
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
-
-cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
-verifySuccess "JAR copied to build distro"
 
 genMongoConfig
 
@@ -84,10 +78,6 @@ dockerBuild
 echo "Docker build complete..."
 
 imageCheck ${DOCKER_TAG}
-
-# Now fix up the DEPLOY_TARGET and for end users, and zip it
-
-rm -f ${DEPLOY_TARGET}/quanta-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts
 cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/dumps

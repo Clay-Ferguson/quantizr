@@ -25,9 +25,6 @@ export DOCKER_TAG=quanta-dev-${QUANTA_VER}
 # Must be the folder where the Quantizr project is located. The root of the source folders.
 export SCRIPTS=${PRJROOT}/scripts
 
-# Tells our scripts where the actual executable code is expected to be found
-export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
-
 export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
