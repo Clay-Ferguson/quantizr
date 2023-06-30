@@ -5,10 +5,12 @@
 source ./set-version.sh
 source ./define-functions.sh
 
+# To Run from DockerHub do this:
+# export DOCKER_IMAGE=subnode/quanta:2.20.12
+# export TSERVER_IMAGE=subnode/tserver:2.20.12
 export DOCKER_IMAGE=quanta
-
-# tserver-tag
 export TSERVER_IMAGE=tserver
+
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 
