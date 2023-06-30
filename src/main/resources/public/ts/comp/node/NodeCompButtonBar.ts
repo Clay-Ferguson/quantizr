@@ -143,7 +143,7 @@ export class NodeCompButtonBar extends Div {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
-                }, null, "fa-plus");
+                }, "btn-secondary " + (isPageRootNode ? "ui-new-node-plus-top" : "ui-new-node-plus"), "fa-plus");
             }
 
             const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
@@ -153,7 +153,7 @@ export class NodeCompButtonBar extends Div {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         title: "Edit Node",
                         [C.NODE_ID_ATTR]: this.node.id
-                    }, null, "fa-edit");
+                    }, "btn-secondary ui-edit-node", "fa-edit");
                 }
 
                 if (this.node.type !== J.NodeType.REPO_ROOT && !ast.nodesToMove) {

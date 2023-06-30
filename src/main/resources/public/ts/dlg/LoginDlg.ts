@@ -33,7 +33,7 @@ export class LoginDlg extends DialogBase {
                 ])
             ]),
             new ButtonBar([
-                new Button("Login", this.login, null, "btn-primary"),
+                new Button("Login", this.login, null, "btn-primary ui-login"),
                 new Button("Close", () => {
                     this.close();
                     S.util.loadAnonPageHome();

@@ -378,7 +378,7 @@ export class NodeCompRowHeader extends Div {
         if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode && !isNostr) {
             if (editingAllowed && editableNode) {
                 editButton = new Icon({
-                    className: "fa fa-edit fa-lg buttonBarIcon",
+                    className: "fa fa-edit fa-lg buttonBarIcon ui-edit-node",
                     onClick: S.edit.runEditNodeByClick,
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id

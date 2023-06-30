@@ -14,6 +14,7 @@ import { Divc } from "./core/Divc";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
 import { Span } from "./core/Span";
+import { TourPanel } from "./core/TourPanel";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
@@ -70,6 +71,7 @@ export class App extends Main {
                     className: "row mainAppRow",
                     id: "appMainContainer"
                 }, [
+                    ast.tour ? new TourPanel() : null,
                     ast.mobileMode ? null : new LeftNavPanel(),
                     new TabPanel(mobileTopBar),
                     ast.mobileMode ? null : new RightNavPanel()

@@ -93,6 +93,7 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
         dispatchLaterList.forEach(d => dispatcher(d));
         dispatchLaterList = [];
         dispatcher({ type, func });
+        afterDispatch();
     }
 }
 
@@ -128,5 +129,10 @@ export function promiseDispatch(type: string, func: StateModFunc): Promise<void>
                 }
             }
         });
+        afterDispatch();
     });
+}
+
+function afterDispatch() {
+    S.tourUtils.afterDispatch()
 }

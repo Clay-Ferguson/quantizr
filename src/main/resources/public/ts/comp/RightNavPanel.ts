@@ -137,7 +137,7 @@ export class RightNavPanel extends Div {
         const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Divc({ className: "float-end" }, [
             // Not showing login on this panel in mobileMode, because it's shown at top of page instead
             new Span("Login", {
-                className: "signupLinkText",
+                className: "signupLinkText ui-login",
                 onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.user.userLogin();
@@ -145,7 +145,7 @@ export class RightNavPanel extends Div {
             }),
 
             new Span("Signup", {
-                className: "signupLinkText float-end",
+                className: "signupLinkText float-end ui-signup",
                 onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.user.userSignup();
@@ -170,7 +170,7 @@ export class RightNavPanel extends Div {
                         loginSignupDiv,
                     ]),
                     new Divc({ className: "flexFloatRight" }, [
-                        textToSpeech, 
+                        textToSpeech,
                         clipboardPasteButton,
                         addNoteButton
                     ]),

@@ -232,6 +232,19 @@ export class MenuPanel extends Div {
             new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
         ]));
 
+        if (!ast.mobileMode && S.tourUtils) {
+            S.tourUtils.init();
+            const tourItems = [];
+            S.tourUtils.tours.forEach(tour => {
+                tourItems.push(new MenuItem(tour.name, () => {
+                    dispatch("SetTour", s => s.tour = tour);
+                }, true, null));
+            });
+            if (tourItems.length > 0) {
+                children.push(new Menu("Guided Tours", tourItems, null));
+            }
+        }
+
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
             if (ast.bookmarks) {

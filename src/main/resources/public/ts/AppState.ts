@@ -5,6 +5,7 @@ import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
+import { Tour } from "./Tour";
 
 export interface ExportSettings {
     exportType: string;
@@ -156,6 +157,7 @@ export class AppState {
     rssNode: J.NodeInfo = null;
 
     bookmarks: J.Bookmark[];
+    tour: Tour;
 
     editNode: J.NodeInfo;
     protocolFilter: string = J.Constant.NETWORK_ACTPUB;

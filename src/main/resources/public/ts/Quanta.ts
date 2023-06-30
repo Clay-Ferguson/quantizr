@@ -242,6 +242,8 @@ export class Quanta {
                             new UserProfileDlg(S.quanta.config.displayUserProfileId).open();
                             S.quanta.config.displayUserProfileId = null;
                         }
+
+                        S.tourUtils.init();
                     }, 100);
                 });
             }

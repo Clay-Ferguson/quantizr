@@ -728,7 +728,7 @@ export class EditNodeDlg extends DialogBase {
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
-            new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary"),
+            new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", "File", {
@@ -744,7 +744,7 @@ export class EditNodeDlg extends DialogBase {
             allowShare ? new IconButton("fa-share-alt", "Share", {
                 onClick: () => this.utl.share(this),
                 title: "Share Node"
-            }) : null,
+            }, "ui-editor-share") : null,
 
             allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
                 onClick: async () => {
