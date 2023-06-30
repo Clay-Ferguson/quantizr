@@ -36,6 +36,10 @@ export class OpenGraphPanel extends Div {
         }
     }
 
+    override domRemoveEvent = () => {
+        S.rpcUtil.removedDomIds.push(this.getId());
+    }
+
     override domAddEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) return;
@@ -145,7 +149,7 @@ export class OpenGraphPanel extends Div {
         try {
             const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
-            }, true, false, true);
+            }, true, false, true, this.getId());
             return res.openGraph;
         }
         catch (e) {

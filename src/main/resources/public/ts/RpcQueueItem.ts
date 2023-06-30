@@ -4,4 +4,5 @@ export class RpcQueueItem {
     public promise: Promise<J.ResponseBase>;
     public func: Function;
     public info: string;
+    public compId: string;
 }

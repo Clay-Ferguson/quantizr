@@ -33,7 +33,9 @@ export class RpcUtil {
     SLOW_INTERVAL = 1000;
     FAST_INTERVAL = 10;
     lifoInterval = this.SLOW_INTERVAL;
+    static MAX_LIFO_SIZE = 70;
 
+    removedDomIds: string[] = [];
     lifoQueue: RpcQueueItem[] = [];
 
     lifoQueuePush = (qi: RpcQueueItem) => {
@@ -47,7 +49,7 @@ export class RpcUtil {
         // TODO: The slightly better solution will be to hook into the Element Unmount event of the 
         // OpenGraphPanel that triggered any given query and be able to have that unmount even pull
         // those specific items out of the queue.
-        if (this.lifoQueue.length > 50) {
+        if (this.lifoQueue.length > RpcUtil.MAX_LIFO_SIZE) {
             this.lifoQueue.shift();
         }
     }
@@ -79,6 +81,14 @@ export class RpcUtil {
 
     rpcQueInterval = setInterval(this.lifoQueueProcessor, this.lifoInterval);
 
+    // For all domIds in removeDomIds we remove those from lifoQueue, and then reset
+    // removeDomIds back to empty array
+    rpcQueCleanupInterval = setInterval(() => {
+        if (this.removedDomIds.length == 0 || this.lifoQueue.length == 0) return;
+        this.lifoQueue = this.lifoQueue.filter(qi => this.removedDomIds.findIndex(id => id == qi.compId) != -1);
+        this.removedDomIds = [];
+    }, 2000);
+
     setIntervalSpeed = (interval: number) => {
         clearInterval(this.rpcQueInterval);
         this.lifoInterval = interval;
@@ -104,15 +114,19 @@ export class RpcUtil {
     is retstarting a SINGLE REPLICA swarm. (i.e. Zero Downtime even for single replia swarm)
     
     NOTE: Currently getOpenGraph is the only call that has queue=true.
+
+    'compId' is the elementId of the element requesting the data, such that if we detect the element
+    has been remove from the dom we know we can cancel any queued query
     */
     rpc = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
         (postName: string, postData: RequestType = null,
-            background: boolean = false, allowErrorDlg: boolean = true, lifoQueue = false): Promise<ResponseType> => {
+            background: boolean = false, allowErrorDlg: boolean = true, lifoQueue = false, compId: string = null): Promise<ResponseType> => {
 
         let qi = null;
         if (lifoQueue) {
             qi = new RpcQueueItem();
             qi.info = postName;
+            qi.compId = compId;
             // console.log("Queueing: " + postName);
             this.lifoQueuePush(qi);
         }
