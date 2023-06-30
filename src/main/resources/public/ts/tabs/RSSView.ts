@@ -139,7 +139,6 @@ export class RSSView extends AppTab<any, RSSView> {
                     ust.rssFeedPage[feedSrcHash] = page;
                 }
 
-                S.rpcUtil.clearQueue();
                 res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                     urls,
                     page
