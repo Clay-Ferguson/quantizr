@@ -41,14 +41,10 @@ export class RpcUtil {
     lifoQueuePush = (qi: RpcQueueItem) => {
         this.lifoQueue.push(qi);
 
-        // todo-0: currently this queue processes just OpenGraph querying from the server and we 
-        // dont't allow more than 50 to be queued up at a time before we start dropping them.
+        // Currently this queue processes just OpenGraph querying from the server and we 
+        // dont't allow more than MAX_LIFO_SIZE to be queued up at a time before we start dropping them.
         // This is because as users navigate around real fast this queue could just create a ton of 
-        // wasted queries to theserver. 
-        //
-        // TODO: The slightly better solution will be to hook into the Element Unmount event of the 
-        // OpenGraphPanel that triggered any given query and be able to have that unmount even pull
-        // those specific items out of the queue.
+        // wasted queries to the server. 
         if (this.lifoQueue.length > RpcUtil.MAX_LIFO_SIZE) {
             this.lifoQueue.shift();
         }
