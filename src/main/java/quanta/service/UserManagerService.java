@@ -211,7 +211,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     // Note: This happens to be about the same as the session timeout, but doesn't need to be
-    @Scheduled(fixedDelay = 15 * DateUtil.MINUTE_MILLIS)
+    @Scheduled(fixedDelay = 60 * DateUtil.MINUTE_MILLIS)
     public void redisMaintenance() {
         if (!MongoRepository.fullInit) return;
 
