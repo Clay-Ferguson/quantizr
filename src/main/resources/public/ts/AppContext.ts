@@ -74,6 +74,7 @@ export function asyncDispatch(type: string, func: StateModFunc) {
  * always do state changes (dispatches) only thru this 'dispatcher', local to this module
  */
 export function dispatch(type: string, func: StateModFunc, dispatchLater: boolean = false) {
+    // console.log("DISP: " + type);
     if (!dispatcher) {
         throw new Error("Called dispatch before first render. type: " + type);
     }
@@ -91,8 +92,6 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
         // dispatch any pending actions first.
         dispatchLaterList.forEach(d => dispatcher(d));
         dispatchLaterList = [];
-        // console.log("DISP: " + type);
-
         dispatcher({ type, func });
     }
 }

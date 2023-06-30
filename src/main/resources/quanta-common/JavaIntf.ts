@@ -979,6 +979,7 @@ export interface PublishNodeToIpfsResponse extends ResponseBase {
 export interface PushPageMessage extends ServerPushInfo {
     payload: string;
     usePopup: boolean;
+    subType: string;
 }
 
 export interface RemovePrivilegeResponse extends ResponseBase {

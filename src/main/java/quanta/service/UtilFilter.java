@@ -49,7 +49,8 @@ public class UtilFilter extends GenericFilterBean {
             httpReq.getRequestURI().contains("/images/") ||
             httpReq.getRequestURI().contains("/fonts/") ||
             httpReq.getRequestURI().contains("/dist/main.") ||
-            httpReq.getRequestURI().endsWith("/images/favicon.ico")
+            httpReq.getRequestURI().endsWith("/images/favicon.ico") ||
+            httpReq.getRequestURI().contains("/getOpenGraph")
         ) {
             httpRes.setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
         }

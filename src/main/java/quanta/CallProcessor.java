@@ -30,9 +30,6 @@ public class CallProcessor extends ServiceBase {
     /*
      * Wraps the processing of any command by using whatever info is on the session and/or the request
      * to perform the login if the user is not logged in, and then call the function to be processed
-     *
-     * todo-0: verify that all calls which return RequestBase go thru this method to get called
-     * otherwise the return Code might not get set, and also for consistency
      */
     public Object run(
         String command,

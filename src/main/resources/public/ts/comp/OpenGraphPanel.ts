@@ -113,7 +113,7 @@ export class OpenGraphPanel extends Div {
                     url: this.url,
                     mime: null
                 };
-    
+
                 S.quanta.openGraphData.set(this.url, og);
                 // this.processOgImage(o.url, og); // <-- DO NOT DELETE
                 if (!this.getRef()) {
@@ -140,11 +140,12 @@ export class OpenGraphPanel extends Div {
     // the only time this method ever runs will be when browsing an RSS feed.
     queryOpenGraph = async (url: string): Promise<J.OpenGraph> => {
         if (!url) return null;
+
         // console.log("QUERY OG for " + url);
         try {
             const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
-            }, true);
+            }, true, false, true);
             return res.openGraph;
         }
         catch (e) {

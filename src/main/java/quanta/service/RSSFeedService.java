@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -64,6 +65,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetMultiRssRequest;
 import quanta.response.GetMultiRssResponse;
+import quanta.response.PushPageMessage;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -84,12 +86,12 @@ public class RSSFeedService extends ServiceBase {
     private boolean USE_HTTP_READER = false;
     private boolean USE_URL_READER = false;
     private boolean USE_SPRING_READER = true;
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
+    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(15000));
     /*
      * Cache of all feeds.
      */
     private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Integer, String> feedNameOfItem = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, String> feedNameOfItem = new ConcurrentHashMap<>();
     /*
      * keep track of which feeds failed so we don't try them again until another 30-min cycle
      */
@@ -111,7 +113,7 @@ public class RSSFeedService extends ServiceBase {
         }
     };
     private static final int FEED_ITEMS_PER_PAGE = 75;
-    private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
+    private static final int REFRESH_FREQUENCY_MINS = 360; // 6 hrs
     static boolean run = false;
 
     /*
@@ -151,7 +153,7 @@ public class RSSFeedService extends ServiceBase {
 
                 for (String url : failedFeedsList) {
                     log.debug("Retrying previously failed feed: " + url);
-                    SyndFeed feed = getFeed(url, false);
+                    SyndFeed feed = getFeed(url, false, 0, 0);
                     if (feed != null) {
                         count++;
                     } else {
@@ -163,7 +165,7 @@ public class RSSFeedService extends ServiceBase {
             // Reload all feeds that were perviously Successful
             for (String url : feedCache.keySet()) {
                 log.debug("Refreshing feed: " + url);
-                SyndFeed feed = getFeed(url, false);
+                SyndFeed feed = getFeed(url, false, 0, 0);
                 if (feed != null) {
                     count++;
                 } else {
@@ -179,8 +181,9 @@ public class RSSFeedService extends ServiceBase {
     public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
         try {
             // Reads all the feeds from the web and creates 'entries' for all content.
+            int index = 0;
             for (String url : urls) {
-                SyndFeed inFeed = getFeed(url, true);
+                SyndFeed inFeed = getFeed(url, true, ++index, urls.size());
                 if (inFeed != null) {
                     for (SyndEntry entry : inFeed.getEntries()) {
                         if (entry.getPublishedDate() != null) {
@@ -190,7 +193,9 @@ public class RSSFeedService extends ServiceBase {
                 }
             }
 
+            log.debug("Unpaged Aggregated Entry Count: " + entries.size());
             entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
+            log.debug("done sorting.");
             /*
              * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
              * then stuff pageEntries back into 'entries' to send out of this method
@@ -210,13 +215,15 @@ public class RSSFeedService extends ServiceBase {
                 idx++;
             }
             entries.clear();
+
+            log.debug("Sending back: " + pageEntries.size());
             entries.addAll(pageEntries);
         } catch (Exception e) {
             ExUtil.error(log, "Error: ", e);
         }
     }
 
-    public SyndFeed getFeed(final String url, boolean fromCache) {
+    public SyndFeed getFeed(final String url, boolean fromCache, int index, int maxIndex) {
         /*
          * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
          * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
@@ -290,6 +297,13 @@ public class RSSFeedService extends ServiceBase {
             }
 
             if (USE_SPRING_READER) {
+                if (ThreadLocals.getSC() != null) {
+                    push.sendServerPushInfo(
+                        ThreadLocals.getSC(),
+                        new PushPageMessage("Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText")
+                    );
+                }
+
                 inFeed =
                     restTemplate.execute(
                         url,
@@ -318,6 +332,7 @@ public class RSSFeedService extends ServiceBase {
                         }
                     );
             }
+
             // another example from online (that I've never tried):
             // try (CloseableHttpClient client = HttpClients.createMinimal()) {
             // HttpUriRequest request = new HttpGet(url);
@@ -333,8 +348,9 @@ public class RSSFeedService extends ServiceBase {
             feedCache.put(url, inFeed);
             // store knowledge of which feed Title goes with each entry instance.
             if (inFeed.getEntries() != null) {
+                log.debug("Feed items: " + inFeed.getEntries().size());
                 for (SyndEntry se : inFeed.getEntries()) {
-                    feedNameOfItem.put(se.hashCode(), inFeed.getTitle());
+                    feedNameOfItem.put(se.getUri(), inFeed.getTitle());
                 }
             }
             return inFeed;
@@ -350,7 +366,7 @@ public class RSSFeedService extends ServiceBase {
              * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
              * under the admin menu for checking server status info.
              */
-            ExUtil.error(log, "Error reading feed: " + url, e);
+            log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
             failedFeeds.add(url);
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);
@@ -415,18 +431,19 @@ public class RSSFeedService extends ServiceBase {
             feed.setDescription("");
             feed.setAuthor("");
             feed.setLink("");
-            List<SyndEntry> entries = new LinkedList<>();
+            List<SyndEntry> entries = new ArrayList<>();
             feed.setEntries(entries);
             aggregateFeeds(urlList, entries, req.getPage());
         } else {
             /* If not an aggregate return the one external feed itself */
             String url = urlList.get(0);
-            SyndFeed cachedFeed = getFeed(url, true);
+            SyndFeed cachedFeed = getFeed(url, true, 1, 1);
             if (cachedFeed != null) {
                 feed = new SyndFeedImpl();
                 cloneFeedForPage(feed, cachedFeed, req.getPage());
             }
         }
+
         if (feed != null) {
             fixFeed(feed);
             boolean addFeedTitles = urlList.size() > 1;
@@ -456,16 +473,20 @@ public class RSSFeedService extends ServiceBase {
             for (SyndEntry entry : feed.getEntries()) {
                 RssFeedEntry e = new RssFeedEntry();
                 if (addFeedTitles) {
-                    e.setParentFeedTitle(feedNameOfItem.get(entry.hashCode()));
+                    e.setParentFeedTitle(feedNameOfItem.get(entry.getUri()));
                 }
                 try {
                     if (processEntry(entry, e)) {
+                        log.debug("Build RSS Ret Obj: " + e.getTitle());
                         rssEntries.add(e);
                     }
-                } catch (Exception ex) {}
+                } catch (Exception ex) {
+                    log.debug("Failed to Process: " + e.getTitle());
+                }
                 // if anything goes wrong processing the entry, we can ignore it and continue with the next entry.
             }
         }
+        log.debug("Returning RSS Display: " + XString.prettyPrint(rf));
         return rf;
     }
 

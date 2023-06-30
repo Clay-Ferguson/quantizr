@@ -77,7 +77,7 @@ public class AppFilter extends GenericFilterBean {
 
             // bypass locking for these two
             switch (httpReq.getRequestURI()) {
-                // todo-0: need to add everything else we can that we KNOW can run concurrently to any user's session
+                // todo-1: need to add everything else we can that we KNOW can run concurrently to any user's session
                 case AppController.API_PATH + "/serverPush":
                 case AppController.API_PATH + "/signNodes":
                 case AppController.API_PATH + "/getOpenGraph":
@@ -90,8 +90,8 @@ public class AppFilter extends GenericFilterBean {
             if (useLock) {
                 mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
                 if (mutex != null) {
-                    boolean isLockAcquired = mutex.tryLock(20, TimeUnit.SECONDS);
-                    if (!isLockAcquired) throw new RuntimeException("Server to busy.");
+                    boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
+                    if (!isLockAcquired) throw new RuntimeException("Server too busy.");
                 }
             }
 

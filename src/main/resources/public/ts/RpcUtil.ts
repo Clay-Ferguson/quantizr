@@ -3,13 +3,15 @@ import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Constants as C } from "./Constants";
+import { RpcQueueItem } from "./RpcQueueItem";
 
 export class RpcUtil {
     rpcPath: string = null;
     rhost: string = null;
-    logRpc: boolean = false;
-    logRpcShort: boolean = false;
+    log: boolean = true;
+    logVerbose: boolean = false;
     callId: number = 0;
+    concurrency: number = 0;
     timer: any = null;
     unauthMessageShowing: boolean = false;
 
@@ -28,6 +30,44 @@ export class RpcUtil {
     // cause the browser to keep running with outdated interfaces instead of foring it to reload 
     // whenver it truly needs to reload.
     RPC_RETRIES: number = 0;
+    SLOW_INTERVAL = 1000;
+    FAST_INTERVAL = 10;
+    lifoInterval = this.SLOW_INTERVAL;
+
+    lifoQueue: RpcQueueItem[] = [];
+
+    clearQueue = () => {
+        this.lifoQueue = [];
+    }
+
+    lifoQueueProcessor = () => {
+        if (this.lifoQueue.length > 0 && this.concurrency == 0) {
+            const idx = this.lifoQueue.length - 1;
+            if (this.lifoQueue[idx].func && this.lifoQueue[idx].promise) {
+                const qi = this.lifoQueue.pop();
+                // console.log("Run Queue Item [size=" + this.lifoQueue.length + "]: " + qi.info);
+                qi.func();
+            }
+        }
+
+        // if queue is empty and we're ticking at high speed slow down slow speed, to save CPU
+        if (this.lifoQueue.length == 0 && this.lifoInterval < this.SLOW_INTERVAL) {
+            this.setIntervalSpeed(this.SLOW_INTERVAL);
+        }
+        // if items are queued and we're ticking at slow rate, then speed up to fast rate to
+        // process the queue asap
+        else if (this.lifoQueue.length > 1 && this.lifoInterval >= this.SLOW_INTERVAL) {
+            this.setIntervalSpeed(this.FAST_INTERVAL);
+        }
+    }
+
+    rpcQueInterval = setInterval(this.lifoQueueProcessor, this.lifoInterval);
+
+    setIntervalSpeed = (interval: number) => {
+        clearInterval(this.rpcQueInterval);
+        this.lifoInterval = interval;
+        this.rpcQueInterval = setInterval(this.lifoQueueProcessor, this.lifoInterval);
+    }
 
     getRemoteHost = (): string => {
         if (this.rhost) {
@@ -45,96 +85,126 @@ export class RpcUtil {
 
     /* RPC calls to server that support retries. Retries are currently disabled, but when enabled it makes
     the browser smart enough to continue working seamlessly even during a server restart, and even with the server
-    is retstarting a SINGLE REPLICA swarm. (i.e. Zero Downtime even for single replia swarm) */
+    is retstarting a SINGLE REPLICA swarm. (i.e. Zero Downtime even for single replia swarm)
+    
+    NOTE: Currently getOpenGraph is the only call that has queue=true.
+    */
     rpc = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
         (postName: string, postData: RequestType = null,
-            background: boolean = false, allowErrorDlg: boolean = true): Promise<ResponseType> => {
+            background: boolean = false, allowErrorDlg: boolean = true, lifoQueue = false): Promise<ResponseType> => {
+
+        let qi = null;
+        if (lifoQueue) {
+            qi = new RpcQueueItem();
+            qi.info = postName;
+            // console.log("Queueing: " + postName);
+            this.lifoQueue.push(qi);
+        }
 
         let retPromise = new Promise<ResponseType>((resolve, reject) => {
-            const callId = ++this.callId;
-            postData = postData || {} as RequestType;
+            const func = () => {
+                const callId = ++this.callId;
+                postData = postData || {} as RequestType;
+                this.concurrency++;
+                if (this.log) {
+                    console.log("POST(" + callId + ", conc=" + this.concurrency + "): [" + this.getRpcPath() + postName + "]");
+                }
 
-            if (!background) {
-                this.rpcCounter++;
-                S.quanta.setOverlay(true);
-            }
-
-            if (this.logRpc) {
-                console.log("POST(" + callId + "): [" + this.getRpcPath() + postName + "]" + S.util.prettyPrint(postData));
-            }
-            else if (this.logRpcShort) {
-                console.log("POST(" + callId + "): [" + this.getRpcPath() + postName + "]");
-            }
-
-            if (this.logRpc && !S.crypto.userSignature) {
-                console.warn("Request will have no signature.");
-            }
-
-            const inner = this.rpcInner(postName, callId, postData);
-            inner.then((data: ResponseType) => {
-                // console.log("rpcNew SUCCESS: " + postName);
-                resolve(data);
-            })
-                .catch((error: any) => {
-                    if (this.RPC_RETRIES == 0) reject(error);
-                    let retries = 0;
-
-                    console.log("error: response=" + S.util.prettyPrint(error));
-                    // if we did get a response with a status we can immediately call reject(), but otherwise
-                    // that indicates server was unreachable so we start retrying 
-                    if (error?.response?.status) {
-                        reject(error);
-                        return;
+                if (this.logVerbose) {
+                    if (!S.crypto.userSignature) {
+                        console.warn("Request will have no signature.");
                     }
-                    console.log("rpcNew FAIL. Server down or network failing. (will retry): " + postName);
-                    let retrying = false;
+                    console.log("   RET: " + S.util.prettyPrint(postData));
+                }
 
-                    const timeoutId = setInterval(() => {
-                        // console.log("Still waiting for a retry.");
-                        if (retrying) return;
-                        retries++;
+                if (!background) {
+                    this.rpcCounter++;
+                    S.quanta.setOverlay(true);
+                }
 
-                        // on the 3rd retry show the user a "Reconnecting message so they know what's happening"
-                        if (retries == 3) {
-                            // we should make it where we can do a state change on the ProgressDlg without
-                            // having to open a new one.
-                            if (this.pgrsDlg) {
-                                this.pgrsDlg.close();
-                            }
-                            const dlg = new ProgressDlg("Reconnecting to server.");
-                            this.pgrsDlg = dlg;
-                            this.pgrsDlg.open();
-                        }
+                const inner = this.rpcInner(postName, callId, postData);
+                inner.then((data: ResponseType) => {
+                    this.concurrency--;
+                    if (this.log) {
+                        console.log("SUCCESS (conc=" + this.concurrency + ")=" + postName);
+                    }
+                    resolve(data);
+                })
+                    .catch((error: any) => {
+                        this.concurrency--;
+                        console.error("ERROR (conc=" + this.concurrency + ")=" + S.util.prettyPrint(error));
+                        if (this.RPC_RETRIES == 0) reject(error);
+                        let retries = 0;
 
-                        if (retries >= this.RPC_RETRIES) {
-                            // console.log("rpcNew FAIL (giving up, exhausted retries): " + postName);
-                            clearTimeout(timeoutId);
+                        // if we did get a response with a status we can immediately call reject(), but otherwise
+                        // that indicates server was unreachable so we start retrying 
+                        if (error?.response?.status) {
                             reject(error);
+                            return;
                         }
+                        console.log("rpcNew FAIL. Server down or network failing. (will retry): " + postName);
+                        let retrying = false;
 
-                        retrying = true;
-                        console.log("rpcNew retry " + retries + ": " + postName);
-                        this.rpcInner(postName, callId, postData)
-                            .then((data: ResponseType) => {
-                                clearTimeout(timeoutId);
-                                retrying = false;
-                                // console.log("rpcNew SUCCESS FINALLY: " + postName);
-                                resolve(data);
-                            })//
-                            .catch((error: any) => {
-                                if (retries >= this.RPC_RETRIES) {
-                                    // console.log("rpcNew FAIL (giving up, exhausted retries): " + postName);
-                                    clearTimeout(timeoutId);
-                                    reject(error);
+                        const timeoutId = setInterval(() => {
+                            // console.log("Still waiting for a retry.");
+                            if (retrying) return;
+                            retries++;
+
+                            // on the 3rd retry show the user a "Reconnecting message so they know what's happening"
+                            if (retries == 3) {
+                                // we should make it where we can do a state change on the ProgressDlg without
+                                // having to open a new one.
+                                if (this.pgrsDlg) {
+                                    this.pgrsDlg.close();
                                 }
-                                retrying = false;
-                            });
-                    }, 3000);
-                });
+                                const dlg = new ProgressDlg("Reconnecting to server.");
+                                this.pgrsDlg = dlg;
+                                this.pgrsDlg.open();
+                            }
+
+                            if (retries >= this.RPC_RETRIES) {
+                                // console.log("rpcNew FAIL (giving up, exhausted retries): " + postName);
+                                clearTimeout(timeoutId);
+                                reject(error);
+                            }
+
+                            retrying = true;
+                            console.log("rpcNew retry " + retries + ": " + postName);
+                            this.rpcInner(postName, callId, postData)
+                                .then((data: ResponseType) => {
+                                    clearTimeout(timeoutId);
+                                    retrying = false;
+                                    // console.log("rpcNew SUCCESS FINALLY: " + postName);
+                                    resolve(data);
+                                })//
+                                .catch((error: any) => {
+                                    if (retries >= this.RPC_RETRIES) {
+                                        // console.log("rpcNew FAIL (giving up, exhausted retries): " + postName);
+                                        clearTimeout(timeoutId);
+                                        reject(error);
+                                    }
+                                    retrying = false;
+                                });
+                        }, 3000);
+                    });
+            }
+
+            // queue the function
+            if (lifoQueue) {
+                qi.func = func;
+            }
+            // or else run immediately
+            else {
+                func();
+            }
         });
 
         retPromise.then((data: J.ResponseBase) => this.rpcSuccess(data, background, postName))
             .catch((error: any) => this.rpcFail(error, background, allowErrorDlg, postName, postData));
+
+        if (lifoQueue) {
+            qi.promise = retPromise;
+        }
 
         return retPromise;
     }
@@ -210,13 +280,11 @@ export class RpcUtil {
             }
 
             if (res?.code == C.RESPONSE_CODE_OK) {
-                if (this.logRpcShort) {
+                if (this.log) {
                     console.log("RES: " + postName + " REPL: " + res.replica);
                 }
-                else if (this.logRpc) {
-                    console.log("RES: " + postName + " REPL: " + res.replica,
-                        "\n    JSON: " +
-                        S.util.prettyPrint(res));
+                if (this.logVerbose) {
+                    console.log("   RET: " + S.util.prettyPrint(res));
                 }
             }
 
@@ -233,7 +301,7 @@ export class RpcUtil {
             }
 
             if (res.code != C.RESPONSE_CODE_OK) {
-                if (!this.logRpc) {
+                if (!this.logVerbose) {
                     let trace = res.stackTrace;
                     if (trace) {
                         trace = trace.replace("\\n", "\n");

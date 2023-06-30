@@ -99,6 +99,12 @@ export class ServerPush {
 
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {
             const data: J.PushPageMessage = JSON.parse(e.data);
+            if (data.subType == "rssProgressText") {
+                dispatch("RssProgress", s => {
+                    s.rssProgressText = data.payload;
+                });
+                return;
+            }
             if (data.usePopup) {
                 S.util.showMessage(data.payload, "Admin Message");
             }

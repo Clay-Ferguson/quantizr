@@ -733,6 +733,8 @@ public class AppController extends ServiceBase implements ErrorController {
         );
     }
 
+    // todo-1: I think this should be a GET operation, not a post, in order to do CACHING (in UtilFilter.java?), but
+    // I want to require an authToken in the header and I've never done that in a POST. I assume it's possible?
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {

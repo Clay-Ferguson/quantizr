@@ -558,6 +558,7 @@ export class Render {
                                 setTimeout(() => {
                                     dispatch("AutoRSSUpdate", s => {
                                         s.rssFeedCache[feedSrcHash] = "loading";
+                                        s.rssProgressText = null;
                                         s.rssFeedPage[feedSrcHash] = 1;
                                         RSSView.loadFeed(s, feedSrcHash, feedSrc);
                                     });

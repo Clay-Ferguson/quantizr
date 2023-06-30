@@ -268,7 +268,11 @@ public class CryptoService extends ServiceBase {
         }
         push.sendServerPushInfo(
             sc,
-            new PushPageMessage("SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.", true)
+            new PushPageMessage(
+                "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.",
+                true,
+                "note"
+            )
         );
     }
 
