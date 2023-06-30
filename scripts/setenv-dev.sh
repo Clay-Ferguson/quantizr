@@ -14,10 +14,10 @@ source ./define-functions-dev.sh
 
 export WEBPACK_SCRIPT=build-dev
 export SASS_SCRIPT=sass-dev
-export DOCKER_IMAGE=quanta-dev-${QUANTA_VER}
+export DOCKER_IMAGE=quanta-dev
 
 # tserver-tag
-export TSERVER_IMAGE=tserver-dev-${QUANTA_VER}
+export TSERVER_IMAGE=tserver-dev
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 

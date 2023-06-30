@@ -46,10 +46,12 @@ https://codenotary.com/blog/extremely-useful-docker-commands
 
 First stop everything:
 
+    docker stack ls
+
     docker stack rm quanta-stack-local
     docker stack rm quanta-stack-dev
 
-Stop all images (shold be unnecessary, since we just stopped everything)
+Stop all images
 
     docker stop $(docker ps -a -q) 
 

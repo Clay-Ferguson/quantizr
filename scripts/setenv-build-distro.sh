@@ -12,10 +12,10 @@ export PRJPARENT=$(dirname "$PRJROOT")
 export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 
-export DOCKER_IMAGE=quanta-${QUANTA_VER}
+export DOCKER_IMAGE=quanta
 
 # tserver-tag
-export TSERVER_IMAGE=tserver-${QUANTA_VER}
+export TSERVER_IMAGE=tserver
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 
