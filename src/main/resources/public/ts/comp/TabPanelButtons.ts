@@ -64,7 +64,7 @@ export class TabPanelButtons extends Div {
         }, [
             new Anchor("#" + data.id, tabName, {
                 "data-bs-toggle": "tab",
-                className: "nav-link appNavTab" + (ast.activeTab === data.id ? " active" : ""),
+                className: "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : ""),
                 title: data.tooltip
             })
         ]);

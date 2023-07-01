@@ -40,7 +40,7 @@ export class NodeCompMainNode extends Div {
         if (ast.nodesToMove && ast.nodesToMove.find(id => id === node.id)) {
             this.setChildren([new Div("You've cut this node. Navigate to another folder to paste it.", { className: "pageNodeCutMessage" })]);
             return true;
-        } 
+        }
 
         if (!node) {
             this.setChildren(null);
@@ -54,7 +54,7 @@ export class NodeCompMainNode extends Div {
         else {
             const focusNode = S.nodeUtil.getHighlightedNode();
             const selected: boolean = (focusNode && focusNode.id === node.id);
-            this.attribs.className = selected ? "activeRowMain" : "inactiveRowMain";
+            this.attribs.className = (selected ? "activeRowMain" : "inactiveRowMain") + " ui-tree-node-top";
             if (!selected && node.id == ast.indexHighlightNode) {
                 this.attribs.className = "docNodeHighlight";
             }

@@ -29,7 +29,7 @@
     border: 2px solid yellow;
     background-color: $modal-content-bg;
     z-index: 16000010;
-    padding: $tinyGap;
+    padding: $tinyGap 0 $tinyGap $tinyGap;
     border-radius: 6px;
 
     // We have to set a fixed height here so that the scrollbars and main

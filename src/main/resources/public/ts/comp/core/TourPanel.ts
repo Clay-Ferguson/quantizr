@@ -23,7 +23,7 @@ export class TourPanel extends Div {
 
         let stepMsg = tour.steps[tour.curStep].name;
         if (tour.curStep < tour.steps.length - 1) {
-            stepMsg += ", then `Next Step`";
+            stepMsg += " Then click `Next Step`";
         }
         children.push(new Span("Step " + (tour.curStep + 1) + "/" + tour.steps.length + ": " + //
             stepMsg, { className: "guidedTourInstructions" }));
