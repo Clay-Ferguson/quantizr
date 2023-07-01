@@ -16,7 +16,7 @@ interface LS { // Local State
 export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null,
-        private treeOp: boolean = null) {
+        private treeOp: boolean = null, private moreClasses: string = "") {
         super(name);
         this.onClick = this.onClick.bind(this);
         this.mergeState({ visible: true, enabled });
@@ -34,11 +34,11 @@ export class MenuItem extends Div {
                 setValue: (checked: boolean) => this.onClick(),
                 getValue: (): boolean => this.stateFunc()
             });
-            innerClazz = "listGroupMenuItemCompact";
+            innerClazz = "listGroupMenuItemCompact " + this.moreClasses;
         }
         else {
             innerSpan = new Span(state.content);
-            innerClazz = "listGroupMenuItem";
+            innerClazz = "listGroupMenuItem " + this.moreClasses;
         }
 
         this.setChildren([
@@ -55,7 +55,7 @@ export class MenuItem extends Div {
             ...{
                 style: { display: (state.visible ? "" : "none") },
                 className: innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
-                    (getAs().mobileMode ? " mobileMenuText" : ""),
+                    (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 onClick: this.onClick
             }
         });

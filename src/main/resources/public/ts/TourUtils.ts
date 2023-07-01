@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "./AppContext";
+import { getAs } from "./AppContext";
 import { Tour } from "./Tour";
 import { TourStep } from "./TourStep";
 
@@ -10,16 +10,18 @@ export class TourUtils {
         this.tours = [
             new Tour("Create a New Node", [
                 new TourStep("Click `My Account` to go to your Account Root", ".ui-my-account"),
-                new TourStep("Click the Plus Button to create a new under your account root", ".ui-new-node-plus-top"),
-                new TourStep("Type some content and click Save", ".ui-editor-save"),
-                new TourStep("If you want to Edit the Node again, click the Edit Button", ".ui-edit-node")
+                new TourStep("Open `Options` Menu", ".ui-menu-options"),
+                new TourStep("Ensure that `Edit Mode` is turned on", ".ui-menu-options-editmode"),
+                new TourStep("Click the `Plus Button` to create a new Node under your account root", ".ui-new-node-plus-top"),
+                new TourStep("Type some content and click `Save`", ".ui-editor-save"),
+                new TourStep("If you want to Edit the Node again, click the `Edit` Button", ".ui-edit-node")
             ]),
             new Tour("Make a Node Public", [
                 new TourStep("Click `My Account` to go to your Account Root", ".ui-my-account"),
                 new TourStep("Click edit button on the node you want to share", ".ui-edit-node"),
-                new TourStep("Click the Sharing button", ".ui-editor-share"),
-                new TourStep("Click the Make Public button", ".ui-share-make-public"),
-                new TourStep("Click Done to exit the Sharing Dialog", ".ui-sharing-done"),
+                new TourStep("Click the `Sharing` button", ".ui-editor-share"),
+                new TourStep("Click the `Make Public` button", ".ui-share-make-public"),
+                new TourStep("Click Done to exit the `Sharing Dialog`", ".ui-sharing-done"),
                 new TourStep("Click Save to exit the Node Editor", ".ui-editor-save"),
             ])
         ];
@@ -38,19 +40,24 @@ export class TourUtils {
                 }
                 else {
                     for (let i = 0; i < elms.length; i++) {
+                        console.log("Class Found: " + elms[i].id);
                         elms[i].classList.add("tourHighlight");
 
-                        // For now let's advance to next step automatically, although this may not necessarily
-                        // always work.
-                        elms[i].addEventListener("click", () => {
-                            setTimeout(() => {
-                                dispatch("AdvanceTourStep", s => {
-                                    if (s.tour && s.tour.curStep < s.tour.steps.length - 1) {
-                                        s.tour.curStep++;
-                                    }
-                                });
-                            }, 1000);
-                        });
+                        // TODO: This will be more challenging, because we might need to allow the user to make
+                        // multiple clicks to reach that desired 'state' to move forward, so let's require
+                        // a manual click of the "Next Step" button for now.
+                        //
+                        // // Advancees to next step automatically, although this may not necessarily
+                        // // always work.
+                        // elms[i].addEventListener("click", () => {
+                        //     setTimeout(() => {
+                        //         dispatch("AdvanceTourStep", s => {
+                        //             if (s.tour && s.tour.curStep < s.tour.steps.length - 1) {
+                        //                 s.tour.curStep++;
+                        //             }
+                        //         });
+                        //     }, 1000);
+                        // });
                     }
                 }
             }

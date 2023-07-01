@@ -18,7 +18,7 @@ export class TabPanel extends Div {
         }
         else {
             const panelCols = ast.userPrefs.mainPanelCols || 6;
-            this.attribs.className = "col-" + panelCols + " tabPanel";
+            this.attribs.className = "col-" + panelCols + " tabPanel" + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
     }
 

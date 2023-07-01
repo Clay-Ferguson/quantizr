@@ -11,6 +11,8 @@ rhsAnonLinks:
     link: ":home"
   - name: "Explore Features"
     link: ":features"
+  - name: "User Guide"
+    link: ":user-guide"
 
 # These links will show up under MAIN section
 # rhsLinks:

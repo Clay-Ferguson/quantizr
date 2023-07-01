@@ -1,9 +1,24 @@
+.appColumn {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.appColumnTourActive {
+    height: 100%;
+    margin: 0;
+    padding: 0 0 $tourPanelHeight 0;
+    overflow: hidden;
+}
+
 .guidedTourHeading {
     margin-right: $smallGap;
     margin-top: $smallGap;
     font-size: 150%;
     font-weight: bold;
     padding: $tinyGap;
+    color: yellow;
 }
 
 .guidedTourInstructions {
@@ -14,21 +29,118 @@
     border: 2px solid yellow;
     background-color: $modal-content-bg;
     z-index: 16000010;
-    padding: $smallGap;
+    padding: $tinyGap;
+    border-radius: 6px;
+
+    // We have to set a fixed height here so that the scrollbars and main
+    // app column heights can adjust a bottom padding and not clip content
+    height: $tourPanelHeight;
+    max-height: $tourPanelHeight;
+    overflow-y: scroll;
 }
 
 .tourHighlight {
-    border-width: 4px !important;
-    border-color: yellow;
-    border-style: solid;
+    position: relative;
+}
 
+// ==============
+/* top line */
+// .tourHighlight::before {
+//   content:'';
+//   position: absolute;
+//   background-color: pink;
+//   width: 30%;
+//   height: 3px;
+//   top: 0;
+//   left:0;
+// }
+
+/* bottom line */
+.tourHighlight::after {
+    content: '';
+    position: absolute;
+    background-color: yellow;
+    width: 100%;
+    height: 8px;
+    bottom: -8px;
+    left: 0;
     animation: blink 1s;
     animation-iteration-count: infinite;
 }
 
+/* left line before text*/
+// .tourHighlight::before {
+//     content: '';
+//     position: absolute;
+//     background-color: yellow;
+//     width: 8px;
+//     height: 100%;
+//     bottom: 0;
+//     left: -8px;
+//     animation: blink 1s;
+//     animation-iteration-count: infinite;
+// }
+
+// /* left line after text*/
+// .left-and-right::after {
+//     content: '';
+//     position: absolute;
+//     background-color: #85C1E9;
+//     width: 3px;
+//     height: 90%;
+//     bottom: 0;
+//     right: 55px;
+// }
+
+// /* vertical line */
+// .corner-border::after {
+//     content: '';
+//     position: absolute;
+//     background-color: pink;
+//     width: 3px;
+//     height: 60%;
+//     top: 0;
+//     left: -15px;
+// }
+
+// /* horizontal line */
+// .corner-border::before {
+//     content: '';
+//     position: absolute;
+//     background-color: pink;
+//     width: 20%;
+//     height: 3px;
+//     top: 0;
+//     left: -12px;
+// }
+
+// /* vertical line */
+// .bottom-corner::after {
+//     content: '';
+//     position: absolute;
+//     background-color: #85C1E9;
+//     width: 3px;
+//     height: 50%;
+//     bottom: 0;
+//     right: 45px;
+// }
+
+// /* horizontal line */
+// .bottom-corner::before {
+//     content: '';
+//     position: absolute;
+//     background-color: #85C1E9;
+//     width: 20%;
+//     height: 3px;
+//     bottom: 0;
+//     right: 45px;
+// }
+
+/////////
+
 @keyframes blink {
     50% {
-        border-color: transparent;
+        background-color: transparent;
     }
 }
 

@@ -7,7 +7,7 @@ import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
 
 export class Menu extends Comp {
-    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null) {
+    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null, private moreClasses: string = "") {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
@@ -17,7 +17,7 @@ export class Menu extends Comp {
 
         this.setChildren([
             new Div(this.name, {
-                className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (ast.mobileMode ? " mobileMenuText" : ""),
+                className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 id: this.getId("heading"),
                 onClick: () => {
                     asyncDispatch("ToggleExpansion", s => S.nav.changeMenuExpansion(s, "toggle", this.name));

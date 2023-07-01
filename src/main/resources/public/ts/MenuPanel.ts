@@ -223,27 +223,15 @@ export class MenuPanel extends Div {
         const fullScreenViewer = S.util.fullscreenViewerActive();
 
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
-            ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, () => getAs().userPrefs.editMode),
+            ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
+                () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
-        ]));
+        ], null, null, "ui-menu-options"));
 
         children.push(new Menu(C.PROTOCOL_MENU_TEXT, [
             new MenuItem("Nostr", () => S.util.setProtocol(J.Constant.NETWORK_NOSTR), true, () => getAs().protocolFilter == J.Constant.NETWORK_NOSTR),
             new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
         ]));
-
-        if (!ast.mobileMode && S.tourUtils) {
-            S.tourUtils.init();
-            const tourItems = [];
-            S.tourUtils.tours.forEach(tour => {
-                tourItems.push(new MenuItem(tour.name, () => {
-                    dispatch("SetTour", s => s.tour = tour);
-                }, true, null));
-            });
-            if (tourItems.length > 0) {
-                children.push(new Menu("Guided Tours", tourItems, null));
-            }
-        }
 
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
@@ -282,7 +270,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Exports", MenuPanel.openExportsNode),
                 systemFolderLinks.length > 0 ? new MenuItemSeparator() : null,
                 ...systemFolderLinks
-            ], null));
+            ], null, null, "ui-menu-folders"));
         }
 
         if (!ast.isAnonUser) {
@@ -484,6 +472,19 @@ export class MenuPanel extends Div {
                 new MenuItem("Profile", MenuPanel.userProfile),
                 new MenuItem("Settings", S.nav.showUserSettings)
             ]));
+
+            if (!ast.mobileMode && S.tourUtils) {
+                S.tourUtils.init();
+                const tourItems = [];
+                S.tourUtils.tours.forEach(tour => {
+                    tourItems.push(new MenuItem(tour.name, () => {
+                        dispatch("SetTour", s => s.tour = tour);
+                    }, true, null));
+                });
+                if (tourItems.length > 0) {
+                    children.push(new Menu("Guided Tours", tourItems, null));
+                }
+            }
         }
 
         // //need to make export safe for end users to use (regarding file sizes)

@@ -38,7 +38,7 @@ export class LeftNavPanel extends Div {
             leftCols--;
         }
 
-        this.attribs.className = "col-" + leftCols + " leftNavPanel customScrollbar";
+        this.attribs.className = "col-" + leftCols + (ast.tour ? " appColumnTourActive" : " appColumn");
         LeftNavPanel.inst = this;
     }
 
@@ -97,45 +97,47 @@ export class LeftNavPanel extends Div {
         }
 
         this.setChildren([
-            new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
-                new Img({
-                    className: "leftNavLogoImg",
-                    src: "/branding/logo-50px-tr.jpg",
-                    onClick: S.util.loadAnonPageHome,
-                    title: "Go to Portal Home Node"
-                }),
+            new Div(null, { className: "leftNavPanel customScrollbar" }, [
+                new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
+                    new Img({
+                        className: "leftNavLogoImg",
+                        src: "/branding/logo-50px-tr.jpg",
+                        onClick: S.util.loadAnonPageHome,
+                        title: "Go to Portal Home Node"
+                    }),
 
-                // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
-                // which is in a different class.
-                new Span(null, { className: "float-end" }, [
-                    ast.nostrQueryRunning ? new Span("Waiting for Nostr...", {
-                        className: "nostrWaitNote"
-                    }) : null,
-                    myMessages && !nostrMessages ? new Span(myMessages, {
-                        className: "newMessagesNote",
-                        onClick: S.nav.showMyNewMessages,
-                        title: "Show your new messages"
-                    }) : null,
-                    nostrMessages ? new Span(nostrMessages, {
-                        className: "newNostrMessagesNote",
-                        onClick: S.srch.refreshFeed,
-                        title: "Show new Nostr messages"
-                    }) : null,
-                    ast.userName && ast.isAnonUser ? new Icon({
-                        className: "fa fa-bars fa-2x clickable",
-                        onClick: () => {
-                            dispatch("ToggleLHS", s => {
-                                s.anonShowLHSMenu = !s.anonShowLHSMenu;
-                            })
-                        },
-                        title: "Show Menu"
-                    }) : null
-                ])
-            ]),
-            ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
-            docIndexToggle,
-            showDocIndex ? new DocIndexPanel() : null,
-            showDocIndex ? null : new MenuPanel(),
+                    // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
+                    // which is in a different class.
+                    new Span(null, { className: "float-end" }, [
+                        ast.nostrQueryRunning ? new Span("Waiting for Nostr...", {
+                            className: "nostrWaitNote"
+                        }) : null,
+                        myMessages && !nostrMessages ? new Span(myMessages, {
+                            className: "newMessagesNote",
+                            onClick: S.nav.showMyNewMessages,
+                            title: "Show your new messages"
+                        }) : null,
+                        nostrMessages ? new Span(nostrMessages, {
+                            className: "newNostrMessagesNote",
+                            onClick: S.srch.refreshFeed,
+                            title: "Show new Nostr messages"
+                        }) : null,
+                        ast.userName && ast.isAnonUser ? new Icon({
+                            className: "fa fa-bars fa-2x clickable",
+                            onClick: () => {
+                                dispatch("ToggleLHS", s => {
+                                    s.anonShowLHSMenu = !s.anonShowLHSMenu;
+                                })
+                            },
+                            title: "Show Menu"
+                        }) : null
+                    ])
+                ]),
+                ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+                docIndexToggle,
+                showDocIndex ? new DocIndexPanel() : null,
+                showDocIndex ? null : new MenuPanel()
+            ])
         ]);
         return true;
     }

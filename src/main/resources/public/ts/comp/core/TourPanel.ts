@@ -16,19 +16,30 @@ export class TourPanel extends Div {
         const children = [];
         const ast = getAs();
         const tour = ast.tour;
+
         if (!tour) return false;
+
+        children.push(new Span("Tour: " + tour.name, { className: "guidedTourHeading" }));
+
+        let stepMsg = tour.steps[tour.curStep].name;
+        if (tour.curStep < tour.steps.length - 1) {
+            stepMsg += ", then `Next Step`";
+        }
+        children.push(new Span("Step " + (tour.curStep + 1) + "/" + tour.steps.length + ": " + //
+            stepMsg, { className: "guidedTourInstructions" }));
+
         children.push(new ButtonBar([
             tour.curStep > 0 ?
-                new Button("Restart Tour", () => {
+                new Button("Restart", () => {
                     dispatch("PrevTourStep", s => {
                         s.tour.curStep = 0;
                     });
                 }) : null,
-            new Button(tour.curStep < tour.steps.length - 1 ? "Cancel Tour" : "I'm Finished", () => {
+            tour.curStep < tour.steps.length - 1 ? new Button("Cancel", () => {
                 dispatch("PrevTourStep", s => {
                     s.tour = null;
                 });
-            }),
+            }) : null,
             tour.curStep > 0 ?
                 new Button("Previous Step", () => {
                     dispatch("PrevTourStep", s => {
@@ -40,11 +51,18 @@ export class TourPanel extends Div {
                     dispatch("NextTourStep", s => {
                         s.tour.curStep++;
                     });
-                }, null /* { className: "tourHighlight" } */, "btn-primary") : null,
+                }, null, "btn-primary") : null,
+            tour.curStep >= tour.steps.length - 1 ? new Button("Finished!", () => {
+                dispatch("PrevTourStep", s => {
+                    s.tour = null;
+                })
+            }) : null
         ], "float-end"));
-        children.push(new Span("Tour: " + tour.name, { className: "guidedTourHeading" }));
-        children.push(new Span("Step " + (tour.curStep + 1) + "/" + tour.steps.length + ": " + //
-            tour.steps[tour.curStep].name, { className: "guidedTourInstructions" }));
+
+
+        if (ast.isAdminUser && tour.expectsLogin) {
+            children.push(new Div("WARNING: This tour expects you to be logged in, for all steps to work.", { className: "alert alert-info" }));
+        }
 
         this.setChildren(children);
         return true;

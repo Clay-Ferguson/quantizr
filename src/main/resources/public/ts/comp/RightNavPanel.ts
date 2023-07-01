@@ -55,7 +55,7 @@ export class RightNavPanel extends Div {
             if (panelCols >= 8) {
                 rightCols--;
             }
-            this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
+            this.attribs.className = "col-" + rightCols + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
 
         const avatarImg = this.makeRHSAvatarDiv();
@@ -154,40 +154,42 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         this.setChildren([
-            new Divc({ className: "float-left" }, [
-                new FlexRowLayout([
-                    avatarImg,
-                    new Diva([
-                        new Divc({ className: "marginBottom" }, [
-                            !ast.isAnonUser ? new Span(displayName, {
-                                className: "clickable marginRight",
-                                onClick: () => {
-                                    PubSub.pub(C.PUBSUB_closeNavPanel);
-                                    new UserProfileDlg(null).open();
-                                }
-                            }) : null,
+            new Div(null, { className: "rightNavPanel customScrollbar" }, [
+                new Divc({ className: "float-left" }, [
+                    new FlexRowLayout([
+                        avatarImg,
+                        new Diva([
+                            new Divc({ className: "marginBottom" }, [
+                                !ast.isAnonUser ? new Span(displayName, {
+                                    className: "clickable marginRight",
+                                    onClick: () => {
+                                        PubSub.pub(C.PUBSUB_closeNavPanel);
+                                        new UserProfileDlg(null).open();
+                                    }
+                                }) : null,
+                            ]),
+                            loginSignupDiv,
                         ]),
-                        loginSignupDiv,
-                    ]),
-                    new Divc({ className: "flexFloatRight" }, [
-                        textToSpeech,
-                        clipboardPasteButton,
-                        addNoteButton
-                    ]),
-                ], "fullWidth"),
-                // new Divc({ className: "marginBottom" }, [
-                //     new ButtonBar([
-                //         clipboardPasteButton,
-                //         addNoteButton,
-                //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                //             title: "Go to your Account Root Node",
-                //             onClick: e => S.nav.navHome(state)
-                //         }) : null
-                //     ])
-                // ]),
-                !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+                        new Divc({ className: "flexFloatRight" }, [
+                            textToSpeech,
+                            clipboardPasteButton,
+                            addNoteButton
+                        ]),
+                    ], "fullWidth"),
+                    // new Divc({ className: "marginBottom" }, [
+                    //     new ButtonBar([
+                    //         clipboardPasteButton,
+                    //         addNoteButton,
+                    //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+                    //             title: "Go to your Account Root Node",
+                    //             onClick: e => S.nav.navHome(state)
+                    //         }) : null
+                    //     ])
+                    // ]),
+                    !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
 
-                ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
+                    ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
+                ])
             ])
         ]);
         return true;
