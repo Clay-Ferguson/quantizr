@@ -12,7 +12,7 @@
 # EXPOSE ${TSERVER_PORT}
 # CMD ["npm", "start"]
 
-FROM node:18
+FROM node:18-alpine
 WORKDIR /home/node/app
 COPY package.json ./
 COPY . .
