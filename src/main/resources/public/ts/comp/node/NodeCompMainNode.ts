@@ -55,9 +55,6 @@ export class NodeCompMainNode extends Div {
             const focusNode = S.nodeUtil.getHighlightedNode();
             const selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = (selected ? "activeRowMain" : "inactiveRowMain") + " ui-tree-node-top";
-            if (!selected && node.id == ast.indexHighlightNode) {
-                this.attribs.className = "docNodeHighlight";
-            }
 
             if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
                 S.render.fadeInId = null;

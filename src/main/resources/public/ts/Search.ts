@@ -583,6 +583,11 @@ export class Search {
         if (!node) return;
         const prefix = tabData.id;
 
+        if (node.id == getAs().indexHighlightNode) {
+            outterClassHighlight = outterClassHighlight || "";
+            outterClassHighlight += " docNodeHighlight";
+        }
+
         // render with info bar, etc always, if this is a threaview or freed tab.
         const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED || tabData.id === C.TAB_REPLIES;
         if (isFeed && allowFooter) {
@@ -668,10 +673,6 @@ export class Search {
         if (extraStyle) {
             // I have a feeling this code is dead. check it. todo-1
             attrs.style = extraStyle;
-        }
-
-        if (node.id == ast.indexHighlightNode) {
-            attrs.className += " docNodeHighlight";
         }
 
         // special case, if node is owned by admin and we're not admin, never show header, unless the ALLOW flag is true

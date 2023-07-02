@@ -149,12 +149,7 @@ export class NodeCompRow extends Div {
                 selectionClass = " activeRow";
             }
             else {
-                if (this.node.id == ast.indexHighlightNode) {
-                    selectionClass = " docNodeHighlight";
-                }
-                else {
-                    selectionClass = " inactiveRow";
-                }
+                selectionClass = " inactiveRow";
             }
             this.attribs.className = (layoutClass || "") + selectionClass;
             const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;

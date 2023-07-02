@@ -41,7 +41,7 @@ export class TourPanel extends Div {
                 });
             }) : null,
             tour.curStep > 0 ?
-                new Button("Previous Step", () => {
+                new Button("Go Back", () => {
                     dispatch("PrevTourStep", s => {
                         s.tour.curStep--;
                     });
@@ -61,7 +61,7 @@ export class TourPanel extends Div {
 
 
         if (ast.isAnonUser && tour.expectsLogin) {
-            children.push(new Div("WARNING: This tour requires you to be logged in, for all steps to work."));
+            children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "bigMarginLeft marginTop" }));
         }
 
         this.setChildren(children);

@@ -39,8 +39,6 @@ public class RssFeedType extends TypeBase {
             } else {
                 if (lineSet.add(tok)) {
                     sb.append(tok);
-                } else {
-                    sb.append("# duplicate -> " + tok);
                 }
             }
         }

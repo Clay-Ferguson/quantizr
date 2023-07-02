@@ -29,14 +29,12 @@
     border: 2px solid yellow;
     background-color: $modal-content-bg;
     z-index: 16000010;
-    padding: $tinyGap 0 $tinyGap $tinyGap;
-    border-radius: 6px;
+    padding: $tinyGap;
 
     // We have to set a fixed height here so that the scrollbars and main
     // app column heights can adjust a bottom padding and not clip content
     height: $tourPanelHeight;
     max-height: $tourPanelHeight;
-    overflow-y: scroll;
 }
 
 .tourHighlight {

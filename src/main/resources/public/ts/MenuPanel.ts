@@ -472,18 +472,18 @@ export class MenuPanel extends Div {
                 new MenuItem("Profile", MenuPanel.userProfile),
                 new MenuItem("Settings", S.nav.showUserSettings)
             ]));
+        }
 
-            if (!ast.mobileMode && S.tourUtils) {
-                S.tourUtils.init();
-                const tourItems = [];
-                S.tourUtils.tours.forEach(tour => {
-                    tourItems.push(new MenuItem(tour.name, () => {
-                        dispatch("SetTour", s => s.tour = tour);
-                    }, true, null));
-                });
-                if (tourItems.length > 0) {
-                    children.push(new Menu("Guided Tours", tourItems, null));
-                }
+        if (!ast.mobileMode && S.tourUtils) {
+            S.tourUtils.init();
+            const tourItems = [];
+            S.tourUtils.tours.forEach(tour => {
+                tourItems.push(new MenuItem(tour.name, () => {
+                    dispatch("SetTour", s => s.tour = tour);
+                }, true, null));
+            });
+            if (tourItems.length > 0) {
+                children.push(new Menu("Guided Tours", tourItems, null));
             }
         }
 

@@ -18,7 +18,7 @@ export class View {
         await promiseDispatch("highlightNode", s => s.indexHighlightNode = id);
         const activeTab = S.tabUtil.getActiveTabComp();
         if (activeTab) {
-            if (activeTab.scrollToNode(id, true)) {
+            if (activeTab.scrollToNode(id)) {
                 return;
             }
         }

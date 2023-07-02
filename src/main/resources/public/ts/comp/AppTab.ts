@@ -38,14 +38,11 @@ export class AppTab<PT = any, TT = any> extends Div {
         this.data.scrollPos = pos;
     }
 
-    scrollToNode = (nodeId: string, highlight: boolean = false): boolean => {
+    scrollToNode = (nodeId: string): boolean => {
         if (!nodeId) return;
         const domId = S.tabUtil.makeDomIdForNode(this.data, nodeId);
         const elm = S.domUtil.domElm(domId);
         if (elm) {
-            if (highlight) {
-                elm.classList.add("docNodeHighlight");
-            }
             this.scrollToElm(elm);
             return true;
         }
