@@ -1,5 +1,20 @@
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 
+.adminButton {
+    font-size: 120%;
+    font-weight: bold;
+    color: var(--bs-green);
+    border-bottom: 2px solid var(--bs-green);
+    cursor: pointer;
+}
+
+.hrefLink {
+    font-size: 120%;
+    font-weight: bold;
+    color: var(--bs-green);
+    cursor: pointer;
+}
+
 .menuButton {
     padding: 12px 16px 12px 16px;
 }

@@ -27,8 +27,8 @@ export class Constants {
     static ID_RHS = "rightNavPanelId";
     static ID_MENU = "appMainMenuPanelId";
 
-    static ADMIN_COMMAND_FEDIVERSE = "{{FederatedFeedButton}}";
-    static ADMIN_COMMAND_TRENDING = "{{TrendingHashtagsButton}}";
+    static ADMIN_COMMAND_FEDIVERSE = "fediverse";
+    static ADMIN_COMMAND_TRENDING = "trending";
 
     // WARNING: These must be able to be prefixes on class names.
     static TAB_MAIN: string = "mainRS";

@@ -136,15 +136,15 @@ export class Render {
     }
 
     injectCustomButtons = (val: string): string => {
-        val = this.injectAdminButton(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse Feed");
-        val = this.injectAdminButton(val, C.ADMIN_COMMAND_TRENDING, "Trending Hashtags");
+        val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");
+        val = this.injectAdminLink(val, C.ADMIN_COMMAND_TRENDING, "Trending");
         return val;
     }
 
-    injectAdminButton = (val: string, cmd: string, buttonText: string) => {
+    injectAdminLink = (val: string, cmd: string, buttonText: string) => {
         // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
         const script = "S.util.adminScriptCommand('" + cmd + "');";
-        return val.replace(cmd, `<button class="btn btn-primary marginRight" onClick="${script}">${buttonText}</button>`);
+        return val.replace("{{" + cmd + "}}", `<span class="adminButton" onClick="${script}">${buttonText}</span>`);
     }
 
     /**
@@ -177,11 +177,21 @@ export class Render {
                 return `<span class="userNameInContent">${text}</span>`;
             }
 
-            if (title) {
-                return `<a href="${href}" title="${title}" target="_blank">${text}</a>`;
+            if (href.toLowerCase().startsWith("http")) {
+                if (title) {
+                    return `<a class="hrefLink" href="${href}" title="${title}" target="_blank">${text}</a>`;
+                }
+                else {
+                    return `<a class="hrefLink" href="${href}" target="_blank">${text}</a>`;
+                }
             }
             else {
-                return `<a href="${href}" target="_blank">${text}</a>`;
+                if (title) {
+                    return `<a class="hrefLink" href="${href}" title="${title}">${text}</a>`;
+                }
+                else {
+                    return `<a class="hrefLink" href="${href}">${text}</a>`;
+                }
             }
         };
 
