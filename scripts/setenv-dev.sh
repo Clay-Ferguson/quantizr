@@ -1,9 +1,11 @@
 #!/bin/bash
 
-THIS_FILE=$(readlink -f "$0")
-THIS_FOLDER=$(dirname "$THIS_FILE")
-export PRJROOT=$(dirname "$THIS_FOLDER")
+FILE=$(readlink -f "$BASH_SOURCE")
+FOLDER=$(dirname "$FILE")
+
+export PRJROOT=$(dirname "$FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
+
 source ./set-version.sh
 
 # Defines some reusable functions that are common to many of these scripts

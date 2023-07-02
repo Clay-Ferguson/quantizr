@@ -18,12 +18,12 @@ source ./setenv-run-distro.sh
 
 ./stop-distro.sh
 
-if [ -f "quanta.tar" ]; then
-    docker load -i quanta.tar
+if [ -f "quanta-${QUANTA_VER}.tar" ]; then
+    docker load -i quanta-${QUANTA_VER}.tar
 fi
 
-if [ -f "tserver.tar" ]; then
-    docker load -i tserver.tar
+if [ -f "tserver-${QUANTA_VER}.tar" ]; then
+    docker load -i tserver-${QUANTA_VER}.tar
 fi
 
 # take ownership of this directory as current user

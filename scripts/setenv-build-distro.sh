@@ -4,9 +4,10 @@
 
 source ./set-version.sh
 source ./define-functions.sh
-THIS_FILE=$(readlink -f "$0")
-THIS_FOLDER=$(dirname "$THIS_FILE")
-export PRJROOT=$(dirname "$THIS_FOLDER")
+
+FILE=$(readlink -f "$BASH_SOURCE")
+FOLDER=$(dirname "$FILE")
+export PRJROOT=$(dirname "$FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
 export WEBPACK_SCRIPT=build-prod

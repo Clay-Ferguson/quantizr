@@ -1,13 +1,13 @@
 #!/bin/bash
 
-THIS_FILE=$(readlink -f "$0")
-THIS_FOLDER=$(dirname "$THIS_FILE")
+FILE=$(readlink -f "$BASH_SOURCE")
+FOLDER=$(dirname "$FILE")
 
-cd ${THIS_FOLDER}/../src/main/resources/public
+cd ${FOLDER}/../src/main/resources/public
 yarn cache clean
 npm cache clean --force
 
-cd ${THIS_FOLDER}/../src/main/resources/server
+cd ${FOLDER}/../src/main/resources/server
 yarn cache clean
 npm cache clean --force
 

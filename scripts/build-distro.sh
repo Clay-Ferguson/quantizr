@@ -13,8 +13,6 @@ clear
 # Set all environment variables
 source ./setenv-build-distro.sh
 checkFunctions
-THIS_FILE=$(readlink -f "$0")
-THIS_FOLDER=$(dirname "$THIS_FILE")
 
 sudo rm -r ${DEPLOY_TARGET}
 
