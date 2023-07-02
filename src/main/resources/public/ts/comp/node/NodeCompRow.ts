@@ -171,7 +171,7 @@ export class NodeCompRow extends Div {
             // show orphans on the page when something is deleted. Other panels don't have this problem
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(null, this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
+            header = new NodeCompRowHeader(null, this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
@@ -196,7 +196,7 @@ export class NodeCompRow extends Div {
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,
-            new NodeCompContent(this.node, this.tabData, true, true, null, null, true, this.isLinkedNode, null),
+            new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, this.isLinkedNode, null),
             this.internalComp,
             S.render.renderLinks(this.node),
             this.allowHeaders ? new NodeCompRowFooter(this.node) : null,

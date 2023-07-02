@@ -622,7 +622,7 @@ export class Search {
                 },
                 className: "boostRowOnFeed"
             }, [
-                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
+                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete, tabData.id) : null,
                 allowHeader ? new Clearfix() : null,
                 boostContent,
                 allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
@@ -682,7 +682,7 @@ export class Search {
 
         const itemDiv = new Divc(attrs, [
             S.render.renderBoostHeader(node, false),
-            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete) : null,
+            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete, tabData.id) : null,
             allowHeader && !node.boostedNode ? new Clearfix() : null,
             content,
             boostComp,

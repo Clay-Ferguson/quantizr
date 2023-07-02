@@ -13,6 +13,7 @@ import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Button } from "../core/Button";
 import { Divc } from "../core/Divc";
+import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
 
@@ -20,7 +21,7 @@ export class NodeCompRowHeader extends Div {
     // node boostingNode as the top/outter level and the 'node' will be the actual node that got boosted by 'boostingNode'
     constructor(private boostingNode: J.NodeInfo, private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
-        private isBoost: boolean, private allowDelete: boolean) {
+        private isBoost: boolean, private allowDelete: boolean, private prefix: string) {
         super(null);
 
         const ast = getAs();
@@ -247,7 +248,7 @@ export class NodeCompRowHeader extends Div {
             // Don't try to read Foreign server content (by checking actPubId to detect remote)
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
-            if (!actPubId && !ast.isAnonUser && allowWideViewIcons) {
+            if (!ast.isAnonUser && allowWideViewIcons) {
                 children.push(new Icon({
                     className: "fa fa-lg fa-volume-up rowHeaderIcon",
                     onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
@@ -257,7 +258,12 @@ export class NodeCompRowHeader extends Div {
                             await S.speech.stopSpeaking();
                         }
                         else if (this.node.content) {
-                            S.speech.speakText(this.node.content, false);
+                            const id = NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
+                            // console.log("Speaking DOM ID: " + id);
+                            const elm = document.getElementById(id);
+                            if (elm) {
+                                S.speech.speakText(elm.textContent, false);
+                            }
                         }
                     },
                     title: "Text-to-Speech: Read this Node"

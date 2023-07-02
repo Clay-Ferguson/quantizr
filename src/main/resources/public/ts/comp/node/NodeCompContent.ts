@@ -15,6 +15,7 @@ import { NodeCompBinary } from "./NodeCompBinary";
 
 export class NodeCompContent extends Div {
     domPreUpdateFunc: Function;
+    static PRE_PREFIX = "nc_";
 
     constructor(public node: J.NodeInfo,
         public tabData: TabIntf<any>,
@@ -32,7 +33,8 @@ export class NodeCompContent extends Div {
         }
 
         super(null, {
-            id: (idPrefix ? idPrefix : "n") + node?.id,
+            // nc_ == Node Content (prefix+id will be the ENTIRE row Dom ID)
+            id: NodeCompContent.PRE_PREFIX + idPrefix + node?.id,
             className: wrapperClass
         });
     }

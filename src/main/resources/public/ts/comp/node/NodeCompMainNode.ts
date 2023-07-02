@@ -82,8 +82,7 @@ export class NodeCompMainNode extends Div {
             if (allowHeader && !node.boostedNode) {
                 const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
                 const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-
-                header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete);
+                header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id);
             }
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
@@ -116,7 +115,7 @@ export class NodeCompMainNode extends Div {
                 buttonBar,
                 new Clearfix(),
                 jumpButton,
-                new NodeCompContent(node, this.tabData, false, true, null, null, true, false, null),
+                new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, false, null),
                 boostComp,
                 S.render.renderLinks(node),
                 new NodeCompRowFooter(node),
