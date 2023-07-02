@@ -694,6 +694,14 @@ export class Render {
         }
     }
 
+    newUserAccountTips = (): Div => {
+        return new Div(null, { className: "bigMargin alert alert-info" }, [
+            new Div("Looks like you haven't created any content yet.", { className: "bigMarginBottom" }),
+            new Div("Tip #1: Click `Menu -> Guided Tours -> Create a New Node` to learn how."),
+            new Div("Tip #2: Click `Menu -> Account -> Profile` to upload your Avatar image, add a bio, etc.")
+        ]);
+    }
+
     renderBoostHeader = (node: J.NodeInfo, treeRender: boolean) => {
         if (!node.boostedNode) return null;
         let displayName = null;

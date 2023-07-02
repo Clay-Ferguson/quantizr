@@ -19,7 +19,8 @@ import { MainTab } from "./tabs/data/MainTab";
 import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
 
 export class Edit {
-    showReadOnlyProperties: boolean = false;
+    showReadOnlyProperties = false;
+    helpNewUserEditCalled = false;
 
     editHashtags = async () => {
         const dlg = new EditTagsDlg();
@@ -1429,5 +1430,20 @@ export class Edit {
 
     updateNode = (node: J.NodeInfo) => {
         dispatch("UpdateNode", s => s.editNode = node);
+    }
+
+    helpNewUserEdit = () => {
+        let ast = getAs();
+        if (this.helpNewUserEditCalled) return;
+        this.helpNewUserEditCalled = true;
+        if (ast.userPrefs.editMode && ast.userPrefs.showMetaData) return;
+
+        setTimeout(() => {
+            S.edit.setUserPreferenceVal(s => {
+                S.nav.changeMenuExpansion(s, "expand", C.OPTIONS_MENU_TEXT);
+                s.userPrefs.editMode = true;
+                s.userPrefs.showMetaData = true;
+            });
+        }, 200);
     }
 }

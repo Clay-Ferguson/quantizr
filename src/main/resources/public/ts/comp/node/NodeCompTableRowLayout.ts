@@ -72,9 +72,9 @@ export class NodeCompTableRowLayout extends Div {
                     const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, false);
                     inVerticalSpace = false;
                     comps.push(row);
+                    rowCount++;
                 }
 
-                rowCount++;
                 // if we have any children on the node they will always have been loaded to be displayed so display them
                 // This is the linline children
                 if (n.children) {
@@ -134,6 +134,12 @@ export class NodeCompTableRowLayout extends Div {
                 }
             }
         }
+
+        if (rowCount == 0 && S.props.isMine(ast.node)) {
+            children.push(S.render.newUserAccountTips());
+            S.edit.helpNewUserEdit();
+        }
+
         this.setChildren(children);
         return true;
     }

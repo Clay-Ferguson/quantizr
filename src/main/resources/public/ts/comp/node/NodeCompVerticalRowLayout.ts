@@ -67,12 +67,12 @@ export class NodeCompVerticalRowLayout extends Div {
 
                         if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
                             row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
+                            rowCount++;
                             comps.push(row);
                         }
                         inVerticalSpace = false;
                     }
 
-                    rowCount++;
                     // if we have any children on the node they will always have been loaded to be displayed so display them
                     // This is the linline children
                     if (n.children) {
@@ -137,6 +137,11 @@ export class NodeCompVerticalRowLayout extends Div {
                     }
                 }
             }
+        }
+
+        if (rowCount == 0 && S.props.isMine(ast.node)) {
+            comps.push(S.render.newUserAccountTips());
+            S.edit.helpNewUserEdit();
         }
 
         this.setChildren(comps);

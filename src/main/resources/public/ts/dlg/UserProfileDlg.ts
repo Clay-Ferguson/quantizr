@@ -229,11 +229,11 @@ export class UserProfileDlg extends DialogBase {
                     state.userProfile.actorUrl || state.userProfile.actorId ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
                     }) : null,
-                    !this.readOnly ? new Button("Logout", S.user.logout) : null,
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Settings", () => {
                         this.close();
                         S.nav.showUserSettings();
                     }),
+                    !this.readOnly ? new Button("Logout", S.user.logout) : null,
                     new Button(this.readOnly ? "Close" : "Cancel", this.close)
                 ], "marginTop")
             ])
