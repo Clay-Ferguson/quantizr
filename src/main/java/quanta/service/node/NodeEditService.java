@@ -147,6 +147,7 @@ public class NodeEditService extends ServiceBase {
         if (parentNode == null) {
             throw new RuntimeException("unable to locate parent for insert");
         }
+
         auth.authForChildNodeCreate(ms, parentNode);
         parentNode.adminUpdate = true;
         // note: redundant security

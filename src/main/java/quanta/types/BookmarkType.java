@@ -1,5 +1,6 @@
 package quanta.types;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -25,8 +26,8 @@ public class BookmarkType extends TypeBase {
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null, null)
             );
         }
-        if (!linkBookmark && nodeToBookmark != null) {
-            req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 100));
+        if (!linkBookmark && nodeToBookmark != null && StringUtils.isEmpty(req.getContent())) {
+            req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 50));
         }
     }
 }

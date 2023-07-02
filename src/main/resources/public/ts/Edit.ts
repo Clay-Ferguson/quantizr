@@ -1146,8 +1146,8 @@ export class Edit {
         }
     }
 
-    addBookmark = (node: J.NodeInfo) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null);
+    addBookmark = (node: J.NodeInfo, content: string = null) => {
+        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, content);
     }
 
     addLinkBookmark = async (content: any, audioUrl: string) => {

@@ -215,7 +215,16 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: "fa fa-bookmark fa-lg rowHeaderIcon",
                     title: "Bookmark this Node",
-                    onClick: () => S.edit.addBookmark(this.node)
+                    onClick: () => {
+                        const id = NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
+                        const elm = document.getElementById(id);
+                        let content = elm?.textContent;
+                        if (content && content.length > 50) {
+                            content = content.substring(0, 50) + "...";
+                        }
+
+                        S.edit.addBookmark(this.node, content);
+                    }
                 }));
             }
 
@@ -261,7 +270,7 @@ export class NodeCompRowHeader extends Div {
                             const id = NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
                             // console.log("Speaking DOM ID: " + id);
                             const elm = document.getElementById(id);
-                            if (elm) {
+                            if (elm && elm.textContent) {
                                 S.speech.speakText(elm.textContent, false);
                             }
                         }
