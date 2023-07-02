@@ -226,7 +226,7 @@ body {
 
 // WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
 .headingBar {
-    padding-top: 4px;
+    padding-top: 8px;
     margin-bottom: 8px;
     border-bottom: 8px solid $nodeBorderBottomColor;
     background-color: $body-bg;

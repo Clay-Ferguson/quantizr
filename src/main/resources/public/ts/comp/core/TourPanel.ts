@@ -60,8 +60,8 @@ export class TourPanel extends Div {
         ], "float-end"));
 
 
-        if (ast.isAdminUser && tour.expectsLogin) {
-            children.push(new Div("WARNING: This tour expects you to be logged in, for all steps to work.", { className: "alert alert-info" }));
+        if (ast.isAnonUser && tour.expectsLogin) {
+            children.push(new Div("WARNING: This tour requires you to be logged in, for all steps to work."));
         }
 
         this.setChildren(children);

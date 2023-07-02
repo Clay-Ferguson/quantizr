@@ -135,7 +135,7 @@ export class NodeCompTableRowLayout extends Div {
             }
         }
 
-        if (rowCount == 0 && S.props.isMine(ast.node)) {
+        if (rowCount == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
             children.push(S.render.newUserAccountTips());
             S.edit.helpNewUserEdit();
         }

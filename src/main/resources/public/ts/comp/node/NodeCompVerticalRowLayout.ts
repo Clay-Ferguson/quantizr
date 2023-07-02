@@ -139,7 +139,7 @@ export class NodeCompVerticalRowLayout extends Div {
             }
         }
 
-        if (rowCount == 0 && S.props.isMine(ast.node)) {
+        if (rowCount == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
             comps.push(S.render.newUserAccountTips());
             S.edit.helpNewUserEdit();
         }
