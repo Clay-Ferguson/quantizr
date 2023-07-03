@@ -175,7 +175,7 @@ public class NodeEditService extends ServiceBase {
 
         // NOTE: Be sure to get nodeId off 'req' here, instead of the var
         if (req.isReply() && req.getNodeId() != null) {
-            newNode.set(NodeProp.INREPLYTO, prop.getProtocolHostAndPort() + "?id=" + req.getNodeId());
+            newNode.set(NodeProp.INREPLYTO, req.getNodeId());
         }
 
         if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
@@ -575,6 +575,7 @@ public class NodeEditService extends ServiceBase {
         node.setTags(nodeInfo.getTags());
         node.touch();
         node.setType(nodeInfo.getType());
+
         /*
          * if node name is empty or not valid (canot have ":" in the name) set it to null quietly
          */
@@ -603,6 +604,7 @@ public class NodeEditService extends ServiceBase {
             }
             node.setName(nodeInfo.getName().trim());
         }
+
         String sig = null;
         if (nodeInfo.getProperties() != null) {
             for (PropertyInfo property : nodeInfo.getProperties()) {
