@@ -56,7 +56,7 @@ export class TourPanel extends Div {
                 dispatch("PrevTourStep", s => {
                     s.tour = null;
                 })
-            }) : null
+            }, null, "btn-primary") : null
         ], "float-end"));
 
 
