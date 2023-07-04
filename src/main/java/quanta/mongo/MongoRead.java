@@ -795,7 +795,8 @@ public class MongoRead extends ServiceBase {
             return Collections.<SubNode>emptyList();
         }
         auth.auth(ms, node, PrivilegeType.READ);
-        List<CriteriaDefinition> criterias = new LinkedList<>();
+        List<Criteria> ands = new LinkedList<>();
+        TextCriteria textCriteria = null;
         Sort sort = null;
         /*
          * This regex finds all that START WITH path, have some characters after path, before the end of the
@@ -809,7 +810,7 @@ public class MongoRead extends ServiceBase {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         }
 
-        criterias.add(crit);
+        ands.add(crit);
 
         if (!StringUtils.isEmpty(text)) {
             if (fuzzy) {
@@ -817,17 +818,17 @@ public class MongoRead extends ServiceBase {
                     prop = SubNode.CONTENT;
                 }
                 if (caseSensitive) {
-                    criterias.add(Criteria.where(prop).regex(text));
+                    ands.add(Criteria.where(prop).regex(text));
                 } else {
                     // i==insensitive (case)
-                    criterias.add(Criteria.where(prop).regex(text, "i"));
+                    ands.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
                 // todo-1: take another look at these to see if any can be useful for more powerful searching.
                 // .matchingAny("search term1", "search term2")
                 // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")
-                TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+                textCriteria = TextCriteria.forDefaultLanguage();
                 /*
                  * If searching for a pure tag name or a username (no spaces in search string), be smart enough to
                  * enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up finding
@@ -846,15 +847,14 @@ public class MongoRead extends ServiceBase {
                  */
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
-                criterias.add(textCriteria);
             }
         }
 
         if (requirePriority) {
-            criterias.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
+            ands.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
         }
         if (requireAttachment) {
-            criterias.add(Criteria.where(SubNode.ATTACHMENTS).ne(null));
+            ands.add(Criteria.where(SubNode.ATTACHMENTS).ne(null));
         }
 
         if (!StringUtils.isEmpty(sortField)) {
@@ -870,13 +870,13 @@ public class MongoRead extends ServiceBase {
                     // because we want to show the soonest items on top, for "future" query, we have
                     // to sort in order (not rev-chron)
                     sortDir = "ASC";
-                    criterias.add(Criteria.where(sortField).gt(new Date().getTime()));
+                    ands.add(Criteria.where(sortField).gt(new Date().getTime()));
                 } //
                 else if ("pastOnly".equals(timeRangeType)) { //
-                    criterias.add(Criteria.where(sortField).lt(new Date().getTime()));
+                    ands.add(Criteria.where(sortField).lt(new Date().getTime()));
                 } //
                 else if ("all".equals(timeRangeType)) { // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
-                    criterias.add(Criteria.where(sortField).ne(null));
+                    ands.add(Criteria.where(sortField).ne(null));
                 }
             }
             if (!StringUtils.isEmpty(sortField)) {
@@ -899,30 +899,20 @@ public class MongoRead extends ServiceBase {
          * is to calculate contentLength on the fly so we can sort on it.
          */
         if ("contentLength".equals(sortField)) {
-            // todo-0: fix this Criteria v.s. CriteriaDefinition
-            // if (!ms.isAdmin()) {
-            //     crit = auth.addReadSecurity(ms, criterias);
-            // }
             List<AggregationOperation> aggOps = new LinkedList<>();
             /*
              * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
              * process it first here
              */
-            for (CriteriaDefinition c : criterias) {
-                if (c instanceof TextCriteria) {
-                    aggOps.add(Aggregation.match(c));
-                }
+            if (textCriteria != null) {
+                aggOps.add(Aggregation.match(textCriteria));
             }
-            /* Next we process all non-TextCriteria conditions */
-            for (CriteriaDefinition c : criterias) {
-                if (!(c instanceof TextCriteria)) {
-                    aggOps.add(Aggregation.match(c));
-                }
-            }
+
+            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+            aggOps.add(Aggregation.match(c));
+
             // calculate contentLength
-            aggOps.add( //
-                Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)").as("contentLength")
-            );
+            aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)").as("contentLength"));
             /*
              * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
              * with aggregates we doing a step by step pipeline of processing so we need records in the correct
@@ -936,13 +926,8 @@ public class MongoRead extends ServiceBase {
             return results.getMappedResults();
         } else { // Otherwise a standard Query.
             Query q = new Query();
-
-            for (CriteriaDefinition c : criterias) {
-                q.addCriteria(c);
-            }
-
-            Criteria crit2 = auth.addReadSecurity(ms, new Criteria());
-            q.addCriteria(crit2);
+            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+            q.addCriteria(c);
 
             if (sort != null) {
                 q.with(sort);
