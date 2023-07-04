@@ -135,7 +135,8 @@ export class NodeCompRowHeader extends Div {
                         // reply to a DM with another DM, else make it a COMMENT type.
                         const replyType = this.node.type === NodeType.NOSTR_ENC_DM ? NodeType.NOSTR_ENC_DM : NodeType.COMMENT;
 
-                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, replyType, true, null, null, this.node.id, null, true);
+                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, replyType,
+                            true, null, null, this.node.id, null, true, false);
                     }
                 }
             }));
@@ -152,7 +153,8 @@ export class NodeCompRowHeader extends Div {
                             S.util.showMessage("Login to boost nodes.", "Login!");
                         }
                         else {
-                            S.edit.addNode(null, null, NodeType.COMMENT, false, null, null, null, this.node.id, false)
+                            S.edit.addNode(null, null, NodeType.COMMENT, false, null, null,
+                                null, this.node.id, false, false)
                         }
                     }
                 }));

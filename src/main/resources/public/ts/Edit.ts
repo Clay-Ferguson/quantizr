@@ -249,7 +249,8 @@ export class Edit {
                     boostTarget: null,
                     fediSend: false,
                     boosterUserId: null,
-                    reply: false
+                    reply: false,
+                    directMessage: false
                 });
                 if (blob) {
                     this.createSubNodeResponse(res, false, null);
@@ -285,7 +286,8 @@ export class Edit {
                     boostTarget: null,
                     fediSend: false,
                     boosterUserId: null,
-                    reply: false
+                    reply: false,
+                    directMessage: false
                 });
                 this.createSubNodeResponse(res, false, null);
             }
@@ -1097,7 +1099,8 @@ export class Edit {
             boostTarget: null,
             fediSend: false,
             boosterUserId: null,
-            reply: false
+            reply: false,
+            directMessage: false
         });
 
         if (blob) {
@@ -1165,7 +1168,8 @@ export class Edit {
             boostTarget: null,
             fediSend: false,
             boosterUserId: null,
-            reply: false
+            reply: false,
+            directMessage: false
         });
         this.createSubNodeResponse(res, true, null);
     }
@@ -1195,7 +1199,7 @@ export class Edit {
     // node will NOT default to public (currently it's public)
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
-        boostTarget: string, fediSend: boolean) => {
+        boostTarget: string, fediSend: boolean, directMessage: boolean) => {
 
         // auto-enable edit mode
         if (!boostTarget && !getAs().userPrefs.editMode) {
@@ -1217,7 +1221,8 @@ export class Edit {
             boostTarget,
             fediSend,
             boosterUserId,
-            reply
+            reply,
+            directMessage
         });
 
         if (!boostTarget) {
@@ -1254,7 +1259,8 @@ export class Edit {
             boostTarget: null,
             fediSend: false,
             boosterUserId: null,
-            reply: false
+            reply: false,
+            directMessage: false
         });
 
         // auto-enable edit mode
@@ -1283,7 +1289,8 @@ export class Edit {
             boostTarget: null,
             fediSend: false,
             boosterUserId: null,
-            reply: false
+            reply: false,
+            directMessage: false
         });
         this.createSubNodeResponse(res, false, null);
     }

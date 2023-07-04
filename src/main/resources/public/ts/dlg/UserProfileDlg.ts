@@ -407,7 +407,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false);
+            S.edit.addNode(null, null, NodeType.COMMENT, false, null, this.userNodeId, null, null, false, true);
         }, 10);
     }
 
@@ -415,7 +415,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, NodeType.NOSTR_ENC_DM, false, null, this.userNodeId, null, null, false);
+            S.edit.addNode(null, null, NodeType.NOSTR_ENC_DM, false, null, this.userNodeId, null, null, false, false);
         }, 10);
     }
 

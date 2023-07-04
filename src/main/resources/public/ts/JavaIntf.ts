@@ -264,6 +264,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     fediSend: boolean;
     payloadType?: string;
     reply: boolean;
+    directMessage: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {

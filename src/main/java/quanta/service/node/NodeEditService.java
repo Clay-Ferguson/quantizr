@@ -222,9 +222,12 @@ public class NodeEditService extends ServiceBase {
 
             /* Always make public if we're replying to public node or posting under our POSTs node */
             if (
-                makePublicWritable ||
-                (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
-                parentNode.isType(NodeType.POSTS)
+                !req.isDirectMessage() &&
+                (
+                    makePublicWritable ||
+                    (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
+                    parentNode.isType(NodeType.POSTS)
+                )
             ) {
                 acl.addPrivilege(
                     ms,
@@ -237,6 +240,7 @@ public class NodeEditService extends ServiceBase {
                 );
             }
         }
+
         if (nostr.isNostrNode(nodeBeingRepliedTo)) {
             ArrayList<ArrayList<String>> tags = new ArrayList<>();
             ArrayList<String> element = new ArrayList<String>();
@@ -247,8 +251,7 @@ public class NodeEditService extends ServiceBase {
             tags.add(element);
             newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
             // if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user
-            // tries
-            // to remove the public setting from and then save it, the system will reject that and tell the user
+            // tries to remove the public setting from and then save it, the system will reject that and tell the user
             // that only DMs are able to be private in Nostr.
             if (!newNode.getType().equals(NodeType.NOSTR_ENC_DM.s())) {
                 acl.addPrivilege(

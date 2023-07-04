@@ -89,7 +89,7 @@ export class FriendsDlg extends DialogBase {
         if (state.loading) {
             message = "Loading...";
         }
-        else if (state.friends?.length > 0) {
+        else if (!state.friends || state.friends.length === 0) {
             if (!this.nodeId) {
                 message = "Once you add some friends you can pick from a list here.";
             }
